@@ -10,7 +10,7 @@ If your are interested in helping to improve [atomes][atomes] you are welcome to
 
 To get started with [atomes][atomes] development, give a look to the code source documentation: 
 
-[https://slookeur.github.io/Atomes-doxygen/index.html](https://slookeur.github.io/Atomes-doxygen/index.html)
+[https://slookeur.github.io/atomes-doxygen/index.html](https://slookeur.github.io/atomes-doxygen/index.html)
 
 Please consider that: 
 
@@ -29,6 +29,6 @@ There are many possible task:
 
 ## Bug tracking: 
 
-  - Bugs should be filled on the GitHub issue tracker: [issue](https://github.com/Slookeur/Atomes-GNU/issues)
+  - Bugs should be filled on the GitHub issue tracker: [issue](https://github.com/Slookeur/atomes-GNU/issues)
 
 [atomes]:https://atomes.ipcms.fr/

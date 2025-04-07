@@ -11,7 +11,7 @@ This page provides the documentation of the code source of the atomes software.
 It includes links to the relevant parts of the code. 
 
 This document is intended for developers who want to work on atomes. Users of atomes are referred to the
-[User Manual](https://slookeur.github.io/Atomes-doc/).
+[User Manual](https://slookeur.github.io/atomes-doc/).
 
 The generic starting point of the application is the main() function.
 
@@ -26,7 +26,7 @@ Documentation topics TODO
 About
 ===========
 
-***Atomes*** is developed by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
+***atomes*** is developed by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
 
 <p align="center">
   <a href="https://www.cnrs.fr/"><img width="100" src="https://www.cnrs.fr/themes/custom/cnrs/logo.svg" alt="CNRS logo" align="center"></a>
