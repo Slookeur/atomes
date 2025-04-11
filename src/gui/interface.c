@@ -844,8 +844,8 @@ void lattice_info_ (int * bid, double * volume, double * density,
   active_cell -> box[* bid].dens = * density;
   if ((active_cell -> npt && * bid == active_project -> steps-1) || ! active_cell -> npt)
   {
-    active_project -> max[GR] = fdmax_ (& active_cell -> ltype);
-    active_project -> min[SQ] = active_project -> min[SK] = fkmin_ (& active_cell -> ltype);
+    active_project -> max[GR] = fdmax_ (& active_cell -> pbc);
+    active_project -> min[SQ] = active_project -> min[SK] = fkmin_ (& active_cell -> pbc);
     int i, j;
     active_cell -> volume = active_cell -> density = 0.0;
     i = (active_cell -> npt) ? active_project -> steps : 1;
