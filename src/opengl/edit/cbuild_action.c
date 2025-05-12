@@ -859,12 +859,13 @@ gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_c
               m ++;
             }
           }
-#ifdef DEBUG
           sort (num_to_save, site_pos);
+#ifdef DEBUG
           for (m=0; m<num_to_save; m++)
           {
             g_debug ("\t\tm= %d, site_pos[%d]= %d", m+1, m+1, site_pos[m]);
           }
+
 #endif
           for (m=0; m<num_to_save; m++)
           {
