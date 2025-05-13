@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId=4DA2F2FC-AD2D-414A-8197-0DD52F1593D2
 AppName=atomes
-AppVerName=atomes 1.1.17
+AppVerName=atomes 1.1.18
 AppPublisher=CNRS
 AppPublisherURL=https://atomes.ipcms.fr/
 AppSupportURL=https://atomes.ipcms.fr/
@@ -39,6 +39,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 function InitializeSetup(): Boolean;
 begin
   Result := TRUE;
+  if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\IPCMS\ATOMES\1.1.18', 'Version') then begin
+    MsgBox('An older version of atomes has been detected on your computer:' #14#14 'We recommand to uninstall this previous version before installing any other', mbConfirmation, MB_OK);
+    Result := FALSE;
+  end;
   if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\IPCMS\ATOMES\1.1.17', 'Version') then begin
     MsgBox('An older version of atomes has been detected on your computer:' #14#14 'We recommand to uninstall this previous version before installing any other', mbConfirmation, MB_OK);
     Result := FALSE;
@@ -115,15 +119,15 @@ end;
 
 [Registry]
 Root: HKLM; Subkey: "Software\IPCMS\ATOMES"; Flags: uninsdeletekeyifempty
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.17"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Version"; ValueData: "1.1.17"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.18"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Version"; ValueData: "1.1.18"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\IPCMS\ATOMES"; Flags: uninsdeletekeyifempty
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.17"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Version"; ValueData: "1.1.17"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Name"; ValueData: "atomes"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.17"; ValueType: string; ValueName: "Company"; ValueData: "Institut de Physique et Chimie des Matériaux de Strasbourg"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.18"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Version"; ValueData: "1.1.18"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Name"; ValueData: "atomes"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.1.18"; ValueType: string; ValueName: "Company"; ValueData: "Institut de Physique et Chimie des Matériaux de Strasbourg"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\.awf\OpenWithProgids"; ValueType: string; ValueName: "atomesWorkspaceFile.awf"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\atomesWorkspaceFile.awf"; ValueType: string; ValueName: ""; ValueData: "atomes Workspace File"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\atomesWorkspaceFile.awf\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "atomes-workspace.ico"; Flags: uninsdeletekey
