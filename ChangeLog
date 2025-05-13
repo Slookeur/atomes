@@ -1,3 +1,11 @@
+2025-05-15 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+         Release of version 1.1.18
+         * Bug corrections:
+		Crystal building, bug correction if occ < 1.0 'cbuild_action.c'
+		OpenGL drawing of NPT boxes 'ogl_draw.c' and 'd_box.c'
+		Workspace space groupe info 'modelinfo.c'
+		Dmax evaluation 'interface.c'
+
 2025-02-20 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.17
          * Bug corrections:
@@ -152,4 +160,4 @@
 		workspace.c: double click on workspace
 
 2022-08-28 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
-         Initial release of the atomes program v1.1.0
+         Initial release of the Atomes program v1.1.0
