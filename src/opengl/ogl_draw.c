@@ -75,7 +75,7 @@ extern int create_bond_lists (gboolean to_pick);
 extern int create_selection_lists ();
 extern void create_poly_lists ();
 extern void create_ring_lists ();
-extern int create_box_lists ();
+extern int create_box_lists (int b_step);
 extern int create_axis_lists ();
 extern int create_pick_lists ();
 extern int create_label_lists ();
@@ -471,7 +471,8 @@ void draw (glwin * view)
   acolorm = plot -> color_map[0];
   pcolorm = plot -> color_map[1];
   step = plot -> step;
-  box_gl = (cell_gl -> npt) ? & cell_gl -> box[step] : & cell_gl -> box[0];
+  int box_step = (cell_gl -> npt) ? step : 0;
+  box_gl = & cell_gl -> box[box_step];
 
 /* #ifdef DEBUG
   clock_gettime (CLOCK_MONOTONIC, & start_time);
@@ -498,7 +499,7 @@ void draw (glwin * view)
     int i;
     for (i=0; i<NGLOBAL_SHADERS; i++) cleaning_shaders (wingl, i);
   }
-  if (wingl -> create_shaders[MDBOX]) wingl -> n_shaders[MDBOX][0] = create_box_lists ();
+  if (wingl -> create_shaders[MDBOX]) wingl -> n_shaders[MDBOX][box_step] = create_box_lists (box_step);
   if (wingl -> create_shaders[MAXIS]) wingl -> n_shaders[MAXIS][0] = create_axis_lists ();
   if (wingl -> create_shaders[LIGHT]) create_light_lists ();
 

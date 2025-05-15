@@ -34,7 +34,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int create_box_lists ();
+  int create_box_lists (int b_step);
 
   double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t cpos, double paral[3][3], ColRGBA col, double slab_alpha);
 
@@ -283,11 +283,13 @@ void prepare_box_vertices (void (*c_func)(vec3_t, vec3_t, float *, float *), flo
 }
 
 /*!
-  \fn int create_box_lists ()
+  \fn int create_box_lists (int b_step)
 
   \brief prepare box OpenGL rendering
+
+  \param b_step the step number if NPT, 0 otherwise
 */
-int create_box_lists ()
+int create_box_lists (int b_step)
 {
   int vertex = 8;
   object_3d * box_a, * box_b;
@@ -325,7 +327,7 @@ int create_box_lists ()
     box_b -> instances = allocfloat (box_b -> num_instances*CYLI_BUFF_SIZE);
 
   }
-  wingl -> ogl_glsl[MDBOX][0] = g_malloc0 (shaders*sizeof*wingl -> ogl_glsl[MDBOX][0]);
+  wingl -> ogl_glsl[MDBOX][b_step] = g_malloc0 (shaders*sizeof*wingl -> ogl_glsl[MDBOX][b_step]);
 
   nbs = nbl = 0;
   pcol = plot -> box_color;
@@ -340,16 +342,16 @@ int create_box_lists ()
   }
   if (plot -> box_axis[BOX] == WIREFRAME)
   {
-    wingl -> ogl_glsl[MDBOX][0][0] = init_shader_program (MDBOX, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, FALSE, box_b);
-    wingl -> ogl_glsl[MDBOX][0][0] -> line_width = plot -> box_axis_line[BOX];
+    wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, FALSE, box_b);
+    wingl -> ogl_glsl[MDBOX][b_step][0] -> line_width = plot -> box_axis_line[BOX];
   }
   else
   {
     // Sphere at corners
-    wingl -> ogl_glsl[MDBOX][0][0] = init_shader_program (MDBOX, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, box_a);
+    wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, box_a);
     g_free (box_a);
     // Cylinders
-    wingl -> ogl_glsl[MDBOX][0][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, box_b);
+    wingl -> ogl_glsl[MDBOX][b_step][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, box_b);
   }
   g_free (box_b);
 
@@ -504,7 +506,6 @@ vec3_t get_normal (vec3_t v1, vec3_t v2, vec3_t v3)
   vec3_t edge_b = v3_sub(v2, v1);
   return v3_norm (v3_cross(edge_a, edge_b));
 }
-
 
 /*!
   \fn double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t cpos, double paral[3][3], ColRGBA col, double slab_alpha)

@@ -70,11 +70,8 @@ void print_spg_name (gchar * str , GtkTextBuffer * buffer)
       if (sta)
       {
         print_info (sta, "sub_bold", buffer);
-        sta = strtok (NULL, "ysubx");
-        if (sta)
-        {
-          print_info (sta, "bold", buffer);
-        }
+        sta = strtok (NULL, "wsubx");
+        if (sta) print_info (sta, "bold", buffer);
       }
     }
   }
