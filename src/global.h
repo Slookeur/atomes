@@ -506,6 +506,7 @@ struct coord_file
   int * nsps;                              /*!< Number of atoms by species */
   double ** coord;                         /*!< Atomic coordinates */
   gboolean cartesian;                      /*!< Cartesian (1) or Fractional coordinates (0) */
+  gboolean chemical;                       /*!< CIF file describing chemical reaction */
   int * lot;                               /*!< Chemical species by atom */
   int ndummy;                              /*!< Number of dummy atom(s), if any */
   gchar ** dummy;                          /*!< List of dummy atom(s), if any */

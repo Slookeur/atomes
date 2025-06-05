@@ -44,7 +44,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_cell);
 
   void get_origin (space_group * spg);
-  void compute_lattice_properties (cell_info * cell);
+  void compute_lattice_properties (cell_info * cell, int box_id);
   void clean_this_proj (project * this_proj, gboolean newp);
 
   space_group * duplicate_space_group (space_group * spg);
@@ -198,16 +198,17 @@ void get_origin (space_group * spg)
 }
 
 /*!
-  \fn void compute_lattice_properties (cell_info * cell)
+  \fn void compute_lattice_properties (cell_info * cell, int box_id)
 
   \brief compute lattice parameters following cell description
 
   \param cell the target cell description
+  \param box_id the target box description to fill
 */
-void compute_lattice_properties (cell_info * cell)
+void compute_lattice_properties (cell_info * cell, int box_id)
 {
   int i;
-  box_info * box = & cell -> box[0];
+  box_info * box = & cell -> box[box_id];
   double ltemp;
   double angle[3];
   double sangle[3], cangle[3];
@@ -354,7 +355,7 @@ int test_lattice (builder_edition * cbuilder, cell_info * cif_cell)
       show_warning ("Please describe properly the lattice parameters", cbuilder -> win);
       return 0;
     }
-    compute_lattice_properties (cell);
+    compute_lattice_properties (cell, 0);
   }
 
   // Strictly different or possibly different ?
@@ -1337,7 +1338,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
       active_box -> vect[i][j] *= cell -> cextra[i];
     }
   }
-  compute_lattice_properties (active_cell);
+  compute_lattice_properties (active_cell, 0);
   active_cell -> ltype = 1;
   active_cell -> pbc = TRUE;
   int tot_cell = 1;

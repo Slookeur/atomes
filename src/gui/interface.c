@@ -454,6 +454,27 @@ gchar * npt_type[4]={"A\tB\tC\t&#x3B1;\t&#x3B2;\t&#x263;",
 gchar * npt_info[3]={"1 line by step, as many lines as MD steps",
                      "2 lines by step, twice as many lines as MD steps",
                      "3 lines by step, three times as many lines as MD steps"};
+gchar * cif_configurations[4]={"Chemical reaction",
+                               "MD trajectory",
+                               "Single step chemical reaction",
+                               "Single configuration"};
+
+gchar * cif_config_legends={"\t<b>Chemical reaction</b>\n"
+                            "\t\tConsider each configuration as a step in a chemical reaction:\n"
+                            "\t\t\t- Atomic coordinates are sorted based on occupancy\n"
+                            "\t\t\t- Each occupancy describes the proportion of a reactant\n"
+                            "\t\t\t- A super lattice is build to respect these proportions\n"
+                            "\t\t\t- A trajectory is constructed following this process\n\n"
+                            "\t<b>MD trajectory</b>\n"
+                            "\t\tConsider the CIF file a MD trajectory\n\n"
+                            "\t<b>Single step chemical reaction</b>\n"
+                            "\t\tSelect and single configuration then treat as chemical reaction\n\n"
+                            "\t<b>Single configuration </b>\n"
+                            "\t\tSelect a single configuration in the CIF file"};
+gchar * cif_config_leg={"\t<b>MD trajectory</b>\n"
+                        "\t\tConsider the CIF file a MD trajectory\n\n"
+                        "\t<b>Single configuration </b>\n"
+                        "\t\tSelect a single configuration in the CIF file"};
 GtkWidget * answer_info;
 
 /*!
@@ -490,7 +511,7 @@ G_MODULE_EXPORT void run_iask (GtkDialog * iask, gint response_id, gpointer data
   const gchar * riask;
   if (response_id == GTK_RESPONSE_OK)
   {
-    if (i == 0 || i > 3)
+    if (i == 0 || i > 4)
     {
       riask = entry_get_text (GTK_ENTRY(answer));
       res_int = string_to_double ((gpointer)riask);
@@ -541,7 +562,7 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   quest = gtk_label_new (lab);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, quest, TRUE, TRUE, 0);
 
-  if (id == 0 || id > 3)
+  if (id == 0 || id > 5)
   {
     answer = gtk_entry_new ();
     gtk_widget_set_size_request (answer, 100, -1);
@@ -549,13 +570,19 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   }
   else
   {
-    if (id < 3)
+    if (id < 5)
     {
       answer = create_combo ();
       gtk_widget_set_size_request (answer, -1, 40);
       if (id < 0) for (i=0; i<3; i++) combo_text_append (answer, field_init[i]);
       if (id == 1) for (i=0; i<3; i++) combo_text_append (answer, coord_type[i]);
       if (id == 2) for (i=0; i<NCFORMATS; i++) combo_text_append (answer, coord_files[i]);
+      if (id == 3) for (i=0; i<4; i++) combo_text_append (answer, cif_configurations[i]);
+      if (id == 4)
+      {
+        combo_text_append (answer, cif_configurations[1]);
+        combo_text_append (answer, cif_configurations[3]);
+      }
     }
     else
     {
@@ -581,11 +608,20 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, answer, FALSE, FALSE, 10);
   if (id == 3)
   {
-    answer_info = markup_label(npt_info[0], -1, -1, 0.5, 0.5);
+    answer_info = markup_label (cif_config_legends, 450, -1, 0.5, 0.5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
+  }
+  if (id == 4)
+  {
+    answer_info = markup_label (cif_config_leg, 450, -1, 0.5, 0.5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
+  }
+  if (id == 5)
+  {
+    answer_info = markup_label (npt_info[0], -1, -1, 0.5, 0.5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
     g_signal_connect(G_OBJECT(answer), "changed", G_CALLBACK(on_answer_changed), NULL);
   }
-
   run_this_gtk_dialog (iask, G_CALLBACK(run_iask), GINT_TO_POINTER(id));
   return res_int;
 }

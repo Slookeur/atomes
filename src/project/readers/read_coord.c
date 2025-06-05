@@ -255,7 +255,7 @@ int open_coord_file (gchar * filename, int fti)
   res = stat (filename, & status);
   if (res == -1)
   {
-    add_reader_info ("Error - cannot get file statistics !", 0);
+    add_reader_info ("Error - cannot get file statistics !\n", 0);
     return 1;
   }
   int fsize = status.st_size;
@@ -263,7 +263,7 @@ int open_coord_file (gchar * filename, int fti)
   coordf = fopen (filename, dfi[0]);
   if (! coordf)
   {
-    add_reader_info ("Error - cannot open coordinates file !", 0);
+    add_reader_info ("Error - cannot open coordinates file !\n", 0);
     return 1;
   }
   int i, j, k, l;
@@ -437,7 +437,7 @@ int open_coord_file (gchar * filename, int fti)
           active_chem -> chem_prop[CHEM_R][i] = set_radius_ (& j, & k);
           if (! active_chem -> chem_prop[CHEM_R][i])
           {
-            gchar * str = g_strdup_printf ("For species %s, radius is equal to 0.0 !", active_chem -> label[i]);
+            gchar * str = g_strdup_printf ("For species %s, radius is equal to 0.0 !\n", active_chem -> label[i]);
             add_reader_info (str, 1);
             g_free (str);
           }

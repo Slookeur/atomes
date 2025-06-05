@@ -1210,7 +1210,7 @@ G_MODULE_EXPORT void run_read_npt_data (GtkDialog * info, gint response_id, gpoi
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     npt_file = file_chooser_get_file_name (chooser);
-    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 3, MainWindow);
+    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 5, MainWindow);
   }
   else
   {
@@ -1272,7 +1272,7 @@ int open_coordinate_file (int id)
   int result;
   int length = strlen(active_project -> coordfile);
   clock_gettime (CLOCK_MONOTONIC, & sta_time);
-  this_reader = g_malloc0(sizeof*this_reader);
+  this_reader = g_malloc0 (sizeof*this_reader);
   // Set default message type to warning
   this_reader -> mid = 1;
   switch (id)
