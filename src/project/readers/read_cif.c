@@ -745,7 +745,7 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
   int lli = 0;
   int * line_numbers = allocint (this_reader -> steps);
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
-  if (step)
+  if (steps)
   {
     if (steps != this_reader -> steps)
     {
@@ -782,9 +782,7 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b,gb
   gchar * cif_value = NULL;
   int loop_pos[2];
   int * line_numbers = allocint (this_reader -> steps);
-  g_debug ("CIF RETRIEVE:: key_a= %s, key_b= %s, linec= %d, conf= %d", key_a, key_b, linec, conf);
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
-  g_debug ("CIF_RETRIEVE:: steps= %d", steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
@@ -809,7 +807,6 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b,gb
       loop_pos[0] = line_numbers[conf];
       loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : line_numbers[conf + 1];
     }
-    g_debug ("CIF RETRIEVE:: loop_pos[0]= %d, loop_pos[1]= %d, all_ligne= %d", loop_pos[0], loop_pos[1], all_ligne);
     g_free (line_numbers);
     if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, FALSE, FALSE, FALSE, NULL))
     {
@@ -819,7 +816,6 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b,gb
       g_free (str);
       return NULL;
     }
-    g_debug ("CIF RETRIEVE:: cif_value= %s", cif_value);
     return cif_value;
   }
   else
@@ -1162,12 +1158,12 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
 #endif
   if (! this_reader -> natomes) return FALSE;
 
-  if (conf && this_reader -> natomes != active_project -> natomes)
+  if (conf && active_project -> steps > 1 && this_reader -> natomes != active_project -> natomes)
   {
     // Not the same number of atoms between each configuration
     str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) is not the same for each configuration !\n"
-                           "  - configuration %d, atoms= %d\n"
-                           "  - initialization, atoms= %d\n", conf, this_reader -> natomes, active_project -> natomes);
+                           "  - configuration N°%d\t :: atoms= %d\n"
+                           "  - initialization      \t\t :: atoms= %d\n", conf, this_reader -> natomes, active_project -> natomes);
     add_reader_info (str, 0);
     g_free (str);
     return FALSE;
@@ -1301,9 +1297,14 @@ int cif_file_get_number_of_positions (int lid)
           }
         }
       }
+      else
+      {
+        this_line = g_strdup_printf ("%s", sym_pos_line);
+      }
       g_free (k_word);
       g_free (str);
       g_free (sym_pos_line);
+      this_line = substitute_string (this_line, " ", NULL);
       this_line = substitute_string (this_line, "'", NULL);
       this_line = substitute_string (this_line, ",", " ");
       this_word = strtok (this_line, " ");
@@ -1312,6 +1313,9 @@ int cif_file_get_number_of_positions (int lid)
          this_reader -> sym_pos[j][k] = g_strdup_printf ("%s", this_word);
          this_word = strtok (NULL, " ");
       }
+#ifdef DEBUG
+      g_debug ("SYM_POS:: pos= %d, x= %s, y= %s, z= %s", j+1, this_reader -> sym_pos[j][0], this_reader -> sym_pos[j][1], this_reader -> sym_pos[j][2]);
+#endif // DEBUG
     }
   }
   return i;
@@ -1629,7 +1633,11 @@ gboolean cif_get_cell_data (int linec, int conf)
       g_free (str);
       return FALSE;
     }
-    this_reader -> lattice.box[i].param[i][j] = string_to_double ((gpointer)str);
+    this_reader -> lattice.box[i].param[0][j] = string_to_double ((gpointer)str);
+    if (i)
+    {
+      if (this_reader -> lattice.box[i].param[0][j] != this_reader -> lattice.box[i-1].param[0][j]) active_cell -> npt = TRUE;
+    }
 #ifdef DEBUG
     g_debug ("CIF:: box[%d][%d]= %f", i, j, this_reader -> lattice.box[i].param[0][j]);
 #endif
@@ -1643,6 +1651,10 @@ gboolean cif_get_cell_data (int linec, int conf)
       return FALSE;
     }
     this_reader -> lattice.box[i].param[1][j] = string_to_double ((gpointer)str);
+    if (i)
+    {
+      if (this_reader -> lattice.box[i].param[1][j] != this_reader -> lattice.box[i-1].param[1][j]) active_cell -> npt = TRUE;
+    }
 #ifdef DEBUG
     g_debug ("CIF:: box[%d][%d]= %f", i, j, this_reader -> lattice.box[i].param[1][j]);
 #endif
@@ -1842,7 +1854,7 @@ int cif_get_space_group (int linec, int conf)
     {
       // Trigonal space group
       gboolean correct_this = FALSE;
-      box_info * box = & this_reader -> lattice.box[0];
+      box_info * box = (conf && active_project -> steps == 1) ? & this_reader -> lattice.box[0] : & this_reader -> lattice.box[conf];
       switch (this_reader -> setting)
       {
         case 0:
@@ -1905,6 +1917,7 @@ int open_cif_configuration (int linec, int conf)
 {
   int res;
   int i, j, k, l, m, n;
+  int cid;
   if (cif_get_cell_data (linec, conf))
   {
     i = cif_get_space_group (linec, conf);
@@ -1952,6 +1965,7 @@ int open_cif_configuration (int linec, int conf)
   }
   if (cif_get_atomic_coordinates (linec, conf))
   {
+    cid = (conf && active_project -> steps == 1) ? 0 : conf;
     if (! this_reader -> cartesian)
     {
       for (i=0; i<3; i++)
@@ -1960,9 +1974,9 @@ int open_cif_configuration (int linec, int conf)
         {
           if (i < 2)
           {
-            active_box -> param[i][j] = this_reader -> lattice.box[0].param[i][j];
+            active_cell -> box[cid].param[i][j] = this_reader -> lattice.box[cid].param[i][j];
           }
-          active_box -> vect[i][j] = this_reader -> lattice.box[0].vect[i][j];
+          active_cell -> box[cid].vect[i][j] = this_reader -> lattice.box[cid].vect[i][j];
         }
       }
       active_cell -> ltype = 1;
@@ -1978,7 +1992,7 @@ int open_cif_configuration (int linec, int conf)
     if (cif_use_symmetry_positions)
     {
       this_reader -> cartesian = TRUE;
-      compute_lattice_properties (active_cell, (conf && active_project -> steps == 1) ? 0 : conf);
+      compute_lattice_properties (active_cell, cid);
       double spgpos[3][4];
       int max_pos = this_reader -> num_sym_pos * this_reader -> natomes;
       gboolean dist_message = FALSE;
@@ -2072,7 +2086,6 @@ int open_cif_configuration (int linec, int conf)
           break;
         }
       }
-      // Just before
       int * all_id = allocint (num_pos);
       l = m = 0;
       for (i=0; i<this_reader -> num_sym_pos; i++)
@@ -2103,7 +2116,7 @@ int open_cif_configuration (int linec, int conf)
         {
           f_pos = vec3 (cryst_pos[j][0], cryst_pos[j][1], cryst_pos[j][2]);
           f_pos = m4_mul_coord (pos_mat, f_pos);
-          c_pos = m4_mul_coord (this_reader -> lattice.box[0].frac_to_cart, f_pos);
+          c_pos = m4_mul_coord (this_reader -> lattice.box[cid].frac_to_cart, f_pos);
           all_pos[l].x = c_pos.x;
           all_pos[l].y = c_pos.y;
           all_pos[l].z = c_pos.z;
@@ -2140,6 +2153,7 @@ int open_cif_configuration (int linec, int conf)
       int ** site_lot = g_malloc0 (num_pos*sizeof*site_lot);
       clock_t CPU_time;
       int tot_pos = 0;
+      // In the following need to compare this with cbuild_action : occupancy
       for (i=0; i<num_pos; i++)
       {
         taken_pos[i] = allocbool(all_id[i]);
@@ -2210,8 +2224,11 @@ int open_cif_configuration (int linec, int conf)
       {
         i += cryst -> at_by_object[j] * cryst -> pos_by_object[j];
       }
-      active_project -> natomes = i;
-      allocatoms (active_project);
+      if (! conf || active_project -> step == 1)
+      {
+        active_project -> natomes = i;
+        allocatoms (active_project);
+      }
       atomic_object * c_obj;
       int * spec_num = allocint (120);
       i = 0;
@@ -2226,10 +2243,10 @@ int open_cif_configuration (int linec, int conf)
             m = c_obj -> at_list[l].sp;
             n = c_obj -> old_z[m];
             spec_num[n] ++;
-            active_project -> atoms[0][i].sp = n;
-            active_project -> atoms[0][i].x = cryst -> coord[j][0].x + c_obj -> at_list[l].x;
-            active_project -> atoms[0][i].y = cryst -> coord[j][0].y + c_obj -> at_list[l].y;
-            active_project -> atoms[0][i].z = cryst -> coord[j][0].z + c_obj -> at_list[l].z;
+            active_project -> atoms[cid][i].sp = n;
+            active_project -> atoms[cid][i].x = cryst -> coord[j][0].x + c_obj -> at_list[l].x;
+            active_project -> atoms[cid][i].y = cryst -> coord[j][0].y + c_obj -> at_list[l].y;
+            active_project -> atoms[cid][i].z = cryst -> coord[j][0].z + c_obj -> at_list[l].z;
             i ++;
           }
         }
@@ -2237,10 +2254,10 @@ int open_cif_configuration (int linec, int conf)
         {
           k = (int)this_reader -> z[cryst_lot[j]];
           spec_num[k] ++;
-          active_project -> atoms[0][i].sp = k;
-          active_project -> atoms[0][i].x = cryst -> coord[j][0].x;
-          active_project -> atoms[0][i].y = cryst -> coord[j][0].y;
-          active_project -> atoms[0][i].z = cryst -> coord[j][0].z;
+          active_project -> atoms[cid][i].sp = k;
+          active_project -> atoms[cid][i].x = cryst -> coord[j][0].x;
+          active_project -> atoms[cid][i].y = cryst -> coord[j][0].y;
+          active_project -> atoms[cid][i].z = cryst -> coord[j][0].z;
           i ++;
         }
       }
@@ -2274,9 +2291,9 @@ int open_cif_configuration (int linec, int conf)
       }
       for (i=0; i<active_project -> natomes; i++)
       {
-        j = active_project -> atoms[0][i].sp;
+        j = active_project -> atoms[cid][i].sp;
         k = tmp_spid[j];
-        active_project -> atoms[0][i].sp = k;
+        active_project -> atoms[cid][i].sp = k;
       }
       g_free (tmp_spid);
       if (low_occ)
@@ -2381,6 +2398,8 @@ int open_cif_file (int linec)
   else
   {
     active_project -> steps = this_reader -> steps;
+    g_free (active_cell -> box);
+    active_cell -> box = g_malloc0(this_reader -> steps*sizeof*active_cell -> box);
     // For each configuration open it:
     i = 0;
     for (j=0; j<active_project -> steps; j++)
@@ -2389,6 +2408,7 @@ int open_cif_file (int linec)
       if (i) return i;
     }
     // Now what ?
+
     return 0;
   }
 }

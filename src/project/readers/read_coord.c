@@ -369,6 +369,9 @@ int open_coord_file (gchar * filename, int fti)
         // get_origin (this_reader -> lattice.sp_group);
         if (! cif_use_symmetry_positions)
         {
+          // Test for all configurations, do build each:
+          //  - a single trajectory ?
+          //  - each in a single project ?
           i = build_crystal (FALSE, active_project, TRUE, FALSE, & this_reader -> lattice, MainWindow);
           if (! i)
           {
