@@ -388,7 +388,7 @@ void sort (int dim, int * tab)
       if (tab[j] <= val) break;
       tab[j+1] = tab[j];
     }
-    tab[j+1]=val;
+    tab[j+1] = val;
   }
 }
 

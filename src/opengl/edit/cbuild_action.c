@@ -775,7 +775,10 @@ gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_c
 #endif
         if (cryst -> sites[k][0] > -1)
         {
-          num_to_save = round (pos_bs*cryst -> occupancy[k]);
+          // Warning for occupancy closest integer value to:
+          //   - (int) ?
+          //   - nearbyint : closest integer value ?
+          num_to_save = nearbyint (pos_bs*cryst -> occupancy[k]);
           l += num_to_save;
 #ifdef DEBUG
           g_debug ("\tnum_to_save= %d, l= %d", num_to_save, l);

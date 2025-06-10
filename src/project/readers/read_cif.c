@@ -94,6 +94,7 @@ FILE * cifp;
 char * line_ptr;
 int * keylines = NULL;
 int saved_group;
+int cif_atoms;
 gboolean cif_chemical = FALSE;
 gchar ** cif_strings = NULL;
 
@@ -1158,12 +1159,12 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
 #endif
   if (! this_reader -> natomes) return FALSE;
 
-  if (conf && active_project -> steps > 1 && this_reader -> natomes != active_project -> natomes)
+  if (conf && active_project -> steps > 1 && this_reader -> natomes != cif_atoms)
   {
     // Not the same number of atoms between each configuration
     str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) is not the same for each configuration !\n"
                            "  - configuration N°%d\t :: atoms= %d\n"
-                           "  - initialization      \t\t :: atoms= %d\n", conf, this_reader -> natomes, active_project -> natomes);
+                           "  - initialization      \t\t :: atoms= %d\n", conf, this_reader -> natomes, cif_atoms);
     add_reader_info (str, 0);
     g_free (str);
     return FALSE;
@@ -1989,8 +1990,14 @@ int open_cif_configuration (int linec, int conf)
       }
     }
     res = 0;
+    cif_atoms = this_reader -> natomes;
     if (cif_use_symmetry_positions)
     {
+      add_reader_info ("<b>Bulding crystal using symmetry positions: </b> \n"
+                       "  1) evaluate candidate atomic positions using data in CIF file: \n"
+                       "     - symmetry positions\n"
+                       "     - atomic coordonates + occupancy\n"
+                       "  2) fill each candidate position using the associated occupancy\n", 1);
       this_reader -> cartesian = TRUE;
       compute_lattice_properties (active_cell, cid);
       double spgpos[3][4];
@@ -2010,22 +2017,48 @@ int open_cif_configuration (int linec, int conf)
       double ** cryst_pos = allocddouble (this_reader -> natomes, 3);
       double ** occ_pos = g_malloc0(sizeof*occ_pos);
       int ** lot_pos = g_malloc0(sizeof*lot_pos);
+
+      double * list_occ = allocdouble (this_reader -> natomes);
+      double val;
+      int vbl;
+      int * list_pos = allocint (this_reader -> natomes);
+      for (i=0; i<this_reader -> natomes; i++)
+      {
+        list_pos[i] = i;
+        list_occ[i] = this_reader -> occupancy[i];
+      }
+      for (i=1; i<this_reader -> natomes; i++)
+      {
+        val = list_occ[i];
+        vbl = list_pos[i];
+        for (j=i-1; j>-1; j--)
+        {
+          if (list_occ[j] >= val) break;
+          list_occ[j+1] = list_occ[j];
+          list_pos[j+1] = list_pos[j];
+        }
+        list_occ[j+1] = val;
+        list_pos[j+1] = vbl;
+      }
       int num_pos = 0;
       int pos_max = 0;
-
+      // The following might be modified for reaction CIF:
+      //  - this_reader -> coord[i] and this_readaer -> coord[j] are not necessarly equal
+      //  - both the disorder group and the occupancy matters in place of the coordinates
       for (i=0; i<2; i++)
       {
         for (j=0; j<this_reader -> natomes; j++)
         {
+          k = list_pos[j];
           if (! j)
           {
             num_pos = 0;
-            for (k=0; k<3; k++) cryst_pos[num_pos][k] = this_reader -> coord[j][k];
+            for (l=0; l<3; l++) cryst_pos[num_pos][l] = this_reader -> coord[k][l];
             cif_pos[num_pos] = 1;
             if (i)
             {
-              occ_pos[num_pos][0] = this_reader -> occupancy[j];
-              lot_pos[num_pos][0] = this_reader -> lot[j];
+              occ_pos[num_pos][0] = this_reader -> occupancy[k];
+              lot_pos[num_pos][0] = this_reader -> lot[k];
             }
             num_pos ++;
             pos_max = 1;
@@ -2033,11 +2066,11 @@ int open_cif_configuration (int linec, int conf)
           else
           {
             save_it = TRUE;
-            for (k=0; k<num_pos; k++)
+            for (l=0; l<num_pos; l++)
             {
-              if (this_reader -> coord[j][0] == cryst_pos[k][0]
-               && this_reader -> coord[j][1] == cryst_pos[k][1]
-               && this_reader -> coord[j][2] == cryst_pos[k][2])
+              if (this_reader -> coord[k][0] == cryst_pos[l][0]
+               && this_reader -> coord[k][1] == cryst_pos[l][1]
+               && this_reader -> coord[k][2] == cryst_pos[l][2])
               {
                 save_it = FALSE;
                 break;
@@ -2045,12 +2078,12 @@ int open_cif_configuration (int linec, int conf)
             }
             if (save_it)
             {
-              for (k=0; k<3; k++) cryst_pos[num_pos][k] = this_reader -> coord[j][k];
+              for (l=0; l<3; l++) cryst_pos[num_pos][l] = this_reader -> coord[k][l];
               cif_pos[num_pos] = 1;
               if (i)
               {
-                occ_pos[num_pos][0] = this_reader -> occupancy[j];
-                lot_pos[num_pos][0] = this_reader -> lot[j];
+                occ_pos[num_pos][0] = this_reader -> occupancy[k];
+                lot_pos[num_pos][0] = this_reader -> lot[k];
               }
               num_pos ++;
             }
@@ -2058,11 +2091,11 @@ int open_cif_configuration (int linec, int conf)
             {
               if (i)
               {
-                occ_pos[k][cif_pos[k]] = this_reader -> occupancy[j];
-                lot_pos[k][cif_pos[k]] = this_reader -> lot[j];
+                occ_pos[l][cif_pos[l]] = this_reader -> occupancy[k];
+                lot_pos[l][cif_pos[l]] = this_reader -> lot[k];
               }
-              cif_pos[k] ++;
-              pos_max = max (pos_max, cif_pos[k]);
+              cif_pos[l] ++;
+              pos_max = max (pos_max, cif_pos[l]);
             }
           }
         }
@@ -2072,7 +2105,8 @@ int open_cif_configuration (int linec, int conf)
           lot_pos = allocdint (num_pos, pos_max);
         }
       }
-
+      g_free (list_occ);
+      g_free (list_pos);
       for (i=0; i<num_pos; i++)
       {
         u = 0;
@@ -2122,20 +2156,23 @@ int open_cif_configuration (int linec, int conf)
           all_pos[l].z = c_pos.z;
           all_origin[l] = j;
           save_it = TRUE;
-          at.x = all_pos[l].x;
-          at.y = all_pos[l].y;
-          at.z = all_pos[l].z;
-          for (k=0; k<l; k++)
+          if (l)
           {
-            bt.x = all_pos[k].x;
-            bt.y = all_pos[k].y;
-            bt.z = all_pos[k].z;
-            dist = distance_3d (active_cell, 0, & at, & bt);
-            if (dist.length < 0.1)
+            at.x = all_pos[l].x;
+            at.y = all_pos[l].y;
+            at.z = all_pos[l].z;
+            for (k=0; k<l; k++)
             {
-              dist_message = TRUE;
-              save_it = FALSE;
-              break;
+              bt.x = all_pos[k].x;
+              bt.y = all_pos[k].y;
+              bt.z = all_pos[k].z;
+              dist = distance_3d (active_cell, 0, & at, & bt);
+              if (dist.length < 0.1)
+              {
+                dist_message = TRUE;
+                save_it = FALSE;
+                break;
+              }
             }
           }
           save_pos[l] = save_it;
@@ -2153,7 +2190,6 @@ int open_cif_configuration (int linec, int conf)
       int ** site_lot = g_malloc0 (num_pos*sizeof*site_lot);
       clock_t CPU_time;
       int tot_pos = 0;
-      // In the following need to compare this with cbuild_action : occupancy
       for (i=0; i<num_pos; i++)
       {
         taken_pos[i] = allocbool(all_id[i]);
@@ -2164,7 +2200,10 @@ int open_cif_configuration (int linec, int conf)
           if (u < 1.0 && tot_pos < all_id[i]) u = 1.0;
           k = lot_pos[i][j];
           l = 0;
-          while (l < (int)u)
+          // Warning for occupancy closest integer value to u:
+          //   - (int)u ?
+          //   - nearbyint (u) : closest integer value ?
+          while (l < (int)nearbyint(u))
           {
             CPU_time = clock ();
             m = (CPU_time - (j+17)*all_id[i]);
@@ -2224,7 +2263,7 @@ int open_cif_configuration (int linec, int conf)
       {
         i += cryst -> at_by_object[j] * cryst -> pos_by_object[j];
       }
-      if (! conf || active_project -> step == 1)
+      if (! conf || active_project -> steps == 1)
       {
         active_project -> natomes = i;
         allocatoms (active_project);
@@ -2337,7 +2376,7 @@ int open_cif_file (int linec)
   gchar * cartkeys[3] = {"cartn_x", "cartn_y", "cartn_z"};
   gchar * str = NULL;
   int cif_action = 0;
-  int cif_step;
+  int cif_step = 1;
   int i, j;
 
   // Determine the number of configuration(s) by checking the presence
@@ -2350,10 +2389,18 @@ int open_cif_file (int linec)
   int cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
   if (this_reader -> steps > 1)
   {
-    str = g_strdup_printf ("It seems that the CIF file contains <b>%d</b> distinct configurations !\n", this_reader -> steps);
+    str = g_strdup_printf ("It seems that the CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
     add_reader_info (str, 1);
     g_free (str);
-    str = NULL;
+    if (cif_use_symmetry_positions)
+    {
+      str = g_strdup_printf ("Impossible to use symmetry positions with multiple configurations\n");
+      add_reader_info (str, 1);
+      g_free (str);
+    }
+  }
+  if (this_reader -> steps > 1 && ! cif_use_symmetry_positions)
+  {
     // Testing for occupancy
     int cif_occ = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occ == this_reader -> steps && cif_occ == cif_site)
@@ -2375,24 +2422,34 @@ int open_cif_file (int linec)
     {
       cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 4, MainWindow);
     }
+  }
+  else
+  {
+    cif_action = 1;
+  }
 
-    if (cif_action)
+
+  if (cif_action && this_reader -> steps > 1)
+  {
+    // We need to select the step to work on
+    str = g_strdup_printf ("Select the configuration, in [1- %d]", this_reader -> steps);
+    cif_step = 0;
+    while (! cif_step)
     {
-      // We need to select the step to work on
-      str = g_strdup_printf ("Select the configuration, in [1- %d]", this_reader -> steps);
-      cif_step = 0;
-      while (! cif_step)
-      {
-        cif_step = iask ("Please select the configuration to work on", str, 0, MainWindow);
-        if (cif_step < 1 || cif_step > this_reader -> steps) cif_step = 0;
-      }
-      g_free (str);
-      str = NULL;
+      cif_step = iask ("Please select the configuration to work on", str, 0, MainWindow);
+      if (cif_step < 1 || cif_step > this_reader -> steps) cif_step = 0;
     }
+    g_free (str);
   }
   if (cif_action)
   {
     active_project -> steps = 1;
+    if (this_reader -> steps > 1)
+    {
+      str = g_strdup_printf ("Working on configuration N°%d\n", cif_step);
+      add_reader_info (str, 1);
+      g_free (str);
+    }
     return open_cif_configuration (linec, cif_step - 1);
   }
   else
@@ -2408,7 +2465,6 @@ int open_cif_file (int linec)
       if (i) return i;
     }
     // Now what ?
-
     return 0;
   }
 }
