@@ -2389,7 +2389,7 @@ int open_cif_file (int linec)
   int cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
   if (this_reader -> steps > 1)
   {
-    str = g_strdup_printf ("It seems that the CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
+    str = g_strdup_printf ("It seems this CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
     add_reader_info (str, 1);
     g_free (str);
     if (cif_use_symmetry_positions)
@@ -2463,6 +2463,7 @@ int open_cif_file (int linec)
     {
       i = open_cif_configuration (linec, j);
       if (i) return i;
+      // Duplicate in new project or append to trajectory
     }
     // Now what ?
     return 0;
