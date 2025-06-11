@@ -701,6 +701,7 @@ struct builder_edition
   GtkWidget * pbut;
   cell_info cell;
   int occupancy;
+  int rounding;
   gboolean overlapping;
   gboolean wrap;
   gboolean clones;

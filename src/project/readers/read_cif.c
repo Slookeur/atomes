@@ -1993,11 +1993,15 @@ int open_cif_configuration (int linec, int conf)
     cif_atoms = this_reader -> natomes;
     if (cif_use_symmetry_positions)
     {
-      add_reader_info ("<b>Bulding crystal using symmetry positions: </b> \n"
-                       "  1) evaluate candidate atomic positions using data in CIF file: \n"
-                       "     - symmetry positions\n"
-                       "     - atomic coordonates + occupancy\n"
-                       "  2) fill each candidate position using the associated occupancy\n", 1);
+      gchar * str = g_strdup_printf ("<b>Bulding crystal using symmetry positions: </b> \n"
+                                     "  1) evaluate candidate atomic positions using data in CIF file: \n"
+                                     "     - symmetry positions\n"
+                                     "     - atomic coordonates + occupancy\n"
+                                     "  2) fill each candidate position using the associated occupancy: \n"
+                                     "     - occupancy %s\n"
+                                     "     - %s\n", cif_occ[this_reader -> rounding], cif_sites[1]);
+      add_reader_info (str, 1);
+      g_free (str);
       this_reader -> cartesian = TRUE;
       compute_lattice_properties (active_cell, cid);
       double spgpos[3][4];
@@ -2203,7 +2207,7 @@ int open_cif_configuration (int linec, int conf)
           // Warning for occupancy closest integer value to u:
           //   - (int)u ?
           //   - nearbyint (u) : closest integer value ?
-          while (l < (int)nearbyint(u))
+          while (l < occupancy(u, this_reader -> rounding))
           {
             CPU_time = clock ();
             m = (CPU_time - (j+17)*all_id[i]);
@@ -2389,7 +2393,7 @@ int open_cif_file (int linec)
   int cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
   if (this_reader -> steps > 1)
   {
-    str = g_strdup_printf ("It seems this CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
+    str = g_strdup_printf ("It seems the CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
     add_reader_info (str, 1);
     g_free (str);
     if (cif_use_symmetry_positions)
@@ -2428,7 +2432,6 @@ int open_cif_file (int linec)
     cif_action = 1;
   }
 
-
   if (cif_action && this_reader -> steps > 1)
   {
     // We need to select the step to work on
@@ -2450,6 +2453,20 @@ int open_cif_file (int linec)
       add_reader_info (str, 1);
       g_free (str);
     }
+  }
+
+  // How to treat occupancy
+  this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
+  if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
+  if (! cif_use_symmetry_positions)
+  {
+    str = g_strdup_printf ("Occupancy %s\n\t%s\n", cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
+    add_reader_info (str, 1);
+    g_free (str);
+  }
+
+  if (cif_action)
+  {
     return open_cif_configuration (linec, cif_step - 1);
   }
   else

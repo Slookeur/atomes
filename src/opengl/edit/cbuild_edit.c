@@ -68,6 +68,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void toggle_occ (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void toggle_overlap (GtkCheckButton * Button, gpointer data);
   G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data);
+  G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void crystal_window (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void crystal_window (GtkWidget * widg, gpointer data);
@@ -1185,6 +1186,20 @@ G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data)
 }
 
 /*!
+  \fn G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data)
+
+  \brief changed rounding method for occupancy
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data)
+{
+  builder_edition * cbuilder = (builder_edition *)data;
+  cbuilder -> rounding = gtk_combo_box_get_active (box);
+}
+
+/*!
   \fn G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
 
   \brief adjust occupancy create dialog callback
@@ -1211,6 +1226,7 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
                       "   the final crystal is considered as a whole.</i>",
                       "<i>Sites are filled successively: all object(s) A, then all object(s) B ... </i>",
                       "<i>Sites are filled alternatively: object A, object B, object A ...</i>"};
+
   GtkWidget * occ_but[5];
   int i;
   for (i=0; i<5; i++)
@@ -1251,15 +1267,33 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
 #else
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(occ_but[i]), TRUE);
 #endif
-  hbox = create_hbox(0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("<b>Allow overlapping</b>", -1, 25, cbuilder -> overlapping, G_CALLBACK(toggle_overlap), (gpointer)cbuilder), FALSE, FALSE, 0);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   gchar * overlap = "<i>Instead of ensuring that sites are filled by a single object,\n"
                     "this allows object(s) to share the same crystalline position. \n"
-                    "The option above describes how filled and empty positions alternate.</i>";
+                    "The option above describes how filled and empty positions alternate.</i>\n";
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (overlap, 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
+
+  // Rounding occupancy here
+  hbox = create_hbox(0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Occupancy rounding:</b>", 200, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  GtkWidget * rounding = create_combo ();
+  gtk_widget_set_size_request (rounding, -1, 30);
+  for (i=0; i<3; i++) combo_text_append (rounding, cif_occupancies[i]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(rounding), cbuilder -> rounding);
+  g_signal_connect(G_OBJECT(rounding), "changed", G_CALLBACK(on_rounding_changed), & cbuilder);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rounding, FALSE, FALSE, 10);
+  gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.75⌋ = 8\n"
+                                 "\t<b>Highest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n"
+                                 "\t<b>Nearest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n"
+                                 "\n\t\t%s\n", cif_occ[0], cif_occ[1], cif_occ[2], cif_sites[0]);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (str, 450, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  g_free (str);
 
   show_the_widgets (info);
   run_this_gtk_dialog (info, G_CALLBACK(run_destroy_dialog), NULL);
@@ -1456,6 +1490,7 @@ void prepare_crystal_builder (gpointer data)
     this_proj -> modelgl -> builder_win = g_malloc0(sizeof*this_proj -> modelgl -> builder_win);
     this_proj -> modelgl -> builder_win -> cell.box = g_malloc0(sizeof*this_proj -> modelgl -> builder_win -> cell.box);
     this_proj -> modelgl -> builder_win -> win = builder_win (this_proj, data);
+    this_proj -> modelgl -> builder_win -> rounding = 2;
   }
   show_the_widgets (this_proj -> modelgl -> builder_win -> win);
 }

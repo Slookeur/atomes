@@ -30,6 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  int occupancy (double occ);
   int test_lattice (builder_edition * cbuilder, cell_info * cif_cell);
   int pos_not_saved (vec3_t * all_pos, int num_pos, vec3_t pos);
   int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
@@ -41,7 +42,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   gboolean same_coords (float a, float b);
   gboolean are_equal_vectors (vec3_t u, vec3_t v);
   gboolean pos_not_taken (int pos, int dim, int * tab);
-  gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_cell);
+  gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int rouding, int tot_cell);
 
   void get_origin (space_group * spg);
   void compute_lattice_properties (cell_info * cell, int box_id);
@@ -679,7 +680,31 @@ gboolean pos_not_taken (int pos, int dim, int * tab)
 }
 
 /*!
-  \fn gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_cell)
+  \fn int occupancy (double occ, int cif_occ)
+
+  \brief handle occupancy integer rouding
+
+  \param occ value to round
+  \param cif_occ how to round
+*/
+int occupancy (double occ, int cif_occ)
+{
+  switch (cif_occ)
+  {
+    case 0:
+      return (int)occ;
+      break;
+    case 1:
+      return (int)occ + 1;
+      break;
+    default:
+      return (int)nearbyint(occ);
+      break;
+  }
+}
+
+/*!
+  \fn gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int rounding, int tot_cell)
 
   \brief adjust the crystallograpĥic sites occupancy
 
@@ -690,9 +715,10 @@ gboolean pos_not_taken (int pos, int dim, int * tab)
       2 = Completely random
       3 = Successively
       4 = Alternatively
+  \param rounding how to round the number of occupied site(s)
   \param tot_cell the total number of cell to build
 */
-gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_cell)
+gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int rounding, int tot_cell)
 {
   int h, i, j, k, l, m, n, o, p, q, r, s, t;
   double v;
@@ -778,7 +804,7 @@ gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int tot_c
           // Warning for occupancy closest integer value to:
           //   - (int) ?
           //   - nearbyint : closest integer value ?
-          num_to_save = nearbyint (pos_bs*cryst -> occupancy[k]);
+          num_to_save = occupancy (pos_bs*cryst -> occupancy[k], rounding);
           l += num_to_save;
 #ifdef DEBUG
           g_debug ("\tnum_to_save= %d, l= %d", num_to_save, l);
@@ -1018,6 +1044,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
   gboolean done;
   crystal_data * cdata = NULL;
   int occupying;
+  int rounding;
   double amin = box -> param[0][0];
   for (i=1; i<3; i++) amin = min(amin, box -> param[0][i]);;
   if (! visible)
@@ -1070,10 +1097,12 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
       for (j=0; j<3; j++) object -> baryc[j] = this_reader -> coord[i][j];
     }
     occupying = 0;
+    rounding = this_reader -> rounding;
   }
   else
   {
     occupying = this_proj -> modelgl -> builder_win -> occupancy;
+    rounding = this_proj -> modelgl -> builder_win -> rounding;
   }
   for (h=0; h<2; h++)
   {
@@ -1413,7 +1442,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
     }
   }
   cdata = free_crystal_data (cdata);
-  gboolean low_occ = adjust_object_occupancy (cryst, occupying, tot_cell);
+  gboolean low_occ = adjust_object_occupancy (cryst, occupying, rounding, tot_cell);
   atom at, bt;
   distance dist;
   gboolean dist_chk = TRUE;

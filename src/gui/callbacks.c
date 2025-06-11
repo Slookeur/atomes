@@ -1210,7 +1210,7 @@ G_MODULE_EXPORT void run_read_npt_data (GtkDialog * info, gint response_id, gpoi
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     npt_file = file_chooser_get_file_name (chooser);
-    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 5, MainWindow);
+    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 6, MainWindow);
   }
   else
   {

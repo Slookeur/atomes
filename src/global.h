@@ -521,6 +521,7 @@ struct coord_file
   gchar *** sym_pos;                       /*!< The symmetry positions, if any */
   int setting;                             /*!< Space group setting */
   int * wyckoff;                           /*!< Wyckoff positions */
+  int rounding;                            /*!< Occupancy rounding */
   double * occupancy;                      /*!< Site(s) occupancy */
   int ** occupied;                         /*!< Occupancy status */
   int * multi;                             /*!< Multiplicity */
