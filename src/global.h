@@ -524,9 +524,9 @@ struct coord_file
   int * wyckoff;                           /*!< Wyckoff positions */
   int rounding;                            /*!< Occupancy rounding */
   double * occupancy;                      /*!< Site(s) occupancy */
-  int ** occupied;                         /*!< Occupancy status */
+  // int ** occupied;                         /*!< Occupancy status */
   int * multi;                             /*!< Multiplicity */
-  int disorder;                            /*!< Number of disorder group */
+  int dis;                                 /*!< Number of disorder group */
   int * disorder;                          /*!< Site disorder group */
   int atom_unlabelled;                     /*!< Number of atom(s) unlabelled */
   int * u_atom_list;                       /*!< List of unlabelled atom(s) */

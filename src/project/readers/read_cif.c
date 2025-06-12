@@ -1013,14 +1013,8 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
       this_reader -> wyckoff[i] = (cid[5]) ? get_atom_wyckoff (cline, cid[5]) : 0;
       this_reader -> occupancy[i] = (cid[6]) ? get_atom_coord (cline, cid[6]) : 1.0;
       this_reader -> multi[i] = (cid[7]) ? get_atom_coord (cline, cid[7]) : 0.0;
+      this_reader -> disorder[i] = (cid[8]) ? get_atom_coord (cline, cid[8]) : 0;
     }
-    /*if (cid[8])
-    {
-      str = get_atom_label (cline, cid[8]);
-      this_reader -> disorder[i] = (int) string_to_double (str);
-      g_free (str);
-    }*/
-
     if (cline) g_free (cline);
     if (str) g_free (str);
   }
@@ -1055,6 +1049,7 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
       this_reader -> wyckoff[i] = (cid[5]) ? get_atom_wyckoff (cline, cid[5]) : 0;
       this_reader -> occupancy[i] = (cid[6]) ? get_atom_coord (cline, cid[6]) : 1.0;
       this_reader -> multi[i] = (cid[7]) ? get_atom_coord (cline, cid[7]) : 0.0;
+      this_reader -> disorder[i] = (cid[8]) ? get_atom_coord (cline, cid[8]) : 0;
     }
 /* #ifdef DEBUG
     j = this_reader -> wyckoff[i];
@@ -1087,7 +1082,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   gchar * labkeys[2] = {"type_symbol", "label"};
   gchar * frackeys[3] = {"fract_x", "fract_y", "fract_z"};
   gchar * cartkeys[3] = {"cartn_x", "cartn_y", "cartn_z"};
-  gchar * symkeys[3] = {"wyckoff_symbol", "occupancy", "symmetry_multiplicity"};
+  gchar * symkeys[4] = {"wyckoff_symbol", "occupancy", "symmetry_multiplicity", "disorder_group"};
   gchar * str = NULL;
   int cid[9];
   int loop_line;
@@ -1172,7 +1167,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
 
   if (! this_reader -> cartesian)
   {
-    for (i=0; i<3; i++)
+    for (i=0; i<4; i++)
     {
       cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
       if (cid[i+5])
@@ -1181,9 +1176,6 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       }
     }
   }
-
-  cid[8] = cif_get_value ("_atom_site", "disorder_group", loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
-
   i = cif_file_get_data_in_loop (linec, loop_line);
   this_reader -> natomes = cif_file_get_number_of_atoms (linec, loop_line+i, i);
 #ifdef DEBUG
@@ -1219,11 +1211,12 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     this_reader -> wyckoff = allocint (this_reader -> natomes);
 	this_reader -> occupancy = allocdouble (this_reader -> natomes);
     this_reader -> multi = allocint (this_reader -> natomes);
+    this_reader -> disorder = allocint (this_reader -> natomes);
   }
   this_reader -> z = allocdouble (1);
   this_reader -> nsps = allocint (1);
   if (! cif_file_get_atoms_data (conf, loop_line+i, cid)) return FALSE;
-   if (conf && active_project -> steps > 1)
+  if (conf && active_project -> steps > 1)
   {
     if (this_reader -> nspec != cif_nspec)
     {
@@ -1249,15 +1242,16 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       }
     }
   }
-  if (! this_reader -> cartesian)
+  if (! this_reader -> cartesian && cif_use_symmetry_positions)
   {
-    this_reader -> occupied = g_malloc0(this_reader -> natomes*sizeof*this_reader -> occupied);
+    // Testing site multiplicity, to ensure that occupancy is not > 1.0
+    // this_reader -> occupied = g_malloc0(this_reader -> natomes*sizeof*this_reader -> occupied);
     double v;
     for (i=0; i<this_reader -> natomes; i++)
     {
-      for (j=0; j<2; j++)
+      /* for (j=0; j<2; j++)
       {
-        k = 1;
+        k = 1; */
         v = this_reader -> occupancy[i];
         for (l=0; l<this_reader -> natomes; l++)
         {
@@ -1268,8 +1262,8 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
              && this_reader -> coord[i][2] == this_reader -> coord[l][2])
             {
               v += this_reader -> occupancy[l];
-              k ++;
-              if (j) this_reader -> occupied[i][k] = l;
+              /* k ++;
+              if (j) this_reader -> occupied[i][k] = l; */
               if (v > 1.00001)
               {
                 add_reader_info ("<b>Atomic coordinates</b>: a site was found to have an occupancy > 1.0 !\n", 0);
@@ -1278,12 +1272,43 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
             }
           }
         }
-        if (! j)
+        /* if (! j)
         {
           this_reader -> occupied[i] = allocint (k+1);
           this_reader -> occupied[i][0] = k;
           this_reader -> occupied[i][1] = i;
         }
+      } */
+    }
+  }
+  if (! this_reader -> cartesian && cif_chemical)
+  {
+    // Testing the different number of occupancies
+    double * test_occ = allocdouble (1);
+    int * num_occ = allocint (1);
+    int i = 1;
+    gboolean new_occ;
+    test_occ[0] = this_reader -> occupancy[0];
+    num_occ[0] = 1;
+    for (j=1; j<this_reader -> natomes; j++)
+    {
+      new_occ = TRUE;
+      for (k=1; k<i; k++)
+      {
+        if (test_occ[k] == this_reader -> occupancy[j])
+        {
+          num_occ[k] ++;
+          new_occ = FALSE;
+          break;
+        }
+      }
+      if (new_occ)
+      {
+        test_occ = g_realloc (test_occ, (i+1)*sizeof*test_occ);
+        test_occ[i] = this_reader -> occupancy[j];
+        num_occ = g_realloc (num_occ, (i+1)*sizeof*num_occ);
+        num_occ[i] = 1;
+        i ++;
       }
     }
   }
