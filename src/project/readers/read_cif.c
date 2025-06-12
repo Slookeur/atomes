@@ -54,6 +54,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   gchar * get_cif_word (gchar * mot);
   gchar * get_atom_label (gchar * line, int lid);
+  gchar * get_atom_disorder (gchar * line, int lid);
   gchar * get_string_from_origin (space_group * spg);
   gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, gboolean all_ligne, gboolean in_loop);
 
@@ -84,7 +85,6 @@ extern int read_space_group (builder_edition * cbuilder, int spg);
 extern gchar * wnpos[3];
 extern void get_wyck_char (float val, int ax, int bx);
 extern space_group * duplicate_space_group (space_group * spg);
-extern int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 extern distance distance_3d (cell_info * cell, int mdstep, atom * at, atom * bt);
 extern void sort (int dim, int * tab);
 
@@ -95,6 +95,10 @@ char * line_ptr;
 int * keylines = NULL;
 int saved_group;
 int cif_atoms;
+int cif_nspec;
+int * cif_lot = NULL;
+int * cif_nsps = NULL;
+
 gboolean cif_chemical = FALSE;
 gchar ** cif_strings = NULL;
 
@@ -280,6 +284,24 @@ int get_atom_wyckoff (gchar * line, int wid)
   wy_line = NULL;
   wy_word = NULL;
   return j;
+}
+
+/*!
+  \fn gchar * get_atom_disorder (gchar * line, int lid)
+
+  \brief read atom disorder group from CIF file
+
+  \param line the string that contains the data
+  \param lid the position to reach on the line
+*/
+gchar * get_atom_disorder (gchar * line, int lid)
+{
+  gchar * at_line = g_strdup_printf ("%s", line);
+  char * at_word = strtok_r (at_line, " ", & line);
+  int i;
+  for (i=0; i<lid-1; i++) at_word = strtok_r (NULL, " ", & line);
+  g_free (at_line);
+  return get_cif_word (at_word);
 }
 
 GtkWidget ** img_cif;
@@ -948,7 +970,7 @@ void check_for_to_lab (int ato, gchar * stlab)
   \param lin line to reach
   \param cid positions on the line for the data to read
 */
-gboolean cif_file_get_atoms_data (int conf, int lin, int cid[8])
+gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
 {
   int i, j;
   double v;
@@ -992,6 +1014,13 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[8])
       this_reader -> occupancy[i] = (cid[6]) ? get_atom_coord (cline, cid[6]) : 1.0;
       this_reader -> multi[i] = (cid[7]) ? get_atom_coord (cline, cid[7]) : 0.0;
     }
+    /*if (cid[8])
+    {
+      str = get_atom_label (cline, cid[8]);
+      this_reader -> disorder[i] = (int) string_to_double (str);
+      g_free (str);
+    }*/
+
     if (cline) g_free (cline);
     if (str) g_free (str);
   }
@@ -1060,7 +1089,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   gchar * cartkeys[3] = {"cartn_x", "cartn_y", "cartn_z"};
   gchar * symkeys[3] = {"wyckoff_symbol", "occupancy", "symmetry_multiplicity"};
   gchar * str = NULL;
-  int cid[8];
+  int cid[9];
   int loop_line;
   int i, j, k, l;
 
@@ -1152,6 +1181,9 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       }
     }
   }
+
+  cid[8] = cif_get_value ("_atom_site", "disorder_group", loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+
   i = cif_file_get_data_in_loop (linec, loop_line);
   this_reader -> natomes = cif_file_get_number_of_atoms (linec, loop_line+i, i);
 #ifdef DEBUG
@@ -1162,7 +1194,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   if (conf && active_project -> steps > 1 && this_reader -> natomes != cif_atoms)
   {
     // Not the same number of atoms between each configuration
-    str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) is not the same for each configuration !\n"
+    str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
                            "  - configuration N°%d\t :: atoms= %d\n"
                            "  - initialization      \t\t :: atoms= %d\n", conf, this_reader -> natomes, cif_atoms);
     add_reader_info (str, 0);
@@ -1191,6 +1223,32 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   this_reader -> z = allocdouble (1);
   this_reader -> nsps = allocint (1);
   if (! cif_file_get_atoms_data (conf, loop_line+i, cid)) return FALSE;
+   if (conf && active_project -> steps > 1)
+  {
+    if (this_reader -> nspec != cif_nspec)
+    {
+      // Not the same number of chemical species between each configuration
+      str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of chemical species changes !\n"
+                             "  - configuration N°%d\t :: species= %d\n"
+                             "  - initialization      \t\t :: species= %d\n", conf, this_reader -> nspec, cif_nspec);
+      add_reader_info (str, 0);
+      g_free (str);
+      return FALSE;
+    }
+    for (i=0; i<this_reader -> nspec; i++)
+    {
+      if (this_reader -> nsps[i] != cif_nsps[i])
+      {
+        // Not the same number of atom(s) by chemical species between each configuration
+        str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
+                               "  - configuration N°%d\t :: atom(s)= %d\n"
+                               "  - initialization      \t\t :: atom(s)= %d\n", conf, i+1, this_reader -> nsps[i], cif_nsps[i]);
+        add_reader_info (str, 0);
+        g_free (str);
+        return FALSE;
+      }
+    }
+  }
   if (! this_reader -> cartesian)
   {
     this_reader -> occupied = g_malloc0(this_reader -> natomes*sizeof*this_reader -> occupied);
@@ -1990,13 +2048,18 @@ int open_cif_configuration (int linec, int conf)
       }
     }
     res = 0;
-    cif_atoms = this_reader -> natomes;
+    if (active_project -> steps > 1)
+    {
+      cif_atoms = this_reader -> natomes;
+      cif_nspec = this_reader -> nspec;
+      cif_nsps = duplicate_int (this_reader -> nspec, this_reader -> nsps);
+    }
     if (cif_use_symmetry_positions)
     {
-      gchar * str = g_strdup_printf ("<b>Bulding crystal using symmetry positions: </b> \n"
+      gchar * str = g_strdup_printf ("<b>Building crystal using symmetry positions: </b> \n"
                                      "  1) evaluate candidate atomic positions using data in CIF file: \n"
                                      "     - symmetry positions\n"
-                                     "     - atomic coordonates + occupancy\n"
+                                     "     - atomic coordinates + occupancy\n"
                                      "  2) fill each candidate position using the associated occupancy: \n"
                                      "     - occupancy %s\n"
                                      "     - %s\n", cif_occ[this_reader -> rounding], cif_sites[1]);
@@ -2047,7 +2110,7 @@ int open_cif_configuration (int linec, int conf)
       int num_pos = 0;
       int pos_max = 0;
       // The following might be modified for reaction CIF:
-      //  - this_reader -> coord[i] and this_readaer -> coord[j] are not necessarly equal
+      //  - this_reader -> coord[i] and this_readaer -> coord[j] are not necessarily equal
       //  - both the disorder group and the occupancy matters in place of the coordinates
       for (i=0; i<2; i++)
       {
@@ -2383,6 +2446,20 @@ int open_cif_file (int linec)
   int cif_step = 1;
   int i, j;
 
+  // How to treat occupancy
+  int cif_occup = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
+  if (cif_occup)
+  {
+    this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
+    if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
+    if (! cif_use_symmetry_positions)
+    {
+      str = g_strdup_printf ("Occupancy %s\n\t%s\n", cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
+      add_reader_info (str, 1);
+      g_free (str);
+    }
+  }
+
   // Determine the number of configuration(s) by checking the presence
   // of the instruction used to declare atomic coordinates
   this_reader -> steps = cif_get_value ("_atom_site", frackeys[0], 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
@@ -2403,11 +2480,10 @@ int open_cif_file (int linec)
       g_free (str);
     }
   }
+
   if (this_reader -> steps > 1 && ! cif_use_symmetry_positions)
   {
-    // Testing for occupancy
-    int cif_occ = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
-    if (cif_occ == this_reader -> steps && cif_occ == cif_site)
+    if (cif_occup == this_reader -> steps && cif_occup == cif_site)
     {
       add_reader_info ("This CIF file could be describing a trajectory or a chemical reaction.\n", 1);
       // This is where to ask what to do !
@@ -2424,6 +2500,7 @@ int open_cif_file (int linec)
     }
     else
     {
+      add_reader_info ("This CIF file could be describing a trajectory.\n", 1);
       cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 4, MainWindow);
     }
   }
@@ -2455,16 +2532,6 @@ int open_cif_file (int linec)
     }
   }
 
-  // How to treat occupancy
-  this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
-  if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
-  if (! cif_use_symmetry_positions)
-  {
-    str = g_strdup_printf ("Occupancy %s\n\t%s\n", cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
-    add_reader_info (str, 1);
-    g_free (str);
-  }
-
   if (cif_action)
   {
     return open_cif_configuration (linec, cif_step - 1);
@@ -2478,11 +2545,15 @@ int open_cif_file (int linec)
     i = 0;
     for (j=0; j<active_project -> steps; j++)
     {
+      this_reader -> nspec = 0;
+      if (this_reader -> nsps)
+      {
+        g_free (this_reader -> nsps);
+        this_reader -> nsps = NULL;
+      }
       i = open_cif_configuration (linec, j);
       if (i) return i;
-      // Duplicate in new project or append to trajectory
     }
-    // Now what ?
     return 0;
   }
 }

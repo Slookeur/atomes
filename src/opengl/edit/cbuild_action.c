@@ -33,7 +33,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int occupancy (double occ);
   int test_lattice (builder_edition * cbuilder, cell_info * cif_cell);
   int pos_not_saved (vec3_t * all_pos, int num_pos, vec3_t pos);
-  int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
+  int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 
   double get_val_from_setting (gchar * pos, gchar * sval);
   double get_value_from_pos (gchar * pos);
@@ -953,23 +953,24 @@ gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int round
 }
 
 /*!
-  \fn int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg)
+  \fn int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg)
 
   \brief build crystal
 
   \param visible is the crystal builder window visible ?
   \param this_proj the target project
+  \param c_step the MD step if multiple CIF configurations
   \param to_wrap wrap or not atomic coordinates in the unit cell
   \param show_clones show / hide clone(s)
   \param cell the cell info that contains the crystal description
   \param widg the GtkWidget sending the signal
 */
-int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg)
+int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg)
 {
   int h, i, j, k, l, m, n, o, p, q;
   int build_res = 1;
   space_group * sp_group = cell -> sp_group;
-  box_info * box = & cell -> box[0];
+  box_info * box = & cell -> box[c_step];
   gchar * str;
   mat4_t ** wyckpos = g_malloc0 (sp_group -> numw*sizeof*wyckpos);
   double spgpos[3][4];
@@ -1052,7 +1053,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
     tint point;
     point.a = this_proj -> id;
     point.b = point.c = 0;
-    this_proj -> modelgl = g_malloc0(sizeof*this_proj -> modelgl);
+    if (! this_proj -> modelgl) this_proj -> modelgl = g_malloc0(sizeof*this_proj -> modelgl);
     prepare_atom_edition (& point, FALSE);
     this_proj -> modelgl -> search_widg[7] = allocate_atom_search (this_proj -> id, INSERT, 7, this_reader -> natomes);
     gboolean do_obj;
@@ -1198,7 +1199,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
         {
           if (object -> dim > amin)
           {
-            str = g_strdup_printf ("%s size (%f Ang.) is bigger than the min(<b><i>a,b,c</i></b>)\n"
+            str = g_strdup_printf ("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
                                    "If you build the crystal the final structure is likely to be crowded !\n"
                                    "Continue anyway ?", object -> name, object -> dim);
             build_res = 2;
@@ -1352,12 +1353,13 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
 
   if (new_proj)
   {
-    init_project(TRUE);
+    init_project (TRUE);
   }
   else if (visible)
   {
     active_project_changed (this_proj -> id);
   }
+  active_box = & active_cell -> box[c_step];
   for (i=0; i<3; i++)
   {
     for (j=0; j<3; j++)
@@ -1370,7 +1372,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
       active_box -> vect[i][j] *= cell -> cextra[i];
     }
   }
-  compute_lattice_properties (active_cell, 0);
+  compute_lattice_properties (active_cell, c_step);
   active_cell -> ltype = 1;
   active_cell -> pbc = TRUE;
   int tot_cell = 1;
@@ -1539,8 +1541,7 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
       }
     }
   }
-  active_project -> steps = 1;
-  active_project -> natomes = tot_new_at;
+
   if (low_occ)
   {
     i = 0;
@@ -1548,16 +1549,38 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
     {
        if (cryst -> nsps[j]) i ++;
     }
-    active_project -> nspec = i;
   }
   else
   {
-    active_project -> nspec = cryst -> spec;
+    i = cryst -> spec;
   }
 #ifdef DEBUG
-  g_debug ("CRYSTAL:: atoms= %d, species= %d", active_project -> natomes, active_project -> nspec);
+  g_debug ("CRYSTAL:: atoms= %d, species= %d", tot_new_at, i);
 #endif
-  alloc_proj_data (active_project, 1);
+  if (! c_step)
+  {
+    active_project -> natomes = tot_new_at;
+    active_project -> nspec = i;
+    alloc_proj_data (active_project, 1);
+  }
+  else
+  {
+    if (active_project -> natomes != tot_new_at)
+    {
+#ifdef DEBUG
+      g_debug ("CRYSTAL:: number of atoms changes between configurations");
+#endif
+      return -1;
+    }
+    if (active_project -> nspec != i)
+    {
+#ifdef DEBUG
+      g_debug ("CRYSTAL:: number of chemical species changes between configurations");
+#endif
+      return -1;
+    }
+  }
+
   active_project_changed (activep);
   k = l = 0;
   for (i=0; i<cryst -> spec; i++)
@@ -1577,17 +1600,37 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
     else
     {
       j = (int)cryst -> z[i];
-      active_chem -> label[k] = g_strdup_printf ("%s", periodic_table_info[j].lab);
-      active_chem -> element[k] = g_strdup_printf ("%s", periodic_table_info[j].name);
-      active_chem -> nsps[k] = cryst -> nsps[i];
-      active_chem -> chem_prop[CHEM_Z][k] = cryst -> z[i];
-      active_chem -> chem_prop[CHEM_M][k] = set_mass_ (& j);
-      active_chem -> chem_prop[CHEM_R][k] = set_radius_ (& j, & l);
-      active_chem -> chem_prop[CHEM_N][k] = set_neutron_ (& j);
-      active_chem -> chem_prop[CHEM_X][k] = active_chem -> chem_prop[CHEM_Z][k];
+      if (! c_step)
+      {
+        active_chem -> label[k] = g_strdup_printf ("%s", periodic_table_info[j].lab);
+        active_chem -> element[k] = g_strdup_printf ("%s", periodic_table_info[j].name);
+        active_chem -> nsps[k] = cryst -> nsps[i];
+        active_chem -> chem_prop[CHEM_Z][k] = cryst -> z[i];
+        active_chem -> chem_prop[CHEM_M][k] = set_mass_ (& j);
+        active_chem -> chem_prop[CHEM_R][k] = set_radius_ (& j, & l);
+        active_chem -> chem_prop[CHEM_N][k] = set_neutron_ (& j);
+        active_chem -> chem_prop[CHEM_X][k] = active_chem -> chem_prop[CHEM_Z][k];
 #ifdef DEBUG
-      g_debug ("CRYSTAL:: spec= %d, label= %s, nsps= %d", k+1, active_chem -> label[k], active_chem -> nsps[k]);
+        g_debug ("CRYSTAL:: spec= %d, label= %s, nsps= %d", k+1, active_chem -> label[k], active_chem -> nsps[k]);
 #endif
+      }
+      else
+      {
+        if (active_chem -> nsps[k] != cryst -> nsps[i])
+        {
+#ifdef DEBUG
+          g_debug ("CRYSTAL:: number of atoms for chemical species %d changes between configurations", k+1);
+#endif
+          return -1;
+        }
+        if (active_chem -> chem_prop[CHEM_Z][k] != cryst -> z[i])
+        {
+#ifdef DEBUG
+          g_debug ("CRYSTAL:: atomic number for chemical species %d changes between configurations", k+1);
+#endif
+          return -1;
+        }
+      }
       for (m=0; m<tot_new_at;m++)
       {
         if (tot_new_lot[m] == i) tot_new_lot[m] = k;
@@ -1606,18 +1649,18 @@ int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboo
   }
   for (i=0; i<tot_new_at; i++)
   {
-    active_project -> atoms[0][i].id = i;
+    active_project -> atoms[c_step][i].id = i;
     j = tot_new_lot[i];
-    active_project -> atoms[0][i].sp =  j;
-    active_project -> atoms[0][i].x = ncc[i].x + copos[0];
-    active_project -> atoms[0][i].y = ncc[i].y + copos[1];
-    active_project -> atoms[0][i].z = ncc[i].z + copos[2];
-    active_project -> atoms[0][i].show[0] = TRUE;
-    active_project -> atoms[0][i].show[1] = TRUE;
-    active_project -> atoms[0][i].label[0] = FALSE;
-    active_project -> atoms[0][i].label[1] = FALSE;
-    active_project -> atoms[0][i].pick[0] = FALSE;
-    active_project -> atoms[0][i].cloned = FALSE;
+    active_project -> atoms[c_step][i].sp =  j;
+    active_project -> atoms[c_step][i].x = ncc[i].x + copos[0];
+    active_project -> atoms[c_step][i].y = ncc[i].y + copos[1];
+    active_project -> atoms[c_step][i].z = ncc[i].z + copos[2];
+    active_project -> atoms[c_step][i].show[0] = TRUE;
+    active_project -> atoms[c_step][i].show[1] = TRUE;
+    active_project -> atoms[c_step][i].label[0] = FALSE;
+    active_project -> atoms[c_step][i].label[1] = FALSE;
+    active_project -> atoms[c_step][i].pick[0] = FALSE;
+    active_project -> atoms[c_step][i].cloned = FALSE;
 #ifdef DEBUG
     // g_debug ("sp= %d, %s %f %f %f", j+1, active_chem -> label[j], ncc[i].x, ncc[i].y, ncc[i].z);
 #endif

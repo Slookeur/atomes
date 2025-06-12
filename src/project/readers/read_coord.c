@@ -61,7 +61,7 @@ extern int open_cif_file (int linec);
 extern int open_hist_file (int linec);
 extern void allocatoms (project * this_proj);
 extern chemical_data * alloc_chem_data (int spec);
-extern int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
+extern int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 extern const gchar * dfi[2];
 
 extern atom_search * cif_search;
@@ -85,7 +85,29 @@ line_node * tail = NULL;
 */
 void add_reader_info (gchar * info, int mid)
 {
-  this_reader -> info = (this_reader -> info) ? g_strdup_printf ("%s\n%s", this_reader -> info, info) : g_strdup_printf ("%s", info);
+  int i;
+  gboolean append = TRUE;
+  for (i=0; i<this_reader -> msg; i++)
+  {
+    if (g_strcmp0(this_reader -> info[i], info) == 0)
+    {
+      append = FALSE;
+      break;
+    }
+  }
+  if (append)
+  {
+    if (! this_reader -> msg)
+    {
+      this_reader -> info = g_malloc0 (sizeof*this_reader -> info);
+    }
+    else
+    {
+      this_reader -> info = g_realloc (this_reader -> info, (this_reader -> msg+1)*sizeof*this_reader -> info);
+    }
+    this_reader -> info[this_reader -> msg] = g_strdup_printf ("%s", info);
+    this_reader -> msg ++;
+  }
   if (! mid) this_reader -> mid = 0;
 }
 
@@ -361,21 +383,21 @@ int open_coord_file (gchar * filename, int fti)
 #endif
   if (! res)
   {
-    if (fti == 9)
+    if (fti == 9 && ! this_reader -> cartesian)
     {
-      if (! this_reader -> cartesian)
+      // this_reader -> lattice.sp_group -> sid = 2;
+      // get_origin (this_reader -> lattice.sp_group);
+      if (! cif_use_symmetry_positions)
       {
-        // this_reader -> lattice.sp_group -> sid = 2;
-        // get_origin (this_reader -> lattice.sp_group);
-        if (! cif_use_symmetry_positions)
+        // Test for all configurations, do build each:
+        //  - a single trajectory ?
+        //  - each in a single project ?
+        for (i=0; i<active_project -> steps; i++)
         {
-          // Test for all configurations, do build each:
-          //  - a single trajectory ?
-          //  - each in a single project ?
-          i = build_crystal (FALSE, active_project, TRUE, FALSE, & this_reader -> lattice, MainWindow);
-          if (! i)
+          j = build_crystal (FALSE, active_project, i, TRUE, FALSE, & this_reader -> lattice, MainWindow);
+          if (! j)
           {
-            add_reader_info ("Error trying to build crystal using the CIF file parameters !\n"
+            add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
                              "This usually comes from: \n"
                              "\t - incorrect space group description\n"
                              "\t - incomplete space group description\n"
@@ -383,7 +405,13 @@ int open_coord_file (gchar * filename, int fti)
                              "\t - incorrect space group setting\n", 0);
             res = 3;
           }
-          else if (i > 1)
+          else if (j < 0)
+          {
+            add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
+                             "Information lead to change(s) between each configuration\n", 0);
+            res = 3;
+          }
+          else if (j > 1)
           {
             add_reader_info ("Potential issue(s) when building crystal !\n"
                              "This usually comes from: \n"
@@ -391,9 +419,9 @@ int open_coord_file (gchar * filename, int fti)
                              "\t - incomplete space group description\n"
                              "\t - missing space group setting\n"
                              "\t - incorrect space group setting\n", 1);
-            if (this_reader -> num_sym_pos)
+            if (this_reader -> num_sym_pos && active_project -> steps == 1)
             {
-              add_reader_info ("\nAnother model will be built using included symmetry positions\n", 1);
+               add_reader_info ("\nAnother model will be built using included symmetry positions\n", 1);
               cif_use_symmetry_positions = TRUE;
             }
           }

@@ -97,7 +97,7 @@ extern G_MODULE_EXPORT void show_sg_info (GtkButton * but, gpointer data);
 
 extern void get_origin (space_group * spg);
 extern int test_lattice (builder_edition * cbuilder, cell_info * cif_cell);
-extern int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
+extern int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 
 gchar * crystal_sytems[7] = {"Triclinic", "Monoclinic", "Othorhombic", "Tetragonal", "Trigonal", "Hexagonal", "Cubic"};
 gchar * bravais_keys[7][4] = {{"Primitive", NULL, NULL, NULL},
@@ -1077,8 +1077,8 @@ G_MODULE_EXPORT void apply_build (GtkButton * but, gpointer data)
   project * this_proj = get_project_by_id(id);
   if (test_lattice(this_proj -> modelgl -> builder_win, NULL))
   {
-    build_crystal (TRUE, this_proj, this_proj -> modelgl -> builder_win -> wrap, this_proj -> modelgl -> builder_win -> clones,
-                                  & this_proj -> modelgl -> builder_win -> cell, this_proj -> modelgl -> builder_win -> win);
+    build_crystal (TRUE, this_proj, 0, this_proj -> modelgl -> builder_win -> wrap, this_proj -> modelgl -> builder_win -> clones,
+                                     & this_proj -> modelgl -> builder_win -> cell, this_proj -> modelgl -> builder_win -> win);
   }
 }
 

@@ -482,7 +482,7 @@ gchar * cif_occ[3]={"to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<
                     "to highest integer: <b>⌈</b>n<sub>sites</sub> x occupancy<b>⌉</b>",
                     "to nearest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌉</b>"};
 gchar * cif_sites[2]={"with n<sub>sites</sub> = f(space group, crystalline positions)",
-                      "with n<sub>sites</sub> = f(symmetry positions, crystaline positions)"};
+                      "with n<sub>sites</sub> = f(symmetry positions, crystalline positions)"};
 
 GtkWidget * answer_info;
 

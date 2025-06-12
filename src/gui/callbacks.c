@@ -1341,17 +1341,24 @@ int open_coordinate_file (int id)
   g_print ("Time to read atomic coordinates: %s\n", calculation_time(FALSE, get_calc_time (sta_time, sto_time)));
   if (this_reader)
   {
-    if (this_reader -> info && (! silent_input || cif_use_symmetry_positions))
+    if (this_reader -> msg && (! silent_input || cif_use_symmetry_positions))
     {
+      gchar * info = g_strdup_printf ("%s", this_reader -> info[0]);
+      int i;
+      for (i=1; i<this_reader -> msg; i++)
+      {
+        info = g_strdup_printf ("%s\n%s", info, this_reader -> info[i]);
+      }
       switch (this_reader -> mid)
       {
         case 0:
-          show_error (this_reader -> info, 0, MainWindow);
+          show_error (info, 0, MainWindow);
           break;
         case 1:
-          show_warning (this_reader -> info, MainWindow);
+          show_warning (info, MainWindow);
           break;
       }
+      g_free (info);
     }
     if (this_reader)
     {

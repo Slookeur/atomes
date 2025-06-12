@@ -512,7 +512,8 @@ struct coord_file
   gchar ** dummy;                          /*!< List of dummy atom(s), if any */
   cell_info lattice;                       /*!< Description of the periodicity */
   int mid;                                 /*!< Message type (0 = error, 1 = warning), if any */
-  gchar * info;                            /*!< Information message, if required */
+  int msg;                                 /*!< Number of message(s) */
+  gchar ** info;                           /*!< Information message(s), if required */
   gchar ** label;                          /*!< VAS or TRJ: list of chemical labels, \n CIF: Label list of mis-labelled object(s) */
   // The following line is only used for DL_POLY history files:
   int traj;                                /*!< */
@@ -525,6 +526,8 @@ struct coord_file
   double * occupancy;                      /*!< Site(s) occupancy */
   int ** occupied;                         /*!< Occupancy status */
   int * multi;                             /*!< Multiplicity */
+  int disorder;                            /*!< Number of disorder group */
+  int * disorder;                          /*!< Site disorder group */
   int atom_unlabelled;                     /*!< Number of atom(s) unlabelled */
   int * u_atom_list;                       /*!< List of unlabelled atom(s) */
   int object_to_insert;                    /*!< Number of object(s) to label */
