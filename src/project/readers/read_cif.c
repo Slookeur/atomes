@@ -99,7 +99,6 @@ int cif_nspec;
 int * cif_lot = NULL;
 int * cif_nsps = NULL;
 
-gboolean cif_chemical = FALSE;
 gchar ** cif_strings = NULL;
 
 gchar * cif_coord_opts[40][2] = {{"b1", "Monoclinic unique axis b, cell choice 1, abc"},    // 0
@@ -516,7 +515,6 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           }
           if (this_word && rec_val)
           {
-             g_debug ("THIS_WORD= %s", this_word);
              * cif_word = get_cif_word (this_word);
           }
           g_free (str_w);
@@ -1086,7 +1084,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   gchar * str = NULL;
   int cid[9];
   int loop_line;
-  int i, j, k, l;
+  int i, j, k;
 
   loop_line = get_loop_line_for_key (linec, conf, "_atom_site", cartkeys[0]);
   if (! loop_line)
@@ -1138,17 +1136,17 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   if (i < 3)
   {
     j = 0;
-    for (l=0; l<3; l++)
+    for (k=0; k<3; k++)
     {
-      cid[l+2] = cif_get_value ("_atom_site", frackeys[l], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
-      if (cid[l+2])
+      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+      if (cid[k+2])
       {
-        cid[l+2] -= loop_line;
+        cid[k+2] -= loop_line;
         j ++;
       }
       else
       {
-        str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", frackeys[l]);
+        str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", frackeys[k]);
         add_reader_info (str, 1);
         g_free (str);
       }
@@ -1245,71 +1243,105 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   if (! this_reader -> cartesian && cif_use_symmetry_positions)
   {
     // Testing site multiplicity, to ensure that occupancy is not > 1.0
-    // this_reader -> occupied = g_malloc0(this_reader -> natomes*sizeof*this_reader -> occupied);
     double v;
     for (i=0; i<this_reader -> natomes; i++)
     {
-      /* for (j=0; j<2; j++)
+      v = this_reader -> occupancy[i];
+      for (j=0; j<this_reader -> natomes; j++)
       {
-        k = 1; */
-        v = this_reader -> occupancy[i];
-        for (l=0; l<this_reader -> natomes; l++)
+        if (j != i)
         {
-          if (l != i)
+          if (this_reader -> coord[i][0] == this_reader -> coord[j][0]
+           && this_reader -> coord[i][1] == this_reader -> coord[j][1]
+           && this_reader -> coord[i][2] == this_reader -> coord[j][2])
           {
-            if (this_reader -> coord[i][0] == this_reader -> coord[l][0]
-             && this_reader -> coord[i][1] == this_reader -> coord[l][1]
-             && this_reader -> coord[i][2] == this_reader -> coord[l][2])
+            v += this_reader -> occupancy[j];
+            if (v > 1.00001)
             {
-              v += this_reader -> occupancy[l];
-              /* k ++;
-              if (j) this_reader -> occupied[i][k] = l; */
-              if (v > 1.00001)
-              {
-                add_reader_info ("<b>Atomic coordinates</b>: a site was found to have an occupancy > 1.0 !\n", 0);
-                return FALSE;
-              }
+              add_reader_info ("<b>Atomic coordinates</b>: a site was found to have an occupancy > 1.0 !\n", 0);
+              return FALSE;
             }
           }
         }
-        /* if (! j)
-        {
-          this_reader -> occupied[i] = allocint (k+1);
-          this_reader -> occupied[i][0] = k;
-          this_reader -> occupied[i][1] = i;
-        }
-      } */
+      }
     }
   }
-  if (! this_reader -> cartesian && cif_chemical)
+  if (! this_reader -> cartesian && this_reader -> chemical)
   {
     // Testing the different number of occupancies
     double * test_occ = allocdouble (1);
     int * num_occ = allocint (1);
-    int i = 1;
-    gboolean new_occ;
+    int * test_order = allocint (1);
+    int * num_order = allocint (1);
+    gboolean new_occ, new_order;
+    int occupancies = 1;
+    int disorders = 1;
     test_occ[0] = this_reader -> occupancy[0];
-    num_occ[0] = 1;
-    for (j=1; j<this_reader -> natomes; j++)
+    test_order[0] = this_reader -> disorder[0];
+    num_occ[0] = num_order[0] = 1;
+    for (i=1; i<this_reader -> natomes; i++)
     {
-      new_occ = TRUE;
-      for (k=1; k<i; k++)
+      new_occ = new_order = TRUE;
+      for (j=0; j<occupancies; j++)
       {
-        if (test_occ[k] == this_reader -> occupancy[j])
+        if (test_occ[j] == this_reader -> occupancy[i])
         {
-          num_occ[k] ++;
+          num_occ[j] ++;
           new_occ = FALSE;
           break;
         }
       }
       if (new_occ)
       {
-        test_occ = g_realloc (test_occ, (i+1)*sizeof*test_occ);
-        test_occ[i] = this_reader -> occupancy[j];
-        num_occ = g_realloc (num_occ, (i+1)*sizeof*num_occ);
-        num_occ[i] = 1;
-        i ++;
+        test_occ = g_realloc (test_occ, (occupancies+1)*sizeof*test_occ);
+        test_occ[occupancies] = this_reader -> occupancy[i];
+        num_occ = g_realloc (num_occ, (occupancies+1)*sizeof*num_occ);
+        num_occ[occupancies] = 1;
+        occupancies ++;
       }
+      for (j=0; j<disorders; j++)
+      {
+        if (test_order[j] == this_reader -> disorder[i])
+        {
+          num_order[j] ++;
+          new_order = FALSE;
+          break;
+        }
+      }
+      if (new_order)
+      {
+        test_order = g_realloc (test_order, (disorders+1)*sizeof*test_order);
+        test_order[disorders] = this_reader -> disorder[i];
+        num_order = g_realloc (num_order, (disorders+1)*sizeof*num_order);
+        num_order[disorders] = 1;
+        disorders ++;
+      }
+    }
+    if (this_reader -> natomes%occupancies == 0 || this_reader -> natomes%disorders == 0)
+    {
+      // Atoms can be separated based on site occupancy or site disorder
+      // We can consider this as a chemical "reaction or trajectory"
+      // As many lattices near by as occupancies or disorders
+      new_occ = TRUE;
+      for (i=0; i<occupancies; i++)
+      {
+        if (num_occ[i] != this_reader -> natomes/occupancies)
+        {
+          new_occ = FALSE;
+          break;
+        }
+     }
+      if (new_occ) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n", 1);
+      new_order = TRUE;
+      for (i=0; i<disorders; i++)
+      {
+        if (num_order[i] != this_reader -> natomes/disorders)
+        {
+          new_order = FALSE;
+          break;
+        }
+      }
+      if (new_order) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n", 1);
     }
   }
   return TRUE;
@@ -2512,16 +2544,15 @@ int open_cif_file (int linec)
     {
       add_reader_info ("This CIF file could be describing a trajectory or a chemical reaction.\n", 1);
       // This is where to ask what to do !
-      // Read all like a chemical reaction: for each configuration sort coordinates by occupancy
+      // Read like a chemical reaction: read one configuration sort coordinates by occupancy
       // Read all as trajectory CIF file: forget about using occupancy to sort coordinates
+      //   - possible if the number of atom(s) by configuration remains constant
       // Read only a selected configuration and:
-      //   - treat as chemical reaction: sort coordinates by occupancy
       //   - read as normal CIF file, forget about using occupancy to sort coordinates
       // Because what follow will depend on this choice
       cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
-      cif_chemical = (cif_action == 0 || cif_action == 2) ? TRUE : FALSE;
-      this_reader -> chemical = (cif_action == 0 || cif_action == 2) ? TRUE : FALSE;
-      cif_action = (cif_action < 2) ? 0 : 1;
+      this_reader -> chemical = ! cif_action;
+      cif_action = (cif_action == 1) ? 0 : 1;
     }
     else
     {

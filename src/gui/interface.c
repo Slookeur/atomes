@@ -454,28 +454,25 @@ gchar * npt_type[4]={"A\tB\tC\t&#x3B1;\t&#x3B2;\t&#x263;",
 gchar * npt_info[3]={"1 line by step, as many lines as MD steps",
                      "2 lines by step, twice as many lines as MD steps",
                      "3 lines by step, three times as many lines as MD steps"};
-gchar * cif_configurations[4]={"Chemical reaction",
+gchar * cif_configurations[3]={"Single step chemical reaction",
                                "MD trajectory",
-                               "Single step chemical reaction",
                                "Single configuration"};
 gchar * cif_occupancies[3]={"Round up to lowest integer",
                             "Round up to highest integer",
                             "Round up to nearest integer"};
-
-gchar * cif_config_legends={"\t<b>Chemical reaction</b>\n"
+gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
                             "\t\tConsider each configuration as a step in a chemical reaction:\n"
-                            "\t\t\t- Atomic coordinates are sorted based on occupancy\n"
-                            "\t\t\t- Each occupancy describes the proportion of a reactant\n"
-                            "\t\t\t- A super lattice is build to respect these proportions\n"
-                            "\t\t\t- A trajectory is constructed following this process\n\n"
+                            "\t\t\t- Atomic coordinates are sorted based on occupancy or disorder site\n"
+                            "\t\t\t- Each describeing the proportion of a reactant\n"
+                            "\t\t\t- A super lattice is build to respect these proportions\n\n"
                             "\t<b>MD trajectory</b>\n"
                             "\t\tConsider the CIF file a MD trajectory\n\n"
-                            "\t<b>Single step chemical reaction</b>\n"
-                            "\t\tSelect and single configuration then treat as chemical reaction\n\n"
+                            "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
                             "\t<b>Single configuration </b>\n"
                             "\t\tSelect a single configuration in the CIF file"};
 gchar * cif_config_leg={"\t<b>MD trajectory</b>\n"
                         "\t\tConsider the CIF file a MD trajectory\n\n"
+                        "\t\tNumber of atom(s) must not change between configuration(s)\n"
                         "\t<b>Single configuration </b>\n"
                         "\t\tSelect a single configuration in the CIF file"};
 gchar * cif_occ[3]={"to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌋</b>",
@@ -592,11 +589,10 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
           for (i=0; i<NCFORMATS; i++) combo_text_append (answer, coord_files[i]);
           break;
         case 3:
-          for (i=0; i<4; i++) combo_text_append (answer, cif_configurations[i]);
+          for (i=0; i<3; i++) combo_text_append (answer, cif_configurations[i]);
           break;
         case 4:
-          combo_text_append (answer, cif_configurations[1]);
-          combo_text_append (answer, cif_configurations[3]);
+          for (i=1; i<3; i++) combo_text_append (answer, cif_configurations[i]);
           break;
         case 5:
           for (i=0; i<3; i++) combo_text_append (answer, cif_occupancies[i]);
