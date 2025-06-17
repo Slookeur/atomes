@@ -392,10 +392,14 @@ int open_coord_file (gchar * filename, int fti)
         // Test for all configurations, do build each:
         //  - a single trajectory ?
         //  - each in a single project ?
-        for (i=0; i<active_project -> steps; i++)
+        i = 1;
+        crystal_dist_chk = TRUE;
+        crystal_crowded = FALSE;
+        crystal_low_warning = TRUE;
+        for (j=0; j<active_project -> steps; j++)
         {
-          j = build_crystal (FALSE, active_project, i, TRUE, FALSE, & this_reader -> lattice, MainWindow);
-          if (! j)
+          k = build_crystal (FALSE, active_project, j, TRUE, FALSE, & this_reader -> lattice, MainWindow);
+          if (! k)
           {
             add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
                              "This usually comes from: \n"
@@ -404,14 +408,16 @@ int open_coord_file (gchar * filename, int fti)
                              "\t - missing space group setting\n"
                              "\t - incorrect space group setting\n", 0);
             res = 3;
+            goto end;
           }
-          else if (j < 0)
+          else if (k < 0)
           {
             add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
                              "Information lead to change(s) between each configuration\n", 0);
             res = 3;
+            goto end;
           }
-          else if (j > 1)
+          else if (k > 1 && i)
           {
             add_reader_info ("Potential issue(s) when building crystal !\n"
                              "This usually comes from: \n"
@@ -424,6 +430,7 @@ int open_coord_file (gchar * filename, int fti)
                add_reader_info ("\nAnother model will be built using included symmetry positions\n", 1);
               cif_use_symmetry_positions = TRUE;
             }
+            i = 0;
           }
         }
       }
@@ -488,6 +495,7 @@ int open_coord_file (gchar * filename, int fti)
       }
     }
   }
+  end:;
   if (! (fti == 9 && cif_use_symmetry_positions) || res)
   {
     if (cif_search)

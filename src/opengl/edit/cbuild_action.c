@@ -952,6 +952,10 @@ gboolean adjust_object_occupancy (crystal_data * cryst, int occupying, int round
   return low_occ;
 }
 
+gboolean crystal_low_warning;
+gboolean crystal_crowded;
+gboolean crystal_dist_chk;
+
 /*!
   \fn int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg)
 
@@ -1199,26 +1203,30 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
         {
           if (object -> dim > amin)
           {
-            str = g_strdup_printf ("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
-                                   "If you build the crystal the final structure is likely to be crowded !\n"
-                                   "Continue anyway ?", object -> name, object -> dim);
-            build_res = 2;
-            if (! ask_yes_no("This object might be too big !" , str, GTK_MESSAGE_WARNING, widg))
+            if (! crystal_crowded)
             {
-              g_free (str);
-              if (points) g_free (points);
-              if (wyckpos) g_free (wyckpos);
-              if (cdata) cdata = free_crystal_data (cdata);
-              if (! visible)
+              str = g_strdup_printf ("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
+                                     "If you build the crystal the final structure is likely to be crowded !\n"
+                                     "Continue anyway ?", object -> name, object -> dim);
+              build_res = 2;
+              crystal_crowded = ask_yes_no("This object might be too big !" , str, GTK_MESSAGE_WARNING, widg);
+              if (! crystal_crowded)
               {
-                this_proj -> modelgl -> search_widg[7] = free_this_search_data (this_proj -> modelgl -> search_widg[7]);
-                g_free (this_proj -> modelgl);
-                this_proj -> modelgl = NULL;
-                active_glwin = NULL;
+                g_free (str);
+                if (points) g_free (points);
+                if (wyckpos) g_free (wyckpos);
+                if (cdata) cdata = free_crystal_data (cdata);
+                if (! visible)
+                {
+                  this_proj -> modelgl -> search_widg[7] = free_this_search_data (this_proj -> modelgl -> search_widg[7]);
+                  g_free (this_proj -> modelgl);
+                  this_proj -> modelgl = NULL;
+                  active_glwin = NULL;
+                }
+                return 0;
               }
-              return 0;
+              g_free (str);
             }
-            g_free (str);
           }
           i ++;
           j += object -> species;
@@ -1447,7 +1455,6 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   gboolean low_occ = adjust_object_occupancy (cryst, occupying, rounding, tot_cell);
   atom at, bt;
   distance dist;
-  gboolean dist_chk = TRUE;
 
   if (! cryst -> overlapping)
   {
@@ -1476,13 +1483,13 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                   if (dist.length < 0.5)
                   {
                     // g_print ("i= %d, j= %d, k= %d, m= %d, d= %f\n", i, j, k, m, dist.length);
-                    if (dist_chk)
+                    if (crystal_dist_chk)
                     {
                       build_res = 3;
                       if (ask_yes_no ("Inter-object distance(s) < 0.5 Ang. !",
                                       "Inter-object distance(s) &lt; 0.5 Ang. !\n\n\t\tContinue and leave a single object at each position ?", GTK_MESSAGE_WARNING, widg))
                       {
-                        dist_chk = FALSE;
+                        crystal_dist_chk = FALSE;
                       }
                       else
                       {
@@ -1491,7 +1498,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                         return 0;
                       }
                     }
-                    if (! dist_chk)
+                    if (! crystal_dist_chk)
                     {
                       if (dist.length < 0.1)
                       {
@@ -1764,7 +1771,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   }
   update_insert_combos ();
   active_cell -> sp_group = duplicate_space_group (sp_group);
-  if (low_occ)
+  if (low_occ && crystal_low_warning)
   {
     gchar * low_warning = "The crystal will be created however some objects might be missing,\n"
                            "Occupancy is too low compared to the number of site(s) per cell.\n\n"
@@ -1773,6 +1780,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                           "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
                           "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.";
     show_warning (low_warning, widg);
+    crystal_low_warning = FALSE;
   }
   return build_res;
 }

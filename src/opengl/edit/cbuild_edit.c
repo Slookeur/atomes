@@ -1077,6 +1077,9 @@ G_MODULE_EXPORT void apply_build (GtkButton * but, gpointer data)
   project * this_proj = get_project_by_id(id);
   if (test_lattice(this_proj -> modelgl -> builder_win, NULL))
   {
+    crystal_dist_chk = TRUE;
+    crystal_crowded = FALSE;
+    crystal_low_warning = TRUE;
     build_crystal (TRUE, this_proj, 0, this_proj -> modelgl -> builder_win -> wrap, this_proj -> modelgl -> builder_win -> clones,
                                      & this_proj -> modelgl -> builder_win -> cell, this_proj -> modelgl -> builder_win -> win);
   }

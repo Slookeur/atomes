@@ -443,13 +443,13 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
   gchar * str;
   gchar * str_w, * str_a, * str_b;
   gchar * mot;
+  gchar * saved_line;
   j = strlen(kroot);
   k = strlen(keyw);
   l = j+k+1;
 
 #ifdef OPENMP
   int numth = (in_loop) ? 1 : omp_get_max_threads ();
-  gchar * saved_line;
   #pragma omp parallel for num_threads(numth) private(i,m,this_line,saved_line,this_word,str_a,str_b,str_w) shared(j,k,l,this_reader,res,coord_line,cif_word,mot,rec_val,all_ligne,in_loop,kroot,keyw,total_num,record_position,line_position)
   for (i=lstart; i<lend; i++)
   {
@@ -553,11 +553,14 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
   while (tail)
   {
     this_line = g_strdup_printf ("%s", tail -> line);
-    this_word = strtok (this_line, " ");
+    saved_line = g_strdup_printf ("%s", this_line);
+    this_word = strtok_r (this_line, " ", & saved_line);
     while (this_word)
     {
       if (in_loop && this_word[0] != '_') return 0;
-      str_w = get_cif_word(this_word);
+
+
+      str_w = get_cif_word (this_word);
       str_w = g_ascii_strdown (str_w, strlen(str_w));
       if (strlen(str_w) == l)
       {
@@ -567,7 +570,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         for (m=j+2; m<l; m++) str_b = g_strdup_printf ("%s%c", str_b, str_w[m]);
         if (g_strcmp0(str_a, kroot) == 0 && g_strcmp0(str_b,keyw) == 0)
         {
-          this_word = strtok (NULL, " ");
+          this_word = strtok_r (NULL, " ", & saved_line);
           if (! this_word)
           {
             if (rec_val || all_ligne)
@@ -581,19 +584,23 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
               return 0;
             }
           }
+
           if (all_ligne)
           {
             mot = g_strdup_printf ("%s", this_word);
-            this_word = strtok (NULL, " ");
+            this_word = strtok_r (NULL, " ", & saved_line);
             while (this_word)
             {
               mot = g_strdup_printf ("%s%s", mot, this_word);
-              this_word = strtok (NULL, " ");
+              this_word = strtok_r (NULL, " ", & saved_line);
             }
             this_word = g_strdup_printf ("%s", mot);
             g_free (mot);
           }
-          if (this_word && rec_val) * cif_word = get_cif_word (this_word);
+          if (this_word && rec_val)
+          {
+             * cif_word = get_cif_word (this_word);
+          }
           g_free (str_w);
           str_w = NULL;
           g_free (str_a);
@@ -629,7 +636,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         g_free (str_w);
         str_w = NULL;
       }
-      this_word = strtok (NULL, " ");
+      this_word = strtok_r (NULL, " ", & saved_line);
     }
     tail = tail -> next;
     i ++;
@@ -765,12 +772,14 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
 {
   int lli = 0;
   int * line_numbers = allocint (this_reader -> steps);
+
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
+  g_debug ("CIF:: get_loop_line_for_key:: linec= %d, key_a= %s, key_b= %s, steps= %d", linec, key_a, key_b, steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
     {
-      gchar * str = g_strdup_printf ("<b>CIF get loop line</b>: something is wrong for keyword: %s%s,\n"
+      gchar * str = g_strdup_printf ("<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
                                      "  -> keyword found= %d times\n"
                                      "  -> configurations in CIF file= %d !\n", key_a, key_b, steps, this_reader -> steps);
       add_reader_info (str, 0);
@@ -797,18 +806,20 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
   \param all_ligne browse all line (1/0)
   \param in_loop is field in a loop (1/0)
 */
-gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b,gboolean all_ligne, gboolean in_loop)
+gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, gboolean all_ligne, gboolean in_loop)
 {
   gchar * str;
   gchar * cif_value = NULL;
   int loop_pos[2];
   int * line_numbers = allocint (this_reader -> steps);
+  g_debug ("CIF:: retrive:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
+  g_debug ("CIF:: retrieve:: steps= %d", steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
     {
-      str = g_strdup_printf ("<b>CIF retrieve value</b>: something is wrong for keyword: %s_%s,\n"
+      str = g_strdup_printf ("<b>CIF retrieve value</b>: something is wrong for keyword: %s_%s\n"
                              "  -> keyword found= %d times\n"
                              "  -> configurations in CIF file= %d !\n", key_a, key_b, steps, this_reader -> steps);
       add_reader_info (str, 0);
@@ -829,14 +840,16 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b,gb
       loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : line_numbers[conf + 1];
     }
     g_free (line_numbers);
-    if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, FALSE, FALSE, FALSE, NULL))
+    g_debug ("CIF:: retrieve:: loop_pos[0]= %d, loop_pos[1]= %d", loop_pos[0], loop_pos[1]);
+    if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, in_loop, FALSE, FALSE, NULL))
     {
-      str = g_strdup_printf ("<b>Keys positions</b>: something is wrong for keyword: %s%s,\n"
+      str = g_strdup_printf ("<b>Keys positions</b>: something is wrong for keyword: %s_%s\n"
                              "  -> not found between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, loop_pos[0], loop_pos[1]);
       add_reader_info (str, 0);
       g_free (str);
       return NULL;
     }
+    g_debug ("CIF:: retrieve:: cif_value ! %s", (cif_value) ? cif_value : "NONE");
     return cif_value;
   }
   else
@@ -1056,7 +1069,6 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
              this_reader -> coord[i][0], this_reader -> coord[i][1], this_reader -> coord[i][2]);
 #endif */
     tail = tail -> next;
-    g_free (tail -> prev);
   }
 #endif
 
@@ -1085,6 +1097,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   int cid[9];
   int loop_line;
   int i, j, k;
+  double u, v;
 
   loop_line = get_loop_line_for_key (linec, conf, "_atom_site", cartkeys[0]);
   if (! loop_line)
@@ -1099,11 +1112,11 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     this_reader -> cartesian = TRUE;
   }
-
+  g_debug ("CIF:: get_coordinates:: loop_line= %d", loop_line);
   i = 0;
   for (j=0; j<2; j++)
   {
-    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j])
     {
       i ++;
@@ -1119,7 +1132,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   i = 0;
   for (j=0; j<3; j++)
   {
-    cid[j+2] = cif_get_value ("_atom_site", cartkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+    cid[j+2] = cif_get_value ("_atom_site", cartkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j+2])
     {
       i ++;
@@ -1138,7 +1151,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     j = 0;
     for (k=0; k<3; k++)
     {
-      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[k+2])
       {
         cid[k+2] -= loop_line;
@@ -1167,7 +1180,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     for (i=0; i<4; i++)
     {
-      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+20, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[i+5])
       {
         cid[i+5] -= loop_line;
@@ -1175,6 +1188,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     }
   }
   i = cif_file_get_data_in_loop (linec, loop_line);
+  g_debug ("CIF:: atoms:: linec= %d, loop_line= %d, i= %d", linec, loop_line, i);
   this_reader -> natomes = cif_file_get_number_of_atoms (linec, loop_line+i, i);
 #ifdef DEBUG
   g_debug ("CIF:: configuration %d, atoms in CIF file= %d", conf+1, this_reader -> natomes);
@@ -1243,7 +1257,6 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   if (! this_reader -> cartesian && cif_use_symmetry_positions)
   {
     // Testing site multiplicity, to ensure that occupancy is not > 1.0
-    double v;
     for (i=0; i<this_reader -> natomes; i++)
     {
       v = this_reader -> occupancy[i];
@@ -1276,7 +1289,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     gboolean new_occ, new_order;
     int occupancies = 1;
     int disorders = 1;
-    test_occ[0] = this_reader -> occupancy[0];
+    u = v = test_occ[0] = this_reader -> occupancy[0];
     test_order[0] = this_reader -> disorder[0];
     num_occ[0] = num_order[0] = 1;
     for (i=1; i<this_reader -> natomes; i++)
@@ -1295,6 +1308,8 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       {
         test_occ = g_realloc (test_occ, (occupancies+1)*sizeof*test_occ);
         test_occ[occupancies] = this_reader -> occupancy[i];
+        u = min (u, test_occ[occupancies]);
+        v = max (v, test_occ[occupancies]);
         num_occ = g_realloc (num_occ, (occupancies+1)*sizeof*num_occ);
         num_occ[occupancies] = 1;
         occupancies ++;
@@ -1331,7 +1346,8 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
           break;
         }
      }
-      if (new_occ) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n", 1);
+      // if (new_occ) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n", 1);
+      // g_debug ("min= %f, max= %f, max/min= %f", u, v, v/u);
       new_order = TRUE;
       for (i=0; i<disorders; i++)
       {
@@ -1341,7 +1357,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
           break;
         }
       }
-      if (new_order) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n", 1);
+      // if (new_order) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n", 1);
     }
   }
   return TRUE;
@@ -1741,7 +1757,7 @@ gboolean cif_get_cell_data (int linec, int conf)
   i = (conf && active_project -> steps == 1) ? 0 : conf;
   for (j=0; j<3; j++)
   {
-    str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, TRUE);
+    str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, FALSE);
     if (! str)
     {
       str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[0][j]);
@@ -1758,7 +1774,7 @@ gboolean cif_get_cell_data (int linec, int conf)
     g_debug ("CIF:: box[%d][%d]= %f", i, j, this_reader -> lattice.box[i].param[0][j]);
 #endif
     g_free (str);
-    str = cif_retrieve_value (linec, conf, "_cell", cellangs[j], TRUE, TRUE);
+    str = cif_retrieve_value (linec, conf, "_cell", cellangs[j], TRUE, FALSE);
     if (! str)
     {
       str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[1][j]);
@@ -2550,9 +2566,10 @@ int open_cif_file (int linec)
       // Read only a selected configuration and:
       //   - read as normal CIF file, forget about using occupancy to sort coordinates
       // Because what follow will depend on this choice
-      cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
+      /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
       this_reader -> chemical = ! cif_action;
-      cif_action = (cif_action == 1) ? 0 : 1;
+      cif_action = (cif_action == 1) ? 0 : 1; */
+      cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 4, MainWindow);
     }
     else
     {
