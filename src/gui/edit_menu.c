@@ -901,4 +901,3 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
     tmpcut = NULL;
   }
 }
-

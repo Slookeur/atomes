@@ -772,9 +772,7 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
 {
   int lli = 0;
   int * line_numbers = allocint (this_reader -> steps);
-
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
-  g_debug ("CIF:: get_loop_line_for_key:: linec= %d, key_a= %s, key_b= %s, steps= %d", linec, key_a, key_b, steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
@@ -812,9 +810,9 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
   gchar * cif_value = NULL;
   int loop_pos[2];
   int * line_numbers = allocint (this_reader -> steps);
-  g_debug ("CIF:: retrive:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
+  // g_debug ("CIF:: retrive:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
-  g_debug ("CIF:: retrieve:: steps= %d", steps);
+  // g_debug ("CIF:: retrieve:: steps= %d", steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
@@ -840,7 +838,6 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
       loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : line_numbers[conf + 1];
     }
     g_free (line_numbers);
-    g_debug ("CIF:: retrieve:: loop_pos[0]= %d, loop_pos[1]= %d", loop_pos[0], loop_pos[1]);
     if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, in_loop, FALSE, FALSE, NULL))
     {
       str = g_strdup_printf ("<b>Keys positions</b>: something is wrong for keyword: %s_%s\n"
@@ -849,7 +846,6 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
       g_free (str);
       return NULL;
     }
-    g_debug ("CIF:: retrieve:: cif_value ! %s", (cif_value) ? cif_value : "NONE");
     return cif_value;
   }
   else
@@ -1112,7 +1108,6 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     this_reader -> cartesian = TRUE;
   }
-  g_debug ("CIF:: get_coordinates:: loop_line= %d", loop_line);
   i = 0;
   for (j=0; j<2; j++)
   {
@@ -1188,11 +1183,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     }
   }
   i = cif_file_get_data_in_loop (linec, loop_line);
-  g_debug ("CIF:: atoms:: linec= %d, loop_line= %d, i= %d", linec, loop_line, i);
   this_reader -> natomes = cif_file_get_number_of_atoms (linec, loop_line+i, i);
-#ifdef DEBUG
-  g_debug ("CIF:: configuration %d, atoms in CIF file= %d", conf+1, this_reader -> natomes);
-#endif
   if (! this_reader -> natomes) return FALSE;
 
   if (conf && active_project -> steps > 1 && this_reader -> natomes != cif_atoms)

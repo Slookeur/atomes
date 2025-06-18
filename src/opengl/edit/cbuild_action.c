@@ -1561,9 +1561,6 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   {
     i = cryst -> spec;
   }
-#ifdef DEBUG
-  g_debug ("CRYSTAL:: atoms= %d, species= %d", tot_new_at, i);
-#endif
   if (! c_step)
   {
     active_project -> natomes = tot_new_at;
