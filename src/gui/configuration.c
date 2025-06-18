@@ -16,7 +16,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 /*!
 * @file configuration.c
 * @short GUI of the configuration window \n
-         Associated interactors
+         Associated controlers
 * @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 */
 
@@ -27,7 +27,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 
  - The GUI for the general configuration window
- - The associated interactors
+ - The associated controlers
 
 *
 * List of functions:
@@ -50,8 +50,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 void create_configuration_dialog ()
 {
-
-
   // General prefs
   /*
   - default radius to be used
@@ -72,7 +70,7 @@ void create_configuration_dialog ()
     - default atom to start the search (all or
     - default max ring size
     - default NUMA ring
-    - defaut search ABAB, no homo in rings, no homo in matrix
+    - default search ABAB, no homo in rings, no homo in matrix
 
     - default max chain size
     - default NUMA chain
@@ -96,5 +94,8 @@ void create_configuration_dialog ()
   - Default show box and option
 
   */
+
+
+
 
 }

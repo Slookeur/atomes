@@ -1094,6 +1094,8 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   int loop_line;
   int i, j, k;
   double u, v;
+  int * tmp_nsps;
+  double * tmp_z;
 
   loop_line = get_loop_line_for_key (linec, conf, "_atom_site", cartkeys[0]);
   if (! loop_line)
@@ -1219,6 +1221,31 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   this_reader -> z = allocdouble (1);
   this_reader -> nsps = allocint (1);
   if (! cif_file_get_atoms_data (conf, loop_line+i, cid)) return FALSE;
+  if (active_project -> steps > 1)
+  {
+    tmp_nsps = duplicate_int (this_reader -> nspec, this_reader -> nsps);
+    tmp_z = duplicate_double (this_reader -> nspec, this_reader -> z);
+    for (i=1; i<this_reader -> nspec; i++)
+    {
+      v = tmp_z[i];
+      j = tmp_nsps[i];
+      for (k=i-1; k>-1; k--)
+      {
+        if (tmp_z[k] <= v) break;
+        tmp_z[k+1] = tmp_z[k];
+        tmp_nsps[k+1] = tmp_nsps[k];
+      }
+      tmp_z[k+1] = v;
+      tmp_nsps[k+1] = j;
+    }
+    g_free (tmp_z);
+    if (! conf)
+    {
+      cif_atoms = this_reader -> natomes;
+      cif_nspec = this_reader -> nspec;
+      cif_nsps = duplicate_int (this_reader -> nspec, tmp_nsps);
+    }
+  }
   if (conf && active_project -> steps > 1)
   {
     if (this_reader -> nspec != cif_nspec)
@@ -1233,7 +1260,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     }
     for (i=0; i<this_reader -> nspec; i++)
     {
-      if (this_reader -> nsps[i] != cif_nsps[i])
+      if (tmp_nsps[i] != cif_nsps[i])
       {
         // Not the same number of atom(s) by chemical species between each configuration
         str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
@@ -1244,6 +1271,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
         return FALSE;
       }
     }
+    g_free (tmp_nsps);
   }
   if (! this_reader -> cartesian && cif_use_symmetry_positions)
   {
@@ -2112,12 +2140,6 @@ int open_cif_configuration (int linec, int conf)
       }
     }
     res = 0;
-    if (active_project -> steps > 1)
-    {
-      cif_atoms = this_reader -> natomes;
-      cif_nspec = this_reader -> nspec;
-      cif_nsps = duplicate_int (this_reader -> nspec, this_reader -> nsps);
-    }
     if (cif_use_symmetry_positions)
     {
       gchar * str = g_strdup_printf ("<b>Building crystal using symmetry positions: </b> \n"
