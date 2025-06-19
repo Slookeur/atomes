@@ -14,9 +14,8 @@ If not, see <https://www.gnu.org/licenses/>
 Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 /*!
-* @file configuration.c
-* @short GUI of the configuration window \n
-         Associated controlers
+* @file preferences.c
+* @short Functions to create the 'User preferences' window
 * @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 */
 
@@ -48,7 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   \brief create the configuration window
 */
-void create_configuration_dialog ()
+void create_user_preferences_dialog ()
 {
   // General prefs
   /*
@@ -89,13 +88,37 @@ void create_configuration_dialog ()
   - Default material (or template) : with all parameters
   - Default number of light sources, light types
   - Default fog mode and other options
+  */
 
+  // Model prefs
+
+  /*
+  - Atoms / Bonds, etc
+  -
   - Default show clones
-  - Default show box and option
+  - Default show box and box option
+  */
+
+  // Representation prefs
+
+  /* Ortho / persp
 
   */
 
-
-
+  gchar * str;
+  GtkWidget * win = create_win ("User preferences", view -> win, FALSE, FALSE);
+  GtkWidget * vbox = create_vbox (5);
+  add_container_child (CONTAINER_WIN, win, vbox);
+  gtk_widget_set_size_request (win, 625, 600);
+  GtkWidget * notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_LEFT);
+  show_the_widgets (notebook);
+  gtk_widget_set_size_request (notebook, 600, 550);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, FALSE, FALSE, 0);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), calc_preferences(), gtk_label_new ("Analysis"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), model_preferences(), gtk_label_new ("Model"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), rep_preferences(), gtk_label_new ("Representation"));
 
 }
