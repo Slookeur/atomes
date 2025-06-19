@@ -31,7 +31,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   int get_atom_wyckoff (gchar * line, int wid);
-  int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int linec, gchar ** cif_word, gboolean rec_val, gboolean all_ligne, gboolean in_loop, gboolean total_num);
+  int cif_get_value int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int linec, gchar ** cif_word,
+                                       gboolean rec_val, gboolean all_ligne, gboolean total_num, gboolean record_position, int * line_position)
   int cif_file_get_data_in_loop (int linec, int lid);
   int cif_file_get_number_of_atoms (int linec, int lid, int nelem);
   int get_loop_line_id (int lid);
@@ -418,7 +419,7 @@ void file_get_to_line (int line_id)
 
 /*!
   \fn int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int linec, gchar ** cif_word,
-                         gboolean rec_val, gboolean all_ligne, gboolean in_loop, gboolean total_num, gboolean record_position, int * line_position)
+                         gboolean rec_val, gboolean all_ligne, gboolean total_num, gboolean record_position, int * line_position)
 
   \brief read pattern in CIF file
 
@@ -429,13 +430,12 @@ void file_get_to_line (int line_id)
   \param cif_word pointer to store the data to read
   \param rec_val record position on the line
   \param all_ligne browse all line (1/0)
-  \param in_loop more than one identical key string (1/0)
   \param total_num get the total number of occurences
   \param record_position record line position of each occurences
   \param line_position line position of each occurences
 */
 int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** cif_word,
-                   gboolean rec_val, gboolean all_ligne, gboolean in_loop, gboolean total_num, gboolean record_position, int * line_position)
+                   gboolean rec_val, gboolean all_ligne, gboolean total_num, gboolean record_position, int * line_position)
 {
   int res = 0;
   int i;
@@ -444,27 +444,24 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
   gchar * str_w, * str_a, * str_b;
   gchar * mot;
   gchar * saved_line;
+  gchar * the_line;
+  gchar * the_word;
   j = strlen(kroot);
   k = strlen(keyw);
   l = j+k+1;
 
 #ifdef OPENMP
-  int numth = (in_loop) ? 1 : omp_get_max_threads ();
-  #pragma omp parallel for num_threads(numth) private(i,m,this_line,saved_line,this_word,str_a,str_b,str_w) shared(j,k,l,this_reader,res,coord_line,cif_word,mot,rec_val,all_ligne,in_loop,kroot,keyw,total_num,record_position,line_position)
+  int numth = omp_get_max_threads ();
+  #pragma omp parallel for num_threads(numth) private(i,m,the_line,saved_line,the_word,mot,str_a,str_b,str_w) shared(j,k,l,this_reader,coord_line,cif_word,rec_val,all_ligne,kroot,keyw,total_num,record_position,line_position,res)
   for (i=lstart; i<lend; i++)
   {
     if (res && ! total_num) goto endi;
-    this_line = g_strdup_printf ("%s", coord_line[i]);
-    saved_line = g_strdup_printf ("%s", this_line);
-    this_word = strtok_r (this_line, " ", & saved_line);
-    while (this_word)
+    the_line = g_strdup_printf ("%s", coord_line[i]);
+    saved_line = g_strdup_printf ("%s", the_line);
+    the_word = strtok_r (the_line, " ", & saved_line);
+    while (the_word)
     {
-      if (in_loop && this_word[0] != '_')
-      {
-        if (! total_num) res = -1;
-        goto endi;
-      }
-      str_w = get_cif_word (this_word);
+      str_w = get_cif_word (the_word);
       str_w = g_ascii_strdown (str_w, strlen(str_w));
       if (strlen(str_w) == l)
       {
@@ -474,8 +471,8 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         for (m=j+2; m<l; m++) str_b = g_strdup_printf ("%s%c", str_b, str_w[m]);
         if (g_strcmp0(str_a, kroot) == 0 && g_strcmp0(str_b,keyw) == 0)
         {
-          this_word = strtok_r (NULL, " ", & saved_line);
-          if (! this_word)
+          the_word = strtok_r (NULL, " ", & saved_line);
+          if (! the_word)
           {
             if (rec_val || all_ligne)
             {
@@ -491,11 +488,14 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           }
           if (total_num)
           {
-            if (record_position)
+            #pragma omp critical
             {
-              line_position[res] = i;
+              if (record_position)
+              {
+                line_position[res] = i + 1;
+              }
+              res ++;
             }
-            res ++;
           }
           else
           {
@@ -503,19 +503,19 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           }
           if (all_ligne)
           {
-            mot = g_strdup_printf ("%s", this_word);
-            this_word = strtok_r (NULL, " ", & saved_line);
-            while (this_word)
+            mot = g_strdup_printf ("%s", the_word);
+            the_word = strtok_r (NULL, " ", & saved_line);
+            while (the_word)
             {
-              mot = g_strdup_printf ("%s%s", mot, this_word);
-              this_word = strtok_r (NULL, " ", & saved_line);
+              mot = g_strdup_printf ("%s%s", mot, the_word);
+              the_word = strtok_r (NULL, " ", & saved_line);
             }
-            this_word = g_strdup_printf ("%s", mot);
+            the_word = g_strdup_printf ("%s", mot);
             g_free (mot);
           }
-          if (this_word && rec_val)
+          if (the_word && rec_val)
           {
-             * cif_word = get_cif_word (this_word);
+            * cif_word = get_cif_word (the_word);
           }
           g_free (str_w);
           str_w = NULL;
@@ -541,7 +541,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         g_free (str_w);
         str_w = NULL;
       }
-      this_word = strtok_r (NULL, " ", & saved_line);
+      the_word = strtok_r (NULL, " ", & saved_line);
     }
     endi:;
   }
@@ -552,15 +552,12 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
   i = lstart;
   while (tail)
   {
-    this_line = g_strdup_printf ("%s", tail -> line);
-    saved_line = g_strdup_printf ("%s", this_line);
-    this_word = strtok_r (this_line, " ", & saved_line);
-    while (this_word)
+    the_line = g_strdup_printf ("%s", tail -> line);
+    saved_line = g_strdup_printf ("%s", the_line);
+    the_word = strtok_r (the_line, " ", & saved_line);
+    while (the_word)
     {
-      if (in_loop && this_word[0] != '_') return 0;
-
-
-      str_w = get_cif_word (this_word);
+      str_w = get_cif_word (the_word);
       str_w = g_ascii_strdown (str_w, strlen(str_w));
       if (strlen(str_w) == l)
       {
@@ -570,8 +567,8 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         for (m=j+2; m<l; m++) str_b = g_strdup_printf ("%s%c", str_b, str_w[m]);
         if (g_strcmp0(str_a, kroot) == 0 && g_strcmp0(str_b,keyw) == 0)
         {
-          this_word = strtok_r (NULL, " ", & saved_line);
-          if (! this_word)
+          the_word = strtok_r (NULL, " ", & saved_line);
+          if (! the_word)
           {
             if (rec_val || all_ligne)
             {
@@ -587,19 +584,19 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
 
           if (all_ligne)
           {
-            mot = g_strdup_printf ("%s", this_word);
-            this_word = strtok_r (NULL, " ", & saved_line);
-            while (this_word)
+            mot = g_strdup_printf ("%s", the_word);
+            the_word = strtok_r (NULL, " ", & saved_line);
+            while (the_word)
             {
-              mot = g_strdup_printf ("%s%s", mot, this_word);
-              this_word = strtok_r (NULL, " ", & saved_line);
+              mot = g_strdup_printf ("%s%s", mot, the_word);
+              the_word = strtok_r (NULL, " ", & saved_line);
             }
-            this_word = g_strdup_printf ("%s", mot);
+            the_word = g_strdup_printf ("%s", mot);
             g_free (mot);
           }
-          if (this_word && rec_val)
+          if (the_word && rec_val)
           {
-             * cif_word = get_cif_word (this_word);
+             * cif_word = get_cif_word (the_word);
           }
           g_free (str_w);
           str_w = NULL;
@@ -611,7 +608,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           {
             if (record_position)
             {
-              line_position[res] = i;
+              line_position[res] = i + 1;
             }
             res ++;
           }
@@ -636,7 +633,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
         g_free (str_w);
         str_w = NULL;
       }
-      this_word = strtok_r (NULL, " ", & saved_line);
+      the_word = strtok_r (NULL, " ", & saved_line);
     }
     tail = tail -> next;
     i ++;
@@ -657,14 +654,16 @@ int cif_file_get_data_in_loop (int linec, int lid)
 {
   gboolean res = FALSE;
   int i = 0;
+  gchar * the_word;
+  gchar * the_line;
 #ifdef OPENMP
   while (! res)
   {
     if (lid+i < linec)
     {
-      this_line = g_strdup_printf ("%s", coord_line[lid+i]);
-      this_word = strtok (this_line, " ");
-      if (this_word[0] == '_')
+      the_line = g_strdup_printf ("%s", coord_line[lid+i]);
+      the_word = strtok (the_line, " ");
+      if (the_word[0] == '_')
       {
         i ++;
       }
@@ -684,9 +683,9 @@ int cif_file_get_data_in_loop (int linec, int lid)
   {
     if (tail)
     {
-      this_line = g_strdup_printf ("%s", tail -> line);
-      this_word = strtok (this_line, " ");
-      if (this_word[0] == '_')
+      the_line = g_strdup_printf ("%s", tail -> line);
+      the_word = strtok (the_line, " ");
+      if (the_word[0] == '_')
       {
         i ++;
         tail = tail -> next;
@@ -715,17 +714,17 @@ int cif_file_get_data_in_loop (int linec, int lid)
 int get_loop_line_id (int lid)
 {
   int i;
+  gchar * the_word;
+  gchar * the_line;
   gchar * str_w;
 #ifdef OPENMP
-  gchar * saved_line;
   for (i=lid-1; i>-1; i--)
   {
-    this_line = g_strdup_printf ("%s", coord_line[i]);
-    saved_line = g_strdup_printf ("%s", this_line);
-    this_word = strtok_r (this_line, " ", & saved_line);
-    if (this_word)
+    the_line = g_strdup_printf ("%s", coord_line[i]);
+    the_word = strtok (the_line, " ");
+    if (the_word)
     {
-      str_w = g_ascii_strdown (this_word, strlen(this_word));
+      str_w = g_ascii_strdown (the_word, strlen(the_word));
       if (g_strcmp0 ("loop_", get_cif_word(str_w)) == 0)
       {
         g_free (str_w);
@@ -739,11 +738,11 @@ int get_loop_line_id (int lid)
   i = lid;
   while (tail)
   {
-    this_line = g_strdup_printf ("%s", tail -> line);
-    this_word = strtok (this_line, " ");
-    if (this_word)
+    the_line = g_strdup_printf ("%s", tail -> line);
+    the_word = strtok (the_line, " ");
+    if (the_word)
     {
-      str_w = g_ascii_strdown (this_word, strlen(this_word));
+      str_w = g_ascii_strdown (the_word, strlen(the_word));
       if (g_strcmp0 ("loop_", get_cif_word(str_w)) == 0)
       {
         g_free (str_w);
@@ -772,7 +771,8 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
 {
   int lli = 0;
   int * line_numbers = allocint (this_reader -> steps);
-  int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
+
+  int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, TRUE, TRUE, line_numbers);
   if (steps)
   {
     if (steps != this_reader -> steps)
@@ -810,8 +810,8 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
   gchar * cif_value = NULL;
   int loop_pos[2];
   int * line_numbers = allocint (this_reader -> steps);
-  // g_debug ("CIF:: retrive:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
-  int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, TRUE, line_numbers);
+  // g_debug ("CIF:: retrieve:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
+  int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, TRUE, TRUE, line_numbers);
   // g_debug ("CIF:: retrieve:: steps= %d", steps);
   if (steps)
   {
@@ -828,20 +828,22 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
     sort (steps, line_numbers);
     if (in_loop)
     {
-      loop_pos[0] = (! line_numbers[conf]) ? 0 : get_loop_line_id (line_numbers[conf]);
+      loop_pos[0] = get_loop_line_id (line_numbers[conf]);
       loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : get_loop_line_id (line_numbers[conf + 1]);
-      loop_pos[1] = (! loop_pos[1]) ? linec : loop_pos[1];
     }
     else
     {
-      loop_pos[0] = line_numbers[conf];
+      loop_pos[0] = (! line_numbers[conf]) ? line_numbers[conf] : line_numbers[conf] - 1;
       loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : line_numbers[conf + 1];
     }
     g_free (line_numbers);
-    if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, in_loop, FALSE, FALSE, NULL))
+    if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, FALSE, FALSE, NULL))
     {
-      str = g_strdup_printf ("<b>Keys positions</b>: something is wrong for keyword: %s_%s\n"
-                             "  -> not found between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, loop_pos[0], loop_pos[1]);
+#ifdef DEBUG
+      g_debug ("CIF:: retrieve:: keyword: %s_%s not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, conf, loop_pos[0], loop_pos[1]);
+#endif
+      str = g_strdup_printf ("<b>Key positions</b>: something is wrong for keyword: %s_%s\n"
+                             "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, conf, loop_pos[0], loop_pos[1]);
       add_reader_info (str, 0);
       g_free (str);
       return NULL;
@@ -869,18 +871,22 @@ int cif_file_get_number_of_atoms (int linec, int lid, int nelem)
   gboolean res = FALSE;
   int i, j;
   char init;
+  gchar * the_word;
+  gchar * the_line;
+  gchar * saved_line;
   i = 0;
 #ifdef OPENMP
   while (! res && (lid+i) < linec)
   {
-    this_line = g_strdup_printf ("%s", coord_line[lid+i]);
-    this_word = strtok (this_line, " ");
+    the_line = g_strdup_printf ("%s", coord_line[lid+i]);
+    saved_line = g_strdup_printf ("%s", the_line);
+    the_word = strtok_r (the_line, " ", & saved_line);
     j = 0;
-    while (this_word)
+    while (the_word)
 	{
-      if (! j) init = this_word[0];
+      if (! j) init = the_word[0];
       j ++;
-      this_word = strtok (NULL, " ");
+      the_word = strtok_r (NULL, " ", & saved_line);
     }
     if (j == nelem && init != '_')
     {
@@ -895,14 +901,15 @@ int cif_file_get_number_of_atoms (int linec, int lid, int nelem)
   file_get_to_line (lid);
   while (! res && tail)
   {
-    this_line = g_strdup_printf ("%s", tail -> line);
-    this_word = strtok (this_line, " ");
+    the_line = g_strdup_printf ("%s", tail -> line);
+    saved_line = g_strdup_printf ("%s", the_line);
+    the_word = strtok_r (the_line, " ", & saved_line);
     j = 0;
-    while (this_word)
+    while (the_word)
 	{
-      if (j == 0) init = this_word[0];
+      if (j == 0) init = the_word[0];
       j ++;
-      this_word = strtok (NULL, " ");
+      the_word = strtok_r (NULL, " ", & saved_line);
     }
     if (j == nelem && init != '_')
     {
@@ -1113,7 +1120,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   i = 0;
   for (j=0; j<2; j++)
   {
-    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
+    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j])
     {
       i ++;
@@ -1129,7 +1136,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   i = 0;
   for (j=0; j<3; j++)
   {
-    cid[j+2] = cif_get_value ("_atom_site", cartkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
+    cid[j+2] = cif_get_value ("_atom_site", cartkeys[j], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j+2])
     {
       i ++;
@@ -1148,7 +1155,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     j = 0;
     for (k=0; k<3; k++)
     {
-      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
+      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[k+2])
       {
         cid[k+2] -= loop_line;
@@ -1177,7 +1184,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     for (i=0; i<4; i++)
     {
-      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL);
+      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+20, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[i+5])
       {
         cid[i+5] -= loop_line;
@@ -1491,7 +1498,7 @@ gboolean cif_get_symmetry_positions (int linec, int conf)
     loop_line = get_loop_line_for_key (linec, conf, pos_key[i], "xyz");
     if (loop_line)
     {
-      line_id = cif_get_value (pos_key[i], "xyz", loop_line, linec, NULL, FALSE, FALSE, TRUE, FALSE, FALSE, NULL);
+      line_id = cif_get_value (pos_key[i], "xyz", loop_line, linec, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
       break;
     }
   }
@@ -1776,7 +1783,7 @@ gboolean cif_get_cell_data (int linec, int conf)
   i = (conf && active_project -> steps == 1) ? 0 : conf;
   for (j=0; j<3; j++)
   {
-    str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, FALSE);
+    str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, TRUE);
     if (! str)
     {
       str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[0][j]);
@@ -1793,7 +1800,7 @@ gboolean cif_get_cell_data (int linec, int conf)
     g_debug ("CIF:: box[%d][%d]= %f", i, j, this_reader -> lattice.box[i].param[0][j]);
 #endif
     g_free (str);
-    str = cif_retrieve_value (linec, conf, "_cell", cellangs[j], TRUE, FALSE);
+    str = cif_retrieve_value (linec, conf, "_cell", cellangs[j], TRUE, TRUE);
     if (! str)
     {
       str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[1][j]);
@@ -2533,7 +2540,7 @@ int open_cif_file (int linec)
   int i, j;
 
   // How to treat occupancy
-  int cif_occup = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
+  int cif_occup = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
   if (cif_occup)
   {
     this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
@@ -2548,12 +2555,12 @@ int open_cif_file (int linec)
 
   // Determine the number of configuration(s) by checking the presence
   // of the instruction used to declare atomic coordinates
-  this_reader -> steps = cif_get_value ("_atom_site", frackeys[0], 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
+  this_reader -> steps = cif_get_value ("_atom_site", frackeys[0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
   if (! this_reader -> steps)
   {
-    this_reader -> steps = cif_get_value ("_atom_site", cartkeys[0], 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
+    this_reader -> steps = cif_get_value ("_atom_site", cartkeys[0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
   }
-  int cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, FALSE, TRUE, FALSE, NULL);
+  int cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
   if (this_reader -> steps > 1)
   {
     str = g_strdup_printf ("It seems the CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);

@@ -472,7 +472,7 @@ gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
                             "\t\tSelect a single configuration in the CIF file"};
 gchar * cif_config_leg={"\t<b>MD trajectory</b>\n"
                         "\t\tConsider the CIF file a MD trajectory\n\n"
-                        "\t\tNumber of atom(s) must not change between configuration(s)\n"
+                        "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
                         "\t<b>Single configuration </b>\n"
                         "\t\tSelect a single configuration in the CIF file"};
 gchar * cif_occ[3]={"to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌋</b>",
