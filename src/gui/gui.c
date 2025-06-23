@@ -96,6 +96,7 @@ extern int get_atom_id_from_periodic_table (atom_search * asearch);
 extern G_MODULE_EXPORT void leaving_from_menu (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data);
+extern void create_user_preferences_dialog ();
 
 #ifdef GTK3
 GtkWidget * MainEvent;
@@ -595,9 +596,9 @@ G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * 
     atomes_shortcuts = shortcuts_window (G_N_ELEMENTS(main_group_by_section), main_group_by_section, G_N_ELEMENTS(main_shortcut_by_group),
                                          main_shortcut_by_group, main_section_names, main_group_names, main_shortcuts);
   }
-  else if (g_strcmp0 (name, "help.configuration") == 0)
+  else if (g_strcmp0 (name, "help.preferences") == 0)
   {
-    // create_configuration_dialog ();
+    create_user_preferences_dialog ();
   }
   g_free (name);
 }
@@ -1020,7 +1021,7 @@ GMenu * create_help_menu ()
 {
   GMenu * menu = g_menu_new ();
   append_menu_item (menu, "Periodic Table", "app.help.periodic", "<CTRL>P", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Configuration", "app.help.configuration", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, "Preferences", "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "Shortcuts", "app.help.shortcuts", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "About", "app.help.about", "<CTRL>A", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   return menu;
@@ -1126,7 +1127,7 @@ GtkWidget * create_main_window (GApplication * atomes)
                                   { "help.periodic", NULL},
                                   { "help.about", NULL},
                                   { "help.shortcuts", NULL},
-                                  { "help.configuration", NULL}};
+                                  { "help.preferences", NULL}};
 
   GSimpleAction ** main_act = g_malloc0 (G_N_ELEMENTS(main_actions)*sizeof*main_act);
   for (i=0; i<G_N_ELEMENTS(main_actions); i++)

@@ -676,7 +676,7 @@ gboolean test_gr (int gr)
 {
   if (active_project -> num_delta[gr] < 2)
   {
-    show_warning ("You must specify a number of δr >= 2\n"
+    show_warning ("You must specify a number of &#x3b4;r >= 2\n"
                   "to discretize the real space between 0.0 and D<sub>max</sub>\n", calc_win);
     return FALSE;
   }
@@ -709,7 +709,7 @@ gboolean test_sq (int sq)
   }
   else if (active_project -> num_delta[sq] < 2)
   {
-    show_warning ("You must specify a number of δq >= 2\n"
+    show_warning ("You must specify a number of &#x3b4;q >= 2\n"
                   "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n", calc_win);
     return FALSE;
   }
@@ -728,14 +728,14 @@ gboolean test_bonds ()
 {
   if (active_project -> runc[0] && active_project -> num_delta[BD] < 2)
   {
-    show_warning ("You must specify a number of δr >= 2\n"
+    show_warning ("You must specify a number of &#x3b4;r >= 2\n"
                   "to discretize the real space between\n"
                   "the shortest and the highest inter-atomic distances", calc_win);
     return FALSE;
   }
   else if (active_project -> runc[1] && active_project -> num_delta[AN] < 2)
   {
-    show_warning ("You must specify a number of δ° >= 2\n"
+    show_warning ("You must specify a number of &#x3b4;&#x3b8; >= 2\n"
                   "to discretize the angular space between 0 and 180°", calc_win);
     return FALSE;
   }
@@ -794,7 +794,7 @@ gboolean test_msd ()
   {
     if (active_project -> delta[MS] == 0.0)
     {
-      show_warning ("You must specify the time step δt\n"
+      show_warning ("You must specify the time step &#x3b4;t\n"
                     "used to integrate the Newton's equations\n"
                     "of motion during the molecular dynamics\n", calc_win);
       return FALSE;

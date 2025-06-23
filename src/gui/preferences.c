@@ -41,6 +41,66 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 
+/*!
+  \fn GtkWidget * view_preferences ()
+
+  \brief view preferences
+*/
+GtkWidget * view_preferences ()
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+
+  return vbox;
+}
+
+/*!
+  \fn GtkWidget * model_preferences ()
+
+  \brief model preferences
+*/
+GtkWidget * model_preferences ()
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+
+  return vbox;
+}
+
+/*!
+  \fn GtkWidget * opengl_preferences ()
+
+  \brief OpenGL preferences
+*/
+GtkWidget * opengl_preferences ()
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+
+  return vbox;
+}
+
+/*!
+  \fn GtkWidget * calc_preferences ()
+
+  \brief analysis preferences
+*/
+GtkWidget * calc_preferences ()
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+
+  return vbox;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data)
+
+  \brief Restore all default parameters
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data)
+{
+
+}
 
 /*!
   \fn void create_configuration_dialog ()
@@ -104,9 +164,7 @@ void create_user_preferences_dialog ()
   /* Ortho / persp
 
   */
-
-  gchar * str;
-  GtkWidget * win = create_win ("User preferences", view -> win, FALSE, FALSE);
+  GtkWidget * win = create_win ("User preferences", MainWindow, FALSE, FALSE);
   GtkWidget * vbox = create_vbox (5);
   add_container_child (CONTAINER_WIN, win, vbox);
   gtk_widget_set_size_request (win, 625, 600);
@@ -116,9 +174,22 @@ void create_user_preferences_dialog ()
   show_the_widgets (notebook);
   gtk_widget_set_size_request (notebook, 600, 550);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, FALSE, FALSE, 0);
+  GtkWidget * gbox = create_vbox (BSEP);
+  gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
+                 "by replacing internal parameters by user defined preferences.\n\n"
+                 "  - Analysis : calculation preferences\n"
+                 "  - OpenGL : rendering preferences\n"
+                 "  - Model : atom(s), bond(s) and box preferences\n"
+                 "  - View : representation and projection preferences";
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, markup_label (mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
+  GtkWidget * hbox = create_hbox (BSEP);
+  GtkWidget * but = create_button ("Restore all default parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_all_defaults), NULL);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), gbox, gtk_label_new ("General"));
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), calc_preferences(), gtk_label_new ("Analysis"));
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), model_preferences(), gtk_label_new ("Model"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), rep_preferences(), gtk_label_new ("Representation"));
-
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), view_preferences(), gtk_label_new ("View"));
+  show_the_widgets (win);
 }

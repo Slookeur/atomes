@@ -1151,9 +1151,7 @@ GtkWidget * param_tab (glwin * view)
   /*gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(fragmol), vbox); */
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, TRUE, 25);
-  GtkWidget * lab = gtk_label_new ("<b>Atom(s) and bond(s) color map:</b>");
-  gtk_label_set_use_markup (GTK_LABEL(lab), 1);
-  gtk_label_align (lab, 0.0, 0.5);
+  GtkWidget * lab = markup_label ("<b>Atom(s) and bond(s) color map:</b>", -1, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 20);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
@@ -1201,9 +1199,7 @@ GtkWidget * param_tab (glwin * view)
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, TRUE, 25);
-  lab = gtk_label_new ("<b>Polyhedra color map:</b>");
-  gtk_label_set_use_markup (GTK_LABEL(lab), 1);
-  gtk_label_align (lab, 0.0, 0.5);
+  lab = markup_label ("<b>Polyhedra color map:</b>", -1, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 20);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
