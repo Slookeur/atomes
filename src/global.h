@@ -524,7 +524,6 @@ struct coord_file
   int * wyckoff;                           /*!< Wyckoff positions */
   int rounding;                            /*!< Occupancy rounding */
   double * occupancy;                      /*!< Site(s) occupancy */
-  // int ** occupied;                         /*!< Occupancy status */
   int * multi;                             /*!< Multiplicity */
   int dis;                                 /*!< Number of disorder group */
   int * disorder;                          /*!< Site disorder group */

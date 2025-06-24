@@ -71,6 +71,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "callbacks.h"
 #include "interface.h"
+#include "preferences.h"
 #include "bind.h"
 #include "project.h"
 #include "workspace.h"
@@ -151,18 +152,25 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
   i = (int)v;
   if (c == RI)
   {
-    j = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
-    k = active_project -> rsparam[j][1];
+    if (preferences)
+    {
+      k = default_rsparam[2];
+    }
+    else
+    {
+      j = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+      k = active_project -> rsparam[j][1];
+    }
   }
   else if (c == CH)
   {
-    k = active_project -> csparam[5];
+    k = (preferences) ? default_csparam[1] : active_project -> csparam[5];
   }
-  else if (c > -1)
+  else if (c > -1 && ! preferences)
   {
     k = active_project -> num_delta[c];
   }
-  if (c < 0)
+  if (c < 0 && ! preferences)
   {
     if (v > 0.0)
     {
@@ -172,7 +180,7 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
       }
     }
   }
-  else if (i > 0)
+  else if (i > 0 && ! preferences)
   {
     if (c == RI)
     {
@@ -307,18 +315,39 @@ G_MODULE_EXPORT void set_numa (GtkEntry * entry, gpointer data)
   {
     if (! search_type)
     {
-      if (active_project -> rsearch[1] != i) active_project -> rsearch[1] = i;
-      j = active_project -> rsearch[1];
+      if (preferences)
+      {
+        default_rsparam[3] = i;
+      }
+      else
+      {
+        if (active_project -> rsearch[1] != i) active_project -> rsearch[1] = i;
+        j = active_project -> rsearch[1];
+      }
     }
     else
     {
-      if (active_project -> csearch != i) active_project -> csearch = i;
-      j = active_project -> csearch;
+      if (preferences)
+      {
+        default_csparam[2] = i;
+      }
+      else
+      {
+        if (active_project -> csearch != i) active_project -> csearch = i;
+        j = active_project -> csearch;
+      }
     }
   }
   else
   {
-    j = (search_type) ? active_project -> csearch : active_project -> rsearch[1];
+    if (preferences)
+    {
+      j = (search_type) ? default_csparam[2] : default_rsparam[3];
+    }
+    else
+    {
+      j = (search_type) ? active_project -> csearch : active_project -> rsearch[1];
+    }
   }
   update_entry_int (entry, j);
 }
@@ -326,7 +355,7 @@ G_MODULE_EXPORT void set_numa (GtkEntry * entry, gpointer data)
 /*!
   \fn GtkWidget * combox_rings (gchar * str, int num, gchar * list_item[num], int id)
 
-  \brief create a combo box for the rings statistics calculation
+  \brief create a combo box for the ring statistics calculation
 
   \param str label of the combo box
   \param num number of values to insert in the combo box
@@ -342,7 +371,7 @@ GtkWidget * combox_rings (gchar * str, int num, gchar * list_item[num], int id)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, FALSE, FALSE, 0);
   rings_box[id] = create_combo ();
   for (i=0; i<num; i++) combo_text_append (rings_box[id], list_item[i]);
-  gtk_fixed_put (GTK_FIXED(fixed), rings_box[id], -1, -1);
+  gtk_fixed_put (GTK_FIXED(fixed), rings_box[id], -1, 5);
   return hbox;
 }
 
@@ -352,7 +381,7 @@ GtkWidget * combox_rings (gchar * str, int num, gchar * list_item[num], int id)
 /*!
   \fn G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
 
-  \brief change rings statistics calculation parameter
+  \brief change ring statistics calculation parameter
 
   \param box the GtkComboBox sending the signal
   \param data the associated data pointer
@@ -363,32 +392,53 @@ G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
   int id = GPOINTER_TO_INT(data);
   if (id == 0)
   {
-    active_project -> rsearch[0] = gtk_combo_box_get_active(box);
-    widget_set_sensitive (rings_box[1], (active_project -> rsearch[0]<0) ? 0 : 1);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), active_project -> rsparam[active_project -> rsearch[0]][0]);
-    for (i=0; i<2; i++) widget_set_sensitive (rings_entry[i], (active_project -> rsearch[0]<0) ? 0 : 1);
-    for (i=0; i<3; i++) widget_set_sensitive (rings_check[i], (active_project -> rsearch[0]<0) ? 0 : 1);
-    update_entry_int (GTK_ENTRY(rings_entry[0]), active_project -> rsparam[active_project -> rsearch[0]][1]);
-    i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
-    for (j=0; j<3; j++)
+    if (preferences)
     {
+      default_rsparam[0] = gtk_combo_box_get_active(box);
+    }
+    else
+    {
+      active_project -> rsearch[0] = gtk_combo_box_get_active(box);
+      widget_set_sensitive (rings_box[1], (active_project -> rsearch[0]<0) ? 0 : 1);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), active_project -> rsparam[active_project -> rsearch[0]][0]);
+      for (i=0; i<2; i++) widget_set_sensitive (rings_entry[i], (active_project -> rsearch[0]<0) ? 0 : 1);
+      for (i=0; i<3; i++) widget_set_sensitive (rings_check[i], (active_project -> rsearch[0]<0) ? 0 : 1);
+      update_entry_int (GTK_ENTRY(rings_entry[0]), active_project -> rsparam[active_project -> rsearch[0]][1]);
+      i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+      for (j=0; j<3; j++)
+      {
 #ifdef GTK4
-      gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
+        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
 #else
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
 #endif
+      }
     }
   }
   else
   {
     if (search_type)
     {
-      active_project -> csparam[0] = gtk_combo_box_get_active(box);
+      if (preferences)
+      {
+        default_csparam[0] = gtk_combo_box_get_active(box);
+      }
+      else
+      {
+        active_project -> csparam[0] = gtk_combo_box_get_active(box);
+      }
     }
     else
     {
-      i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
-      active_project -> rsparam[i][0] = gtk_combo_box_get_active(box);
+      if (preferences)
+      {
+        default_rsparam[1] = gtk_combo_box_get_active(box);
+      }
+      else
+      {
+        i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+        active_project -> rsparam[i][0] = gtk_combo_box_get_active(box);
+      }
     }
   }
 }
@@ -428,10 +478,24 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
   {
     case 0:
       i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
-      active_project -> rsparam[i][oid+2] = status;
+      if (preferences)
+      {
+        default_rsparam[oid+4] = status;
+      }
+      else
+      {
+        active_project -> rsparam[i][oid+2] = status;
+      }
       break;
     case 1:
-      active_project -> csparam[oid+1] = status;
+      if (preferences)
+      {
+        default_csparam[oid+3] = status;
+      }
+      else
+      {
+        active_project -> csparam[oid+1] = status;
+      }
       if (oid == 0 && status)
       {
 #ifdef GTK4
@@ -488,23 +552,31 @@ void calc_rings (GtkWidget * vbox)
                         "No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>", "Only search for 1-(2)<sub>n</sub>-1 coordinated atom chains, ie. isolated chains."}};
   gchar * val_d={"\n*\t<i><b>n</b><sub>max</sub></i> in total number of nodes (or atoms)\n"
                  "**\tvalue used for memory allocation = f(<i><b>n</b><sub>max</sub></i>, system studied)\n"
-                 "***\tBut homopolar bonds can shorten the rings"};
-  gchar * val_e={"\n<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).\n"
-                 "[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).\n"
-                 "[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).\n"
-                 "[4] K. Goetzke and H. J. Klein. <i>J. Non-Cryst. Solids.</i>, <b>127</b>:215-220 (1991).\n"
-                 "[5] X. Yuan and A. N. Cormack. <i>Comp. Mat. Sci.</i>, <b>24</b>:343-360 (2002).\n"
-                 "[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>"};
-  gchar * list_node[active_project -> nspec+1];
+                 "***\tbut homopolar bonds can shorten the rings"};
+  gchar * val_e={"\n<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
+                 "<sub>[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).</sub>\n"
+                 "<sub>[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).</sub>\n"
+                 "<sub>[4] K. Goetzke and H. J. Klein. <i>J. Non-Cryst. Solids.</i>, <b>127</b>:215-220 (1991).</sub>\n"
+                 "<sub>[5] X. Yuan and A. N. Cormack. <i>Comp. Mat. Sci.</i>, <b>24</b>:343-360 (2002).</sub>\n"
+                 "<sub>[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>"};
+  gchar * list_node[(preferences) ? 2 : active_project -> nspec+1];
   int i, j, k;
   toggled_rings = FALSE;
   if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[0], 5, defs, 0), FALSE, FALSE, 0);
 
   list_node[0] = g_strdup_printf ("All");
-  for (i=0; i<active_project -> nspec; i++) list_node[i+1] = g_strdup_printf ("%s", active_chem -> label[i]);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[1], active_project -> nspec+1, list_node, 1), FALSE, FALSE, 0);
+  if (preferences)
+  {
+    list_node[1] = g_strdup_printf ("Chemical species");
+  }
+  else
+  {
+    for (i=0; i<active_project -> nspec; i++) list_node[i+1] = g_strdup_printf ("%s", active_chem -> label[i]);
+  }
 
-  j = active_project -> rsearch[0];
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[1], (preferences) ? 2 : active_project -> nspec+1, list_node, 1), FALSE, FALSE, 0);
+
+  j = (preferences) ? default_rsparam[0] : active_project -> rsearch[0];
   k = RI + search_type;
   GtkWidget * hbox;
   for (i=0; i<2; i++)
@@ -515,12 +587,26 @@ void calc_rings (GtkWidget * vbox)
     if (i == 0)
     {
       rings_entry[i] = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(k));
-      update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? active_project -> csparam[5] : active_project -> rsparam[j][1]);
+      if (preferences)
+      {
+        update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? default_csparam[1] : default_rsparam[2]);
+      }
+      else
+      {
+        update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? active_project -> csparam[5] : active_project -> rsparam[j][1]);
+      }
     }
     else
     {
       rings_entry[i] = create_entry (G_CALLBACK(set_numa), 100, 15, FALSE, NULL);
-      update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? active_project -> csearch : active_project -> rsearch[1]);
+      if (preferences)
+      {
+        update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? default_csparam[2] : default_rsparam[3]);
+      }
+      else
+      {
+        update_entry_int (GTK_ENTRY(rings_entry[i]), (search_type) ? active_project -> csearch : active_project -> rsearch[1]);
+      }
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rings_entry[i], FALSE, FALSE, 0);
     if (! search_type && j < 0) widget_set_sensitive (rings_entry[i], 0);
@@ -528,11 +614,21 @@ void calc_rings (GtkWidget * vbox)
   gboolean status;
   for (i=0; i<3+search_type; i++)
   {
-    status =  (j < 0) ? 0 : (search_type) ? active_project -> csparam[i+1] : active_project -> rsparam[j][i+2];
+    if (preferences)
+    {
+      status = (search_type) ? default_csparam[i+3] : default_rsparam[i+4];
+    }
+    else
+    {
+      status =  (j < 0) ? 0 : (search_type) ? active_project -> csparam[i+1] : active_project -> rsparam[j][i+2];
+    }
     rings_check[i] = check_button (val_c[search_type][i], -1, 40, status, G_CALLBACK(toggle_rings), GINT_TO_POINTER(i));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, rings_check[i], FALSE, FALSE, 0);
-    if (active_project -> nspec == 1) widget_set_sensitive (rings_check[i], 0);
-    if (! search_type && j < 0) widget_set_sensitive (rings_check[i], 0);
+    if (! preferences)
+    {
+      if (active_project -> nspec == 1) widget_set_sensitive (rings_check[i], 0);
+      if (! search_type && j < 0) widget_set_sensitive (rings_check[i], 0);
+    }
   }
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_d, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   if (! search_type)
@@ -540,12 +636,19 @@ void calc_rings (GtkWidget * vbox)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_e, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     i = 0;
     g_signal_connect(G_OBJECT(rings_box[0]), "changed", G_CALLBACK(combox_rings_changed), GINT_TO_POINTER(0));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[0]), active_project -> rsearch[0]);
-    widget_set_sensitive (rings_box[1], (active_project -> rsearch[0]<0) ? 0 : 1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[0]), (preferences) ? default_rsparam[0] : active_project -> rsearch[0]);
+    widget_set_sensitive (rings_box[1], (preferences) ? 1 : (active_project -> rsearch[0]<0) ? 0 : 1);
   }
   i = 1;
   g_signal_connect(G_OBJECT(rings_box[1]), "changed", G_CALLBACK(combox_rings_changed), GINT_TO_POINTER(i));
-  gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), (search_type) ? active_project -> csparam[0] : active_project -> rsparam[j][0]);
+  if (preferences)
+  {
+    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), (search_type) ? default_csparam[0] : default_rsparam[1]);
+  }
+  else
+  {
+    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), (search_type) ? active_project -> csparam[0] : active_project -> rsparam[j][0]);
+  }
 }
 
 #ifdef GTK4
