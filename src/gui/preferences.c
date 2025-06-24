@@ -50,6 +50,8 @@ extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void calc_rings (GtkWidget * vbox);
 
+GtkWidget * preference_notebook = NULL;
+
 gchar * default_delta_num_leg[7] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
                                     "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",  "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]"};
 int default_num_delta[7];          /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp */
@@ -204,41 +206,7 @@ void read_preferences_from_xml_configuration ()
   }
 }
 
-/*!
-  \fn G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data)
-
-  \brief restore all default parameters
-
-  \param but the GtkButton sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
-{
-  // Analysis preferences
-
-  default_num_delta[GR] = 1000;
-  default_num_delta[SQ] = 1000;
-  default_num_delta[SK] = 1000;
-  default_num_delta[GK] = 1000;
-  default_num_delta[BD] = 100;
-  default_num_delta[AN] = 90;
-  default_num_delta[CH-1] = 20;
-
-  default_rsparam[0] = -1;
-  default_rsparam[1] = 0;
-  default_rsparam[2] = 10;
-  default_rsparam[3] = 500;
-  default_rsparam[4] = 0;
-  default_rsparam[5] = 0;
-  default_rsparam[6] = 0;
-
-  default_csparam[0] = 0;
-  default_csparam[1] = 10;
-  default_csparam[2] = 500;
-  default_csparam[3] = 0;
-  default_csparam[4] = 0;
-  default_csparam[5] = 0;
-}
+G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data);
 
 /*!
   \fn void set_atomes_preferences ()
@@ -304,101 +272,6 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 }
 
 /*!
-  \fn G_MODULE_EXPORT void set_default_rs (GtkEntry * res, gpointer data)
-
-  \brief update default ring statistics preferences
-
-  \param res the GtkEntry the signal is coming from
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_default_rs (GtkEntry * res, gpointer data)
-{
-  int i = GPOINTER_TO_INT(data);
-  const gchar * m = entry_get_text (res);
-  default_rsparam[i] = (int) string_to_double ((gpointer)m);
-  update_entry_int (res, default_rsparam[i]);
-}
-
-/*!
-  \fn G_MODULE_EXPORT void set_default_cs (GtkEntry * res, gpointer data)
-
-  \brief update default chain statistics preferences
-
-  \param res the GtkEntry the signal is coming from
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_default_cs (GtkEntry * res, gpointer data)
-{
-  int i = GPOINTER_TO_INT(data);
-  const gchar * m = entry_get_text (res);
-  default_csparam[i] = (int) string_to_double ((gpointer)m);
-  update_entry_int (res, default_csparam[i]);
-}
-
-/*!
-  \fn G_MODULE_EXPORT void ring_combox_changed (GtkComboBox * box, gpointer data)
-
-  \brief change ring statistics calculation preference
-
-  \param box the GtkComboBox sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void ring_combox_changed (GtkComboBox * box, gpointer data)
-{
-  int i = gtk_combo_box_get_active(box);
-  int j = GPOINTER_TO_INT(data);
-  default_rsparam[j] = i;
-}
-
-/*!
-  \fn G_MODULE_EXPORT void chain_combox_changed (GtkComboBox * box, gpointer data)
-
-  \brief change chain statistics calculation preference
-
-  \param box the GtkComboBox sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void chain_combox_changed (GtkComboBox * box, gpointer data)
-{
-  int i = gtk_combo_box_get_active(box);
-  default_csparam[0] = i;
-}
-
-/*!
-  \fn GtkWidget * combox_ring_chain_pref (gchar * str, int num, gchar * list_item[num], int val, int cid)
-
-  \brief create a combo box for the ring / chain statistics parameters
-
-  \param str label of the combo box
-  \param num number of values to insert in the combo box
-  \param list_item text data to insert in the combo boc
-  \param val active value for the combo box
-  \param cid 0 = rings, 1 = chains
-*/
-GtkWidget * combox_ring_chain_pref (gchar * str, int num, gchar * list_item[num], int val, int cid)
-{
-  GtkWidget * hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 350, 40, 0.0, 0.5), FALSE, FALSE, 15);
-  GtkWidget * fixed = gtk_fixed_new ();
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, FALSE, FALSE, 0);
-  GtkWidget * combo = create_combo ();
-  int i;
-  for (i=0; i<num; i++) combo_text_append (combo, list_item[i]);
-  gtk_fixed_put (GTK_FIXED(fixed), combo, -1, 5);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combo), val);
-  switch (cid)
-  {
-    case 2:
-      g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(chain_combox_changed), NULL);
-      break;
-    default:
-      g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(ring_combox_changed), GINT_TO_POINTER(cid));
-      break;
-  }
-  return hbox;
-}
-
-/*!
   \fn GtkWidget * calc_preferences ()
 
   \brief analysis preferences
@@ -412,7 +285,6 @@ GtkWidget * calc_preferences ()
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   GtkWidget * entry;
-  //gchar * str;
   int i;
   for (i=0; i<7; i++)
   {
@@ -436,6 +308,58 @@ GtkWidget * calc_preferences ()
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Chain statistics"));
 
   return notebook;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data)
+
+  \brief restore all default parameters
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
+{
+  // Analysis preferences
+
+  default_num_delta[GR] = 1000;
+  default_num_delta[SQ] = 1000;
+  default_num_delta[SK] = 1000;
+  default_num_delta[GK] = 1000;
+  default_num_delta[BD] = 100;
+  default_num_delta[AN] = 90;
+  default_num_delta[CH-1] = 20;
+
+  default_rsparam[0] = -1;
+  default_rsparam[1] = 0;
+  default_rsparam[2] = 10;
+  default_rsparam[3] = 500;
+  default_rsparam[4] = 0;
+  default_rsparam[5] = 0;
+  default_rsparam[6] = 0;
+
+  default_csparam[0] = 0;
+  default_csparam[1] = 10;
+  default_csparam[2] = 500;
+  default_csparam[3] = 0;
+  default_csparam[4] = 0;
+  default_csparam[5] = 0;
+
+  if (preference_notebook)
+  {
+    GtkWidget * tab;
+    int i;
+    for (i=4; i>0; i--)
+    {
+     tab = gtk_notebook_get_nth_page (GTK_NOTEBOOK (preference_notebook), i);
+     destroy_this_widget (tab);
+    }
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
+    show_the_widgets (preference_notebook);
+  }
 }
 
 /*!
@@ -500,17 +424,19 @@ void create_user_preferences_dialog ()
   /* Ortho / persp
 
   */
-  GtkWidget * win = create_win ("User preferences", MainWindow, TRUE, FALSE);
+  GtkWidget * win = dialogmodal ("User preferences", GTK_WINDOW(MainWindow));
   preferences = TRUE;
-  GtkWidget * vbox = create_vbox (5);
+  GtkWidget * vbox = dialog_get_content_area (win);
   add_container_child (CONTAINER_WIN, win, vbox);
+  gtk_window_set_resizable (GTK_WINDOW (win), TRUE);
   gtk_widget_set_size_request (win, 625, 600);
-  GtkWidget * notebook = gtk_notebook_new ();
-  gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_LEFT);
-  show_the_widgets (notebook);
-  gtk_widget_set_size_request (notebook, 600, 550);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, FALSE, FALSE, 0);
+  gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
+  preference_notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK(preference_notebook), TRUE);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(preference_notebook), GTK_POS_LEFT);
+  show_the_widgets (preference_notebook);
+  gtk_widget_set_size_request (preference_notebook, 600, 550);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
   gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
                  "by replacing internal parameters by user defined preferences.\n\n"
@@ -523,11 +449,14 @@ void create_user_preferences_dialog ()
   GtkWidget * but = create_button ("Restore all default parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), gbox, gtk_label_new ("General"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), calc_preferences(), gtk_label_new ("Analysis"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), model_preferences(), gtk_label_new ("Model"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), view_preferences(), gtk_label_new ("View"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
   show_the_widgets (win);
+  run_this_gtk_dialog (win, G_CALLBACK(run_destroy_dialog), NULL);
   preferences = FALSE;
+  preference_notebook = NULL;
 }
