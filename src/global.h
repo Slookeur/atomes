@@ -88,6 +88,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #  endif
 #endif
 
+#define MY_ENCODING "UTF-8"
+
 #include "math_3d.h"
 
 // dint, tint and qint structures are used for pointer purposes.

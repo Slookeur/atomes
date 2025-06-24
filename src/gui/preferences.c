@@ -41,7 +41,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 #include "preferences.h"
+#include <libxml/encoding.h>
+#include <libxml/xmlwriter.h>
 #include <libxml/xmlreader.h>
+#include <libxml/parser.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -92,19 +95,158 @@ int default_csparam[7];             /*!< Chain statistics parameters: \n
 
 gboolean preferences = FALSE;
 
-void set_parameter (double value, gchar * code_var, int id)
+/*!
+  \fn int save_preferences_to_xml_configuration ()
+
+  \brief save software preferences to XML configuration
+*/
+int save_preferences_to_xml_configuration ()
+{
+  int rc;
+#ifdef G_OS_WIN32
+  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.cfg", NULL);
+#else
+  struct passwd * pw = getpwuid(getuid());
+  ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes-2.cfg", pw -> pw_dir);
+#endif
+
+  xmlTextWriterPtr writer;
+
+  gchar * xml_delta_num_leg[7] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
+                                  "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",  "Spherical harmonics: l(max) in [2-40]"};
+  gchar * xml_rings_leg[7] = {"Default search",
+                              "Atom(s) to initiate the search from",
+                              "Maximum size for a ring",
+                              "Maximum number of rings of size n per MD step",
+                              "Only search for ABAB rings",
+                              "No homopolar bonds in the rings (A-A, B-B ...)",
+                              "No homopolar bonds in the connectivity matrix"};
+  gchar * xml_chain_leg[7] = {"Atom(s) to initiate the search from",
+                              "Maximum size for a ring",
+                              "Maximum number of rings of size n per MD step",
+                              "Only search for AAAA chains",
+                              "Only search for ABAB chains",
+                              "No homopolar bonds in the chains (A-A, B-B ...)",
+                              "Only search for 1-(2)n-1 chains"};
+
+  /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
+  writer = xmlNewTextWriterFilename(ATOMES_CONFIG, 0);
+  if (writer == NULL) return 0;
+  rc = xmlTextWriterSetIndent(writer, 1);
+  if (rc < 0) return 0;
+  /* Start the document with the xml default for the version,
+   * encoding MY_ENCODING and the default for the standalone
+   * declaration. */
+  rc = xmlTextWriterStartDocument(writer, NULL, MY_ENCODING, NULL);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)"atomes preferences XML file");
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"atomes_preferences-xml");
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"analysis");
+  if (rc < 0) return 0;
+  int i;
+  gchar * str;
+
+  for (i=0; i<7; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_delta_num_leg[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_num_delta");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_num_delta[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement(writer);
+    if (rc < 0) return 0;
+  }
+
+  for (i=0; i<7; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_rings_leg[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_rsparam");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_rsparam[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement(writer);
+    if (rc < 0) return 0;
+  }
+
+  for (i=0; i<7; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_chain_leg[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_csparam");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_csparam[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement(writer);
+    if (rc < 0) return 0;
+  }
+
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterEndDocument(writer);
+  if (rc < 0) return 0;
+
+  xmlFreeTextWriter(writer);
+  return 1;
+}
+
+/*!
+  \fn void set_parameter (double value, gchar * code_var, int vid)
+
+  \brief set default parameter
+
+  \param value the value to set
+  \param code_var the name of variable to set
+  \param vid the id number to set
+
+*/
+void set_parameter (double value, gchar * code_var, int vid)
 {
   if (g_strcmp0(code_var, "default_num_delta") == 0)
   {
-    default_num_delta[id] = (int)value;
+    default_num_delta[vid] = (int)value;
   }
   else if (g_strcmp0(code_var, "default_rsparam") == 0)
   {
-    default_rsparam[id] = (int)value;
+    default_rsparam[vid] = (int)value;
   }
   else if (g_strcmp0(code_var, "default_csparam") == 0)
   {
-    default_csparam[id] = (int)value;
+    default_csparam[vid] = (int)value;
   }
 }
 
@@ -113,7 +255,7 @@ void set_parameter (double value, gchar * code_var, int id)
 
   \brief read analysis preferences from XML configuration
 
-  \param analysis_node the XML node that point to analysis preferences
+  \param analysis node the XML node that point to analysis preferences
 */
 void read_analysis_preferences (xmlNodePtr analysis_node)
 {
@@ -258,7 +400,7 @@ GtkWidget * opengl_preferences ()
 /*!
   \fn G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 
-  \brief update default num delta preferences
+  \brief update default number of delta preferences
 
   \param res the GtkEntry the signal is coming from
   \param data the associated data pointer
@@ -321,6 +463,7 @@ GtkWidget * calc_preferences ()
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
   // Analysis preferences
+  if (save_preferences_to_xml_configuration ()) g_debug ("Saving ok");
 
   default_num_delta[GR] = 1000;
   default_num_delta[SQ] = 1000;
@@ -427,7 +570,6 @@ void create_user_preferences_dialog ()
   GtkWidget * win = dialogmodal ("User preferences", GTK_WINDOW(MainWindow));
   preferences = TRUE;
   GtkWidget * vbox = dialog_get_content_area (win);
-  add_container_child (CONTAINER_WIN, win, vbox);
   gtk_window_set_resizable (GTK_WINDOW (win), TRUE);
   gtk_widget_set_size_request (win, 625, 600);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);

@@ -63,8 +63,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "callbacks.h"
 
-#define MY_ENCODING "UTF-8"
-
 extern int open_coordinate_file (int id);
 
 #define NFORMATS 7
@@ -101,13 +99,13 @@ size_t strfind (char * ida)
 }
 
 /*!
-  \fn int XmlwriterFilename (const char *uri)
+  \fn int XmlwriterFilename (const char * uri)
 
   \brief write ISAACS XML file
 
-  \param *uri the file name
+  \param uri the file name
 */
-int XmlwriterFilename (const char *uri)
+int XmlwriterFilename (const char * uri)
 {
   int rc;
   int i, j;
@@ -140,7 +138,7 @@ int XmlwriterFilename (const char *uri)
   rc = xmlTextWriterStartElement(writer, BAD_CAST "isaacs-xml");
   if (rc < 0) return 0;
 
-  /* Start the "data" element. Since thist is the first
+  /* Start the "data" element. Since this is the first
    * element, this will be the root element of the document.
    <data>
 	  <type> </type>
@@ -210,7 +208,7 @@ int XmlwriterFilename (const char *uri)
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"species");
   if (rc < 0) return 0;
-  val=g_strdup_printf("%d",active_project -> nspec);
+  val = g_strdup_printf("%d",active_project -> nspec);
   rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"number", BAD_CAST val);
   g_free (val);
   if (rc < 0) return 0;
@@ -218,7 +216,7 @@ int XmlwriterFilename (const char *uri)
   {
     rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"label");
     if (rc < 0) return 0;
-    val=g_strdup_printf("%d",i);
+    val = g_strdup_printf("%d",i);
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST val);
     g_free (val);
     if (rc < 0) return 0;
