@@ -96,8 +96,8 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
 
-gchar * default_ogl_leg[7] = {"Default style", "Atoms color", "Polyhedra color",
-                              "Quality", "Lightning model", "Material", "Lights", "Fog"};
+gchar * default_ogl_leg[7] = {"Default style", "Atom(s) color map", "Polyhedra color map",
+                              "Quality", "Lightning model", "Material", "Fog"};
 int * default_opengl = NULL;
 int * tmp_opengl = NULL;
 
@@ -136,7 +136,13 @@ int save_preferences_to_xml_file ()
                               "Only search for ABAB chains",
                               "No homopolar bonds in the chains (A-A, B-B ...)",
                               "Only search for 1-(2)n-1 chains"};
-
+  gchar * xml_opengl_leg[7] = {"Default style",
+                               "Atom(s) color map",
+                               "Polyhedra color map",
+                               "Quality",
+                               "Lightning model",
+                               "Material",
+                               "Fog"};
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename(ATOMES_CONFIG, 0);
   if (writer == NULL) return 0;
@@ -165,7 +171,7 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_delta_num_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_num_delta");
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_num_delta");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
@@ -185,7 +191,7 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_rings_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_rsparam");
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_rsparam");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
@@ -205,13 +211,38 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_chain_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"code_var", BAD_CAST "default_csparam");
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_csparam");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_csparam[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement(writer);
+    if (rc < 0) return 0;
+  }
+
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"opengl");
+  if (rc < 0) return 0;
+  for (i=0; i<7; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_opengl_leg[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_opengl");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_opengl[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
@@ -233,47 +264,51 @@ int save_preferences_to_xml_file ()
 }
 
 /*!
-  \fn void set_parameter (double value, gchar * code_var, int vid)
+  \fn void set_parameter (double value, gchar * key, int vid)
 
   \brief set default parameter
 
   \param value the value to set
-  \param code_var the name of variable to set
+  \param key the name of variable to set
   \param vid the id number to set
 
 */
-void set_parameter (double value, gchar * code_var, int vid)
+void set_parameter (double value, gchar * key, int vid)
 {
-  if (g_strcmp0(code_var, "default_num_delta") == 0)
+  if (g_strcmp0(key, "default_num_delta") == 0)
   {
     default_num_delta[vid] = (int)value;
   }
-  else if (g_strcmp0(code_var, "default_rsparam") == 0)
+  else if (g_strcmp0(key, "default_rsparam") == 0)
   {
     default_rsparam[vid] = (int)value;
   }
-  else if (g_strcmp0(code_var, "default_csparam") == 0)
+  else if (g_strcmp0(key, "default_csparam") == 0)
   {
     default_csparam[vid] = (int)value;
+  }
+  else if (g_strcmp0(key, "default_opengl") == 0)
+  {
+    default_opengl[vid] = (int)value;
   }
 }
 
 /*!
-  \fn void read_analysis_preferences (xmlNodePtr analysis_node)
+  \fn void read_preferences (xmlNodePtr preference_node)
 
-  \brief read analysis preferences from XML configuration
+  \brief read preferences from XML configuration
 
-  \param analysis node the XML node that point to analysis preferences
+  \param preference_node node the XML node that point to preferences
 */
-void read_analysis_preferences (xmlNodePtr analysis_node)
+void read_preferences (xmlNodePtr preference_node)
 {
   xmlNodePtr node, p_node;
   xmlAttrPtr p_details;
   gboolean set_codevar, set_id;
-  gchar * code_var;
+  gchar * key;
   int id;
   double value;
-  node = findnode (analysis_node  -> children, "parameter");
+  node = findnode (preference_node  -> children, "parameter");
   while (node)
   {
     value = string_to_double ((gpointer)xmlNodeGetContent(node));
@@ -284,9 +319,9 @@ void read_analysis_preferences (xmlNodePtr analysis_node)
       p_node = p_details -> children;
       if (p_node)
       {
-        if (g_strcmp0("code_var",(char *)p_details -> name) == 0)
+        if (g_strcmp0("key",(char *)p_details -> name) == 0)
         {
-          code_var = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+          key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
           set_codevar = TRUE;
         }
         if (g_strcmp0("id",(char *)p_details -> name) == 0)
@@ -299,7 +334,7 @@ void read_analysis_preferences (xmlNodePtr analysis_node)
     }
     if (set_codevar && set_id)
     {
-      set_parameter (value, code_var, id);
+      set_parameter (value, key, id);
     }
     node = node -> next;
     node = findnode (node, "parameter");
@@ -330,17 +365,17 @@ void read_preferences_from_xml_file ()
         node = findnode(racine -> children, "analysis");
         if (node)
         {
-          read_analysis_preferences (node);
+          read_preferences (node);
         }
         node = findnode(racine -> children, "opengl");
         if (node)
         {
-
+          read_preferences (node);
         }
         node = findnode(racine -> children, "model");
         if (node)
         {
-
+          read_preferences (node);
         }
       }
       xmlFreeDoc(doc);
@@ -362,6 +397,7 @@ void set_atomes_preferences ()
   default_num_delta = allocint (7);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
+  default_opengl = allocint (7);
   restore_defaults_parameters (NULL, NULL);
   read_preferences_from_xml_file ();
 }
@@ -391,6 +427,26 @@ GtkWidget * model_preferences ()
 }
 
 /*!
+  \fn G_MODULE_EXPORT void set_default_style (GtkComboBox * box, gpointer data)
+
+  \brief change default atom(s) and bond(s) style
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_default_style (GtkComboBox * box, gpointer data)
+{
+  GtkTreeIter iter;
+  if (gtk_combo_box_get_active_iter (box, & iter))
+  {
+    GtkTreeModel * model = gtk_combo_box_get_model (box);
+    int i;
+    gtk_tree_model_get (model, & iter, 1, & i, -1);
+    tmp_opengl[0] = (i > 0) ? i - 1 : i;
+  }
+}
+
+/*!
   \fn GtkTreeModel * style_combo_tree ()
 
   \brief create opengl style combo model
@@ -400,22 +456,55 @@ GtkTreeModel * style_combo_tree ()
   GtkTreeIter iter, iter2;
   GtkTreeStore * store;
   int i, j;
-  gchar * name, * word;
-  store = gtk_tree_store_new (1, G_TYPE_STRING);
+  store = gtk_tree_store_new (2, G_TYPE_STRING, G_TYPE_INT);
   for (i=0; i<OGL_STYLES; i++)
   {
     gtk_tree_store_append (store, & iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, text_styles[i], -1);
+    gtk_tree_store_set (store, & iter, 0, text_styles[i], 1, i+1, -1);
     if (i == SPACEFILL)
     {
       for (j=0; j<FILLED_STYLES; j++)
       {
         gtk_tree_store_append (store, & iter2, & iter);
-        gtk_tree_store_set (store, & iter2, 0, text_filled[j], -1);
+        gtk_tree_store_set (store, & iter2, 0, text_filled[j], 1, -j-1, -1);
       }
     }
   }
   return  GTK_TREE_MODEL (store);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data)
+
+  \brief change default atom(s) or polyhedra color map
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data)
+{
+  int i, j;
+  i = gtk_combo_box_get_active (box);
+  j = GPOINTER_TO_INT(data);
+  tmp_opengl[j+1] = i;
+}
+
+/*!
+  \fn GtkWidget * combo_map (int obj)
+
+  \brief create color map combo
+
+  \param obj 0 = atom(s), 1 = polyhedra
+*/
+GtkWidget * combo_map (int obj)
+{
+  GtkWidget * combo = create_combo ();
+  combo_text_append (combo, "Atomic species");
+  combo_text_append (combo, "Total coordination(s)");
+  combo_text_append (combo, "Partial coordination(s)");
+  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), default_opengl[1+obj]);
+  g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_map), GINT_TO_POINTER(obj));
+  return combo;
 }
 
 /*!
@@ -436,7 +525,6 @@ GtkWidget * opengl_preferences ()
   //{"Default style", "Atoms color", "Polyhedra color",
   // "Quality", "Lightning model", "Material", "Lights", "Fog"};
 
-
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[0], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
@@ -445,14 +533,19 @@ GtkWidget * opengl_preferences ()
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);
-  // g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(), );
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);//default_opengl[0]);
-  /* GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
-  if(cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
-  }*/
+  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), default_opengl[0]);
+  g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[1], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(0), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[2], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
@@ -534,6 +627,11 @@ void clean_all_tmp ()
     g_free (tmp_csparam);
     tmp_csparam = NULL;
   }
+  if (tmp_opengl)
+  {
+    g_free (tmp_opengl);
+    tmp_opengl = NULL;
+  }
 }
 
 /*!
@@ -547,6 +645,7 @@ void prepare_tmp_default ()
   tmp_num_delta = duplicate_int (7, default_num_delta);
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
+  tmp_opengl = duplicate_int (7, default_opengl);
 }
 
 /*!
@@ -574,6 +673,12 @@ void save_preferences ()
     default_csparam = NULL;
   }
   default_csparam = duplicate_int (7, tmp_csparam);
+  if (default_opengl)
+  {
+    g_free (default_opengl);
+    default_opengl = NULL;
+  }
+  default_opengl = duplicate_int (7, tmp_opengl);
 }
 
 /*!
@@ -610,6 +715,8 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_csparam[3] = 0;
   default_csparam[4] = 0;
   default_csparam[5] = 0;
+
+  default_opengl[0] = 0;
 
   if (preference_notebook)
   {
@@ -666,38 +773,12 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
 */
 void create_user_preferences_dialog ()
 {
-  // General prefs
   /*
-  - default radius to be used
-  - default X-ray scattering method
-
-  - calculations:
-    - default dr for g(r)
-    - dq for s(q)
-    - dk for s(k)
-    - dr for g(r)
-
-    - default dr for distances
-    - default d° for angles
-    - default search for molecules and frag
-    - default output in file + file name
-
-    - default ring definition to be used
-    - default atom to start the search (all or
-    - default max ring size
-    - default NUMA ring
-    - default search ABAB, no homo in rings, no homo in matrix
-
-    - default max chain size
-    - default NUMA chain
-    - default only AAAA, ABAB, no homo in chains,
-
     - delta t for dynamics + unit
     - Steps between configurations
   */
   // OpenGL prefs
   /*
-
   - Default style
   - Default color scheme: atoms, poly
   - Default quality
