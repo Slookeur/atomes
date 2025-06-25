@@ -169,7 +169,7 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_delta_num_leg[i]);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_num_leg[i]);
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_num_delta");
     if (rc < 0) return 0;
@@ -189,7 +189,7 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_rings_leg[i]);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_rings_leg[i]);
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_rsparam");
     if (rc < 0) return 0;
@@ -209,7 +209,7 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_chain_leg[i]);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_chain_leg[i]);
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_csparam");
     if (rc < 0) return 0;
@@ -234,7 +234,7 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"name", BAD_CAST xml_opengl_leg[i]);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_opengl_leg[i]);
     if (rc < 0) return 0;
     rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_opengl");
     if (rc < 0) return 0;
@@ -752,10 +752,12 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   {
     case GTK_RESPONSE_APPLY:
       save_preferences ();
-      if (ask_yes_no("Save atomes preferences ?", "Save <b>atomes</b> preferences to file ?", GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+      gchar * str = g_strdup_printf ("Saving <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
+      if (ask_yes_no("Save atomes preferences ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
       {
         save_preferences_to_xml_file ();
       }
+      g_free (str);
       break;
     default:
       break;
@@ -816,13 +818,16 @@ void create_user_preferences_dialog ()
   GtkWidget * gbox = create_vbox (BSEP);
   gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
                  "by replacing internal parameters by user defined preferences.\n\n"
-                 "\t<b>Analysis</b> : calculation preferences\n"
-                 "\t<b>OpenGL</b> : rendering preferences\n"
-                 "\t<b>Model</b> : atom(s), bond(s) and box preferences\n"
-                 "\t<b>View</b> : representation and projection preferences";
+                 "\t<b>Analysis</b>\t: calculation preferences\n"
+                 "\t<b>OpenGL  </b>\t: rendering preferences\n"
+                 "\t<b>Model   </b>\t: atom(s), bond(s) and box preferences\n"
+                 "\t<b>View      </b>\t: representation and projection preferences\n\n"
+                 "Default parameters are used for any new project added to the workspace\n";
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, markup_label (mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
   GtkWidget * hbox = create_hbox (BSEP);
-  GtkWidget * but = create_button ("Restore all default parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
+  GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
+  GtkWidget * but_lab = markup_label ("Restore <b>atomes</b> default parameters", -1, -1, 0.5, 0.5);
+  add_container_child (CONTAINER_BUT, but, but_lab);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
