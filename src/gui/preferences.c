@@ -40,6 +40,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "project.h"
 #include "workspace.h"
+#include "glview.h"
 #include "preferences.h"
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
@@ -94,6 +95,11 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
+
+gchar * default_ogl_leg[7] = {"Default style", "Atoms color", "Polyhedra color",
+                              "Quality", "Lightning model", "Material", "Lights", "Fog"};
+int * default_opengl = NULL;
+int * tmp_opengl = NULL;
 
 gboolean preferences = FALSE;
 
@@ -385,15 +391,72 @@ GtkWidget * model_preferences ()
 }
 
 /*!
+  \fn GtkTreeModel * style_combo_tree ()
+
+  \brief create opengl style combo model
+*/
+GtkTreeModel * style_combo_tree ()
+{
+  GtkTreeIter iter, iter2;
+  GtkTreeStore * store;
+  int i, j;
+  gchar * name, * word;
+  store = gtk_tree_store_new (1, G_TYPE_STRING);
+  for (i=0; i<OGL_STYLES; i++)
+  {
+    gtk_tree_store_append (store, & iter, NULL);
+    gtk_tree_store_set (store, & iter, 0, text_styles[i], -1);
+    if (i == SPACEFILL)
+    {
+      for (j=0; j<FILLED_STYLES; j++)
+      {
+        gtk_tree_store_append (store, & iter2, & iter);
+        gtk_tree_store_set (store, & iter2, 0, text_filled[j], -1);
+      }
+    }
+  }
+  return  GTK_TREE_MODEL (store);
+}
+
+/*!
   \fn GtkWidget * opengl_preferences ()
 
   \brief OpenGL preferences
 */
 GtkWidget * opengl_preferences ()
 {
+  GtkWidget * notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+  show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
+  GtkWidget * hbox;
+  GtkWidget * entry;
+  GtkWidget * combo;
+  //{"Default style", "Atoms color", "Polyhedra color",
+  // "Quality", "Lightning model", "Material", "Lights", "Fog"};
 
-  return vbox;
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[0], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  GtkTreeModel * model = style_combo_tree ();
+  combo = gtk_combo_box_new_with_model (model);
+  g_object_unref (model);
+  GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);
+  // g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(), );
+  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);//default_opengl[0]);
+  /* GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
+  if(cell_list && cell_list -> data)
+  {
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
+  }*/
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  return notebook;
 }
 
 /*!
@@ -686,8 +749,8 @@ void create_user_preferences_dialog ()
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
-  gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
   show_the_widgets (preference_notebook);
   show_the_widgets (win);
+  gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
   run_this_gtk_dialog (win, G_CALLBACK(edit_preferences), NULL);
 }
