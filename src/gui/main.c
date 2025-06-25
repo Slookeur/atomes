@@ -825,6 +825,12 @@ int main (int argc, char *argv[])
 #endif
     atomes_visual = ! (abs(atomes_visual));
 
+#ifdef G_OS_WIN32
+    ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.pml", NULL);
+#else
+    struct passwd * pw = getpwuid(getuid());
+    ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes.pml", pw -> pw_dir);
+#endif
     set_atomes_preferences ();
     // setlocale(LC_ALL,"en_US");
     gtk_disable_setlocale ();

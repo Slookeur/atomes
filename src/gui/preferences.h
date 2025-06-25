@@ -37,11 +37,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern gboolean preferences;
 
 extern gchar * default_delta_num_leg[7];
-extern int default_num_delta[7];
+extern int * default_num_delta;
+extern int * tmp_num_delta;
 extern gchar * default_ring_param[7] ;
-extern int default_rsparam[7];
+extern int * default_rsparam;
+extern int * tmp_rsparam;
 extern gchar * default_chain_param[7];
-extern int default_csparam[7];
+extern int * default_csparam;
+extern int * tmp_csparam;
 
 extern void set_atomes_preferences ();
 

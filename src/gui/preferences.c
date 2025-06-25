@@ -57,7 +57,8 @@ GtkWidget * preference_notebook = NULL;
 
 gchar * default_delta_num_leg[7] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
                                     "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",  "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]"};
-int default_num_delta[7];          /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp */
+int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp */
+int * tmp_num_delta = NULL;
 
 gchar * default_ring_param[7] = {"Default search",
                                  "Atom(s) to initiate the search from",
@@ -66,15 +67,15 @@ gchar * default_ring_param[7] = {"Default search",
                                  "Only search for ABAB rings",
                                  "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>",
                                  "No homopolar bonds in the connectivity matrix"};
-int default_rsparam[7];            /*!< Ring statistics parameters: \n
-                                        0 = Default search, \n
-                                        1 = Initial node(s) for the search: selected chemical species or all atoms, \n
-                                        2 = Maximum size of ring for the search Rmax, \n
-                                        3 = Maximum number of ring(s) per MD step NUMA, \n
-                                        4 = Search only for ABAB rings or not, \n
-                                        5 = Include Homopolar bond(s) in the analysis or not, \n
-                                        6 = Include homopolar bond(s) when calculating the distance matrix */
-
+int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
+                                       0 = Default search, \n
+                                       1 = Initial node(s) for the search: selected chemical species or all atoms, \n
+                                       2 = Maximum size of ring for the search Rmax, \n
+                                       3 = Maximum number of ring(s) per MD step NUMA, \n
+                                       4 = Search only for ABAB rings or not, \n
+                                       5 = Include Homopolar bond(s) in the analysis or not, \n
+                                       6 = Include homopolar bond(s) when calculating the distance matrix */
+int * tmp_rsparam = NULL;
 
 // 0 = Initnode, 1 = RMAX, 2 = CNUMAn 3 = AAAA, 4 = ABAB, 5 = Homo, 6 = 1221
 gchar * default_chain_param[7] = {"Atom(s) to initiate the search from",
@@ -84,30 +85,31 @@ gchar * default_chain_param[7] = {"Atom(s) to initiate the search from",
                                   "Only search for ABAB chains",
                                   "No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>",
                                   "Only search for 1-(2)<sub>n</sub>-1 chains, ie. isolated chains"};
-int default_csparam[7];             /*!< Chain statistics parameters: \n
-                                         0 = Initial node(s) for the search: selected chemical species or all atoms, \n
-                                         1 = Maximum size for a chain Cmax, \n
-                                         2 = Maximum number of chain(s) per MD step CNUMA, \n
-                                         3 = Search only for AAAA chains or not, \n
-                                         4 = Search only for ABAB chains or not, \n
-                                         5 = Include Homopolar bond(s) in the analysis or not, \n
-                                         6 = Search only for 1-(2)n-1 chains */
+int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
+                                       0 = Initial node(s) for the search: selected chemical species or all atoms, \n
+                                       1 = Maximum size for a chain Cmax, \n
+                                       2 = Maximum number of chain(s) per MD step CNUMA, \n
+                                       3 = Search only for AAAA chains or not, \n
+                                       4 = Search only for ABAB chains or not, \n
+                                       5 = Include Homopolar bond(s) in the analysis or not, \n
+                                       6 = Search only for 1-(2)n-1 chains */
+int * tmp_csparam = NULL;
 
 gboolean preferences = FALSE;
 
 /*!
-  \fn int save_preferences_to_xml_configuration ()
+  \fn int save_preferences_to_xml_file ()
 
-  \brief save software preferences to XML configuration
+  \brief save software preferences to XML file
 */
-int save_preferences_to_xml_configuration ()
+int save_preferences_to_xml_file ()
 {
   int rc;
 #ifdef G_OS_WIN32
-  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.cfg", NULL);
+  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.pml", NULL);
 #else
   struct passwd * pw = getpwuid(getuid());
-  ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes-2.cfg", pw -> pw_dir);
+  ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes.pml", pw -> pw_dir);
 #endif
 
   xmlTextWriterPtr writer;
@@ -299,18 +301,12 @@ void read_analysis_preferences (xmlNodePtr analysis_node)
 }
 
 /*!
-  \fn void read_preferences_from_xml_configuration ()
+  \fn void read_preferences_from_xml_file ()
 
-  \brief read software preferences from XML configuration
+  \brief read software preferences from XML file
 */
-void read_preferences_from_xml_configuration ()
+void read_preferences_from_xml_file ()
 {
-#ifdef G_OS_WIN32
-  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.cfg", NULL);
-#else
-  struct passwd * pw = getpwuid(getuid());
-  ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes.cfg", pw -> pw_dir);
-#endif
   xmlDoc * doc;
   xmlTextReaderPtr reader;
   xmlNodePtr racine;
@@ -357,8 +353,11 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 */
 void set_atomes_preferences ()
 {
+  default_num_delta = allocint (7);
+  default_rsparam = allocint (7);
+  default_csparam = allocint (7);
   restore_defaults_parameters (NULL, NULL);
-  read_preferences_from_xml_configuration ();
+  read_preferences_from_xml_file ();
 }
 
 /*!
@@ -409,8 +408,8 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 {
   int i = GPOINTER_TO_INT(data);
   const gchar * m = entry_get_text (res);
-  default_num_delta[i] = (int) string_to_double ((gpointer)m);
-  update_entry_int (res, default_num_delta[i]);
+  tmp_num_delta[i] = (int) string_to_double ((gpointer)m);
+  update_entry_int (res, tmp_num_delta[i]);
 }
 
 /*!
@@ -433,23 +432,85 @@ GtkWidget * calc_preferences ()
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
     entry = create_entry (G_CALLBACK(set_default_num_delta), 150, 15, TRUE, GINT_TO_POINTER(i));
-    update_entry_int ((GtkEntry *)entry, default_num_delta[i]);
+    update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   }
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
-
   vbox = create_vbox (BSEP);
   search_type = 0;
   calc_rings (vbox);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Ring statistics"));
-
   vbox = create_vbox (BSEP);
   search_type = 1;
   calc_rings (vbox);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Chain statistics"));
 
   return notebook;
+}
+
+/*!
+  \fn void clean_all_tmp ()
+
+  \brief free all temporary buffers
+*/
+void clean_all_tmp ()
+{
+  if (tmp_num_delta)
+  {
+    g_free (tmp_num_delta);
+    tmp_num_delta = NULL;
+  }
+  if (tmp_rsparam)
+  {
+    g_free (tmp_rsparam);
+    tmp_rsparam = NULL;
+  }
+  if (tmp_csparam)
+  {
+    g_free (tmp_csparam);
+    tmp_csparam = NULL;
+  }
+}
+
+/*!
+  \fn void prepare_tmp_default ()
+
+  \brief prepare temporary parameters
+*/
+void prepare_tmp_default ()
+{
+  clean_all_tmp ();
+  tmp_num_delta = duplicate_int (7, default_num_delta);
+  tmp_rsparam = duplicate_int (7, default_rsparam);
+  tmp_csparam = duplicate_int (7, default_csparam);
+}
+
+/*!
+  \fn void save_preferences ()
+
+  \brief save user preferences
+*/
+void save_preferences ()
+{
+  if (default_num_delta)
+  {
+    g_free (default_num_delta);
+    default_num_delta = NULL;
+  }
+  default_num_delta = duplicate_int (7, tmp_num_delta);
+  if (default_rsparam)
+  {
+    g_free (default_rsparam);
+    default_rsparam = NULL;
+  }
+  default_rsparam = duplicate_int (7, tmp_rsparam);
+  if (default_csparam)
+  {
+    g_free (default_csparam);
+    default_csparam = NULL;
+  }
+  default_csparam = duplicate_int (7, tmp_csparam);
 }
 
 /*!
@@ -463,7 +524,6 @@ GtkWidget * calc_preferences ()
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
   // Analysis preferences
-  if (save_preferences_to_xml_configuration ()) g_debug ("Saving ok");
 
   default_num_delta[GR] = 1000;
   default_num_delta[SQ] = 1000;
@@ -492,6 +552,7 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   {
     GtkWidget * tab;
     int i;
+    prepare_tmp_default ();
     for (i=4; i>0; i--)
     {
      tab = gtk_notebook_get_nth_page (GTK_NOTEBOOK (preference_notebook), i);
@@ -501,8 +562,38 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
+    gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
     show_the_widgets (preference_notebook);
   }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id, gpointer data)
+
+  \brief edit preferences - running the dialog
+
+  \param edit_prefs the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id, gpointer data)
+{
+  switch (response_id)
+  {
+    case GTK_RESPONSE_APPLY:
+      save_preferences ();
+      if (ask_yes_no("Save atomes preferences ?", "Save <b>atomes</b> preferences to file ?", GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+      {
+        save_preferences_to_xml_file ();
+      }
+      break;
+    default:
+      break;
+  }
+  destroy_this_dialog (edit_prefs);
+  preferences = FALSE;
+  clean_all_tmp ();
+  preference_notebook = NULL;
 }
 
 /*!
@@ -567,16 +658,15 @@ void create_user_preferences_dialog ()
   /* Ortho / persp
 
   */
-  GtkWidget * win = dialogmodal ("User preferences", GTK_WINDOW(MainWindow));
+  GtkWidget * win = dialog_cancel_apply ("User preferences", MainWindow, TRUE);
   preferences = TRUE;
+  prepare_tmp_default ();
   GtkWidget * vbox = dialog_get_content_area (win);
-  gtk_window_set_resizable (GTK_WINDOW (win), TRUE);
   gtk_widget_set_size_request (win, 625, 600);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
   preference_notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(preference_notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(preference_notebook), GTK_POS_LEFT);
-  show_the_widgets (preference_notebook);
   gtk_widget_set_size_request (preference_notebook, 600, 550);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
@@ -592,13 +682,12 @@ void create_user_preferences_dialog ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
-
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
+  gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
+  show_the_widgets (preference_notebook);
   show_the_widgets (win);
-  run_this_gtk_dialog (win, G_CALLBACK(run_destroy_dialog), NULL);
-  preferences = FALSE;
-  preference_notebook = NULL;
+  run_this_gtk_dialog (win, G_CALLBACK(edit_preferences), NULL);
 }
