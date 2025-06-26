@@ -1308,18 +1308,18 @@ void init_img (project * this_proj)
   img -> rep = PERSPECTIVE;
   img -> filled_type = NONE;
   // Visual styles
-  if (! default_opengl[1])
+  if (! default_opengl[0])
   {
     img -> style = (this_proj -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
   }
-  else if (default_opengl[1] > 0)
+  else if (default_opengl[0] > 0)
   {
-    img -> style = (default_opengl[1] < 2) ? default_opengl[1] - 1 : default_opengl[1];
+    img -> style = (default_opengl[0] < 2) ? default_opengl[0] - 1 : default_opengl[0];
   }
   else
   {
     img -> style = SPACEFILL;
-    img -> filled_type = - default_opengl[1] - 1;
+    img -> filled_type = - default_opengl[0] - 1;
   }
   img -> box_axis[AXIS] = NONE; // (this_proj -> natomes <= 1000) ?  CYLINDERS : DEFAULT_STYLE;
   if (this_proj -> cell.pbc)
