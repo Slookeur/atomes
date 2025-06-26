@@ -91,6 +91,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
 #include "initcoord.h"
 #include "bind.h"
 #include "project.h"
@@ -1302,13 +1303,24 @@ void init_img (project * this_proj)
   img -> axis_pos[1] = 50.0;
   img -> axis_pos[2] = 0.0;
   img -> axis_labels = 1;
-  img -> filled_type = NONE;
-  img -> quality = QUALITY;
+  img -> quality = default_opengl[3];
   img -> render = FILL;
   img -> rep = PERSPECTIVE;
-
+  img -> filled_type = NONE;
   // Visual styles
-  img -> style = (this_proj -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
+  if (! default_opengl[1])
+  {
+    img -> style = (this_proj -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
+  }
+  else if (default_opengl[1] > 0)
+  {
+    img -> style = (default_opengl[1] < 2) ? default_opengl[1] - 1 : default_opengl[1];
+  }
+  else
+  {
+    img -> style = SPACEFILL;
+    img -> filled_type = - default_opengl[1] - 1;
+  }
   img -> box_axis[AXIS] = NONE; // (this_proj -> natomes <= 1000) ?  CYLINDERS : DEFAULT_STYLE;
   if (this_proj -> cell.pbc)
   {
@@ -1350,7 +1362,7 @@ void init_img (project * this_proj)
   set_img_lights (this_proj, img);
   img -> m_terial.predefine = 4;
   img -> m_terial.albedo = vec3(0.5, 0.5, 0.5);
-  img -> m_terial.param[0] = DEFAULT_LIGHTNING;
+  img -> m_terial.param[0] = default_opengl[4];
   img -> m_terial.param[1] = DEFAULT_METALLIC;
   img -> m_terial.param[2] = DEFAULT_ROUGHNESS;
   img -> m_terial.param[3] = DEFAULT_AMBIANT_OCCLUSION;

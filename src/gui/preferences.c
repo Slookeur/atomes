@@ -53,6 +53,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void calc_rings (GtkWidget * vbox);
+extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
+extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
+extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 
 GtkWidget * preference_notebook = NULL;
 
@@ -442,7 +445,7 @@ G_MODULE_EXPORT void set_default_style (GtkComboBox * box, gpointer data)
     GtkTreeModel * model = gtk_combo_box_get_model (box);
     int i;
     gtk_tree_model_get (model, & iter, 1, & i, -1);
-    tmp_opengl[0] = (i > 0) ? i - 1 : i;
+    tmp_opengl[0] = (! i) ? 0 : i;
   }
 }
 
@@ -457,6 +460,8 @@ GtkTreeModel * style_combo_tree ()
   GtkTreeStore * store;
   int i, j;
   store = gtk_tree_store_new (2, G_TYPE_STRING, G_TYPE_INT);
+  gtk_tree_store_append (store, & iter, NULL);
+  gtk_tree_store_set (store, & iter, 0, "f(atoms) <sup>*</sup>", 1, 0, -1);
   for (i=0; i<OGL_STYLES; i++)
   {
     gtk_tree_store_append (store, & iter, NULL);
@@ -502,7 +507,7 @@ GtkWidget * combo_map (int obj)
   combo_text_append (combo, "Atomic species");
   combo_text_append (combo, "Total coordination(s)");
   combo_text_append (combo, "Partial coordination(s)");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), default_opengl[1+obj]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), tmp_opengl[1+obj]);
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_map), GINT_TO_POINTER(obj));
   return combo;
 }
@@ -520,32 +525,54 @@ GtkWidget * opengl_preferences ()
   show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  GtkWidget * entry;
+  //GtkWidget * entry;
   GtkWidget * combo;
   //{"Default style", "Atoms color", "Polyhedra color",
   // "Quality", "Lightning model", "Material", "Lights", "Fog"};
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[0], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Default style</b>", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
   combo = gtk_combo_box_new_with_model (model);
   g_object_unref (model);
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), default_opengl[0]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), tmp_opengl[0]);
+  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
+  if (cell_list && cell_list -> data)
+  {
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
+  }
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("* if 10 000 atoms or more: <i>Wireframe</i>, otherwise: <i>Ball and stick</i>", -1, -1, 0.5, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[1], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Color maps</b>", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tatom(s) and bond(s)", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_ogl_leg[2], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tpolyhedra", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Quality</b>", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_hscale (2, 500, 1, tmp_opengl[3], GTK_POS_TOP, 1, 150,
+                                                   G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), NULL), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Lightning model</b>", 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, NULL), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
@@ -691,6 +718,7 @@ void save_preferences ()
 */
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
+  int i;
   // Analysis preferences
 
   default_num_delta[GR] = 1000;
@@ -716,12 +744,13 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_csparam[4] = 0;
   default_csparam[5] = 0;
 
-  default_opengl[0] = 0;
-
+  default_opengl[0] = -1;
+  default_opengl[1] = default_opengl[2] = 0;
+  default_opengl[3] = QUALITY;
+  default_opengl[4] = DEFAULT_LIGHTNING;
   if (preference_notebook)
   {
     GtkWidget * tab;
-    int i;
     prepare_tmp_default ();
     for (i=4; i>0; i--)
     {

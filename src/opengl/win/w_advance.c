@@ -87,6 +87,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
 #include "glview.h"
 #include "glwindow.h"
 
@@ -1031,9 +1032,16 @@ G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data)
 */
 G_MODULE_EXPORT void set_l_model (GtkComboBox * box, gpointer data)
 {
-  glwin * view = (glwin *)data;
-  view -> anim -> last -> img -> m_terial.param[0] = gtk_combo_box_get_active (box);
-  update (view);
+  if (preferences)
+  {
+    tmp_opengl[4] = gtk_combo_box_get_active (box);
+  }
+  else
+  {
+    glwin * view = (glwin *)data;
+    view -> anim -> last -> img -> m_terial.param[0] = gtk_combo_box_get_active (box);
+    update (view);
+  }
 }
 
 /*!
@@ -1116,7 +1124,7 @@ G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType s
 {
   set_quality ((int)value, data);
 #ifdef GTK4
-  update_menu_bar ((glwin *)data);
+  if (! preferences) update_menu_bar ((glwin *)data);
 #endif
   return FALSE;
 }
@@ -1133,8 +1141,34 @@ G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data)
 {
   set_quality ((int)gtk_range_get_value (range), data);
 #ifdef GTK4
-  update_menu_bar ((glwin *)data);
+  if (! preferences) update_menu_bar ((glwin *)data);
 #endif
+}
+
+/*!
+  \fn GtkWidget * lightning_box (glwin * view, Material * this_material)
+
+  \brief create ligthning model combo box
+
+  \param view the target glwin, if anuy
+  \param Material the target material, if any
+*/
+GtkWidget * lightning_fix (glwin * view, Material * this_material)
+{
+  GtkWidget * fix = gtk_fixed_new ();
+  GtkWidget * lmodel = create_combo ();
+  gtk_fixed_put (GTK_FIXED (fix), lmodel, 0, 10);
+
+  char * l_model[6] = {"None", "Phong", "Blinn", "Cook-Torrance-Blinn", "Cook-Torrance-Beckmann", "Cook-Torrance-GCX"};
+  int i;
+  for (i=0; i<6; i++)
+  {
+    combo_text_append (lmodel, l_model[i]);
+  }
+  g_signal_connect (G_OBJECT (lmodel), "changed", G_CALLBACK(set_l_model), view);
+  gtk_widget_set_size_request (lmodel, 100, -1);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(lmodel), (preferences) ? tmp_opengl[4] : this_material -> param[0]);
+  return fix;
 }
 
 /*!
@@ -1156,19 +1190,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (2, 500, 1, view -> anim -> last -> img -> quality, GTK_POS_TOP, 1, 150,
                                                    G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label("<b>Lightning model</b>: ", 100, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  GtkWidget * lmodel = create_combo ();
-  GtkWidget * fix = gtk_fixed_new ();
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fix, FALSE, FALSE, 0);
-  gtk_fixed_put (GTK_FIXED (fix), lmodel, 0, 10);
-
-  char * l_model[6] = {"None", "Phong", "Blinn", "Cook-Torrance-Blinn", "Cook-Torrance-Beckmann", "Cook-Torrance-GCX"};
-  for (i=0; i<6; i++)
-  {
-    combo_text_append (lmodel, l_model[i]);
-  }
-  g_signal_connect (G_OBJECT (lmodel), "changed", G_CALLBACK(set_l_model), view);
-  gtk_widget_set_size_request (lmodel, 100, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(lmodel), this_material -> param[0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, this_material), FALSE, FALSE, 0);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,

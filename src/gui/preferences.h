@@ -45,6 +45,8 @@ extern int * tmp_rsparam;
 extern gchar * default_chain_param[7];
 extern int * default_csparam;
 extern int * tmp_csparam;
+extern int * default_opengl;
+extern int * tmp_opengl;
 
 extern void set_atomes_preferences ();
 

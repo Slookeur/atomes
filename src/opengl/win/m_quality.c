@@ -44,6 +44,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
 #include "project.h"
 #include "glwindow.h"
 #include "glview.h"
@@ -58,14 +59,21 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 void set_quality (int q, glwin * view)
 {
-  view -> anim -> last -> img -> quality = q;
-  init_default_shaders (view);
-  view -> create_shaders[MDBOX] = TRUE;
-  view -> create_shaders[MAXIS] = TRUE;
-  update (view);
+  if (! preferences)
+  {
+    view -> anim -> last -> img -> quality = q;
+    init_default_shaders (view);
+    view -> create_shaders[MDBOX] = TRUE;
+    view -> create_shaders[MAXIS] = TRUE;
+    update (view);
 #ifdef GTK3
-  gtk_range_set_value (GTK_RANGE(view -> ogl_quality), view -> anim -> last -> img -> quality);
+    gtk_range_set_value (GTK_RANGE(view -> ogl_quality), view -> anim -> last -> img -> quality);
 #endif
+  }
+  else
+  {
+    tmp_opengl[3] = q;
+  }
 }
 
 /*!
