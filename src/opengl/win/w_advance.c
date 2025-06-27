@@ -91,8 +91,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 
-#define TEMPLATES 7
-
 extern void set_quality (int q, glwin * view);
 
 gchar * material_template[TEMPLATES] = {"Opaque",
@@ -117,23 +115,23 @@ float mat_min_max[5][2] = {{0.0, 1.0},
                            {0.0, 10.0},
                            {0.0, 1.0}};
 
-gchar * settings[3][10] = {{"<u>Albedo:</u>",
-                            "<u>Metallic:</u>",
-                            "<u>Roughness:</u>",
-                            "<u>Ambient occlusion:</u>",
-                            "<u>Gamma correction:</u>",
-                            "<u>Opacity:</u>"},
-                           {"<u>Position:</u>",
-                            "<u>Direction:</u>",
-                            "<u>Intensity:</u>",
-                            "<u>Constant attenuation:</u>",
-                            "<u>Linear attenuation:</u>",
-                            "<u>Quadratic attenuation:</u>",
-                            "<u>Cone angle</u>",
-                            "<u>Inner cutoff:</u>",
-                            "<u>Outer cutoff:</u>"
-                            "<u>Type:</u>"},
-                            {"Color:"}};
+gchar * ogl_settings[3][10] = {{"<u>Albedo:</u>",
+                                "<u>Metallic:</u>",
+                                "<u>Roughness:</u>",
+                                "<u>Ambient occlusion:</u>",
+                                "<u>Gamma correction:</u>",
+                                "<u>Opacity:</u>"},
+                               {"<u>Position:</u>",
+                                "<u>Direction:</u>",
+                                "<u>Intensity:</u>",
+                                "<u>Constant attenuation:</u>",
+                                "<u>Linear attenuation:</u>",
+                                "<u>Quadratic attenuation:</u>",
+                                "<u>Cone angle</u>",
+                                "<u>Inner cutoff:</u>",
+                                "<u>Outer cutoff:</u>"
+                                "<u>Type:</u>"},
+                               {"Color:"}};
 
 gchar * lpos[3] = {"x", "y", "z"};
 gchar * cpos[3] = {"r", "g", "b"};
@@ -714,37 +712,56 @@ void set_data_pos (vec3_t * vect, int pos, double v)
 G_MODULE_EXPORT void set_object_pos (GtkEntry * res, gpointer data)
 {
   tint * id = (tint *)data;
+  glwin * view;
+  opengl_edition * edit_ogl;
+  Material * the_mat;
+  Light * the_light;
+  Fog * the_fog;
   const gchar * m = entry_get_text (res);
   double v = string_to_double ((gpointer)m);
-  glwin * view = get_project_by_id(id -> a) -> modelgl;
-  image * this_image = view -> anim -> last -> img;
+  if (! preferences)
+  {
+    view = get_project_by_id(id -> a) -> modelgl;
+    image * this_image = view -> anim -> last -> img;
+    the_mat = & this_image -> m_terial;
+    the_light = this_image -> l_ght;
+    the_fog = & this_image -> f_g;
+    edit_ogl = view -> opengl_win;
+  }
+  else
+  {
+    the_mat = & tmp_material;
+    the_light = tmp_light;
+    the_fog = tmp_fog;
+    edit_ogl = pref_ogl_edit;
+  }
   if (id -> b == 0)
   {
-    set_data_pos (& this_image -> m_terial.albedo, id -> c, v);
+    set_data_pos (& the_mat -> albedo, id -> c, v);
   }
   else if (id -> b == 4)
   {
-    set_data_pos (& this_image -> f_g.color, id -> c, v);
+    set_data_pos (& the_fog -> color, id -> c, v);
   }
-  else if (id -> b > 0 && view -> opengl_win)
+  else if (id -> b > 0 && edit_ogl)
   {
-    int li = gtk_combo_box_get_active (GTK_COMBO_BOX(view -> opengl_win -> lights));
+    int li = gtk_combo_box_get_active (GTK_COMBO_BOX(edit_ogl -> lights));
     switch (id -> b)
     {
       case 1:
-        set_data_pos (& this_image -> l_ght[li].position, id -> c, v);
+        set_data_pos (& the_light[li].position, id -> c, v);
         break;
       case 2:
-        set_data_pos (& this_image -> l_ght[li].direction, id -> c, v);
+        set_data_pos (& the_light[li].direction, id -> c, v);
         break;
       case 3:
-        set_data_pos (& this_image -> l_ght[li].intensity, id -> c, v);
+        set_data_pos (& the_light[li].intensity, id -> c, v);
         break;
     }
-    if (this_image -> l_ght[li].show) view -> create_shaders[LIGHT] = TRUE;
+    if (the_light[li].show && ! preferences) view -> create_shaders[LIGHT] = TRUE;
   }
-  if (view -> opengl_win) update_entry_double (res, v);
-  update (view);
+  if (edit_ogl) update_entry_double (res, v);
+  if (! preferences) update (view);
 }
 
 /*!
@@ -829,7 +846,7 @@ GtkWidget * create_setting_pos (int pid, int lid, float * values, opengl_edition
 {
   int i;
   GtkWidget * setting_pos = create_vbox (5);
-  if (pid != 0) abox (setting_pos, settings[(pid < 4) ? 1 : 2][lid], 0);
+  if (pid != 0) abox (setting_pos, ogl_settings[(pid < 4) ? 1 : 2][lid], 0);
   GtkWidget * box = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, setting_pos, box, FALSE, FALSE, 0);
 
@@ -893,7 +910,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit)
 
   box = abox (vbox, "Light configuration: ", 0);
 
-  hbox = adv_box (vbox, settings[1][9], 170, 0.0);
+  hbox = adv_box (vbox, ogl_settings[1][9], 170, 0.0);
   ogl_edit -> light_type = create_combo ();
   gchar * ltype[3] = {"Directional", "Point", "Spot"};
   for (i=0; i<3; i++)
@@ -935,7 +952,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit)
     for (j=0; j<3; j++)
     {
       ogl_edit -> light_entry[k] = create_entry (G_CALLBACK(update_light_param), 100, 15, FALSE, &ogl_edit -> pointer[k]);
-      lhbox = adv_box (ogl_edit -> light_b_entry[i], settings[1][k+3], 170, 0.0);
+      lhbox = adv_box (ogl_edit -> light_b_entry[i], ogl_settings[1][k+3], 170, 0.0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lhbox, ogl_edit -> light_entry[k], FALSE, FALSE, 10);
       if (i == 1) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lhbox, gtk_label_new("°"), FALSE, FALSE, 5);
       k ++;
@@ -971,8 +988,22 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
 #endif
 {
   int i, j, k;
-  glwin * view = (glwin *)data;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(view -> opengl_win -> templates));
+  Material * the_mat;
+  opengl_edition * ogl_edit;
+  glwin * view;
+  if (! preferences)
+  {
+    view = (glwin *)data;
+    ogl_edit = view -> opengl_win;
+    the_mat = & view -> anim -> last -> img -> m_terial;
+    i = gtk_combo_box_get_active (GTK_COMBO_BOX(view -> opengl_win -> templates));
+  }
+  else
+  {
+    ogl_edit = pref_ogl_edit;
+    the_mat = & tmp_material;
+    i = gtk_combo_box_get_active (GTK_COMBO_BOX(pref_ogl_edit -> templates));
+  }
 #ifdef GTK4
   j = gtk_check_button_get_active (but);
 #else
@@ -981,18 +1012,33 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
   if (j)
   {
     if (i == -1) i = 3;
-    for (k=0; k<5; k++) view -> anim -> last -> img -> m_terial.param[k+1] = template_parameters[i][k];
-    gtk_combo_box_set_active (GTK_COMBO_BOX(view -> opengl_win -> templates), i);
+    the_mat -> albedo = vec3(0.5, 0.5, 0.5);
+    for (k=0; k<5; k++)
+    {
+      the_mat -> param[k+1] = template_parameters[i][k];
+      if (ogl_edit)
+      {
+        update_entry_double (GTK_ENTRY(ogl_edit -> m_entry[j]), the_mat -> param[k+1]);
+        gtk_range_set_value (GTK_RANGE(ogl_edit -> m_scale[j]), the_mat -> param[k+1]);
+      }
+    }
+    gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> templates), i);
+    if (ogl_edit)
+    {
+      update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][0]), the_mat -> albedo.x);
+      update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][1]), the_mat -> albedo.y);
+      update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][2]), the_mat -> albedo.z);
+    }
     k = i+1;
   }
   else
   {
     k = 0;
   }
-  view -> anim -> last -> img -> m_terial.predefine = k;
-  widget_set_sensitive (view -> opengl_win -> templates, view -> anim -> last -> img -> m_terial.predefine);
-  widget_set_sensitive (view -> opengl_win -> param_mat, ! view -> anim -> last -> img -> m_terial.predefine);
-  update (view);
+  the_mat -> predefine = k;
+  widget_set_sensitive (ogl_edit -> templates, the_mat -> predefine);
+  widget_set_sensitive (ogl_edit -> param_mat, ! the_mat -> predefine);
+  if (! preferences) update (view);
 }
 
 /*!
@@ -1006,20 +1052,41 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
 G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  glwin * view = (glwin *)data;
-  Material * mat = & view -> anim -> last -> img -> m_terial;
+  Material * the_mat;
+  glwin * view;
+  opengl_edition * ogl_edit;
+  if (preferences)
+  {
+    the_mat = & tmp_material;
+    ogl_edit = pref_ogl_edit;
+  }
+  else
+  {
+    view = (glwin *)data;
+    the_mat = & view -> anim -> last -> img -> m_terial;
+    ogl_edit = view -> opengl_win;
+  }
   i = gtk_combo_box_get_active (box);
-  //gtk_range_set_value (GTK_RANGE(shiny), template_parameters[i][0]);
+  the_mat -> predefine = i + 1;
   for (j=0; j<5; j++)
   {
+    the_mat -> param[j+1] = template_parameters[i][j];
 #ifdef DEBUG
     g_debug ("SET_TEMPLATES:: j= %d, val= %f", j, template_parameters[i][j]);
 #endif
-    //gtk_range_set_value (GTK_RANGE(base_ogl[0][j]), template_parameters[i][j+1]);
+   if (ogl_edit)
+   {
+     update_entry_double (GTK_ENTRY(ogl_edit -> m_entry[j]), the_mat -> param[j+1]);
+     gtk_range_set_value (GTK_RANGE(ogl_edit -> m_scale[j]), the_mat -> param[j+1]);
+   }
   }
-  mat -> predefine = i + 1;
-  for (j=0; j<5; j++) mat -> param[j+1] = template_parameters[i][j];
-  update (view);
+  if (ogl_edit)
+  {
+    update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][0]), the_mat -> albedo.x);
+    update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][1]), the_mat -> albedo.y);
+    update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][2]), the_mat -> albedo.z);
+  }
+  if (! preferences) update (view);
 }
 
 /*!
@@ -1034,7 +1101,7 @@ G_MODULE_EXPORT void set_l_model (GtkComboBox * box, gpointer data)
 {
   if (preferences)
   {
-    tmp_opengl[4] = gtk_combo_box_get_active (box);
+    tmp_material.param[0] = gtk_combo_box_get_active (box);
   }
   else
   {
@@ -1055,15 +1122,27 @@ G_MODULE_EXPORT void set_l_model (GtkComboBox * box, gpointer data)
 void param_has_changed (gpointer data, double val)
 {
   dint * mid = (dint *)data;
-  glwin * view = get_project_by_id(mid -> a) -> modelgl;
-  Material * mat = & view -> anim -> last -> img -> m_terial;
-  if (mat_min_max[mid -> b][0] >= 0.0 && val <= mat_min_max[mid -> b][1]) mat -> param[mid -> b + 1] = val;
-  if (view -> opengl_win)
+  opengl_edition * edit_ogl;
+  Material * the_mat;
+  glwin * view;
+  if (preferences)
   {
-    update_entry_double (GTK_ENTRY(view -> opengl_win -> m_entry[mid -> b]), mat -> param[mid -> b + 1]);
-    gtk_range_set_value (GTK_RANGE(view -> opengl_win -> m_scale[mid -> b]), mat -> param[mid -> b + 1]);
+    edit_ogl = pref_ogl_edit;
+    the_mat = & tmp_material;
   }
-  update (view);
+  else
+  {
+    view = get_project_by_id(mid -> a) -> modelgl;
+    edit_ogl = view -> opengl_win;
+    the_mat = & view -> anim -> last -> img -> m_terial;
+  }
+  if (mat_min_max[mid -> b][0] >= 0.0 && val <= mat_min_max[mid -> b][1]) the_mat -> param[mid -> b + 1] = val;
+  if (edit_ogl)
+  {
+    update_entry_double (GTK_ENTRY(edit_ogl -> m_entry[mid -> b]), the_mat -> param[mid -> b + 1]);
+    gtk_range_set_value (GTK_RANGE(edit_ogl -> m_scale[mid -> b]), the_mat -> param[mid -> b + 1]);
+  }
+  if (! preferences) update (view);
 }
 
 /*!
@@ -1146,14 +1225,14 @@ G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data)
 }
 
 /*!
-  \fn GtkWidget * lightning_box (glwin * view, Material * this_material)
+  \fn GtkWidget * lightning_box (glwin * view, Material this_material)
 
   \brief create ligthning model combo box
 
   \param view the target glwin, if anuy
-  \param Material the target material, if any
+  \param this_material the target material, if any
 */
-GtkWidget * lightning_fix (glwin * view, Material * this_material)
+GtkWidget * lightning_fix (glwin * view, Material this_material)
 {
   GtkWidget * fix = gtk_fixed_new ();
   GtkWidget * lmodel = create_combo ();
@@ -1167,7 +1246,7 @@ GtkWidget * lightning_fix (glwin * view, Material * this_material)
   }
   g_signal_connect (G_OBJECT (lmodel), "changed", G_CALLBACK(set_l_model), view);
   gtk_widget_set_size_request (lmodel, 100, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(lmodel), (preferences) ? tmp_opengl[4] : this_material -> param[0]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(lmodel), this_material.param[0]);
   return fix;
 }
 
@@ -1184,17 +1263,16 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit)
   GtkWidget * layout = create_layout (-1, 300);
   GtkWidget * vbox = add_vbox_to_layout (layout, 650, -1);
   int i;
-  Material * this_material = & view -> anim -> last -> img -> m_terial;
 
   GtkWidget * box = adv_box (vbox, "<b>Quality</b>: ", 100, 1.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (2, 500, 1, view -> anim -> last -> img -> quality, GTK_POS_TOP, 1, 150,
                                                    G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label("<b>Lightning model</b>: ", 100, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, this_material), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, view -> anim -> last -> img -> m_terial), FALSE, FALSE, 0);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                       check_button ("<b>Use template</b>", 100, 40, this_material -> predefine, G_CALLBACK(set_use_template_toggle), view),
+                       check_button ("<b>Use template</b>", 100, 40, view -> anim -> last -> img -> m_terial.predefine, G_CALLBACK(set_use_template_toggle), view),
                        FALSE, FALSE, 0);
   box = abox (vbox, "<b>Templates</b>: ", 0);
   ogl_edit -> templates  = create_combo ();
@@ -1202,7 +1280,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit)
   {
     combo_text_append (ogl_edit -> templates, material_template[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> templates), this_material -> predefine-1);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> templates), view -> anim -> last -> img -> m_terial.predefine-1);
   g_signal_connect (G_OBJECT (ogl_edit -> templates), "changed", G_CALLBACK(set_template), view);
   gtk_widget_set_size_request (ogl_edit -> templates, 100, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, ogl_edit -> templates, FALSE, FALSE, 0);
@@ -1219,25 +1297,25 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit)
   GtkWidget * m_fixed;
   for (i=0; i<5; i++)
   {
-    box = adv_box (ogl_edit -> param_mat, settings[0][i+1], 130, 0.0);
-    ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, this_material -> param[i+1],
+    box = adv_box (ogl_edit -> param_mat, ogl_settings[0][i+1], 130, 0.0);
+    ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, view -> anim -> last -> img -> m_terial.param[i+1],
                                              GTK_POS_TOP, 3, 200, G_CALLBACK(scale_param), G_CALLBACK(scroll_scale_param), & ogl_edit -> pointer[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, ogl_edit -> m_scale[i], FALSE, FALSE, 10);
     ogl_edit -> m_entry[i] = create_entry (G_CALLBACK(update_mat_param), 100, 15, FALSE, & ogl_edit -> pointer[i]);
-    update_entry_double(GTK_ENTRY(ogl_edit -> m_entry[i]), this_material -> param[i+1]);
+    update_entry_double(GTK_ENTRY(ogl_edit -> m_entry[i]), view -> anim -> last -> img -> m_terial.param[i+1]);
     m_fixed = gtk_fixed_new ();
     gtk_fixed_put (GTK_FIXED(m_fixed), ogl_edit -> m_entry[i], 0, 15);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, m_fixed, FALSE, FALSE, 15);
   }
-  float values[] = {this_material -> albedo.x,
-                    this_material -> albedo.y,
-                    this_material -> albedo.z};
+  float values[] = {view -> anim -> last -> img -> m_terial.albedo.x,
+                    view -> anim -> last -> img -> m_terial.albedo.y,
+                    view -> anim -> last -> img -> m_terial.albedo.z};
 
-  adv_box (ogl_edit -> param_mat, settings[0][0], 130, 0.0);
+  adv_box (ogl_edit -> param_mat, ogl_settings[0][0], 130, 0.0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (0, 0, values, ogl_edit), FALSE, FALSE, 5);
   show_the_widgets (layout);
-  widget_set_sensitive (ogl_edit -> templates, this_material -> predefine);
-  widget_set_sensitive (ogl_edit -> param_mat, ! this_material -> predefine);
+  widget_set_sensitive (ogl_edit -> templates, view -> anim -> last -> img -> m_terial.predefine);
+  widget_set_sensitive (ogl_edit -> param_mat, ! view -> anim -> last -> img -> m_terial.predefine);
   return layout;
 }
 

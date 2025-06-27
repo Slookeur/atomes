@@ -33,6 +33,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void print_matrices ();
   void setup_camera ();
   void unrotate_camera ();
+  void copy_material (Material * new_mat, Material * old_mat);
   void duplicate_material_and_lightning (image * new_img, image * old_img);
   void add_image ();
   void at_shift (atom * at, float * shift);
@@ -170,6 +171,23 @@ screen_string * duplicate_screen_string (screen_string * old_s)
 }
 
 /*!
+  \fn void copy_material (Material * new_mat, Material * old_mat)
+
+  \brief copy material data
+
+  \param new_mat the new material data
+  \param old_mat the old material data to be copied
+
+*/
+void copy_material (Material * new_mat, Material * old_mat)
+{
+  new_mat -> predefine = old_mat -> predefine;
+  new_mat -> albedo = old_mat -> albedo;
+  int i;
+  for (i=0; i<6; i++) new_mat -> param[i] = old_mat -> param[i];
+}
+
+/*!
   \fn void duplicate_material_and_lightning (image * new_img, image * old_img)
 
   \brief copy the material and lightning parameters of an image data structure
@@ -181,15 +199,13 @@ void duplicate_material_and_lightning (image * new_img, image * old_img)
 {
   new_img -> quality = old_img -> quality;
   new_img -> render = old_img -> render;
+  copy_material (& new_img -> m_terial, & old_img -> m_terial);
   new_img -> lights = old_img -> lights;
   new_img -> l_ght = copy_light_sources (old_img -> lights, old_img -> lights, old_img -> l_ght);
-  new_img -> m_terial.predefine = old_img -> m_terial.predefine;
-  new_img -> m_terial.albedo = old_img -> m_terial.albedo;
-  int i;
-  for (i=0; i<6; i++) new_img -> m_terial.param[i] = old_img -> m_terial.param[i];
   new_img -> f_g.mode = old_img -> f_g.mode;
   new_img -> f_g.based = old_img -> f_g.based;
   new_img -> f_g.density = old_img -> f_g.density;
+  int i;
   for (i=0; i<2; i++) new_img -> f_g.depth[i] = old_img -> f_g.depth[i];
   new_img -> f_g.color = old_img -> f_g.color;
 }

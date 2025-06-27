@@ -43,6 +43,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #define DEFAULT_STYLE 1
 
 #define DEFAULT_SIZE 1
+
 /*! \def DEFAULT_LIGHTNING
   \brief Default OpenGL material ligthning
 */
@@ -72,6 +73,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   \brief Default OpenGL opacity
 */
 #define DEFAULT_OPACITY            1.00
+
+/*! \def TEMPLATES
+  \brief Number of material templates
+*/
+#define TEMPLATES 7
+
+extern gchar * material_template[TEMPLATES];
+extern GLfloat template_parameters[TEMPLATES][5];
 
 // default light data
 /*! \def MAX_LIGHTS

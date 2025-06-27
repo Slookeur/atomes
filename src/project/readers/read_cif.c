@@ -1002,7 +1002,6 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
   gboolean done = TRUE;
   gchar * cline;
   int at_step = (active_project -> steps == 1) ? 0 : conf;
-  g_print ("CIF: reading atoms data\n");
 #ifdef OPENMP
   int numth = omp_get_max_threads ();
   #pragma omp parallel for num_threads(numth) private(i,j,v,cline,str) shared(this_reader,coord_line,at_step,done,lin)
@@ -1052,7 +1051,7 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
     v = get_z_from_periodic_table (str);
     if (v)
     {
-      check_for_species (v, i);
+        check_for_species (v, i);
     }
     else
     {
@@ -1110,28 +1109,23 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   gchar * str = NULL;
   int cid[9];
   int loop_line;
+  int loop_max;
   int i, j, k;
   double u, v;
   int * tmp_nsps;
   double * tmp_z;
 
-  loop_line = get_loop_line_for_key (linec, conf, "_atom_site", cartkeys[0]);
+
+  loop_line = get_loop_line_for_key (linec, conf, "_atom_site", (this_reader -> cartesian) ? cartkeys[0] : frackeys[0]);
   if (! loop_line)
   {
-    loop_line = get_loop_line_for_key (linec, conf, "_atom_site", frackeys[0]);
-    if (! loop_line)
-    {
-      return FALSE;
-    }
+    return FALSE;
   }
-  else
-  {
-    this_reader -> cartesian = TRUE;
-  }
+  loop_max = (loop_line + 100 > linec) ? linec : loop_line + 100;
   i = 0;
   for (j=0; j<2; j++)
   {
-    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_line+100, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j])
     {
       i ++;
@@ -1144,65 +1138,33 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     return FALSE;
   }
 
-  i = 0;
-  for (j=0; j<3; j++)
+  for (i=0; i<3; i++)
   {
-    cid[j+2] = cif_get_value ("_atom_site", cartkeys[j], loop_line, loop_line+100, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
-    if (cid[j+2])
+    cid[i+2] = cif_get_value ("_atom_site", (this_reader -> cartesian) ? cartkeys[i] : frackeys[i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+    if (cid[i+2])
     {
-      i ++;
-      cid[j+2] -= loop_line;
+      cid[i+2] -= loop_line;
     }
-    else if (this_reader -> cartesian)
+    else
     {
-      str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", cartkeys[j]);
+      str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", (this_reader -> cartesian) ? cartkeys[i] : frackeys[i]);
       add_reader_info (str, 1);
       g_free (str);
       this_reader -> cartesian = FALSE;
     }
-  }
-  if (i < 3)
-  {
-    j = 0;
-    for (k=0; k<3; k++)
-    {
-      cid[k+2] = cif_get_value ("_atom_site", frackeys[k], loop_line, loop_line+100, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
-      if (cid[k+2])
-      {
-        cid[k+2] -= loop_line;
-        j ++;
-      }
-      else
-      {
-        str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", frackeys[k]);
-        add_reader_info (str, 1);
-        g_free (str);
-      }
-    }
-    if (j < 3)
-    {
-      add_reader_info ("<b>Atomic coordinates</b>: no complete cartesian coordinates !\n", 0);
-      add_reader_info ("<b>Atomic coordinates</b>: no complete fractional coordinates !\n", 0);
-      return FALSE;
-    }
-  }
-  else
-  {
-    this_reader -> cartesian = TRUE;
   }
 
   if (! this_reader -> cartesian)
   {
     for (i=0; i<4; i++)
     {
-      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_line+100, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[i+5])
       {
         cid[i+5] -= loop_line;
       }
     }
   }
-  g_print ("CIF:: Going for atoms data\n");
   i = cif_file_get_data_in_loop (linec, loop_line);
   this_reader -> natomes = cif_file_get_number_of_atoms (linec, loop_line+i, i);
   if (! this_reader -> natomes) return FALSE;
@@ -2127,6 +2089,12 @@ int open_cif_configuration (int linec, int conf)
     }
     g_print ("CIF: space group ok\n");
   }
+  else if (! this_reader -> cartesian)
+  {
+    // Error no cell data using fractional coordinates
+    return 3;
+  }
+
   // Reading positions
   if (cif_get_symmetry_positions (linec, conf))
   {
@@ -2568,6 +2536,7 @@ int open_cif_file (int linec)
   if (! this_reader -> steps)
   {
     this_reader -> steps = cif_get_value ("_atom_site", cartkeys[0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+    this_reader -> cartesian = TRUE;
   }
   else
   {

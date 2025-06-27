@@ -41,6 +41,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 #include "glview.h"
+#include "glwin.h"
 #include "preferences.h"
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
@@ -53,9 +54,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void calc_rings (GtkWidget * vbox);
+#ifdef GTK4
+extern G_MODULE_EXPORT void set_use_template_toggle (GtkCheckButton * but, gpointer data);
+#else
+extern G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer data);
+#endif
+extern G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data);
+extern GtkWidget * create_setting_pos (int pid, int lid, float * values, opengl_edition * ogl_win);
+extern G_MODULE_EXPORT void update_mat_param (GtkEntry * res, gpointer data);
+extern G_MODULE_EXPORT gboolean scroll_scale_param (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
+extern G_MODULE_EXPORT void scale_param (GtkRange * range, gpointer data);
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
-extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
+extern void copy_material (Material * new_mat, Material * old_mat);
+extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+extern GtkWidget * lightning_fix (glwin * view, Material this_material);
+extern GtkWidget * adv_box (GtkWidget * box, char * lab, int size, float xalign);
+extern float mat_min_max[5][2];
+extern gchar * ogl_settings[3][10];
 
 GtkWidget * preference_notebook = NULL;
 
@@ -99,12 +115,19 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
 
-gchar * default_ogl_leg[7] = {"Default style", "Atom(s) color map", "Polyhedra color map",
-                              "Quality", "Lightning model", "Material", "Fog"};
+gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
 int * tmp_opengl = NULL;
 
+Material default_material;
+Material tmp_material;
+Light * default_light = NULL;
+Light * tmp_light = NULL;
+Fog * default_fog = NULL;
+Fog * tmp_fog = NULL;
+
 gboolean preferences = FALSE;
+opengl_edition * pref_ogl_edit = NULL;
 
 /*!
   \fn int save_preferences_to_xml_file ()
@@ -233,7 +256,7 @@ int save_preferences_to_xml_file ()
 
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"opengl");
   if (rc < 0) return 0;
-  for (i=0; i<7; i++)
+  for (i=0; i<4; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
@@ -252,6 +275,17 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterEndElement(writer);
     if (rc < 0) return 0;
   }
+  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"material");
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"lights");
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
 
   rc = xmlTextWriterEndElement(writer);
   if (rc < 0) return 0;
@@ -400,7 +434,7 @@ void set_atomes_preferences ()
   default_num_delta = allocint (7);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
-  default_opengl = allocint (7);
+  default_opengl = allocint (5);
   restore_defaults_parameters (NULL, NULL);
   read_preferences_from_xml_file ();
 }
@@ -525,10 +559,16 @@ GtkWidget * opengl_preferences ()
   show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  //GtkWidget * entry;
   GtkWidget * combo;
-  //{"Default style", "Atoms color", "Polyhedra color",
-  // "Quality", "Lightning model", "Material", "Lights", "Fog"};
+
+  // Crearting an OpenGL edition data structure
+  pref_ogl_edit = g_malloc0(sizeof*pref_ogl_edit);
+  int i;
+  for (i=0; i<6; i++)
+  {
+    pref_ogl_edit -> pointer[i].a = -1;
+    pref_ogl_edit -> pointer[i].b = i;
+  }
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Style</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
@@ -548,7 +588,7 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("* if 10 000 atoms or more: <i>Wireframe</i>, otherwise: <i>Ball and stick</i>", -1, -1, 0.5, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup> if 10 000 atoms or more: <i>Wireframe</i>, otherwise: <i>Ball and stick</i>", -1, -1, 0.5, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   hbox = create_hbox (BSEP);
@@ -572,10 +612,70 @@ GtkWidget * opengl_preferences ()
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Lightning model</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, NULL), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, tmp_material), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
+  vbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
+                       check_button ("<b>Use template</b>", 100, 40, tmp_material.predefine, G_CALLBACK(set_use_template_toggle), NULL),
+                       FALSE, FALSE, 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, markup_label ("<b>Templates</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  pref_ogl_edit -> templates = create_combo ();
+  for (i=0; i<TEMPLATES; i++)
+  {
+    combo_text_append (pref_ogl_edit -> templates, material_template[i]);
+  }
+  gtk_combo_box_set_active (GTK_COMBO_BOX(pref_ogl_edit -> templates), tmp_material.predefine-1);
+  g_signal_connect (G_OBJECT (pref_ogl_edit -> templates), "changed", G_CALLBACK(set_template), NULL);
+  gtk_widget_set_size_request (pref_ogl_edit -> templates, 100, -1);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, pref_ogl_edit -> templates, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  pref_ogl_edit -> param_mat = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_ogl_edit -> param_mat, FALSE, FALSE, 0);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Material properties</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, pref_ogl_edit -> param_mat, hbox, FALSE, FALSE, 5);
+
+  GtkWidget * m_fixed;
+  GtkWidget * box;
+  for (i=0; i<5; i++)
+  {
+    box = adv_box (pref_ogl_edit -> param_mat, ogl_settings[0][i+1], 130, 0.0);
+    pref_ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, tmp_material.param[i+1],
+                                                  GTK_POS_TOP, 3, 200, G_CALLBACK(scale_param), G_CALLBACK(scroll_scale_param), & pref_ogl_edit -> pointer[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, pref_ogl_edit -> m_scale[i], FALSE, FALSE, 10);
+    pref_ogl_edit -> m_entry[i] = create_entry (G_CALLBACK(update_mat_param), 100, 15, FALSE, & pref_ogl_edit -> pointer[i]);
+    update_entry_double(GTK_ENTRY(pref_ogl_edit -> m_entry[i]), tmp_material.param[i+1]);
+    m_fixed = gtk_fixed_new ();
+    gtk_fixed_put (GTK_FIXED(m_fixed), pref_ogl_edit -> m_entry[i], 0, 15);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, m_fixed, FALSE, FALSE, 15);
+  }
+  float values[] = {tmp_material.albedo.x, tmp_material.albedo.y, tmp_material.albedo.z};
+  adv_box (pref_ogl_edit -> param_mat, ogl_settings[0][0], 130, 0.0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, pref_ogl_edit -> param_mat, create_setting_pos (0, 0, values, pref_ogl_edit), FALSE, FALSE, 5);
+  widget_set_sensitive (pref_ogl_edit -> templates, tmp_material.predefine);
+  widget_set_sensitive (pref_ogl_edit -> param_mat, ! tmp_material.predefine);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Material"));
+
+  vbox = create_vbox (BSEP);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Number of light sources</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Lights"));
+
+  vbox = create_vbox (BSEP);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Fog mode</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Fog"));
+
   return notebook;
 }
 
@@ -659,6 +759,11 @@ void clean_all_tmp ()
     g_free (tmp_opengl);
     tmp_opengl = NULL;
   }
+  if (tmp_light)
+  {
+    g_free (tmp_light);
+    tmp_light = NULL;
+  }
 }
 
 /*!
@@ -672,7 +777,9 @@ void prepare_tmp_default ()
   tmp_num_delta = duplicate_int (7, default_num_delta);
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
-  tmp_opengl = duplicate_int (7, default_opengl);
+  tmp_opengl = duplicate_int (5, default_opengl);
+  copy_material (& tmp_material, & default_material);
+  tmp_light = copy_light_sources (default_opengl[4], default_opengl[4], default_light);
 }
 
 /*!
@@ -705,7 +812,9 @@ void save_preferences ()
     g_free (default_opengl);
     default_opengl = NULL;
   }
-  default_opengl = duplicate_int (7, tmp_opengl);
+  default_opengl = duplicate_int (5, tmp_opengl);
+  copy_material (& default_material, & tmp_material);
+  default_light = copy_light_sources (tmp_opengl[4], tmp_opengl[4], tmp_light);
 }
 
 /*!
@@ -746,7 +855,24 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 
   for (i=0; i<3; i++) default_opengl[i] = 0;
   default_opengl[3] = QUALITY;
-  default_opengl[4] = DEFAULT_LIGHTNING;
+
+  // Material
+  default_material.predefine = 4; // Plastic
+  default_material.albedo = vec3(0.5, 0.5, 0.5);
+  default_material.param[0] = DEFAULT_LIGHTNING;
+  default_material.param[1] = DEFAULT_METALLIC;
+  default_material.param[2] = DEFAULT_ROUGHNESS;
+  default_material.param[3] = DEFAULT_AMBIANT_OCCLUSION;
+  default_material.param[4] = DEFAULT_GAMMA_CORRECTION;
+  default_material.param[5] = DEFAULT_OPACITY;
+
+  // Lights
+  default_opengl[4] = 3;
+  default_light = g_malloc0 (3*sizeof*default_light);
+  /*default_light[0] = init_light_source (0, 1.0, 1.0);
+  default_light[1] = init_light_source (1, 1.0, 1.0);
+  default_light[2] = init_light_source (1, 1.0, 1.0);*/
+
   if (preference_notebook)
   {
     GtkWidget * tab;
@@ -806,16 +932,6 @@ void create_user_preferences_dialog ()
   /*
     - delta t for dynamics + unit
     - Steps between configurations
-  */
-  // OpenGL prefs
-  /*
-  - Default style
-  - Default color scheme: atoms, poly
-  - Default quality
-  - Default lightning model
-  - Default material (or template) : with all parameters
-  - Default number of light sources, light types
-  - Default fog mode and other options
   */
 
   // Model prefs

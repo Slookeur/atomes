@@ -1360,14 +1360,9 @@ void init_img (project * this_proj)
   if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
   set_img_lights (this_proj, img);
-  img -> m_terial.predefine = 4;
-  img -> m_terial.albedo = vec3(0.5, 0.5, 0.5);
-  img -> m_terial.param[0] = default_opengl[4];
-  img -> m_terial.param[1] = DEFAULT_METALLIC;
-  img -> m_terial.param[2] = DEFAULT_ROUGHNESS;
-  img -> m_terial.param[3] = DEFAULT_AMBIANT_OCCLUSION;
-  img -> m_terial.param[4] = DEFAULT_GAMMA_CORRECTION;
-  img -> m_terial.param[5] = DEFAULT_OPACITY;
+  img -> m_terial.predefine = default_material.predefine;
+  img -> m_terial.albedo = default_material.albedo;
+  for (i=0; i<6; i++) img -> m_terial.param[i] = default_material.param[i];
 
   img -> f_g.density = 0.005;
   img -> f_g.depth[0] = 1.0;
