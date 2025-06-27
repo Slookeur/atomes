@@ -225,7 +225,7 @@ float get_atom_coord (gchar * line, int mid)
     co_word = strtok_r (NULL, " ", & line);
   }
   double v = string_to_double ((gpointer)get_cif_word(co_word));
-  co_line = NULL;
+  g_free (co_line);
   co_word = NULL;
   return v;
 }
@@ -281,7 +281,7 @@ int get_atom_wyckoff (gchar * line, int wid)
       break;
     }
   }
-  wy_line = NULL;
+  g_free (wy_line);
   wy_word = NULL;
   return j;
 }
@@ -452,7 +452,6 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
 
 #ifdef OPENMP
   int numth = omp_get_max_threads ();
-  g_print ("CIF: get_value:: threads= %d, lstart= %d, lend= %d\n", numth, lstart, lend);
   #pragma omp parallel for num_threads(numth) private(i,m,the_line,saved_line,the_word,mot,str_a,str_b,str_w) shared(j,k,l,this_reader,coord_line,cif_word,rec_val,all_ligne,kroot,keyw,total_num,record_position,line_position,res)
   for (i=lstart; i<lend; i++)
   {
@@ -497,7 +496,6 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
               }
               res ++;
               if (this_reader -> steps && res == this_reader -> steps) total_num = FALSE;
-              g_print ("CIF:: retrieve:: proc= %d, res= %d\n", omp_get_thread_num(), res);
             }
           }
           else
@@ -816,10 +814,8 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
   int loop_pos[2];
   int * line_numbers = allocint (this_reader -> steps);
   // g_debug ("CIF:: retrieve:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d", linec, conf, key_a, key_b, this_reader -> steps);
-  g_print ("CIF:: retrieve:: linec= %d, conf= %d, key_a= %s, key_b= %s, this_reader -> steps= %d\n", linec, conf, key_a, key_b, this_reader -> steps);
   int steps = cif_get_value (key_a, key_b, 0, linec, NULL, FALSE, FALSE, TRUE, TRUE, line_numbers);
   // g_debug ("CIF:: retrieve:: steps= %d", steps);
-  g_print ("CIF:: retrieve:: steps= %d\n", steps);
   if (steps)
   {
     if (steps != this_reader -> steps)
@@ -845,7 +841,6 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
       loop_pos[1] = (loop_pos[0] + 1000) > linec ? linec : (loop_pos[0] + 1000);
       // loop_pos[1] = (conf == this_reader -> steps - 1) ? linec : line_numbers[conf + 1];
     }
-    g_print ("CIF:: retrieve :: loop_pos[0]= %d, loop_pos[1]= %d\n", loop_pos[0], loop_pos[1]);
     g_free (line_numbers);
     if (! cif_get_value (key_a, key_b, loop_pos[0], loop_pos[1], & cif_value, TRUE, all_ligne, FALSE, FALSE, NULL))
     {
@@ -1004,7 +999,7 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
   int at_step = (active_project -> steps == 1) ? 0 : conf;
 #ifdef OPENMP
   int numth = omp_get_max_threads ();
-  #pragma omp parallel for num_threads(numth) private(i,j,v,cline,str) shared(this_reader,coord_line,at_step,done,lin)
+  #pragma omp parallel for num_threads(numth) private(i,j,v,cline,str) shared(this_reader,coord_line,at_step,done,lin,cid)
   for (i=0; i<this_reader -> natomes; i++)
   {
     cline = g_strdup_printf ("%s", coord_line[i+lin]);
@@ -1039,8 +1034,16 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
       this_reader -> multi[i] = (cid[7]) ? get_atom_coord (cline, cid[7]) : 0.0;
       this_reader -> disorder[i] = (cid[8]) ? get_atom_coord (cline, cid[8]) : 0;
     }
-    if (cline) g_free (cline);
-    if (str) g_free (str);
+    if (cline)
+    {
+      g_free (cline);
+      cline = NULL;
+    }
+    if (str)
+    {
+      g_free (str);
+      str = NULL;
+    }
   }
 #else
   file_get_to_line (lin);
@@ -1051,7 +1054,7 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
     v = get_z_from_periodic_table (str);
     if (v)
     {
-        check_for_species (v, i);
+      check_for_species (v, i);
     }
     else
     {
@@ -1084,7 +1087,6 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
     tail = tail -> next;
   }
 #endif
-
   if (! done)
   {
     done = (cif_search) ? TRUE : get_missing_object_from_user ();
@@ -1121,7 +1123,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     return FALSE;
   }
-  loop_max = (loop_line + 100 > linec) ? linec : loop_line + 100;
+  loop_max = (loop_line + 1000 > linec) ? linec : loop_line + 1000;
   i = 0;
   for (j=0; j<2; j++)
   {
@@ -1153,7 +1155,6 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       this_reader -> cartesian = FALSE;
     }
   }
-
   if (! this_reader -> cartesian)
   {
     for (i=0; i<4; i++)
@@ -1755,7 +1756,6 @@ gboolean cif_get_cell_data (int linec, int conf)
     this_reader -> lattice.box = g_malloc0(active_project -> steps*sizeof*this_reader -> lattice.box);
   }
   i = (conf && active_project -> steps == 1) ? 0 : conf;
-  g_print ("CIF:: cell:: i= %d\n", i);
   for (j=0; j<3; j++)
   {
     str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, TRUE);
@@ -1767,7 +1767,6 @@ gboolean cif_get_cell_data (int linec, int conf)
       return FALSE;
     }
     this_reader -> lattice.box[i].param[0][j] = string_to_double ((gpointer)str);
-    g_print ("CIF:: box[%d][%d]= %f\n", i, j, this_reader -> lattice.box[i].param[0][j]);
     if (i)
     {
       if (this_reader -> lattice.box[i].param[0][j] != this_reader -> lattice.box[i-1].param[0][j]) active_cell -> npt = TRUE;
@@ -1785,7 +1784,6 @@ gboolean cif_get_cell_data (int linec, int conf)
       return FALSE;
     }
     this_reader -> lattice.box[i].param[1][j] = string_to_double ((gpointer)str);
-    g_print ("CIF:: angle[%d][%d]= %f\n", i, j, this_reader -> lattice.box[i].param[1][j]);
     g_free (str);
     if (i)
     {
@@ -1795,7 +1793,6 @@ gboolean cif_get_cell_data (int linec, int conf)
     g_debug ("CIF:: angle[%d][%d]= %f", i, j, this_reader -> lattice.box[i].param[1][j]);
 #endif
   }
-  g_print ("CIF:: Lattice ok\n");
   this_reader -> lattice.ltype = 0;
   compute_lattice_properties (& this_reader -> lattice, i);
   for (i=0; i<3; i++) this_reader -> lattice.cextra[i] = 1;
@@ -2057,7 +2054,6 @@ int open_cif_configuration (int linec, int conf)
   int cid;
   if (cif_get_cell_data (linec, conf))
   {
-    g_print ("CIF: cell data ok\n");
     i = cif_get_space_group (linec, conf);
     if (conf && active_project -> steps > 1 && i != saved_group)
     {
@@ -2087,7 +2083,6 @@ int open_cif_configuration (int linec, int conf)
       // Error in space group
       return 3;
     }
-    g_print ("CIF: space group ok\n");
   }
   else if (! this_reader -> cartesian)
   {
@@ -2103,13 +2098,11 @@ int open_cif_configuration (int linec, int conf)
       add_reader_info ("Symmetry position(s) in CIF file\n", 1);
     }
   }
-  g_print ("CIF: symmetry pos ok\n");
   if (cif_use_symmetry_positions && ! this_reader -> num_sym_pos)
   {
     add_reader_info ("No symmetry position(s) in CIF file\n", 0);
     return 3;
   }
-  g_print ("CIF: going for atomic coordinates\n");
   if (cif_get_atomic_coordinates (linec, conf))
   {
     cid = (conf && active_project -> steps == 1) ? 0 : conf;
@@ -2136,7 +2129,6 @@ int open_cif_configuration (int linec, int conf)
       }
     }
     res = 0;
-    g_print ("cif_use_symmetry_positions= %d\n", cif_use_symmetry_positions);
     if (cif_use_symmetry_positions)
     {
       gchar * str = g_strdup_printf ("<b>Building crystal using symmetry positions: </b> \n"
