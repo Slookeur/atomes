@@ -57,6 +57,7 @@ extern int open_c3d_file (int linec);
 extern int open_pdb_file (int linec);
 extern int open_trj_file (int linec);
 extern int open_vas_file (int linec);
+extern int open_cif_configuration (int linec, int conf);
 extern int open_cif_file (int linec);
 extern int open_hist_file (int linec);
 extern void allocatoms (project * this_proj);
@@ -66,6 +67,7 @@ extern const gchar * dfi[2];
 
 extern atom_search * cif_search;
 extern atomic_object * cif_object;
+extern gboolean cif_multiple;
 
 FILE * coordf;
 coord_file * this_reader;
@@ -363,13 +365,23 @@ int open_coord_file (gchar * filename, int fti)
     {
       res = open_pdb_file (i);
     }
-    else if (fti == 9 || fti == 10)
+    else if (fti > 8 && fti < 12)
     {
-      if (fti == 10) cif_use_symmetry_positions = TRUE;
+      if (fti == 11) cif_use_symmetry_positions = TRUE;
       this_reader -> cartesian = FALSE;
-      res = open_cif_file (i);
+      if (fti == 10)
+      {
+        res = open_cif_file (i);
+      }
+      else
+      {
+        active_project -> steps = this_reader -> steps = 1;
+        this_reader -> rounding = -1;
+        cif_multiple = FALSE;
+        res = open_cif_configuration (i, 0);
+      }
     }
-    else if (fti == 11)
+    else if (fti == 12)
     {
       res = open_hist_file (i);
     }

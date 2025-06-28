@@ -92,13 +92,14 @@ char * coord_files[NCFORMATS+1] = {"XYZ file",
                                    "VASP trajectory - NPT",
                                    "Protein Data Bank file",
                                    "Protein Data Bank file",
-                                   "Crystallographic information (crystal build)",
-                                   "Crystallographic information (symmetry positions)",
+                                   "Cryst. information (crystal build) - single configuration",
+                                   "Cryst. information (crystal build) - multiple configurations",
+                                   "Cryst. information (symmetry positions) - single configuration",
                                    "DL-POLY HISTORY file",
                                    "ISAACS Project File"};
 
 char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar", "xdatcar",
-                                    "pdb", "ent", "cif", "cif", "hist", "ipf"};
+                                    "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
 
 char ** las;
 void initcwidgets ();
@@ -1330,8 +1331,12 @@ int open_coordinate_file (int id)
       result = open_coord_file (active_project -> coordfile, 10);
       break;
     case 11:
-      // DL-POLY file
+      // CIF file using symmetry positions
       result = open_coord_file (active_project -> coordfile, 11);
+      break;
+    case 12:
+      // DL-POLY file
+      result = open_coord_file (active_project -> coordfile, 12);
       break;
     default:
       result = 2;
@@ -1440,7 +1445,7 @@ void open_this_coordinate_file (int format, gchar * proj_name)
       g_free (str);
     }
     on_edit_activate (NULL, GINT_TO_POINTER(0));
-    if (format != 1 && format != 4 && format != 6 && format != 9 && format != 10 && format != 11) on_edit_activate (NULL, GINT_TO_POINTER(4));
+    if (format != 1 && format != 4 && format != 6 && format != 9 && format != 10 && format != 11 && format != 12) on_edit_activate (NULL, GINT_TO_POINTER(4));
     initcutoffs (active_chem, active_project -> nspec);
     on_edit_activate (NULL, GINT_TO_POINTER(2));
     active_project_changed (activep);
@@ -1449,7 +1454,7 @@ void open_this_coordinate_file (int format, gchar * proj_name)
     chemistry_ ();
     apply_project (TRUE);
     active_project_changed (activep);
-    if ((format == 9 || format == 10) && active_cell -> has_a_box)
+    if ((format == 9 || format == 10 || format == 11) && active_cell -> has_a_box)
     {
 #ifdef GTK3
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_rep[0], TRUE);
@@ -1462,14 +1467,14 @@ void open_this_coordinate_file (int format, gchar * proj_name)
       active_glwin -> wrapped = TRUE;
     }
     add_project_to_workspace ();
-    if (format == 9 && cif_use_symmetry_positions)
+    if ((format == 9 || format == 10) && cif_use_symmetry_positions)
     {
       gchar * file_name = g_strdup_printf ("%s", active_project -> coordfile);
       gchar * proj_name = g_strdup_printf ("%s - symmetry position(s)", active_project -> name);
       init_project (TRUE);
       active_project -> coordfile = g_strdup_printf ("%s", file_name);
       g_free (file_name);
-      open_this_coordinate_file (10, proj_name);
+      open_this_coordinate_file (11, proj_name);
       g_free (proj_name);
     }
   }
