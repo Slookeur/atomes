@@ -530,30 +530,17 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           str_b = NULL;
           goto endi;
         }
-        if (str_a)
-        {
-          g_free (str_a);
-          str_a = NULL;
-        }
-        if (str_b)
-        {
-          g_free (str_b);
-          str_b = NULL;
-        }
+        g_free (str_a);
+        str_a = NULL;
+        g_free (str_b);
+        str_b = NULL;
       }
-      if (str_w)
-      {
-        g_free (str_w);
-        str_w = NULL;
-      }
+      g_free (str_w);
+      str_w = NULL;
       the_word = strtok_r (NULL, " ", & saved_line);
     }
     endi:;
-    if (the_line)
-    {
-      g_free (the_line);
-      the_line = NULL;
-    }
+    g_free (the_line);
   }
 
   if (res < 0) res = 0;
@@ -609,8 +596,6 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           {
              * cif_word = get_cif_word (the_word);
           }
-          g_free (str_w);
-          str_w = NULL;
           g_free (str_a);
           str_a = NULL;
           g_free (str_b);
@@ -626,6 +611,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           }
           else
           {
+            g_free (str_w);
             g_free (the_line);
             return i + 1;
           }
@@ -641,11 +627,8 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           str_b = NULL;
         }
       }
-      if (str_w)
-      {
-        g_free (str_w);
-        str_w = NULL;
-      }
+      g_free (str_w);
+      str_w = NULL;
       the_word = strtok_r (NULL, " ", & saved_line);
     }
     g_free (the_line);
