@@ -1370,6 +1370,7 @@ int open_coordinate_file (int id)
       if (this_reader -> info) g_free (this_reader -> info);
       if (this_reader -> z) g_free (this_reader -> z);
       if (this_reader -> nsps) g_free (this_reader -> nsps);
+      if (this_reader -> dummy) g_free (this_reader -> dummy);
       if (this_reader -> label) g_free (this_reader -> label);
       if (this_reader -> object_list) g_free (this_reader -> object_list);
       if (this_reader -> u_atom_list) g_free (this_reader -> u_atom_list);
@@ -1378,6 +1379,7 @@ int open_coordinate_file (int id)
       if (this_reader -> sym_pos) g_free (this_reader -> sym_pos);
       if (this_reader -> wyckoff) g_free (this_reader -> wyckoff);
       if (this_reader -> occupancy) g_free (this_reader -> occupancy);
+      if (this_reader -> disorder) g_free (this_reader -> disorder);
       if (this_reader -> multi) g_free (this_reader -> multi);
       if (this_reader -> lattice.sp_group) g_free (this_reader -> lattice.sp_group);
       if (this_reader -> lattice.box) g_free (this_reader -> lattice.box);

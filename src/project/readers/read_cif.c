@@ -523,20 +523,14 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
             * cif_word = get_cif_word (the_word);
           }
           g_free (str_w);
-          str_w = NULL;
           g_free (str_a);
-          str_a = NULL;
           g_free (str_b);
-          str_b = NULL;
           goto endi;
         }
         g_free (str_a);
-        str_a = NULL;
         g_free (str_b);
-        str_b = NULL;
       }
       g_free (str_w);
-      str_w = NULL;
       the_word = strtok_r (NULL, " ", & saved_line);
     }
     endi:;
@@ -596,10 +590,6 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           {
              * cif_word = get_cif_word (the_word);
           }
-          g_free (str_a);
-          str_a = NULL;
-          g_free (str_b);
-          str_b = NULL;
           if (total_num)
           {
             if (record_position)
@@ -607,28 +597,28 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
               line_position[res] = i + 1;
             }
             res ++;
-            if (this_reader -> steps && res == this_reader -> steps) return res;
+            if (this_reader -> steps && res == this_reader -> steps)
+            {
+              g_free (str_a);
+              g_free (str_b);
+              g_free (str_w);
+              g_free (the_line);
+              return res;
+            }
           }
           else
           {
+            g_free (str_a);
+            g_free (str_b);
             g_free (str_w);
             g_free (the_line);
             return i + 1;
           }
         }
-        if (str_a)
-        {
-          g_free (str_a);
-          str_a = NULL;
-        }
-        if (str_b)
-        {
-          g_free (str_b);
-          str_b = NULL;
-        }
+        g_free (str_a);
+        g_free (str_b);
       }
       g_free (str_w);
-      str_w = NULL;
       the_word = strtok_r (NULL, " ", & saved_line);
     }
     g_free (the_line);

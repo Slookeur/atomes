@@ -376,8 +376,10 @@ gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif)
   str_b = g_strdup_printf ("%s", init);
   while (g_strcmp0 (str_a, str_b))
   {
+    g_free (str_b);
     str_b = g_strdup_printf ("%s", str_a);
-    str_a = g_strdup_printf ("%s", replace_markup (str_a, o_motif, n_motif));
+    g_free (str_a);
+    str_a = g_strdup_printf ("%s", replace_markup (str_b, o_motif, n_motif));
   }
   g_free (str_b);
   return str_a;
