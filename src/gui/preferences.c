@@ -169,6 +169,15 @@ int save_preferences_to_xml_file ()
                                "Lightning model",
                                "Material",
                                "Fog"};
+  gchar * xml_material_leg[8] = {"Predefine material",
+                                 "Lightning model",
+                                 "Metallic",
+                                 "Roughness",
+                                 "Back lightning",
+                                 "Gamma",
+                                 "Opacity",
+                                 "Alebdo"};
+
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename(ATOMES_CONFIG, 0);
   if (writer == NULL) return 0;
@@ -277,6 +286,54 @@ int save_preferences_to_xml_file ()
   }
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"material");
   if (rc < 0) return 0;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "-1");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%d", default_matertial.predefine);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement(writer);
+  if (rc < 0) return 0;
+  for (i=0; i<6; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i+1]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%f", default_matertial.param[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement(writer);
+    if (rc < 0) return 0;
+  }
+
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[7]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "7");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", default_matertial.albedo.x);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement(writer);
+
 
   rc = xmlTextWriterEndElement(writer);
   if (rc < 0) return 0;
