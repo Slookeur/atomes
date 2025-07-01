@@ -58,8 +58,10 @@ extern void calc_rings (GtkWidget * vbox);
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
 extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
 extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
+extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
-extern void copy_material (Material * new_mat, Material * old_mat);
+extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
+extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern Light init_light_source (int type, float val, float vbl);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
@@ -124,6 +126,50 @@ gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
 
 /*!
+  \fn int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
+
+  \brief save vector data (x,y,z) to XML file
+
+  \param writer the XML writer to update
+  \param did id, if any
+  \param legend the corresponding legend
+  \param data the data to save
+*/
+int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
+{
+  int rc;
+  gchar * str;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST legend);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST key);
+  if (rc < 0) return 0;
+  if (did > -1)
+  {
+    str = g_strdup_printf ("%d", did);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST str);
+    g_free (str);
+    if (rc < 0) return 0;
+  }
+  str = g_strdup_printf ("%f", data.x);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"x", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", data.y);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"y", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", data.z);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"z", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  return 1;
+}
+
+/*!
   \fn int save_preferences_to_xml_file ()
 
   \brief save software preferences to XML file
@@ -171,6 +217,18 @@ int save_preferences_to_xml_file ()
                                  "Gamma",
                                  "Opacity",
                                  "Albedo"};
+  gchar * xml_lightning_leg[7] = {"Type",
+                                  "Fix",
+                                  "Position",
+                                  "Direction",
+                                  "Intensity",
+                                  "Attenuation",
+                                  "Spot specifics"};
+  gchar* xml_fog_leg[5] = {"Mode",
+                           "Type",
+                           "Density",
+                           "Depth",
+                           "Color"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -254,6 +312,7 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
   }
 
+  // End analysis
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
@@ -314,37 +373,164 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
   }
 
+  rc = xml_save_xyz_to_file (writer, 6, xml_material_leg[7], "default_material", default_material.albedo);
+  if (! rc) return rc;
+
+  // End matertial
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"lightning");
+  if (rc < 0) return 0;
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[7]);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST "Number of lights");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_lightning");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "6");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "0");
   if (rc < 0) return 0;
-  str = g_strdup_printf ("%f", default_material.albedo.x);
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"x", BAD_CAST str);
-  g_free (str);
-  if (rc < 0) return 0;
-  str = g_strdup_printf ("%f", default_material.albedo.y);
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"y", BAD_CAST str);
-  g_free (str);
-  if (rc < 0) return 0;
-  str = g_strdup_printf ("%f", default_material.albedo.z);
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"z", BAD_CAST str);
+  str = g_strdup_printf ("%d", default_lightning.lights);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
   g_free (str);
   if (rc < 0) return 0;
   rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  for (i=0; i<default_lightning.lights; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"light");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_lightning_leg[0]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "light.type");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_lightning.spot[i].type);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_lightning_leg[1]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "light.fix");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_lightning.spot[i].fix);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
 
+    if (default_lightning.spot[i].type)
+    {
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[2], "light.position", default_lightning.spot[i].position);
+      if (! rc) return rc;
+    }
+    if (default_lightning.spot[i].type != 1)
+    {
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[3], "light.direction", default_lightning.spot[i].direction);
+      if (! rc) return rc;
+    }
+    rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[4], "light.intensity", default_lightning.spot[i].intensity);
+    if (! rc) return rc;
+    if (default_lightning.spot[i].type)
+    {
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[5], "light.attenuation", default_lightning.spot[i].attenuation);
+      if (! rc) return rc;
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[6], "light.spot", default_lightning.spot[i].spot_data);
+      if (! rc) return rc;
+    }
+     rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
+
+  // End lightning
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"lights");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"fog");
   if (rc < 0) return 0;
-
+  // Mode
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[0]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.mode");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "0");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%d", default_fog.mode);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  // Type
+  if (rc < 0) return 0;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[1]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.type");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "1");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%d", default_fog.based);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  // Density
+  if (rc < 0) return 0;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[2]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.density");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "2");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", default_fog.density);
+  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  // Depth
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[3]);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.depth");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "3");
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", default_fog.depth[0]);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"start", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", default_fog.depth[1]);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"end", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  // Color
+  rc = xml_save_xyz_to_file (writer, 4, xml_fog_leg[4], "fog.color", default_fog.color);
+  if (! rc) return rc;
+  // End fog
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
+  // End opengl
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
@@ -359,7 +545,7 @@ int save_preferences_to_xml_file ()
 }
 
 /*!
-  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
+  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, int start, int end)
 
   \brief set default parameter
 
@@ -367,6 +553,8 @@ int save_preferences_to_xml_file ()
   \param key the name of variable to set
   \param vid the id number to set
   \param vect vector to set, if any
+  \param start initial value, if any, -1.0 otherwise
+  \param end final value, if any, -1.0 otherwise
 
 */
 void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
@@ -405,6 +593,31 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
       default_material.param[vid] = value;
     }
   }
+  else if (g_strcmp0(key, "default_lightning") == 0)
+  {
+
+  }
+  else if (g_strcmp0(key, "fog.mode") == 0)
+  {
+    default_fog.mode = (int)value;
+  }
+  else if (g_strcmp0(key, "fog.type") == 0)
+  {
+    default_fog.type = (int)value;
+  }
+  else if (g_strcmp0(key, "fog.density") == 0)
+  {
+    default_fog.density = value;
+  }
+  else if (g_strcmp0(key, "fog.depth") == 0)
+  {
+    if (start != -1.0) default_fog.depth[0] = start;
+    if (end != -1.0) default_fog.depth[1] = end;
+  }
+  else if (g_strcmp0(key, "fog.color") == 0 && vect)
+  {
+    default_fog.color = * vect;
+  }
 }
 
 /*!
@@ -422,6 +635,7 @@ void read_parameter (xmlNodePtr parameter_node)
   gboolean set_x, set_y, set_z;
   gchar * key;
   int id;
+  double start, end;
   double value;
   vec3_t vec;
   while (parameter_node)
@@ -435,6 +649,7 @@ void read_parameter (xmlNodePtr parameter_node)
       p_node = p_details -> children;
       if (p_node)
       {
+        start = end = -1.0;
         if (g_strcmp0("key",(char *)p_details -> name) == 0)
         {
           key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
@@ -460,12 +675,20 @@ void read_parameter (xmlNodePtr parameter_node)
           vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
           set_z = TRUE;
         }
+        else if (g_strcmp0("start",(char *)p_details -> name) == 0)
+        {
+          start = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+        }
+        else if (g_strcmp0("end",(char *)p_details -> name) == 0)
+        {
+          end = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+        }
       }
       p_details = p_details -> next;
     }
     if (set_codevar && set_id)
     {
-      set_parameter (value, key, id, (set_x && set_y && set_z) ? & vec : NULL);
+      set_parameter (value, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end);
     }
     parameter_node = parameter_node -> next;
     parameter_node = findnode (parameter_node, "parameter");
@@ -481,11 +704,28 @@ void read_parameter (xmlNodePtr parameter_node)
 */
 void read_preferences (xmlNodePtr preference_node)
 {
-  xmlNodePtr node;
+  xmlNodePtr node, l_node;
 
   node = findnode (preference_node  -> children, "parameter");
   read_parameter (node);
   node = findnode (preference_node  -> children, "material");
+  if (node)
+  {
+    read_parameter (findnode (node -> children, "parameter"));
+  }
+  node = findnode (preference_node  -> children, "lightning");
+  if (node)
+  {
+    read_parameter (findnode (node -> children, "parameter"));
+    l_node = findnode (node -> children, "light");
+    while (l_node)
+    {
+      read_parameter (l_node);
+      l_node = l_node -> next;
+      l_node = findnode (l_node, "light");
+    }
+  }
+  node = findnode (preference_node  -> children, "fog");
   if (node)
   {
     read_parameter (findnode (node -> children, "parameter"));
@@ -735,12 +975,8 @@ GtkWidget * opengl_preferences ()
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new ("Lights"));
 
-  vbox = create_vbox (BSEP);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Fog mode</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new ("Fog"));
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Fog"));
   // gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
   return notebook;
 }
@@ -844,9 +1080,10 @@ void prepare_tmp_default ()
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
   tmp_opengl = duplicate_int (5, default_opengl);
-  copy_material (& tmp_material, & default_material);
+  duplicate_material (& tmp_material, & default_material);
   tmp_lightning.lights = default_lightning.lights;
   tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
+  duplicate_fog (& tmp_fog, & default_fog);
 }
 
 /*!
@@ -880,9 +1117,10 @@ void save_preferences ()
     default_opengl = NULL;
   }
   default_opengl = duplicate_int (5, tmp_opengl);
-  copy_material (& default_material, & tmp_material);
+  duplicate_material (& default_material, & tmp_material);
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
+  duplicate_fog (& default_fog, & tmp_fog);
 }
 
 /*!
@@ -1021,12 +1259,12 @@ void create_user_preferences_dialog ()
   preferences = TRUE;
   prepare_tmp_default ();
   GtkWidget * vbox = dialog_get_content_area (win);
-  gtk_widget_set_size_request (win, 625, 610);
+  gtk_widget_set_size_request (win, 625, 645);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
   preference_notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(preference_notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(preference_notebook), GTK_POS_LEFT);
-  gtk_widget_set_size_request (preference_notebook, 600, 600);
+  gtk_widget_set_size_request (preference_notebook, 600, 635);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
   gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"

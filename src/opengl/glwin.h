@@ -185,7 +185,7 @@ struct Light
   vec3_t position;    /*!< Light position */
   vec3_t direction;   /*!< Light direction for directional and spot lights */
   vec3_t intensity;   /*!< Light colors */
-  vec3_t attenuation; /*!< Constant, linear and quadratic attenuations */
+  vec3_t attenuation; /*!< Constant, linear and quadratic attenuation */
   vec3_t spot_data;   /*!< Angle, inner and outer spot light cutoff */
 };
 

@@ -49,7 +49,7 @@ extern void window_encode (glwin * view, gboolean video);
   \brief update the sensitivity of the edition window(s) if any are opened
 
   \param view the target glwin
-  \param status sensitity
+  \param status sensitivity
 */
 void prepare_edition_windows (glwin * view, int status)
 {

@@ -1252,22 +1252,33 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
 */
 void set_img_lights (project * this_proj, image * img)
 {
-  img -> l_ghtning.lights = 3;
+  img -> l_ghtning.lights = default_lightning.lights;
   if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
-  img -> l_ghtning.spot = g_malloc0 (3*sizeof*img -> l_ghtning.spot);
-  float val;
+  img -> l_ghtning.spot = g_malloc0 (img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
+  float size = 0.0;
+  int i;
   if (this_proj -> cell.box)
   {
-    val = (this_proj -> cell.box[0].param[0][0] == 0.0) ? img -> p_depth : this_proj -> cell.box[0].param[0][0];
+    for (i=0; i<3; i++) size = max (size, this_proj -> cell.box[0].param[0][i]);
   }
-  else
+  size = (size) ? size : img -> p_depth;
+  for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    val = img -> p_depth;
+    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, size, img -> p_depth);
+    img -> l_ghtning.spot[i].fix = default_lightning.spot[i].fix;
+    img -> l_ghtning.spot[i].intensity = default_lightning.spot[i].intensity;
+    if (img -> p_depth <= 50.0)
+    {
+      img -> l_ghtning.spot[i].intensity = v3_muls (img -> l_ghtning.spot[i].intensity, img -> p_depth/100.0);
+    }
+    img -> l_ghtning.spot[i].attenuation = default_lightning.spot[i].attenuation;
+    img -> l_ghtning.spot[i].direction = default_lightning.spot[i].direction;
+    img ->l_ghtning.spot[i].position = default_lightning.spot[i].position;
+    if (img -> l_ghtning.spot[i].type)
+    {
+      img -> l_ghtning.spot[i].position = v3_muls (img -> l_ghtning.spot[i].position, img -> p_depth);
+    }
   }
-  float vbl = img -> p_depth;
-  img -> l_ghtning.spot[0] = init_light_source (0, val, vbl);
-  img -> l_ghtning.spot[1] = init_light_source (1, val, vbl);
-  img -> l_ghtning.spot[2] = init_light_source (1, val, vbl);
 }
 
 /*!
