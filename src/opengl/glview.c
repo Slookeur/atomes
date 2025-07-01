@@ -1375,10 +1375,12 @@ void init_img (project * this_proj)
   img -> m_terial.albedo = default_material.albedo;
   for (i=0; i<6; i++) img -> m_terial.param[i] = default_material.param[i];
 
-  img -> f_g.density = 0.005;
-  img -> f_g.depth[0] = 1.0;
-  img -> f_g.depth[1] = 90.0;
-  img -> f_g.color = vec3 (0.01f, 0.01f, 0.01f);
+  img -> f_g.mode = default_fog.mode;
+  img -> f_g.based = default_fog.based;
+  img -> f_g.density = default_fog.density;
+  img -> f_g.depth[0] = default_fog.depth[0];
+  img -> f_g.depth[1] = default_fog.depth[1];
+  img -> f_g.color = default_fog.color;
 }
 
 /*!

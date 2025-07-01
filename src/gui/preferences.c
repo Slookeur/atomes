@@ -545,7 +545,7 @@ int save_preferences_to_xml_file ()
 }
 
 /*!
-  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, int start, int end)
+  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double start, double end)
 
   \brief set default parameter
 
@@ -557,7 +557,7 @@ int save_preferences_to_xml_file ()
   \param end final value, if any, -1.0 otherwise
 
 */
-void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
+void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double start, double end)
 {
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
@@ -581,12 +581,9 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
     {
       default_material.predefine = (int)value;
     }
-    else if (vid == 6)
+    else if (vid == 6 && vect)
     {
-      if (vect)
-      {
-        default_material.albedo = * vect;
-      }
+      default_material.albedo = * vect;
     }
     else
     {
@@ -595,7 +592,35 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
   }
   else if (g_strcmp0(key, "default_lightning") == 0)
   {
-
+    default_lightning.lights = (int)value;
+  }
+  else if (g_strcmp0(key, "light.type") == 0)
+  {
+    default_lightning.spot[vid].type = (int)value;
+  }
+  else if (g_strcmp0(key, "light.fix") == 0)
+  {
+    default_lightning.spot[vid].fix = (int)value;
+  }
+  else if (g_strcmp0(key, "light.direction") == 0 && vect)
+  {
+    default_lightning.spot[vid].direction = * vect;
+  }
+  else if (g_strcmp0(key, "light.position") == 0 && vect)
+  {
+    default_lightning.spot[vid].position = * vect;
+  }
+  else if (g_strcmp0(key, "light.intensity") == 0 && vect)
+  {
+    default_lightning.spot[vid].intensity = * vect;
+  }
+  else if (g_strcmp0(key, "light.attenuation") == 0 && vect)
+  {
+    default_lightning.spot[vid].attenuation = * vect;
+  }
+  else if (g_strcmp0(key, "light.spot") == 0 && vect)
+  {
+    default_lightning.spot[vid].spot_data = * vect;
   }
   else if (g_strcmp0(key, "fog.mode") == 0)
   {
@@ -603,7 +628,7 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
   }
   else if (g_strcmp0(key, "fog.type") == 0)
   {
-    default_fog.type = (int)value;
+    default_fog.based = (int)value;
   }
   else if (g_strcmp0(key, "fog.density") == 0)
   {
@@ -611,6 +636,7 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
   }
   else if (g_strcmp0(key, "fog.depth") == 0)
   {
+    g_print ("start= %f, end= %f\n", start, end);
     if (start != -1.0) default_fog.depth[0] = start;
     if (end != -1.0) default_fog.depth[1] = end;
   }
@@ -634,22 +660,24 @@ void read_parameter (xmlNodePtr parameter_node)
   gboolean set_codevar, set_id;
   gboolean set_x, set_y, set_z;
   gchar * key;
+  gchar * content;
   int id;
   double start, end;
   double value;
   vec3_t vec;
   while (parameter_node)
   {
-    value = string_to_double ((gpointer)xmlNodeGetContent(parameter_node));
+    content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+    value = (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
     p_details = parameter_node -> properties;
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
+    start = end = -1.0;
     while (p_details)
     {
       p_node = p_details -> children;
       if (p_node)
       {
-        start = end = -1.0;
         if (g_strcmp0("key",(char *)p_details -> name) == 0)
         {
           key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
@@ -696,6 +724,88 @@ void read_parameter (xmlNodePtr parameter_node)
 }
 
 /*!
+  \fn void read_light (xmlNodePtr light_node)
+
+  \brief read light preferences from XML configuration
+
+  \param light_node
+*/
+void read_light (xmlNodePtr light_node)
+{
+  xmlNodePtr l_node, p_node;
+  xmlNodePtr parameter_node;
+  xmlAttrPtr l_details, p_details;
+  gchar * key;
+  int lid;
+  gboolean set_codevar;
+  gboolean set_lid = FALSE;
+  gboolean set_x, set_y, set_z;
+  gchar * content;
+  double value;
+  vec3_t vec;
+  l_details = light_node -> properties;
+  while (l_details)
+  {
+    l_node = l_details -> children;
+    if (l_node)
+    {
+      if (g_strcmp0("id",(char *)l_details -> name) == 0)
+      {
+        lid = (int) string_to_double ((gpointer)xmlNodeGetContent(l_node));
+        set_lid = TRUE;
+      }
+    }
+    l_details = l_details -> next;
+  }
+  if (set_lid)
+  {
+    parameter_node = findnode (light_node -> children, "parameter");
+    set_codevar = FALSE;
+    set_x = set_y = set_z = FALSE;
+    while (parameter_node)
+    {
+      content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+      value = (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
+      p_details = parameter_node -> properties;
+      while (p_details)
+      {
+        p_node = p_details -> children;
+        if (p_node)
+        {
+          if (g_strcmp0("key",(char *)p_details -> name) == 0)
+          {
+            key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+            set_codevar = TRUE;
+          }
+          else if (g_strcmp0("x",(char *)p_details -> name) == 0)
+          {
+            vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            set_x = TRUE;
+          }
+          else if (g_strcmp0("y",(char *)p_details -> name) == 0)
+          {
+            vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            set_y = TRUE;
+          }
+          else if (g_strcmp0("z",(char *)p_details -> name) == 0)
+          {
+            vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            set_z = TRUE;
+          }
+        }
+        p_details = p_details -> next;
+      }
+      if (set_codevar)
+      {
+        set_parameter (value, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0);
+      }
+      parameter_node = parameter_node -> next;
+      parameter_node = findnode (parameter_node, "parameter");
+    }
+  }
+}
+
+/*!
   \fn void read_preferences (xmlNodePtr preference_node)
 
   \brief read preferences from XML configuration
@@ -720,7 +830,7 @@ void read_preferences (xmlNodePtr preference_node)
     l_node = findnode (node -> children, "light");
     while (l_node)
     {
-      read_parameter (l_node);
+      read_light (l_node);
       l_node = l_node -> next;
       l_node = findnode (l_node, "light");
     }
@@ -1179,6 +1289,14 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
   default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
 
+  // Fog
+  default_fog.mode = 0;
+  default_fog.based = 0;
+  default_fog.density = 0.05;
+  default_fog.depth[0] = 1.0;
+  default_fog.depth[1] = 90.0;
+  default_fog.color = vec3 (0.01f, 0.01f, 0.01f);
+
   if (preference_notebook)
   {
     GtkWidget * tab;
@@ -1279,7 +1397,7 @@ void create_user_preferences_dialog ()
   GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
   GtkWidget * but_lab = markup_label ("Restore <b>atomes</b> default parameters", -1, -1, 0.5, 0.5);
   add_container_child (CONTAINER_BUT, but, but_lab);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 60);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
