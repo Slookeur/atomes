@@ -159,7 +159,7 @@ void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char 
 */
 GLuint * glsl_add_lights (glsl_program * glsl)
 {
-  int tot = MATERIAL_DATA + plot -> lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
+  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
   lightning[1]  = glGetUniformLocation (glsl -> id, "lights_on");
@@ -176,7 +176,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   lightning[12] = glGetUniformLocation (glsl -> id, "fog.color");
   lightning[13] = glGetUniformLocation (glsl -> id, "numLights");
   int j;
-  for (j=0; j<plot -> lights; j++)
+  for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     set_light_uniform_location (lightning, glsl -> id, j, 0, "type");
     set_light_uniform_location (lightning, glsl -> id, j, 1, "position");
@@ -829,36 +829,36 @@ void set_lights_data (glsl_program * glsl)
   glUniform1f (glsl -> light_uniform[10], plot -> f_g.density);
   glUniform2f (glsl -> light_uniform[11], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
   glUniform3f (glsl -> light_uniform[12], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
-  glUniform1i (glsl -> light_uniform[13], plot -> lights);
-  for (j=0; j<plot -> lights; j++)
+  glUniform1i (glsl -> light_uniform[13], plot -> l_ghtning.lights);
+  for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     k = j*LIGHT_DATA + LIGHT_INFO + MATERIAL_DATA + FOG_DATA;
-    glUniform1i (glsl -> light_uniform[k], plot -> l_ght[j].type);
-    if (plot -> l_ght[j].fix == 0)
+    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j].type);
+    if (plot -> l_ghtning.spot[j].fix == 0)
     {
-      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ght[j].position);
+      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].position);
     }
     else
     {
-      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ght[j].position);
+      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].position);
     }
     glUniform3f (glsl -> light_uniform[k+1], l_pos.x, l_pos.y, l_pos.z);
-    if (plot -> l_ght[j].fix == 0)
+    if (plot -> l_ghtning.spot[j].fix == 0)
     {
-      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ght[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].direction);
     }
     else
     {
-      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ght[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].direction);
     }
     glUniform3f (glsl -> light_uniform[k+2], l_dir.x, l_dir.y, l_dir.z);
-    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ght[j].intensity.x, plot -> l_ght[j].intensity.y, plot -> l_ght[j].intensity.z);
-    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ght[j].attenuation.x);
-    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ght[j].attenuation.y);
-    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ght[j].attenuation.z);
-    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ght[j].spot_data.x*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ght[j].spot_data.y*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ght[j].spot_data.z*pi/180.0));
+    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j].intensity.x, plot -> l_ghtning.spot[j].intensity.y, plot -> l_ghtning.spot[j].intensity.z);
+    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j].attenuation.x);
+    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j].attenuation.y);
+    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j].attenuation.z);
+    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j].spot_data.x*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
   }
 }
 

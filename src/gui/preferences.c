@@ -26,7 +26,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 
  - The GUI for the general configuration window
- - The associated controlers
+ - The associated controllers
 
 *
 * List of functions:
@@ -54,21 +54,15 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void calc_rings (GtkWidget * vbox);
-#ifdef GTK4
-extern G_MODULE_EXPORT void set_use_template_toggle (GtkCheckButton * but, gpointer data);
-#else
-extern G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer data);
-#endif
-extern G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data);
-extern GtkWidget * create_setting_pos (int pid, int lid, float * values, opengl_edition * ogl_win);
-extern G_MODULE_EXPORT void update_mat_param (GtkEntry * res, gpointer data);
-extern G_MODULE_EXPORT gboolean scroll_scale_param (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
-extern G_MODULE_EXPORT void scale_param (GtkRange * range, gpointer data);
+
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
+extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
+extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void copy_material (Material * new_mat, Material * old_mat);
+extern Light init_light_source (int type, float val, float vbl);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
-extern GtkWidget * lightning_fix (glwin * view, Material this_material);
+extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int size, float xalign);
 extern float mat_min_max[5][2];
 extern gchar * ogl_settings[3][10];
@@ -121,10 +115,10 @@ int * tmp_opengl = NULL;
 
 Material default_material;
 Material tmp_material;
-Light * default_light = NULL;
-Light * tmp_light = NULL;
-Fog * default_fog = NULL;
-Fog * tmp_fog = NULL;
+Lightning default_lightning;
+Lightning tmp_lightning;
+Fog default_fog;
+Fog tmp_fog;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -176,26 +170,26 @@ int save_preferences_to_xml_file ()
                                  "Back lightning",
                                  "Gamma",
                                  "Opacity",
-                                 "Alebdo"};
+                                 "Albedo"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
-  writer = xmlNewTextWriterFilename(ATOMES_CONFIG, 0);
+  writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
   if (writer == NULL) return 0;
   rc = xmlTextWriterSetIndent(writer, 1);
   if (rc < 0) return 0;
   /* Start the document with the xml default for the version,
    * encoding MY_ENCODING and the default for the standalone
    * declaration. */
-  rc = xmlTextWriterStartDocument(writer, NULL, MY_ENCODING, NULL);
+  rc = xmlTextWriterStartDocument (writer, NULL, MY_ENCODING, NULL);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)"atomes preferences XML file");
+  rc = xmlTextWriterWriteComment (writer, (const xmlChar *)"atomes preferences XML file");
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"atomes_preferences-xml");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atomes_preferences-xml");
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"analysis");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"analysis");
   if (rc < 0) return 0;
   int i;
   gchar * str;
@@ -204,19 +198,19 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_num_leg[i]);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_num_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_num_delta");
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_num_delta");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_num_delta[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement(writer);
+    rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
 
@@ -224,19 +218,19 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_rings_leg[i]);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_rings_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_rsparam");
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_rsparam");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_rsparam[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement(writer);
+    rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
 
@@ -244,79 +238,79 @@ int save_preferences_to_xml_file ()
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_chain_leg[i]);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_chain_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_csparam");
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_csparam");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_csparam[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement(writer);
+    rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
 
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"opengl");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"opengl");
   if (rc < 0) return 0;
   for (i=0; i<4; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_opengl_leg[i]);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_opengl_leg[i]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_opengl");
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_opengl");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_opengl[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement(writer);
+    rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"material");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"material");
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i]);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[0]);
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "-1");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "-1");
   if (rc < 0) return 0;
-  str = g_strdup_printf ("%d", default_matertial.predefine);
+  str = g_strdup_printf ("%d", default_material.predefine);
   rc = xmlTextWriterWriteFormatString (writer, "%s", str);
   g_free (str);
   if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
   for (i=0; i<6; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i+1]);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i+1]);
     if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
-    str = g_strdup_printf ("%f", default_matertial.param[i]);
+    str = g_strdup_printf ("%f", default_material.param[i]);
     rc = xmlTextWriterWriteFormatString (writer, "%s", str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement(writer);
+    rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
 
@@ -324,50 +318,58 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
   rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[7]);
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
   if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "7");
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "6");
   if (rc < 0) return 0;
-  str = g_strdup_printf ("%f", default_matertial.albedo.x);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  str = g_strdup_printf ("%f", default_material.albedo.x);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"x", BAD_CAST str);
   g_free (str);
   if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement(writer);
+  str = g_strdup_printf ("%f", default_material.albedo.y);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"y", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", default_material.albedo.z);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"z", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
 
-
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"lights");
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"lights");
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterEndElement(writer);
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterEndDocument(writer);
+  rc = xmlTextWriterEndDocument (writer);
   if (rc < 0) return 0;
 
-  xmlFreeTextWriter(writer);
+  xmlFreeTextWriter (writer);
   return 1;
 }
 
 /*!
-  \fn void set_parameter (double value, gchar * key, int vid)
+  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
 
   \brief set default parameter
 
   \param value the value to set
   \param key the name of variable to set
   \param vid the id number to set
+  \param vect vector to set, if any
 
 */
-void set_parameter (double value, gchar * key, int vid)
+void set_parameter (double value, gchar * key, int vid, vec3_t * vect)
 {
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
@@ -385,6 +387,89 @@ void set_parameter (double value, gchar * key, int vid)
   {
     default_opengl[vid] = (int)value;
   }
+  else if (g_strcmp0(key, "default_material") == 0)
+  {
+    if (vid < 0)
+    {
+      default_material.predefine = (int)value;
+    }
+    else if (vid == 6)
+    {
+      if (vect)
+      {
+        default_material.albedo = * vect;
+      }
+    }
+    else
+    {
+      default_material.param[vid] = value;
+    }
+  }
+}
+
+/*!
+  \fn void read_parameter (xmlNodePtr parameter_node)
+
+  \brief read preferences from XML configuration
+
+  \param parameter_node node the XML node that point to parameter
+*/
+void read_parameter (xmlNodePtr parameter_node)
+{
+  xmlNodePtr p_node;
+  xmlAttrPtr p_details;
+  gboolean set_codevar, set_id;
+  gboolean set_x, set_y, set_z;
+  gchar * key;
+  int id;
+  double value;
+  vec3_t vec;
+  while (parameter_node)
+  {
+    value = string_to_double ((gpointer)xmlNodeGetContent(parameter_node));
+    p_details = parameter_node -> properties;
+    set_codevar = set_id = FALSE;
+    set_x = set_y = set_z = FALSE;
+    while (p_details)
+    {
+      p_node = p_details -> children;
+      if (p_node)
+      {
+        if (g_strcmp0("key",(char *)p_details -> name) == 0)
+        {
+          key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+          set_codevar = TRUE;
+        }
+        else if (g_strcmp0("id",(char *)p_details -> name) == 0)
+        {
+          id = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_id = TRUE;
+        }
+        else if (g_strcmp0("x",(char *)p_details -> name) == 0)
+        {
+          vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_x = TRUE;
+        }
+        else if (g_strcmp0("y",(char *)p_details -> name) == 0)
+        {
+          vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_y = TRUE;
+        }
+        else if (g_strcmp0("z",(char *)p_details -> name) == 0)
+        {
+          vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_z = TRUE;
+        }
+      }
+      p_details = p_details -> next;
+    }
+    if (set_codevar && set_id)
+    {
+      set_parameter (value, key, id, (set_x && set_y && set_z) ? & vec : NULL);
+    }
+    parameter_node = parameter_node -> next;
+    parameter_node = findnode (parameter_node, "parameter");
+  }
 }
 
 /*!
@@ -396,42 +481,14 @@ void set_parameter (double value, gchar * key, int vid)
 */
 void read_preferences (xmlNodePtr preference_node)
 {
-  xmlNodePtr node, p_node;
-  xmlAttrPtr p_details;
-  gboolean set_codevar, set_id;
-  gchar * key;
-  int id;
-  double value;
+  xmlNodePtr node;
+
   node = findnode (preference_node  -> children, "parameter");
-  while (node)
+  read_parameter (node);
+  node = findnode (preference_node  -> children, "material");
+  if (node)
   {
-    value = string_to_double ((gpointer)xmlNodeGetContent(node));
-    p_details = node -> properties;
-    set_codevar = set_id = FALSE;
-    while (p_details)
-    {
-      p_node = p_details -> children;
-      if (p_node)
-      {
-        if (g_strcmp0("key",(char *)p_details -> name) == 0)
-        {
-          key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
-          set_codevar = TRUE;
-        }
-        if (g_strcmp0("id",(char *)p_details -> name) == 0)
-        {
-          id = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
-          set_id = TRUE;
-        }
-      }
-      p_details = p_details -> next;
-    }
-    if (set_codevar && set_id)
-    {
-      set_parameter (value, key, id);
-    }
-    node = node -> next;
-    node = findnode (node, "parameter");
+    read_parameter (findnode (node -> children, "parameter"));
   }
 }
 
@@ -669,62 +726,14 @@ GtkWidget * opengl_preferences ()
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Lightning model</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, tmp_material), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, & tmp_material), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
-  vbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                       check_button ("<b>Use template</b>", 100, 40, tmp_material.predefine, G_CALLBACK(set_use_template_toggle), NULL),
-                       FALSE, FALSE, 5);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, markup_label ("<b>Templates</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  pref_ogl_edit -> templates = create_combo ();
-  for (i=0; i<TEMPLATES; i++)
-  {
-    combo_text_append (pref_ogl_edit -> templates, material_template[i]);
-  }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(pref_ogl_edit -> templates), tmp_material.predefine-1);
-  g_signal_connect (G_OBJECT (pref_ogl_edit -> templates), "changed", G_CALLBACK(set_template), NULL);
-  gtk_widget_set_size_request (pref_ogl_edit -> templates, 100, -1);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, pref_ogl_edit -> templates, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (NULL, pref_ogl_edit, & tmp_material), gtk_label_new ("Material"));
 
-  pref_ogl_edit -> param_mat = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_ogl_edit -> param_mat, FALSE, FALSE, 0);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Material properties</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, pref_ogl_edit -> param_mat, hbox, FALSE, FALSE, 5);
-
-  GtkWidget * m_fixed;
-  GtkWidget * box;
-  for (i=0; i<5; i++)
-  {
-    box = adv_box (pref_ogl_edit -> param_mat, ogl_settings[0][i+1], 130, 0.0);
-    pref_ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, tmp_material.param[i+1],
-                                                  GTK_POS_TOP, 3, 200, G_CALLBACK(scale_param), G_CALLBACK(scroll_scale_param), & pref_ogl_edit -> pointer[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, pref_ogl_edit -> m_scale[i], FALSE, FALSE, 10);
-    pref_ogl_edit -> m_entry[i] = create_entry (G_CALLBACK(update_mat_param), 100, 15, FALSE, & pref_ogl_edit -> pointer[i]);
-    update_entry_double(GTK_ENTRY(pref_ogl_edit -> m_entry[i]), tmp_material.param[i+1]);
-    m_fixed = gtk_fixed_new ();
-    gtk_fixed_put (GTK_FIXED(m_fixed), pref_ogl_edit -> m_entry[i], 0, 15);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, m_fixed, FALSE, FALSE, 15);
-  }
-  float values[] = {tmp_material.albedo.x, tmp_material.albedo.y, tmp_material.albedo.z};
-  adv_box (pref_ogl_edit -> param_mat, ogl_settings[0][0], 130, 0.0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, pref_ogl_edit -> param_mat, create_setting_pos (0, 0, values, pref_ogl_edit), FALSE, FALSE, 5);
-  widget_set_sensitive (pref_ogl_edit -> templates, tmp_material.predefine);
-  widget_set_sensitive (pref_ogl_edit -> param_mat, ! tmp_material.predefine);
-
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Material"));
-
-  vbox = create_vbox (BSEP);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Number of light sources</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Lights"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new ("Lights"));
 
   vbox = create_vbox (BSEP);
   hbox = create_hbox (BSEP);
@@ -732,7 +741,7 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Fog"));
-
+  // gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
   return notebook;
 }
 
@@ -816,10 +825,10 @@ void clean_all_tmp ()
     g_free (tmp_opengl);
     tmp_opengl = NULL;
   }
-  if (tmp_light)
+  if (tmp_lightning.spot)
   {
-    g_free (tmp_light);
-    tmp_light = NULL;
+    g_free (tmp_lightning.spot);
+    tmp_lightning.spot = NULL;
   }
 }
 
@@ -836,7 +845,8 @@ void prepare_tmp_default ()
   tmp_csparam = duplicate_int (7, default_csparam);
   tmp_opengl = duplicate_int (5, default_opengl);
   copy_material (& tmp_material, & default_material);
-  tmp_light = copy_light_sources (default_opengl[4], default_opengl[4], default_light);
+  tmp_lightning.lights = default_lightning.lights;
+  tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
 }
 
 /*!
@@ -871,7 +881,8 @@ void save_preferences ()
   }
   default_opengl = duplicate_int (5, tmp_opengl);
   copy_material (& default_material, & tmp_material);
-  default_light = copy_light_sources (tmp_opengl[4], tmp_opengl[4], tmp_light);
+  default_lightning.lights = tmp_lightning.lights;
+  default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
 }
 
 /*!
@@ -924,11 +935,11 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_material.param[5] = DEFAULT_OPACITY;
 
   // Lights
-  default_opengl[4] = 3;
-  default_light = g_malloc0 (3*sizeof*default_light);
-  /*default_light[0] = init_light_source (0, 1.0, 1.0);
-  default_light[1] = init_light_source (1, 1.0, 1.0);
-  default_light[2] = init_light_source (1, 1.0, 1.0);*/
+  default_lightning.lights = 3;
+  default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
+  default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
+  default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
+  default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
 
   if (preference_notebook)
   {
@@ -979,6 +990,7 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   preference_notebook = NULL;
 }
 
+extern void update_light_data (int li, opengl_edition * ogl_win);
 /*!
   \fn void create_configuration_dialog ()
 
@@ -1009,12 +1021,12 @@ void create_user_preferences_dialog ()
   preferences = TRUE;
   prepare_tmp_default ();
   GtkWidget * vbox = dialog_get_content_area (win);
-  gtk_widget_set_size_request (win, 625, 600);
+  gtk_widget_set_size_request (win, 625, 610);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
   preference_notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(preference_notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(preference_notebook), GTK_POS_LEFT);
-  gtk_widget_set_size_request (preference_notebook, 600, 550);
+  gtk_widget_set_size_request (preference_notebook, 600, 600);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
   gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
@@ -1037,7 +1049,6 @@ void create_user_preferences_dialog ()
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
   show_the_widgets (preference_notebook);
-  show_the_widgets (win);
   gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
   run_this_gtk_dialog (win, G_CALLBACK(edit_preferences), NULL);
 }

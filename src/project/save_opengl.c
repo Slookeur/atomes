@@ -256,17 +256,17 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fwrite (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  for (i=0; i<img -> lights; i++)
+  if (fwrite (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fwrite (& img -> l_ght[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
   }
   if (fwrite (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;

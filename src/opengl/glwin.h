@@ -189,6 +189,17 @@ struct Light
   vec3_t spot_data;   /*!< Angle, inner and outer spot light cutoff */
 };
 
+/*! \typedef Lightning
+
+  \brief Lightning data for OpenGL rendering
+*/
+typedef struct Lightning Lightning;
+struct Lightning
+{
+  int lights;         /*!< The number of lights */
+  Light * spot;       /*!< The lights */
+};
+
 /*! \typedef Material
 
   \brief Material parameters for OpenGL rendering
@@ -441,11 +452,10 @@ struct image
                                                     0 = filled (default), \n
                                                     1 = lines, \n
                                                     2 = points */
-  int lights;                                   /*!< Number of light(s), default 3 */
   int * light_loc;                              /*!< Lights locations (only used when drawing light spots), in \n
                                                     0 = ambient light, not in the model, \n
                                                     1 = spot or directional light, in the model */
-  Light * l_ght;                                /*!< Light(s) description(s), if any */
+  Lightning l_ghtning;                          /*!< Lightning description */
   Material m_terial;                            /*!< Material description, if any */
   Fog f_g;                                      /*!< Fog description, if any*/
 

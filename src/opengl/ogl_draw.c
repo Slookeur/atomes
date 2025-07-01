@@ -200,8 +200,8 @@ void duplicate_material_and_lightning (image * new_img, image * old_img)
   new_img -> quality = old_img -> quality;
   new_img -> render = old_img -> render;
   copy_material (& new_img -> m_terial, & old_img -> m_terial);
-  new_img -> lights = old_img -> lights;
-  new_img -> l_ght = copy_light_sources (old_img -> lights, old_img -> lights, old_img -> l_ght);
+  new_img -> l_ghtning.lights = old_img -> l_ghtning.lights;
+  new_img -> l_ghtning.spot = copy_light_sources (old_img -> l_ghtning.lights, old_img -> l_ghtning.lights, old_img -> l_ghtning.spot);
   new_img -> f_g.mode = old_img -> f_g.mode;
   new_img -> f_g.based = old_img -> f_g.based;
   new_img -> f_g.density = old_img -> f_g.density;

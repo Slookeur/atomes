@@ -400,23 +400,23 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fread (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (img -> l_ght != NULL)
+  if (fread (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (img -> l_ghtning.spot != NULL)
   {
-    g_free (img -> l_ght);
-    img -> l_ght = NULL;
+    g_free (img -> l_ghtning.spot);
+    img -> l_ghtning.spot = NULL;
   }
-  img -> l_ght = g_malloc0 (img -> lights*sizeof*img -> l_ght);
-  for (i=0; i<img -> lights; i++)
+  img -> l_ghtning.spot = g_malloc0 (img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
+  for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fread (& img -> l_ght[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ght[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
   }
   if (fread (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;

@@ -1252,9 +1252,9 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
 */
 void set_img_lights (project * this_proj, image * img)
 {
-  img -> lights = 3;
-  if (img -> l_ght) g_free (img -> l_ght);
-  img -> l_ght = g_malloc0 (3*sizeof*img -> l_ght);
+  img -> l_ghtning.lights = 3;
+  if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
+  img -> l_ghtning.spot = g_malloc0 (3*sizeof*img -> l_ghtning.spot);
   float val;
   if (this_proj -> cell.box)
   {
@@ -1265,9 +1265,9 @@ void set_img_lights (project * this_proj, image * img)
     val = img -> p_depth;
   }
   float vbl = img -> p_depth;
-  img -> l_ght[0] = init_light_source (0, val, vbl);
-  img -> l_ght[1] = init_light_source (1, val, vbl);
-  img -> l_ght[2] = init_light_source (1, val, vbl);
+  img -> l_ghtning.spot[0] = init_light_source (0, val, vbl);
+  img -> l_ghtning.spot[1] = init_light_source (1, val, vbl);
+  img -> l_ghtning.spot[2] = init_light_source (1, val, vbl);
 }
 
 /*!

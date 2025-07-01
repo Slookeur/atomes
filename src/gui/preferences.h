@@ -49,10 +49,11 @@ extern int * default_opengl;
 extern int * tmp_opengl;
 extern Material default_material;
 extern Material tmp_material;
-extern Light * default_light;
-extern Light * tmp_light;
-extern Fog * default_fog;
-extern Fog * tmp_fog;
+extern Lightning default_lightning;
+extern Lightning tmp_lightning;
+extern Fog default_fog;
+extern Fog tmp_fog;
+
 extern opengl_edition * pref_ogl_edit;
 
 extern void set_atomes_preferences ();

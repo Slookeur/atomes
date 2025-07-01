@@ -162,6 +162,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
+
+extern void update_light_data (int li, opengl_edition * ogl_win);
 
 /*!
   \fn void show_the_widgets (GtkWidget * widg)
@@ -494,6 +497,7 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
   gtk_window_set_modal (GTK_WINDOW(dial), TRUE);
   if (handler) g_signal_connect (G_OBJECT(dial), "response", handler, data);
   show_the_widgets (dial);
+  if (preferences) update_light_data (0, pref_ogl_edit);
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);
   g_main_loop_run (Event_loop[dialog_id]);
