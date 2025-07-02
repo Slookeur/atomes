@@ -80,11 +80,13 @@ void init_project (gboolean alloc_box)
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
 
   for (i=0; i<6; i++) new_proj -> num_delta[i] = default_num_delta[i];
-  new_proj -> num_delta[8] = default_num_delta[6];
+  new_proj -> num_delta[SP] = default_num_delta[6];
+  new_proj -> num_delta[MS] = default_num_delta[7];
 
   new_proj -> delta[RI] = new_proj -> delta[CH] = 1.0;
   new_proj -> min[RI] = new_proj -> min[CH] = 1;
   new_proj -> delta[SP] = 2.0;
+  new_proj -> delta[MS] = default_delta_t[0];
   for (i=0; i<5; i++)
   {
     new_proj -> rsparam[i][0] = default_rsparam[1];
@@ -103,7 +105,7 @@ void init_project (gboolean alloc_box)
   new_proj -> newproj = TRUE;
   new_proj -> steps = 1;
   new_proj -> xcor = 1;
-  new_proj -> tunit = -1;
+  new_proj -> tunit = (int)default_delta_t[1];
 
   new_proj -> sk_advanced[0] = 1.0;
   new_proj -> sk_advanced[1] = 15.0;

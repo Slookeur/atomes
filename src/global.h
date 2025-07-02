@@ -414,7 +414,7 @@ extern char * coord_files_ext[NCFORMATS+1];
 extern char * calc_name[NCALCS-2];
 extern char * graph_name[NGRAPHS] ;
 extern char * rings_type[5];
-extern char * untime[6];
+extern char * untime[5];
 extern gchar * workspacefile;
 
 extern int nprojects;

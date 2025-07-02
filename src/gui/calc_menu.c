@@ -269,7 +269,6 @@ void calc_msd (GtkWidget * vbox)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (val_b[0]), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (g_strdup_printf ("<b>%d</b>",active_project -> steps), -1, 50, 0.5, 0.5), FALSE, FALSE, 0);
-
   for (i=1; i<3; i++)
   {
     hbox = create_hbox (15);
@@ -289,7 +288,7 @@ void calc_msd (GtkWidget * vbox)
     if (i == 1)
     {
       GtkWidget * tcombo = create_combo ();
-      for (j=0; j<6 ; j++) combo_text_append (tcombo, untime[j]);
+      for (j=0; j<5 ; j++) combo_text_append (tcombo, untime[j]);
       gtk_combo_box_set_active (GTK_COMBO_BOX(tcombo), active_project -> tunit);
       g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(combox_tunit_changed), NULL);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tcombo, FALSE, FALSE, 0);

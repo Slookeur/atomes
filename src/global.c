@@ -146,12 +146,11 @@ char * rings_type[5] = {"All (No rules)",
                         "Primitive",
                         "Strong"};
 
-char * untime[6] = {"fs",
+char * untime[5] = {"fs",
                     "ps",
                     "ns",
                     "µs",
-                    "ms",
-                    " "};
+                    "ms"};
 
 gchar * workspacefile = NULL;
 

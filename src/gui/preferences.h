@@ -37,15 +37,18 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern gboolean preferences;
 
 extern gboolean default_clones;
-extern gchar * default_delta_num_leg[7];
+extern gchar * default_delta_num_leg[8];
 extern int * default_num_delta;
 extern int * tmp_num_delta;
+extern double * default_delta_t;
 extern gchar * default_ring_param[7] ;
 extern int * default_rsparam;
 extern int * tmp_rsparam;
 extern gchar * default_chain_param[7];
 extern int * default_csparam;
 extern int * tmp_csparam;
+
+// OpenGL
 extern int * default_opengl;
 extern int * tmp_opengl;
 extern Material default_material;
@@ -54,6 +57,8 @@ extern Lightning default_lightning;
 extern Lightning tmp_lightning;
 extern Fog default_fog;
 extern Fog tmp_fog;
+
+// Model
 
 extern opengl_edition * pref_ogl_edit;
 

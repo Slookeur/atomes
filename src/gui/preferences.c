@@ -73,18 +73,11 @@ GtkWidget * atom_entry_over[8];
 GtkWidget * bond_entry_over[6];
 GtkWidget * preference_notebook = NULL;
 
-gchar * default_delta_num_leg[7] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
-                                    "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",  "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]"};
-int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp */
+int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd */
 int * tmp_num_delta = NULL;
+double * default_delta_t = NULL;  /*!< 0 = time step, \n 1 = time unit , in: fs, ps, ns, µs, ms */
+double * tmp_delta_t = NULL;
 
-gchar * default_ring_param[7] = {"Default search",
-                                 "Atom(s) to initiate the search from",
-                                 " <i><b>n</b><sub>max</sub></i> = maximum size for a ring <sup>*</sup>",
-                                 "Maximum number of rings of size <i><b>n</b></i> per MD step<sup>**</sup>",
-                                 "Only search for ABAB rings",
-                                 "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>",
-                                 "No homopolar bonds in the connectivity matrix"};
 int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        0 = Default search, \n
                                        1 = Initial node(s) for the search: selected chemical species or all atoms, \n
@@ -94,15 +87,6 @@ int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Include homopolar bond(s) when calculating the distance matrix */
 int * tmp_rsparam = NULL;
-
-// 0 = Initnode, 1 = RMAX, 2 = CNUMAn 3 = AAAA, 4 = ABAB, 5 = Homo, 6 = 1221
-gchar * default_chain_param[7] = {"Atom(s) to initiate the search from",
-                                  "<i><b>n</b><sub>max</sub></i> = maximum size for a chain <sup>*</sup>",
-                                  "Maximum number of chains of size <i><b>n</b></i> per MD step <sup>**</sup>",
-                                  "Only search for AAAA chains",
-                                  "Only search for ABAB chains",
-                                  "No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>",
-                                  "Only search for 1-(2)<sub>n</sub>-1 chains, ie. isolated chains"};
 int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        0 = Initial node(s) for the search: selected chemical species or all atoms, \n
                                        1 = Maximum size for a chain Cmax, \n
@@ -201,8 +185,10 @@ int save_preferences_to_xml_file ()
 
   xmlTextWriterPtr writer;
 
-  gchar * xml_delta_num_leg[7] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
-                                  "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",  "Spherical harmonics: l(max) in [2-40]"};
+  gchar * xml_delta_num_leg[8] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
+                                  "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",
+                                  "Spherical harmonics: l(max) in [2-40]", "MSD: steps between configurations"};
+  gchar * xml_delta_t_leg[2] = {"MSD: time steps δt", "MSD: time unit"};
   gchar * xml_rings_leg[7] = {"Default search",
                               "Atom(s) to initiate the search from",
                               "Maximum size for a ring",
@@ -267,7 +253,7 @@ int save_preferences_to_xml_file ()
   int i;
   gchar * str;
 
-  for (i=0; i<7; i++)
+  for (i=0; i<8; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
     if (rc < 0) return 0;
@@ -286,7 +272,27 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
-
+  // Delta t
+  for (i=0; i<2; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_t_leg[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_delta_t");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", i);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%f", default_delta_t[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    g_free (str);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
+  // Rings
   for (i=0; i<7; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
@@ -306,7 +312,7 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
-
+  // Chains
   for (i=0; i<7; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
@@ -391,7 +397,7 @@ int save_preferences_to_xml_file ()
   rc = xml_save_xyz_to_file (writer, 6, xml_material_leg[7], "default_material", default_material.albedo);
   if (! rc) return rc;
 
-  // End matertial
+  // End material
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
@@ -577,6 +583,10 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double st
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
     default_num_delta[vid] = (int)value;
+  }
+  else if (g_strcmp0(key, "default_delta_t") == 0)
+  {
+    default_delta_t[vid] = value;
   }
   else if (g_strcmp0(key, "default_rsparam") == 0)
   {
@@ -909,7 +919,8 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 */
 void set_atomes_preferences ()
 {
-  default_num_delta = allocint (7);
+  default_num_delta = allocint (8);
+  default_delta_t = allocdouble (2);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
   default_opengl = allocint (5);
@@ -1056,6 +1067,99 @@ G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 {
+  gchar * ats[3]={"atom(s)", "dot(s)", "sphere(s)"};
+  gchar * dim[3]={"radius", "size", "width"};
+  gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
+  gchar * col[3]={"Radius", "Size", "Width"};
+  int object = GPOINTER_TO_INT(data);
+  int aid, bid;
+  gchar * str;
+  if (object < 0)
+  {
+    // Going for bonds
+    aid = - object - 2;
+    aid = (aid) > 2 ? aid - 3 : aid;
+    bid = (object == -3 || object == -6) ? 2 : 0;
+    str = (object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
+  }
+  else
+  {
+    // Going for atoms
+    aid = object - 2;
+    aid = (aid) > 3 ? aid - 4 : aid;
+    aid = (aid == 3) ? 1 : aid;
+    bid = (object%2 == 0) ? 0 : 1;
+    str = (object > 5) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
+  }
+
+  GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
+  g_free (str);
+  gtk_window_set_default_size (GTK_WINDOW(win), 300, 600);
+  GtkWidget * vbox = dialog_get_content_area (win);
+  GType type[4]={G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE};
+
+  GtkTreeViewColumn * pref_col[4];
+  GtkCellRenderer * pref_cel[4];
+  GtkTreeSelection * pref_select;
+
+  GtkListStore * pref_model = gtk_list_store_newv (4, type);
+  GtkTreeIter elem;
+  int i;
+  double val;
+  for (i=1; i<120; i++)
+  {
+    val = 0.0;
+    gtk_list_store_append (pref_model, & elem);
+    gtk_list_store_set (pref_model, & elem,
+                        0, periodic_table_info[i].name,
+                        1, periodic_table_info[i].lab,
+                        2, periodic_table_info[i].Z,
+                        3, val, -1);
+  }
+  GtkWidget * pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
+  gchar * name[3]={"Element", "Symbol", "Z"};
+  for (i=0; i<4; i++)
+  {
+    pref_cel[i] = gtk_cell_renderer_text_new();
+    if (i == 3)
+    {
+      g_object_set (pref_cel[i], "editable", TRUE, NULL);
+      gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
+      // g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_model_pref), GPOINTER_TO_INT(i));
+      pref_col[i] = gtk_tree_view_column_new_with_attributes(col[bid], pref_cel[i], "text", i, NULL);
+    }
+    else
+    {
+      pref_col[i] = gtk_tree_view_column_new_with_attributes(name[i], pref_cel[i], "text", i, NULL);
+    }
+    gtk_tree_view_column_set_alignment (pref_col[i], 0.5);
+    gtk_tree_view_column_set_resizable (pref_col[i], TRUE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pref_tree), pref_col[i]);
+    if (i > 0)
+    {
+      gtk_tree_view_column_set_min_width (pref_col[i], 50);
+    }
+  }
+  g_object_unref (pref_model);
+  pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
+  gtk_tree_selection_set_mode (pref_select, GTK_SELECTION_SINGLE);
+#ifdef GTK3
+//   g_signal_connect (G_OBJECT(pref_tree), "button_press_event", G_CALLBACK(on_pref_button_event), NULL);
+#else
+/*  add_widget_gesture_and_key_action (pref_tree, "datab-context-click", G_CALLBACK(on_pref_button_pressed), NULL,
+                                               "datab-context-release", G_CALLBACK(on_pref_button_released), NULL,
+                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL); */
+#endif
+  gtk_tree_view_expand_all (GTK_TREE_VIEW(pref_tree));
+
+  GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
+  add_container_child (CONTAINER_SCR, scrol, pref_tree);
+  // gtk_widget_set_size_request (win, 625, 645);
+  // gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
+
+  show_the_widgets(win);
+
+  // run_this_gtk_dialog (win, G_CALLBACK(), NULL);
 
 }
 
@@ -1356,6 +1460,15 @@ GtkWidget * opengl_preferences ()
     pref_ogl_edit -> pointer[i].b = i;
   }
 
+  gchar * info[2] = {"The <b>OpenGL</b> tab regroups rendering options",
+                     "use it to configure the OpenGL 3D scene:"};
+  gchar * m_list[3][2] = {{"Material", "aspect for atom(s) and bond(s)"},
+                          {"Lights", "lightning of the scene"},
+                          {"Fog", "atmosphere effects"}};
+  gchar * end = {"It also offers to adjust the main visualization style and the color maps"};
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, end), FALSE, FALSE, 30);
+
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Style</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
@@ -1423,8 +1536,30 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 {
   int i = GPOINTER_TO_INT(data);
   const gchar * m = entry_get_text (res);
-  tmp_num_delta[i] = (int) string_to_double ((gpointer)m);
-  update_entry_int (res, tmp_num_delta[i]);
+  double value = string_to_double ((gpointer)m);
+  if (i < 8)
+  {
+    tmp_num_delta[i] = (int) value;
+    update_entry_int (res, tmp_num_delta[i]);
+  }
+  else
+  {
+    tmp_delta_t[0] = value;
+    update_entry_double (res, tmp_delta_t[0]);
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
+
+  \brief change default time units
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
+{
+  tmp_delta_t[1] = (double) gtk_combo_box_get_active(box);
 }
 
 /*!
@@ -1435,32 +1570,69 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 GtkWidget * calc_preferences ()
 {
   GtkWidget * notebook = gtk_notebook_new ();
+  GtkWidget * vbox, * vvbox;
+  GtkWidget * hbox, * hhbox;
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
   show_the_widgets (notebook);
-  GtkWidget * vbox = create_vbox (BSEP);
-  GtkWidget * hbox;
+  vbox = create_vbox (BSEP);
+  gchar * default_delta_num_leg[8] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
+                                      "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
+                                      "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "step(s) between configurations"};
+
+  gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
+                     "use it to setup your own default parameters:"};
+  gchar * m_list[2][2] = {{"Rings", "ring statistics options"},
+                          {"Chains", "chain statistics options"}};
+  gchar * end = {"Other options are listed below"};
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, end), FALSE, FALSE, 20);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  vvbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 10);
   GtkWidget * entry;
   int i;
-  for (i=0; i<7; i++)
+  for (i=0; i<8; i++)
   {
-    hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], 350, -1, 0.0, 0.5), FALSE, FALSE, 15);
-    entry = create_entry (G_CALLBACK(set_default_num_delta), 150, 15, TRUE, GINT_TO_POINTER(i));
+    if (i == 7)
+    {
+      hhbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("<b>Mean Squared Displacement</b>:", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
+    }
+    hhbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
+    entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, TRUE, GINT_TO_POINTER(i));
     update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, entry, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
   }
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
-  vbox = create_vbox (BSEP);
-  search_type = 0;
-  calc_rings (vbox);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Ring statistics"));
-  vbox = create_vbox (BSEP);
-  search_type = 1;
-  calc_rings (vbox);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Chain statistics"));
+  hhbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("time step(s) &#x3b4;t", 285, -1, 0.0, 0.5), FALSE, FALSE, 30);
+  entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, TRUE, GINT_TO_POINTER(i));
+  update_entry_double ((GtkEntry *)entry, tmp_delta_t[0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, entry, FALSE, FALSE, 0);
+  GtkWidget * tcombo = create_combo ();
+  for (i=0; i<5 ; i++) combo_text_append (tcombo, untime[i]);
 
+  gtk_combo_box_set_active (GTK_COMBO_BOX(tcombo), (int)tmp_delta_t[1]);
+  g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(tunit_changed), NULL);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, tcombo, FALSE, FALSE, 0);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
+
+
+  // calc_msd (vbox);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  for (i=0; i<2; i++)
+  {
+    vbox = create_vbox (BSEP);
+    search_type = i;
+    calc_rings (vbox);
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? "Chains" : "Rings"));
+  }
   return notebook;
 }
 
@@ -1475,6 +1647,11 @@ void clean_all_tmp ()
   {
     g_free (tmp_num_delta);
     tmp_num_delta = NULL;
+  }
+  if (tmp_delta_t)
+  {
+    g_free (tmp_delta_t);
+    tmp_delta_t = NULL;
   }
   if (tmp_rsparam)
   {
@@ -1526,7 +1703,8 @@ void clean_all_tmp ()
 void prepare_tmp_default ()
 {
   clean_all_tmp ();
-  tmp_num_delta = duplicate_int (7, default_num_delta);
+  tmp_num_delta = duplicate_int (8, default_num_delta);
+  tmp_delta_t = duplicate_double (2, default_delta_t);
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
   tmp_opengl = duplicate_int (5, default_opengl);
@@ -1554,7 +1732,8 @@ void save_preferences ()
     g_free (default_num_delta);
     default_num_delta = NULL;
   }
-  default_num_delta = duplicate_int (7, tmp_num_delta);
+  default_num_delta = duplicate_int (8, tmp_num_delta);
+  default_delta_t = duplicate_double (2, tmp_delta_t);
   if (default_rsparam)
   {
     g_free (default_rsparam);
@@ -1625,6 +1804,9 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_num_delta[BD] = 100;
   default_num_delta[AN] = 90;
   default_num_delta[CH-1] = 20;
+  default_num_delta[MS-1] = 0;
+  default_delta_t[0] = 0.0;
+  default_delta_t[1] = -1.0;
 
   default_rsparam[0] = -1;
   default_rsparam[1] = 0;
