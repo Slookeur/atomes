@@ -65,10 +65,12 @@ extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern Light init_light_source (int type, float val, float vbl);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
-extern GtkWidget * adv_box (GtkWidget * box, char * lab, int size, float xalign);
+extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern float mat_min_max[5][2];
 extern gchar * ogl_settings[3][10];
 
+GtkWidget * atom_entry_over[8];
+GtkWidget * bond_entry_over[6];
 GtkWidget * preference_notebook = NULL;
 
 gchar * default_delta_num_leg[7] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
@@ -114,13 +116,26 @@ int * tmp_csparam = NULL;
 gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
 int * tmp_opengl = NULL;
-
 Material default_material;
 Material tmp_material;
 Lightning default_lightning;
 Lightning tmp_lightning;
 Fog default_fog;
 Fog tmp_fog;
+
+// Model
+gboolean default_clones;
+gboolean tmp_clones;
+gboolean default_cell;
+gboolean tmp_cell;
+gboolean * default_o_at_rs;
+gboolean * tmp_o_at_rs;
+double * default_at_rs;
+double * tmp_at_rs;
+gboolean * default_o_bd_rw;
+gboolean * tmp_o_bd_rw;
+double * default_bd_rw;
+double * tmp_bd_rw;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -636,7 +651,6 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double st
   }
   else if (g_strcmp0(key, "fog.depth") == 0)
   {
-    g_print ("start= %f, end= %f\n", start, end);
     if (start != -1.0) default_fog.depth[0] = start;
     if (end != -1.0) default_fog.depth[1] = end;
   }
@@ -899,6 +913,10 @@ void set_atomes_preferences ()
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
   default_opengl = allocint (5);
+  default_at_rs = allocdouble (8);
+  default_o_at_rs = allocbool (8);
+  default_bd_rw = allocdouble (6);
+  default_o_bd_rw = allocbool (6);
   restore_defaults_parameters (NULL, NULL);
   read_preferences_from_xml_file ();
 }
@@ -916,7 +934,7 @@ GtkWidget * view_preferences ()
 }
 
 /*!
-  \fn GtkWidget * pref_list (gchar * mess, int nelem, gchar * mlist[nelem][2], gchar * end)
+  \fn GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gchar * end)
 
   \brief print information message with item list of elements
 
@@ -925,12 +943,15 @@ GtkWidget * view_preferences ()
   \param mlsit item list
   \param end end message, if any
 */
-GtkWidget * pref_list (gchar * mess, int nelem, gchar * mlist[nelem][2], gchar * end)
+GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gchar * end)
 {
   gchar * str;
   GtkWidget * vbox = create_vbox (BSEP);
+  GtkWidget * vvbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(mess[0], -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(mess[1], -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
   int i;
   for (i=0; i<nelem; i++)
   {
@@ -945,8 +966,227 @@ GtkWidget * pref_list (gchar * mess, int nelem, gchar * mlist[nelem][2], gchar *
   }
   if (end)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(end, -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(end, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
   }
+  return vbox;
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data)
+
+  \brief toggle set / unset default callback GTK4
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data)
+{
+  int status = gtk_check_button_get_active (but);
+#else
+/*!
+  \fn G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data)
+
+  \brief toggle set / unset default callback GTK3
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data)
+{
+  int status = gtk_toggle_button_get_active (but);
+#endif
+  int object = GPOINTER_TO_INT(data);
+  switch (object)
+  {
+    case 0:
+      tmp_clones = status;
+      break;
+    case 1:
+      tmp_cell = status;
+      break;
+    default:
+      if (object < 0)
+      {
+        // Bonds
+        tmp_o_bd_rw[-object-2] = status;
+        widget_set_sensitive(bond_entry_over[-object-2], status);
+      }
+      else
+      {
+        tmp_o_at_rs[object-2] = status;
+        widget_set_sensitive(atom_entry_over[object-2], status);
+      }
+      break;
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
+
+  \brief update default number of delta preferences
+
+  \param res the GtkEntry the signal is coming from
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
+{
+  int i = GPOINTER_TO_INT(data);
+  const gchar * m = entry_get_text (res);
+  double value = string_to_double ((gpointer)m);
+  if (i < 0)
+  {
+    // Bonds
+    tmp_bd_rw[-i-2] = value;
+  }
+  else
+  {
+    tmp_at_rs[i-2] = value;
+  }
+  update_entry_double (res, value);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
+
+  \brief edit atoms and bonds species related parameters
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
+{
+
+}
+
+/*!
+  \fn GtkWidget * over_param (int object, int style)
+
+  \brief create override check button and entry
+
+  \param object 0 = atoms, 1 = bonds
+  \param style style id number
+*/
+GtkWidget * over_param (int object, int style)
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+  GtkWidget * hbox = create_hbox (BSEP);
+  int clone = ((object && style > 2) || (! object && style > 3)) ? 20 : 0;
+  int mod = (object) ? -1 : 1;
+  gboolean over = (! object && style%2 == 0) ? TRUE : (object && (style == 0 || style == 3)) ? TRUE : FALSE;
+  gchar * leg;
+  if (! object || (object && (style != 2 && style != 5)))
+  {
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button("Edit species related parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+    hbox = create_hbox (BSEP);
+  }
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
+  if (over)
+  {
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameter", -1, -1, FALSE, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
+  }
+  else
+  {
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Set default value", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  }
+  if (object)
+  {
+    bond_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, TRUE, GINT_TO_POINTER(mod*(style+2)));
+    update_entry_double (GTK_ENTRY(bond_entry_over[style]), tmp_bd_rw[style]);
+    if (over) widget_set_sensitive (bond_entry_over[style], tmp_o_bd_rw[style]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, bond_entry_over[style], FALSE, FALSE, 0);
+    leg = g_strdup_printf ("%s", (style == 1 || style == 4) ? "pts" : "&#xC5;");
+  }
+  else
+  {
+    atom_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, TRUE, GINT_TO_POINTER(mod*(style+2)));
+    update_entry_double (GTK_ENTRY(atom_entry_over[style]), tmp_at_rs[style]);
+    if (over) widget_set_sensitive (atom_entry_over[style], tmp_o_at_rs[style]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, atom_entry_over[style], FALSE, FALSE, 0);
+    leg = g_strdup_printf ("%s", (style == 1 || style == 3 || style == 5 || style == 7) ? "pts" : "&#xC5;");
+  }
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(leg, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  g_free (leg);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  return vbox;
+}
+
+/*!
+  \fn GtkWidget * style_tab (int style)
+
+  \brief create preferences tab for a style
+
+  \param style the style for this tab
+*/
+GtkWidget * style_tab (int style)
+{
+  GtkWidget * vbox = create_vbox (BSEP);
+  gchar * object[3]={"<b>Atom(s)</b>", "<b>Bond(s)</b>", "\t<u>Clone(s)</u>"};
+  gchar * ats[3]={"tom(s) ", "ot(s)", "phere(s)"};
+  gchar * ha_init[3]={"A", "D", "S"};
+  gchar * la_init[3]={"a", "d", "s"};
+  gchar * dim[3]={"radius", "size", "width"};
+  gchar * bts[3]={"ond(s)", "ireframe", "ylinders"};
+  gchar * hb_init[3]={"B", "W", "C"};
+  gchar * lb_init[3]={"b", "w", "c"};
+  int i;
+  int asid, bsid;
+  int lid;
+  gchar * str;
+  gboolean do_atoms = FALSE;
+  gboolean do_bonds = FALSE;
+  if (style == 0 || style == 1 || style == 3 || style == 5)
+  {
+    do_atoms = TRUE;
+    asid = (style == 3) ? 2 : (style == 5) ? 3 : style;
+  }
+  if (style == 0 || style == 1 || style == 4)
+  {
+    do_bonds = TRUE;
+    bsid = (style == 4) ? 2 : style;
+  }
+  if (do_atoms)
+  {
+    lid = (style == 3) ? 2 : (style == 5) ? 1 : style;
+    for (i=0; i<2; i++)
+    {
+      adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
+      if (! i)
+      {
+        str = g_strdup_printf ("\t%s%s %s", ha_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
+      }
+      else
+      {
+        str = g_strdup_printf ("\t\tClone %s%s %s", la_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
+      }
+      adv_box (vbox, str, 10, 120, 0.0);
+      g_free (str);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, asid+4*i), FALSE, FALSE, 0);
+    }
+  }
+  if (do_bonds)
+  {
+    // Bond(s) parameters
+    for (i=0; i<2; i++)
+    {
+      adv_box (vbox, object[i+1], 10-5*i, 120, 0.0);
+      if (! i)
+      {
+        str = g_strdup_printf ("\t%s%s %s", hb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
+      }
+      else
+      {
+        str = g_strdup_printf ("\t\tClone %s%s %s", lb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
+      }
+      adv_box (vbox, str, 10, 120, 0.0);
+      g_free (str);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (1, bsid+3*i), FALSE, FALSE, 0);
+    }
+  }
+
   return vbox;
 }
 
@@ -964,15 +1204,31 @@ GtkWidget * model_preferences ()
   GtkWidget * vbox = create_vbox (BSEP);
   //GtkWidget * hbox;
   //GtkWidget * combo;
-  gchar * info = "Note that the options available in the <b>Model</b> tab\n"
-                 "depend on the style selection in the <b>OpenGL</b> tab:";
+  gchar * info[2] = {"The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options",
+                     "which effect apply when the corresponding <b>OpenGL</b> style is used:"};
   gchar * m_list[6][2] = {{"Ball and stick", "atoms and bonds radii"},
                           {"Wireframe", "dots size and wireframes width"},
                           {"Spacefill", "tabulated parameters"},
                           {"Spheres", "atoms radii"},
                           {"Cylinders", "bonds radii"},
                           {"Dots", "dots size"}};
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, NULL), FALSE, FALSE, 5);
+  gchar * end = {"It also provides options to customize atomic label(s), and, the model box, if any."};
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, end), FALSE, FALSE, 30);
+
+  GtkWidget * hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
+  int i;
+  for (i=0; i<OGL_STYLES; i++)
+  {
+    if (i != 2) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
+  }
 
   // Show / hide atom(s) ?
   /* Atom radius
@@ -985,7 +1241,7 @@ GtkWidget * model_preferences ()
 
   // Repeat for clones
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
   // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (0), gtk_label_new ("Atom(s)"));
   // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (1), gtk_label_new ("Clone(s)"));
   // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), label_tab (), gtk_label_new ("Label(s)"));
@@ -1091,7 +1347,7 @@ GtkWidget * opengl_preferences ()
   GtkWidget * hbox;
   GtkWidget * combo;
 
-  // Crearting an OpenGL edition data structure
+  // Creating an OpenGL edition data structure
   pref_ogl_edit = g_malloc0(sizeof*pref_ogl_edit);
   int i;
   for (i=0; i<6; i++)
@@ -1134,23 +1390,21 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
-  hbox = create_hbox (BSEP);
+  /*hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Quality</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_hscale (2, 500, 1, tmp_opengl[3], GTK_POS_TOP, 1, 175,
                                                    G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), NULL), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);*/
 
-  hbox = create_hbox (BSEP);
+  /*hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Lightning model</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, & tmp_material), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);*/
+  show_the_widgets (vbox);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
-
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (NULL, pref_ogl_edit, & tmp_material), gtk_label_new ("Material"));
-
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new ("Lights"));
-
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new ("Fog"));
 
   gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
@@ -1242,6 +1496,26 @@ void clean_all_tmp ()
     g_free (tmp_lightning.spot);
     tmp_lightning.spot = NULL;
   }
+  if (tmp_o_at_rs)
+  {
+    g_free (tmp_o_at_rs);
+    tmp_o_at_rs = NULL;
+  }
+  if (tmp_at_rs)
+  {
+    g_free (tmp_at_rs);
+    tmp_at_rs = NULL;
+  }
+  if (tmp_o_bd_rw)
+  {
+    g_free (tmp_o_bd_rw);
+    tmp_o_bd_rw = NULL;
+  }
+  if (tmp_bd_rw)
+  {
+    g_free (tmp_bd_rw);
+    tmp_bd_rw = NULL;
+  }
 }
 
 /*!
@@ -1260,6 +1534,12 @@ void prepare_tmp_default ()
   tmp_lightning.lights = default_lightning.lights;
   tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
   duplicate_fog (& tmp_fog, & default_fog);
+  tmp_clones = default_clones;
+  tmp_cell = default_cell;
+  tmp_o_at_rs = duplicate_bool (8, default_o_at_rs);
+  tmp_at_rs = duplicate_double (8, default_at_rs);
+  tmp_o_bd_rw = duplicate_bool (6, default_o_bd_rw);
+  tmp_bd_rw = duplicate_double (6, default_bd_rw);
 }
 
 /*!
@@ -1297,6 +1577,33 @@ void save_preferences ()
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
   duplicate_fog (& default_fog, & tmp_fog);
+  // Model
+  default_clones = tmp_clones;
+  default_cell = tmp_cell;
+  if (default_o_at_rs)
+  {
+    g_free (default_o_at_rs);
+    default_o_at_rs = NULL;
+  }
+  default_o_at_rs = duplicate_bool (8, tmp_o_at_rs);
+  if (default_at_rs)
+  {
+    g_free (default_at_rs);
+    default_at_rs = NULL;
+  }
+  default_at_rs = duplicate_double (8, tmp_at_rs);
+  if (default_o_bd_rw)
+  {
+    g_free (default_o_bd_rw);
+    default_o_bd_rw = NULL;
+  }
+  default_o_bd_rw = duplicate_bool (6, tmp_o_bd_rw);
+  if (default_bd_rw)
+  {
+    g_free (default_bd_rw);
+    default_bd_rw = NULL;
+  }
+  default_bd_rw = duplicate_double (6, tmp_bd_rw);
 }
 
 /*!
@@ -1360,6 +1667,21 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_fog.depth[0] = 1.0;
   default_fog.depth[1] = 90.0;
   default_fog.color = vec3 (0.01f, 0.01f, 0.01f);
+
+  // Model
+  default_clones = FALSE;
+  default_cell = TRUE;
+  for (i=0; i<4; i++)
+  {
+    default_o_at_rs[i] = default_o_at_rs[i+4] = FALSE;
+    default_at_rs[i] = default_at_rs[i+4] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+
+  }
+  for (i=0; i<3; i++)
+  {
+    default_o_bd_rw[i] = default_o_bd_rw[i+3] = FALSE;
+    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+  }
 
   if (preference_notebook)
   {
@@ -1450,23 +1772,14 @@ void create_user_preferences_dialog ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
 
-  gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
-                 "by replacing internal parameters by user defined preferences.";
+  gchar * mess[2] = {"Browse the following to modify the default configuration of <b>atomes</b>",
+                     "by replacing internal parameters by user defined preferences."};
   gchar * mlist[4][2]= {{"Analysis", "calculation preferences"},
                         {"OpenGL", "rendering preferences"},
                         {"Model", "atom(s), bond(s) and box preferences"},
                         {"View", "representation and projection preferences"}};
   gchar * end = "Default parameters are used for any new project added to the workspace\n";
 
-
-  /*gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
-                 "by replacing internal parameters by user defined preferences.\n\n"
-                 "\t<b>Analysis</b>\t: calculation preferences\n"
-                 "\t<b>OpenGL  </b>\t: rendering preferences\n"
-                 "\t<b>Model   </b>\t: atom(s), bond(s) and box preferences\n"
-                 "\t<b>View      </b>\t: representation and projection preferences\n\n"
-                 "Default parameters are used for any new project added to the workspace\n";
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, markup_label (mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);*/
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, pref_list(mess, 4, mlist, end), FALSE, FALSE, 20);
 
   GtkWidget * hbox = create_hbox (BSEP);

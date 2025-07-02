@@ -1810,13 +1810,15 @@ GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCal
   GtkWidget * but = gtk_check_button_new ();
   if (text != NULL)
   {
+    gchar * label = g_strdup_printf (" %s", text);
 #ifdef GTK4
-    gtk_check_button_set_label (GTK_CHECK_BUTTON(but), text);
+    gtk_check_button_set_label (GTK_CHECK_BUTTON(but), label);
     GtkWidget * lab = gtk_widget_get_last_child (but);
     adjust_label (lab, -1, -1, 0.0, 0.5);
 #else
-    add_container_child (CONTAINER_BUT, but, markup_label(text, -1, -1, 0.0, 0.5));
+    add_container_child (CONTAINER_BUT, but, markup_label(label, -1, -1, 0.0, 0.5));
 #endif
+    g_free (label);
   }
   gtk_widget_set_size_request (but, dimx, dimy);
 #ifdef GTK4

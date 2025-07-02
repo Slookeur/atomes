@@ -1355,15 +1355,13 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   int i;
   GtkWidget * box, * hbox;
 
-  if (! preferences)
-  {
-    box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (2, 500, 1, view -> anim -> last -> img -> quality, GTK_POS_TOP, 1, 200,
-                         G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
-    box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 20);
-  }
+  box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (2, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200,
+                       G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
+  box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 20);
+
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
                        check_button ("<b>Use template</b>", 100, 40, the_mat -> predefine, G_CALLBACK(set_use_template_toggle), view),
                        FALSE, FALSE, 0);

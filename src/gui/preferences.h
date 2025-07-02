@@ -36,6 +36,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 extern gboolean preferences;
 
+extern gboolean default_clones;
 extern gchar * default_delta_num_leg[7];
 extern int * default_num_delta;
 extern int * tmp_num_delta;
