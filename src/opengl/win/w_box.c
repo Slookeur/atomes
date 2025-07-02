@@ -203,7 +203,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   GtkWidget * pos_box = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box_data, pos_box, TRUE, TRUE, 0);
 
-  box = abox (box_data, "Style: ", 0);
+  box = abox (box_data, "Style: ", 5);
   styles  = create_combo ();
   for (i=0; i<BOX_STYLES; i++)
   {
@@ -213,21 +213,21 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   if (view -> anim -> last -> img -> box_axis[BOX] == WIREFRAME) i = 0;
   if (view -> anim -> last -> img -> box_axis[BOX] == CYLINDERS) i = 1;
   gtk_combo_box_set_active (GTK_COMBO_BOX(styles), i);
-  gtk_widget_set_size_request (styles, 100, -1);
+  gtk_widget_set_size_request (styles, 120, -1);
   g_signal_connect (G_OBJECT (styles), "changed", G_CALLBACK(set_box_combo_style), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, styles, TRUE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, styles, FALSE, FALSE, 10);
   width_box = abox (box_data, "Line width [pts]: ", 0);
-  GtkWidget * width  = create_entry (G_CALLBACK(update_bond_parameter), 100, 10, FALSE, (gpointer)GINT_TO_POINTER(-3));
+  GtkWidget * width  = create_entry (G_CALLBACK(update_bond_parameter), 120, 10, FALSE, (gpointer)GINT_TO_POINTER(-3));
   update_entry_double (GTK_ENTRY(width), view -> anim -> last -> img -> box_axis_line[BOX]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, width_box, width, FALSE, FALSE, 10);
-  radius_box = abox (box_data, "Cylinder radius [Å]: ", 0);
-  GtkWidget * radius = create_entry (G_CALLBACK(update_bond_parameter), 100, 10, FALSE, (gpointer)GINT_TO_POINTER(-3));
+  radius_box = abox (box_data, "Cylinder radius [&#xC5;]: ", 0);
+  GtkWidget * radius = create_entry (G_CALLBACK(update_bond_parameter), 120, 10, FALSE, (gpointer)GINT_TO_POINTER(-3));
   update_entry_double (GTK_ENTRY(radius), view -> anim -> last -> img -> box_axis_rad[BOX]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, radius_box, radius, FALSE, FALSE, 10);
 
   // Colors
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (box_data, "Color:", 0),
-                       color_button(view -> anim -> last -> img -> box_color, TRUE, 100, -1, G_CALLBACK(set_color_box), NULL),
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (box_data, "Color:", 5),
+                       color_button(view -> anim -> last -> img -> box_color, TRUE, 120, -1, G_CALLBACK(set_color_box), NULL),
                        FALSE, FALSE, 10);
 
   g_signal_connect (G_OBJECT(win), "response", G_CALLBACK(run_destroy_dialog), NULL);

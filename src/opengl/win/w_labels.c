@@ -619,7 +619,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * chbox;
   if (lid < 3)
   {
-    box = abox (vbox, "Distance to atom [Å]:", 0);
+    box = abox (vbox, "Distance to atom [&#xC5;]:", 0);
     chbox = create_hbox (0);
     for (i=0; i<2; i++)
     {

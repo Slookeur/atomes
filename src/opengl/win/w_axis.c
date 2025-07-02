@@ -530,7 +530,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     ac = FALSE;
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, pos_box,
-                       check_button ("Use template positions:", 120, 40, ac,
+                       check_button ("Use template positions:", 120, 30, ac,
                                      G_CALLBACK(use_axis_default_positions), data), FALSE, FALSE, 0);
   templates = create_combo ();
   for (i=0; i < AXIS_TEMPLATES; i++)
@@ -572,7 +572,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   }
   widget_set_sensitive (axis_position_box, ! ac);
 
-  box = abox (axis_data, "Length [Å]: ", 0);
+  box = abox (axis_data, "Length [&#xC5;]: ", 0);
   GtkWidget * length  = create_entry (G_CALLBACK(update_bond_parameter), 150, 10, FALSE, (gpointer)GINT_TO_POINTER(-5));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, length, FALSE, FALSE, 0);
   update_entry_double (GTK_ENTRY(length), view -> anim -> last -> img -> axis_length);
@@ -592,11 +592,11 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, styles, FALSE, FALSE, 0);
 
   width_box = abox (axis_data, "Line width [pts]: ", 0);
-  GtkWidget * width  = create_entry (G_CALLBACK(update_bond_parameter), 100, 10, FALSE, (gpointer)GINT_TO_POINTER(-4));
+  GtkWidget * width  = create_entry (G_CALLBACK(update_bond_parameter), 150, 10, FALSE, (gpointer)GINT_TO_POINTER(-4));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, width_box, width, FALSE, FALSE, 0);
   update_entry_double (GTK_ENTRY(width), view -> anim -> last -> img -> box_axis_line[AXIS]);
-  radius_box = abox (axis_data, "Cylinder radius [Å]: ", 0);
-  GtkWidget * radius  = create_entry (G_CALLBACK(update_bond_parameter), 100, 10, FALSE, (gpointer)GINT_TO_POINTER(-4));
+  radius_box = abox (axis_data, "Cylinder radius [&#xC5;]: ", 0);
+  GtkWidget * radius  = create_entry (G_CALLBACK(update_bond_parameter), 150, 10, FALSE, (gpointer)GINT_TO_POINTER(-4));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, radius_box, radius, FALSE, FALSE, 0);
   update_entry_double (GTK_ENTRY(radius), view -> anim -> last -> img -> box_axis_rad[AXIS]);
 

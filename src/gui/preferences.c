@@ -916,15 +916,82 @@ GtkWidget * view_preferences ()
 }
 
 /*!
+  \fn GtkWidget * pref_list (gchar * mess, int nelem, gchar * mlist[nelem][2], gchar * end)
+
+  \brief print information message with item list of elements
+
+  \param mess main information message
+  \param nelem number of elements in the list
+  \param mlsit item list
+  \param end end message, if any
+*/
+GtkWidget * pref_list (gchar * mess, int nelem, gchar * mlist[nelem][2], gchar * end)
+{
+  gchar * str;
+  GtkWidget * vbox = create_vbox (BSEP);
+  GtkWidget * hbox;
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  int i;
+  for (i=0; i<nelem; i++)
+  {
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    str = g_strdup_printf ("<b>%s</b>", mlist[i][0]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 120, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    g_free (str);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(":", -1, -1, 1.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(mlist[i][1], -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  }
+  if (end)
+  {
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(end, -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  }
+  return vbox;
+}
+
+/*!
   \fn GtkWidget * model_preferences ()
 
   \brief model preferences
 */
 GtkWidget * model_preferences ()
 {
+  GtkWidget * notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+  show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
+  //GtkWidget * hbox;
+  //GtkWidget * combo;
+  gchar * info = "Note that the options available in the <b>Model</b> tab\n"
+                 "depend on the style selection in the <b>OpenGL</b> tab:";
+  gchar * m_list[6][2] = {{"Ball and stick", "atoms and bonds radii"},
+                          {"Wireframe", "dots size and wireframes width"},
+                          {"Spacefill", "tabulated parameters"},
+                          {"Spheres", "atoms radii"},
+                          {"Cylinders", "bonds radii"},
+                          {"Dots", "dots size"}};
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, NULL), FALSE, FALSE, 5);
 
-  return vbox;
+  // Show / hide atom(s) ?
+  /* Atom radius
+     Bond radius
+      -> fonction du style
+  */
+  // Label atom(s)
+  //    - Label tab
+  // Chemical species color
+
+  // Repeat for clones
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (0), gtk_label_new ("Atom(s)"));
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (1), gtk_label_new ("Clone(s)"));
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), label_tab (), gtk_label_new ("Label(s)"));
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
+
+  return notebook;
 }
 
 /*!
@@ -1020,7 +1087,6 @@ GtkWidget * opengl_preferences ()
   GtkWidget * notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-  show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   GtkWidget * combo;
@@ -1087,7 +1153,7 @@ GtkWidget * opengl_preferences ()
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new ("Fog"));
 
-  // gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
+  gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
   return notebook;
 }
 
@@ -1245,7 +1311,6 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 {
   int i;
   // Analysis preferences
-
   default_num_delta[GR] = 1000;
   default_num_delta[SQ] = 1000;
   default_num_delta[SK] = 1000;
@@ -1271,7 +1336,6 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 
   for (i=0; i<3; i++) default_opengl[i] = 0;
   default_opengl[3] = QUALITY;
-
   // Material
   default_material.predefine = 4; // Plastic
   default_material.albedo = vec3(0.5, 0.5, 0.5);
@@ -1385,19 +1449,31 @@ void create_user_preferences_dialog ()
   gtk_widget_set_size_request (preference_notebook, 600, 635);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
   GtkWidget * gbox = create_vbox (BSEP);
+
   gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
+                 "by replacing internal parameters by user defined preferences.";
+  gchar * mlist[4][2]= {{"Analysis", "calculation preferences"},
+                        {"OpenGL", "rendering preferences"},
+                        {"Model", "atom(s), bond(s) and box preferences"},
+                        {"View", "representation and projection preferences"}};
+  gchar * end = "Default parameters are used for any new project added to the workspace\n";
+
+
+  /*gchar * mess = "Browse the following to modify the default configuration of <b>atomes</b>\n"
                  "by replacing internal parameters by user defined preferences.\n\n"
                  "\t<b>Analysis</b>\t: calculation preferences\n"
                  "\t<b>OpenGL  </b>\t: rendering preferences\n"
                  "\t<b>Model   </b>\t: atom(s), bond(s) and box preferences\n"
                  "\t<b>View      </b>\t: representation and projection preferences\n\n"
                  "Default parameters are used for any new project added to the workspace\n";
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, markup_label (mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, markup_label (mess, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);*/
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, pref_list(mess, 4, mlist, end), FALSE, FALSE, 20);
+
   GtkWidget * hbox = create_hbox (BSEP);
   GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
   GtkWidget * but_lab = markup_label ("Restore <b>atomes</b> default parameters", -1, -1, 0.5, 0.5);
   add_container_child (CONTAINER_BUT, but, but_lab);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 60);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 130);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
