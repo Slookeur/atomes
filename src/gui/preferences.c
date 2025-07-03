@@ -97,6 +97,25 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
 
+/*! \typedef element_radius
+
+  \brief element radius data structure
+*/
+typedef struct element_radius element_radius;
+struct element_radius
+{
+  int Z;            /*!< Atomic number */
+  double rad;       /*!< Assiociated radius */
+  element_radius * next;
+};
+
+// 5 styles + 5 cloned styles
+element_radius * default_atomic_rad[14];
+element_radius * tmp_atomic_rad[14];
+// 3 styles + 3 cloned styles
+element_radius * default_bond_radius[6];
+element_radius * tmp_bond_rad[10];
+
 gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
 int * tmp_opengl = NULL;
@@ -1057,6 +1076,139 @@ G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
   update_entry_double (res, value);
 }
 
+element_radius ** edit_list;
+GtkWidget * pref_tree;
+
+/*!
+  \fn G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string, gchar * new_text, gpointer user_data)
+
+  \brief edit cell in the preferences tree model
+
+  \param cell the GtkCellRendererText sending the signal
+  \param path_string the path in the tree model
+  \param new_text the string describing the new value
+  \param user_data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string, gchar * new_text, gpointer user_data)
+{
+  int col = (GPOINTER_TO_INT(data);
+  GtkListStore * pref_model = gtk_tree_view_get_model(GTK_TREE_VIEW(pref_tree));
+  gtk_tree_model_get_iter_from_string (pref_model, & row, path_string);
+  double val = string_to_double ((gpointer)new_text);
+  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 3, val, -1);
+  int z;
+  gboolean add_elem = TRUE;
+  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 2, & z, -1);
+  element_radius * tmp_list;
+  if (edit_list[col])
+  {
+    tmp_list = edit_list[col];
+    while (tmp_list)
+    {
+      if (tmp_list -> Z == z)
+      {
+        tmp_list -> rad = val;
+        add_elem = FALSE;
+        break;
+      }
+    }
+  }
+  if (add_elem)
+  {
+    if (edit_list[col])
+    {
+      tmp_list = edit_list[col];
+      while (tmp_list)
+      {
+        if (! tmp_list -> next)
+        {
+          tmp_list -> next = g_malloc0(sizeof*tmp_list);
+          tmp_list = tmp_list -> next;
+          break;
+        }
+      }
+    }
+    else
+    {
+      edit_list[col] = g_malloc0(sizeof*edit_list[col]);
+      tmp_list = edit_list;
+    }
+    tmp_list -> Z = z;
+    tmp_list -> rad = val;
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
+
+  \brief edit chem preferences - running the dialog
+
+  \param edit_prefs the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
+{
+  switch (response_id)
+  {
+    case GTK_RESPONSE_APPLY:
+      int object = GPOINTER_TO_INT (data);
+      if (object < 0)
+      {
+        // tmp_bond_rad[- object - 2];
+      }
+      else
+      {
+         // tmp_atomic_rad[object - 2];
+      }
+      int i;
+      for (i=0; i<in_list; i++)
+      {
+
+      }
+      break;
+    default:
+      if (edit_list)
+      {
+        g_free (edit_list);
+        edit_list = NULL;
+      }
+      break;
+  }
+  destroy_this_dialog (edit_chem);
+}
+
+/*!
+  \fn double get_radius (int object, int z, element_radius * rad_list)
+
+  \brief retrieve the radius/width of a species depending on style
+
+  \param object style information
+  \param z atomic number
+  \param rad_list pre allocated data, if any
+
+*/
+double get_radius (int object, int z, element_radius * rad_list)
+{
+  tmp_rad = rad_list;
+  while (tmp_rad)
+  {
+    if (tmp_rad -> Z == i)
+    {
+      return tmp_rad -> rad;
+    }
+    tmp_rad = tmp_rad -> next;
+  }
+  if (object < 0)
+  {
+    // Bonds
+  }
+  else
+  {
+    // Atoms
+  }
+}
+
 /*!
   \fn G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 
@@ -1073,6 +1225,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * col[3]={"Radius", "Size", "Width"};
   int object = GPOINTER_TO_INT(data);
   int aid, bid;
+  int num_col;
   gchar * str;
   if (object < 0)
   {
@@ -1081,6 +1234,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     aid = (aid) > 2 ? aid - 3 : aid;
     bid = (object == -3 || object == -6) ? 2 : 0;
     str = (object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
+    num_col = 4;
   }
   else
   {
@@ -1090,42 +1244,52 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     aid = (aid == 3) ? 1 : aid;
     bid = (object%2 == 0) ? 0 : 1;
     str = (object > 5) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
+    num_col = (aid == 2) ? 6 : 4;
   }
 
+  edit_list = NULL;
   GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
   g_free (str);
-  gtk_window_set_default_size (GTK_WINDOW(win), 300, 600);
+  gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 4) ? 300 : 400, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
-  GType type[4]={G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE};
-
-  GtkTreeViewColumn * pref_col[4];
-  GtkCellRenderer * pref_cel[4];
+  GType type[numcol] = (num_col == 4) ?  {G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE} : {G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
+  GtkTreeViewColumn * pref_col[num_col];
+  GtkCellRenderer * pref_cel[num_col];
   GtkTreeSelection * pref_select;
-
-  GtkListStore * pref_model = gtk_list_store_newv (4, type);
+  GtkListStore * pref_model = gtk_list_store_newv (num_col, type);
   GtkTreeIter elem;
-  int i;
-  double val;
-  for (i=1; i<120; i++)
+  edit_list = g_malloc0((num_col == 6) ? 3 : 1)*sizeof*edit_list);
+  int i, j, k;
+  double val, vbl, vcl;
+  i = (object < 0) ? - object - 2 : object -2;
+  if (num_col == 6) j = (object > 5) ? 12 : 10;
+  for (k=1; k<120; k++)
   {
-    val = 0.0;
+    val = get_radius (object, k, (object < 0) ? tmp_bond_rad[i] : tmp_atom_rad[i]);
     gtk_list_store_append (pref_model, & elem);
     gtk_list_store_set (pref_model, & elem,
-                        0, periodic_table_info[i].name,
-                        1, periodic_table_info[i].lab,
-                        2, periodic_table_info[i].Z,
+                        0, periodic_table_info[k].name,
+                        1, periodic_table_info[k].lab,
+                        2, periodic_table_info[k].Z,
                         3, val, -1);
+    if (num_col == 6)
+    {
+      vbl = get_radius (object, k, tmp_atom_rad[j]);
+      vcl = get_radius (object, k, tmp_atom_rad[j+1]);
+      gtk_list_store_set (pref_model, & elem, 4, vbl, 5, vcl, -1);
+    }
   }
-  GtkWidget * pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
+
+  pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
   gchar * name[3]={"Element", "Symbol", "Z"};
-  for (i=0; i<4; i++)
+  for (i=0; i<num_col; i++)
   {
     pref_cel[i] = gtk_cell_renderer_text_new();
-    if (i == 3)
+    if (i > 2)
     {
       g_object_set (pref_cel[i], "editable", TRUE, NULL);
       gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
-      // g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_model_pref), GPOINTER_TO_INT(i));
+      g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-2));
       pref_col[i] = gtk_tree_view_column_new_with_attributes(col[bid], pref_cel[i], "text", i, NULL);
     }
     else
@@ -1143,13 +1307,6 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   g_object_unref (pref_model);
   pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
   gtk_tree_selection_set_mode (pref_select, GTK_SELECTION_SINGLE);
-#ifdef GTK3
-//   g_signal_connect (G_OBJECT(pref_tree), "button_press_event", G_CALLBACK(on_pref_button_event), NULL);
-#else
-/*  add_widget_gesture_and_key_action (pref_tree, "datab-context-click", G_CALLBACK(on_pref_button_pressed), NULL,
-                                               "datab-context-release", G_CALLBACK(on_pref_button_released), NULL,
-                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL); */
-#endif
   gtk_tree_view_expand_all (GTK_TREE_VIEW(pref_tree));
 
   GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
@@ -1157,10 +1314,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   // gtk_widget_set_size_request (win, 625, 645);
   // gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
 
-  show_the_widgets(win);
-
-  // run_this_gtk_dialog (win, G_CALLBACK(), NULL);
-
+  run_this_gtk_dialog (win, G_CALLBACK(edit_chem_preferences), data);
 }
 
 /*!
@@ -1175,7 +1329,7 @@ GtkWidget * over_param (int object, int style)
 {
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox = create_hbox (BSEP);
-  int clone = ((object && style > 2) || (! object && style > 3)) ? 20 : 0;
+  int clone = ((object && style > 2) || (! object && style > 4)) ? 20 : 0;
   int mod = (object) ? -1 : 1;
   gboolean over = (! object && style%2 == 0) ? TRUE : (object && (style == 0 || style == 3)) ? TRUE : FALSE;
   gchar * leg;
@@ -1210,7 +1364,7 @@ GtkWidget * over_param (int object, int style)
     update_entry_double (GTK_ENTRY(atom_entry_over[style]), tmp_at_rs[style]);
     if (over) widget_set_sensitive (atom_entry_over[style], tmp_o_at_rs[style]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, atom_entry_over[style], FALSE, FALSE, 0);
-    leg = g_strdup_printf ("%s", (style == 1 || style == 3 || style == 5 || style == 7) ? "pts" : "&#xC5;");
+    leg = g_strdup_printf ("%s", (style == 1 || style == 4 || style == 6 || style == 9) ? "pts" : "&#xC5;");
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(leg, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (leg);
@@ -1242,10 +1396,10 @@ GtkWidget * style_tab (int style)
   gchar * str;
   gboolean do_atoms = FALSE;
   gboolean do_bonds = FALSE;
-  if (style == 0 || style == 1 || style == 3 || style == 5)
+  if (style == 0 || style == 1 || style == 2 || style == 3 || style == 5)
   {
     do_atoms = TRUE;
-    asid = (style == 3) ? 2 : (style == 5) ? 3 : style;
+    asid = (style == 5) ? 4 : style;
   }
   if (style == 0 || style == 1 || style == 4)
   {
@@ -1254,7 +1408,7 @@ GtkWidget * style_tab (int style)
   }
   if (do_atoms)
   {
-    lid = (style == 3) ? 2 : (style == 5) ? 1 : style;
+    lid = (style == 3) ? 2 : (style == 2 || style == 5) ? 1 : style;
     for (i=0; i<2; i++)
     {
       adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
@@ -1268,7 +1422,7 @@ GtkWidget * style_tab (int style)
       }
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, asid+4*i), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, asid+5*i), FALSE, FALSE, 0);
     }
   }
   if (do_bonds)
@@ -1335,7 +1489,7 @@ GtkWidget * model_preferences ()
   int i;
   for (i=0; i<OGL_STYLES; i++)
   {
-    if (i != 2) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
   }
 
   // Show / hide atom(s) ?
