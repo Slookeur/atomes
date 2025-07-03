@@ -42,6 +42,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "workspace.h"
 #include "glview.h"
 #include "glwin.h"
+#include "bind.h"
 #include "preferences.h"
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
@@ -110,8 +111,8 @@ struct element_radius
 };
 
 // 5 styles + 5 cloned styles
-element_radius * default_atomic_rad[14];
-element_radius * tmp_atomic_rad[14];
+element_radius * default_atomic_rad[16];
+element_radius * tmp_atomic_rad[16];
 // 3 styles + 3 cloned styles
 element_radius * default_bond_radius[6];
 element_radius * tmp_bond_rad[10];
@@ -1091,14 +1092,15 @@ GtkWidget * pref_tree;
 */
 G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string, gchar * new_text, gpointer user_data)
 {
-  int col = (GPOINTER_TO_INT(data);
-  GtkListStore * pref_model = gtk_tree_view_get_model(GTK_TREE_VIEW(pref_tree));
+  int col = GPOINTER_TO_INT(user_data);
+  GtkTreeModel * pref_model = gtk_tree_view_get_model(GTK_TREE_VIEW(pref_tree));
+  GtkTreeIter row;
   gtk_tree_model_get_iter_from_string (pref_model, & row, path_string);
   double val = string_to_double ((gpointer)new_text);
-  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 3, val, -1);
+  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 4, val, -1);
   int z;
   gboolean add_elem = TRUE;
-  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 2, & z, -1);
+  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 3, & z, -1);
   element_radius * tmp_list;
   if (edit_list[col])
   {
@@ -1131,7 +1133,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
     else
     {
       edit_list[col] = g_malloc0(sizeof*edit_list[col]);
-      tmp_list = edit_list;
+      tmp_list = edit_list[col];
     }
     tmp_list -> Z = z;
     tmp_list -> rad = val;
@@ -1161,11 +1163,6 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
       {
          // tmp_atomic_rad[object - 2];
       }
-      int i;
-      for (i=0; i<in_list; i++)
-      {
-
-      }
       break;
     default:
       if (edit_list)
@@ -1177,6 +1174,8 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
   }
   destroy_this_dialog (edit_chem);
 }
+
+gboolean user_defined;
 
 /*!
   \fn double get_radius (int object, int z, element_radius * rad_list)
@@ -1190,11 +1189,12 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
 */
 double get_radius (int object, int z, element_radius * rad_list)
 {
-  tmp_rad = rad_list;
+  element_radius * tmp_rad = rad_list;
   while (tmp_rad)
   {
-    if (tmp_rad -> Z == i)
+    if (tmp_rad -> Z == z)
     {
+      user_defined = TRUE;
       return tmp_rad -> rad;
     }
     tmp_rad = tmp_rad -> next;
@@ -1205,8 +1205,16 @@ double get_radius (int object, int z, element_radius * rad_list)
   }
   else
   {
-    // Atoms
+    if (object == 2 || object == 7 || object > 9)
+    {
+      int ft = (object == 2 || object == 7) ? 0 : (object < 13) ? object - 9 : object - 12;
+      if (z < 119)
+      {
+        return set_radius_ (& z, & ft);
+      }
+    }
   }
+  return 0.0;
 }
 
 /*!
@@ -1222,7 +1230,6 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * ats[3]={"atom(s)", "dot(s)", "sphere(s)"};
   gchar * dim[3]={"radius", "size", "width"};
   gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
-  gchar * col[3]={"Radius", "Size", "Width"};
   int object = GPOINTER_TO_INT(data);
   int aid, bid;
   int num_col;
@@ -1234,75 +1241,88 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     aid = (aid) > 2 ? aid - 3 : aid;
     bid = (object == -3 || object == -6) ? 2 : 0;
     str = (object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
-    num_col = 4;
+    num_col = 5;
   }
   else
   {
     // Going for atoms
     aid = object - 2;
-    aid = (aid) > 3 ? aid - 4 : aid;
-    aid = (aid == 3) ? 1 : aid;
-    bid = (object%2 == 0) ? 0 : 1;
-    str = (object > 5) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
-    num_col = (aid == 2) ? 6 : 4;
+    aid = (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : 2;
+    bid = (object == 1 || object == 6) ? 1 : 0;
+    str = (object - 2 > 4) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
+    num_col = (object == 4 || object == 9) ? 8 : 5;
   }
 
   edit_list = NULL;
   GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
   g_free (str);
-  gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 4) ? 300 : 400, 600);
+  gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 8) ? 600 : 300, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
-  GType type[numcol] = (num_col == 4) ?  {G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE} : {G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
+  GType type[8] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
   GtkTreeViewColumn * pref_col[num_col];
   GtkCellRenderer * pref_cel[num_col];
   GtkTreeSelection * pref_select;
   GtkListStore * pref_model = gtk_list_store_newv (num_col, type);
   GtkTreeIter elem;
-  edit_list = g_malloc0((num_col == 6) ? 3 : 1)*sizeof*edit_list);
-  int i, j, k;
-  double val, vbl, vcl;
-  i = (object < 0) ? - object - 2 : object -2;
-  if (num_col == 6) j = (object > 5) ? 12 : 10;
+  edit_list = g_malloc0(((num_col == 8) ? 4 : 1)*sizeof*edit_list);
+  int i, j, k, l;
+  double val, vbl, vcl, vdl;
+  i = (object < 0) ? - object - 2 : object - 2;
+  if (num_col == 8) j = (object > 5) ? 12 : 10;
   for (k=1; k<120; k++)
   {
-    val = get_radius (object, k, (object < 0) ? tmp_bond_rad[i] : tmp_atom_rad[i]);
+    user_defined = FALSE;
+    val = get_radius (i, k, (object < 0) ? tmp_bond_rad[i] : tmp_atomic_rad[i]);
     gtk_list_store_append (pref_model, & elem);
-    gtk_list_store_set (pref_model, & elem,
-                        0, periodic_table_info[k].name,
-                        1, periodic_table_info[k].lab,
-                        2, periodic_table_info[k].Z,
-                        3, val, -1);
-    if (num_col == 6)
+    gtk_list_store_set (pref_model, & elem, 0, user_defined,
+                        1, periodic_table_info[k].name,
+                        2, periodic_table_info[k].lab,
+                        3, periodic_table_info[k].Z,
+                        4, val, -1);
+    if (num_col == 8)
     {
-      vbl = get_radius (object, k, tmp_atom_rad[j]);
-      vcl = get_radius (object, k, tmp_atom_rad[j+1]);
-      gtk_list_store_set (pref_model, & elem, 4, vbl, 5, vcl, -1);
+      l = user_defined;
+      user_defined = FALSE;
+      vbl = get_radius (j, k, tmp_atomic_rad[j]);
+      l += (user_defined) ? 3 : 0;
+      user_defined = FALSE;
+      vcl = get_radius (j+1, k, tmp_atomic_rad[j+1]);
+      l += (user_defined) ? 5 : 0;
+      user_defined = FALSE;
+      vdl = get_radius (j+2, k, tmp_atomic_rad[j+2]);
+      l += (user_defined) ? 10 : 0;
+      gtk_list_store_set (pref_model, & elem, 0, l, 5, vbl, 6, vcl, 7, vdl, -1);
     }
   }
 
   pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
-  gchar * name[3]={"Element", "Symbol", "Z"};
+  gchar * name[3] = {"Element", "Symbol", "Z"};
+  gchar * g_name[3] = {"Radius", "Size", "Width"};
+  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4]"};
+
   for (i=0; i<num_col; i++)
   {
     pref_cel[i] = gtk_cell_renderer_text_new();
-    if (i > 2)
+    if (i > 3)
     {
       g_object_set (pref_cel[i], "editable", TRUE, NULL);
       gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
-      g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-2));
-      pref_col[i] = gtk_tree_view_column_new_with_attributes(col[bid], pref_cel[i], "text", i, NULL);
+      g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-3));
+      pref_col[i] = gtk_tree_view_column_new_with_attributes((num_col) == 8 ? f_name[i-4] : g_name[bid], pref_cel[i], "text", i, NULL);
+    }
+    else if (i)
+    {
+      pref_col[i] = gtk_tree_view_column_new_with_attributes(name[i-1], pref_cel[i], "text", i, NULL);
+      gtk_tree_view_column_set_alignment (pref_col[i], 0.5);
+      gtk_tree_view_column_set_resizable (pref_col[i], TRUE);
+      gtk_tree_view_column_set_min_width (pref_col[i], 50);
     }
     else
     {
-      pref_col[i] = gtk_tree_view_column_new_with_attributes(name[i], pref_cel[i], "text", i, NULL);
+      pref_col[i] = gtk_tree_view_column_new_with_attributes("", pref_cel[i], "text", i, NULL);
+      gtk_tree_view_column_set_visible (pref_col[i], FALSE);
     }
-    gtk_tree_view_column_set_alignment (pref_col[i], 0.5);
-    gtk_tree_view_column_set_resizable (pref_col[i], TRUE);
     gtk_tree_view_append_column(GTK_TREE_VIEW(pref_tree), pref_col[i]);
-    if (i > 0)
-    {
-      gtk_tree_view_column_set_min_width (pref_col[i], 50);
-    }
   }
   g_object_unref (pref_model);
   pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
@@ -1311,9 +1331,15 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 
   GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, scrol, pref_tree);
-  // gtk_widget_set_size_request (win, 625, 645);
-  // gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
-
+  if (num_col == 8)
+  {
+    gchar * legend={"\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
+                    "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
+                    "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
+                    "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
+                    "<sub>[4] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
+     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
+  }
   run_this_gtk_dialog (win, G_CALLBACK(edit_chem_preferences), data);
 }
 
@@ -1408,7 +1434,7 @@ GtkWidget * style_tab (int style)
   }
   if (do_atoms)
   {
-    lid = (style == 3) ? 2 : (style == 2 || style == 5) ? 1 : style;
+    lid = (style == 3) ? 2 : (style == 2 || style == 5) ? 1 : style;
     for (i=0; i<2; i++)
     {
       adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
