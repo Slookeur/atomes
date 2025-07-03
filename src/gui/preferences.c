@@ -1316,9 +1316,13 @@ GtkWidget * model_preferences ()
                           {"Spheres", "atoms radii"},
                           {"Cylinders", "bonds radii"},
                           {"Dots", "dots size"}};
-  gchar * end = {"It also provides options to customize atomic label(s), and, the model box, if any."};
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, end), FALSE, FALSE, 30);
-
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, NULL), FALSE, FALSE, 0);
+  gchar * other_info[2] = {"It also provides options to customize atomic label(s),", "and, the model box, if any:"};
+  gchar * o_list[2][2] = {{"Labels", "atomic labels"},
+                          {"Box", "model box details"}};
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 2, o_list, NULL), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 40, 0.0, 0.0), FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
