@@ -282,7 +282,7 @@ float get_sphere_radius (int style, int sp, int ac, int sel)
 {
   if (style == WIREFRAME || style == PUNT)
   {
-    return plot -> pointrad[sp + ac*proj_sp] + sel*4.0;
+    return plot -> pointrad[sp + ac*proj_sp] + sel*5.0;
   }
   else if (style == SPACEFILL)
   {
@@ -290,7 +290,7 @@ float get_sphere_radius (int style, int sp, int ac, int sel)
   }
   else if (style == CYLINDERS)
   {
-    return plot -> radall[ac] + sel*0.05;
+    return plot -> radall[ac] + sel*0.1;
   }
   else
   {
