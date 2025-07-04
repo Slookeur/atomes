@@ -1210,7 +1210,6 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
             g_free (edit_list[col]);
             edit_list[col] = NULL;
           }
-          g_free (tmp_list);
           add_elem = FALSE;
         }
         else
@@ -1355,9 +1354,9 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
           g_free (edit_list[i]);
           edit_list[i] = NULL;
         }
-        g_free (edit_list);
-        edit_list = NULL;
       }
+      g_free (edit_list);
+      edit_list = NULL;
       break;
   }
   destroy_this_dialog (edit_chem);
