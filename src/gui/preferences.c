@@ -1169,7 +1169,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
   gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, col+4, str, -1);
   g_free (str);
   gboolean add_elem = FALSE;
-  gboolean remove_list = FALSE;
+  gboolean remove_elem = FALSE;
   element_radius * tmp_list;
   int col_val[4] = {1, 3, 5, 10};
   float v = get_radius ((the_object < 0) ? - the_object - 2 : the_object - 2, z, NULL);
@@ -1177,6 +1177,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
   if (edit_list[col])
   {
     tmp_list = edit_list[col];
+    add_elem = TRUE;
     while (tmp_list)
     {
       if (tmp_list -> Z == z)
@@ -1184,40 +1185,41 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
         tmp_list -> rad = val;
         if (val == v)
         {
+          remove_elem = TRUE;
           if (tmp_list -> next)
           {
             if (tmp_list -> prev)
             {
-              tmp_list -> prev = tmp_list -> next;
+              tmp_list -> prev -> next = tmp_list -> next;
               tmp_list -> next -> prev = tmp_list -> prev;
             }
             else
             {
-              tmp_list -> next -> prev = NULL;
+              edit_list[col] = tmp_list -> next;
+              edit_list[col] -> prev = NULL;
             }
-            g_free (tmp_list);
+          }
+          else if (tmp_list -> prev)
+          {
+            edit_list[col] -> rad = tmp_list -> rad;
+            edit_list[col] -> Z = tmp_list -> Z;
+            edit_list[col] -> prev = NULL;
           }
           else
           {
-            if (tmp_list -> prev)
-            {
-              tmp_list -> prev -> next = NULL;
-              g_free (tmp_list);
-            }
-            else
-            {
-              g_free (edit_list[col]);
-              edit_list[col] = NULL;
-              remove_list = TRUE;
-            }
+            g_free (edit_list[col]);
+            edit_list[col] = NULL;
           }
+          g_free (tmp_list);
+          add_elem = FALSE;
         }
         else
         {
+          tmp_list -> rad = v;
           add_elem = FALSE;
         }
-        break;
       }
+      tmp_list = tmp_list -> next;
     }
   }
   else if (val != v)
@@ -1232,14 +1234,12 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
       tmp_list = edit_list[col];
       while (tmp_list)
       {
-        if (! tmp_list -> next)
-        {
-          tmp_list -> next = g_malloc0(sizeof*tmp_list);
-          tmp_list -> next -> prev = tmp_list;
-          tmp_list = tmp_list -> next;
-          break;
-        }
+        if (! tmp_list -> next) break;
+        tmp_list = tmp_list -> next;
       }
+      tmp_list -> next = g_malloc0(sizeof*tmp_list -> next);
+      tmp_list -> next -> prev = tmp_list;
+      tmp_list = tmp_list -> next;
     }
     else
     {
@@ -1256,7 +1256,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
     else
     {
       int a, b, c, d;
-      a = col_val[col] / 10;
+      a = z / 10;
       b = (z - a * 10) / 5;
       c = (z - a * 10 - b * 5) / 3;
       d = z - a * 10 - b * 5 - c * 3;
@@ -1268,7 +1268,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
     }
     gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, 0, z, -1);
   }
-  else if (remove_list)
+  else if (remove_elem)
   {
     gtk_tree_model_get (pref_model, & row, 0, & z, -1);
     z -= col_val[col];
@@ -1287,22 +1287,74 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
 */
 G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
 {
+  int i, j;
+  int object = object = GPOINTER_TO_INT (data);
+  element_radius * tmp_rad, * tmp_rbd;
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
-      int object = GPOINTER_TO_INT (data);
       if (object < 0)
       {
-        // tmp_bond_rad[- object - 2];
+        object = - object - 2;
+        g_free (tmp_bond_rad[object]);
+        tmp_bond_rad[object] = NULL;
+        if (edit_list[0])
+        {
+          tmp_bond_rad[object] = g_malloc0(sizeof*tmp_bond_rad[object]);
+          tmp_rad = edit_list[0];
+          tmp_rbd = tmp_bond_rad[object];
+          while (tmp_rad)
+          {
+            tmp_rbd -> Z = tmp_rad -> Z;
+            tmp_rbd -> rad = tmp_rad -> rad;
+            if (tmp_rad -> next)
+            {
+              tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+              tmp_rbd -> next -> prev = tmp_rbd;
+              tmp_rbd = tmp_rbd -> next;
+            }
+            tmp_rad = tmp_rad -> next;
+          }
+        }
       }
       else
       {
-        // tmp_atomic_rad[object - 2];
+        j = (object == 4 || object == 9) ? 4 : 1;
+        object = object - 2;
+        for (i=0; i<j; i++)
+        {
+          g_free (tmp_atomic_rad[object+i]);
+          tmp_atomic_rad[object+i] = NULL;
+          if (edit_list[i])
+          {
+            tmp_atomic_rad[object+i] = g_malloc0(sizeof*tmp_atomic_rad[object+i]);
+            tmp_rad = edit_list[i];
+            tmp_rbd = tmp_atomic_rad[object+i];
+            while (tmp_rad)
+            {
+              tmp_rbd -> Z = tmp_rad -> Z;
+              tmp_rbd -> rad = tmp_rad -> rad;
+              if (tmp_rad -> next)
+              {
+                tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+                tmp_rbd -> next -> prev = tmp_rbd;
+                tmp_rbd = tmp_rbd -> next;
+              }
+              tmp_rad = tmp_rad -> next;
+            }
+          }
+        }
       }
       break;
     default:
-      if (edit_list)
+      j = (object < 0) ? 1 : (object == 4 || object == 9) ? 4 : 1;
+      for (i=0; i<j; i++)
       {
+        if (edit_list[i])
+        {
+          g_free (edit_list[i]);
+          edit_list[i] = NULL;
+        }
         g_free (edit_list);
         edit_list = NULL;
       }
@@ -1393,6 +1445,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * dim[3]={"radius", "size", "width"};
   gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
   the_object = GPOINTER_TO_INT(data);
+  int i, j, k, l;
   int aid, bid;
   int num_col;
   gchar * str;
@@ -1426,14 +1479,61 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   GtkTreeSelection * pref_select;
   GtkListStore * pref_model = gtk_list_store_newv (num_col, type);
   GtkTreeIter elem;
-  edit_list = g_malloc0(((num_col == 8) ? 4 : 1)*sizeof*edit_list);
-  int i, j, k, l;
   i = (the_object < 0) ? - the_object - 2 : the_object - 2;
+  j = (num_col == 8) ? 4 : 1;
+  element_radius * tmp_rad, * tmp_rbd;
+  edit_list = g_malloc0(j*sizeof*edit_list);
+  for (k=0; k<j; k++)
+  {
+    if (the_object < 0)
+    {
+      if (tmp_bond_rad[i])
+      {
+        tmp_rad = tmp_bond_rad[i];
+        edit_list[k] = g_malloc0(sizeof*edit_list[k]);
+        tmp_rbd = edit_list[k];
+        while (tmp_rad)
+        {
+          tmp_rbd -> Z = tmp_rad -> Z;
+          tmp_rbd -> rad = tmp_rad -> rad;
+          if (tmp_rad -> next)
+          {
+            tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+            tmp_rbd -> next -> prev = tmp_rbd;
+            tmp_rbd = tmp_rbd -> next;
+          }
+          tmp_rad = tmp_rad -> next;
+        }
+      }
+    }
+    else
+    {
+      if (tmp_atomic_rad[i+k])
+      {
+        tmp_rad = tmp_atomic_rad[i+k];
+        edit_list[k] = g_malloc0(sizeof*edit_list[k]);
+        tmp_rbd = edit_list[k];
+        while (tmp_rad)
+        {
+          tmp_rbd -> Z = tmp_rad -> Z;
+          tmp_rbd -> rad = tmp_rad -> rad;
+          if (tmp_rad -> next)
+          {
+            tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+            tmp_rbd -> next -> prev = tmp_rbd;
+            tmp_rbd = tmp_rbd -> next;
+          }
+          tmp_rad = tmp_rad -> next;
+        }
+      }
+    }
+  }
+
   if (num_col == 8) j = (the_object > 5) ? 12 : 10;
   for (k=1; k<120; k++)
   {
     user_defined = FALSE;
-    str = g_strdup_printf ("%f", get_radius (i, k, (the_object < 0) ? tmp_bond_rad[i] : tmp_atomic_rad[i]));
+    str = g_strdup_printf ("%f", get_radius (i, k, edit_list[0]));
     gtk_list_store_append (pref_model, & elem);
     gtk_list_store_set (pref_model, & elem, 0, user_defined,
                         1, periodic_table_info[k].name,
@@ -1444,17 +1544,17 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     {
       l = user_defined;
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j, k, tmp_atomic_rad[j]));
+      str = g_strdup_printf ("%f", get_radius (j, k, edit_list[1]));
       l += (user_defined) ? 3 : 0;
       gtk_list_store_set (pref_model, & elem, 5, str, -1);
       g_free (str);
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j+1, k, tmp_atomic_rad[j+1]));
+      str = g_strdup_printf ("%f", get_radius (j+1, k, edit_list[2]));
       l += (user_defined) ? 5 : 0;
       gtk_list_store_set (pref_model, & elem, 6, str, -1);
       g_free (str);
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j+2, k, tmp_atomic_rad[j+2]));
+      str = g_strdup_printf ("%f", get_radius (j+2, k, edit_list[3]));
       l += (user_defined) ? 10 : 0;
       gtk_list_store_set (pref_model, & elem, 0, l, 7, str, -1);
     }
