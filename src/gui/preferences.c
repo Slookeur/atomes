@@ -1370,7 +1370,7 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
   \param col the tree view column
   \param renderer the column renderer
   \param mod the tree model
-  \param iter the tree it
+  \param iter the tree iter
   \param data the associated data pointer
 */
 void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
@@ -1562,7 +1562,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
   gchar * name[3] = {"Element", "Symbol", "Z"};
   gchar * g_name[3] = {"Radius", "Size", "Width"};
-  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4]"};
+  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4,5]"};
 
   for (i=0; i<num_col; i++)
   {
@@ -1602,7 +1602,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
                     "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
                     "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
                     "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
-                    "<sub>[4] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
+                    "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
   }
   run_this_gtk_dialog (win, G_CALLBACK(edit_chem_preferences), data);
