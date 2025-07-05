@@ -1084,16 +1084,17 @@ GtkWidget * pref_tree;
 gboolean user_defined;
 
 /*!
-  \fn double get_radius (int object, int z, element_radius * rad_list)
+  \fn float get_radius (int object, int col, int z, element_radius * rad_list)
 
   \brief retrieve the radius/width of a species depending on style
 
   \param object the object to look at
+  \param modifier for tabulated radii
   \param z atomic number
   \param rad_list pre allocated data, if any
 
 */
-double get_radius (int object, int z, element_radius * rad_list)
+float get_radius (int object, int col, int z, element_radius * rad_list)
 {
   element_radius * tmp_rad = rad_list;
   int ft;
@@ -1108,6 +1109,7 @@ double get_radius (int object, int z, element_radius * rad_list)
   }
   if (object < 0)
   {
+    object = - object - 2;
     // Bonds
     if (object == 0 || object == 3)
     {
@@ -1124,9 +1126,10 @@ double get_radius (int object, int z, element_radius * rad_list)
   }
   else
   {
-    if (object == 2 || object == 7 || object > 9)
+    object -= 2;
+    if (object == 2 || object == 7 || col)
     {
-      ft = (object == 2 || object == 7) ? 0 : (object < 13) ? object - 9 : object - 12;
+      ft = col;
       if (z < 119)
       {
         return set_radius_ (& z, & ft);
@@ -1140,7 +1143,7 @@ double get_radius (int object, int z, element_radius * rad_list)
     else if (object == 0 || object == 5)
     {
       ft = 0;
-      return set_radius_ (& z, & ft) / 2.0;
+      return set_radius_ (& z, & ft);
     }
   }
   return 0.0;
@@ -1165,15 +1168,12 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
   int z;
   float val = string_to_double ((gpointer)new_text);
   gtk_tree_model_get (pref_model, & row, 3, & z, -1);
-  gchar * str = g_strdup_printf ("%f", val);
-  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, col+4, str, -1);
-  g_free (str);
+  gtk_list_store_set (GTK_LIST_STORE(pref_model), & row, col+4, val, -1);
   gboolean add_elem = FALSE;
   gboolean remove_elem = FALSE;
   element_radius * tmp_list;
   int col_val[4] = {1, 3, 5, 10};
-  float v = get_radius ((the_object < 0) ? - the_object - 2 : the_object - 2, z, NULL);
-
+  float v = get_radius (the_object, col, z, NULL);
   if (edit_list[col])
   {
     tmp_list = edit_list[col];
@@ -1444,7 +1444,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * dim[3]={"radius", "size", "width"};
   gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
   the_object = GPOINTER_TO_INT(data);
-  int i, j, k, l;
+  int i, j, k;
   int aid, bid;
   int num_col;
   gchar * str;
@@ -1472,7 +1472,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   g_free (str);
   gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 8) ? 600 : 300, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
-  GType type[8] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING};
+  GType type[8] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
   GtkTreeViewColumn * pref_col[num_col];
   GtkCellRenderer * pref_cel[num_col];
   GtkTreeSelection * pref_select;
@@ -1528,34 +1528,27 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     }
   }
 
-  if (num_col == 8) j = (the_object > 5) ? 12 : 10;
-  for (k=1; k<120; k++)
+  for (i=1; i<120; i++)
   {
     user_defined = FALSE;
-    str = g_strdup_printf ("%f", get_radius (i, k, edit_list[0]));
     gtk_list_store_append (pref_model, & elem);
     gtk_list_store_set (pref_model, & elem, 0, user_defined,
-                        1, periodic_table_info[k].name,
-                        2, periodic_table_info[k].lab,
-                        3, periodic_table_info[k].Z,
-                        4, str, -1);
+                        1, periodic_table_info[i].name,
+                        2, periodic_table_info[i].lab,
+                        3, periodic_table_info[i].Z,
+                        4, get_radius (the_object, 0, i, edit_list[0]), -1);
     if (num_col == 8)
     {
-      l = user_defined;
+      j = user_defined;
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j, k, edit_list[1]));
-      l += (user_defined) ? 3 : 0;
-      gtk_list_store_set (pref_model, & elem, 5, str, -1);
-      g_free (str);
+      j += (user_defined) ? 3 : 0;
+      gtk_list_store_set (pref_model, & elem, 5,  get_radius (the_object, 1, i, edit_list[1]), -1);
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j+1, k, edit_list[2]));
-      l += (user_defined) ? 5 : 0;
-      gtk_list_store_set (pref_model, & elem, 6, str, -1);
-      g_free (str);
+      j += (user_defined) ? 5 : 0;
+      gtk_list_store_set (pref_model, & elem, 6, get_radius (the_object, 2, i, edit_list[2]), -1);
       user_defined = FALSE;
-      str = g_strdup_printf ("%f", get_radius (j+2, k, edit_list[3]));
-      l += (user_defined) ? 10 : 0;
-      gtk_list_store_set (pref_model, & elem, 0, l, 7, str, -1);
+      j += (user_defined) ? 10 : 0;
+      gtk_list_store_set (pref_model, & elem, 0, j, 7, get_radius (the_object, 3, i, edit_list[3]), -1);
     }
   }
 
