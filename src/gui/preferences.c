@@ -111,12 +111,12 @@ struct element_radius
   element_radius * prev;
 };
 
-// 5 styles + 5 cloned styles
+// 5+3 styles + 5+3 cloned styles
 element_radius * default_atomic_rad[16];
 element_radius * tmp_atomic_rad[16];
 // 3 styles + 3 cloned styles
-element_radius * default_bond_radius[6];
-element_radius * tmp_bond_rad[10];
+element_radius * default_bond_rad[6];
+element_radius * tmp_bond_rad[6];
 
 gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
@@ -190,6 +190,42 @@ int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gcha
 }
 
 /*!
+  \fn int xml_save_parameter_to_file (xmlTextWriterPtr writer, gchar * xml_leg, gchar * xml_key, gboolean doid, int xml_id, gchar * value)
+
+  \brief save single parameter to XML file
+
+  \param writer the XML writer to update
+  \param xml_leg information
+  \param xml_key key
+  \param doid add id attribute to parameter (1/0)
+  \param xml_id value for id
+  \param value parameter to write
+*/
+int xml_save_parameter_to_file (xmlTextWriterPtr writer, gchar * xml_leg, gchar * xml_key, gboolean doid, int xml_id, gchar * value)
+{
+  int rc;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_leg);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST xml_key);
+  if (rc < 0) return 0;
+  if (doid)
+  {
+    gchar * str;
+    str = g_strdup_printf ("%d", xml_id);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    g_free (str);
+    if (rc < 0) return 0;
+  }
+  rc = xmlTextWriterWriteFormatString (writer, "%s", value);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  return 1;
+}
+
+/*!
   \fn int save_preferences_to_xml_file ()
 
   \brief save software preferences to XML file
@@ -246,11 +282,35 @@ int save_preferences_to_xml_file ()
                                   "Intensity",
                                   "Attenuation",
                                   "Spot specifics"};
-  gchar* xml_fog_leg[5] = {"Mode",
-                           "Type",
-                           "Density",
-                           "Depth",
-                           "Color"};
+  gchar * xml_fog_leg[5] = {"Mode",
+                            "Type",
+                            "Density",
+                            "Depth",
+                            "Color"};
+  gchar * xml_model_leg[2] = {"Show clones",
+                              "Show box"};
+  gchar * xml_atom_leg[16] = {"Ball and stick: atoms radius",
+                              "Wireframes: dot size",
+                              "Spacefilled: covalent radius",
+                              "Spheres: sphere radius",
+                              "Dots: dot size",
+                              "Cloned ball and stick: atoms radius",
+                              "Cloned wireframes: dot size",
+                              "Cloned spacefilled: covalent radius",
+                              "Cloned spheres: sphere radius",
+                              "Cloned dots: dot size",
+                              "Spacefilled: ionic radius",
+                              "Spacefilled: van Der Waals radius",
+                              "Cloned spacefilled: crystal radius",
+                              "Cloned spacefilled: ionic radius",
+                              "Cloned spacefilled: van Der Waals radius",
+                              "Cloned spacefilled: crystal radius"};
+  gchar * xml_bond_leg[6] = {"Ball and stick: bond radius",
+                             "Wireframes: wireframe width",
+                             "Cylinders: cylinders radius",
+                             "Cloned ball and stick: bond radius",
+                             "Cloned wireframes: wireframe width",
+                             "Cloned cylinders: cylinders radius"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -276,82 +336,34 @@ int save_preferences_to_xml_file ()
 
   for (i=0; i<8; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_num_leg[i]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_num_delta");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
+    str = g_strdup_printf ("%d",  default_num_delta[i]);
+    rc = xml_save_parameter_to_file (writer, xml_delta_num_leg[i], "default_num_delta", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", default_num_delta[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
-    g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
   // Delta t
   for (i=0; i<2; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_delta_t_leg[i]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_delta_t");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
-    g_free (str);
-    if (rc < 0) return 0;
     str = g_strdup_printf ("%f", default_delta_t[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer, xml_delta_t_leg[i], "default_delta_t", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
   // Rings
   for (i=0; i<7; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_rings_leg[i]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_rsparam");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
-    g_free (str);
-    if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_rsparam[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer,  xml_rings_leg[i], "default_rsparam", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
   // Chains
   for (i=0; i<7; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_chain_leg[i]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_csparam");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
-    g_free (str);
-    if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_csparam[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer,  xml_chain_leg[i], "default_csparam", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
 
   // End analysis
@@ -362,57 +374,27 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
   for (i=0; i<4; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_opengl_leg[i]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_opengl");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
-    g_free (str);
-    if (rc < 0) return 0;
+
     str = g_strdup_printf ("%d", default_opengl[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer,  xml_opengl_leg[i], "default_opengl", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
+
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"material");
   if (rc < 0) return 0;
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[0]);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "-1");
-  if (rc < 0) return 0;
+
   str = g_strdup_printf ("%d", default_material.predefine);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  rc = xml_save_parameter_to_file (writer,  xml_material_leg[0], "default_opengl", TRUE, -1, str);
   g_free (str);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement (writer);
-  if (rc < 0) return 0;
+  if (! rc) return 0;
+
   for (i=0; i<6; i++)
   {
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_material_leg[i+1]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_material");
-    if (rc < 0) return 0;
-    str = g_strdup_printf ("%d", i);
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
-    g_free (str);
-    if (rc < 0) return 0;
     str = g_strdup_printf ("%f", default_material.param[i]);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer, xml_material_leg[i+1], "default_material", TRUE, i, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
   }
 
   rc = xml_save_xyz_to_file (writer, 6, xml_material_leg[7], "default_material", default_material.albedo);
@@ -424,20 +406,12 @@ int save_preferences_to_xml_file ()
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"lightning");
   if (rc < 0) return 0;
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST "Number of lights");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "default_lightning");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "0");
-  if (rc < 0) return 0;
+
   str = g_strdup_printf ("%d", default_lightning.lights);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  rc = xml_save_parameter_to_file (writer, "Number of lights", "default_lightning", TRUE, 0, str);
   g_free (str);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement (writer);
-  if (rc < 0) return 0;
+  if (! rc) return 0;
+
   for (i=0; i<default_lightning.lights; i++)
   {
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"light");
@@ -446,30 +420,15 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST (const xmlChar *)str);
     g_free (str);
     if (rc < 0) return 0;
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_lightning_leg[0]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "light.type");
-    if (rc < 0) return 0;
+
     str = g_strdup_printf ("%d", default_lightning.spot[i].type);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer, xml_lightning_leg[0], "light.type", FALSE, 0, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_lightning_leg[1]);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "light.fix");
-    if (rc < 0) return 0;
+    if (! rc) return 0;
     str = g_strdup_printf ("%d", default_lightning.spot[i].fix);
-    rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+    rc = xml_save_parameter_to_file (writer, xml_lightning_leg[1], "light.fix", FALSE, 0, str);
     g_free (str);
-    if (rc < 0) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
+    if (! rc) return 0;
 
     if (default_lightning.spot[i].type)
     {
@@ -501,51 +460,20 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"fog");
   if (rc < 0) return 0;
   // Mode
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[0]);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.mode");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "0");
-  if (rc < 0) return 0;
   str = g_strdup_printf ("%d", default_fog.mode);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  rc = xml_save_parameter_to_file (writer, xml_fog_leg[0], "fog.mode", TRUE, 0, str);
   g_free (str);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement (writer);
+  if (! rc) return 0;
   // Type
-  if (rc < 0) return 0;
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[1]);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.type");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "1");
-  if (rc < 0) return 0;
   str = g_strdup_printf ("%d", default_fog.based);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  rc = xml_save_parameter_to_file (writer, xml_fog_leg[1], "fog.type", TRUE, 1, str);
   g_free (str);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement (writer);
-  if (rc < 0) return 0;
+  if (! rc) return 0;
   // Density
-  if (rc < 0) return 0;
-  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"info", BAD_CAST xml_fog_leg[2]);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST "fog.density");
-  if (rc < 0) return 0;
-  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST "2");
-  if (rc < 0) return 0;
   str = g_strdup_printf ("%f", default_fog.density);
-  rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+  rc = xml_save_parameter_to_file (writer, xml_fog_leg[2], "fog.density", TRUE, 2, str);
   g_free (str);
-  if (rc < 0) return 0;
-  rc = xmlTextWriterEndElement (writer);
-  if (rc < 0) return 0;
+  if (! rc) return 0;
   // Depth
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
   if (rc < 0) return 0;
@@ -573,6 +501,75 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
 
   // End opengl
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
+
+  // Model
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"model");
+  if (rc < 0) return 0;
+
+  if (default_clones)
+  {
+    str = g_strdup_printf ("%d", default_clones);
+    rc = xml_save_parameter_to_file (writer, xml_model_leg[0], "default_clones", FALSE, 0, str);
+    g_free (str);
+    if (! rc) return 0;
+  }
+  if (! default_cell)
+  {
+    str = g_strdup_printf ("%d", default_cell);
+    rc = xml_save_parameter_to_file (writer, xml_model_leg[1], "default_cell", FALSE, 0, str);
+    g_free (str);
+    if (! rc) return 0;
+  }
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atoms_and_bonds");
+  if (rc < 0) return 0;
+  element_radius * tmp_rad;
+  for (i=0; i<16; i++)
+  {
+    if (default_atomic_rad[i])
+    {
+      rc = xmlTextWriterStartElement (writer, BAD_CAST xml_atom_leg[i]);
+      if (rc < 0) return 0;
+      tmp_rad = default_atomic_rad[i];
+      while (tmp_rad)
+      {
+        str = g_strdup_printf ("%f", tmp_rad -> rad);
+        rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_atomic_rad", TRUE, tmp_rad -> Z, str);
+        g_free (str);
+        if (! rc) return 0;
+        tmp_rad = tmp_rad -> next;
+      }
+      rc = xmlTextWriterEndElement (writer);
+      if (rc < 0) return 0;
+    }
+  }
+  for (i=0; i<6; i++)
+  {
+    if (default_bond_rad[i])
+    {
+      rc = xmlTextWriterStartElement (writer, BAD_CAST xml_bond_leg[i]);
+      if (rc < 0) return 0;
+      tmp_rad = default_bond_rad[i];
+      while (tmp_rad)
+      {
+        str = g_strdup_printf ("%f", tmp_rad -> rad);
+        rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_bond_rad", TRUE, tmp_rad -> Z, str);
+        g_free (str);
+        if (! rc) return 0;
+        tmp_rad = tmp_rad -> next;
+      }
+      rc = xmlTextWriterEndElement (writer);
+      if (rc < 0) return 0;
+    }
+  }
+
+  // End atoms_and_bonds
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
+  // End model
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
@@ -1084,6 +1081,35 @@ GtkWidget * pref_tree;
 gboolean user_defined;
 
 /*!
+  \fn element_radius * duplicate_element_radius (element_radius * old_list)
+
+  \brief duplicate an element radius data structure
+
+  \param old_list the data structure to duplicate
+*/
+element_radius * duplicate_element_radius (element_radius * old_list)
+{
+  if (! old_list) return NULL;
+  element_radius * new_list = g_malloc0(sizeof*new_list);
+  element_radius * tmp_rad, * tmp_rbd;
+  tmp_rad = old_list;
+  tmp_rbd = new_list;
+  while (tmp_rad)
+  {
+    tmp_rbd -> Z = tmp_rad -> Z;
+    tmp_rbd -> rad = tmp_rad -> rad;
+    if (tmp_rad -> next)
+    {
+      tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+      tmp_rbd -> next -> prev = tmp_rbd;
+      tmp_rbd = tmp_rbd -> next;
+    }
+    tmp_rad = tmp_rad -> next;
+  }
+  return new_list;
+}
+
+/*!
   \fn float get_radius (int object, int col, int z, element_radius * rad_list)
 
   \brief retrieve the radius/width of a species depending on style
@@ -1288,33 +1314,14 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
 {
   int i, j;
   int object = object = GPOINTER_TO_INT (data);
-  element_radius * tmp_rad, * tmp_rbd;
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
       if (object < 0)
       {
         object = - object - 2;
-        g_free (tmp_bond_rad[object]);
-        tmp_bond_rad[object] = NULL;
-        if (edit_list[0])
-        {
-          tmp_bond_rad[object] = g_malloc0(sizeof*tmp_bond_rad[object]);
-          tmp_rad = edit_list[0];
-          tmp_rbd = tmp_bond_rad[object];
-          while (tmp_rad)
-          {
-            tmp_rbd -> Z = tmp_rad -> Z;
-            tmp_rbd -> rad = tmp_rad -> rad;
-            if (tmp_rad -> next)
-            {
-              tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
-              tmp_rbd -> next -> prev = tmp_rbd;
-              tmp_rbd = tmp_rbd -> next;
-            }
-            tmp_rad = tmp_rad -> next;
-          }
-        }
+        if (tmp_bond_rad[object]) g_free (tmp_bond_rad[object]);
+        tmp_bond_rad[object] = duplicate_element_radius (edit_list[0]);
       }
       else
       {
@@ -1322,26 +1329,8 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
         object = object - 2;
         for (i=0; i<j; i++)
         {
-          g_free (tmp_atomic_rad[object+i]);
-          tmp_atomic_rad[object+i] = NULL;
-          if (edit_list[i])
-          {
-            tmp_atomic_rad[object+i] = g_malloc0(sizeof*tmp_atomic_rad[object+i]);
-            tmp_rad = edit_list[i];
-            tmp_rbd = tmp_atomic_rad[object+i];
-            while (tmp_rad)
-            {
-              tmp_rbd -> Z = tmp_rad -> Z;
-              tmp_rbd -> rad = tmp_rad -> rad;
-              if (tmp_rad -> next)
-              {
-                tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
-                tmp_rbd -> next -> prev = tmp_rbd;
-                tmp_rbd = tmp_rbd -> next;
-              }
-              tmp_rad = tmp_rad -> next;
-            }
-          }
+          if (tmp_atomic_rad[object+i]) g_free (tmp_atomic_rad[object+i]);
+          tmp_atomic_rad[object+i] = duplicate_element_radius (edit_list[i]);
         }
       }
       break;
@@ -1480,51 +1469,16 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   GtkTreeIter elem;
   i = (the_object < 0) ? - the_object - 2 : the_object - 2;
   j = (num_col == 8) ? 4 : 1;
-  element_radius * tmp_rad, * tmp_rbd;
   edit_list = g_malloc0(j*sizeof*edit_list);
   for (k=0; k<j; k++)
   {
     if (the_object < 0)
     {
-      if (tmp_bond_rad[i])
-      {
-        tmp_rad = tmp_bond_rad[i];
-        edit_list[k] = g_malloc0(sizeof*edit_list[k]);
-        tmp_rbd = edit_list[k];
-        while (tmp_rad)
-        {
-          tmp_rbd -> Z = tmp_rad -> Z;
-          tmp_rbd -> rad = tmp_rad -> rad;
-          if (tmp_rad -> next)
-          {
-            tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
-            tmp_rbd -> next -> prev = tmp_rbd;
-            tmp_rbd = tmp_rbd -> next;
-          }
-          tmp_rad = tmp_rad -> next;
-        }
-      }
+      edit_list[k] = duplicate_element_radius (tmp_bond_rad[i]);
     }
     else
     {
-      if (tmp_atomic_rad[i+k])
-      {
-        tmp_rad = tmp_atomic_rad[i+k];
-        edit_list[k] = g_malloc0(sizeof*edit_list[k]);
-        tmp_rbd = edit_list[k];
-        while (tmp_rad)
-        {
-          tmp_rbd -> Z = tmp_rad -> Z;
-          tmp_rbd -> rad = tmp_rad -> rad;
-          if (tmp_rad -> next)
-          {
-            tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
-            tmp_rbd -> next -> prev = tmp_rbd;
-            tmp_rbd = tmp_rbd -> next;
-          }
-          tmp_rad = tmp_rad -> next;
-        }
-      }
+      edit_list[k] = duplicate_element_radius (tmp_atomic_rad[i+k]);
     }
   }
 
@@ -1945,16 +1899,6 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
-  /*hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Quality</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_hscale (2, 500, 1, tmp_opengl[3], GTK_POS_TOP, 1, 175,
-                                                   G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), NULL), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);*/
-
-  /*hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Lightning model</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lightning_fix (NULL, & tmp_material), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);*/
   show_the_widgets (vbox);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
@@ -2064,9 +2008,6 @@ GtkWidget * calc_preferences ()
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
 
-
-  // calc_msd (vbox);
-
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
   for (i=0; i<2; i++)
   {
@@ -2135,6 +2076,23 @@ void clean_all_tmp ()
     g_free (tmp_bd_rw);
     tmp_bd_rw = NULL;
   }
+  int i;
+  for (i=0; i<16; i++)
+  {
+    if (tmp_atomic_rad[i])
+    {
+      g_free (tmp_atomic_rad[i]);
+      tmp_atomic_rad[i] = NULL;
+    }
+  }
+  for (i=0; i<6; i++)
+  {
+    if (tmp_bond_rad[i])
+    {
+      g_free (tmp_bond_rad[i]);
+      tmp_bond_rad[i] = NULL;
+    }
+  }
 }
 
 /*!
@@ -2160,6 +2118,15 @@ void prepare_tmp_default ()
   tmp_at_rs = duplicate_double (8, default_at_rs);
   tmp_o_bd_rw = duplicate_bool (6, default_o_bd_rw);
   tmp_bd_rw = duplicate_double (6, default_bd_rw);
+  int i;
+  for (i=0; i<16; i++)
+  {
+    tmp_atomic_rad[i] = duplicate_element_radius (default_atomic_rad[i]);
+  }
+  for (i=0; i<6; i++)
+  {
+    tmp_bond_rad[i] = duplicate_element_radius (default_bond_rad[i]);
+  }
 }
 
 /*!
@@ -2225,6 +2192,17 @@ void save_preferences ()
     default_bd_rw = NULL;
   }
   default_bd_rw = duplicate_double (6, tmp_bd_rw);
+  int i;
+  for (i=0; i<16; i++)
+  {
+    if (default_atomic_rad[i]) g_free (default_atomic_rad[i]);
+    default_atomic_rad[i] = duplicate_element_radius (tmp_atomic_rad[i]);
+  }
+  for (i=0; i<6; i++)
+  {
+    if (default_bond_rad[i]) g_free (default_bond_rad[i]);
+    default_bond_rad[i] = duplicate_element_radius (tmp_bond_rad[i]);
+  }
 }
 
 /*!
