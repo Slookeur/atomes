@@ -1607,7 +1607,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 {
   gchar * ats[3]={"atom(s)", "dot(s)", "sphere(s)"};
   gchar * dim[3]={"radius", "size", "width"};
-  gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
+  gchar * bts[3]={"bond(s)", "wireframe(s)", "cylinder(s)"};
   the_object = GPOINTER_TO_INT(data);
   int i, j, k, l, n, m;
   int aid, bid;
@@ -1804,7 +1804,7 @@ GtkWidget * style_tab (int style)
   gchar * ha_init[3]={"A", "D", "S"};
   gchar * la_init[3]={"a", "d", "s"};
   gchar * dim[3]={"radius", "size", "width"};
-  gchar * bts[3]={"ond(s)", "ireframe", "ylinders"};
+  gchar * bts[3]={"ond(s)", "ireframe(s)", "ylinder(s)"};
   gchar * hb_init[3]={"B", "W", "C"};
   gchar * lb_init[3]={"b", "w", "c"};
   int i;
