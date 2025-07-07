@@ -1414,7 +1414,6 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
         }
         else
         {
-          tmp_list -> rad = v;
           add_elem = FALSE;
         }
       }
@@ -1506,7 +1505,7 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
         for (i=0; i<j; i++)
         {
           m = (i) ? 1 : 0;
-          if (tmp_atomic_rad[j-2+m*l+i]) g_free (tmp_atomic_rad[object+m*l+i]);
+          if (tmp_atomic_rad[object+m*l+i]) g_free (tmp_atomic_rad[object+m*l+i]);
           tmp_atomic_rad[object+m*l+i] = duplicate_element_radius (edit_list[i]);
         }
       }
