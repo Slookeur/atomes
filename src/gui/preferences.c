@@ -146,28 +146,10 @@ double * tmp_bd_rw;
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
 
-gchar * xml_atom_leg[16] = {"ball_and_stick-atoms_radius",
-                            "wireframes-dot_size",
-                            "spacefilled-covalent_radius",
-                            "spheres-sphere_radius",
-                            "dots-dot_size",
-                            "cloned_ball_and_stick-atoms_radius",
-                            "cloned_wireframes-dot_size",
-                            "cloned_spacefilled-covalent_radius",
-                            "cloned_spheres-sphere_radius",
-                            "cloned_dots-dot_size",
-                            "spacefilled-ionic_radius",
-                            "spacefilled-van_Der_Waals_radius",
-                            "spacefilled-crystal_radius",
-                            "cloned_spacefilled-ionic_radius",
-                            "cloned_spacefilled-van_Der_Waals_radius",
-                            "cloned_spacefilled-crystal_radius"};
-gchar * xml_bond_leg[6] = {"ball_and_stick-bond_radius",
-                           "wireframes-wireframe_width",
-                           "cylinders-cylinders_radius",
-                           "cloned_ball_and_stick-bond_radius",
-                           "cloned_wireframes-wireframe_width",
-                           "cloned_cylinders-cylinders_radius"};
+gchar * xml_style_leg[6] = {"ball_and_stick", "wireframes", "spacefilled", "spheres", "cylinders", "dots"};
+gchar * xml_filled_leg[4] = {"covalent", "ionic", "van-der-waals", "crystal"};
+gchar * xml_atom_leg[3] = {"atoms_radius", "dot_size", "sphere_radius"};
+gchar * xml_bond_leg[3] = {"bond_radius", "wireframe_width", "cylinders_radius"};
 
 /*!
   \fn int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
@@ -333,7 +315,7 @@ int save_preferences_to_xml_file ()
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"analysis");
   if (rc < 0) return 0;
-  int i;
+  int i, j, k, l, m, n, o;
   gchar * str;
 
   for (i=0; i<8; i++)
@@ -527,40 +509,117 @@ int save_preferences_to_xml_file ()
   }
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atoms_and_bonds");
   if (rc < 0) return 0;
+
   element_radius * tmp_rad;
-  for (i=0; i<16; i++)
+  gboolean do_atoms;
+  gboolean do_bonds;
+  gchar * str_a, * str_b;
+  for (i=0; i<OGL_STYLES; i++)
   {
-    if (default_atomic_rad[i])
+    do_atoms = do_bonds = FALSE;
+    if (i != 4)
     {
-      rc = xmlTextWriterStartElement (writer, BAD_CAST xml_atom_leg[i]);
-      if (rc < 0) return 0;
-      tmp_rad = default_atomic_rad[i];
-      while (tmp_rad)
+      j = (i < 4) ? i : 4;
+      if (default_o_at_rs[j] || default_o_at_rs[j+5]) do_atoms = TRUE;
+      if (default_atomic_rad[j] || default_atomic_rad[j+5]) do_atoms = TRUE;
+      if (! do_atoms)
       {
-        str = g_strdup_printf ("%f", tmp_rad -> rad);
-        rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_atomic_rad", TRUE, tmp_rad -> Z, str);
-        g_free (str);
-        if (! rc) return 0;
-        tmp_rad = tmp_rad -> next;
+        if (j == 2)
+        {
+          for (k=0; k<3; k++)
+          {
+            if (default_atomic_rad[10+k] || default_atomic_rad[12+k]) do_atoms = TRUE;
+          }
+        }
       }
-      rc = xmlTextWriterEndElement (writer);
-      if (rc < 0) return 0;
     }
-  }
-  for (i=0; i<6; i++)
-  {
-    if (default_bond_rad[i])
+    if (i != 2 && i != 3 && i != 5)
     {
-      rc = xmlTextWriterStartElement (writer, BAD_CAST xml_bond_leg[i]);
+      j = (j < 2) ? j : 2;
+      if (default_o_bd_rw[j] || default_o_bd_rw[j+3]) do_bonds = TRUE;
+      if (default_bond_rad[j] || default_bond_rad[j+3]) do_bonds = TRUE;
+    }
+    if (do_atoms || do_bonds)
+    {
+      rc = xmlTextWriterStartElement (writer, BAD_CAST xml_style_leg[i]);
       if (rc < 0) return 0;
-      tmp_rad = default_bond_rad[i];
-      while (tmp_rad)
+      if (do_atoms)
       {
-        str = g_strdup_printf ("%f", tmp_rad -> rad);
-        rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_bond_rad", TRUE, tmp_rad -> Z, str);
-        g_free (str);
-        if (! rc) return 0;
-        tmp_rad = tmp_rad -> next;
+        j = (i < 4) ? i : 4;
+        k = (j == 0 || j == 2) ? 0 : (j == 1 || j == 4) ? 1 : 2;
+        for (l=0; l<2; l++)
+        {
+          if (default_o_at_rs[j+l*5])
+          {
+            str_a = (l) ? g_strdup_printf ("clone-%s", xml_atom_leg[k]) : g_strdup_printf ("%s", xml_atom_leg[k]);
+            str_b = g_strdup_printf ("%f", default_at_rs[j+l*5]);
+            rc = xml_save_parameter_to_file (writer, str_a, "default_at_rs", TRUE, j+l*5, str_b);
+            g_free (str_a);
+            g_free (str_b);
+            if (! rc) return 0;
+          }
+        }
+        l = (j == 2) ? 4 : 1;
+        for (m=0; m < l;  m++)
+        {
+          n = (m) ? 7 : 0;
+          for (o= 0; o<2; o++)
+          {
+            n = (o && m) ? 5 : n;
+            if (default_atomic_rad[j+n+5*o+m])
+            {
+              str_a = (o) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[l] : xml_atom_leg[k]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[l] : xml_atom_leg[k]);
+              rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
+              g_free (str_a);
+              if (rc < 0) return 0;
+              tmp_rad = default_atomic_rad[j+n+5*o+m];
+              while (tmp_rad)
+              {
+                str = g_strdup_printf ("%f", tmp_rad -> rad);
+                rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_atomic_rad", TRUE, tmp_rad -> Z, str);
+                g_free (str);
+                if (! rc) return 0;
+                tmp_rad = tmp_rad -> next;
+              }
+              rc = xmlTextWriterEndElement (writer);
+              if (rc < 0) return 0;
+            }
+          }
+        }
+      }
+      if (do_bonds)
+      {
+        j = (j < 2) ? j : 2;
+        for (k=0; k<2; k++)
+        {
+          if (default_o_bd_rw[j+k*3])
+          {
+            str_a = (k) ? g_strdup_printf ("clone-%s", xml_atom_leg[k]) : g_strdup_printf ("%s", xml_bond_leg[k]);
+            str_b = g_strdup_printf ("%f", default_bd_rw[j+k*3]);
+            rc = xml_save_parameter_to_file (writer, str_a, "default_bd_rw", TRUE, j+k*3, str_b);
+            g_free (str_a);
+            g_free (str_b);
+            if (! rc) return 0;
+          }
+          if (default_bond_rad[j+k*3])
+          {
+            str_a = (k) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[k] : xml_bond_leg[j]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[k] : xml_bond_leg[j]);
+            rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
+            g_free (str_a);
+            if (rc < 0) return 0;
+            tmp_rad = default_bond_rad[j+k*3];
+            while (tmp_rad)
+            {
+              str = g_strdup_printf ("%f", tmp_rad -> rad);
+              rc = xml_save_parameter_to_file (writer, periodic_table_info[tmp_rad -> Z].lab, "default_bond_rad", TRUE, tmp_rad -> Z, str);
+              g_free (str);
+              if (! rc) return 0;
+              tmp_rad = tmp_rad -> next;
+            }
+            rc = xmlTextWriterEndElement (writer);
+            if (rc < 0) return 0;
+          }
+        }
       }
       rc = xmlTextWriterEndElement (writer);
       if (rc < 0) return 0;
@@ -689,13 +748,23 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
   {
     default_fog.color = * vect;
   }
-  else if (g_strcmp0(key, "default_cell" == 0)
+  else if (g_strcmp0(key, "default_cell") == 0)
   {
     default_cell = (int)value;
   }
-  else if (g_strcmp0(key, "default_clones" == 0)
+  else if (g_strcmp0(key, "default_clones") == 0)
   {
     default_clones = (int)value;
+  }
+  else if (g_strcmp0(key, "default_at_rs") == 0)
+  {
+    default_o_at_rs[vid] = TRUE;
+    default_at_rs[vid] = value;
+  }
+  else if (g_strcmp0(key, "default_bd_rw") == 0)
+  {
+    default_o_bd_rw[vid] = TRUE;
+    default_bd_rw[vid] = value;
   }
   else if (g_strcmp0(key, "default_atomic_rad") == 0)
   {
@@ -913,6 +982,22 @@ void read_preferences (xmlNodePtr preference_node)
 }
 
 /*!
+  \fn void read_style_from_xml_file ()
+
+  \brief read style preferences from XML file
+*/
+void read_style_from_xml_file (xmlNodePtr style_node, int style)
+{
+  xmlNodePtr node;
+  int i;
+  // node = findnode (style_node -> children, xml_atom_leg);
+  if (node)
+  {
+
+  }
+}
+
+/*!
   \fn void read_preferences_from_xml_file ()
 
   \brief read software preferences from XML file
@@ -924,7 +1009,7 @@ void read_preferences_from_xml_file ()
   xmlNodePtr racine;
   xmlNodePtr node, p_node, l_node;
   const xmlChar aml[22]="atomes_preferences-xml";
-  int i;
+  // int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
   {
@@ -973,22 +1058,12 @@ void read_preferences_from_xml_file ()
           p_node = findnode(node -> children, "atoms_and_bonds");
           if (p_node)
           {
-            for (i=0; i<16; i++)
+            for (i=0; i<OGL_STYLES; i++)
             {
-              l_node = findnode (p_node -> children, xml_atom_leg[i]);
+              l_node = findnode (p_node -> children, xml_style_leg[i]);
               if (l_node)
               {
-                radius_id = i;
-                read_preferences (l_node);
-              }
-            }
-            for (i=0; i<6; i++)
-            {
-              l_node = findnode (p_node -> children, xml_bond_leg[i]);
-              if (l_node)
-              {
-                radius_id = i;
-                read_preferences (l_node);
+                read_style_from_xml_file (l_node, i);
               }
             }
           }
@@ -1015,8 +1090,8 @@ void set_atomes_preferences ()
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
   default_opengl = allocint (5);
-  default_at_rs = allocdouble (8);
-  default_o_at_rs = allocbool (8);
+  default_at_rs = allocdouble (10);
+  default_o_at_rs = allocbool (10);
   default_bd_rw = allocdouble (6);
   default_o_bd_rw = allocbool (6);
   restore_defaults_parameters (NULL, NULL);
@@ -1239,7 +1314,7 @@ float get_radius (int object, int col, int z, element_radius * rad_list)
       // Dots
       return DEFAULT_SIZE;
     }
-    else if (object == 0 || object == 5)
+    else if (object == 0 || object == 3 || object == 5 ||  object == 8)
     {
       ft = 0;
       return set_radius_ (& z, & ft);
@@ -1526,7 +1601,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   {
     // Going for atoms
     aid = the_object - 2;
-    aid = (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : 2;
+    aid = (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : 2;
     bid = (the_object == 1 || the_object == 6) ? 1 : 0;
     str = (the_object - 2 > 4) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
     num_col = (the_object == 4 || the_object == 9) ? 8 : 5;
@@ -1650,23 +1725,21 @@ GtkWidget * over_param (int object, int style)
   GtkWidget * hbox = create_hbox (BSEP);
   int clone = ((object && style > 2) || (! object && style > 4)) ? 20 : 0;
   int mod = (object) ? -1 : 1;
-  gboolean over = (! object && style%2 == 0) ? TRUE : (object && (style == 0 || style == 3)) ? TRUE : FALSE;
+  gboolean over = (! object) ? TRUE : (object && (style != 2 && style != 5)) ? TRUE : FALSE;
   gchar * leg;
-  if (! object || (object && (style != 2 && style != 5)))
+  if (over)
   {
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button("Edit species related parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species related parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 60);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     hbox = create_hbox (BSEP);
-  }
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-  if (over)
-  {
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameter", -1, -1, FALSE, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameter", -1, -1, (object) ? tmp_o_bd_rw[style] : tmp_o_at_rs[style], G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
   }
   else
   {
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Set default value", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   }
   if (object)
@@ -1683,7 +1756,7 @@ GtkWidget * over_param (int object, int style)
     update_entry_double (GTK_ENTRY(atom_entry_over[style]), tmp_at_rs[style]);
     if (over) widget_set_sensitive (atom_entry_over[style], tmp_o_at_rs[style]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, atom_entry_over[style], FALSE, FALSE, 0);
-    leg = g_strdup_printf ("%s", (style == 1 || style == 4 || style == 6 || style == 9) ? "pts" : "&#xC5;");
+    leg = g_strdup_printf ("%s", (style == 1 || style == 6 || style == 4 || style == 9) ? "pts" : "&#xC5;");
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(leg, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (leg);
@@ -1710,7 +1783,7 @@ GtkWidget * style_tab (int style)
   gchar * hb_init[3]={"B", "W", "C"};
   gchar * lb_init[3]={"b", "w", "c"};
   int i;
-  int asid, bsid;
+  int bsid;
   int lid;
   gchar * str;
   gboolean do_atoms = FALSE;
@@ -1718,7 +1791,6 @@ GtkWidget * style_tab (int style)
   if (style == 0 || style == 1 || style == 2 || style == 3 || style == 5)
   {
     do_atoms = TRUE;
-    asid = (style == 5) ? 4 : style;
   }
   if (style == 0 || style == 1 || style == 4)
   {
@@ -1727,7 +1799,7 @@ GtkWidget * style_tab (int style)
   }
   if (do_atoms)
   {
-    lid = (style == 3) ? 2 : (style == 2 || style == 5) ? 1 : style;
+    lid = (style == 3) ? 2 : (style == 1 || style == 5) ? 1 : 0;
     for (i=0; i<2; i++)
     {
       adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
@@ -1741,7 +1813,7 @@ GtkWidget * style_tab (int style)
       }
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, asid+5*i), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, (style < 5) ? style+5*i : 4 + 5*i), FALSE, FALSE, 0);
     }
   }
   if (do_bonds)
@@ -2195,8 +2267,8 @@ void prepare_tmp_default ()
   duplicate_fog (& tmp_fog, & default_fog);
   tmp_clones = default_clones;
   tmp_cell = default_cell;
-  tmp_o_at_rs = duplicate_bool (8, default_o_at_rs);
-  tmp_at_rs = duplicate_double (8, default_at_rs);
+  tmp_o_at_rs = duplicate_bool (10, default_o_at_rs);
+  tmp_at_rs = duplicate_double (10, default_at_rs);
   tmp_o_bd_rw = duplicate_bool (6, default_o_bd_rw);
   tmp_bd_rw = duplicate_double (6, default_bd_rw);
   int i;
@@ -2254,13 +2326,13 @@ void save_preferences ()
     g_free (default_o_at_rs);
     default_o_at_rs = NULL;
   }
-  default_o_at_rs = duplicate_bool (8, tmp_o_at_rs);
+  default_o_at_rs = duplicate_bool (10, tmp_o_at_rs);
   if (default_at_rs)
   {
     g_free (default_at_rs);
     default_at_rs = NULL;
   }
-  default_at_rs = duplicate_double (8, tmp_at_rs);
+  default_at_rs = duplicate_double (10, tmp_at_rs);
   if (default_o_bd_rw)
   {
     g_free (default_o_bd_rw);
@@ -2354,15 +2426,14 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   // Model
   default_clones = FALSE;
   default_cell = TRUE;
-  for (i=0; i<4; i++)
+  for (i=0; i<5; i++)
   {
-    default_o_at_rs[i] = default_o_at_rs[i+4] = FALSE;
-    default_at_rs[i] = default_at_rs[i+4] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
-
+    default_o_at_rs[i] = default_o_at_rs[i+5] = FALSE;
+    default_at_rs[i] = default_at_rs[i+5] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
   }
   for (i=0; i<3; i++)
   {
-    default_o_bd_rw[i] = default_o_bd_rw[i+3] = FALSE;
+    default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
     default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
   }
 
