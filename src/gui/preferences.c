@@ -535,7 +535,7 @@ int save_preferences_to_xml_file ()
     }
     if (i != 2 && i != 3 && i != 5)
     {
-      j = (j < 2) ? j : 2;
+      j = (i < 2) ? i : 2;
       if (default_o_bd_rw[j] || default_o_bd_rw[j+3]) do_bonds = TRUE;
       if (default_bond_rad[j] || default_bond_rad[j+3]) do_bonds = TRUE;
     }
@@ -568,7 +568,7 @@ int save_preferences_to_xml_file ()
             n = (o && m) ? 5 : n;
             if (default_atomic_rad[j+n+5*o+m])
             {
-              str_a = (o) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[l] : xml_atom_leg[k]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[l] : xml_atom_leg[k]);
+              str_a = (o) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[m] : xml_atom_leg[k]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[m] : xml_atom_leg[k]);
               rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
               g_free (str_a);
               if (rc < 0) return 0;
@@ -589,12 +589,12 @@ int save_preferences_to_xml_file ()
       }
       if (do_bonds)
       {
-        j = (j < 2) ? j : 2;
+        j = (i < 2) ? i : 2;
         for (k=0; k<2; k++)
         {
           if (default_o_bd_rw[j+k*3])
           {
-            str_a = (k) ? g_strdup_printf ("clone-%s", xml_atom_leg[k]) : g_strdup_printf ("%s", xml_bond_leg[k]);
+            str_a = (k) ? g_strdup_printf ("clone-%s", xml_bond_leg[j]) : g_strdup_printf ("%s", xml_bond_leg[j]);
             str_b = g_strdup_printf ("%f", default_bd_rw[j+k*3]);
             rc = xml_save_parameter_to_file (writer, str_a, "default_bd_rw", TRUE, j+k*3, str_b);
             g_free (str_a);
@@ -603,7 +603,7 @@ int save_preferences_to_xml_file ()
           }
           if (default_bond_rad[j+k*3])
           {
-            str_a = (k) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[k] : xml_bond_leg[j]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[k] : xml_bond_leg[j]);
+            str_a = (k) ? g_strdup_printf ("clone-%s", xml_bond_leg[j]) : g_strdup_printf ("%s", xml_bond_leg[j]);
             rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
             g_free (str_a);
             if (rc < 0) return 0;
@@ -989,11 +989,37 @@ void read_preferences (xmlNodePtr preference_node)
 void read_style_from_xml_file (xmlNodePtr style_node, int style)
 {
   xmlNodePtr node;
-  int i;
-  // node = findnode (style_node -> children, xml_atom_leg);
-  if (node)
+  gchar * str;
+  int i, j, k, l;
+  i = (style == 0 || style == 2) ? 0 : (style == 1 || style == 4) ? 1 : 2;
+  for (j=0; j<2; j++)
   {
-
+    k = (style == 2) ? 4 : 1;
+    for (l=0; l<k; l++)
+    {
+      str = (j) ? g_strdup_printf ("clone-%s", (k == 4) ? xml_filled_leg[l] : xml_atom_leg[i]) : g_strdup_printf ("%s", (k == 4) ? xml_filled_leg[l] : xml_atom_leg[i]);
+      node = findnode (style_node, str);
+      if (node)
+      {
+        if (j)
+        {
+          radius_id = (l) ? 12 + l : style + 5;
+        }
+        else
+        {
+          radius_id = (l) ? 9 + l : style;
+        }
+        read_preferences (node);
+      }
+    }
+  }
+  i = (style < 2) ? style : 2;
+  for (j=0; j<2; j++)
+  {
+    str = (j) ? g_strdup_printf ("clone-%s", xml_bond_leg[i]) : g_strdup_printf ("%s", xml_bond_leg[i]);
+    node = findnode (style_node, str);
+    radius_id = (j) ? style + 3 : style;
+    if (node) read_preferences(node);
   }
 }
 
@@ -1009,7 +1035,7 @@ void read_preferences_from_xml_file ()
   xmlNodePtr racine;
   xmlNodePtr node, p_node, l_node;
   const xmlChar aml[22]="atomes_preferences-xml";
-  // int i;
+  int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
   {
@@ -1063,7 +1089,7 @@ void read_preferences_from_xml_file ()
               l_node = findnode (p_node -> children, xml_style_leg[i]);
               if (l_node)
               {
-                read_style_from_xml_file (l_node, i);
+                read_style_from_xml_file (l_node -> children, i);
               }
             }
           }
