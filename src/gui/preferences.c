@@ -117,6 +117,7 @@ element_radius * tmp_atomic_rad[16];
 // 3 styles + 3 cloned styles
 element_radius * default_bond_rad[6];
 element_radius * tmp_bond_rad[6];
+int radius_id;
 
 gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
@@ -144,6 +145,29 @@ double * tmp_bd_rw;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
+
+gchar * xml_atom_leg[16] = {"ball_and_stick-atoms_radius",
+                            "wireframes-dot_size",
+                            "spacefilled-covalent_radius",
+                            "spheres-sphere_radius",
+                            "dots-dot_size",
+                            "cloned_ball_and_stick-atoms_radius",
+                            "cloned_wireframes-dot_size",
+                            "cloned_spacefilled-covalent_radius",
+                            "cloned_spheres-sphere_radius",
+                            "cloned_dots-dot_size",
+                            "spacefilled-ionic_radius",
+                            "spacefilled-van_Der_Waals_radius",
+                            "spacefilled-crystal_radius",
+                            "cloned_spacefilled-ionic_radius",
+                            "cloned_spacefilled-van_Der_Waals_radius",
+                            "cloned_spacefilled-crystal_radius"};
+gchar * xml_bond_leg[6] = {"ball_and_stick-bond_radius",
+                           "wireframes-wireframe_width",
+                           "cylinders-cylinders_radius",
+                           "cloned_ball_and_stick-bond_radius",
+                           "cloned_wireframes-wireframe_width",
+                           "cloned_cylinders-cylinders_radius"};
 
 /*!
   \fn int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
@@ -289,28 +313,6 @@ int save_preferences_to_xml_file ()
                             "Color"};
   gchar * xml_model_leg[2] = {"Show clones",
                               "Show box"};
-  gchar * xml_atom_leg[16] = {"Ball and stick: atoms radius",
-                              "Wireframes: dot size",
-                              "Spacefilled: covalent radius",
-                              "Spheres: sphere radius",
-                              "Dots: dot size",
-                              "Cloned ball and stick: atoms radius",
-                              "Cloned wireframes: dot size",
-                              "Cloned spacefilled: covalent radius",
-                              "Cloned spheres: sphere radius",
-                              "Cloned dots: dot size",
-                              "Spacefilled: ionic radius",
-                              "Spacefilled: van Der Waals radius",
-                              "Cloned spacefilled: crystal radius",
-                              "Cloned spacefilled: ionic radius",
-                              "Cloned spacefilled: van Der Waals radius",
-                              "Cloned spacefilled: crystal radius"};
-  gchar * xml_bond_leg[6] = {"Ball and stick: bond radius",
-                             "Wireframes: wireframe width",
-                             "Cylinders: cylinders radius",
-                             "Cloned ball and stick: bond radius",
-                             "Cloned wireframes: wireframe width",
-                             "Cloned cylinders: cylinders radius"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -385,7 +387,7 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
 
   str = g_strdup_printf ("%d", default_material.predefine);
-  rc = xml_save_parameter_to_file (writer,  xml_material_leg[0], "default_opengl", TRUE, -1, str);
+  rc = xml_save_parameter_to_file (writer,  xml_material_leg[0], "default_material", TRUE, -1, str);
   g_free (str);
   if (! rc) return 0;
 
@@ -584,7 +586,7 @@ int save_preferences_to_xml_file ()
 }
 
 /*!
-  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double start, double end)
+  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float start, float end)
 
   \brief set default parameter
 
@@ -596,8 +598,9 @@ int save_preferences_to_xml_file ()
   \param end final value, if any, -1.0 otherwise
 
 */
-void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double start, double end)
+void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float start, float end)
 {
+  element_radius * tmp_rad;
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
     default_num_delta[vid] = (int)value;
@@ -686,6 +689,54 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, double st
   {
     default_fog.color = * vect;
   }
+  else if (g_strcmp0(key, "default_cell" == 0)
+  {
+    default_cell = (int)value;
+  }
+  else if (g_strcmp0(key, "default_clones" == 0)
+  {
+    default_clones = (int)value;
+  }
+  else if (g_strcmp0(key, "default_atomic_rad") == 0)
+  {
+    if (default_atomic_rad[radius_id])
+    {
+      tmp_rad = default_atomic_rad[radius_id];
+      while (tmp_rad -> next)
+      {
+        tmp_rad = tmp_rad -> next;
+      }
+      tmp_rad -> next = g_malloc0(sizeof*tmp_rad);
+      tmp_rad = tmp_rad -> next;
+    }
+    else
+    {
+      default_atomic_rad[radius_id] = g_malloc0(sizeof*default_atomic_rad[radius_id]);
+      tmp_rad = default_atomic_rad[radius_id];
+    }
+    tmp_rad -> Z = vid;
+    tmp_rad -> rad = value;
+  }
+  else if (g_strcmp0(key, "default_bond_rad") == 0)
+  {
+    if (default_bond_rad[radius_id])
+    {
+      tmp_rad = default_bond_rad[radius_id];
+      while (tmp_rad -> next)
+      {
+        tmp_rad = tmp_rad -> next;
+      }
+      tmp_rad -> next = g_malloc0(sizeof*tmp_rad);
+      tmp_rad = tmp_rad -> next;
+    }
+    else
+    {
+      default_bond_rad[radius_id] = g_malloc0(sizeof*default_bond_rad[radius_id]);
+      tmp_rad = default_bond_rad[radius_id];
+    }
+    tmp_rad -> Z = vid;
+    tmp_rad -> rad = value;
+  }
 }
 
 /*!
@@ -704,7 +755,7 @@ void read_parameter (xmlNodePtr parameter_node)
   gchar * key;
   gchar * content;
   int id;
-  double start, end;
+  float start, end;
   double value;
   vec3_t vec;
   while (parameter_node)
@@ -856,32 +907,9 @@ void read_light (xmlNodePtr light_node)
 */
 void read_preferences (xmlNodePtr preference_node)
 {
-  xmlNodePtr node, l_node;
-
+  xmlNodePtr node;
   node = findnode (preference_node  -> children, "parameter");
   read_parameter (node);
-  node = findnode (preference_node  -> children, "material");
-  if (node)
-  {
-    read_parameter (findnode (node -> children, "parameter"));
-  }
-  node = findnode (preference_node  -> children, "lightning");
-  if (node)
-  {
-    read_parameter (findnode (node -> children, "parameter"));
-    l_node = findnode (node -> children, "light");
-    while (l_node)
-    {
-      read_light (l_node);
-      l_node = l_node -> next;
-      l_node = findnode (l_node, "light");
-    }
-  }
-  node = findnode (preference_node  -> children, "fog");
-  if (node)
-  {
-    read_parameter (findnode (node -> children, "parameter"));
-  }
 }
 
 /*!
@@ -894,8 +922,9 @@ void read_preferences_from_xml_file ()
   xmlDoc * doc;
   xmlTextReaderPtr reader;
   xmlNodePtr racine;
-  xmlNodePtr node;
+  xmlNodePtr node, p_node, l_node;
   const xmlChar aml[22]="atomes_preferences-xml";
+  int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
   {
@@ -913,12 +942,56 @@ void read_preferences_from_xml_file ()
         node = findnode(racine -> children, "opengl");
         if (node)
         {
+          p_node = findnode (node  -> children, "material");
+          if (p_node)
+          {
+            read_preferences (p_node);
+          }
+          p_node = findnode (node  -> children, "lightning");
+          if (p_node)
+          {
+            read_preferences (p_node);
+            l_node = findnode (p_node -> children, "light");
+            while (l_node)
+            {
+              read_light (l_node);
+              l_node = l_node -> next;
+              l_node = findnode (l_node, "light");
+            }
+          }
+          p_node = findnode (node  -> children, "fog");
+          if (p_node)
+          {
+            read_preferences(p_node);
+          }
           read_preferences (node);
         }
         node = findnode(racine -> children, "model");
         if (node)
         {
           read_preferences (node);
+          p_node = findnode(node -> children, "atoms_and_bonds");
+          if (p_node)
+          {
+            for (i=0; i<16; i++)
+            {
+              l_node = findnode (p_node -> children, xml_atom_leg[i]);
+              if (l_node)
+              {
+                radius_id = i;
+                read_preferences (l_node);
+              }
+            }
+            for (i=0; i<6; i++)
+            {
+              l_node = findnode (p_node -> children, xml_bond_leg[i]);
+              if (l_node)
+              {
+                radius_id = i;
+                read_preferences (l_node);
+              }
+            }
+          }
         }
       }
       xmlFreeDoc(doc);
@@ -1312,7 +1385,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
 */
 G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
 {
-  int i, j;
+  int i, j, k, l, m;
   int object = object = GPOINTER_TO_INT (data);
   switch (response_id)
   {
@@ -1326,11 +1399,14 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
       else
       {
         j = (object == 4 || object == 9) ? 4 : 1;
+        k = (object < 5) ? 0 : 1;
         object = object - 2;
+        l = (k) ? 5 : 7;
         for (i=0; i<j; i++)
         {
-          if (tmp_atomic_rad[object+i]) g_free (tmp_atomic_rad[object+i]);
-          tmp_atomic_rad[object+i] = duplicate_element_radius (edit_list[i]);
+          m = (i) ? 1 : 0;
+          if (tmp_atomic_rad[j-2+m*l+i]) g_free (tmp_atomic_rad[object+m*l+i]);
+          tmp_atomic_rad[object+m*l+i] = duplicate_element_radius (edit_list[i]);
         }
       }
       break;
@@ -1433,7 +1509,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * dim[3]={"radius", "size", "width"};
   gchar * bts[3]={"bond(s)", "wireframe", "cylinders"};
   the_object = GPOINTER_TO_INT(data);
-  int i, j, k;
+  int i, j, k, l, n, m;
   int aid, bid;
   int num_col;
   gchar * str;
@@ -1469,16 +1545,19 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   GtkTreeIter elem;
   i = (the_object < 0) ? - the_object - 2 : the_object - 2;
   j = (num_col == 8) ? 4 : 1;
+  k = ((the_object < 0 && i > 2) || (the_object > 0 && i > 4)) ? 1 : 0;
   edit_list = g_malloc0(j*sizeof*edit_list);
-  for (k=0; k<j; k++)
+  for (l=0; l<j; l++)
   {
     if (the_object < 0)
     {
-      edit_list[k] = duplicate_element_radius (tmp_bond_rad[i]);
+      edit_list[l] = duplicate_element_radius (tmp_bond_rad[i]);
     }
     else
     {
-      edit_list[k] = duplicate_element_radius (tmp_atomic_rad[i+k]);
+      m = (k) ? 5 : 7;
+      n = (l) ? 1 : 0;
+      edit_list[l] = duplicate_element_radius (tmp_atomic_rad[i+n*m+l]);
     }
   }
 
@@ -1495,14 +1574,16 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     {
       j = user_defined;
       user_defined = FALSE;
-      j += (user_defined) ? 3 : 0;
       gtk_list_store_set (pref_model, & elem, 5,  get_radius (the_object, 1, i, edit_list[1]), -1);
+      j += (user_defined) ? 3 : 0;
       user_defined = FALSE;
-      j += (user_defined) ? 5 : 0;
       gtk_list_store_set (pref_model, & elem, 6, get_radius (the_object, 2, i, edit_list[2]), -1);
+      j += (user_defined) ? 5 : 0;
       user_defined = FALSE;
+      gtk_list_store_set (pref_model, & elem, 7, get_radius (the_object, 3, i, edit_list[3]), -1);
       j += (user_defined) ? 10 : 0;
-      gtk_list_store_set (pref_model, & elem, 0, j, 7, get_radius (the_object, 3, i, edit_list[3]), -1);
+      user_defined = FALSE;
+      gtk_list_store_set (pref_model, & elem, 0, j, -1);
     }
   }
 
@@ -2224,7 +2305,7 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_num_delta[BD] = 100;
   default_num_delta[AN] = 90;
   default_num_delta[CH-1] = 20;
-  default_num_delta[MS-1] = 0;
+  default_num_delta[MS-2] = 0;
   default_delta_t[0] = 0.0;
   default_delta_t[1] = -1.0;
 
