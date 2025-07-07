@@ -149,7 +149,7 @@ opengl_edition * pref_ogl_edit = NULL;
 gchar * xml_style_leg[6] = {"ball_and_stick", "wireframes", "spacefilled", "spheres", "cylinders", "dots"};
 gchar * xml_filled_leg[4] = {"covalent", "ionic", "van-der-waals", "crystal"};
 gchar * xml_atom_leg[3] = {"atoms_radius", "dot_size", "sphere_radius"};
-gchar * xml_bond_leg[3] = {"bond_radius", "wireframe_width", "cylinders_radius"};
+gchar * xml_bond_leg[3] = {"bond_radius", "wireframe_width", "cylinder_radius"};
 
 /*!
   \fn int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
@@ -1120,7 +1120,9 @@ void set_atomes_preferences ()
   default_o_at_rs = allocbool (10);
   default_bd_rw = allocdouble (6);
   default_o_bd_rw = allocbool (6);
+  preferences = TRUE;
   restore_defaults_parameters (NULL, NULL);
+  preferences = FALSE;
   read_preferences_from_xml_file ();
 }
 

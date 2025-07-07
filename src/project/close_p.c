@@ -174,11 +174,14 @@ void close_project (project * to_close)
       }
     }
   }
-  for (i=0; i<to_close -> steps; i++)
+  if (to_close -> atoms)
   {
-    g_free (to_close -> atoms[i]);
+    for (i=0; i<to_close -> steps; i++)
+    {
+      if (to_close -> atoms[i]) g_free (to_close -> atoms[i]);
+    }
+    g_free (to_close -> atoms);
   }
-  g_free (to_close -> atoms);
   if (to_close -> run)
   {
     for (i=0 ; i<NGRAPHS ; i++)
