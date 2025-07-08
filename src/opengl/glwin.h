@@ -256,6 +256,20 @@ struct screen_string
   screen_string * last;
 };
 
+typedef struct screen_label screen_label;
+struct screen_label
+{
+  int position;
+  int render;
+  int scale;
+  int format;
+  gchar * font;
+  int n_colors;
+  ColRGBA * color;
+  double shift[3];
+  screen_string * list;
+};
+
 typedef struct atom_in_selection atom_in_selection;
 struct atom_in_selection
 {
@@ -311,50 +325,15 @@ struct image
 
   // Labels
   // 0 = atoms, 1 = clones, 2 = axis, 3 = measures, 4 = measure edition
-  int labels_position[5];                       /*!< Labels position: \n
+  screen_label labels[5];                       /*!< Labels: \n
                                                     0 = atom(s), \n
                                                     1 = clone(s), \n
                                                     2 = axis, \n
                                                     3 = measure(s), \n
                                                     4 = measure(s) in edition mode */
-  int labels_render[5];                         /*!< Labels rendering mode: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  int labels_scale[5];                          /*!< Labels scaling mode: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  gchar * labels_font[5];                       /*!< Labels font: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  ColRGBA * labels_color[5];                    /*!< Labels color: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  double labels_shift[5][3];                    /*!< Labels axis shit, if any: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  struct screen_string * labels_list[5];        /*!< Label screen strings (rendered and re-usable objects): \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  // 0 =Element name, 1 = Atomic symbol, 2 = Atomic symbol + ID number, 3 = ID number
-  int labels_format[3];                         /*!< Label format for the atom(s) and clone(s) \n
+
+  // 0 = Element name, 1 = Atomic symbol, 2 = Atomic symbol + ID number, 3 = ID number
+  int labels_format[2];                         /*!< Label format for the atom(s) and clone(s) \n
                                                     0 = element name, \n
                                                     1 = atomic symbol, \n
                                                     2 = atomic symbol + ID number (default), \n

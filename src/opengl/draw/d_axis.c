@@ -318,7 +318,7 @@ int create_axis_lists ()
       pos = vec3 ((i==0) ? axis_size+label_pos : 0.0, (i==1) ? axis_size+label_pos : 0.0, (i==2) ? axis_size+label_pos : 0.0);
       prepare_string (plot -> axis_title[i], 2, color_axis (i), pos, shift, NULL, NULL, NULL);
     }
-    nshaders += (plot -> labels_render[2]+1) * (plot -> labels_list[2] -> last -> id + 1);
+    nshaders += (plot -> labels[2].render+1) * (plot -> labels[2].list -> last -> id + 1);
     wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
     render_all_strings (MAXIS, 2);
   }

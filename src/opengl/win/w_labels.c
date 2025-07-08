@@ -66,6 +66,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "glview.h"
 #include "glwindow.h"
+#include "preferences.h"
 
 #define LABEL_FORMATS 4
 
@@ -105,9 +106,9 @@ G_MODULE_EXPORT void set_labels_format (GtkComboBox * box, gpointer data)
   tint * id = (tint *) data;
   int i = gtk_combo_box_get_active (box);
   project * this_proj = get_project_by_id(id -> a);
-  if (i != this_proj -> modelgl -> anim -> last -> img -> labels_format[id -> b])
+  if (i != this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].format)
   {
-    this_proj -> modelgl -> anim -> last -> img -> labels_format[id -> b] = i;
+    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].format = i;
     if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
     if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
     update (this_proj -> modelgl);
@@ -127,9 +128,9 @@ G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
   tint * id = (tint *) data;
   int i = gtk_combo_box_get_active (box);
   project * this_proj = get_project_by_id(id -> a);
-  if (i != this_proj -> modelgl -> anim -> last -> img -> labels_render[id -> b])
+  if (i != this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].render)
   {
-    this_proj -> modelgl -> anim -> last -> img -> labels_render[id -> b] = i;
+    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].render = i;
     if (id -> b < 2)
     {
       this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
@@ -161,11 +162,11 @@ void init_labels_colors (image * img, int sp, int id)
   int i;
   for (i = 0; i < sp; i++)
   {
-    img -> labels_color[id][i].red = img -> at_color[i+id*sp].red;
-    img -> labels_color[id][i].green = img -> at_color[i+id*sp].green;
-    img -> labels_color[id][i].blue = img -> at_color[i+id*sp].blue;
-    img -> labels_color[id][i].alpha = 1.0;
-    GdkRGBA col = colrgba_togtkrgba (img -> labels_color[id][i]);
+    img -> labels[id].color[i].red = img -> at_color[i+id*sp].red;
+    img -> labels[id].color[i].green = img -> at_color[i+id*sp].green;
+    img -> labels[id].color[i].blue = img -> at_color[i+id*sp].blue;
+    img -> labels[id].color[i].alpha = 1.0;
+    GdkRGBA col = colrgba_togtkrgba (img -> labels[id].color[i]);
     gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(color_title[i]), & col);
   }
 }
@@ -203,18 +204,19 @@ G_MODULE_EXPORT void use_atom_default_colors (GtkToggleButton * but, gpointer da
 #endif
   if (val)
   {
-    if (this_proj -> modelgl -> anim -> last -> img -> labels_color[b] != NULL)
+    if (this_proj -> modelgl -> anim -> last -> img -> labels[b].color != NULL)
     {
       init_labels_colors (this_proj -> modelgl -> anim -> last -> img, this_proj -> nspec, b);
-      g_free (this_proj -> modelgl -> anim -> last -> img -> labels_color[b]);
+      g_free (this_proj -> modelgl -> anim -> last -> img -> labels[b].color);
     }
-    this_proj -> modelgl -> anim -> last -> img -> labels_color[b] = NULL;
+    this_proj -> modelgl -> anim -> last -> img -> labels[b].color = NULL;
+    this_proj -> modelgl -> anim -> last -> img -> labels[b].n_colors = 0;
   }
   else
   {
-    this_proj -> modelgl -> anim -> last -> img -> labels_color[b] = g_malloc (2*this_proj -> nspec
-                                                                    *sizeof*this_proj -> modelgl -> anim -> last -> img -> labels_color[b]);
+    this_proj -> modelgl -> anim -> last -> img -> labels[b].color = g_malloc (2*this_proj -> nspec*sizeof*this_proj -> modelgl -> anim -> last -> img -> labels[b].color);
     init_labels_colors (this_proj -> modelgl -> anim -> last -> img, this_proj -> nspec, b);
+    this_proj -> modelgl -> anim -> last -> img -> labels[b].n_colors = 2*this_proj -> nspec;
   }
   widget_set_sensitive (atom_color_box, ! val);
   this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
@@ -233,8 +235,8 @@ G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data)
 {
   tint * id = (tint *) data;
   project * this_proj = get_project_by_id(id -> a);
-  g_free (this_proj -> modelgl -> anim -> last -> img -> labels_font[id -> b]);
-  this_proj -> modelgl -> anim -> last -> img -> labels_font[id -> b] = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
+  g_free (this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].font);
+  this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
   if (id -> b < 2)
   {
     this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
@@ -262,7 +264,7 @@ G_MODULE_EXPORT void set_label_color (GtkColorChooser * colob, gpointer data)
 {
   tint * id = (tint *) data;
   project * this_proj = get_project_by_id(id -> a);
-  this_proj -> modelgl -> anim -> last -> img -> labels_color[id -> b][id -> c] = get_button_color (colob);
+  this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].color[id -> c] = get_button_color (colob);
   if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
   if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
   update (this_proj -> modelgl);
@@ -280,7 +282,7 @@ G_MODULE_EXPORT void set_labels_position (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
   project * this_proj = get_project_by_id(id -> a);
-  this_proj -> modelgl -> anim -> last -> img -> labels_position[id -> b] = gtk_combo_box_get_active (box);
+  this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].position = gtk_combo_box_get_active (box);
   if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
   if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
   update (this_proj -> modelgl);
@@ -300,7 +302,7 @@ void label_shift_has_changed (gpointer data, double value)
   project * this_proj = get_project_by_id(id -> a);
   int i = id -> b / 10;
   int j = id -> b - i * 10;
-  this_proj -> modelgl -> anim -> last -> img -> labels_shift[i][j] = value;
+  this_proj -> modelgl -> anim -> last -> img -> labels[i].shift[j] = value;
   if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
   update (this_proj -> modelgl);
 }
@@ -359,9 +361,9 @@ G_MODULE_EXPORT void set_labels_scale (GtkToggleButton * but, gpointer data)
   tint * id = (tint *) data;
   project * this_proj = get_project_by_id(id -> a);
 #ifdef GTK4
-  this_proj -> modelgl -> anim -> last -> img -> labels_scale[id -> b] = gtk_check_button_get_active (but);
+  this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].scale = gtk_check_button_get_active (but);
 #else
-  this_proj -> modelgl -> anim -> last -> img -> labels_scale[id -> b] = gtk_toggle_button_get_active (but);
+  this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].scale = gtk_toggle_button_get_active (but);
 #endif
   if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
   if (id -> b == 2) this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
@@ -538,9 +540,13 @@ GtkWidget * labels_tab (glwin * view, int lid)
 {
   int i;
   gchar * lpos[3] = {"x", "y", "z"};
-
-  project * this_proj = get_project_by_id(view -> proj);
-
+  project * this_proj;
+  screen_label * label;
+  if (! preferences)
+  {
+    this_proj = get_project_by_id (view -> proj);
+    label = & view -> anim -> last -> img -> labels[lid];
+  }
   GtkWidget * tbox = create_vbox (BSEP);
   GtkWidget * vbox = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, vbox, FALSE, FALSE, 5);
@@ -554,7 +560,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     {
       combo_text_append (formats, lab_formats[i]);
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(formats), view -> anim -> last -> img -> labels_format[lid]);
+    gtk_combo_box_set_active (GTK_COMBO_BOX(formats), label -> format);
     gtk_widget_set_size_request (formats, 220, -1);
     g_signal_connect (G_OBJECT (formats), "changed", G_CALLBACK(set_labels_format), & view -> colorp[lid][0]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, formats, FALSE, FALSE, 10);
@@ -568,7 +574,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(config), view -> anim -> last -> img -> labels_render[lid]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(config), label -> render);
   gtk_widget_set_size_request (config, 220, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), & view -> colorp[lid][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
@@ -576,14 +582,14 @@ GtkWidget * labels_tab (glwin * view, int lid)
   // Font
   box = abox (vbox, "Font:", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                       font_button (view -> anim -> last -> img -> labels_font[lid], 220, -1, G_CALLBACK(set_labels_font), & view -> colorp[lid][0]),
+                       font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), & view -> colorp[lid][0]),
                        FALSE, FALSE, 10);
 
   if (lid == 3)
   {
     box = abox (vbox, "Font color:", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                         color_button(view -> anim -> last -> img -> labels_color[lid][0], TRUE, 220, -1, G_CALLBACK(set_label_color), & view -> colorp[lid][0]),
+                         color_button(label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), & view -> colorp[lid][0]),
                          FALSE, FALSE, 10);
   }
 
@@ -592,7 +598,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * position = create_combo ();
   combo_text_append (position, "Always visible");
   combo_text_append (position, "Normal");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(position), view -> anim -> last -> img -> labels_position[lid]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(position), label -> position);
   gtk_widget_set_size_request (position, 220, -1);
   g_signal_connect (G_OBJECT (position), "changed", G_CALLBACK(set_labels_position), & view -> colorp[lid][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, position, FALSE, FALSE, 10);
@@ -600,7 +606,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   // Size / scale
   box = abox (vbox, "Size:", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                       check_button ("scale with zoom in/out", 220, -1, view -> anim -> last -> img -> labels_scale[lid], G_CALLBACK(set_labels_scale), & view -> colorp[lid][0]),
+                       check_button ("scale with zoom in/out", 220, -1, label -> scale, G_CALLBACK(set_labels_scale), & view -> colorp[lid][0]),
                        FALSE, FALSE, 10);
 
   if (lid == 3)
@@ -625,8 +631,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     {
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, markup_label(lpos[i], 30, -1, 0.5, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox,
-                           create_hscale(-5.0, 5.0, 0.01, view -> anim -> last -> img -> labels_shift[lid][i], GTK_POS_TOP,
-                                         3, 100, G_CALLBACK(set_label_shift), G_CALLBACK(scroll_set_label_shift), & view -> colorp[lid*10+i][0]),
+                           create_hscale(-5.0, 5.0, 0.01, label -> shift[i], GTK_POS_TOP, 3, 100, G_CALLBACK(set_label_shift), G_CALLBACK(scroll_set_label_shift), & view -> colorp[lid*10+i][0]),
                            FALSE, FALSE, 0);
     }
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, chbox, FALSE, FALSE, 0);
@@ -634,7 +639,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
 
   // Colors
   gboolean ac;
-  if (view -> anim -> last -> img -> labels_color[lid] == NULL)
+  if (view -> anim -> last -> img -> labels[lid].color == NULL)
   {
     ac = TRUE;
   }
@@ -658,13 +663,13 @@ GtkWidget * labels_tab (glwin * view, int lid)
     {
       chbox = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, markup_label(this_proj -> chemistry -> label[i], 120, -1, 0.5, 0.5), FALSE, FALSE, 20);
-      if (view -> anim -> last -> img -> labels_color[lid] == NULL)
+      if (label -> color == NULL)
       {
         color_title[i] = color_button(view -> anim -> last -> img -> at_color[i], TRUE, 80, -1, G_CALLBACK(set_label_color), & view -> colorp[lid][i]);
       }
       else
       {
-        color_title[i] = color_button(view -> anim -> last -> img -> labels_color[lid][i], TRUE, 80, -1, G_CALLBACK(set_label_color), & view -> colorp[lid][i]);
+        color_title[i] = color_button(label -> color[i], TRUE, 80, -1, G_CALLBACK(set_label_color), & view -> colorp[lid][i]);
       }
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, color_title[i], FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, atom_color_box, chbox, FALSE, FALSE, 0);

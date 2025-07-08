@@ -83,9 +83,9 @@ gchar * text_reps[OGL_REPS] = {"Orthographic", "Perspective"};
 void update_labels (glwin * view)
 {
   int i;
-  for (i=0; i<2; i++) if (view -> anim -> last -> img -> labels_scale[i]) view -> create_shaders[LABEL] = TRUE;
-  if (view -> anim -> last -> img -> labels_scale[2]) view -> create_shaders[MAXIS] = TRUE;
-  if (view -> anim -> last -> img -> labels_scale[3]) view -> create_shaders[MEASU] = TRUE;
+  for (i=0; i<2; i++) if (view -> anim -> last -> img -> labels[i].scale) view -> create_shaders[LABEL] = TRUE;
+  if (view -> anim -> last -> img -> labels[2].scale) view -> create_shaders[MAXIS] = TRUE;
+  if (view -> anim -> last -> img -> labels[3].scale) view -> create_shaders[MEASU] = TRUE;
 }
 
 /*!

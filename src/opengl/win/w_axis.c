@@ -615,18 +615,18 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(config), view -> anim -> last -> img -> labels_render[2]);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(config), view -> anim -> last -> img -> labels[2].render);
   gtk_widget_set_size_request (config, 150, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), & view -> colorp[2][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 0);
   box = abox (axis_label_box, "Font:", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                      font_button(view -> anim -> last -> img -> labels_font[2], 150, 30, G_CALLBACK(set_labels_font), & view -> colorp[2][0]),
+                      font_button(view -> anim -> last -> img -> labels[2].font, 150, 30, G_CALLBACK(set_labels_font), & view -> colorp[2][0]),
                       FALSE, FALSE, 0);
   // Size / scale
   box = abox (axis_label_box, "Size:", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                       check_button ("scale with zoom in/out", 150, -1, view -> anim -> last -> img -> labels_scale[2], G_CALLBACK(set_labels_scale), & view -> colorp[2][0]),
+                       check_button ("scale with zoom in/out", 150, -1, view -> anim -> last -> img -> labels[2].scale, G_CALLBACK(set_labels_scale), & view -> colorp[2][0]),
                        FALSE, FALSE, 10);
 
   // Colors

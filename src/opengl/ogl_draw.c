@@ -36,6 +36,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void duplicate_fog (Fog * new_fog, Fog * old_fog);
   void duplicate_material (Material * new_mat, Material * old_mat);
   void duplicate_material_and_lightning (image * new_img, image * old_img);
+  void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
   void add_image ();
   void at_shift (atom * at, float * shift);
   void at_unshift (atom * at, float * shift);
@@ -226,6 +227,44 @@ void duplicate_material_and_lightning (image * new_img, image * old_img)
 }
 
 /*!
+  \fn void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
+
+  \brief copy screen_label data structure
+
+  \param new_lab the new screen_label structure
+  \param old_lab the old screen_label structure to be copied
+*/
+void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
+{
+  screen_string * stmp_a, * stmp_b;
+  new_lab -> format = old_lab -> format;
+  new_lab -> font = g_strdup_printf ("%s", old_lab -> font);
+  new_lab -> color = NULL;
+  int i;
+  for (i=0; i<3; i++) new_lab -> shift[i] = old_lab -> shift[i];
+  new_lab -> n_colors = old_lab -> n_colors;
+  if (old_lab -> color != NULL)
+  {
+    new_lab -> color = duplicate_color (new_lab -> n_colors, old_lab -> color);
+  }
+  new_lab -> list = NULL;
+  if (old_lab -> list != NULL)
+  {
+    new_lab -> list = duplicate_screen_string (old_lab -> list);
+    new_lab -> list -> last = duplicate_screen_string (old_lab -> list -> last);
+    stmp_a = old_lab -> list -> last;
+    stmp_b = new_lab -> list -> last;
+    while (stmp_a -> prev != NULL)
+    {
+      stmp_b -> prev = duplicate_screen_string (stmp_a -> prev);
+      stmp_b -> prev -> last = stmp_b -> last;
+      stmp_a = stmp_a -> prev;
+      stmp_b = stmp_b -> prev;
+    }
+  }
+}
+
+/*!
   \fn image * duplicate_image (image * old_img)
 
   \brief create a copy of an image data structure
@@ -293,36 +332,7 @@ image * duplicate_image (image * old_img)
     new_img -> axis_color = duplicate_color (3, old_img -> axis_color);
   }
 
-  screen_string * stmp_a, * stmp_b;
-
-  for (i=0; i<5; i++)
-  {
-    if (i<2)new_img -> labels_format[i] = old_img -> labels_format[i];
-    new_img -> labels_font[i] = g_strdup_printf ("%s", old_img -> labels_font[i]);
-    new_img -> labels_color[i] = NULL;
-    for (j=0; j<3; j++)new_img -> labels_shift[i][j] = old_img -> labels_shift[i][j];
-    if (old_img -> labels_color[i] != NULL)
-    {
-      k = (i < 2) ? proj_gl -> nspec : 1;
-      new_img -> labels_color[i] = duplicate_color (k, old_img -> labels_color[i]);
-    }
-    new_img -> labels_list[i] = NULL;
-    if (old_img -> labels_list[i] != NULL)
-    {
-      new_img -> labels_list[i] = duplicate_screen_string (old_img -> labels_list[i]);
-      new_img -> labels_list[i] -> last = duplicate_screen_string (old_img -> labels_list[i] -> last);
-      stmp_a = old_img -> labels_list[i] -> last;
-      stmp_b =new_img -> labels_list[i] -> last;
-      while (stmp_a -> prev != NULL)
-      {
-        stmp_b -> prev = duplicate_screen_string (stmp_a -> prev);
-        stmp_b -> prev -> last = stmp_b -> last;
-        stmp_a = stmp_a -> prev;
-        stmp_b = stmp_b -> prev;
-      }
-    }
-  }
-
+  for (i=0; i<5; i++) duplicate_screen_label (& new_img -> labels[i], & old_img -> labels[i]);
   duplicate_material_and_lightning (new_img, old_img);
 
   // Atom selection

@@ -98,19 +98,6 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
 
-/*! \typedef element_radius
-
-  \brief element radius data structure
-*/
-typedef struct element_radius element_radius;
-struct element_radius
-{
-  int Z;            /*!< Atomic number */
-  double rad;       /*!< Assiociated radius */
-  element_radius * next;
-  element_radius * prev;
-};
-
 // 5+3 styles + 5+3 cloned styles
 element_radius * default_atomic_rad[16];
 element_radius * tmp_atomic_rad[16];
@@ -142,6 +129,10 @@ gboolean * default_o_bd_rw;
 gboolean * tmp_o_bd_rw;
 double * default_bd_rw;
 double * tmp_bd_rw;
+screen_label * default_label[5];
+screen_label * tmp_label[5];
+int default_lab_format[2];
+int tmp_lab_format[2];
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -528,7 +519,7 @@ int save_preferences_to_xml_file ()
         {
           for (k=0; k<3; k++)
           {
-            if (default_atomic_rad[10+k] || default_atomic_rad[12+k]) do_atoms = TRUE;
+            if (default_atomic_rad[10+k] || default_atomic_rad[13+k]) do_atoms = TRUE;
           }
         }
       }
@@ -1291,7 +1282,7 @@ element_radius * duplicate_element_radius (element_radius * old_list)
   \brief retrieve the radius/width of a species depending on style
 
   \param object the object to look at
-  \param modifier for tabulated radii
+  \param col modifier for tabulated radii
   \param z atomic number
   \param rad_list pre allocated data, if any
 
@@ -1487,7 +1478,7 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
 */
 G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
 {
-  int i, j, k, l, m;
+  int i, j, k, l;
   int object = object = GPOINTER_TO_INT (data);
   switch (response_id)
   {
@@ -1501,14 +1492,13 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
       else
       {
         j = (object == 4 || object == 9) ? 4 : 1;
-        k = (object < 5) ? 0 : 1;
+        k = (object < 5) ? 7 : 5;
         object = object - 2;
-        l = (k) ? 5 : 7;
         for (i=0; i<j; i++)
         {
-          m = (i) ? 1 : 0;
-          if (tmp_atomic_rad[object+m*l+i]) g_free (tmp_atomic_rad[object+m*l+i]);
-          tmp_atomic_rad[object+m*l+i] = duplicate_element_radius (edit_list[i]);
+          l = (i) ? 1 : 0;
+          if (tmp_atomic_rad[object+l*k+i]) g_free (tmp_atomic_rad[object+l*k+i]);
+          tmp_atomic_rad[object+l*k+i] = duplicate_element_radius (edit_list[i]);
         }
       }
       break;
@@ -1762,7 +1752,7 @@ GtkWidget * over_param (int object, int style)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameter", -1, -1, (object) ? tmp_o_bd_rw[style] : tmp_o_at_rs[style], G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameters", -1, -1, (object) ? tmp_o_bd_rw[style] : tmp_o_at_rs[style], G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
   }
   else
   {
@@ -1882,14 +1872,12 @@ GtkWidget * model_preferences ()
   //GtkWidget * combo;
   gchar * info[2] = {"The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options",
                      "which effect apply when the corresponding <b>OpenGL</b> style is used:"};
-  gchar * m_list[6][2] = {{"Ball and stick", "atoms and bonds radii"},
-                          {"Wireframe", "dots size and wireframes width"},
+  gchar * m_list[4][2] = {{"Ball and stick", "atoms<sup>*</sup> and bonds radii"},
+                          {"Wireframe", "dots<sup>**</sup> size and wireframes width"},
                           {"Spacefill", "tabulated parameters"},
-                          {"Spheres", "atoms radii"},
-                          {"Cylinders", "bonds radii"},
-                          {"Dots", "dots size"}};
+                          {"Cylinders", "bonds radii"}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 6, m_list, NULL), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 0);
   gchar * other_info[2] = {"It also provides options to customize atomic label(s),", "and, the model box, if any:"};
   gchar * o_list[2][2] = {{"Labels", "atomic labels"},
                           {"Box", "model box details"}};
@@ -1902,13 +1890,28 @@ GtkWidget * model_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
 
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>the same parameters are also used for the </i>spheres<i> style</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>**</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>the same parameters are also used for the </i>dots<i> style</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
   int i;
   for (i=0; i<OGL_STYLES; i++)
   {
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
+    if (i != 3 && i != 5) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
   }
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), colors_tab(), gtk_label_new ("Colors"));
+
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab(NULL, 0), gtk_label_new ("Labels"));
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab(NULL, 1), gtk_label_new ("Clone labels"));
+
 
   // Show / hide atom(s) ?
   /* Atom radius
@@ -2063,21 +2066,22 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup> if 10 000 atoms or more: <i>Wireframe</i>, otherwise: <i>Ball and stick</i>", -1, -1, 0.5, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>if 10 000 atoms or more: </i>Wireframe<i>, otherwise: </i>Ball and stick", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Color maps</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 15);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tatom(s) and bond(s)", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(0), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tpolyhedra", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
 
   show_the_widgets (vbox);
 
@@ -2383,6 +2387,14 @@ void save_preferences ()
     if (default_bond_rad[i]) g_free (default_bond_rad[i]);
     default_bond_rad[i] = duplicate_element_radius (tmp_bond_rad[i]);
   }
+
+  if (nprojects)
+  {
+    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active sesssion !\n Do you want to apply prefernces to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    {
+      // To write apply to opened projects
+    }
+  }
 }
 
 /*!
@@ -2496,9 +2508,10 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
+
       save_preferences ();
-      gchar * str = g_strdup_printf ("Saving <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
-      if (ask_yes_no("Save atomes preferences ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+      gchar * str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
+      if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
       {
         save_preferences_to_xml_file ();
       }
