@@ -32,6 +32,21 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #define PREFERENCES_H_
 
+/*! \typedef element_radius
+
+  \brief element radius data structure
+*/
+typedef struct element_radius element_radius;
+struct element_radius
+{
+  int Z;            /*!< Atomic number */
+  double rad;       /*!< Assiociated radius */
+  element_radius * next;
+  element_radius * prev;
+};
+
+extern float get_radius (int object, int col, int z, element_radius * rad_list);
+
 // Analysis parameters
 
 extern gboolean preferences;
@@ -59,6 +74,16 @@ extern Fog default_fog;
 extern Fog tmp_fog;
 
 // Model
+extern element_radius * default_atomic_rad[16];
+extern element_radius * tmp_atomic_rad[16];
+// 3 styles + 3 cloned styles
+extern element_radius * default_bond_rad[6];
+extern element_radius * tmp_bond_rad[6];
+
+extern gboolean * default_o_at_rs;
+extern double * default_at_rs;
+extern gboolean * default_o_bd_rw;
+extern double * default_bd_rw;
 
 extern opengl_edition * pref_ogl_edit;
 

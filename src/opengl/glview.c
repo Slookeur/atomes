@@ -1204,27 +1204,36 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
   img -> atomicrad = allocdouble (2*nsp);
   img -> bondrad = allocddouble (2*nsp, 2*nsp);
   img -> linerad = allocddouble (2*nsp, 2*nsp);
+
+  img -> radall[0] = default_bd_rw[2];
+  img -> radall[1] = default_bd_rw[5];
   for (i = 0; i < nsp; i++)
   {
-    img -> sphererad[i] = img -> sphererad[i+nsp] = this_proj -> chemistry -> chem_prop[CHEM_R][i]/2.0;
-    img -> atomicrad[i] = img -> atomicrad[i+nsp] = this_proj -> chemistry -> chem_prop[CHEM_R][i];
-    img -> pointrad[i] = img -> pointrad[i+nsp] = DEFAULT_SIZE;
-    img -> at_color[i] = img -> at_color[i+nsp] = set_default_color ((int)this_proj -> chemistry -> chem_prop[CHEM_Z][i]);
-    img -> linerad[i][i] = img -> linerad[i+nsp][i+nsp] = DEFAULT_SIZE;
-    img -> bondrad[i][i] = img -> bondrad[i+nsp][i+nsp] = min(1.0, img -> sphererad[i]/2.0);
+    j = this_proj -> chemistry -> chem_prop[CHEM_Z][i];
+    // B & S
+    img -> sphererad[i] = (default_o_at_rs[0]) ? default_at_rs[0] : get_radius (2, 0, j, default_atomic_rad[0]);
+    img -> sphererad[i+nsp] = (default_o_at_rs[5]) ? default_at_rs[5] : get_radius (7, 0, j, default_atomic_rad[5]);
+    img -> bondrad[i][i] = (default_o_bd_rw[0]) ? default_bd_rw[0] : get_radius (-2, 0, j, default_bond_rad[0]);
+    img -> bondrad[i+nsp][i+nsp] = (default_o_bd_rw[3]) ? default_bd_rw[3] : get_radius (-5, 0, j, default_bond_rad[3]);;
+    // Filled
+    img -> atomicrad[i] = (default_o_at_rs[3]) ? default_at_rs[3] : get_radius (5, 0, j, default_atomic_rad[3]);
+    img -> atomicrad[i+nsp] = (default_o_at_rs[8]) ? default_at_rs[8] : get_radius (10, 0, j, default_atomic_rad[8]);
+    // Wireframe & Dots
+    img -> pointrad[i] = (default_o_at_rs[1]) ? default_at_rs[1] : get_radius (3, 0, j, default_atomic_rad[1]);
+    img -> pointrad[i+nsp] = (default_o_at_rs[6]) ? default_at_rs[6] : get_radius (8, 0, j, default_atomic_rad[6]);
+    img -> linerad[i][i] = (default_o_bd_rw[1]) ? default_bd_rw[1] : get_radius (-3, 0, j, default_bond_rad[1]);
+    img -> linerad[i+nsp][i+nsp] = (default_o_bd_rw[4]) ? default_bd_rw[4] : get_radius (-6, 0, j, default_bond_rad[4]);
+
+    img -> at_color[i] = img -> at_color[i+nsp] = set_default_color (j);
   }
   for (i=0; i < nsp-1; i++)
   {
     for (j=i+1; j < nsp; j++)
     {
-      img -> linerad[i][j] = img -> linerad[j][i]
-                           = img -> linerad[i+nsp][j+nsp]
-                           = img -> linerad[j+nsp][i+nsp] = DEFAULT_SIZE;
-      img -> bondrad[i][j] = min(1.0, img -> sphererad[i]/2.0);
-      img -> bondrad[i][j] = min(img -> bondrad[i][j], img -> sphererad[j]/2.0);
-      img -> bondrad[j][i] = img -> bondrad[i+nsp][j+nsp]
-                           = img -> bondrad[j+nsp][i+nsp]
-                           = img -> bondrad[i][j];
+      img -> linerad[i][j] = img -> linerad[j][i] = min (img -> linerad[i][i], img -> linerad[j][j]);
+      img -> linerad[i+nsp][j+nsp] = img -> linerad[j+nsp][i+nsp] = min (img -> linerad[i+nsp][i+nsp], img -> linerad[j+nsp][j+nsp]);
+      img -> bondrad[i][j] = img -> bondrad[j][i] = min(img -> bondrad[i][i], img -> bondrad[j][j]);
+      img -> bondrad[i+nsp][j+nsp] = img -> bondrad[j+nsp][i+nsp] = min(img -> bondrad[i+nsp][i+nsp], img -> bondrad[j+nsp][j+nsp]);
     }
   }
   for (i=0; i<10; i++)
@@ -1344,29 +1353,27 @@ void init_img (project * this_proj)
 
   for (i=0; i<5; i++)
   {
-    img -> labels_position[i] = 1;
-    img -> labels_render[i] = BETTER_TEXT;
-    if (i < 2) img -> labels_format[i] = SYMBOL_AND_NUM;
-    img -> labels_font[i] = g_strdup_printf ("Sans Bold 12");
+    img -> labels[i].position = 1;
+    img -> labels[i].render = BETTER_TEXT;
+    if (i < 2) img -> labels[i].format = SYMBOL_AND_NUM;
+    img -> labels[i].font = g_strdup_printf ("Sans Bold 12");
   }
   img -> mtilt = TRUE;
   img -> mfactor = 1;
   img -> mwidth = 1.0;
   for (i=0; i<2; i++)
   {
-    img -> labels_font[3+i] = g_strdup_printf ("Courier New Bold 18");
-    img -> labels_color[3+i] = g_malloc (sizeof*img -> labels_color[3]);
-    img -> labels_color[3+i][0].red = 1.0;
-    img -> labels_color[3+i][0].green = 1.0;
-    img -> labels_color[3+i][0].blue = 1.0;
-    img -> labels_color[3+i][0].alpha = 1.0;
+    img -> labels[3+i].font = g_strdup_printf ("Courier New Bold 18");
+    img -> labels[3+i].color = g_malloc (sizeof*img -> labels[3+i].color);
+    img -> labels[3+i].color[0].red = 1.0;
+    img -> labels[3+i].color[0].green = 1.0;
+    img -> labels[3+i].color[0].blue = 1.0;
+    img -> labels[3+i].color[0].alpha = 1.0;
     img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
   }
   img -> axis_title[0] = g_strdup_printf ("x");
   img -> axis_title[1] = g_strdup_printf ("y");
   img -> axis_title[2] = g_strdup_printf ("z");
-
-  img -> radall[0] = img -> radall[1] = 0.1;
 
   if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;

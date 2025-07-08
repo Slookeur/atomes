@@ -33,6 +33,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int read_atom_a (FILE * fp, project * this_proj, int s, int a);
   int read_atom_b (FILE * fp, project * this_proj, int s, int a);
   int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size, int steps);
+  int read_this_image_label (FILE * fp, screen_label * label);
   int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
 
 */
@@ -41,6 +42,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "glview.h"
 #include "initcoord.h"
+
+extern gboolean old_img_labels;
 
 /*!
   \fn int read_atom_a (FILE * fp, project * this_proj, int s, int a)
@@ -270,6 +273,35 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
 }
 
 /*!
+  \fn int read_this_image_label (FILE * fp, screen_label label)
+
+  \brief read image label from file
+
+  \param fp the file pointer
+  \param label the target label
+*/
+int read_this_image_label (FILE * fp, screen_label * label)
+{
+  int i;
+  if (fread (& label -> position, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& label -> render, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& label -> scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& label -> shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  if (fread (& label -> n_colors, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (label -> n_colors)
+  {
+    label -> color = g_malloc (label -> n_colors*sizeof*label -> color);
+    for (i=0; i<label -> n_colors; i++)
+    {
+      if (fread (& label -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    }
+  }
+  label -> font = read_this_string (fp);
+  if (label -> font == NULL) return ERROR_RW;
+  return OK;
+}
+
+/*!
   \fn int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 
   \brief read OpenGL image properties from file
@@ -319,38 +351,57 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fread (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fread (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> labels_position, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fread (img -> labels_render, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fread (img -> labels_scale, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fread (img -> labels_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
-  for (i=0; i<5; i++)
+  if (old_img_labels)
   {
-    if (fread (img -> labels_shift[i], sizeof(double), 3, fp) != 3) return ERROR_RW;
-    if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-    if (val)
+    for (i=0; i<5; i++)
     {
-      if (i < 2)
-      {
-        j = 2*sid;
-      }
-      else if (i == 2)
-      {
-        j = 3;
-      }
-      else
-      {
-        j = 1;
-      }
-      img -> labels_color[i] = g_malloc (j*sizeof*img -> labels_color[i]);
-      for (k=0; k<j; k++)
-      {
-        if (fread (& img -> labels_color[i][k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-      }
+      if (fread (& img -> labels[i].position, sizeof(int), 1, fp) != 1) return ERROR_RW;
     }
-    img -> labels_font[i] = read_this_string (fp);
-    if (img -> labels_font[i] == NULL) return ERROR_RW;
+    for (i=0; i<5; i++)
+    {
+      if (fread (& img -> labels[i].render, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    }
+    for (i=0; i<5; i++)
+    {
+      if (fread (& img -> labels[i].scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    }
+    if (fread (img -> labels_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    for (i=0; i<5; i++)
+    {
+      if (fread (img -> labels[i].shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
+      if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+      if (val)
+      {
+        if (i < 2)
+        {
+          j = 2*sid;
+        }
+        else if (i == 2)
+        {
+          j = 3;
+        }
+        else
+        {
+          j = 1;
+        }
+        img -> labels[i].n_colors = j;
+        img -> labels[i].color = g_malloc (j*sizeof*img -> labels[i].color);
+        for (k=0; k<j; k++)
+        {
+          if (fread (& img -> labels[i].color[k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+        }
+      }
+      img -> labels[i].font = read_this_string (fp);
+      if (img -> labels[i].font == NULL) return ERROR_RW;
+    }
   }
-
+  else
+  {
+    for (i=0; i<5; i++)
+    {
+      if (! read_this_image_label(fp, & img -> labels[i])) return ERROR_RW;
+    }
+  }
   // Measures
   if (fread (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;

@@ -48,6 +48,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "glview.h"
 #include "glwindow.h"
+#include "preferences.h"
 
 extern gchar * label_atpts (project * this_proj, glwin * view, int id);
 
@@ -177,7 +178,7 @@ G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data)
   int ft = (s >= OGL_STYLES) ? s - OGL_STYLES * (s/OGL_STYLES) : NONE;
   int old_style = this_proj -> modelgl -> anim -> last -> img -> style;
   int old_filled = this_proj -> modelgl -> anim -> last -> img -> filled_type;
-  int i, j, k;
+  int i, j, k, l, m;
 #ifdef GTK3
   if ((old_style != st || old_filled != ft) && gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg))
 #else
@@ -201,10 +202,13 @@ G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data)
     if (s >= OGL_STYLES)
     {
       j = this_proj -> nspec;
+      k = (ft) ? 9 + ft : 2;
+      l = (ft) ? 12 + ft : 7;
       for (i=0; i<j; i++)
       {
-        k = (int)this_proj -> chemistry -> chem_prop[CHEM_Z][i];
-        this_proj -> modelgl -> anim -> last -> img -> atomicrad[i] = this_proj -> modelgl -> anim -> last -> img -> atomicrad[i+j] = set_radius_ (& k, & ft);
+        m = (int)this_proj -> chemistry -> chem_prop[CHEM_Z][i];
+        this_proj -> modelgl -> anim -> last -> img -> atomicrad[i] = (default_o_at_rs[2]) ? default_at_rs[2] : get_radius (2, ft, m, default_atomic_rad[k]);
+        this_proj -> modelgl -> anim -> last -> img -> atomicrad[i+j] = (default_o_at_rs[7]) ? default_at_rs[7] : get_radius (7, ft, m, default_atomic_rad[l]);
       }
 #ifdef GTK3
       if (widg != this_proj -> modelgl -> filled_styles[ft])

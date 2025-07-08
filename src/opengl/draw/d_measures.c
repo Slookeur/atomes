@@ -101,7 +101,7 @@ void draw_angle_label (atom * at, atom * bt, atom * ct, int pi)
   }
   float ls[3] = {15.0, 15.0, 0.0};
   vec3_t pos = vec3(bt -> x, bt -> y, bt -> z);
-  prepare_string (str, 3+pi, plot -> labels_color[3+pi][0], pos, ls, at, bt, ct);
+  prepare_string (str, 3+pi, plot -> labels[3+pi].color[0], pos, ls, at, bt, ct);
   g_free (str);
 }
 
@@ -457,7 +457,7 @@ void draw_bond_label (atom * at, atom * bt, int pi)
     str = g_strdup_printf("%.3lf Å", dist.length);
   }
   float ls[3] = {-15.0, 15.0, 0.0};
-  prepare_string (str, 3+pi, plot -> labels_color[3+pi][0], pos, ls, at, bt, NULL);
+  prepare_string (str, 3+pi, plot -> labels[3+pi].color[0], pos, ls, at, bt, NULL);
   g_free (str);
 }
 
@@ -655,11 +655,11 @@ int prepare_measure_shaders (int type, int shaders)
       }
     }
      // When all labels are found we render the text if any
-    if (plot -> labels_list[3+type] != NULL)
+    if (plot -> labels[3+type].list != NULL)
     {
       measures_drawing = nshaders + shaders;
       render_all_strings (MEASU, 3+type);
-      nshaders += (plot -> labels_render[3+type]+1) * (plot -> labels_list[3+type] -> last -> id + 1);
+      nshaders += (plot -> labels[3+type].render+1) * (plot -> labels[3+type].list -> last -> id + 1);
     }
   }
   return nshaders;
@@ -703,10 +703,10 @@ void create_measures_lists ()
         angles_loop (wingl, 1, j, NULL);
       }
 
-      if (plot -> labels_list[3+j] != NULL)
+      if (plot -> labels[3+j].list != NULL)
       {
         // shaders for the labels if any
-        wingl -> n_shaders[MEASU][0] += (plot -> labels_render[3+j]+1) * (plot -> labels_list[3+j] -> last -> id + 1);
+        wingl -> n_shaders[MEASU][0] += (plot -> labels[3+j].render+1) * (plot -> labels[3+j].list -> last -> id + 1);
       }
     }
   }

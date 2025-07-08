@@ -33,6 +33,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int save_atom_a (FILE * fp, project * this_proj, int s, int a);
   int save_atom_b (FILE * fp, project * this_proj, int s, int a);
   int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_max, int ** num_data, gboolean *** show, int **** all_data);
+  int write_this_image_label (FILE * fp, screen_label label);
   int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
 
 */
@@ -122,6 +123,30 @@ int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_m
 }
 
 /*!
+  \fn int write_this_image_label (FILE * fp, screen_label label)
+
+  \brief save image label to file
+
+  \param fp the file pointer
+  \param label the target label
+*/
+int write_this_image_label (FILE * fp, screen_label label)
+{
+  int i;
+  if (fwrite (& label.position, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& label.render, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& label.scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (label.shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  if (fwrite (& label.n_colors, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<label.n_colors; i++)
+  {
+    if (fwrite (& label.color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  }
+  if (save_this_string (fp, label.font) != OK) return ERROR_RW;
+  return OK;
+}
+
+/*!
   \fn int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 
   \brief save OpenGL image properties to file
@@ -166,42 +191,11 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fwrite (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> labels_position, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_render, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_scale, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+
   for (i=0; i<5; i++)
   {
-    if (fwrite (img -> labels_shift[i], sizeof(double), 3, fp) != 3) return ERROR_RW;
-    if (img -> labels_color[i] != NULL)
-    {
-      val = TRUE;
-      if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-      if (i < 2)
-      {
-        j = 2*sid;
-      }
-      else if (i == 2)
-      {
-        j = 3;
-      }
-      else
-      {
-        j = 1;
-      }
-      for (k=0; k<j; k++)
-      {
-        if (fwrite (& img -> labels_color[i][k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-      }
-    }
-    else
-    {
-      val = FALSE;
-      if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-    }
-    if (save_this_string (fp, img -> labels_font[i]) != OK) return ERROR_RW;
+    if (write_this_image_label(fp, img -> labels[i])) return ERROR_RW;
   }
-
   // Measures
   if (fwrite (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;
