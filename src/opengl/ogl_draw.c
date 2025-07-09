@@ -237,7 +237,10 @@ void duplicate_material_and_lightning (image * new_img, image * old_img)
 void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
 {
   screen_string * stmp_a, * stmp_b;
-  new_lab -> format = old_lab -> format;
+
+  new_lab -> position = old_lab -> position;
+  new_lab -> render = old_lab -> render;
+  new_lab -> scale = old_lab -> scale;
   new_lab -> font = g_strdup_printf ("%s", old_lab -> font);
   new_lab -> color = NULL;
   int i;

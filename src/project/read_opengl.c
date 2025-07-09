@@ -365,7 +365,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     {
       if (fread (& img -> labels[i].scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
     }
-    if (fread (img -> labels_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
     for (i=0; i<5; i++)
     {
       if (fread (img -> labels[i].shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
@@ -401,6 +401,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     {
       if (! read_this_image_label(fp, & img -> labels[i])) return ERROR_RW;
     }
+    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
   }
   // Measures
   if (fread (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;

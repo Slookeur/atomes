@@ -506,7 +506,7 @@ G_MODULE_EXPORT gboolean close_event_model (GtkWidget * widg, GdkEvent * event, 
   \brief create atom(s) advanced properties notebook
 
   \param view the target glwin
-  \param atom_or_clone atom(s) (0) or clone(s) (1)
+  \param atom_or_clone atom(s) or clone(s) (0/1)
 */
 GtkWidget * advance_atom_notebook (glwin * view, int atom_or_clone)
 {

@@ -1355,7 +1355,7 @@ void init_img (project * this_proj)
   {
     img -> labels[i].position = 1;
     img -> labels[i].render = BETTER_TEXT;
-    if (i < 2) img -> labels[i].format = SYMBOL_AND_NUM;
+    if (i < 2) img -> acl_format[i] = SYMBOL_AND_NUM;
     img -> labels[i].font = g_strdup_printf ("Sans Bold 12");
   }
   img -> mtilt = TRUE;

@@ -196,6 +196,7 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   {
     if (write_this_image_label(fp, img -> labels[i])) return ERROR_RW;
   }
+  if (fwrite (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
   // Measures
   if (fwrite (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;

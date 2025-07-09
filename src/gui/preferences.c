@@ -129,13 +129,24 @@ gboolean * default_o_bd_rw;
 gboolean * tmp_o_bd_rw;
 double * default_bd_rw;
 double * tmp_bd_rw;
-screen_label * default_label[5];
-screen_label * tmp_label[5];
-int default_lab_format[2];
-int tmp_lab_format[2];
+
+screen_label default_label[5];
+screen_label tmp_label[5];
+int default_acl_format[2];
+int tmp_acl_format[2];
+gboolean default_mtilt;
+gboolean tmp_mtilt;
+int defaut_mpattern;
+int tmp_mpattern;
+int default_mfactor;
+int tmp_mfactor;
+double default_mwidth;
+double tmp_mwidth;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
+
+tint * pref_pointer = NULL;
 
 gchar * xml_style_leg[6] = {"ball_and_stick", "wireframes", "spacefilled", "spheres", "cylinders", "dots"};
 gchar * xml_filled_leg[4] = {"covalent", "ionic", "van-der-waals", "crystal"};
@@ -620,6 +631,8 @@ int save_preferences_to_xml_file ()
   // End atoms_and_bonds
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
+
+
 
   // End model
   rc = xmlTextWriterEndElement (writer);
@@ -2523,6 +2536,8 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   destroy_this_dialog (edit_prefs);
   preferences = FALSE;
   clean_all_tmp ();
+  g_free (pref_pointer);
+  pref_pointer = NULL;
   preference_notebook = NULL;
 }
 
@@ -2573,6 +2588,15 @@ void create_user_preferences_dialog ()
                         {"Model", "atom(s), bond(s) and box preferences"},
                         {"View", "representation and projection preferences"}};
   gchar * end = "Default parameters are used for any new project added to the workspace\n";
+
+  pref_pointer = g_malloc0(NUM_COLORS*sizeof*pref_pointer);
+  int i;
+  for (i=0; i<NUM_COLORS; i++)
+  {
+    pref_pointer[i].a = -1;
+    pref_pointer[i].b = i;
+    pref_pointer[i].c = -1;
+  }
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, pref_list(mess, 4, mlist, end), FALSE, FALSE, 20);
 

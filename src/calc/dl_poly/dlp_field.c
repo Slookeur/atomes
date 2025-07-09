@@ -3932,7 +3932,7 @@ void close_the_assistant (GtkAssistant * assistant)
   field_color = FALSE;
   for (j=0; j<2; j++)
   {
-    tmp_view -> anim -> last -> img -> labels[j].format = saved_label_format[j];
+    tmp_view -> anim -> last -> img -> acl_format[j] = saved_label_format[j];
     tmp_view -> anim -> last -> img -> labels[j].position = saved_label_position[j];
   }
   field_unselect_all ();
@@ -4813,10 +4813,10 @@ void create_classical_force_field (int p, int f)
 
   for (i=0; i<2; i++)
   {
-    saved_label_format[i] = tmp_view -> anim -> last -> img -> labels[i].format;
+    saved_label_format[i] = tmp_view -> anim -> last -> img -> acl_format[i];
     saved_label_position[i] = tmp_view -> anim -> last -> img -> labels[i].position;
     tmp_view -> anim -> last -> img -> labels[i].position = 0;
-    tmp_view -> anim -> last -> img -> labels[i].format = ID_IN_MOLECULE;
+    tmp_view -> anim -> last -> img -> acl_format[i] = ID_IN_MOLECULE;
   }
 
   //g_debug ("Number of pages in the assitant: %d", gtk_assistant_get_n_pages (GTK_ASSISTANT (field_assistant)));

@@ -262,7 +262,6 @@ struct screen_label
   int position;
   int render;
   int scale;
-  int format;
   gchar * font;
   int n_colors;
   ColRGBA * color;
@@ -331,9 +330,8 @@ struct image
                                                     2 = axis, \n
                                                     3 = measure(s), \n
                                                     4 = measure(s) in edition mode */
-
   // 0 = Element name, 1 = Atomic symbol, 2 = Atomic symbol + ID number, 3 = ID number
-  int labels_format[2];                         /*!< Label format for the atom(s) and clone(s) \n
+  int acl_format[2];                            /*!< Label format for the atom(s) and clone(s): \n
                                                     0 = element name, \n
                                                     1 = atomic symbol, \n
                                                     2 = atomic symbol + ID number (default), \n

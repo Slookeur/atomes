@@ -94,7 +94,7 @@ void prepare_label (atom at, int id, double al)
     lcol = plot -> labels[id].color[k];
     lcol.alpha = al;
   }
-  switch (plot -> labels[id].format)
+  switch (plot -> acl_format[id])
   {
     case ELEMENT_NAME:
       str = g_strdup_printf ("%s", exact_name(proj_gl -> chemistry -> element[k]));

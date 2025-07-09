@@ -85,6 +85,21 @@ extern double * default_at_rs;
 extern gboolean * default_o_bd_rw;
 extern double * default_bd_rw;
 
+extern screen_label default_label[5];
+extern screen_label tmp_label[5];
+extern int default_acl_format[2];
+extern int tmp_acl_format[2];
+extern gboolean default_mtilt;
+extern gboolean tmp_mtilt;
+extern int defaut_mpattern;
+extern int tmp_mpattern;
+extern int default_mfactor;
+extern int tmp_mfactor;
+extern double default_mwidth;
+extern double tmp_mwidth;
+
+extern tint * pref_pointer;
+
 extern opengl_edition * pref_ogl_edit;
 
 extern void set_atomes_preferences ();

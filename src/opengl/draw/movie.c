@@ -738,10 +738,9 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
   if (img_a -> axis_labels != img_b -> axis_labels) view -> create_shaders[MAXIS] = shaders = TRUE;
   for (i=0; i<3; i++)
   {
-    if (g_strcmp0 (img_a -> axis_title[i],img_b -> axis_title[i]) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
+    if (g_strcmp0 (img_a -> axis_title[i], img_b -> axis_title[i]) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
     if (img_a -> axis_pos[i] != img_b -> axis_pos[i]) view -> create_shaders[MAXIS] = shaders = TRUE;
   }
-  if (img_a -> labels_format[2] != img_b -> labels_format[2]) view -> create_shaders[MAXIS] = shaders = TRUE;
   if (g_strcmp0 (img_a -> labels[2].font, img_b -> labels[2].font) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
   if (img_a -> labels[2].position != img_b -> labels[2].position) view -> create_shaders[MAXIS] = shaders = TRUE;
   if (img_a -> labels[2].scale != img_b -> labels[2].scale) view -> create_shaders[MAXIS] = shaders = TRUE;
@@ -893,7 +892,7 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
 
   for (i=0; i<2; i++)
   {
-    if (img_a -> labels_format[i] != img_b -> labels_format[i]) view -> create_shaders[LABEL] = shaders = TRUE;
+    if (img_a -> acl_format[i] != img_b -> acl_format[i]) view -> create_shaders[LABEL] = shaders = TRUE;
     if (g_strcmp0 (img_a -> labels[i].font, img_b -> labels[i].font) != 0) view -> create_shaders[LABEL] = shaders = TRUE;
     if (img_a -> labels[i].position != img_b -> labels[i].position) view -> create_shaders[LABEL] = shaders = TRUE;
     if (img_a -> labels[i].scale != img_b -> labels[i].scale) view -> create_shaders[LABEL] = shaders = TRUE;
