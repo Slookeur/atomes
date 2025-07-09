@@ -244,6 +244,8 @@ int open_project (FILE * fp, int npi)
   else if (g_strcmp0(ver, "%\n% project file v-2.8\n%\n") == 0)
   {
     old_img_labels = FALSE;
+    labels_in_file = TRUE;
+    correct_x = FALSE;
   }
 
  #ifdef DEBUG

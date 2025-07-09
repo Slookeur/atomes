@@ -4159,7 +4159,7 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], hbox, FALSE, FALSE, 2);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.5), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Search: ", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Search ", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
     asearch -> object_box  = create_combo ();
     combo_text_append (asearch -> object_box, "Atom(s)");
     if (! i) combo_text_append (asearch -> object_box, "Atom(s): all");
@@ -4184,26 +4184,26 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     GtkWidget * entry = create_entry (G_CALLBACK(set_search_digit), 90, 15, TRUE, asearch);
     if (asearch -> action < 2)
     {
-      prep_search_box (asearch -> info[0], markup_label("For: ", 100, -1, 0.0, 0.5), asearch -> object_box);
-      prep_search_box (asearch -> info[0], markup_label("Filter by: ", 100, -1, 0.0, 0.5), asearch -> filter_box);
-      prep_search_box (asearch -> info[0], markup_label("Species: ", 100, -1, 0.0, 0.5), asearch -> atom_box);
+      prep_search_box (asearch -> info[0], markup_label("For ", 100, -1, 0.0, 0.5), asearch -> object_box);
+      prep_search_box (asearch -> info[0], markup_label("Filter by ", 100, -1, 0.0, 0.5), asearch -> filter_box);
+      prep_search_box (asearch -> info[0], markup_label("Species ", 100, -1, 0.0, 0.5), asearch -> atom_box);
       asearch -> id_box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], asearch -> id_box, FALSE, FALSE, 0);
-      prep_search_box (asearch -> id_box, markup_label("Atom Id: ", 100, -1, 0.0, 0.5), entry);
+      prep_search_box (asearch -> id_box, markup_label("Atom Id ", 100, -1, 0.0, 0.5), entry);
     }
     else
     {
       hbox = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], hbox, FALSE, FALSE, 5);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("For: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("For ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> object_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Filter by: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Filter by ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> filter_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Species: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Species ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> atom_box, FALSE, FALSE, 0);
       asearch -> id_box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> id_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, markup_label("Atom Id: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, markup_label("Atom Id ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, entry, FALSE, FALSE, 0);
     }
 
@@ -4239,7 +4239,7 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
                                       "Use the filters above to define the object(s) of the search", -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
   }
 
-  abox (vbox, "Selection: ", 2);
+  abox (vbox, "Selection ", 2);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   GtkWidget * scrollsets = create_scroll (NULL, -1, -1, GTK_SHADOW_ETCHED_IN);

@@ -1924,7 +1924,7 @@ GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
 {
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, vspace);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.25), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(lab, 150, 30, 0.0, 0.5), FALSE, FALSE, 0);
   return hbox;
 }

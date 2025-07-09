@@ -165,7 +165,7 @@ G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
   }
   else
   {
-    tmp_label[id -> b].render = i;
+    tmp_label[id -> b] -> render = i;
   }
 }
 
@@ -276,7 +276,7 @@ G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data)
   }
   else
   {
-    tmp_label[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
+    tmp_label[id -> b] -> font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
   }
 }
 
@@ -301,7 +301,7 @@ G_MODULE_EXPORT void set_label_color (GtkColorChooser * colob, gpointer data)
   }
   else
   {
-    tmp_label[id -> b].color[id -> c] = get_button_color (colob);
+    tmp_label[id -> b] -> color[id -> c] = get_button_color (colob);
   }
 }
 
@@ -327,7 +327,7 @@ G_MODULE_EXPORT void set_labels_position (GtkComboBox * box, gpointer data)
   }
   else
   {
-    tmp_label[id -> b].position = i;
+    tmp_label[id -> b] -> position = i;
   }
 }
 
@@ -353,7 +353,7 @@ void label_shift_has_changed (gpointer data, double value)
   }
   else
   {
-    tmp_label[i].shift[j] = value;
+    tmp_label[i] -> shift[j] = value;
   }
 }
 
@@ -426,7 +426,7 @@ G_MODULE_EXPORT void set_labels_scale (GtkToggleButton * but, gpointer data)
   }
   else
   {
-    tmp_label[id -> b].scale = i;
+    tmp_label[id -> b] -> scale = i;
   }
 }
 
@@ -663,7 +663,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   }
   else
   {
-    label = & tmp_label[lid];
+    label = tmp_label[lid];
     lab_pointer = & pref_pointer[lid];
     for (i=0; i<2; i++) shift_pointer[i] = & pref_pointer[lid*10+i];
     mtilt = tmp_mtilt;
@@ -679,7 +679,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * box;
   if (lid < 2)
   {
-    box = abox (vbox, "Templates: ", 0);
+    box = abox (vbox, "Templates ", 0);
     GtkWidget * formats  = create_combo ();
     for (i=0; i<LABEL_FORMATS; i++)
     {
@@ -695,7 +695,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b><u>Label(s):</u></b>", -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
   }
   // Rendering
-  box = abox (vbox, "Rendering: ", 0);
+  box = abox (vbox, "Rendering ", 0);
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
@@ -705,17 +705,17 @@ GtkWidget * labels_tab (glwin * view, int lid)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
 
   // Font
-  box = abox (vbox, "Font:", 0);
+  box = abox (vbox, "Font", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
 
   if (lid == 3)
   {
-    box = abox (vbox, "Font color:", 0);
+    box = abox (vbox, "Font color", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, color_button(label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), lab_pointer), FALSE, FALSE, 10);
   }
 
   // Position
-  box = abox (vbox, "Position:", 0);
+  box = abox (vbox, "Position", 0);
   GtkWidget * position = create_combo ();
   combo_text_append (position, "Always visible");
   combo_text_append (position, "Normal");
@@ -725,7 +725,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, position, FALSE, FALSE, 10);
 
   // Size / scale
-  box = abox (vbox, "Size:", 0);
+  box = abox (vbox, "Size", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                        check_button ("scale with zoom in/out", 220, -1, label -> scale, G_CALLBACK(set_labels_scale), lab_pointer),
                        FALSE, FALSE, 10);
@@ -733,7 +733,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   if (lid == 3)
   {
     // Tilt
-    box = abox (vbox, "Tilt:", 0);
+    box = abox (vbox, "Tilt", 0);
     tilt = create_combo ();
     combo_text_append (tilt, "None");
     combo_text_append (tilt, "Adapted");
@@ -746,7 +746,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * chbox;
   if (lid < 3)
   {
-    box = abox (vbox, "Distance to atom [&#xC5;]:", 0);
+    box = abox (vbox, "Distance to atom [&#xC5;]", 0);
     chbox = create_hbox (0);
     for (i=0; i<2; i++)
     {
@@ -770,7 +770,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   }
   if (lid < 3 && ! preferences)
   {
-    box = abox (vbox, "Color(s):", 0);
+    box = abox (vbox, "Color(s)", 0);
     GtkWidget * col_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, col_box, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, col_box,
@@ -803,7 +803,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("Show / hide: ", -1, 40, mpattern+1, G_CALLBACK(enable_lines), lab_pointer), FALSE, FALSE, 0);
     line_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, line_box, TRUE, TRUE, 0);
-    box = abox (line_box, "Pattern:", 0);
+    box = abox (line_box, "Pattern", 0);
     GtkListStore * store = gtk_list_store_new (1, GDK_TYPE_PIXBUF);
     GtkTreeIter iter;
     for (i=0; i<NDOTS; i++)
@@ -822,12 +822,12 @@ GtkWidget * labels_tab (glwin * view, int lid)
     gtk_widget_set_size_request (lstyle, 100, 35);
     g_signal_connect (G_OBJECT (lstyle), "changed", G_CALLBACK(set_measure_style), lab_pointer);
 
-    box = abox (line_box, "Factor:", 0);
+    box = abox (line_box, "Factor", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                          create_hscale(1.0, 10.0, 1.0, (double)mfactor, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_factor), G_CALLBACK(scroll_set_measure_factor), lab_pointer),
                          TRUE, TRUE, 0);
 
-    box = abox (line_box, "Width:", 0);
+    box = abox (line_box, "Width", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                          create_hscale(1.0, 10.0, 1.0, mwidth, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_width), G_CALLBACK(scroll_set_measure_width), lab_pointer),
                          TRUE, TRUE, 0);

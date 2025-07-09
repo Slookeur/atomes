@@ -60,9 +60,11 @@ extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrol
 extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
 extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
 extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
+extern GtkWidget * labels_tab (glwin * view, int lid);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
+extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
 extern Light init_light_source (int type, float val, float vbl);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
@@ -104,6 +106,10 @@ element_radius * tmp_atomic_rad[16];
 // 3 styles + 3 cloned styles
 element_radius * default_bond_rad[6];
 element_radius * tmp_bond_rad[6];
+// atoms + clones
+element_color * default_label_color[2];
+element_color * tmp_label_color[2];
+
 int radius_id;
 
 gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
@@ -131,7 +137,7 @@ double * default_bd_rw;
 double * tmp_bd_rw;
 
 screen_label default_label[5];
-screen_label tmp_label[5];
+screen_label * tmp_label[5];
 int default_acl_format[2];
 int tmp_acl_format[2];
 gboolean default_mtilt;
@@ -297,6 +303,12 @@ int save_preferences_to_xml_file ()
                             "Color"};
   gchar * xml_model_leg[2] = {"Show clones",
                               "Show box"};
+  gchar * xml_label_leg[6] = {"Position",
+                              "Rendering" ,
+                              "Scaling",
+                              "Font",
+                              "Shift",
+                              "Colors"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -632,7 +644,47 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
+  // atoms and clones labels
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
+  if (rc < 0) return 0;
+  gchar * obj[2]={"atoms", "clones"};
+  for (i=0; i<2; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST obj[i]);
+    if (rc < 0) return 0;
 
+    str = g_strdup_printf ("%d", default_label[i].position);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[0], "default_label", TRUE, 0, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%d", default_label[i].render);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%d", default_label[i].scale);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+    g_free (str);
+    if (! rc) return 0;
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[i].font);
+    if (! rc) return 0;
+    rc = xml_save_xyz_to_file (writer, 4, xml_label_leg[4], "default_label", vec3(default_label[i].shift[0], default_label[i].shift[1], default_label[i].shift[2]));
+    if (! rc) return 0;
+    str = g_strdup_printf ("%d", default_label[i].n_colors);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[5], "default_label", TRUE, 5, str);
+    g_free (str);
+    if (default_label[i].n_colors)
+    {
+      // Hmmm
+    }
+    if (! rc) return 0;
+
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
+
+  // End atoms and clones labels
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
 
   // End model
   rc = xmlTextWriterEndElement (writer);
@@ -648,12 +700,26 @@ int save_preferences_to_xml_file ()
   return 1;
 }
 
+int label_id;
+
 /*!
-  \fn void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float start, float end)
+  \fn double xml_string_to_double (gchar * content)
+
+  \brief convert XML string to double
+
+  \param content the string to convert
+*/
+double xml_string_to_double (gchar * content)
+{
+  return (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
+}
+
+/*!
+  \fn void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end)
 
   \brief set default parameter
 
-  \param value the value to set
+  \param content the string content
   \param key the name of variable to set
   \param vid the id number to set
   \param vect vector to set, if any
@@ -661,34 +727,34 @@ int save_preferences_to_xml_file ()
   \param end final value, if any, -1.0 otherwise
 
 */
-void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float start, float end)
+void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end)
 {
   element_radius * tmp_rad;
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
-    default_num_delta[vid] = (int)value;
+    default_num_delta[vid] = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_delta_t") == 0)
   {
-    default_delta_t[vid] = value;
+    default_delta_t[vid] = xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_rsparam") == 0)
   {
-    default_rsparam[vid] = (int)value;
+    default_rsparam[vid] = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_csparam") == 0)
   {
-    default_csparam[vid] = (int)value;
+    default_csparam[vid] = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_opengl") == 0)
   {
-    default_opengl[vid] = (int)value;
+    default_opengl[vid] = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_material") == 0)
   {
     if (vid < 0)
     {
-      default_material.predefine = (int)value;
+      default_material.predefine = (int)xml_string_to_double(content);
     }
     else if (vid == 6 && vect)
     {
@@ -696,20 +762,20 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
     }
     else
     {
-      default_material.param[vid] = value;
+      default_material.param[vid] = xml_string_to_double(content);
     }
   }
   else if (g_strcmp0(key, "default_lightning") == 0)
   {
-    default_lightning.lights = (int)value;
+    default_lightning.lights = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.type") == 0)
   {
-    default_lightning.spot[vid].type = (int)value;
+    default_lightning.spot[vid].type = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.fix") == 0)
   {
-    default_lightning.spot[vid].fix = (int)value;
+    default_lightning.spot[vid].fix = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.direction") == 0 && vect)
   {
@@ -733,15 +799,15 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
   }
   else if (g_strcmp0(key, "fog.mode") == 0)
   {
-    default_fog.mode = (int)value;
+    default_fog.mode = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "fog.type") == 0)
   {
-    default_fog.based = (int)value;
+    default_fog.based = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "fog.density") == 0)
   {
-    default_fog.density = value;
+    default_fog.density = xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "fog.depth") == 0)
   {
@@ -754,21 +820,21 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
   }
   else if (g_strcmp0(key, "default_cell") == 0)
   {
-    default_cell = (int)value;
+    default_cell = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_clones") == 0)
   {
-    default_clones = (int)value;
+    default_clones = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_at_rs") == 0)
   {
     default_o_at_rs[vid] = TRUE;
-    default_at_rs[vid] = value;
+    default_at_rs[vid] = xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_bd_rw") == 0)
   {
     default_o_bd_rw[vid] = TRUE;
-    default_bd_rw[vid] = value;
+    default_bd_rw[vid] = xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_atomic_rad") == 0)
   {
@@ -788,7 +854,7 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
       tmp_rad = default_atomic_rad[radius_id];
     }
     tmp_rad -> Z = vid;
-    tmp_rad -> rad = value;
+    tmp_rad -> rad = xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_bond_rad") == 0)
   {
@@ -808,7 +874,33 @@ void set_parameter (double value, gchar * key, int vid, vec3_t * vect, float sta
       tmp_rad = default_bond_rad[radius_id];
     }
     tmp_rad -> Z = vid;
-    tmp_rad -> rad = value;
+    tmp_rad -> rad = xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_label") == 0)
+  {
+    switch (vid)
+    {
+      case 0:
+        default_label[label_id].position = (int)xml_string_to_double(content);
+        break;
+      case 1:
+        default_label[label_id].render = (int)xml_string_to_double(content);
+        break;
+      case 2:
+        default_label[label_id].scale = (int)xml_string_to_double(content);
+        break;
+      case 3:
+        default_label[label_id].font = g_strdup_printf ("%s", content);
+        break;
+      case 4:
+        default_label[label_id].shift[0] = vect -> x;
+        default_label[label_id].shift[1] = vect -> y;
+        default_label[label_id].shift[2] = vect -> z;
+        break;
+      case 5:
+        default_label[label_id].n_colors = (int)xml_string_to_double(content);
+        break;
+    }
   }
 }
 
@@ -829,12 +921,10 @@ void read_parameter (xmlNodePtr parameter_node)
   gchar * content;
   int id;
   float start, end;
-  double value;
   vec3_t vec;
   while (parameter_node)
   {
     content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
-    value = (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
     p_details = parameter_node -> properties;
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
@@ -882,8 +972,10 @@ void read_parameter (xmlNodePtr parameter_node)
     }
     if (set_codevar && set_id)
     {
-      set_parameter (value, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end);
+      // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
+      set_parameter (content, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end);
     }
+    g_free (content);
     parameter_node = parameter_node -> next;
     parameter_node = findnode (parameter_node, "parameter");
   }
@@ -907,7 +999,6 @@ void read_light (xmlNodePtr light_node)
   gboolean set_lid = FALSE;
   gboolean set_x, set_y, set_z;
   gchar * content;
-  double value;
   vec3_t vec;
   l_details = light_node -> properties;
   while (l_details)
@@ -931,7 +1022,6 @@ void read_light (xmlNodePtr light_node)
     while (parameter_node)
     {
       content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
-      value = (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
       p_details = parameter_node -> properties;
       while (p_details)
       {
@@ -963,8 +1053,9 @@ void read_light (xmlNodePtr light_node)
       }
       if (set_codevar)
       {
-        set_parameter (value, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0);
+        set_parameter (content, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0);
       }
+      g_free (content);
       parameter_node = parameter_node -> next;
       parameter_node = findnode (parameter_node, "parameter");
     }
@@ -986,9 +1077,12 @@ void read_preferences (xmlNodePtr preference_node)
 }
 
 /*!
-  \fn void read_style_from_xml_file ()
+  \fn void read_style_from_xml_file (xmlNodePtr style_node, int style)
 
   \brief read style preferences from XML file
+
+  \param style_node the XML node that point to style data
+  \param style the target style
 */
 void read_style_from_xml_file (xmlNodePtr style_node, int style)
 {
@@ -1094,6 +1188,19 @@ void read_preferences_from_xml_file ()
               if (l_node)
               {
                 read_style_from_xml_file (l_node -> children, i);
+              }
+            }
+          }
+          p_node = findnode(node -> children, "labels");
+          if (p_node)
+          {
+            for (i=0; i<2; i++)
+            {
+              l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
+              if (l_node)
+              {
+                label_id = i;
+                read_preferences (l_node);
               }
             }
           }
@@ -1257,6 +1364,7 @@ G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
 
 int the_object;
 element_radius ** edit_list;
+element_color * color_list;
 GtkWidget * pref_tree;
 gboolean user_defined;
 
@@ -1353,6 +1461,58 @@ float get_radius (int object, int col, int z, element_radius * rad_list)
     }
   }
   return 0.0;
+}
+
+/*!
+  \fn element_color * duplicate_element_color (element_color * old_list)
+
+  \brief duplicate an element color data structure
+
+  \param old_list the data structure to duplicate
+*/
+element_color * duplicate_element_color (element_color * old_list)
+{
+  if (! old_list) return NULL;
+  element_color * new_list = g_malloc0(sizeof*new_list);
+  element_color * tmp_rad, * tmp_rbd;
+  tmp_rad = old_list;
+  tmp_rbd = new_list;
+  while (tmp_rad)
+  {
+    tmp_rbd -> Z = tmp_rad -> Z;
+    tmp_rbd -> col = tmp_rad -> col;
+    if (tmp_rad -> next)
+    {
+      tmp_rbd -> next = g_malloc0(sizeof*tmp_rbd -> next);
+      tmp_rbd -> next -> prev = tmp_rbd;
+      tmp_rbd = tmp_rbd -> next;
+    }
+    tmp_rad = tmp_rad -> next;
+  }
+  return new_list;
+}
+
+/*!
+  \fn ColRGBA get_spec_color (int z)
+
+  \brief retrieve the color of a chemical species
+
+  \param z atomic number
+
+*/
+ColRGBA get_spec_color (int z)
+{
+  element_color * tmp_col = color_list;
+  while (tmp_col)
+  {
+    if (tmp_col -> Z == z)
+    {
+      user_defined = TRUE;
+      return tmp_col -> col;
+    }
+    tmp_col = tmp_col -> next;
+  }
+  return set_default_color (z);
 }
 
 /*!
@@ -1492,50 +1652,87 @@ G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string,
 G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data)
 {
   int i, j, k, l;
-  int object = object = GPOINTER_TO_INT (data);
+  int object = GPOINTER_TO_INT (data);
+  gboolean do_style = (object < 100) ? TRUE : FALSE;
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
-      if (object < 0)
+      if (do_style)
       {
-        object = - object - 2;
-        if (tmp_bond_rad[object]) g_free (tmp_bond_rad[object]);
-        tmp_bond_rad[object] = duplicate_element_radius (edit_list[0]);
+        if (object < 0)
+        {
+          object = - object - 2;
+          if (tmp_bond_rad[object]) g_free (tmp_bond_rad[object]);
+          tmp_bond_rad[object] = duplicate_element_radius (edit_list[0]);
+        }
+        else
+        {
+          j = (object == 4 || object == 9) ? 4 : 1;
+          k = (object < 5) ? 7 : 5;
+          object = object - 2;
+          for (i=0; i<j; i++)
+          {
+            l = (i) ? 1 : 0;
+            if (tmp_atomic_rad[object+l*k+i]) g_free (tmp_atomic_rad[object+l*k+i]);
+            tmp_atomic_rad[object+l*k+i] = duplicate_element_radius (edit_list[i]);
+          }
+        }
       }
       else
       {
-        j = (object == 4 || object == 9) ? 4 : 1;
-        k = (object < 5) ? 7 : 5;
-        object = object - 2;
-        for (i=0; i<j; i++)
-        {
-          l = (i) ? 1 : 0;
-          if (tmp_atomic_rad[object+l*k+i]) g_free (tmp_atomic_rad[object+l*k+i]);
-          tmp_atomic_rad[object+l*k+i] = duplicate_element_radius (edit_list[i]);
-        }
+        object -= 100;
+        if (tmp_label_color[object] g_free (tmp_label_color[object]);
+        tmp_label_color[object] = duplicate_element_color (color_list);
       }
       break;
     default:
-      j = (object < 0) ? 1 : (object == 4 || object == 9) ? 4 : 1;
-      for (i=0; i<j; i++)
+      if (do_style)
       {
-        if (edit_list[i])
+        j = (object < 0) ? 1 : (object == 4 || object == 9) ? 4 : 1;
+        for (i=0; i<j; i++)
         {
-          g_free (edit_list[i]);
-          edit_list[i] = NULL;
+          if (edit_list[i])
+          {
+            g_free (edit_list[i]);
+            edit_list[i] = NULL;
+          }
         }
+        g_free (edit_list);
+        edit_list = NULL;
       }
-      g_free (edit_list);
-      edit_list = NULL;
+      else
+      {
+        g_free (color_list);
+        color_list = NULL;
+      }
       break;
   }
   destroy_this_dialog (edit_chem);
 }
 
 /*!
+  \fn void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
+
+  \brief set background color
+
+  \param col the tree view column
+  \param renderer the column renderer
+  \param mod the tree model
+  \param iter the tree iter
+  \param data the associated data pointer
+*/
+void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
+{
+  int z;
+  gtk_tree_model_get (mod, iter, 3, & z, -1);
+  GdkRGBA colo = colrgba_togtkrgba (get_spec_color (z));
+  g_object_set (renderer, "background-rgba", & colo, "background-set", TRUE, NULL);
+}
+
+/*!
   \fn void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 
-  \brief
+  \brief set text font and color
 
   \param col the tree view column
   \param renderer the column renderer
@@ -1618,77 +1815,110 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   int aid, bid;
   int num_col;
   gchar * str;
-  if (the_object < 0)
+  gboolean do_style = (the_object < 100) ? TRUE : FALSE;
+
+  if (do_style)
   {
-    // Going for bonds
-    aid = - the_object - 2;
-    aid = (aid) > 2 ? aid - 3 : aid;
-    bid = (the_object == -3 || the_object == -6) ? 2 : 0;
-    str = (the_object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
-    num_col = 5;
+    if (the_object < 0)
+    {
+      // Going for bonds
+      aid = - the_object - 2;
+      aid = (aid) > 2 ? aid - 3 : aid;
+      bid = (the_object == -3 || the_object == -6) ? 2 : 0;
+      str = (the_object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
+      num_col = 5;
+    }
+    else
+    {
+      // Going for atoms
+      aid = the_object - 2;
+      aid = (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : 2;
+      bid = (the_object == 1 || the_object == 6) ? 1 : 0;
+      str = (the_object - 2 > 4) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
+      num_col = (the_object == 4 || the_object == 9) ? 8 : 5;
+    }
   }
   else
   {
-    // Going for atoms
-    aid = the_object - 2;
-    aid = (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : 2;
-    bid = (the_object == 1 || the_object == 6) ? 1 : 0;
-    str = (the_object - 2 > 4) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
-    num_col = (the_object == 4 || the_object == 9) ? 8 : 5;
+    // Going for colors
+    aid = the_object - 100;
+    str = g_strdup_printf ("Select %s color", (aid) ? "clone" : "atom");
+    num_col = 5;
   }
-
   edit_list = NULL;
+  color_list = NULL;
   GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
   g_free (str);
   gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 8) ? 600 : 300, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
-  GType type[8] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
+  GType s_type[8] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE};
+  GType c_type[5] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING};
   GtkTreeViewColumn * pref_col[num_col];
   GtkCellRenderer * pref_cel[num_col];
   GtkTreeSelection * pref_select;
-  GtkListStore * pref_model = gtk_list_store_newv (num_col, type);
+  GtkListStore * pref_model;
   GtkTreeIter elem;
-  i = (the_object < 0) ? - the_object - 2 : the_object - 2;
-  j = (num_col == 8) ? 4 : 1;
-  k = ((the_object < 0 && i > 2) || (the_object > 0 && i > 4)) ? 1 : 0;
-  edit_list = g_malloc0(j*sizeof*edit_list);
-  for (l=0; l<j; l++)
+  if (do_style)
   {
-    if (the_object < 0)
+    pref_model = gtk_list_store_newv (num_col, s_type);
+    i = (the_object < 0) ? - the_object - 2 : the_object - 2;
+    j = (num_col == 8) ? 4 : 1;
+    k = ((the_object < 0 && i > 2) || (the_object > 0 && i > 4)) ? 1 : 0;
+    edit_list = g_malloc0(j*sizeof*edit_list);
+    for (l=0; l<j; l++)
     {
-      edit_list[l] = duplicate_element_radius (tmp_bond_rad[i]);
-    }
-    else
-    {
-      m = (k) ? 5 : 7;
-      n = (l) ? 1 : 0;
-      edit_list[l] = duplicate_element_radius (tmp_atomic_rad[i+n*m+l]);
+      if (the_object < 0)
+      {
+        edit_list[l] = duplicate_element_radius (tmp_bond_rad[i]);
+      }
+      else
+      {
+        m = (k) ? 5 : 7;
+        n = (l) ? 1 : 0;
+        edit_list[l] = duplicate_element_radius (tmp_atomic_rad[i+n*m+l]);
+      }
     }
   }
+  else
+  {
+    pref_model = gtk_list_store_newv (num_col, c_type);
+    color_list = duplicate_element_color (tmp_label_colors[aid]);
+  }
 
-  for (i=1; i<120; i++)
+  for (i=1; i<119; i++)
   {
     user_defined = FALSE;
     gtk_list_store_append (pref_model, & elem);
-    gtk_list_store_set (pref_model, & elem, 0, user_defined,
-                        1, periodic_table_info[i].name,
-                        2, periodic_table_info[i].lab,
-                        3, periodic_table_info[i].Z,
-                        4, get_radius (the_object, 0, i, edit_list[0]), -1);
-    if (num_col == 8)
+    if (do_style)
     {
-      j = user_defined;
-      user_defined = FALSE;
-      gtk_list_store_set (pref_model, & elem, 5,  get_radius (the_object, 1, i, edit_list[1]), -1);
-      j += (user_defined) ? 3 : 0;
-      user_defined = FALSE;
-      gtk_list_store_set (pref_model, & elem, 6, get_radius (the_object, 2, i, edit_list[2]), -1);
-      j += (user_defined) ? 5 : 0;
-      user_defined = FALSE;
-      gtk_list_store_set (pref_model, & elem, 7, get_radius (the_object, 3, i, edit_list[3]), -1);
-      j += (user_defined) ? 10 : 0;
-      user_defined = FALSE;
-      gtk_list_store_set (pref_model, & elem, 0, j, -1);
+      gtk_list_store_set (pref_model, & elem, 0, user_defined,
+                          1, periodic_table_info[i].name,
+                          2, periodic_table_info[i].lab,
+                          3, periodic_table_info[i].Z,
+                          4, get_radius (the_object, 0, i, edit_list[0]), -1);
+      if (num_col == 8)
+      {
+        j = user_defined;
+        user_defined = FALSE;
+        gtk_list_store_set (pref_model, & elem, 5,  get_radius (the_object, 1, i, edit_list[1]), -1);
+        j += (user_defined) ? 3 : 0;
+        user_defined = FALSE;
+        gtk_list_store_set (pref_model, & elem, 6, get_radius (the_object, 2, i, edit_list[2]), -1);
+        j += (user_defined) ? 5 : 0;
+        user_defined = FALSE;
+        gtk_list_store_set (pref_model, & elem, 7, get_radius (the_object, 3, i, edit_list[3]), -1);
+        j += (user_defined) ? 10 : 0;
+        user_defined = FALSE;
+        gtk_list_store_set (pref_model, & elem, 0, j, -1);
+      }
+    }
+    else
+    {
+      gtk_list_store_set (pref_model, & elem, 0, user_defined,
+                          1, periodic_table_info[i].name,
+                          2, periodic_table_info[i].lab,
+                          3, periodic_table_info[i].Z,
+                          4, NULL, -1);
     }
   }
 
@@ -1696,17 +1926,26 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   gchar * name[3] = {"Element", "Symbol", "Z"};
   gchar * g_name[3] = {"Radius", "Size", "Width"};
   gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4,5]"};
-
   for (i=0; i<num_col; i++)
   {
     pref_cel[i] = gtk_cell_renderer_text_new();
     if (i > 3)
     {
-      g_object_set (pref_cel[i], "editable", TRUE, NULL);
-      gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
-      g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-4));
-      pref_col[i] = gtk_tree_view_column_new_with_attributes((num_col) == 8 ? f_name[i-4] : g_name[bid], pref_cel[i], "text", i, NULL);
-      gtk_tree_view_column_set_cell_data_func (pref_col[i], pref_cel[i], radius_set_color_and_markup, GINT_TO_POINTER(i-4), NULL);
+      if (do_style)
+      {
+        g_object_set (pref_cel[i], "editable", TRUE, NULL);
+        gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
+        g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-4));
+        pref_col[i] = gtk_tree_view_column_new_with_attributes((num_col) == 8 ? f_name[i-4] : g_name[bid], pref_cel[i], "text", i, NULL);
+        gtk_tree_view_column_set_cell_data_func (pref_col[i], pref_cel[i], radius_set_color_and_markup, GINT_TO_POINTER(i-4), NULL);
+      }
+      else
+      {
+        gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
+        // g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-4));
+        pref_col[i] = gtk_tree_view_column_new_with_attributes("Color", pref_cel[i], "text", i, NULL);
+        gtk_tree_view_column_set_cell_data_func (pref_col[i], pref_cel[i], color_set_color, NULL, NULL);
+      }
     }
     else if (i)
     {
@@ -1892,9 +2131,10 @@ GtkWidget * model_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 0);
   gchar * other_info[2] = {"It also provides options to customize atomic label(s),", "and, the model box, if any:"};
-  gchar * o_list[2][2] = {{"Labels", "atomic labels"},
+  gchar * o_list[3][2] = {{"Labels", "atom labels"},
+                          {"Colors", "atom colors"},
                           {"Box", "model box details"}};
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 2, o_list, NULL), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 3, o_list, NULL), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 40, 0.0, 0.0), FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 10);
@@ -1920,27 +2160,29 @@ GtkWidget * model_preferences ()
   {
     if (i != 3 && i != 5) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
   }
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), colors_tab(), gtk_label_new ("Colors"));
 
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab(NULL, 0), gtk_label_new ("Labels"));
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab(NULL, 1), gtk_label_new ("Clone labels"));
+  gchar * obj[2] = {"<b>Atoms</b>", "<b>Clones</b>"};
+  vbox = create_vbox (BSEP);
+  for (i=0; i<2; i++)
+  {
+    hbox = adv_box (vbox, obj[i], 5, 120, 0.0);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  }
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
+
+  vbox = create_vbox (BSEP);
+  for (i=0; i<2; i++)
+  {
+    hbox = adv_box (vbox, obj[i], 5, 120, 0.0);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species colors", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(100+i)), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  }
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Colors"));
 
 
-  // Show / hide atom(s) ?
-  /* Atom radius
-     Bond radius
-      -> fonction du style
-  */
-  // Label atom(s)
-  //    - Label tab
-  // Chemical species color
-
-  // Repeat for clones
-
-
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (0), gtk_label_new ("Atom(s)"));
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), atom_tab (1), gtk_label_new ("Clone(s)"));
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), label_tab (), gtk_label_new ("Label(s)"));
   // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
 
   return notebook;
@@ -2290,6 +2532,22 @@ void clean_all_tmp ()
       tmp_bond_rad[i] = NULL;
     }
   }
+  for (i=0; i<2; i++)
+  {
+    if (tmp_label_color[i])
+    {
+      g_free (tmp_label_color[i]);
+      tmp_label_color[i] = NULL;
+    }
+  }
+  for (i=0; i<5; i++)
+  {
+    if (tmp_label[i])
+    {
+      g_free (tmp_label[i]);
+      tmp_label[i] = NULL;
+    }
+  }
 }
 
 /*!
@@ -2316,14 +2574,19 @@ void prepare_tmp_default ()
   tmp_o_bd_rw = duplicate_bool (6, default_o_bd_rw);
   tmp_bd_rw = duplicate_double (6, default_bd_rw);
   int i;
-  for (i=0; i<16; i++)
+  for (i=0; i<16; i++)tmp_atomic_rad[i] = duplicate_element_radius (default_atomic_rad[i]);
+  for (i=0; i<6; i++) tmp_bond_rad[i] = duplicate_element_radius (default_bond_rad[i]);
+  for (i=0; i<2; i++) tmp_label_color[i] = duplicate_element_color (default_label_color[i]);
+  for (i=0; i<5; i++)
   {
-    tmp_atomic_rad[i] = duplicate_element_radius (default_atomic_rad[i]);
+    tmp_label[i] = g_malloc(sizeof*tmp_label[i]);
+    duplicate_screen_label (tmp_label[i], & default_label[i]);
   }
-  for (i=0; i<6; i++)
-  {
-    tmp_bond_rad[i] = duplicate_element_radius (default_bond_rad[i]);
-  }
+  for (i=0; i<2; i++) tmp_acl_format[i] = default_acl_format[i];
+  tmp_mtilt = default_mtilt;
+  tmp_mpattern = defaut_mpattern ;
+  tmp_mfactor = default_mfactor;
+  tmp_mwidth = default_mwidth;
 }
 
 /*!
@@ -2400,6 +2663,20 @@ void save_preferences ()
     if (default_bond_rad[i]) g_free (default_bond_rad[i]);
     default_bond_rad[i] = duplicate_element_radius (tmp_bond_rad[i]);
   }
+  for (i=0; i<2; i++)
+  {
+    if (default_label_color[i]) g_free (default_label_color[i]);
+    default_label_color[i] = duplicate_element_color (tmp_label_color[i]);
+  }
+  for (i=0; i<5; i++)
+  {
+    duplicate_screen_label (& default_label[i], tmp_label[i]);
+  }
+  for (i=0; i<2; i++) default_acl_format[i] = tmp_acl_format[i];
+  default_mtilt = tmp_mtilt;
+  defaut_mpattern = tmp_mpattern;
+  default_mfactor = tmp_mfactor;
+  default_mwidth = tmp_mwidth;
 
   if (nprojects)
   {
@@ -2420,7 +2697,7 @@ void save_preferences ()
 */
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
-  int i;
+  int i, j;
   // Analysis preferences
   default_num_delta[GR] = 1000;
   default_num_delta[SQ] = 1000;
@@ -2462,6 +2739,7 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 
   // Lights
   default_lightning.lights = 3;
+  if (default_lightning.spot) g_free (default_lightning.spot);
   default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
   default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
   default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
@@ -2483,11 +2761,58 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
     default_o_at_rs[i] = default_o_at_rs[i+5] = FALSE;
     default_at_rs[i] = default_at_rs[i+5] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
   }
+
+  for (i=0; i<16; i++)
+  {
+    if (default_atomic_rad[i])
+    {
+      g_free (default_atomic_rad[i]);
+      default_atomic_rad[i] = NULL;
+    }
+  }
   for (i=0; i<3; i++)
   {
     default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
     default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
   }
+  for (i=0; i<6; i++)
+  {
+    if (default_bond_rad[i])
+    {
+      g_free (default_bond_rad[i]);
+      default_bond_rad[i] = NULL;
+    }
+  }
+  for (i=0; i<2; i++)
+  {
+    if (default_label_color[i])
+    {
+      g_free (default_label_color[i]);
+      default_label_color[i] = NULL;
+    }
+  }
+  for (i=0; i<5; i++)
+  {
+    default_label[i].position = 1;
+    default_label[i].render = BETTER_TEXT;
+    default_label[i].scale = 0;
+    for (j=0; j<3; j++) default_label[i].shift[j] = 0.0;
+    default_label[i].n_colors = (i > 2) ? 1 : 0;
+    if (default_label[i].n_colors)
+    {
+      default_label[i].color = g_malloc (sizeof*default_label[i].color);
+      default_label[i].color[0].red = 1.0;
+      default_label[i].color[0].green = 1.0;
+      default_label[i].color[0].blue = 1.0;
+      default_label[i].color[0].alpha = 1.0;
+    }
+    default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
+  }
+  default_acl_format[0] = default_acl_format[1] = SYMBOL_AND_NUM;
+  default_mtilt = TRUE;
+  defaut_mpattern = 0;
+  default_mfactor = 1;
+  default_mwidth = 1.0;
 
   if (preference_notebook)
   {

@@ -40,9 +40,22 @@ typedef struct element_radius element_radius;
 struct element_radius
 {
   int Z;            /*!< Atomic number */
-  double rad;       /*!< Assiociated radius */
+  double rad;       /*!< Associated radius */
   element_radius * next;
   element_radius * prev;
+};
+
+/*! \typedef element_color
+
+  \brief element color data structure
+*/
+typedef struct element_color element_color;
+struct element_color
+{
+  int Z;            /*!< Atomic number */
+  ColRGBA col;      /*!< Associated color */
+  element_color * next;
+  element_color * prev;
 };
 
 extern float get_radius (int object, int col, int z, element_radius * rad_list);
@@ -86,7 +99,7 @@ extern gboolean * default_o_bd_rw;
 extern double * default_bd_rw;
 
 extern screen_label default_label[5];
-extern screen_label tmp_label[5];
+extern screen_label * tmp_label[5];
 extern int default_acl_format[2];
 extern int tmp_acl_format[2];
 extern gboolean default_mtilt;

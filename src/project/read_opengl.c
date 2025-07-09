@@ -399,7 +399,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   {
     for (i=0; i<5; i++)
     {
-      if (! read_this_image_label(fp, & img -> labels[i])) return ERROR_RW;
+      if (read_this_image_label(fp, & img -> labels[i])) return ERROR_RW;
     }
     if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
   }
