@@ -47,8 +47,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void fill_dihedral_model_row (int p, int a, int b, int c, int d, GtkTreeStore * store);
   void update_selection_tree (glwin * view, int sid, int mid);
   void update_label_selection (glwin * view, int sid);
+  void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
 
-  G_MODULE_EXPORT void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
   G_MODULE_EXPORT void measure_tree_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data);
   G_MODULE_EXPORT void close_ml (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void measure_labels (GtkButton * but, gpointer data);
@@ -388,7 +388,7 @@ void update_selection_tree (glwin * view, int sid, int mid)
 }
 
 /*!
-  \fn G_MODULE_EXPORT void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
+  \fn void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
 
   \brief measure tree button event
 
@@ -398,7 +398,7 @@ void update_selection_tree (glwin * view, int sid, int mid)
   \param event_button event buttton
   \param data the associated data pointer
 */
-G_MODULE_EXPORT void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
+void measure_tree_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
 {
   if (event_button == 1)
   {
@@ -421,7 +421,7 @@ G_MODULE_EXPORT void measure_tree_button_event (GtkWidget * widget, double event
       if (gtk_tree_model_get_iter (measure_model, & row, path))
       {
         gtk_tree_model_get (measure_model, & row, 0, & j, -1);
-        // select bonds, angles or dihedraks:
+        // select bonds, angles or dihedrals:
         switch (dat -> c)
         {
           case 0:
@@ -445,7 +445,7 @@ G_MODULE_EXPORT void measure_tree_button_event (GtkWidget * widget, double event
 /*!
   \fn G_MODULE_EXPORT gboolean measure_tree_selection_event (GtkWidget * widget, GdkEventButton * event, gpointer data)
 
-  \brief measures tree view button press callback GTK4
+  \brief measures tree view button press callback GTK3
 
   \param widget the GtkWidget sending the signal
   \param event the GtkEventButton triggering the signal
@@ -464,7 +464,7 @@ G_MODULE_EXPORT gboolean measure_tree_selection_event (GtkWidget * widget, GdkEv
 /*!
   \fn G_MODULE_EXPORT void measure_tree_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data)
 
-  \brief measures tree view button press callback GTK3
+  \brief measures tree view button press callback GTK4
 
   \param gesture the GtkGesture sending the signal
   \param n_press number of times it was pressed

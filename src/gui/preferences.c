@@ -1681,7 +1681,7 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
       else
       {
         object -= 100;
-        if (tmp_label_color[object] g_free (tmp_label_color[object]);
+        if (tmp_label_color[object]) g_free (tmp_label_color[object]);
         tmp_label_color[object] = duplicate_element_color (color_list);
       }
       break;
@@ -1798,6 +1798,204 @@ void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * ren
 }
 
 /*!
+  \fn gboolean are_identical_colors (ColRGBA col_a, ColRGBA col_b)
+
+  \brief test if two colors are identicals
+
+  \param col_a first color to test
+  \param col_b second color to test
+*/
+gboolean are_identical_colors (ColRGBA col_a, ColRGBA col_b)
+{
+  if (col_a.red != col_b.red) return FALSE;
+  if (col_a.green != col_b.green) return FALSE;
+  if (col_a.blue != col_b.blue) return FALSE;
+  if (col_a.alpha != col_b.alpha) return FALSE;
+  return TRUE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void run_ac_color (GtkDialog * win, gint response_id, gpointer data)
+
+  \brief window color chooser - running the dialog
+
+  \param win the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void run_ac_color (GtkDialog * win, gint response_id, gpointer data)
+{
+  if (response_id == GTK_RESPONSE_OK)
+  {
+    ColRGBA colo = get_window_color (GTK_WIDGET(win));
+    int i = GPOINTER_TO_INT (data);
+    ColRGBA orig = set_default_color (i);
+    gboolean add_elem;
+    element_color * tmp_list;
+    if (color_list)
+    {
+      tmp_list = color_list;
+      add_elem = TRUE;
+      while (tmp_list)
+      {
+        if (tmp_list -> Z == i)
+        {
+          tmp_list -> col = colo;
+          if (are_identical_colors(colo, orig))
+          {
+            if (tmp_list -> next)
+            {
+              if (tmp_list -> prev)
+              {
+                tmp_list -> prev -> next = tmp_list -> next;
+                tmp_list -> next -> prev = tmp_list -> prev;
+              }
+              else
+              {
+                color_list = tmp_list -> next;
+                color_list -> prev = NULL;
+              }
+            }
+            else if (tmp_list -> prev)
+            {
+              color_list -> col = tmp_list -> col;
+              color_list -> Z = tmp_list -> Z;
+              color_list -> prev = NULL;
+            }
+            else
+            {
+              g_free (color_list);
+              color_list = NULL;
+            }
+            add_elem = FALSE;
+          }
+          else
+          {
+            add_elem = FALSE;
+          }
+        }
+        tmp_list = tmp_list -> next;
+      }
+    }
+    else if (! are_identical_colors(colo, orig))
+    {
+      add_elem = TRUE;
+    }
+    if (add_elem)
+    {
+      if (color_list)
+      {
+        tmp_list = color_list;
+        while (tmp_list)
+        {
+          if (! tmp_list -> next) break;
+          tmp_list = tmp_list -> next;
+        }
+        tmp_list -> next = g_malloc0(sizeof*tmp_list -> next);
+        tmp_list -> next -> prev = tmp_list;
+        tmp_list = tmp_list -> next;
+      }
+      else
+      {
+        color_list = g_malloc0(sizeof*color_list);
+        tmp_list = color_list;
+      }
+      tmp_list -> Z = i;
+      tmp_list -> col = colo;
+    }
+  }
+  destroy_this_dialog (win);
+}
+
+/*!
+  \fn void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
+
+  \brief species color selection mouse button event
+
+  \param widget the GtkWidget sending the signal
+  \param event_x x position
+  \param event_y y position
+  \param event_button event buttton
+  \param data the associated data pointer
+*/
+void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data)
+{
+  if (event_button == 1)
+  {
+    GtkTreeModel * model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
+    GtkTreePath * path;
+    GtkTreeViewColumn * column;
+    int i, j;
+#ifdef GTK4
+    int e_x, e_y;
+    gtk_tree_view_convert_widget_to_bin_window_coords (GTK_TREE_VIEW(widget), event_x, event_y, & e_x, & e_y);
+    if (gtk_tree_view_get_path_at_pos (GTK_TREE_VIEW(widget), e_x, e_y, & path, & column, & i, & j))
+#else
+    if (gtk_tree_view_get_path_at_pos (GTK_TREE_VIEW(widget), event_x, event_y, & path, & column, & i, & j))
+#endif
+    {
+      if (g_strcmp0("Color", gtk_tree_view_column_get_title (column)) == 0)
+      {
+        GtkTreeIter row;
+        if (gtk_tree_model_get_iter (model, & row, path))
+        {
+          i = GPOINTER_TO_INT(data);
+          gchar * obj[2]={"atom", "clone"};
+          int z;
+          gtk_tree_model_get (model, & row, 3, & z, -1);
+          gchar * str = g_strdup_printf ("%s %s color", periodic_table_info[z].lab, obj[i]);
+          GdkRGBA col = colrgba_togtkrgba (get_spec_color (z));
+          GtkWidget * win = gtk_color_chooser_dialog_new (str, GTK_WINDOW(MainWindow));
+          gtk_window_set_modal (GTK_WINDOW(win), TRUE);
+          gtk_color_chooser_set_use_alpha (GTK_COLOR_CHOOSER(win), TRUE);
+          gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(win), & col);
+          g_free (str);
+          run_this_gtk_dialog (win, G_CALLBACK(run_ac_color), GINT_TO_POINTER(z));
+        }
+      }
+    }
+  }
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void pref_color_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data)
+
+  \brief mouse button pressed callback GTK4
+
+  \param gesture the GtkGesture sending the signal
+  \param n_press the number of times it was pressed
+  \param x x position
+  \param y y position
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void pref_color_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data)
+{
+  color_button_event (gtk_event_controller_get_widget ((GtkEventController*)gesture), x, y,
+                      gtk_gesture_single_get_current_button ((GtkGestureSingle * )gesture), GDK_BUTTON_PRESS, data);
+}
+#else
+/*!
+  \fn G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEventButton * event, gpointer data)
+
+  \brief on button event in species color edition
+
+  \param widget the GtkWidget sending the signal
+  \param event the GtkEventButton triggering the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEvent * event, gpointer data)
+{
+  if (event -> type == GDK_BUTTON_PRESS)
+  {
+    GdkEventButton * bevent = (GdkEventButton*)event;
+    color_button_event (widget, bevent -> x, bevent -> y, bevent -> button, data);
+  }
+  return FALSE;
+}
+#endif
+
+/*!
   \fn G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 
   \brief edit atoms and bonds species related parameters
@@ -1882,7 +2080,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   else
   {
     pref_model = gtk_list_store_newv (num_col, c_type);
-    color_list = duplicate_element_color (tmp_label_colors[aid]);
+    color_list = duplicate_element_color (tmp_label_color[aid]);
   }
 
   for (i=1; i<119; i++)
@@ -1965,6 +2163,13 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
   gtk_tree_selection_set_mode (pref_select, GTK_SELECTION_SINGLE);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(pref_tree));
+
+#ifdef GTK3
+  g_signal_connect (G_OBJECT(pref_tree), "button_press_event", G_CALLBACK(pref_color_button_event), GINT_TO_POINTER(aid));
+#else
+  add_widget_gesture_and_key_action (dataview, "datab-context-click", G_CALLBACK(pref_color_button_pressed), GINT_TO_POINTER(aid),
+                                               NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+#endif
 
   GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, scrol, pref_tree);
