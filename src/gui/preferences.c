@@ -1000,6 +1000,7 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
   {
     if (! vid)
     {
+      default_label[label_id].color = g_malloc0(sizeof*default_label[label_id].color);
       default_label[label_id].color[0] = * col;
     }
     else
@@ -1925,6 +1926,8 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
       }
       break;
   }
+  if (tmp_color) g_free (tmp_color);
+  tmp_color = NULL;
   destroy_this_dialog (edit_chem);
 }
 
@@ -1944,6 +1947,7 @@ void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
   int z;
   gtk_tree_model_get (mod, iter, 3, & z, -1);
   GdkRGBA colo = colrgba_togtkrgba (get_spec_color (z, color_list));
+  if (tmp_color) colo.alpha = 0.5;
   g_object_set (renderer, "background-rgba", & colo, "background-set", TRUE, NULL);
 }
 
@@ -2285,6 +2289,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   }
   edit_list = NULL;
   color_list = NULL;
+  tmp_color = NULL;
   GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
   g_free (str);
   gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 8) ? 600 : 300, 600);
@@ -2380,7 +2385,6 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
       else
       {
         gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
-        // g_signal_connect (G_OBJECT(pref_cel[i]), "edited", G_CALLBACK(edit_pref), GINT_TO_POINTER(i-4));
         pref_col[i] = gtk_tree_view_column_new_with_attributes("Color", pref_cel[i], "text", i, NULL);
         gtk_tree_view_column_set_cell_data_func (pref_col[i], pref_cel[i], color_set_color, NULL, NULL);
       }
@@ -2425,9 +2429,21 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   else if (do_label)
   {
     gtk_widget_set_sensitive (edit_scrol, ! tmp_label[aid] -> n_colors);
+    GtkWidget * vvbox = create_vbox (BSEP);
     GtkWidget * hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Use single color", -1, -1, tmp_label[aid] -> n_colors, G_CALLBACK(toggled_default_stuff), data), FALSE, FALSE, 10);
-    tmp_color = NULL;
+    gchar * info[3] = {"By default label and species colors are similar,", "you can modify that using this dialog window.", "You can also use a single color for all labels:"};
+    for (i=0; i<2; i++)
+    {
+      hbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(info[i], 300, -1, 0.5, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
+    }
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 10);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(info[i], 300, -1, 0.5, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Use single color", -1, -1, tmp_label[aid] -> n_colors, G_CALLBACK(toggled_default_stuff), data), FALSE, FALSE, 30);
     ColRGBA active_col;
     if (tmp_label[aid] -> n_colors)
     {
@@ -2438,8 +2454,8 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     active_col.red = active_col.green = active_col.blue = active_col.alpha = 1.0;
     edit_colob = color_button (active_col, TRUE, 100, -1, G_CALLBACK(set_stuff_color), tmp_color);
     widget_set_sensitive (edit_colob, tmp_label[aid] -> n_colors);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, edit_colob, FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, edit_colob, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
   }
   run_this_gtk_dialog (win, G_CALLBACK(edit_chem_preferences), data);
 }
