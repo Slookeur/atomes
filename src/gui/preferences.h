@@ -59,6 +59,7 @@ struct element_color
 };
 
 extern float get_radius (int object, int col, int z, element_radius * rad_list);
+extern ColRGBA get_spec_color (int z, element_color * clist);
 
 // Analysis parameters
 
@@ -110,6 +111,9 @@ extern int default_mfactor;
 extern int tmp_mfactor;
 extern double default_mwidth;
 extern double tmp_mwidth;
+
+extern element_color * default_label_color[2];
+extern element_color * default_atom_color[2];
 
 extern tint * pref_pointer;
 

@@ -752,10 +752,17 @@ GtkWidget * labels_tab (glwin * view, int lid)
     {
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, markup_label(lpos[i], 30, -1, 0.5, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox,
-                           create_hscale(-5.0, 5.0, 0.01, label -> shift[i], GTK_POS_TOP, 3, 100, G_CALLBACK(set_label_shift), G_CALLBACK(scroll_set_label_shift), shift_pointer[i]),
+                           create_hscale(-5.0, 5.0, 0.01, label -> shift[i], (preferences) ? GTK_POS_RIGHT : GTK_POS_TOP, 3, 100, G_CALLBACK(set_label_shift), G_CALLBACK(scroll_set_label_shift), shift_pointer[i]),
                            FALSE, FALSE, 0);
     }
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, chbox, FALSE, FALSE, 0);
+    if (preferences)
+    {
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, chbox, FALSE, FALSE, 0);
+    }
+    else
+    {
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, chbox, FALSE, FALSE, 0);
+    }
   }
 
   // Colors

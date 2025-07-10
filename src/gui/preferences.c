@@ -107,6 +107,8 @@ element_radius * tmp_atomic_rad[16];
 element_radius * default_bond_rad[6];
 element_radius * tmp_bond_rad[6];
 // atoms + clones
+element_color * default_atom_color[2];
+element_color * tmp_atom_color[2];
 element_color * default_label_color[2];
 element_color * tmp_label_color[2];
 
@@ -158,6 +160,54 @@ gchar * xml_style_leg[6] = {"ball_and_stick", "wireframes", "spacefilled", "sphe
 gchar * xml_filled_leg[4] = {"covalent", "ionic", "van-der-waals", "crystal"};
 gchar * xml_atom_leg[3] = {"atoms_radius", "dot_size", "sphere_radius"};
 gchar * xml_bond_leg[3] = {"bond_radius", "wireframe_width", "cylinder_radius"};
+
+/*!
+  \fn int xml_save_color_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, ColRGBA col)
+
+  \brief save color data (red, green, blue, alpha) to XML file
+
+  \param writer the XML writer to update
+  \param did id, if any
+  \param legend the corresponding legend
+  \param data the data to save
+*/
+int xml_save_color_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, ColRGBA col)
+{
+  int rc;
+  gchar * str;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST legend);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"key", BAD_CAST key);
+  if (rc < 0) return 0;
+  if (did > -1)
+  {
+    str = g_strdup_printf ("%d", did);
+    rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"id", BAD_CAST str);
+    g_free (str);
+    if (rc < 0) return 0;
+  }
+  str = g_strdup_printf ("%f", col.red);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"red", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", col.green);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"green", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", col.blue);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"blue", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  str = g_strdup_printf ("%f", col.alpha);
+  rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"alpha", BAD_CAST str);
+  g_free (str);
+  if (rc < 0) return 0;
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+  return 1;
+}
 
 /*!
   \fn int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data)
@@ -644,6 +694,7 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
+  element_color * tmp_col;
   // atoms and clones labels
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
   if (rc < 0) return 0;
@@ -672,19 +723,60 @@ int save_preferences_to_xml_file ()
     str = g_strdup_printf ("%d", default_label[i].n_colors);
     rc = xml_save_parameter_to_file (writer, xml_label_leg[5], "default_label", TRUE, 5, str);
     g_free (str);
-    if (default_label[i].n_colors)
+    if (default_label[i].n_colors || default_label_color[i])
     {
-      // Hmmm
+      rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
+      if (rc < 0) return 0;
+      if (default_label[i].n_colors)
+      {
+        xml_save_color_to_file (writer, 0, "only_label_color", "default_label_color", default_label[i].color[0]);
+      }
+      else
+      {
+        tmp_col = default_label_color[i];
+        while (tmp_col)
+        {
+          rc = xml_save_color_to_file (writer, tmp_col -> Z, periodic_table_info[tmp_col -> Z].lab, "default_label_color", tmp_col -> col);
+          if (! rc) return 0;
+          tmp_col = tmp_col -> next;
+        }
+      }
+      rc = xmlTextWriterEndElement (writer);
+      if (rc < 0) return 0;
     }
-    if (! rc) return 0;
 
     rc = xmlTextWriterEndElement (writer);
     if (rc < 0) return 0;
   }
 
-  // End atoms and clones labels
+  // End atoms and clones colors
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
+
+  do_atoms = (default_atom_color[0] || default_atom_color[1]) ? TRUE : FALSE;
+  if (do_atoms)
+  {
+    // atoms and clones labels
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
+    if (rc < 0) return 0;
+    for (i=0; i<2; i++)
+    {
+      if (default_atom_color[i])
+      {
+        rc = xmlTextWriterStartElement (writer, BAD_CAST obj[i]);
+        if (rc < 0) return 0;
+        tmp_col = default_atom_color[i];
+        while (tmp_col)
+        {
+          rc = xml_save_color_to_file (writer, tmp_col -> Z, periodic_table_info[tmp_col -> Z].lab, "default_atom_color", tmp_col -> col);
+          if (! rc) return 0;
+          tmp_col = tmp_col -> next;
+        }
+        rc = xmlTextWriterEndElement (writer);
+        if (rc < 0) return 0;
+      }
+    }
+  }
 
   // End model
   rc = xmlTextWriterEndElement (writer);
@@ -715,7 +807,7 @@ double xml_string_to_double (gchar * content)
 }
 
 /*!
-  \fn void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end)
+  \fn void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col)
 
   \brief set default parameter
 
@@ -725,11 +817,13 @@ double xml_string_to_double (gchar * content)
   \param vect vector to set, if any
   \param start initial value, if any, -1.0 otherwise
   \param end final value, if any, -1.0 otherwise
+  \param col color to set, if any
 
 */
-void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end)
+void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col)
 {
   element_radius * tmp_rad;
+  element_color * tmp_col;
   if (g_strcmp0(key, "default_num_delta") == 0)
   {
     default_num_delta[vid] = (int)xml_string_to_double(content);
@@ -902,6 +996,53 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
         break;
     }
   }
+  else if (g_strcmp0(key, "default_label_color") == 0)
+  {
+    if (! vid)
+    {
+      default_label[label_id].color[0] = * col;
+    }
+    else
+    {
+      if (default_label_color[label_id])
+      {
+        tmp_col = default_label_color[label_id];
+        while (tmp_col -> next)
+        {
+          tmp_col = tmp_col -> next;
+        }
+        tmp_col -> next = g_malloc0(sizeof*tmp_col);
+        tmp_col = tmp_col -> next;
+      }
+      else
+      {
+        default_label_color[label_id] = g_malloc0(sizeof*default_label_color[label_id]);
+        tmp_col = default_label_color[label_id];
+      }
+      tmp_col -> Z = vid;
+      tmp_col -> col = * col;
+    }
+  }
+  else if (g_strcmp0(key, "default_atom_color") == 0)
+  {
+    if (default_atom_color[label_id])
+    {
+      tmp_col = default_atom_color[label_id];
+      while (tmp_col -> next)
+      {
+        tmp_col = tmp_col -> next;
+      }
+      tmp_col -> next = g_malloc0(sizeof*tmp_col);
+      tmp_col = tmp_col -> next;
+    }
+    else
+    {
+      default_atom_color[label_id] = g_malloc0(sizeof*default_atom_color[label_id]);
+      tmp_col = default_atom_color[label_id];
+    }
+    tmp_col -> Z = vid;
+    tmp_col -> col = * col;
+  }
 }
 
 /*!
@@ -917,6 +1058,8 @@ void read_parameter (xmlNodePtr parameter_node)
   xmlAttrPtr p_details;
   gboolean set_codevar, set_id;
   gboolean set_x, set_y, set_z;
+  gboolean set_r, set_g, set_b, set_a;
+  ColRGBA col;
   gchar * key;
   gchar * content;
   int id;
@@ -928,6 +1071,7 @@ void read_parameter (xmlNodePtr parameter_node)
     p_details = parameter_node -> properties;
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
+    set_r = set_g = set_b = set_a = FALSE;
     start = end = -1.0;
     while (p_details)
     {
@@ -967,13 +1111,33 @@ void read_parameter (xmlNodePtr parameter_node)
         {
           end = string_to_double ((gpointer)xmlNodeGetContent(p_node));
         }
+        else if (g_strcmp0("red",(char *)p_details -> name) == 0)
+        {
+          col.red = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_r = TRUE;
+        }
+        else if (g_strcmp0("green",(char *)p_details -> name) == 0)
+        {
+          col.green = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_g = TRUE;
+        }
+        else if (g_strcmp0("blue",(char *)p_details -> name) == 0)
+        {
+          col.blue = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_b = TRUE;
+        }
+        else if (g_strcmp0("alpha",(char *)p_details -> name) == 0)
+        {
+          col.alpha = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_a = TRUE;
+        }
       }
       p_details = p_details -> next;
     }
     if (set_codevar && set_id)
     {
       // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
-      set_parameter (content, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end);
+      set_parameter (content, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
     }
     g_free (content);
     parameter_node = parameter_node -> next;
@@ -1053,7 +1217,7 @@ void read_light (xmlNodePtr light_node)
       }
       if (set_codevar)
       {
-        set_parameter (content, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0);
+        set_parameter (content, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0, NULL);
       }
       g_free (content);
       parameter_node = parameter_node -> next;
@@ -1131,7 +1295,7 @@ void read_preferences_from_xml_file ()
   xmlDoc * doc;
   xmlTextReaderPtr reader;
   xmlNodePtr racine;
-  xmlNodePtr node, p_node, l_node;
+  xmlNodePtr node, p_node, l_node, c_node;
   const xmlChar aml[22]="atomes_preferences-xml";
   int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
@@ -1197,6 +1361,24 @@ void read_preferences_from_xml_file ()
             for (i=0; i<2; i++)
             {
               l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
+              if (l_node)
+              {
+                label_id = i;
+                read_preferences (l_node);
+                c_node = findnode(l_node -> children, "colors");
+                if (c_node)
+                {
+                  read_preferences (c_node);
+                }
+              }
+            }
+          }
+          c_node = findnode(node -> children, "colors");
+          if (c_node)
+          {
+            for (i=0; i<2; i++)
+            {
+              l_node = findnode (c_node -> children, (i) ? "clones" : "atoms");
               if (l_node)
               {
                 label_id = i;
@@ -1287,6 +1469,15 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
   return vbox;
 }
 
+int the_object;
+element_radius ** edit_list;
+element_color * color_list;
+GtkWidget * pref_tree;
+gboolean user_defined;
+GtkWidget * edit_scrol;
+GtkWidget * edit_colob;
+ColRGBA * tmp_color;
+
 #ifdef GTK4
 /*!
   \fn G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data)
@@ -1328,10 +1519,29 @@ G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data
         tmp_o_bd_rw[-object-2] = status;
         widget_set_sensitive(bond_entry_over[-object-2], status);
       }
-      else
+      else if (object < 100)
       {
         tmp_o_at_rs[object-2] = status;
         widget_set_sensitive(atom_entry_over[object-2], status);
+      }
+      else
+      {
+        widget_set_sensitive (edit_scrol, ! status);
+        widget_set_sensitive (edit_colob,  status);
+        ColRGBA col;
+        col.red = col.green = col.blue = col.alpha = 1.0;
+        if (status)
+        {
+          tmp_color = g_malloc0(sizeof*tmp_color);
+          tmp_color -> red = tmp_color -> green = tmp_color -> blue = tmp_color -> alpha = 1.0;
+        }
+        else
+        {
+          if (tmp_color) g_free (tmp_color);
+          tmp_color = NULL;
+        }
+        GdkRGBA rgb_col =  colrgba_togtkrgba(col);
+        gtk_color_button_set_rgba (GTK_COLOR_BUTTON(edit_colob), & rgb_col);
       }
       break;
   }
@@ -1361,12 +1571,6 @@ G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data)
   }
   update_entry_double (res, value);
 }
-
-int the_object;
-element_radius ** edit_list;
-element_color * color_list;
-GtkWidget * pref_tree;
-gboolean user_defined;
 
 /*!
   \fn element_radius * duplicate_element_radius (element_radius * old_list)
@@ -1493,16 +1697,17 @@ element_color * duplicate_element_color (element_color * old_list)
 }
 
 /*!
-  \fn ColRGBA get_spec_color (int z)
+  \fn ColRGBA get_spec_color (int z, , element_color * clist)
 
   \brief retrieve the color of a chemical species
 
   \param z atomic number
+  \param clist the target color list, if any
 
 */
-ColRGBA get_spec_color (int z)
+ColRGBA get_spec_color (int z, element_color * clist)
 {
-  element_color * tmp_col = color_list;
+  element_color * tmp_col = clist;
   while (tmp_col)
   {
     if (tmp_col -> Z == z)
@@ -1654,6 +1859,7 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
   int i, j, k, l;
   int object = GPOINTER_TO_INT (data);
   gboolean do_style = (object < 100) ? TRUE : FALSE;
+  gboolean do_label = (object == 1000 || object == 1001) ? TRUE : FALSE;
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
@@ -1678,11 +1884,18 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
           }
         }
       }
+      else if (do_label)
+      {
+        object -= 1000;
+        if (tmp_label_color[object]) g_free (tmp_label_color[object]);
+        tmp_label_color[object] = duplicate_element_color (color_list);
+        if (tmp_color) tmp_label[object] -> color[0] = * tmp_color;
+      }
       else
       {
         object -= 100;
-        if (tmp_label_color[object]) g_free (tmp_label_color[object]);
-        tmp_label_color[object] = duplicate_element_color (color_list);
+        if (tmp_atom_color[object]) g_free (tmp_atom_color[object]);
+        tmp_atom_color[object] = duplicate_element_color (color_list);
       }
       break;
     default:
@@ -1725,7 +1938,7 @@ void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
 {
   int z;
   gtk_tree_model_get (mod, iter, 3, & z, -1);
-  GdkRGBA colo = colrgba_togtkrgba (get_spec_color (z));
+  GdkRGBA colo = colrgba_togtkrgba (get_spec_color (z, color_list));
   g_object_set (renderer, "background-rgba", & colo, "background-set", TRUE, NULL);
 }
 
@@ -1944,7 +2157,7 @@ void color_button_event (GtkWidget * widget, double event_x, double event_y, gui
           int z;
           gtk_tree_model_get (model, & row, 3, & z, -1);
           gchar * str = g_strdup_printf ("%s %s color", periodic_table_info[z].lab, obj[i]);
-          GdkRGBA col = colrgba_togtkrgba (get_spec_color (z));
+          GdkRGBA col = colrgba_togtkrgba (get_spec_color (z, color_list));
           GtkWidget * win = gtk_color_chooser_dialog_new (str, GTK_WINDOW(MainWindow));
           gtk_window_set_modal (GTK_WINDOW(win), TRUE);
           gtk_color_chooser_set_use_alpha (GTK_COLOR_CHOOSER(win), TRUE);
@@ -1996,6 +2209,19 @@ G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEvent *
 #endif
 
 /*!
+  \fn G_MODULE_EXPORT void set_stuff_color (GtkColorChooser * colob, gpointer data)
+
+  \brief change stuff color
+
+  \param colob the GtkColorChooser sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_stuff_color (GtkColorChooser * colob, gpointer data)
+{
+  * tmp_color = get_button_color (colob);
+}
+
+/*!
   \fn G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 
   \brief edit atoms and bonds species related parameters
@@ -2014,7 +2240,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   int num_col;
   gchar * str;
   gboolean do_style = (the_object < 100) ? TRUE : FALSE;
-
+  gboolean do_label = FALSE;
   if (do_style)
   {
     if (the_object < 0)
@@ -2039,8 +2265,17 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   else
   {
     // Going for colors
-    aid = the_object - 100;
-    str = g_strdup_printf ("Select %s color", (aid) ? "clone" : "atom");
+    if (the_object < 1000)
+    {
+      aid = the_object - 100;
+      str = g_strdup_printf ("Select %s color", (aid) ? "clone" : "atom");
+    }
+    else
+    {
+      aid = the_object - 1000;
+      str = g_strdup_printf ("Select %s label color", (aid) ? "clone" : "atom");
+      do_label = TRUE;
+    }
     num_col = 5;
   }
   edit_list = NULL;
@@ -2080,7 +2315,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   else
   {
     pref_model = gtk_list_store_newv (num_col, c_type);
-    color_list = duplicate_element_color (tmp_label_color[aid]);
+    color_list = duplicate_element_color ((do_label) ? tmp_label_color[aid] : tmp_atom_color[aid]);
   }
 
   for (i=1; i<119; i++)
@@ -2171,8 +2406,8 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
                                                  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 #endif
 
-  GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
-  add_container_child (CONTAINER_SCR, scrol, pref_tree);
+  edit_scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
+  add_container_child (CONTAINER_SCR, edit_scrol, pref_tree);
   if (num_col == 8)
   {
     gchar * legend={"\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
@@ -2181,6 +2416,25 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
                     "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
                     "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
+  }
+  else if (do_label)
+  {
+    gtk_widget_set_sensitive (edit_scrol, ! tmp_label[aid] -> n_colors);
+    GtkWidget * hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Use single color", -1, -1, tmp_label[aid] -> n_colors, G_CALLBACK(toggled_default_stuff), data), FALSE, FALSE, 10);
+    tmp_color = NULL;
+    ColRGBA active_col;
+    if (tmp_label[aid] -> n_colors)
+    {
+      tmp_color = g_malloc0(sizeof*tmp_color);
+      * tmp_color = tmp_label[aid] -> color[0];
+      active_col = tmp_label[aid] -> color[0];
+    }
+    active_col.red = active_col.green = active_col.blue = active_col.alpha = 1.0;
+    edit_colob = color_button (active_col, TRUE, 100, -1, G_CALLBACK(set_stuff_color), tmp_color);
+    widget_set_sensitive (edit_colob, tmp_label[aid] -> n_colors);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, edit_colob, FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
   }
   run_this_gtk_dialog (win, G_CALLBACK(edit_chem_preferences), data);
 }
@@ -2368,12 +2622,20 @@ GtkWidget * model_preferences ()
 
   gchar * obj[2] = {"<b>Atoms</b>", "<b>Clones</b>"};
   vbox = create_vbox (BSEP);
+  GtkWidget * hhbox;
   for (i=0; i<2; i++)
   {
     hbox = adv_box (vbox, obj[i], 5, 120, 0.0);
     hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i), FALSE, FALSE, 40);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+    hbox = create_hbox (BSEP);
+    hhbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.25), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("Colors", 150, 30, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button ("Adjust color(s)", IMG_NONE, NULL, 220, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(1000+i)), FALSE, FALSE, 15);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, hhbox, FALSE, FALSE, 40);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   }
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
 
@@ -2739,6 +3001,11 @@ void clean_all_tmp ()
   }
   for (i=0; i<2; i++)
   {
+    if (tmp_atom_color[i])
+    {
+      g_free (tmp_atom_color[i]);
+      tmp_atom_color[i] = NULL;
+    }
     if (tmp_label_color[i])
     {
       g_free (tmp_label_color[i]);
@@ -2781,7 +3048,11 @@ void prepare_tmp_default ()
   int i;
   for (i=0; i<16; i++)tmp_atomic_rad[i] = duplicate_element_radius (default_atomic_rad[i]);
   for (i=0; i<6; i++) tmp_bond_rad[i] = duplicate_element_radius (default_bond_rad[i]);
-  for (i=0; i<2; i++) tmp_label_color[i] = duplicate_element_color (default_label_color[i]);
+  for (i=0; i<2; i++)
+  {
+    tmp_atom_color[i] = duplicate_element_color (default_atom_color[i]);
+    tmp_label_color[i] = duplicate_element_color (default_label_color[i]);
+  }
   for (i=0; i<5; i++)
   {
     tmp_label[i] = g_malloc(sizeof*tmp_label[i]);
@@ -2870,6 +3141,8 @@ void save_preferences ()
   }
   for (i=0; i<2; i++)
   {
+    if (default_atom_color[i]) g_free (default_atom_color[i]);
+    default_atom_color[i] = duplicate_element_color (tmp_atom_color[i]);
     if (default_label_color[i]) g_free (default_label_color[i]);
     default_label_color[i] = duplicate_element_color (tmp_label_color[i]);
   }
@@ -2990,6 +3263,11 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   }
   for (i=0; i<2; i++)
   {
+    if (default_atom_color[i])
+    {
+      g_free (default_atom_color[i]);
+      default_atom_color[i] = NULL;
+    }
     if (default_label_color[i])
     {
       g_free (default_label_color[i]);

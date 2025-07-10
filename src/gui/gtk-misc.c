@@ -1913,12 +1913,12 @@ void set_image_from_icon_name (GtkWidget * widg, gchar * icon)
 
 /*!
   \fn GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
-*  GtkWidget * bbox (GtkWidget * box, char * lab)
-*  GtkWidget * cbox (GtkWidget * box, char * lab)
-*  GtkWidget * fbox (GtkWidget * box, char * lab)
 
   \brief box creating routine, to help design faster elements for the GUI
 
+  \param box the box to insert the new box into
+  \param lab string to display
+  \param vspace vertical space
 */
 GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
 {
@@ -1929,6 +1929,14 @@ GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
   return hbox;
 }
 
+/*!
+  \fn GtkWidget * bbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * bbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);
@@ -1939,6 +1947,14 @@ GtkWidget * bbox (GtkWidget * box, char * lab)
   return hhbox;
 }
 
+/*!
+  \fn GtkWidget * cbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * cbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);
@@ -1949,6 +1965,14 @@ GtkWidget * cbox (GtkWidget * box, char * lab)
   return hhbox;
 }
 
+/*!
+  \fn GtkWidget * fbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * fbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);

@@ -1230,7 +1230,8 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
     img -> linerad[i][i] = (default_o_bd_rw[1]) ? default_bd_rw[1] : get_radius (-3, 0, j, default_bond_rad[1]);
     img -> linerad[i+nsp][i+nsp] = (default_o_bd_rw[4]) ? default_bd_rw[4] : get_radius (-6, 0, j, default_bond_rad[4]);
 
-    img -> at_color[i] = img -> at_color[i+nsp] = set_default_color (j);
+    img -> at_color[i] = get_spec_color (j, default_atom_color[0]);
+    img -> at_color[i+nsp] = get_spec_color (j, default_atom_color[1]);
   }
   for (i=0; i < nsp-1; i++)
   {
