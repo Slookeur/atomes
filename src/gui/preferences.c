@@ -1889,7 +1889,12 @@ G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response
         object -= 1000;
         if (tmp_label_color[object]) g_free (tmp_label_color[object]);
         tmp_label_color[object] = duplicate_element_color (color_list);
-        if (tmp_color) tmp_label[object] -> color[0] = * tmp_color;
+        if (tmp_color)
+        {
+          if (! tmp_label[object] -> color) tmp_label[object] -> color = g_malloc0(sizeof*tmp_label[object] -> color);
+          tmp_label[object] -> color[0] = * tmp_color;
+          tmp_label[object] -> n_colors = 1;
+        }
       }
       else
       {
