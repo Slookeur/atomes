@@ -1972,7 +1972,7 @@ void color_button_event (GtkWidget * widget, double event_x, double event_y, gui
 G_MODULE_EXPORT void pref_color_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data)
 {
   color_button_event (gtk_event_controller_get_widget ((GtkEventController*)gesture), x, y,
-                      gtk_gesture_single_get_current_button ((GtkGestureSingle * )gesture), GDK_BUTTON_PRESS, data);
+                      gtk_gesture_single_get_current_button ((GtkGestureSingle * )gesture), data);
 }
 #else
 /*!
@@ -2167,8 +2167,8 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 #ifdef GTK3
   g_signal_connect (G_OBJECT(pref_tree), "button_press_event", G_CALLBACK(pref_color_button_event), GINT_TO_POINTER(aid));
 #else
-  add_widget_gesture_and_key_action (dataview, "datab-context-click", G_CALLBACK(pref_color_button_pressed), GINT_TO_POINTER(aid),
-                                               NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+  add_widget_gesture_and_key_action (pref_tree, "pref-context-click", G_CALLBACK(pref_color_button_pressed), GINT_TO_POINTER(aid),
+                                                 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 #endif
 
   GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
