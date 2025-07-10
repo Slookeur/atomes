@@ -755,9 +755,9 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid)
 
 /*!
   \fn void spec_data_ (int * status, int * ind, int * atd, int * nsp,
-*                   char * lbel, char * el_nme,
-*                   double * amss, double * rdus,
-*                   double * nscatt, double * xscatt)
+                       char * lbel, char * el_nme,
+                       double * amss, double * rdus,
+                       double * nscatt, double * xscatt)
 
   \brief update project data using information from Fortran90
 

@@ -17,9 +17,10 @@ LINUX = 1
 WINDOWS = 0
 
 # The next line defines the GTK version !
-GTKV = 3
+GTKV = 4
 ifeq ($(GTKV),4)
-  DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS
+  DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+  # To enforce strickly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
   IGTK = `pkg-config --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
   LGTK = `pkg-config --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 else
@@ -165,11 +166,12 @@ OBJ = obj/
 BIN = bin/
 
 INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
-INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATED
+INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+# To enforce strickly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ifeq ($(MAKECMDGOALS),atomes)
-  FCFLAGS = -O3 -cpp
-  CFLAGS = -O3
+  FCFLAGS = -O2 -cpp
+  CFLAGS = -O2
   LDFLAGS = $(LIBS) $(LDFLGS)
   DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS)
 endif
@@ -199,6 +201,7 @@ OBJ_GUI = \
 	$(OBJ)calc_menu.o \
 	$(OBJ)tools.o \
 	$(OBJ)gui.o \
+	$(OBJ)preferences.o \
 	$(OBJ)initc.o \
 	$(OBJ)callbacks.o \
 	$(OBJ)interface.o \
@@ -592,6 +595,8 @@ $(OBJ)calc_menu.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)calc_menu.o $(GUI)calc_menu.c $(INCLUDES)
 $(OBJ)tools.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)tools.o $(GUI)tools.c $(INCLUDES)
+$(OBJ)preferences.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)preferences.o $(GUI)preferences.c $(INCLUDES)
 $(OBJ)gui.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)gui.o $(GUI)gui.c $(INCLUDES)
 $(OBJ)initc.o:

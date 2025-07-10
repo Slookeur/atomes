@@ -1068,9 +1068,7 @@ void init_all_bonds ()
 }
 
 /*!
-  \fn int test_for_angles (field_atom* at,
-*                       field_atom* bt,
-*                       field_atom* ct)
+  \fn int test_for_angles (field_atom * at, field_atom * bt, field_atom * ct)
 
   \brief search for angle(s) between these field atoms
 
@@ -1114,10 +1112,7 @@ int test_for_angles (field_atom* at,
 }
 
 /*!
-  \fn int angles_from_bonds (int n,
-*                         field_atom* at,
-*                         field_atom* bt,
-*                         field_atom* ct)
+  \fn int angles_from_bonds (int n, field_atom * at, field_atom * bt, field_atom * ct)
 
   \brief find, and initialize, angles using bonds
 
@@ -1166,10 +1161,7 @@ void init_all_angles ()
 }
 
 /*!
-  \fn int test_for_dihedrals (field_atom* at,
-*                          field_atom* bt,
-*                          field_atom* ct,
-*                          field_atom* dt)
+  \fn int test_for_dihedrals (field_atom * at, field_atom * bt, field_atom * ct, field_atom * dt)
 
   \brief search for dihedral(s) between these field atoms
 
@@ -1223,11 +1215,7 @@ int test_for_dihedrals (field_atom* at,
 }
 
 /*!
-  \fn int dihedrals_from_angles (int n,
-*                             field_atom* at,
-*                             field_atom* bt,
-*                             field_atom* ct,
-*                             field_atom* dt)
+  \fn int dihedrals_from_angles (int n, field_atom * at, field_atom * bt, field_atom * ct, field_atom * dt)
 
   \brief find, and initialize, dihedrals using angles
 
@@ -1282,8 +1270,8 @@ void init_all_dihedrals ()
 
 /*!
   \fn int impropers_inversion (int n, int stru,
-*                           int at, int bt, int ct, int dt,
-*                           int a, int b, int c, int d)
+                               int at, int bt, int ct, int dt,
+                               int a, int b, int c, int d)
 
   \brief prepare new improper / inversion
 
@@ -1574,9 +1562,9 @@ gboolean is_this_numbering_possible_for_this_atom (int frag, field_neighbor * ng
 
 /*!
   \fn int find_neighbor_loop (int frag, int aid, int fai,
-*                          field_atom* fat,
-*                          field_neighbor * ngmb,
-*                          int sid, gboolean save_it)
+                              field_atom* fat,
+                              field_neighbor * ngmb,
+                              int sid, gboolean save_it)
 
   \brief find / set up field atom data for a fragment
 
@@ -1624,7 +1612,7 @@ int find_neighbor_loop (int frag, int aid, int fai,
 
 /*!
   \fn gboolean id_n_fold_atoms_in_fragment (int frag, int limit, int num_ngb, int search_type,
-*                                        int init, field_neighbor * ngma_init)
+                                            int init, field_neighbor * ngma_init)
 
   \brief find atom id in fragment using the neighbor list
 

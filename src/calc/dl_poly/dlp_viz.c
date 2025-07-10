@@ -137,9 +137,7 @@ void field_unselect_all ()
 extern gboolean in_bond (int at, int bd[2]);
 
 /*!
-  \fn void visualize_bonds (int viz, int aid,
-*                         field_atom* at,
-*                         field_atom* bt)
+  \fn void visualize_bonds (int viz, int aid, field_atom * at, field_atom * bt)
 
   \brief show / hide bond / bond restraint
 
@@ -170,9 +168,9 @@ void visualize_bonds (int viz, int bid,
 
 /*!
   \fn void visualize_angles (int viz, int aid,
-*                         field_atom* at,
-*                         field_atom* bt,
-*                         field_atom* ct)
+                             field_atom* at,
+                             field_atom* bt,
+                             field_atom* ct)
 
   \brief show / hide angle / angle restraint
 
@@ -213,10 +211,10 @@ void visualize_angles (int viz, int aid,
 
 /*!
   \fn void visualize_dihedrals (int viz, int did,
-*                            field_atom* at,
-*                            field_atom* bt,
-*                            field_atom* ct,
-*                            field_atom* dt)
+                                field_atom* at,
+                                field_atom* bt,
+                                field_atom* ct,
+                                field_atom* dt)
 
   \brief show / hide dihedral / dihedral restraint
 
@@ -267,10 +265,10 @@ void visualize_dihedrals (int viz, int did,
 
 /*!
   \fn void visualize_imp_inv (int viz, int dih, int iid,
-*                          field_atom* at,
-*                          field_atom* bt,
-*                          field_atom* ct,
-*                          field_atom* dt)
+                              field_atom* at,
+                              field_atom* bt,
+                              field_atom* ct,
+                              field_atom* dt)
 
   \brief show / hide improper or inversion
 

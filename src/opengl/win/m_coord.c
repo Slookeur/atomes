@@ -291,7 +291,7 @@ GtkWidget * add_menu_coord (glwin * view, int id, int jd)
   if (is_coord_in_menu(jd, this_proj))
   {
     if (jd == 2 || jd == 3) detach_frag_mol_menu(view, id, jd);
-    GtkWidget * colt = create_menu_item (TRUE, "_Show/Hide");
+    GtkWidget * colt = create_menu_item (TRUE, "Show/Hide");
     gtk_menu_shell_append ((GtkMenuShell *)menuct, colt);
     if (jd < 2 || jd > 3)
     {

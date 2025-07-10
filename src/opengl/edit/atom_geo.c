@@ -317,7 +317,7 @@ int find_this_geo_id (int gid, coord_info * obj, int * old_z, int old_geo, int o
 
 /*!
   \fn void check_coord_modification (project * this_proj, int * old_id, atom * new_list,
-*                                    atomic_object * this_object, gboolean movtion, gboolean passivating)
+                                     atomic_object * this_object, gboolean movtion, gboolean passivating)
 
   \brief check atom coordination modification on edition
 

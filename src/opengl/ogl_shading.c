@@ -514,8 +514,8 @@ object_3d * duplicate_object_3d (object_3d * old_obj)
 
 /*!
   \fn glsl_program * init_shader_program (int object, int object_id,
-*                                      const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
-*                                      GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
+                                          const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
+                                          GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
 
   \brief create an OpenGL shader program
 

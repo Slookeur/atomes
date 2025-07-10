@@ -320,8 +320,8 @@ ColRGBA set_default_color (int z)
 
 /*!
   \fn void update_bonds_ (int * bd, int * stp,
-*                         int * bdim, int bda[*bdim], int bdb[*bdim],
-*                         double * x, double * y, double * z)
+                          int * bdim, int bda[*bdim], int bdb[*bdim],
+                          double * x, double * y, double * z)
 
   \brief update bonding information from Fortran90
 

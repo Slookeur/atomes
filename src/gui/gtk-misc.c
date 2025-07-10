@@ -361,11 +361,11 @@ GtkWidget * new_gtk_window ()
 #ifdef GTK4
 /*!
   \fn void add_widget_gesture_and_key_action (GtkWidget * widget,
-*                                          gchar * cp_name, GCallback cp_handler, gpointer cp_data,
-*                                          gchar * cr_name, GCallback cr_handler, gpointer cr_data,
-*                                          gchar * kp_name, GCallback kp_handler, gpointer kp_data,
-*                                          gchar * mo_name, GCallback mo_handler, gpointer mo_data,
-*                                          gchar * sc_name, GCallback sc_handler, gpointer sc_data)
+                                              gchar * cp_name, GCallback cp_handler, gpointer cp_data,
+                                              gchar * cr_name, GCallback cr_handler, gpointer cr_data,
+                                              gchar * kp_name, GCallback kp_handler, gpointer kp_data,
+                                              gchar * mo_name, GCallback mo_handler, gpointer mo_data,
+                                              gchar * sc_name, GCallback sc_handler, gpointer sc_data)
 
   \brief Adding GTK4 mouse, and keyboard events to a GtkWidget
 
@@ -1477,10 +1477,10 @@ GtkWidget * create_image_from_data (int format, gpointer item_image)
 #ifdef GTK3
 /*!
   \fn GtkWidget * gtk3_menu_item (GtkWidget * menu, gchar * name,
-*                              int icon_format, gpointer item_icon,
-*                              GCallback handler, gpointer data,
-*                              gboolean accel, guint key, GdkModifierType mod,
-*                              gboolean check, gboolean radio, gboolean status)
+                                  int icon_format, gpointer item_icon,
+                                  GCallback handler, gpointer data,
+                                  gboolean accel, guint key, GdkModifierType mod,
+                                  gboolean check, gboolean radio, gboolean status)
 
   \brief create a GT3 menu item, and insert it in a menu, if any
 
@@ -1580,8 +1580,8 @@ void add_menu_separator (GtkWidget * menu)
 }
 #endif
 
-/*
-* GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
+/*!
+  \fn GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
 
   \brief create a GtkLabel with pango markup
 

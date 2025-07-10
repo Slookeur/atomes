@@ -98,9 +98,9 @@ G_MODULE_EXPORT void to_render_gl_image (GSimpleAction * action, GVariant * para
 
 /*!
   \fn void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, const gchar * key, int mpop, int item_id,
-*                           gchar * accel, int image_format, gpointer icon,
-*                           gboolean custom, GCallback handler, gpointer data,
-*                           gboolean check, gboolean status, gboolean radio, gboolean sensitive)
+                               gchar * accel, int image_format, gpointer icon,
+                               gboolean custom, GCallback handler, gpointer data,
+                               gboolean check, gboolean status, gboolean radio, gboolean sensitive)
 
   \brief generic function to create menu item for the OpenGL menu bar / pop up menu
 

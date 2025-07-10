@@ -195,9 +195,6 @@ int open_save (FILE * fp, int i, int pid, int aid, int npi, gchar * pfile)
     }
     else
     {
-#ifdef DEBUG
-      g_debug ("pid= %d, pfile= %s", pid, pfile);
-#endif
       get_project_by_id (pid) -> projfile = g_strdup_printf ("%s", pfile);
       add_project_to_workspace ();
       prep_calc_actions ();

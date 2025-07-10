@@ -606,7 +606,7 @@ void clean_object_bonds (project * proj, int o_step, atomic_object * object, int
 
 /*!
   \fn void add_object_atoms (atomic_object * this_object, project * this_proj,
-*                            int o_step, int numa, int * old_id, gboolean alloc_new_id, atom_search * remove)
+                             int o_step, int numa, int * old_id, gboolean alloc_new_id, atom_search * remove)
 
   \brief add atom list to insert object
 

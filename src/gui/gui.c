@@ -168,7 +168,7 @@ int main_shortcut_by_group[] = { 3, 3, 2 };
 
 /*!
   \fn GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int groups, int shortcut_by_group[groups],
-*                                   gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[])
+                                    gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[])
 
   \brief Create the shortcuts information window
 
@@ -629,7 +629,7 @@ GIcon * get_gicon_from_data (int format, const gchar * icon)
 
 /*!
   \fn void widget_add_action (GSimpleActionGroup * action_group, const gchar * act, GCallback handler, gpointer data,
-*                          gboolean check, gboolean status, gboolean radio, const gchar * stat)
+                              gboolean check, gboolean status, gboolean radio, const gchar * stat)
 
   \brief add an action to an action group
 
@@ -667,8 +667,8 @@ void widget_add_action (GSimpleActionGroup * action_group, const gchar * act, GC
 
 /*!
   \fn GMenuItem * create_gmenu_item (const gchar * label, const gchar * action, const gchar * accel,
-*                                    const gchar * custom, int format, const gchar * icon,
-*                                    gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
+                                     const gchar * custom, int format, const gchar * icon,
+                                     gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
 
   \brief create menu item
 
@@ -742,8 +742,8 @@ void append_submenu (GMenu * menu, const gchar * label, GMenu * submenu)
 
 /*!
   \fn void append_menu_item (GMenu * menu, const gchar * label, const gchar * action, const gchar * accel,
-*                            const gchar * custom, int format, const gchar * icon,
-*                            gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
+                             const gchar * custom, int format, const gchar * icon,
+                             gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
 
   \brief create a menu item, then append it to a menu
 
