@@ -150,6 +150,12 @@ int default_mfactor;
 int tmp_mfactor;
 double default_mwidth;
 double tmp_mwidth;
+box_data default_box;
+box_data * tmp_box;
+box_edition * pref_box_win = NULL;
+axis_data default_axis;
+axis_data * tmp_axis;
+axis_edition * pref_axis_win = NULL;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -2667,7 +2673,8 @@ GtkWidget * model_preferences ()
   }
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
 
-    // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
+  pref_box_win = g_malloc0(sizeof*pref_box_win);
+  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
 
   return notebook;
 }
@@ -3363,6 +3370,8 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   clean_all_tmp ();
   g_free (pref_pointer);
   pref_pointer = NULL;
+  if (pref_box_win) g_free (pref_box_win);
+  pref_box_win = NULL;
   preference_notebook = NULL;
 }
 

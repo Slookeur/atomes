@@ -362,9 +362,9 @@ struct image
   int extra_cell[3];                            /*!< Extra cells (if any) on x, y and z */
 
   double axis_length;                           /*!< Axis length */
-  int axispos;                                  /*!< Axis */
-  GLdouble axis_pos[3];                         /*!< Axis position */
-  int axis_labels;                              /*!<  */
+  int axispos;                                  /*!< Axis template position */
+  GLdouble axis_pos[3];                         /*!< Axis custom position */
+  int axis_labels;                              /*!< Show / hide axis labels */
   gchar * axis_title[3];                        /*!< Axis titles */
   ColRGBA * axis_color;                         /*!< Axis colors, if not default */
 
@@ -855,6 +855,35 @@ struct model_edition
   GtkWidget * notebook;
 };
 
+typedef struct box_edition box_edition;
+struct box_edition
+{
+  GtkWidget * win;
+  GtkWidget * styles;
+  GtkWidget * width_box;
+  GtkWidget * width;
+  GtkWidget * radius_box;
+  GtkWidget * radius;
+  GtkWidget * box_data;
+};
+
+typedef struct axis_edition axis_edition;
+struct axis_edition
+{
+  GtkWidget * win;
+  GtkWidget * styles;
+  GtkWidget * width_box;
+  GtkWidget * width;
+  GtkWidget * radius_box;
+  GtkWidget * radius;
+  GtkWidget * length;
+  GtkWidget * axis_data;
+  GtkWidget * templates;
+  GtkWidget * axis_position_box;
+  GtkWidget * axis_color_title[3];
+  GtkWidget * ax_title[3];
+};
+
 /*! \typedef glwin
 
   \brief OpenGL window widget structure */
@@ -922,6 +951,8 @@ struct glwin
   opengl_edition * opengl_win;
   model_edition * model_win[2];
   builder_edition * builder_win;
+  box_edition * box_win;
+  axis_edition * axis_win;
 
   // OpenGL plot
   GtkWidget * plot;

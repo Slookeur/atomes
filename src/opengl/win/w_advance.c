@@ -142,7 +142,7 @@ gchar * cpos[3] = {"r", "g", "b"};
 
   \brief create a box with markup label
 
-  \param box the GtkWidget sending the signal
+  \param box the box to insert the widget in
   \param lab label
   \param vspace vertical space
   \param size size

@@ -58,6 +58,37 @@ struct element_color
   element_color * prev;
 };
 
+/*! \typedef box_data
+
+  \brief box information data structure
+*/
+typedef struct box_data box_data;
+struct box_data
+{
+  int box;             /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double box_line;     /*!< Width for wireframe */
+  double box_rad;      /*!< Radius for cylinders */
+  ColRGBA box_color;   /*!< Associated color */
+};
+
+/*! \typedef axis_data
+
+  \brief axis information data structure
+*/
+typedef struct axis_data axis_data;
+struct axis_data
+{
+  int axis;              /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double axis_line;      /*!< Width for wireframe */
+  double axis_rad;       /*!< Radius for cylinders */
+  double length;         /*!< Axis length */
+  int pos;               /*!< Axis template position */
+  GLdouble axis_pos[3];  /*!< Axis custom positions */
+  int labels;            /*!< Show / hide axis labels */
+  gchar * title[3];      /*!< Axis titles */
+  ColRGBA * axis_color;  /*!< Associated color */
+};
+
 extern float get_radius (int object, int col, int z, element_radius * rad_list);
 extern ColRGBA get_spec_color (int z, element_color * clist);
 
@@ -111,6 +142,13 @@ extern int default_mfactor;
 extern int tmp_mfactor;
 extern double default_mwidth;
 extern double tmp_mwidth;
+
+extern box_data default_box;
+extern box_data * tmp_box;
+extern box_edition * pref_box_win;
+extern axis_data default_axis;
+extern axis_data * tmp_axis;
+extern axis_edition * pref_axis_win;
 
 extern element_color * default_label_color[2];
 extern element_color * default_atom_color[2];

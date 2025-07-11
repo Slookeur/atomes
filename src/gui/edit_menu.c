@@ -87,7 +87,7 @@ GtkWidget * chem_spec[2];
 GtkWidget * chem_entry[CHEM_PARAMS-1];
 GtkWidget * vect_entry[9];
 double * tmp_chem[CHEM_PARAMS];
-double tmp_box[2][3];
+double tmp_lattice[2][3];
 double tmp_vect[3][3];
 int tmp_pbc, tmp_frac;
 int tmp_xcor, tmp_lat;
@@ -111,7 +111,7 @@ G_MODULE_EXPORT void update_box (GtkEntry * entry, gpointer data)
   double v = string_to_double ((gpointer)m);
   if (v >= 0.0)
   {
-    tmp_box[id -> a][id -> b] = v;
+    tmp_lattice[id -> a][id -> b] = v;
   }
   update_entry_double (entry, v);
 }
@@ -300,7 +300,7 @@ void edit_box (GtkWidget * vbox)
   {
     for (j=0; j<3; j++, k++)
     {
-      if (i < 2) tmp_box[i][j] = active_box -> param[i][j];
+      if (i < 2) tmp_lattice[i][j] = active_box -> param[i][j];
       tmp_vect[i][j] = active_box -> vect[i][j];
       t_box[k].a = i;
       t_box[k].b = j;
@@ -315,7 +315,7 @@ void edit_box (GtkWidget * vbox)
     {
       gtk_grid_attach (GTK_GRID (table), markup_label(box_prop[i][j], -1, -1, 0.5, 0.5), j, i+2*i+1, 1, 1);
       entry = create_entry (G_CALLBACK(update_box), 100, 15, FALSE, (gpointer)& t_box[k]);
-      update_entry_double (GTK_ENTRY(entry), tmp_box[i][j]);
+      update_entry_double (GTK_ENTRY(entry), tmp_lattice[i][j]);
       gtk_grid_attach (GTK_GRID (table), entry, j, i+2*i+2, 1, 1);
     }
   }
@@ -575,9 +575,9 @@ gboolean has_box_changed ()
   {
     for (j=0; j<3; j++)
     {
-      if (tmp_box[i][j] != active_box -> param[i][j])
+      if (tmp_lattice[i][j] != active_box -> param[i][j])
       {
-        active_box -> param[i][j] = tmp_box[i][j];
+        active_box -> param[i][j] = tmp_lattice[i][j];
         changed = TRUE;
       }
     }
@@ -761,7 +761,7 @@ G_MODULE_EXPORT void run_on_edit_activate (GtkDialog * win, gint response_id, gp
       }
       else if (i == 1)
       {
-        done = test_pbc (tmp_pbc, tmp_frac, tmp_box, tmp_vect);
+        done = test_pbc (tmp_pbc, tmp_frac, tmp_lattice, tmp_vect);
         if (done)
         {
           prep_box (i);
@@ -854,7 +854,7 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
     edit_box (box);
     if (id == 3)
     {
-      skip = test_pbc (tmp_pbc, tmp_frac, tmp_box, tmp_vect);
+      skip = test_pbc (tmp_pbc, tmp_frac, tmp_lattice, tmp_vect);
       if (skip)
       {
         active_cell -> ltype = tmp_lat;

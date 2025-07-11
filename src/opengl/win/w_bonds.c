@@ -80,6 +80,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][7]), str);
       g_free (str);
 #endif
+      if (opengl_project -> modelgl -> axis_win -> length)
+      {
+        update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> length), v);
+      }
       opengl_project -> modelgl -> create_shaders[MAXIS] = TRUE;
       break;
     case -4:
@@ -88,11 +92,15 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[AXIS] = v;
         v = opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[AXIS];
 #ifdef GTK3
-      // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Radius [ %f Å ]", v);
-      gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][6]), str);
-      g_free (str);
+        // GTK3 Menu Action To Check
+        str = g_strdup_printf ("_Radius [ %f Å ]", v);
+        gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][6]), str);
+        g_free (str);
 #endif
+        if (opengl_project -> modelgl -> axis_win -> radius)
+        {
+          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> radius), v);
+        }
       }
       else
       {
@@ -103,6 +111,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][4]), str);
         g_free (str);
 #endif
+      }
+      if (opengl_project -> modelgl -> axis_win -> width)
+      {
+        update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> width), v);
       }
       opengl_project -> modelgl -> create_shaders[MAXIS] = TRUE;
       break;
@@ -117,6 +129,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][6]), str);
         g_free (str);
 #endif
+        if (opengl_project -> modelgl -> box_win -> radius)
+        {
+          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> radius), v);
+        }
       }
       else
       {
@@ -128,6 +144,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][4]), str);
         g_free (str);
 #endif
+        if (opengl_project -> modelgl -> box_win -> width)
+        {
+          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> width), v);
+        }
       }
       opengl_project -> modelgl -> create_shaders[MDBOX] = TRUE;
       break;
@@ -274,7 +294,7 @@ void bonds_input_win (GtkWidget * win, project * this_proj, int nspec, int aoc, 
     str = g_strdup_printf ("  %s - %s", this_proj -> chemistry -> label[i], this_proj -> chemistry -> label[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label(str, 100, -1, 0.2, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    rad = create_entry (G_CALLBACK(update_bond_parameter), 120, 15, FALSE, (gpointer)GINT_TO_POINTER(j));
+    rad = create_entry (G_CALLBACK(update_bond_parameter), 120, 15, FALSE, GINT_TO_POINTER(j));
     update_entry_double (GTK_ENTRY(rad), val[k][k]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, rad, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label(dim[n], 40, -1, 0.0, 0.5), FALSE, FALSE, 0);
@@ -292,7 +312,7 @@ void bonds_input_win (GtkWidget * win, project * this_proj, int nspec, int aoc, 
       str = g_strdup_printf ("  %s - %s", this_proj -> chemistry -> label[i], this_proj -> chemistry -> label[j]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label(str, 100, -1, 0.2, 0.5), FALSE, FALSE, 0);
       g_free (str);
-      rad = create_entry (G_CALLBACK(update_bond_parameter), 120, 15, FALSE, (gpointer)GINT_TO_POINTER(k));
+      rad = create_entry (G_CALLBACK(update_bond_parameter), 120, 15, FALSE, GINT_TO_POINTER(k));
       update_entry_double (GTK_ENTRY(rad), val[l][m]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, rad, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label(dim[n], 40, -1, 0.0, 0.5), FALSE, FALSE, 0);
