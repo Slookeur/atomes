@@ -2611,22 +2611,31 @@ GtkWidget * model_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 0);
   gchar * other_info[2] = {"It also provides options to customize atomic label(s),", "and, the model box, if any:"};
-  gchar * o_list[3][2] = {{"Labels", "atom labels"},
-                          {"Colors", "atom colors"},
+  gchar * o_list[2][2] = {{"Labels", "atom labels"},
                           {"Box", "model box details"}};
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 3, o_list, NULL), FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 40, 0.0, 0.0), FALSE, FALSE, 0);
-  GtkWidget * hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 2, o_list, NULL), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 20, 0.0, 0.0), FALSE, FALSE, 0);
 
+  GtkWidget * hbox;
+  gchar * obj[2] = {"<b>Atoms</b>", "<b>Clones</b>"};
+  int i;
+  for (i=0; i<2; i++)
+  {
+    hbox = adv_box (vbox, obj[i], 5, 150, 1.0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species colors", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(100+i)), FALSE, FALSE, 30);
+  }
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>the same parameters are also used for the </i>spheres<i> style</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>**</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
@@ -2635,13 +2644,11 @@ GtkWidget * model_preferences ()
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
-  int i;
   for (i=0; i<OGL_STYLES; i++)
   {
     if (i != 3 && i != 5) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
   }
 
-  gchar * obj[2] = {"<b>Atoms</b>", "<b>Clones</b>"};
   vbox = create_vbox (BSEP);
   GtkWidget * hhbox;
   for (i=0; i<2; i++)
@@ -2660,18 +2667,7 @@ GtkWidget * model_preferences ()
   }
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
 
-  vbox = create_vbox (BSEP);
-  for (i=0; i<2; i++)
-  {
-    hbox = adv_box (vbox, obj[i], 5, 120, 0.0);
-    hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species colors", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(100+i)), FALSE, FALSE, 60);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-  }
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Colors"));
-
-
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
+    // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
 
   return notebook;
 }
