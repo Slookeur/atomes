@@ -30,6 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  void update_show_hide_box_axis (glwin * view, int box_or_axis, int status);
+
   G_MODULE_EXPORT void set_box_axis_style (GtkWidget * widg, gpointer data);
   G_MODULE_EXPORT void show_hide_box_axis (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void change_box_axis_radio (GSimpleAction * action, GVariant * parameter, gpointer data);
@@ -107,50 +109,71 @@ void update_show_hide_box_axis (glwin * view, int box_or_axis, int status)
 G_MODULE_EXPORT void set_box_axis_style (GtkWidget * widg, gpointer data)
 {
   tint * the_data = (tint *)data;
-  int j, k, o;
+  int i, j, k, l, m, n;
   j = the_data -> b;
-  o = the_data -> c;
+  n = the_data -> c;
   glwin * view = get_project_by_id(the_data -> a) -> modelgl;
-  k = view -> anim -> last -> img -> box_axis[o];
+  k = view -> anim -> last -> img -> box_axis[n];
   int dim[2]={OGL_BOX, OGL_AXIS};
-  int i, m, l;
   l = (k == NONE) ? 2 : (j == WIREFRAME) ? 2 : 1;
   m = (k == NONE) ? 0 : (j == WIREFRAME) ? 1 : 2;
   if (k != j && gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg))
   {
-    view -> anim -> last -> img -> box_axis[o] = NONE - 1;
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[o][l], FALSE);
-    show_the_widgets (view -> ogl_box_axis[o][3+2*(m-1)]);
-    hide_the_widgets (view -> ogl_box_axis[o][3+2*(l-1)]);
-    if (widg != view -> ogl_box_axis[o][(k == NONE) ? 1 : m])
+    view -> anim -> last -> img -> box_axis[n] = NONE - 1;
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[n][l], FALSE);
+    show_the_widgets (view -> ogl_box_axis[n][3+2*(m-1)]);
+    hide_the_widgets (view -> ogl_box_axis[n][3+2*(l-1)]);
+    if (widg != view -> ogl_box_axis[n][(k == NONE) ? 1 : m])
     {
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[o][(k == NONE) ? 1 : m], TRUE);
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[n][(k == NONE) ? 1 : m], TRUE);
     }
-    for (i=1; i<dim[o]; i++) widget_set_sensitive (view -> ogl_box_axis[o][i], 1);
-    view -> anim -> last -> img -> box_axis[o] = (k == NONE) ? WIREFRAME : j;
+    for (i=1; i<dim[n]; i++) widget_set_sensitive (view -> ogl_box_axis[n][i], 1);
+    view -> anim -> last -> img -> box_axis[n] = (k == NONE) ? WIREFRAME : j;
   }
   else if (k == j && ! gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg))
   {
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[o][(k == NONE) ? 1 : m], TRUE);
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[n][(k == NONE) ? 1 : m], TRUE);
   }
   else if (j == 0)
   {
     for (i=1; i<3; i++)
     {
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[o][i], FALSE);
-      widget_set_sensitive (view -> ogl_box_axis[o][i], 0);
-      widget_set_sensitive (view -> ogl_box_axis[o][i], 0);
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[n][i], FALSE);
+      widget_set_sensitive (view -> ogl_box_axis[n][i], 0);
+      widget_set_sensitive (view -> ogl_box_axis[n][i], 0);
     }
-    widget_set_sensitive (view -> ogl_box_axis[o][4], 0);
-    for (i=6; i<dim[o]; i++)
+    widget_set_sensitive (view -> ogl_box_axis[n][4], 0);
+    for (i=6; i<dim[n]; i++)
     {
-      widget_set_sensitive (view -> ogl_box_axis[o][i], 0);
+      widget_set_sensitive (view -> ogl_box_axis[n][i], 0);
     }
-    if (widg != view -> ogl_box_axis[o][0]) gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[o][0], FALSE);
-    view -> anim -> last -> img -> box_axis[o] = NONE;
+    if (widg != view -> ogl_box_axis[n][0]) gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[n][0], FALSE);
+    view -> anim -> last -> img -> box_axis[n] = NONE;
   }
-  if (! from_box_or_axis) update_show_hide_box_axis (view, the_data -> c, (k == NONE) ? 0 : 1);
-  view -> create_shaders[o+MDBOX] = TRUE;
+  i = (view -> anim -> last -> img -> box_axis[n] == NONE) ? NONE : (view -> anim -> last -> img -> box_axis[n] == WIREFRAME) ? 0 : 1;
+  switch (n)
+  {
+    case 0:
+      if (view -> box_win)
+      {
+        if (view -> box_win -> styles && GTK_IS_WIDGET(view -> box_win -> styles))
+        {
+          gtk_combo_box_set_active (GTK_COMBO_BOX(view -> box_win -> styles), i);
+        }
+      }
+      break;
+    case 1:
+      if (view -> axis_win)
+      {
+        if (view -> axis_win -> styles && GTK_IS_WIDGET(view -> axis_win -> styles))
+        {
+          gtk_combo_box_set_active (GTK_COMBO_BOX(view -> axis_win -> styles), i);
+        }
+      }
+      break;
+  }
+  if (! from_box_or_axis) update_show_hide_box_axis (view, n, (view -> anim -> last -> img -> box_axis[n] == NONE) ? 1 : 0);
+  view -> create_shaders[n+MDBOX] = TRUE;
   update (view);
 }
 
