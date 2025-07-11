@@ -66,28 +66,28 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
 {
   glwin * view;
   int box_type;
-  double * box_line;
-  double * box_rad;
+  double box_line;
+  double box_rad;
   gchar * str;
   const gchar * n = entry_get_text (res);
   double v = string_to_double ((gpointer)n);
   if (preferences)
   {
     box_type = tmp_box -> box;
-    box_line = & tmp_box -> box_line;
-    box_rad = & tmp_box -> box_rad;
+    box_line = tmp_box -> line;
+    box_rad = tmp_box -> rad;
   }
   else
   {
     view = (glwin *)data;
     box_type = view -> anim -> last -> img -> box_axis[BOX];
-    box_line = & view -> anim -> last -> img -> box_axis_line[BOX];
-    box_rad = & view -> anim -> last -> img -> box_axis_rad[BOX];
+    box_line = view -> anim -> last -> img -> box_axis_line[BOX];
+    box_rad = view -> anim -> last -> img -> box_axis_rad[BOX];
   }
   if (box_type == CYLINDERS)
   {
-    if (v > 0.0) * box_rad = v;
-    v = * box_rad;
+    if (v > 0.0) box_rad = v;
+    v = box_rad;
     if (! preferences)
     {
 #ifdef GTK3
@@ -96,12 +96,17 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][6]), str);
       g_free (str);
 #endif
+      view -> anim -> last -> img -> box_axis_rad[BOX] = v;
+    }
+    else
+    {
+      tmp_box -> rad = v;
     }
   }
   else
   {
-    if (v > 0.0) * box_line = v;
-    v = * box_line;
+    if (v > 0.0) box_line = v;
+    v = box_line;
     if (! preferences)
     {
 #ifdef GTK3
@@ -110,6 +115,11 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][4]), str);
       g_free (str);
 #endif
+      view -> anim -> last -> img -> box_axis_line[BOX] = v;
+    }
+    else
+    {
+      tmp_box -> line = v;
     }
   }
   update_entry_double (res, v);
@@ -156,25 +166,33 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
   {
     if (is_the_widget_visible(box_win -> width_box)) hide_the_widgets (box_win -> width_box);
     if (! is_the_widget_visible(box_win -> radius_box)) show_the_widgets (box_win -> radius_box);
-#ifdef GTK3
-    // GTK3 Menu Action To Check
     if (! preferences)
     {
+#ifdef GTK3
+    // GTK3 Menu Action To Check
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][2], TRUE);
-    }
 #endif
+    }
+    else
+    {
+      tmp_box -> box = CYLINDERS;
+    }
   }
   else if (i == 0)
   {
     if (is_the_widget_visible(box_win -> radius_box)) hide_the_widgets (box_win -> radius_box);
     if (! is_the_widget_visible(box_win -> width_box)) show_the_widgets (box_win -> width_box);
-#ifdef GTK3
-    // GTK3 Menu Action To Check
     if (! preferences)
     {
+#ifdef GTK3
+    // GTK3 Menu Action To Check
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][1], TRUE);
-    }
 #endif
+    }
+    else
+    {
+      tmp_box -> box = WIREFRAME;
+    }
   }
   if (! preferences)
   {
@@ -227,24 +245,24 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
 #endif // GTK3
   if (val)
   {
-#ifdef GTK3
-    // GTK3 Menu Action To Check
     if (! preferences)
     {
+#ifdef GTK3
+    // GTK3 Menu Action To Check
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], TRUE);
-    }
 #endif
+    }
     gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), WIREFRAME-1);
   }
   else
   {
-#ifdef GTK3
-    // GTK3 Menu Action To Check
     if (! preferences)
     {
+#ifdef GTK3
+    // GTK3 Menu Action To Check
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], FALSE);
-    }
 #endif
+    }
     gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), NONE);
   }
 #ifdef GTK3
@@ -268,7 +286,7 @@ G_MODULE_EXPORT void set_color_box (GtkColorChooser * colob, gpointer data)
 {
   if (preferences)
   {
-    tmp_box -> box_color = get_button_color (colob);
+    tmp_box -> color = get_button_color (colob);
   }
   else
   {
@@ -313,9 +331,9 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   {
     the_box = pref_box_win;
     box_type = tmp_box -> box;
-    box_color = tmp_box -> box_color;
-    box_line = tmp_box -> box_line;
-    box_rad = tmp_box -> box_rad;
+    box_color = tmp_box -> color;
+    box_line = tmp_box -> line;
+    box_rad = tmp_box -> rad;
   }
   else
   {
@@ -328,16 +346,18 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
     box_rad = view -> anim -> last -> img -> box_axis_rad[BOX];
   }
 
-  GtkWidget * vbox;
+  GtkWidget * vbox = create_vbox (BSEP);
   if (preferences)
   {
-    vbox = create_vbox (BSEP);
-    the_box -> win = adv_box (vbox, "<b>Box settings</b>", 5, 120, 0.0);
+    the_box -> win = create_vbox (BSEP);
+    adv_box (the_box -> win, "<b>Box settings</b>", 5, 120, 0.0);
+    GtkWidget * hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_box -> win, hbox, FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
   }
   else
   {
     the_box -> win = create_win ("Box settings", view -> win, FALSE, FALSE);
-    vbox = create_vbox (BSEP);
     add_container_child (CONTAINER_WIN, the_box -> win, vbox);
   }
   GtkWidget * box;
@@ -352,14 +372,14 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   }
   the_box -> show_hide = check_button ("Show / hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> show_hide, FALSE, FALSE, 0);
-  GtkWidget * box_data = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, box_data, TRUE, TRUE, 10);
-  widget_set_sensitive (box_data, ac);
+  the_box -> box_data = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> box_data, TRUE, TRUE, 10);
+  widget_set_sensitive (the_box -> box_data, ac);
 
   GtkWidget * pos_box = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, box_data, pos_box, TRUE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, the_box -> box_data, pos_box, TRUE, TRUE, 0);
 
-  box = abox (box_data, "Style ", 5);
+  box = abox (the_box -> box_data, "Style ", 5);
   the_box -> styles  = create_combo ();
   for (i=0; i<BOX_STYLES; i++)
   {
@@ -372,17 +392,17 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   gtk_widget_set_size_request (the_box -> styles, 120, -1);
   g_signal_connect (G_OBJECT (the_box -> styles), "changed", G_CALLBACK(set_box_combo_style), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_box -> styles, FALSE, FALSE, 10);
-  the_box -> width_box = abox (box_data, "Line width [pts] ", 0);
+  the_box -> width_box = abox (the_box -> box_data, "Line width [pts] ", 0);
   the_box -> width  = create_entry (G_CALLBACK(update_box_parameter), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(the_box -> width), box_line);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_box -> width_box, the_box -> width, FALSE, FALSE, 10);
-  the_box -> radius_box = abox (box_data, "Cylinder radius [&#xC5;] ", 0);
+  the_box -> radius_box = abox (the_box -> box_data, "Cylinder radius [&#xC5;] ", 0);
   the_box -> radius = create_entry (G_CALLBACK(update_box_parameter), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(the_box -> radius), box_rad);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_box -> radius_box, the_box -> radius, FALSE, FALSE, 10);
 
   // Colors
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (box_data, "Color ", 5), color_button(box_color, TRUE, 120, -1, G_CALLBACK(set_color_box), data), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (the_box -> box_data, "Color ", 5), color_button(box_color, TRUE, 120, -1, G_CALLBACK(set_color_box), data), FALSE, FALSE, 10);
 
   if (! preferences)
   {

@@ -165,6 +165,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "interface.h"
 #include "preferences.h"
+#include "glview.h"
 
 extern void update_light_data (int li, opengl_edition * ogl_win);
 extern void setup_fog_dialogs (opengl_edition * ogl_edit, int fid);
@@ -504,6 +505,10 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
   {
     update_light_data (0, pref_ogl_edit);
     setup_fog_dialogs (pref_ogl_edit, tmp_fog.mode);
+    if (tmp_box -> box > NONE)
+    {
+       hide_the_widgets ((tmp_box -> box == WIREFRAME) ? pref_box_win -> radius_box : pref_box_win -> width_box);
+    }
   }
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);

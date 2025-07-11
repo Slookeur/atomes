@@ -103,8 +103,8 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
   if (preferences)
   {
     axis_type = tmp_axis -> axis;
-    axis_line = & tmp_axis -> axis_line;
-    axis_rad = & tmp_axis -> axis_rad;
+    axis_line = & tmp_axis -> line;
+    axis_rad = & tmp_axis -> rad;
   }
   else
   {
@@ -208,7 +208,7 @@ void activate_pos_box (glwin * view, gboolean val)
   int i;
   if (val)
   {
-    i = (preferences) ? tmp_axis -> pos : view -> anim -> last -> img -> axispos;
+    i = (preferences) ? tmp_axis -> t_pos : view -> anim -> last -> img -> axispos;
   }
   else
   {
@@ -409,7 +409,7 @@ G_MODULE_EXPORT void use_axis_default_positions (GtkToggleButton * but, gpointer
   if (preferences)
   {
     the_axis = pref_axis_win;
-    pos = & tmp_axis -> pos;
+    pos = & tmp_axis -> t_pos;
   }
   else
   {
@@ -506,7 +506,7 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
   if (preferences)
   {
     the_axis = pref_axis_win;
-    col = tmp_axis -> axis_color;
+    col = tmp_axis -> color;
   }
   else
   {
@@ -519,7 +519,7 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
   {
     if (col != NULL)
     {
-      init_axis_colors ((preferences) ? tmp_axis -> axis_color : view -> anim -> last -> img -> axis_color, the_axis);
+      init_axis_colors ((preferences) ? tmp_axis -> color : view -> anim -> last -> img -> axis_color, the_axis);
       if (! preferences)
       {
         g_free (view -> anim -> last -> img -> axis_color);
@@ -527,8 +527,8 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
       }
       else
       {
-        g_free (tmp_axis -> axis_color);
-        tmp_axis -> axis_color = NULL;
+        g_free (tmp_axis -> color);
+        tmp_axis -> color = NULL;
       }
     }
   }
@@ -541,8 +541,8 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
     }
     else
     {
-      tmp_axis -> axis_color = g_malloc (3*sizeof*tmp_axis -> axis_color);
-      init_axis_colors (tmp_axis -> axis_color, the_axis);
+      tmp_axis -> color = g_malloc (3*sizeof*tmp_axis -> color);
+      init_axis_colors (tmp_axis -> color, the_axis);
     }
 
   }
@@ -574,7 +574,7 @@ G_MODULE_EXPORT void set_axis_color (GtkColorChooser * colob, gpointer data)
   }
   else
   {
-    tmp_axis -> axis_color[dat -> b] = get_button_color (colob);
+    tmp_axis -> color[dat -> b] = get_button_color (colob);
   }
 }
 
@@ -601,7 +601,7 @@ void axis_position_has_changed (gpointer data, double v)
   }
   else
   {
-    if (v >= 0.0 && v <= 100.0) tmp_axis -> axis_pos[dat -> b] = v;
+    if (v >= 0.0 && v <= 100.0) tmp_axis -> c_pos[dat -> b] = v;
   }
 }
 
@@ -740,7 +740,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   double axis_rad;
   double axis_length;
   int axis_labels;
-  int axis_pos;
+  int axis_tpos;
 
   ColRGBA * axis_color = NULL;
   int label_render;
@@ -749,12 +749,12 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   {
     the_axis = pref_axis_win;
     axis_type = tmp_axis -> axis;
-    axis_line = tmp_axis -> axis_line;
-    axis_rad = tmp_axis -> axis_rad;
-    axis_pos = tmp_axis -> pos;
+    axis_line = tmp_axis -> line;
+    axis_rad = tmp_axis -> rad;
+    axis_tpos = tmp_axis -> t_pos;
     axis_length = tmp_axis -> length;
     axis_labels = tmp_axis -> labels;
-    axis_color = tmp_axis -> axis_color;
+    axis_color = tmp_axis -> color;
     label_render = tmp_label[2] -> render;
   }
   else
@@ -765,7 +765,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     axis_type = view -> anim -> last -> img -> box_axis[AXIS];
     axis_line = view -> anim -> last -> img -> box_axis_line[AXIS];
     axis_rad = view -> anim -> last -> img -> box_axis_rad[AXIS];
-    axis_pos = view -> anim -> last -> img -> axispos;
+    axis_tpos = view -> anim -> last -> img -> axispos;
     axis_length = view -> anim -> last -> img -> axis_length;
     axis_labels = view -> anim -> last -> img -> axis_labels;
     axis_color = view -> anim -> last -> img -> axis_color;
@@ -803,7 +803,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
 
   GtkWidget * pos_box = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, pos_box, FALSE, FALSE, 0);
-  if (axis_pos != CUSTOM)
+  if (axis_tpos != CUSTOM)
   {
     ac = TRUE;
   }

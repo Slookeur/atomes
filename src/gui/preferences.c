@@ -61,6 +61,7 @@ extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Mater
 extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
 extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 extern GtkWidget * labels_tab (glwin * view, int lid);
+extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
@@ -762,7 +763,7 @@ int save_preferences_to_xml_file ()
   do_atoms = (default_atom_color[0] || default_atom_color[1]) ? TRUE : FALSE;
   if (do_atoms)
   {
-    // atoms and clones labels
+    // atoms and clones colors
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
     if (rc < 0) return 0;
     for (i=0; i<2; i++)
@@ -782,6 +783,21 @@ int save_preferences_to_xml_file ()
         if (rc < 0) return 0;
       }
     }
+  }
+
+  if (default_box.box != NONE)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"box");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%f", (default_box.box == WIREFRAME) ? default_box.line : default_box.rad);
+    rc = xml_save_parameter_to_file (writer, (default_box.box == WIREFRAME) ? "Wireframe width" : "Cylinder radius", "default_box", TRUE, default_box.box, str);
+    g_free (str);
+    if (! rc) return 0;
+    rc = xml_save_color_to_file (writer, -1, "Color", "default_box", default_box.color);
+    if (! rc) return 0;
+    // End box
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
   }
 
   // End model
@@ -1050,6 +1066,25 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
     tmp_col -> Z = vid;
     tmp_col -> col = * col;
   }
+  else if (g_strcmp0(key, "default_box") == 0)
+  {
+    if (col)
+    {
+      default_box.color = * col;
+    }
+    else
+    {
+      default_box.box = vid;
+      if (default_box.box == WIREFRAME)
+      {
+        default_box.line = xml_string_to_double(content);
+      }
+      else
+      {
+        default_box.rad = xml_string_to_double(content);
+      }
+    }
+  }
 }
 
 /*!
@@ -1141,7 +1176,7 @@ void read_parameter (xmlNodePtr parameter_node)
       }
       p_details = p_details -> next;
     }
-    if (set_codevar && set_id)
+    if (set_codevar && (set_id || (set_r && set_g && set_b && set_a)))
     {
       // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
       set_parameter (content, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
@@ -1392,6 +1427,11 @@ void read_preferences_from_xml_file ()
                 read_preferences (l_node);
               }
             }
+          }
+          p_node = findnode(node -> children, "box");
+          if (p_node)
+          {
+            read_preferences (p_node);
           }
         }
       }
@@ -2672,7 +2712,8 @@ GtkWidget * model_preferences ()
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
 
   pref_box_win = g_malloc0(sizeof*pref_box_win);
-  // gtk_notebook_append_page (GTK_NOTEBOOK(notebook), box_tab (), gtk_label_new ("Box"));
+  box_advanced (NULL, NULL);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_box_win -> win, gtk_label_new ("Box"));
 
   return notebook;
 }
@@ -3042,6 +3083,11 @@ void clean_all_tmp ()
       tmp_label[i] = NULL;
     }
   }
+  if (tmp_box)
+  {
+    g_free (tmp_box);
+    tmp_box = NULL;
+  }
 }
 
 /*!
@@ -3085,6 +3131,11 @@ void prepare_tmp_default ()
   tmp_mpattern = defaut_mpattern ;
   tmp_mfactor = default_mfactor;
   tmp_mwidth = default_mwidth;
+  tmp_box = g_malloc0(sizeof*tmp_box);
+  tmp_box -> box = default_box.box;
+  tmp_box -> color = default_box.color;
+  tmp_box -> line = default_box.line;
+  tmp_box -> rad = default_box.rad;
 }
 
 /*!
@@ -3177,6 +3228,11 @@ void save_preferences ()
   defaut_mpattern = tmp_mpattern;
   default_mfactor = tmp_mfactor;
   default_mwidth = tmp_mwidth;
+
+  default_box.box = tmp_box -> box;
+  default_box.color = tmp_box -> color;
+  default_box.line = tmp_box -> line;
+  default_box.rad = tmp_box -> rad;
 
   if (nprojects)
   {
@@ -3318,6 +3374,14 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   defaut_mpattern = 0;
   default_mfactor = 1;
   default_mwidth = 1.0;
+
+  default_box.box = WIREFRAME;
+  default_box.color.red = 0.0;
+  default_box.color.green = 1.0;
+  default_box.color.blue = 0.0;
+  default_box.color.alpha = 1.0;
+  default_box.line = DEFAULT_SIZE;
+  default_box.rad = 0.05;
 
   if (preference_notebook)
   {

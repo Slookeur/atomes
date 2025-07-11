@@ -1313,14 +1313,12 @@ void init_img (project * this_proj)
   img -> backcolor.green = 0.0;
   img -> backcolor.blue = 0.0;
   img -> backcolor.alpha = 1.0;
-  img -> box_color.red = 0.0;
-  img -> box_color.green = 1.0;
-  img -> box_color.blue = 0.0;
-  img -> box_color.alpha = 1.0;
+  img -> box_color = default_box.color;
+  img -> box_axis_rad[BOX] = default_box.rad;
+  img -> box_axis_line[BOX] = default_box.line;
+
   img -> color_map[0] = 0;
   img -> color_map[1] = 0;
-  img -> box_axis_rad[BOX] = 0.05;
-  img -> box_axis_line[BOX] = DEFAULT_SIZE;
   img -> axispos = BOTTOM_RIGHT;
   img -> box_axis_rad[AXIS] = 0.1;
   img -> box_axis_line[AXIS] = DEFAULT_SIZE;
@@ -1351,7 +1349,8 @@ void init_img (project * this_proj)
   img -> box_axis[AXIS] = NONE; // (this_proj -> natomes <= 1000) ?  CYLINDERS : DEFAULT_STYLE;
   if (this_proj -> cell.pbc)
   {
-    img -> box_axis[BOX] = (this_proj -> natomes <= 1000) ? CYLINDERS : DEFAULT_STYLE;
+    img -> box_axis[BOX] = default_box.box;
+    // img -> box_axis[BOX] = (this_proj -> natomes <= 1000) ? CYLINDERS : DEFAULT_STYLE;
   }
   else
   {

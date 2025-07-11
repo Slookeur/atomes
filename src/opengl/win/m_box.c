@@ -114,6 +114,7 @@ G_MODULE_EXPORT void set_box_axis_style (GtkWidget * widg, gpointer data)
   n = the_data -> c;
   glwin * view = get_project_by_id(the_data -> a) -> modelgl;
   k = view -> anim -> last -> img -> box_axis[n];
+  g_print ("style :: k= %d, j= %d\n", k, j);
   int dim[2]={OGL_BOX, OGL_AXIS};
   l = (k == NONE) ? 2 : (j == WIREFRAME) ? 2 : 1;
   m = (k == NONE) ? 0 : (j == WIREFRAME) ? 1 : 2;
