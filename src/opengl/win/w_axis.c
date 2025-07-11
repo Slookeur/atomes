@@ -73,6 +73,7 @@ gchar * axis_template[AXIS_TEMPLATES] = {"Top Right Corner *", "Top Left Corner 
 double axis_init_color[3][3] = {{0.0, 0.0, 1.0},{0.0, 1.0, 0.0},{1.0, 0.0, 0.0}};
 double axis_range[3][2] = {{0.0,100.0}, {0.0, 100.0}, {0.0, 100.0}};
 
+extern gboolean from_box_or_axis;
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern G_MODULE_EXPORT void set_labels_render (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data);
@@ -274,7 +275,9 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
       {
 #ifdef GTK3
         // GTK3 Menu Action To Check
+        from_box_or_axis = TRUE;
         gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][1], TRUE);
+        from_box_or_axis = FALSE;
 #endif
       }
       break;
@@ -286,16 +289,18 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
       {
 #ifdef GTK3
         // GTK3 Menu Action To Check
+        from_box_or_axis = TRUE;
         gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][2], TRUE);
+        from_box_or_axis = FALSE;
 #endif
       }
       break;
   }
   if (! preferences)
   {
-#ifdef GTK4
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
+#ifdef GTK4
     update_menu_bar (view);
 #endif
   }
@@ -336,6 +341,9 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
     the_axis = view -> axis_win;
   }
   val = button_get_status ((GtkWidget *)but);
+#ifdef GTK3
+  from_box_or_axis = TRUE;
+#endif // GTK3
   if (val)
   {
 #ifdef GTK4
@@ -358,6 +366,9 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
 #endif
     if (the_axis -> styles && GTK_IS_WIDGET(the_axis -> styles)) gtk_combo_box_set_active (GTK_COMBO_BOX(the_axis -> styles), NONE);
   }
+#ifdef GTK3
+  from_box_or_axis = FALSE;
+#endif // GTK3
   widget_set_sensitive (the_axis -> axis_data, val);
 #ifdef GTK4
   if (! preferences)

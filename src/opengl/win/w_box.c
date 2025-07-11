@@ -52,6 +52,8 @@ extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, f
 
 gchar * box_style[BOX_STYLES] = {"Wireframe", "Cylinders"};
 
+gboolean from_box_or_axis = FALSE;
+
 /*!
   \fn G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
 
@@ -147,6 +149,8 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
     view -> create_shaders[MDBOX] = TRUE;
     update (view);
   }
+#else
+  from_box_or_axis = TRUE;
 #endif
   if (i == 1)
   {
@@ -172,8 +176,15 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
     }
 #endif
   }
+  if (! preferences)
+  {
+    view -> create_shaders[MDBOX] = TRUE;
+    update (view);
 #ifdef GTK4
-  if (! preferences) update_menu_bar (view);
+    update_menu_bar (view);
+#else
+  }
+  from_box_or_axis = FALSE;
 #endif
 }
 
@@ -211,6 +222,9 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
   {
     box_win = pref_box_win;
   }
+#ifdef GTK3
+  from_box_or_axis = TRUE;
+#endif // GTK3
   if (val)
   {
 #ifdef GTK3
@@ -233,6 +247,9 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
 #endif
     gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), NONE);
   }
+#ifdef GTK3
+  from_box_or_axis = FALSE;
+#endif // GTK3
   widget_set_sensitive (box_win -> box_data, val);
 #ifdef GTK4
   if (! preferences) update_menu_bar (view);
