@@ -563,11 +563,7 @@ G_MODULE_EXPORT void to_axis_title (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  if (gtk_check_button_get_active (but))
-#else
-  if (gtk_toggle_button_get_active (but))
-#endif
+  if (button_get_status ((GtkWidget *)but))
   {
     widget_set_sensitive (axis_title, 0);
     project * this_proj = get_project_by_id(a);
@@ -609,11 +605,7 @@ G_MODULE_EXPORT void set_grid (GtkToggleButton * grid, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = gtk_check_button_get_active (grid);
-#else
-  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = gtk_toggle_button_get_active (grid);
-#endif
+  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = button_get_status ((GtkWidget *)grid);
   update_curve (data);
 }
 
@@ -663,11 +655,7 @@ G_MODULE_EXPORT void set_axis (GtkToggleButton * axis, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = gtk_check_button_get_active (axis);
-#else
-  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = gtk_toggle_button_get_active (axis);
-#endif
+  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = button_get_status ((GtkWidget *)axis);
   update_curve (data);
 }
 
@@ -796,15 +784,10 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
   show_the_widgets (tptx[i]);
   show_the_widgets (tpty[i]);
 
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(show_axis), this_proj -> curves[b][c] -> show_axis[i]);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(show_grid), this_proj -> curves[b][c] -> show_grid[i]);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(axis_default_title), this_proj -> curves[b][c] -> axis_defaut_title[i]);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(show_axis), this_proj -> curves[b][c] -> show_axis[i]);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(show_grid), this_proj -> curves[b][c] -> show_grid[i]);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(axis_default_title), this_proj -> curves[b][c] -> axis_defaut_title[i]);
-#endif
+  button_set_status (show_axis, this_proj -> curves[b][c] -> show_axis[i]);
+  button_set_status (show_grid, this_proj -> curves[b][c] -> show_grid[i]);
+  button_set_status (axis_default_title, this_proj -> curves[b][c] -> axis_defaut_title[i]);
+
   widget_set_sensitive (axis_title, ! this_proj -> curves[b][c] -> axis_defaut_title[i]);
   update_entry_text (GTK_ENTRY(axis_title), this_proj -> curves[b][c] -> axis_title[i]);
   gtk_font_chooser_set_font (GTK_FONT_CHOOSER(axis_title_font), this_proj -> curves[b][c] -> axis_title_font[i]);

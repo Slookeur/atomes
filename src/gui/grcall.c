@@ -269,12 +269,7 @@ G_MODULE_EXPORT void on_cutcheck_toggled (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void on_cutcheck_toggled (GtkToggleButton * but, gpointer data)
 #endif
 {
-  gboolean status;
-#ifdef GTK4
-  status = gtk_check_button_get_active (but);
-#else
-  status = gtk_toggle_button_get_active (but);
-#endif
+  gboolean status = button_get_status ((GtkWidget *)but);
   if (status)
   {
     fitc = 1;

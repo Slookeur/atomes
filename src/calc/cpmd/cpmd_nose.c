@@ -984,11 +984,7 @@ G_MODULE_EXPORT void select_atoms_not_thermostated (GtkToggleButton * but, gpoin
 {
   int h, i, j, k, l, m;
   h = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  j = button_get_status ((GtkWidget *)but);
   for (i=0; i<qm_proj -> natomes; i++)
   {
     m = 0;

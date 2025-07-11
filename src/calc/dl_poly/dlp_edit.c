@@ -842,11 +842,7 @@ G_MODULE_EXPORT void visualize_it (GtkToggleButton * but, gpointer data)
   int i, j;
   i = GPOINTER_TO_INT (data);
   j = 0;
-#ifdef GTK4
-  toviz.c = gtk_check_button_get_active (but);
-#else
-  toviz.c = gtk_toggle_button_get_active (but);
-#endif
+  toviz.c = button_get_status ((GtkWidget *)but);
   if (i < MOLIMIT)
   {
     j = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[i-1]));
@@ -894,11 +890,7 @@ G_MODULE_EXPORT void select_it (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  toviz.c = gtk_check_button_get_active (but);
-#else
-  toviz.c = gtk_toggle_button_get_active (but);
-#endif
+  toviz.c = button_get_status ((GtkWidget *)but);
   if (i < MOLIMIT) j = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[i-1]));
   if (is_moy)
   {
@@ -2228,11 +2220,7 @@ G_MODULE_EXPORT void shell_in_vdw (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void shell_in_vdw (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_fshell -> vdw = gtk_check_button_get_active (but);
-#else
-  tmp_fshell -> vdw = gtk_toggle_button_get_active (but);
-#endif
+  tmp_fshell -> vdw = button_get_status ((GtkWidget *)but);
   adjust_vdw_interactions (tmp_fshell -> vdw);
 }
 

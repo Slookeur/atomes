@@ -303,12 +303,7 @@ G_MODULE_EXPORT void check_semi (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> thermo_opts[i] = j;
   if (i == 6) widget_set_sensitive (bath_box, j);
 }
@@ -703,12 +698,7 @@ G_MODULE_EXPORT void check_impact (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void check_impact (GtkToggleButton * but, gpointer data)
 #endif
 {
-  gboolean i;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  gboolean i = button_get_status ((GtkWidget *)but);
   tmp_field -> md_opts[13] = (i) ? 1.0 : 0.0;
   widget_set_sensitive (impact_but, i);
 }
@@ -997,12 +987,7 @@ G_MODULE_EXPORT void check_equi (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   k = 2*i + 2*(i/5) + i/6 - i/7;
   tmp_field -> equi_opts[k] = (j) ? 1.0 : 0.0;
   if (i < 6) widget_set_sensitive (equi_box[i], j);
@@ -1188,12 +1173,7 @@ G_MODULE_EXPORT void check_out (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i < 7)
   {
     k = 4*i - i/4 - 2*(i/5) - 2*(i/6);
@@ -1460,12 +1440,7 @@ G_MODULE_EXPORT void check_ana (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> ana_opts[i] = (j) ? 1.0 : 0.0;
   switch (i)
   {
@@ -1661,12 +1636,7 @@ G_MODULE_EXPORT void check_io (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i < 2)
   {
     tmp_field -> io_opts[2*i] = (j) ? 1.0 : 0.0;
@@ -2113,12 +2083,7 @@ G_MODULE_EXPORT void check_elec (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> elec_opts[i] = (j) ? 1.0 : 0.0;
   if (! i) widget_set_sensitive (elec_box[j], j);
   if (i == 2) widget_set_sensitive (elec_box[1], j);
@@ -2246,11 +2211,7 @@ G_MODULE_EXPORT void check_vdw (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  i = button_get_status ((GtkWidget *)but);
   tmp_field -> vdw_opts[j] = (double)i;
   if (j == 0) widget_set_sensitive (vdw_box[0], i);
   if (j == 4) widget_set_sensitive (vdw_box[1], i);
@@ -2336,11 +2297,7 @@ G_MODULE_EXPORT void check_met (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  i = button_get_status ((GtkWidget *)but);
   tmp_field -> met_opts[j] = (double)i;
 }
 
@@ -2455,12 +2412,7 @@ G_MODULE_EXPORT void check_sys (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> sys_opts[i] = (j) ? 1.0 : 0.0;
   if (i > 5)
   {

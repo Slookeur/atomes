@@ -137,14 +137,7 @@ G_MODULE_EXPORT void toggled_show_hide_coord (GtkToggleButton * widg, gpointer d
   }
   j += c;
 
-
-#ifdef GTK4
-  k = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-// GTK3 Menu Action To Check
-  k = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
-
+  k = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   if (k != this_proj -> modelgl -> anim -> last -> img -> show_coord[g][j])
   {
     if (is_coord_in_menu(g, this_proj))
@@ -222,11 +215,7 @@ G_MODULE_EXPORT void toggled_label_unlabel_coord (GtkToggleButton * widg, gpoint
   tint pointer;
   pointer.a = the_data -> d;
   pointer.b = the_data -> c;
-#ifdef GTK4
-  pointer.c = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-  pointer.c = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
+  pointer.c = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   selected_aspec = the_data -> b;
 #ifdef DEBUG
   g_debug ("Toggle label/unlabel coord:: s= %d, g= %d, c= %d, selec_sp= %d", pointer.a, pointer.b, pointer.c, selected_aspec);
@@ -265,11 +254,7 @@ G_MODULE_EXPORT void toggled_select_unselect_coord (GtkToggleButton * widg, gpoi
   tint pointer;
   pointer.a = the_data -> d;
   pointer.b = the_data -> c;
-#ifdef GTK4
-  pointer.c = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-  pointer.c = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
+  pointer.c = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   selected_aspec = the_data -> b;
 #ifdef DEBUG
   g_debug ("Toggle select/unselect coord:: s= %d, g= %d, c= %d, selec_sp= %d", pointer.a, pointer.b, pointer.c, selected_aspec);
@@ -319,8 +304,8 @@ G_MODULE_EXPORT void toggled_show_hide_poly (GtkToggleButton * widg, gpointer da
       j += this_proj -> coord -> ntg[g][i];
     }
   }
+  k = button_get_status ((GtkWidget *)widg);
 #ifdef GTK4
-  k = gtk_check_button_get_active (widg);
   if (k != this_proj -> modelgl -> anim -> last -> img -> show_poly[g][j])
   {
     gchar * str;
@@ -347,7 +332,6 @@ G_MODULE_EXPORT void toggled_show_hide_poly (GtkToggleButton * widg, gpointer da
   }
 #else
   // GTK3 Menu Action To Check
-  k = gtk_toggle_button_get_active (widg);
   if (is_coord_in_menu(g, this_proj))
   {
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_poly[0][g][j], k);
@@ -1126,7 +1110,7 @@ G_MODULE_EXPORT void on_cloned_poly_toggled (GtkToggleButton * Button, gpointer 
 {
   glwin * view = (glwin *)data;
 #ifdef GTK4
-   view -> anim -> last -> img -> cloned_poly = gtk_check_button_get_active (Button);
+   view -> anim -> last -> img -> cloned_poly = button_get_status ((GtkWidget *)Button);
    g_action_group_activate_action ((GActionGroup *)view -> action_group, "set-cloned-poly.0.0", NULL);
    /* int shaders[2] = {POLYS, RINGS};
    re_create_md_shaders (2, shaders, get_project_by_id(view -> proj));

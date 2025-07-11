@@ -953,11 +953,7 @@ G_MODULE_EXPORT void set_bshift (GtkToggleButton * shift, gpointer data)
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> bshift = gtk_check_button_get_active (shift);
-#else
-  this_proj -> curves[b][c] -> bshift = gtk_toggle_button_get_active (shift);
-#endif
+  this_proj -> curves[b][c] -> bshift = button_get_status ((GtkWidget *)shift);
   update_curve (data);
 }
 

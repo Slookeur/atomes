@@ -208,11 +208,7 @@ G_MODULE_EXPORT void set_title (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_title = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> show_title = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> show_title = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (title_box, this_proj -> curves[b][c] -> show_title);
   update_curve (data);
 }
@@ -244,11 +240,7 @@ G_MODULE_EXPORT void set_title_default (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> default_title = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> default_title = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> default_title = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (custom_title, ! this_proj -> curves[b][c] -> default_title);
   if (this_proj -> curves[b][c] -> default_title)
   {
@@ -416,11 +408,7 @@ G_MODULE_EXPORT void set_show_frame (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_frame = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> show_frame = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> show_frame = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (frame_box, this_proj -> curves[b][c] -> show_frame);
   update_curve (data);
 }

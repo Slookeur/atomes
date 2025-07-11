@@ -138,11 +138,7 @@ G_MODULE_EXPORT void toggle_pbc (GtkCheckButton * Button, gpointer data)
 G_MODULE_EXPORT void toggle_pbc (GtkToggleButton * Button, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_pbc = gtk_check_button_get_active (Button);
-#else
-  tmp_pbc = gtk_toggle_button_get_active (Button);
-#endif
+  tmp_pbc = button_get_status ((GtkWidget *)Button);
 }
 
 #ifdef GTK4
@@ -167,11 +163,7 @@ G_MODULE_EXPORT void toggle_frac (GtkCheckButton * Button, gpointer data)
 G_MODULE_EXPORT void toggle_frac (GtkToggleButton * Button, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_frac = gtk_check_button_get_active (Button);
-#else
-  tmp_frac = gtk_toggle_button_get_active (Button);
-#endif
+  tmp_frac = button_get_status ((GtkWidget *)Button);
   /*if (gtk_toggle_button_get_active (Button))
   {
     widget_set_sensitive (frac_box, 1);
@@ -407,11 +399,7 @@ G_MODULE_EXPORT void toggle_xcor (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void toggle_xcor (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_xcor = gtk_check_button_get_active (but);
-#else
-  tmp_xcor = gtk_toggle_button_get_active (but);
-#endif
+  tmp_xcor = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (chem_entry[CHEM_PARAMS-2], ! tmp_xcor);
 }
 

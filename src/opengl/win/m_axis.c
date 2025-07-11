@@ -89,6 +89,13 @@ G_MODULE_EXPORT void set_axis_template_pos (GtkWidget * widg, gpointer data)
     this_proj -> modelgl -> anim -> last -> img -> axispos = j;
     this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
     update (this_proj -> modelgl);
+    if (this_proj -> modelgl -> axis_win)
+    {
+      if (this_proj -> modelgl -> axis_win -> templates && GTK_IS_WIDGET(this_proj -> modelgl -> axis_win -> templates))
+      {
+        gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> axis_win -> templates), j);
+      }
+    }
   }
   else if (i == j && ! gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg))
   {
@@ -241,6 +248,13 @@ G_MODULE_EXPORT void change_axis_pos_radio (GSimpleAction * action, GVariant * p
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
     g_action_change_state (G_ACTION (action), parameter);
+    if (view -> axis_win)
+    {
+      if (view -> axis_win -> templates && GTK_IS_WIDGET(view -> axis_win -> templates))
+      {
+        gtk_combo_box_set_active (GTK_COMBO_BOX(view -> axis_win -> templates), i);
+      }
+    }
   }
 }
 

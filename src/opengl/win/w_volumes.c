@@ -603,11 +603,7 @@ G_MODULE_EXPORT void show_volumes (GtkToggleButton * but, gpointer data)
 {
   tint * dat = (tint *)data;
   project * this_proj = get_project_by_id (dat -> a);
-#ifdef GTK4
-  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = gtk_check_button_get_active (but);
-#else
-  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = button_get_status ((GtkWidget *)but);
   int shaders[1] = {VOLMS};
   re_create_md_shaders (1, shaders, this_proj);
   update (this_proj -> modelgl);
@@ -637,11 +633,7 @@ G_MODULE_EXPORT void fm_show_volumes (GtkToggleButton * but, gpointer data)
 {
   qint * dat = (qint *)data;
   project * this_proj = get_project_by_id (dat -> a);
-#ifdef GTK4
-  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = gtk_check_button_get_active (but);
-#else
-  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = button_get_status ((GtkWidget *)but);
   int shaders[1] = {VOLMS};
   re_create_md_shaders (1, shaders, this_proj);
   update (this_proj -> modelgl);

@@ -1247,6 +1247,8 @@ extern GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, flo
 extern GtkWidget * color_button (ColRGBA col, gboolean alpha, int dimx, int dimy, GCallback handler, gpointer data);
 extern GtkWidget * font_button (gchar * font, int dimx, int dimy, GCallback handler, gpointer data);
 extern GtkWidget * spin_button (GCallback handler, double value, double start, double end, double step, int digits, int dim,  gpointer data);
+extern int button_get_status (GtkWidget * button);
+extern void button_set_status (GtkWidget * button, int status);
 extern GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data);
 extern GtkWidget * radio_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data);
 extern GtkWidget * create_button (gchar * text, int image_format, gchar * image, int dimx, int dimy, int relief, GCallback handler, gpointer data);

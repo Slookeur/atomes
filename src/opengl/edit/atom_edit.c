@@ -263,8 +263,6 @@ G_MODULE_EXPORT gboolean delete_action (GtkWidget * widg, GdkEvent * event, gpoi
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void set_reset_transformation (GtkCheckButton * but, gpointer data)
-{
-  if (gtk_check_button_get_active (but))
 #else
 /*!
   \fn G_MODULE_EXPORT void set_reset_transformation (GtkToggleButton * but, gpointer data)
@@ -275,9 +273,9 @@ G_MODULE_EXPORT void set_reset_transformation (GtkCheckButton * but, gpointer da
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void set_reset_transformation (GtkToggleButton * but, gpointer data)
-{
-  if (gtk_toggle_button_get_active (but))
 #endif
+{
+  if (button_get_status((GtkWidget *)but))
   {
     tint * id = (tint *)data;
     project * this_proj = get_project_by_id (id -> a);
@@ -306,11 +304,7 @@ G_MODULE_EXPORT void set_reset_transformation (GtkToggleButton * but, gpointer d
       init_default_shaders (this_proj -> modelgl);
       update (this_proj -> modelgl);
     }
-#ifdef GTK4
-    gtk_check_button_set_active (but, FALSE);
-#else
-    gtk_toggle_button_set_active (but, FALSE);
-#endif
+    button_set_status ((GtkWidget *)but, FALSE);
   }
 }
 

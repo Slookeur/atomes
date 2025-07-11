@@ -1011,11 +1011,7 @@ G_MODULE_EXPORT void set_wr (GtkToggleButton * but, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> wrap = gtk_check_button_get_active (but);
-#else
-  cbuilder -> wrap = gtk_toggle_button_get_active (but);
-#endif
+  cbuilder -> wrap = button_get_status ((GtkWidget *)but);
 }
 
 #ifdef GTK4
@@ -1041,11 +1037,7 @@ G_MODULE_EXPORT void set_shc (GtkToggleButton * but, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> clones = gtk_check_button_get_active (but);
-#else
-  cbuilder -> clones = gtk_toggle_button_get_active (but);
-#endif
+  cbuilder -> clones = button_get_status ((GtkWidget *)but);
 }
 
 /*!
@@ -1181,11 +1173,7 @@ G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> overlapping = gtk_check_button_get_active (Button);
-#else
-  cbuilder -> overlapping = gtk_toggle_button_get_active (Button);
-#endif
+  cbuilder -> overlapping = button_get_status ((GtkWidget *)Button);
 }
 
 /*!
@@ -1265,11 +1253,7 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (occup[i], 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
   }
   i = cbuilder -> occupancy;
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(occ_but[i]), TRUE);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(occ_but[i]), TRUE);
-#endif
+  button_set_status (occ_but[i], TRUE);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("<b>Allow overlapping</b>", -1, 25, cbuilder -> overlapping, G_CALLBACK(toggle_overlap), (gpointer)cbuilder), FALSE, FALSE, 0);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);

@@ -1128,13 +1128,8 @@ G_MODULE_EXPORT void set_show_motion_axis (GtkToggleButton * but, gpointer data)
   project * this_proj = get_project_by_id (id -> a);
   int i, j;
   j = id -> b - TOLAB;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(this_proj -> modelgl -> atom_win -> axis_but[! j]), i);
-#else
-  i = gtk_toggle_button_get_active (but);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(this_proj -> modelgl -> atom_win -> axis_but[! j]), i);
-#endif
+  i = button_get_status ((GtkWidget *)but);
+  button_set_status (this_proj -> modelgl -> atom_win -> axis_but[! j], i);
   this_proj -> modelgl -> atom_win -> active = j;
   this_proj -> modelgl -> atom_win -> show_axis[j] = i;
   if (i)

@@ -164,12 +164,7 @@ G_MODULE_EXPORT void set_slab_property (GtkToggleButton * but, gpointer data)
 {
   dint * dat = (dint *)data;
   glwin * view = get_project_by_id(dat -> a) -> modelgl;
-  gboolean status;
-#ifdef GTK4
-  status = gtk_check_button_get_active (but);
-#else
-  status = gtk_toggle_button_get_active (but);
-#endif
+  gboolean status = button_get_status ((GtkWidget *)but);
   switch (dat -> b)
   {
     case 0:

@@ -311,11 +311,7 @@ G_MODULE_EXPORT void update_cp2k_option_check (GtkToggleButton * but, gpointer d
 {
   int i;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) button_get_status ((GtkWidget *)but);
   print_start_buffer ();
 }
 
@@ -593,11 +589,7 @@ G_MODULE_EXPORT void update_cp2k_check (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cp2k -> opts[i] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cp2k -> opts[i] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cp2k -> opts[i] = (double) button_get_status ((GtkWidget *)but);
   if (i == CP2RES)
   {
     for (j=0; j<2; j++) widget_set_sensitive (checked_box[j], (int)tmp_cp2k -> opts[CP2RES]);

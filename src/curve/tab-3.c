@@ -135,11 +135,7 @@ G_MODULE_EXPORT void show_data_legend (GtkToggleButton * leg, gpointer data)
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_legend = gtk_check_button_get_active (leg);
-#else
-  this_proj -> curves[b][c] -> show_legend = gtk_toggle_button_get_active (leg);
-#endif
+  this_proj -> curves[b][c] -> show_legend = button_get_status ((GtkWidget *)leg);
   widget_set_sensitive (legend_box, this_proj -> curves[b][c] -> show_legend);
   if (! this_proj -> curves[b][c] -> show_legend)
   {
@@ -210,11 +206,7 @@ G_MODULE_EXPORT void show_data_legend_box (GtkToggleButton * bleg, gpointer data
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_legend_box = gtk_check_button_get_active (bleg);
-#else
-  this_proj -> curves[b][c] -> show_legend_box = gtk_toggle_button_get_active (bleg);
-#endif
+  this_proj -> curves[b][c] -> show_legend_box = button_get_status ((GtkWidget *)bleg);
   widget_set_sensitive (legend_box_style, this_proj -> curves[b][c] -> show_legend_box);
   update_curve (data);
 }

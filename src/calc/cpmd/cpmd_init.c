@@ -350,12 +350,7 @@ G_MODULE_EXPORT void update_cpmd_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i == DEFCO || i == DEFDU)
   {
     widget_set_sensitive (but_at[(i == DEFCO) ? 0 : 1], j);
@@ -646,11 +641,7 @@ G_MODULE_EXPORT void update_calc_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cpmd -> calc_opts[i] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cpmd -> calc_opts[i] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cpmd -> calc_opts[i] = (double) button_get_status ((GtkWidget *)but);
   for (i=1; i<4; i++) print_the_section (i, 0, qmbuffer[i]);
 }
 

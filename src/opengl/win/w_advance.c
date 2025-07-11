@@ -187,8 +187,6 @@ int status;
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void toggled_delete_ligth (GtkCheckButton * but, gpointer data)
-{
-  if (gtk_check_button_get_active (but))
 #else
 /*!
   \fn G_MODULE_EXPORT void toggled_delete_ligth (GtkToggleButton * but, gpointer data)
@@ -199,9 +197,9 @@ G_MODULE_EXPORT void toggled_delete_ligth (GtkCheckButton * but, gpointer data)
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void toggled_delete_ligth (GtkToggleButton * but, gpointer data)
-{
-  if (gtk_toggle_button_get_active (but))
 #endif
+{
+  if (button_get_status ((GtkWidget *)but))
   {
     status --;
   }
@@ -238,11 +236,7 @@ G_MODULE_EXPORT void run_light_source_to_be_removed (GtkDialog * win, gint respo
   j = 0;
   for (i=0; i<ogl_lightning -> lights; i++)
   {
-#ifdef GTK4
-    if (gtk_check_button_get_active (GTK_CHECK_BUTTON(light_but[i])))
-#else
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(light_but[i])))
-#endif
+    if (button_get_status ((GtkWidget *)light_but[i]))
     {
       light_list[j] = i;
       j ++;
@@ -510,11 +504,7 @@ void update_light_data (int li, opengl_edition * ogl_win)
   update_entry_double (GTK_ENTRY(ogl_win -> entogl[3][2]), this_light -> intensity.z);
   if (! preferences)
   {
-#ifdef GTK4
-    gtk_check_button_set_active (GTK_CHECK_BUTTON(ogl_win -> light_show), this_light -> show);
-#else
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(ogl_win -> light_show), this_light -> show);
-#endif
+    button_set_status (ogl_win -> light_show, this_light -> show);
   }
 }
 
@@ -890,11 +880,7 @@ G_MODULE_EXPORT void show_this_light (GtkToggleButton * but, gpointer data)
   opengl_edition * ogl_win = (opengl_edition *)data;
   glwin * view = get_project_by_id(ogl_win -> proj) -> modelgl;
   int li = gtk_combo_box_get_active (GTK_COMBO_BOX(ogl_win -> lights));
-#ifdef GTK4
-  view -> anim -> last -> img -> l_ghtning.spot[li].show = gtk_check_button_get_active (but);
-#else
-  view -> anim -> last -> img -> l_ghtning.spot[li].show = gtk_toggle_button_get_active (but);
-#endif
+  view -> anim -> last -> img -> l_ghtning.spot[li].show = button_get_status ((GtkWidget *)but);
   view -> create_shaders[LIGHT] = TRUE;
   update (view);
 }
@@ -1093,11 +1079,7 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
     the_mat = & tmp_material;
     i = gtk_combo_box_get_active (GTK_COMBO_BOX(pref_ogl_edit -> templates));
   }
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  j = button_get_status ((GtkWidget *)but);
   if (j)
   {
     if (i == -1) i = 3;

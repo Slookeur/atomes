@@ -343,6 +343,27 @@ G_MODULE_EXPORT void show_hide_box_axis (GSimpleAction * action, GVariant * para
     update (view);
     g_action_change_state (G_ACTION (action), g_variant_new_boolean (show));
     g_variant_unref (state);
+    switch (the_data -> c)
+    {
+      case 0:
+        if (view -> box_win)
+        {
+          if (view -> box_win -> show_hide && GTK_IS_WIDGET(view -> box_win -> show_hide))
+          {
+            button_set_status (view -> box_win -> show_hide, ! status);
+          }
+        }
+        break;
+      case 1:
+        if (view -> axis_win)
+        {
+          if (view -> axis_win -> show_hide && GTK_IS_WIDGET(view -> axis_win -> show_hide))
+          {
+            button_set_status (view -> axis_win -> show_hide, ! status);
+          }
+        }
+        break;
+    }
   }
 }
 

@@ -406,11 +406,7 @@ G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
       i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
       for (j=0; j<3; j++)
       {
-#ifdef GTK4
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
-#else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[j]), active_project -> rsparam[i][j+2]);
-#endif
+        button_set_status (rings_check[j], active_project -> rsparam[i][j+2]);
       }
     }
   }
@@ -467,11 +463,7 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
   int oid = GPOINTER_TO_INT(data);
   int i;
   gboolean status;
-#ifdef GTK4
-  status = gtk_check_button_get_active (but);
-#else
-  status = gtk_toggle_button_get_active (but);
-#endif
+  status = button_get_status ((GtkWidget *)but);
   toggled_rings = TRUE;
   switch (search_type)
   {
@@ -497,31 +489,15 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
       }
       if (oid == 0 && status)
       {
-#ifdef GTK4
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[1]), ! status);
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[2]), ! status);
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[3]), ! status);
-#else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[1]), ! status);
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[2]), ! status);
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[3]), ! status);
-#endif
+        for (i=1; i<4; i++) button_set_status(rings_check[i], ! status);
       }
       else if (oid == 1 && status)
       {
-#ifdef GTK4
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[0]), ! status);
-#else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[0]), ! status);
-#endif
+        button_set_status(rings_check[0], ! status);
       }
       else if (oid == 2 && status)
       {
-#ifdef GTK4
-        gtk_check_button_set_active (GTK_CHECK_BUTTON(rings_check[1]), ! status);
-#else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(rings_check[1]), ! status);
-#endif
+        button_set_status(rings_check[1], ! status);
       }
       break;
   }
@@ -683,11 +659,7 @@ G_MODULE_EXPORT void run_toggle_bond (GtkDialog * info, gint response_id, gpoint
   }
   else
   {
-#ifdef GTK4
-    gtk_check_button_set_active ((GtkCheckButton *)data, FALSE);
-#else
-    gtk_toggle_button_set_active ((GtkToggleButton *)data, FALSE);
-#endif
+    button_set_status (data, FALSE);
   }
 #ifdef GTK4
   destroy_this_native_dialog (info);
@@ -719,12 +691,7 @@ G_MODULE_EXPORT void toggle_bond (GtkToggleButton * Button, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT (data);
-  gboolean status;
-#ifdef GTK4
-  status = gtk_check_button_get_active (Button);
-#else
-  status = gtk_toggle_button_get_active (Button);
-#endif
+  gboolean status = button_get_status ((GtkWidget *)Button);
   if (i < 3)
   {
     active_project -> runc[i] = status;

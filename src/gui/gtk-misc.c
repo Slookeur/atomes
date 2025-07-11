@@ -63,6 +63,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void run_this_gtk_native_dialog (GtkNativeDialog * dial, GCallback handler, gpointer data);
   void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data);
   void resize_this_window (GtkWidget * window, int x, int y);
+  void button_set_status (GtkWidget * button, int status);
   void update_entry_int (GtkEntry * entry, int intval);
   void update_entry_double (GtkEntry * entry, double doubleval);
   void update_entry_long_double (GtkEntry * entry, double doubleval);
@@ -157,6 +158,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   int get_widget_width (GtkWidget * widg);
   int get_widget_height (GtkWidget * widg);
+  int button_get_status (GtkWidget * button);
 
 */
 
@@ -1794,6 +1796,39 @@ GtkWidget * spin_button (GCallback handler, double value, double start, double e
 }
 
 /*!
+  \fn int button_get_status (GtkWidget * button)
+
+  \brief get status of check / toggle button
+
+  \param button the button to check
+*/
+int button_get_status (GtkWidget * button)
+{
+#ifdef GTK4
+  return gtk_check_button_get_active (GTK_CHECK_BUTTON(button));
+#else
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(button));
+#endif
+}
+
+/*!
+  \fn void button_set_status (GtkWidget * button, int status)
+
+  \brief set status of check / toggle button
+
+  \param button the button to update
+  \param status the new status
+*/
+void button_set_status (GtkWidget * button, int status)
+{
+#ifdef GTK4
+  gtk_check_button_set_active (GTK_CHECK_BUTTON(button), status);
+#else
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(button), status);
+#endif
+}
+
+/*!
   \fn GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data)
 
   \brief create a check button
@@ -1821,11 +1856,7 @@ GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCal
     g_free (label);
   }
   gtk_widget_set_size_request (but, dimx, dimy);
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(but), state);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(but), state);
-#endif
+  button_set_status (but, state);
   if (handler != NULL) g_signal_connect (G_OBJECT(but), "toggled", handler, data);
   return but;
 }

@@ -97,12 +97,7 @@ G_MODULE_EXPORT void update_restart_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_cpmd -> restart[i] = (j) ? 1 : 0;
   if (i == 3 || i == 6)
   {

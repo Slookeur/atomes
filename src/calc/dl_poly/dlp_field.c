@@ -1577,11 +1577,7 @@ G_MODULE_EXPORT void toggle_field_params (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  tmp_field -> afp[i] = gtk_check_button_get_active (but);
-#else
-  tmp_field -> afp[i] = gtk_toggle_button_get_active (but);
-#endif
+  tmp_field -> afp[i] = button_get_status ((GtkWidget *)but);
   if (i == MAXDATC)
   {
     for (j=0; j<MOLIMIT-1; j++)
@@ -4198,18 +4194,10 @@ G_MODULE_EXPORT void run_clean_field (GtkDialog * dial, gint response_id, gpoint
     hide_the_widgets (preview_but);
     for (i=0; i<19; i++)
     {
-#ifdef GTK4
-      gtk_check_button_set_active (GTK_CHECK_BUTTON(ff_but[i]), afp_init[i+MAXDATC+2]);
-#else
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(ff_but[i]), afp_init[i+MAXDATC+2]);
-#endif
+      button_set_status (ff_but[i], afp_init[i+MAXDATC+2]);
     }
     if (append_pages) remove_classical_assistant_pages ();
-#ifdef GTK4
-    gtk_check_button_set_active (GTK_CHECK_BUTTON(data), FALSE);
-#else
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(data), FALSE);
-#endif
+    button_set_status (data, FALSE);
     assist_init = FALSE;
   }
   destroy_this_dialog (dial);
@@ -4237,11 +4225,7 @@ G_MODULE_EXPORT void clean_field (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void clean_field (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  if (gtk_check_button_get_active (but))
-#else
-  if (gtk_toggle_button_get_active (but))
-#endif
+  if (button_get_status ((GtkWidget *)but))
   {
     GtkWidget * dial = dialog_cancel_apply ("Clean all force field parameter(s) ?", field_assistant, FALSE);
     GtkWidget * box = dialog_get_content_area (dial);
@@ -4276,11 +4260,7 @@ G_MODULE_EXPORT void select_field_action (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_field -> prepare_file[i] = gtk_check_button_get_active (but);
-#else
-  tmp_field -> prepare_file[i] = gtk_toggle_button_get_active (but);
-#endif
+  tmp_field -> prepare_file[i] = button_get_status ((GtkWidget *)but);
   if (i == 1)
   {
     for (j=0; j<2; j++)
@@ -4380,11 +4360,7 @@ void create_ff_structure (int ai, int type)
     }
     else
     {
-#ifdef GTK4
-      tmp_field -> prepare_file[i] = gtk_check_button_get_active (GTK_CHECK_BUTTON(field_i_prep[i]));
-#else
-      tmp_field -> prepare_file[i] = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(field_i_prep[i]));
-#endif
+      tmp_field -> prepare_file[i] = button_get_status (field_i_prep[i]);
     }
     widget_set_sensitive (field_i_lab[i], FALSE);
   }

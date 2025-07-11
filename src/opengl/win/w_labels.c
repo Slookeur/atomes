@@ -215,12 +215,7 @@ G_MODULE_EXPORT void use_atom_default_colors (GtkToggleButton * but, gpointer da
 #endif
 {
   tint * id = (tint *) data;
-  gboolean val;
-#ifdef GTK4
-  val = gtk_check_button_get_active (but);
-#else
-  val = gtk_toggle_button_get_active (but);
-#endif
+  gboolean val = button_get_status ((GtkWidget *)but);
   int b = id -> b;
   project * this_proj = get_project_by_id(id -> a);
   if (val)
@@ -409,12 +404,7 @@ G_MODULE_EXPORT void set_labels_scale (GtkToggleButton * but, gpointer data)
 #endif
 {
   tint * id = (tint *) data;
-  int i;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  int i = button_get_status ((GtkWidget *)but);
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);
@@ -591,11 +581,7 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
   project * this_proj;
   if (id -> a != -1) this_proj = get_project_by_id(id -> a);
   int i, j;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  i = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (line_box, i);
   if (i)
   {

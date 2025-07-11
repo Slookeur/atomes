@@ -859,6 +859,7 @@ typedef struct box_edition box_edition;
 struct box_edition
 {
   GtkWidget * win;
+  GtkWidget * show_hide;
   GtkWidget * styles;
   GtkWidget * width_box;
   GtkWidget * width;
@@ -871,6 +872,7 @@ typedef struct axis_edition axis_edition;
 struct axis_edition
 {
   GtkWidget * win;
+  GtkWidget * show_hide;
   GtkWidget * styles;
   GtkWidget * width_box;
   GtkWidget * width;

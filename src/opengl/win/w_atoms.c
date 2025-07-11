@@ -265,11 +265,10 @@ G_MODULE_EXPORT void toggled_show_hide_atom (GtkToggleButton * but, gpointer dat
   i = id -> a;
   j = id -> b;
   k = id -> c;
-  gboolean show;
+  gboolean show = button_get_status ((GtkWidget *)but);
 #ifdef GTK4
   project * this_proj = get_project_by_id (i);
   int l, m;
-  show = gtk_check_button_get_active (but);
   for (l=0; l<this_proj -> steps; l++)
   {
     for (m=0; m<this_proj -> natomes; m++)
@@ -285,7 +284,6 @@ G_MODULE_EXPORT void toggled_show_hide_atom (GtkToggleButton * but, gpointer dat
   init_default_shaders (this_proj -> modelgl);
   update_menu_bar (this_proj -> modelgl);
 #else
-  show = gtk_toggle_button_get_active (but);
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)get_project_by_id(i) -> modelgl -> ogl_spec[j][k], show);
 #endif
 }
@@ -317,11 +315,10 @@ G_MODULE_EXPORT void toggled_show_hide_label (GtkToggleButton * but, gpointer da
   i = id -> a;
   j = id -> b;
   k = id -> c;
-  gboolean show;
+  gboolean show = button_get_status ((GtkWidget *)but);
   project * this_proj = get_project_by_id (i);
 #ifdef GTK4
   int l, m;
-  show = gtk_check_button_get_active (but);
   for (l=0; l<this_proj -> steps; l++)
   {
     for (m=0; m<this_proj -> natomes; m++)
@@ -338,7 +335,6 @@ G_MODULE_EXPORT void toggled_show_hide_label (GtkToggleButton * but, gpointer da
   update_menu_bar (this_proj -> modelgl);
 #else
   // GTK3 Menu Action To Check
-  show = gtk_toggle_button_get_active (but);
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_lab[j][k], show);
 #endif
 }

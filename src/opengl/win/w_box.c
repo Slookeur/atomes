@@ -199,12 +199,7 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
 #endif
 {
-  gboolean val;
-#ifdef GTK4
-  val = gtk_check_button_get_active (but);
-#else
-  val = gtk_toggle_button_get_active (but);
-#endif
+  gboolean val = button_get_status ((GtkWidget *)but);
   glwin * view;
   box_edition * box_win;
   if (! preferences)
@@ -239,6 +234,9 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
     gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), NONE);
   }
   widget_set_sensitive (box_win -> box_data, val);
+#ifdef GTK4
+  if (! preferences) update_menu_bar (view);
+#endif
 }
 
 /*!
@@ -335,7 +333,8 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   {
     ac = FALSE;
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("Show / hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data), FALSE, FALSE, 0);
+  the_box -> show_hide = check_button ("Show / hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> show_hide, FALSE, FALSE, 0);
   GtkWidget * box_data = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, box_data, TRUE, TRUE, 10);
   widget_set_sensitive (box_data, ac);

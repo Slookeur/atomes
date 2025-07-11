@@ -1495,8 +1495,6 @@ ColRGBA * tmp_color;
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data)
-{
-  int status = gtk_check_button_get_active (but);
 #else
 /*!
   \fn G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data)
@@ -1507,9 +1505,9 @@ G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data)
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data)
-{
-  int status = gtk_toggle_button_get_active (but);
 #endif
+{
+  int status = button_get_status ((GtkWidget *)but);
   int object = GPOINTER_TO_INT(data);
   switch (object)
   {
