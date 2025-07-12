@@ -882,8 +882,8 @@ struct axis_edition
   GtkWidget * axis_data;
   GtkWidget * templates;
   GtkWidget * axis_position_box;
+  GtkWidget * axis_label_box;
   GtkWidget * axis_color_title[3];
-  GtkWidget * ax_title[3];
 };
 
 /*! \typedef glwin

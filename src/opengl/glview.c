@@ -1323,13 +1323,13 @@ void init_img (project * this_proj)
   img -> box_axis_rad[AXIS] = default_axis.rad;
   img -> box_axis_line[AXIS] = default_axis.line;
   img -> axis_length = default_axis.length;
-  if (default_axis.color)
-  {
-    img -> axis_color = duplicate_color (3, default_axis.color);
-  }
-  for (i=0; i<3; i++) img -> axis_pos[i] = default_axis.c_pos[i];
   img -> axis_labels = default_axis.labels;
-
+  if (default_axis.color) img -> axis_color = duplicate_color (3, default_axis.color);
+  for (i=0; i<3; i++)
+  {
+    img -> axis_pos[i] = default_axis.c_pos[i];
+    img -> axis_title[i] = g_strdup_printf ("%s", default_axis.title[i]);
+  }
   img -> quality = default_opengl[3];
   img -> render = FILL;
   img -> rep = PERSPECTIVE;
@@ -1370,9 +1370,6 @@ void init_img (project * this_proj)
   {
     img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
   }
-  img -> axis_title[0] = g_strdup_printf ("x");
-  img -> axis_title[1] = g_strdup_printf ("y");
-  img -> axis_title[2] = g_strdup_printf ("z");
 
   if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;

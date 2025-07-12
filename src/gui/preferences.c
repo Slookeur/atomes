@@ -3454,6 +3454,9 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_axis.length = 2.0*DEFAULT_SIZE;
   default_axis.c_pos[0] = default_axis.c_pos[1] = 50.0;
   default_axis.c_pos[2] = 0.0;
+  default_axis.title[0] = "x";
+  default_axis.title[1] = "y";
+  default_axis.title[2] = "z";
   if (default_axis.color) g_free (default_axis.color);
   default_axis.color = NULL;
 
