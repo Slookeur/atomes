@@ -302,7 +302,7 @@ G_MODULE_EXPORT void set_legend_box_line (GtkComboBox * fbox, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  get_project_by_id(a) -> curves[b][c] -> legend_box_dash = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox)) + 1;
+  get_project_by_id(a) -> curves[b][c] -> legend_box_dash = combo_get_active ((GtkWidget *)fbox) + 1;
   set_legend_box_style (data);
 }
 

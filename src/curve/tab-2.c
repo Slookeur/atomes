@@ -218,7 +218,7 @@ void set_data_style (gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   project * this_proj = get_project_by_id(a);
   DataLayout * layout;
   if (i > 0)
@@ -264,8 +264,8 @@ G_MODULE_EXPORT void set_data_glyph (GtkComboBox * gbox, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
-  j = gtk_combo_box_get_active (GTK_COMBO_BOX(gbox));
+  i = combo_get_active (setcolorbox);
+  j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
     get_extra_layout (i-1) -> glyph = j;
@@ -302,8 +302,8 @@ G_MODULE_EXPORT void set_data_dash (GtkComboBox * gbox, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
-  j = gtk_combo_box_get_active (GTK_COMBO_BOX(gbox));
+  i = combo_get_active (setcolorbox);
+  j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
     get_extra_layout (i-1) -> dash = j;
@@ -339,7 +339,7 @@ G_MODULE_EXPORT void set_data_color (GtkColorChooser * colob, gpointer data)
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (i > 0)
   {
     get_extra_layout (i-1) -> datacolor = get_button_color (colob);
@@ -371,7 +371,7 @@ G_MODULE_EXPORT void set_data_thickness (GtkEntry * thickd, gpointer data)
   wid = entry_get_text (thickd);
   k = string_to_double ((gpointer)wid);
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
@@ -419,7 +419,7 @@ G_MODULE_EXPORT void set_data_glyph_size (GtkEntry * glsize, gpointer data)
   wid = entry_get_text (glsize);
   k = string_to_double ((gpointer)wid);
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
@@ -467,7 +467,7 @@ G_MODULE_EXPORT void set_data_hist_width (GtkEntry * entry, gpointer data)
   wid = entry_get_text (entry);
   k = string_to_double ((gpointer)wid);
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
@@ -515,7 +515,7 @@ G_MODULE_EXPORT void set_data_hist_opac (GtkEntry * entry, gpointer data)
   wid = entry_get_text (entry);
   k = string_to_double ((gpointer)wid);
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (k >= 0.0 && k <= 1.0)
   {
     if (i > 0)
@@ -558,8 +558,8 @@ G_MODULE_EXPORT void set_data_hist_pos (GtkComboBox * gbox, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
-  j = gtk_combo_box_get_active (GTK_COMBO_BOX(gbox));
+  i = combo_get_active (setcolorbox);
+  j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
     get_extra_layout (i-1) -> hpos = j;
@@ -590,7 +590,7 @@ G_MODULE_EXPORT void set_data_glyph_freq (GtkEntry * glfreq, gpointer data)
   wid = entry_get_text (glfreq);
   j = string_to_double ((gpointer)wid);
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
+  i = combo_get_active (setcolorbox);
   if (j > 0)
   {
     if (i > 0)
@@ -631,7 +631,7 @@ G_MODULE_EXPORT void choose_set (GtkComboBox * box, gpointer data)
   int i, j, k, l;
   tint ad;
 
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   j = dataxe[0].a;
   k = dataxe[0].b;
   l = dataxe[0].c;
@@ -676,8 +676,8 @@ G_MODULE_EXPORT void set_data_aspect (GtkComboBox * box, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(setcolorbox));
-  j = gtk_combo_box_get_active (box);
+  i = combo_get_active (setcolorbox);
+  j = combo_get_active ((GtkWidget *)box);
   if (j == 1)
   {
     gtk_combo_box_set_active (GTK_COMBO_BOX(data_glyph), 0);
@@ -773,7 +773,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   CurveExtra * ctmpa, * ctmpb, * ctmpc, * ctmpd;
   project * this_proj = get_project_by_id(cid -> a);
   l = this_proj -> curves[cid -> b][cid -> c] -> extrac -> extras;
-  m = gtk_combo_box_get_active (GTK_COMBO_BOX (setcolorbox));
+  m = combo_get_active (setcolorbox);
   if (m > 0)
   {
     ctmpa = this_proj -> curves[cid -> b][cid -> c] -> extrac -> first;

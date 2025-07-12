@@ -552,7 +552,7 @@ GtkWidget * advanced_atom_properties (int atom_or_clone, glwin * view)
 /*!
   \fn G_MODULE_EXPORT void atom_properties (GtkWidget * widg, gpointer data)
 
-  \brief atom(s) propery callback GTK3
+  \brief atom(s) property callback GTK3
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
@@ -562,7 +562,7 @@ G_MODULE_EXPORT void atom_properties (GtkWidget * widg, gpointer data)
 /*!
   \fn G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * parameter, gpointer data)
 
-  \brief atom(s) propery callback GTK4
+  \brief atom(s) property callback GTK4
 
   \param action the GAction sending the signal
   \param parameter GVariant parameter of the GAction, if any
@@ -594,6 +594,6 @@ G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * paramet
   }
   else
   {
-    show_warning (g_strdup_printf ("Error impossible to display the model window for %s !", (atom_or_clone) ? "clones" : "atomes"), this_proj -> modelgl -> win);
+    show_warning (g_strdup_printf ("Error impossible to display the model window for %s !", (atom_or_clone) ? "clones" : "atoms"), this_proj -> modelgl -> win);
   }
 }

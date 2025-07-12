@@ -338,7 +338,7 @@ G_MODULE_EXPORT void changed_cp2k_option_box (GtkComboBox * box, gpointer data)
     j = 0;
     k = i - CP2VDW;
   }
-  tmp_cp2k -> extra_opts[j][k] = (double) gtk_combo_box_get_active (box);
+  tmp_cp2k -> extra_opts[j][k] = (double) combo_get_active ((GtkWidget *)box);
   if (i == CP2VDW)
   {
     cp2k_vdw_box[1] = destroy_this_widget (cp2k_vdw_box[1]);
@@ -643,7 +643,7 @@ G_MODULE_EXPORT void cp2k_file_info (GtkTextBuffer * textbuf, gpointer data)
   }
   else
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(cp2k_spec_combo));
+    j = combo_get_active (cp2k_spec_combo);
     k = i + CP2FRE - 10;
     if (tmp_cp2k -> spec_files[j][k] != NULL) g_free (tmp_cp2k -> spec_files[j][k]);
     tmp_cp2k -> spec_files[j][k] = g_strdup_printf ("%s", gtk_text_buffer_get_text (textbuf, & bStart, & bEnd, FALSE));
@@ -728,20 +728,20 @@ G_MODULE_EXPORT void changed_cp2k_box (GtkComboBox * box, gpointer data)
   int i, j;
   gboolean motion;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   if (j != (int)tmp_cp2k -> opts[i])
   {
     if (i == CP2SYM)
     {
       cp2k_spec_box[1] = destroy_this_widget (cp2k_spec_box[1]);
-      cp2k_spec_box[1] = create_cp2k_spec_box (gtk_combo_box_get_active (box));
+      cp2k_spec_box[1] = create_cp2k_spec_box (combo_get_active ((GtkWidget *)box));
       show_the_widgets (cp2k_spec_box[1]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cp2k_spec_box[0], cp2k_spec_box[1], FALSE, FALSE, 0);
     }
     else
     {
       if (i == CP2RUN) motion = cp2k_with_motion ();
-      tmp_cp2k -> opts[i] = (double) gtk_combo_box_get_active (box);
+      tmp_cp2k -> opts[i] = (double) combo_get_active ((GtkWidget *)box);
 
       if (i == CP2RUN)
       {

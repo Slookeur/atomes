@@ -494,7 +494,7 @@ GtkWidget * answer_info;
 G_MODULE_EXPORT void on_answer_changed (GtkWidget * widg, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(widg));
+  i = combo_get_active (widg);
   j = (! i || i == 2) ? 0 : (i == 1) ? 1 : 2;
   gtk_label_set_text (GTK_LABEL(answer_info), npt_info[j]);
 }
@@ -537,7 +537,7 @@ G_MODULE_EXPORT void run_iask (GtkDialog * iask, gint response_id, gpointer data
     else
     {
       done = TRUE;
-      res_int = gtk_combo_box_get_active (GTK_COMBO_BOX(answer));
+      res_int = combo_get_active (answer);
     }
   }
   if (done) destroy_this_dialog (iask);

@@ -264,9 +264,9 @@ int prepare_cp2k_basis_pseudo_list (int sp, int * sp_id, int n_basis_pseudo, cha
 G_MODULE_EXPORT void changed_basis_pseudo_box (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(cp2k_spec_combo));
+  i = combo_get_active (cp2k_spec_combo);
   j = GPOINTER_TO_INT(data);
-  k = gtk_combo_box_get_active (box);
+  k = combo_get_active ((GtkWidget *)box);
   if (k > -1)
   {
     tmp_cp2k -> spec_data[i][j] = k;

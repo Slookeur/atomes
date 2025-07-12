@@ -175,7 +175,7 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
   {
     if (axischoice != NULL)
     {
-      j = gtk_combo_box_get_active (GTK_COMBO_BOX(axischoice));
+      j = combo_get_active (axischoice);
       update_entry_double (GTK_ENTRY(vmin), this_proj -> curves[rid][cid] -> axmin[j]);
       update_entry_double (GTK_ENTRY(vmax), this_proj -> curves[rid][cid] -> axmax[j]);
       update_entry_double (GTK_ENTRY(majt), this_proj -> curves[rid][cid] -> majt[j]);

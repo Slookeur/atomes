@@ -991,7 +991,7 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
 G_MODULE_EXPORT void set_angular_precision (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (i != view -> volume_win -> angp)
   {
     project * this_proj = get_project_by_id (view -> proj);

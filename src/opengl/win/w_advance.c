@@ -518,7 +518,7 @@ void update_light_data (int li, opengl_edition * ogl_win)
 */
 G_MODULE_EXPORT void show_light_param (GtkComboBox * box, gpointer data)
 {
-  int li = gtk_combo_box_get_active (box);
+  int li = combo_get_active ((GtkWidget *)box);
   update_light_data (li, (opengl_edition *)data);
 }
 
@@ -690,7 +690,7 @@ G_MODULE_EXPORT void update_light_param (GtkEntry * res, gpointer data)
   opengl_edition * ogl_edit = (preferences) ? pref_ogl_edit : (view) ? view -> opengl_win : NULL;
   if (ogl_edit)
   {
-    int li = gtk_combo_box_get_active (GTK_COMBO_BOX(ogl_edit-> lights));
+    int li = combo_get_active (ogl_edit-> lights);
     Light * this_light = (preferences) ? & tmp_lightning.spot[li] : & view -> anim -> last -> img -> l_ghtning.spot[li];
     const gchar * m = entry_get_text (res);
     double v = string_to_double ((gpointer)m);
@@ -789,7 +789,7 @@ G_MODULE_EXPORT void set_object_pos (GtkEntry * res, gpointer data)
   }
   else if (id -> b > 0 && edit_ogl)
   {
-    int li = gtk_combo_box_get_active (GTK_COMBO_BOX(edit_ogl -> lights));
+    int li = combo_get_active (edit_ogl -> lights);
     switch (id -> b)
     {
       case 1:
@@ -819,8 +819,8 @@ G_MODULE_EXPORT void set_object_pos (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void set_light_type (GtkComboBox * box, gpointer data)
 {
   opengl_edition * ogl_win = (opengl_edition *)data;
-  int li = gtk_combo_box_get_active (GTK_COMBO_BOX(ogl_win -> lights));
-  int ti = gtk_combo_box_get_active (box);
+  int li = combo_get_active (ogl_win -> lights);
+  int ti = combo_get_active ((GtkWidget *)box);
   show_active_light_data (ogl_win, li, ti);
 }
 
@@ -846,8 +846,8 @@ G_MODULE_EXPORT void set_light_fix (GtkComboBox * box, gpointer data)
   {
     ogl_ligthning = & tmp_lightning;
   }
-  int li = gtk_combo_box_get_active (GTK_COMBO_BOX(ogl_win -> lights));
-  ogl_ligthning -> spot[li].fix = gtk_combo_box_get_active (box);
+  int li = combo_get_active (ogl_win -> lights);
+  ogl_ligthning -> spot[li].fix = combo_get_active ((GtkWidget *)box);
   if (! preferences)
   {
     view -> create_shaders[LIGHT] = TRUE;
@@ -879,7 +879,7 @@ G_MODULE_EXPORT void show_this_light (GtkToggleButton * but, gpointer data)
 {
   opengl_edition * ogl_win = (opengl_edition *)data;
   glwin * view = get_project_by_id(ogl_win -> proj) -> modelgl;
-  int li = gtk_combo_box_get_active (GTK_COMBO_BOX(ogl_win -> lights));
+  int li = combo_get_active (ogl_win -> lights);
   view -> anim -> last -> img -> l_ghtning.spot[li].show = button_get_status ((GtkWidget *)but);
   view -> create_shaders[LIGHT] = TRUE;
   update (view);
@@ -1071,13 +1071,13 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
     view = (glwin *)data;
     ogl_edit = view -> opengl_win;
     the_mat = & view -> anim -> last -> img -> m_terial;
-    i = gtk_combo_box_get_active (GTK_COMBO_BOX(view -> opengl_win -> templates));
+    i = combo_get_active (view -> opengl_win -> templates);
   }
   else
   {
     ogl_edit = pref_ogl_edit;
     the_mat = & tmp_material;
-    i = gtk_combo_box_get_active (GTK_COMBO_BOX(pref_ogl_edit -> templates));
+    i = combo_get_active (pref_ogl_edit -> templates);
   }
   j = button_get_status ((GtkWidget *)but);
   if (j)
@@ -1137,7 +1137,7 @@ G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data)
     the_mat = & view -> anim -> last -> img -> m_terial;
     ogl_edit = view -> opengl_win;
   }
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   the_mat -> predefine = i + 1;
   for (j=0; j<5; j++)
   {
@@ -1172,12 +1172,12 @@ G_MODULE_EXPORT void set_l_model (GtkComboBox * box, gpointer data)
 {
   if (preferences)
   {
-    tmp_material.param[0] = gtk_combo_box_get_active (box);
+    tmp_material.param[0] = combo_get_active ((GtkWidget *)box);
   }
   else
   {
     glwin * view = (glwin *)data;
-    view -> anim -> last -> img -> m_terial.param[0] = gtk_combo_box_get_active (box);
+    view -> anim -> last -> img -> m_terial.param[0] = combo_get_active ((GtkWidget *)box);
     update (view);
   }
 }
@@ -1501,7 +1501,7 @@ G_MODULE_EXPORT void set_fog_type (GtkWidget * widg, gpointer data)
   {
     this_fog = & tmp_fog;
   }
-  this_fog -> based = gtk_combo_box_get_active (GTK_COMBO_BOX(widg));
+  this_fog -> based = combo_get_active (widg);
   if (! preferences) update (view);
 }
 
@@ -1558,7 +1558,7 @@ void setup_fog_dialogs (opengl_edition * ogl_edit, int fid)
 */
 G_MODULE_EXPORT void set_fog_mode (GtkWidget * widg, gpointer data)
 {
-  setup_fog_dialogs ((opengl_edition *)data, gtk_combo_box_get_active (GTK_COMBO_BOX(widg)));
+  setup_fog_dialogs ((opengl_edition *)data, combo_get_active (widg));
 }
 
 /*!

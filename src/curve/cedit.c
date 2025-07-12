@@ -402,7 +402,7 @@ void edit_curve (gpointer data)
 
   add_gtk_close_event (edit_box, G_CALLBACK(destroy_this_window), NULL);
 
-  if (gtk_combo_box_get_active (GTK_COMBO_BOX(data_aspect)))
+  if (combo_get_active (data_aspect))
   {
     hide_the_widgets (Glyph_box);
   }

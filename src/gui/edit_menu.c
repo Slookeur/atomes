@@ -327,7 +327,7 @@ void edit_box (GtkWidget * vbox)
 */
 G_MODULE_EXPORT void update_chemistry (GtkEntry * entry, gpointer data)
 {
-  int i = gtk_combo_box_get_active (GTK_COMBO_BOX(spec_box));
+  int i = combo_get_active (spec_box);
   int j = GPOINTER_TO_INT(data);
   const gchar * m = entry_get_text (entry);
   double v = string_to_double ((gpointer)m);
@@ -346,7 +346,7 @@ G_MODULE_EXPORT void update_chemistry (GtkEntry * entry, gpointer data)
 G_MODULE_EXPORT void on_spec_changed (GtkComboBox * combo, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (combo);
+  i = combo_get_active ((GtkWidget *)combo);
   gtk_label_set_text (GTK_LABEL(chem_spec[0]), active_chem -> element[i]);
   gtk_label_set_text (GTK_LABEL(chem_spec[1]), g_strdup_printf("%d", (int)active_chem -> chem_prop[CHEM_Z][i]));
   for (j=0; j<CHEM_PARAMS-1; j++)
@@ -367,10 +367,10 @@ G_MODULE_EXPORT void on_spec_changed (GtkComboBox * combo, gpointer data)
 G_MODULE_EXPORT void on_rad_changed (GtkComboBox * combo, gpointer data)
 {
   int i, j, k;
-  i = gtk_combo_box_get_active (combo);
+  i = combo_get_active ((GtkWidget *)combo);
   if (i != -1)
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(spec_box));
+    j = combo_get_active (spec_box);
     k = (int)active_chem -> chem_prop[CHEM_Z][j];
     tmp_chem[1][j] = set_radius_ (& k, & i);
     update_entry_double (GTK_ENTRY(chem_entry[1]), tmp_chem[1][j]);

@@ -90,13 +90,13 @@ G_MODULE_EXPORT void set_measure_style (GtkComboBox * box, gpointer data)
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> mpattern = gtk_combo_box_get_active (box);
+    this_proj -> modelgl -> anim -> last -> img -> mpattern = combo_get_active ((GtkWidget *)box);
     this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
     update (this_proj -> modelgl);
   }
   else
   {
-    tmp_mpattern = gtk_combo_box_get_active (box);
+    tmp_mpattern = combo_get_active ((GtkWidget *)box);
   }
 }
 
@@ -111,7 +111,7 @@ G_MODULE_EXPORT void set_measure_style (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_labels_format (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);
@@ -140,7 +140,7 @@ G_MODULE_EXPORT void set_labels_format (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);
@@ -311,7 +311,7 @@ G_MODULE_EXPORT void set_label_color (GtkColorChooser * colob, gpointer data)
 G_MODULE_EXPORT void set_labels_position (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);
@@ -431,7 +431,7 @@ G_MODULE_EXPORT void set_labels_scale (GtkToggleButton * but, gpointer data)
 G_MODULE_EXPORT void set_labels_tilt (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
     project * this_proj = get_project_by_id(id -> a);

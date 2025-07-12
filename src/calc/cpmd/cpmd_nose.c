@@ -1482,7 +1482,7 @@ void create_nose_thermo_param_box (int therm_id)
 G_MODULE_EXPORT void changed_nose_thermo_id_box (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   create_nose_thermo_param_box (i);
 }
 
@@ -1662,7 +1662,7 @@ G_MODULE_EXPORT void update_thermo_parameter (GtkEntry * res, gpointer data)
   {
     if (get_num_thermo () > 1)
     {
-      j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_id_box[0]));
+      j = combo_get_active (combo_id_box[0]);
     }
     else
     {
@@ -1734,7 +1734,7 @@ GtkWidget * create_nose_box (int n)
 G_MODULE_EXPORT void changed_thermo_box_nose (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != get_thermo () -> sys)
   {
     clean_thermostat (get_thermo () -> type);
@@ -1819,7 +1819,7 @@ void prepare_therm_elec ()
 G_MODULE_EXPORT void changed_thermo_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   j = GPOINTER_TO_INT (data);
   if (j == 0 && i != get_thermo () -> type)
   {

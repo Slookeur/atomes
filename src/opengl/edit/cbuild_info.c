@@ -461,7 +461,7 @@ GtkWidget * create_wyck_pts_info (space_group * spg, int sid)
 G_MODULE_EXPORT void set_so_info (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), i);
   if (i > -1)
   {

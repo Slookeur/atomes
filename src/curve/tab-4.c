@@ -120,7 +120,7 @@ extern int a, b, c, d;
 */
 int get_active_axis ()
 {
-  return gtk_combo_box_get_active (GTK_COMBO_BOX(axischoice));
+  return combo_get_active (axischoice);
 }
 
 /*!
@@ -425,7 +425,7 @@ G_MODULE_EXPORT void set_io_ticks (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> ticks_io[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> ticks_io[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -444,7 +444,7 @@ G_MODULE_EXPORT void set_pos_ticks (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> ticks_pos[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> ticks_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -463,7 +463,7 @@ G_MODULE_EXPORT void set_pos_labels (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> labels_pos[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> labels_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -717,9 +717,10 @@ G_MODULE_EXPORT void set_scale (GtkComboBox * sbox, gpointer data)
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
   int i = get_active_axis ();
-  this_proj -> curves[b][c] -> scale[i] = gtk_combo_box_get_active(sbox);
-  widget_set_sensitive (majt, ! gtk_combo_box_get_active(sbox));
-  widget_set_sensitive (nmi[i], ! gtk_combo_box_get_active(sbox));
+  int j = combo_get_active((GtkWidget *)sbox);
+  this_proj -> curves[b][c] -> scale[i] = j;
+  widget_set_sensitive (majt, ! j);
+  widget_set_sensitive (nmi[i], ! j);
   this_proj -> curves[b][c]-> autoscale[i] = TRUE;
   update_curve (data);
 }
@@ -727,14 +728,14 @@ G_MODULE_EXPORT void set_scale (GtkComboBox * sbox, gpointer data)
 int handler_id;
 
 /*!
-  \fn G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
+  \fn G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
 
   \brief change the axis
 
-  \param widg the GtkComboBox sending the signal
+  \param box the GtkComboBox sending the signal
   \param data the associated data pointer
 */
-G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
+G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
 {
   int i;
   tint * ad = (tint *)data;
@@ -742,7 +743,7 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (widg);
+  i = combo_get_active ((GtkWidget *)box);
   update_entry_double (GTK_ENTRY(vmin), this_proj -> curves[b][c] -> axmin[i]);
   update_entry_double (GTK_ENTRY(vmax), this_proj -> curves[b][c] -> axmax[i]);
   update_entry_double (GTK_ENTRY(majt), this_proj -> curves[b][c] -> majt[i]);

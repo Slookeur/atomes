@@ -158,7 +158,7 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
     }
     else
     {
-      j = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+      j = combo_get_active (rings_box[0]);
       k = active_project -> rsparam[j][1];
     }
   }
@@ -227,7 +227,7 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
 */
 G_MODULE_EXPORT void combox_tunit_changed (GtkComboBox * box, gpointer data)
 {
-  active_project -> tunit = gtk_combo_box_get_active(box);
+  active_project -> tunit = combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -393,17 +393,17 @@ G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
   {
     if (preferences)
     {
-      tmp_rsparam[0] = gtk_combo_box_get_active(box);
+      tmp_rsparam[0] = combo_get_active ((GtkWidget *)box);
     }
     else
     {
-      active_project -> rsearch[0] = gtk_combo_box_get_active(box);
+      active_project -> rsearch[0] = combo_get_active ((GtkWidget *)box);
       widget_set_sensitive (rings_box[1], (active_project -> rsearch[0]<0) ? 0 : 1);
       gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), active_project -> rsparam[active_project -> rsearch[0]][0]);
       for (i=0; i<2; i++) widget_set_sensitive (rings_entry[i], (active_project -> rsearch[0]<0) ? 0 : 1);
       for (i=0; i<3; i++) widget_set_sensitive (rings_check[i], (active_project -> rsearch[0]<0) ? 0 : 1);
       update_entry_int (GTK_ENTRY(rings_entry[0]), active_project -> rsparam[active_project -> rsearch[0]][1]);
-      i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+      i = combo_get_active (rings_box[0]);
       for (j=0; j<3; j++)
       {
         button_set_status (rings_check[j], active_project -> rsparam[i][j+2]);
@@ -416,23 +416,23 @@ G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
     {
       if (preferences)
       {
-        tmp_csparam[0] = gtk_combo_box_get_active(box);
+        tmp_csparam[0] = combo_get_active ((GtkWidget *)box);
       }
       else
       {
-        active_project -> csparam[0] = gtk_combo_box_get_active(box);
+        active_project -> csparam[0] = combo_get_active ((GtkWidget *)box);
       }
     }
     else
     {
       if (preferences)
       {
-        tmp_rsparam[1] = gtk_combo_box_get_active(box);
+        tmp_rsparam[1] = combo_get_active ((GtkWidget *)box);
       }
       else
       {
-        i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
-        active_project -> rsparam[i][0] = gtk_combo_box_get_active(box);
+        i = combo_get_active (rings_box[0]);
+        active_project -> rsparam[i][0] = combo_get_active ((GtkWidget *)box);
       }
     }
   }
@@ -468,7 +468,7 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
   switch (search_type)
   {
     case 0:
-      i = gtk_combo_box_get_active(GTK_COMBO_BOX(rings_box[0]));
+      i = combo_get_active (rings_box[0]);
       if (preferences)
       {
         tmp_rsparam[oid+4] = status;

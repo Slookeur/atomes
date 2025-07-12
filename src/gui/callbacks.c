@@ -971,7 +971,7 @@ G_MODULE_EXPORT void update_sa (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void changed_spec_combo (GtkComboBox * box, gpointer data)
 {
-  update_sa_info (gtk_combo_box_get_active (box));
+  update_sa_info (combo_get_active ((GtkWidget *)box));
 }
 
 /*!

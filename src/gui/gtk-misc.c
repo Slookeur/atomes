@@ -906,6 +906,28 @@ GtkWidget * create_layout (int x, int y)
 }
 
 /*!
+  \fn int combo_get_active (GtkWidget * combo)
+
+  \brief retrieve the active item's position
+
+  \param combo the GtkWidget sending the signal
+*/
+int combo_get_active (GtkWidget * combo)
+{
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+}
+/* #ifdef GTK4
+#if GTK_MINOR_VERSION > 9
+  return gtk_drop_down_get_selected (GtkDropDown *)combo);
+#else
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+#endif
+#else
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+#endif // GTK4
+} */
+
+/*!
   \fn void combo_text_append (GtkWidget * combo, gchar * text)
 
   \brief append text in GtkComboBox widget

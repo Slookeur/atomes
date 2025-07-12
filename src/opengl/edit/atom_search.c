@@ -177,7 +177,7 @@ G_MODULE_EXPORT void set_atoms_for_action (GtkComboBox * box, gpointer data)
   tint * id = (tint *)data;
   project * this_proj = get_project_by_id (id -> a);
   int i, j, k;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   this_proj -> modelgl -> search_widg[id -> c] -> status = i;
   if (id -> c == 2)
   {

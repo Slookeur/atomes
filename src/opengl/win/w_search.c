@@ -1395,7 +1395,7 @@ G_MODULE_EXPORT void set_atom (GtkEntry * entry, gpointer data)
 */
 void clear_fields (atom_search * asearch)
 {
-  int i = gtk_combo_box_get_active (GTK_COMBO_BOX(asearch -> atom_box));
+  int i = combo_get_active (asearch -> atom_box);
   if (i)
   {
     update_entry_text (GTK_ENTRY(asearch -> entry_a), exact_name(get_project_by_id(asearch -> proj) -> chemistry -> label[i-1]));
@@ -3840,7 +3840,7 @@ void clean_picked_and_labelled (atom_search * asearch, gboolean clean_msd)
 G_MODULE_EXPORT void set_spec_changed (GtkComboBox * box, gpointer data)
 {
   atom_search * asearch = (atom_search *) data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   asearch -> spec = i;
   update_search_tree (asearch);
   if (get_project_by_id(asearch -> proj) -> natomes >= 10000)
@@ -3869,7 +3869,7 @@ G_MODULE_EXPORT void set_spec_changed (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_filter_changed (GtkComboBox * box, gpointer data)
 {
   atom_search * asearch = (atom_search *) data;
-  asearch -> filter = gtk_combo_box_get_active (box);
+  asearch -> filter = combo_get_active ((GtkWidget *)box);
   int object = get_asearch_object (asearch);
   int filter = get_asearch_filter (asearch);
   widget_set_sensitive (asearch -> atom_box, (object && filter > 2) ? 0 : 1);
@@ -3902,7 +3902,7 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
   if (get_project_by_id(asearch -> proj) -> natomes >= 10000)
   {
     was_object = ((! asearch -> mode && asearch -> object > 1) || (asearch -> mode && asearch -> object)) ? 1 : 0;
-    asearch -> object = gtk_combo_box_get_active (box);
+    asearch -> object = combo_get_active ((GtkWidget *)box);
     filter = get_asearch_filter (asearch);
     object =  ((! asearch -> mode && asearch -> object > 1) || (asearch -> mode && asearch -> object)) ? 1 : 0;
     if ((! asearch -> mode && (asearch -> object == 1 || asearch -> object == 3)) || (asearch -> mode && asearch -> object))
@@ -3929,7 +3929,7 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
   else
   {
     was_object = (asearch -> object) ? 1 : 0;
-    asearch -> object = gtk_combo_box_get_active (box);
+    asearch -> object = combo_get_active ((GtkWidget *)box);
     filter = get_asearch_filter (asearch);
     object = (asearch -> object) ? 1 : 0;
     if (is_the_widget_visible(asearch -> id_box)) hide_the_widgets (asearch -> id_box);
@@ -3995,7 +3995,7 @@ G_MODULE_EXPORT void set_search_mode (GtkComboBox * box, gpointer data)
 {
   atom_search * asearch = (atom_search *)data;
   project * this_proj = get_project_by_id(asearch -> proj);
-  asearch -> mode = gtk_combo_box_get_active (box);
+  asearch -> mode = combo_get_active ((GtkWidget *)box);
   if ((asearch -> action == REPLACE || asearch -> action == REMOVE) && asearch -> atom_tree)
   {
     if (! asearch -> mode)

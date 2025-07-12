@@ -400,7 +400,7 @@ G_MODULE_EXPORT void show_hide_box_axis (GSimpleAction * action, GVariant * para
     update (view);
     g_action_change_state (G_ACTION (action), g_variant_new_boolean (show));
     g_variant_unref (state);
-    update_show_hide_box_axis (view, the_data -> c, status);
+    update_show_hide_box_axis (view, the_data -> c, ! show);
   }
 }
 

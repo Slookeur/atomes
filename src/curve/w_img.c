@@ -130,7 +130,7 @@ G_MODULE_EXPORT void set_background (GtkToggleButton * backb, gpointer data)
 */
 G_MODULE_EXPORT void choose_format (GtkComboBox * box, gpointer cid)
 {
-  forme = gtk_combo_box_get_active (box);
+  forme = combo_get_active ((GtkWidget *)box);
   if (forme != -1)
   {
     dwidget * imf  = (dwidget *) cid;

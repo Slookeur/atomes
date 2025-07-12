@@ -1767,7 +1767,7 @@ G_MODULE_EXPORT void changed_mol_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   gtk_label_set_text (GTK_LABEL(field_label[i]), set_field_label(i, j));
   gtk_label_set_use_markup (GTK_LABEL(field_label[i]), TRUE);
   gtk_tree_store_clear (field_model[i]);
@@ -2069,7 +2069,7 @@ G_MODULE_EXPORT void run_changed_energy_unit (GtkDialog * dialog, gint response_
 G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
 {
   int i, j, k, l;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_field -> energy_unit)
   {
     if (field_file_has_energy_parameters(FALSE, 0, 0))
@@ -2352,7 +2352,7 @@ G_MODULE_EXPORT void changed_field_key_renderer (GtkCellRendererCombo * combo, g
     l = get_field_data_id (i-5, str);
     if (l > -1)
     {
-      if (i < MOLIMIT) k = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+      if (i < MOLIMIT) k = combo_get_active (combo_mol[i-1]);
       if (i > 6 && i < MOLIMIT)
       {
         tmp_fstr = get_active_struct (i-7, k, j);
@@ -2518,7 +2518,7 @@ gchar * pop_info (int i, int id)
     default:
       if (i < MOLIMIT)
       {
-        j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+        j = combo_get_active (combo_mol[i-1]);
         tmp_fmol = get_active_field_molecule (j);
       }
       switch (i)
@@ -2849,7 +2849,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
       default:
         if (i == 1)
         {
-          j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+          j = combo_get_active (combo_mol[i-1]);
           tmp_fmol = get_active_field_molecule (j);
           if (actel > 1)
           {
@@ -2951,7 +2951,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
       default:
         if (i == 1)
         {
-          j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+          j = combo_get_active (combo_mol[i-1]);
           tmp_fmol = get_active_field_molecule (j);
           if (actel > 1)
           {
@@ -3164,7 +3164,7 @@ void field_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
       if (is_special[tree][k] == 2) break;
     }
     gtk_tree_model_get (mod, iter, k, & j, -1);
-    l = (tree && tree < MOLIMIT) ? gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[tree-1])) : 0;
+    l = (tree && tree < MOLIMIT) ? combo_get_active (combo_mol[tree-1]) : 0;
     k = get_field_objects (tree, l);
     set_renderer_color (j, renderer, init_color (i-1, k));
   }
@@ -3445,7 +3445,7 @@ G_MODULE_EXPORT void edit_field_cell (GtkCellRendererText * cell, gchar * path_s
   GtkTreePath * path = gtk_tree_path_new_from_string (path_string);
   gtk_tree_model_get_iter (GTK_TREE_MODEL(field_model[j]), & iter, path);
   gtk_tree_model_get (GTK_TREE_MODEL(field_model[j]), & iter, 0, & k, -1);
-  l = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[j-1]));
+  l = combo_get_active (combo_mol[j-1]);
   float val = string_to_double ((gpointer)new_text);
   k --;
   if (i == 0) get_active_atom (l, k) -> mass = val;
@@ -4393,7 +4393,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   if (j > -1)
   {
     switch (i)

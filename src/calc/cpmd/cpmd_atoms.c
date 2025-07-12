@@ -125,7 +125,7 @@ void create_dummy_param_box (int dummy_id);
 G_MODULE_EXPORT void dummy_type_changed (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != dummy -> type)
   {
     dummy -> type = i;
@@ -207,7 +207,7 @@ void create_dummy_param_box (int dummy_id)
 G_MODULE_EXPORT void changed_dummy_id_box (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   create_dummy_param_box (i);
 }
 

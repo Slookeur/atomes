@@ -1051,7 +1051,7 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
 G_MODULE_EXPORT void set_atom_color_map_box (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   int j = view -> cmap[i];
 #ifdef GTK4
   gchar * variant = g_strdup_printf ("set-amap.%d.0", j);
@@ -1074,7 +1074,7 @@ G_MODULE_EXPORT void set_atom_color_map_box (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_poly_color_map_box (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   int j = view -> cmap[i] + ATOM_MAPS;
 #ifdef GTK4
   gchar * variant = g_strdup_printf ("set-pmap.%d.0", j);

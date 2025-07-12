@@ -853,7 +853,7 @@ G_MODULE_EXPORT void on_toggle_visualize_or_select_object (GtkCellRendererToggle
     {
       gchar * str;
       forall = FALSE;
-      j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+      j = combo_get_active (combo_mol[i-1]);
       tmp_fmol = get_active_field_molecule (j);
       l =  struct_id(i);
       ids = allocint (l);
@@ -916,7 +916,7 @@ G_MODULE_EXPORT void on_toggle_visualize_or_select_object (GtkCellRendererToggle
     k = -1;
     if (i > 0 && i < MOLIMIT)
     {
-      k = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+      k = combo_get_active (combo_mol[i-1]);
       tmp_fmol = get_active_field_molecule (k);
     }
     if (i == 0 && dat -> c == 1)
@@ -938,7 +938,7 @@ G_MODULE_EXPORT void on_toggle_visualize_or_select_object (GtkCellRendererToggle
   }
   else if (dat -> c == 0)
   {
-    k = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+    k = combo_get_active (combo_mol[i-1]);
     visualize_single_struct (i, j+1, k, ids);
     check_to_visualize_properties (i);
   }
@@ -1025,7 +1025,7 @@ G_MODULE_EXPORT void visualize_or_select_all_elements (GtkTreeViewColumn * col, 
   tint * dat = (tint *)data;
   i = dat -> b;
   j = -1;
-  if (i > 0 && i < MOLIMIT) j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+  if (i > 0 && i < MOLIMIT) j = combo_get_active (combo_mol[i-1]);
   num_field_objects = get_field_objects (i, j);
   if (i < 7)
   {

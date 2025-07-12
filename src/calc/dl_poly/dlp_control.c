@@ -187,7 +187,7 @@ GtkWidget * thermo_option_box;
 */
 G_MODULE_EXPORT void set_order (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> thermo_opts[0] = gtk_combo_box_get_active (box);
+  tmp_field -> thermo_opts[0] = combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -435,7 +435,7 @@ G_MODULE_EXPORT void set_thermostat (GtkComboBox * box, gpointer data)
   switch (i)
   {
     case 0:
-      tmp_field -> thermostat = gtk_combo_box_get_active (box);
+      tmp_field -> thermostat = combo_get_active ((GtkWidget *)box);
       for (j=0; j<6; j++) tmp_field -> thermo_opts[j] = 0.0;
       if (tmp_field -> ensemble)
       {
@@ -446,7 +446,7 @@ G_MODULE_EXPORT void set_thermostat (GtkComboBox * box, gpointer data)
       }
       break;
     case 1:
-      tmp_field -> thermo_opts[7] = gtk_combo_box_get_active (box);
+      tmp_field -> thermo_opts[7] = combo_get_active ((GtkWidget *)box);
       break;
   }
 }
@@ -502,7 +502,7 @@ G_MODULE_EXPORT void set_ensemble (GtkComboBox * box, gpointer data)
     }
     thermo_option_box = destroy_this_widget (thermo_option_box);
   }
-  tmp_field -> ensemble = gtk_combo_box_get_active (box);
+  tmp_field -> ensemble = combo_get_active ((GtkWidget *)box);
   tmp_field -> thermostat = 0;
 
   for (i=0; i<6; i++) tmp_field -> thermo_opts[i] = 0.0;
@@ -659,7 +659,7 @@ G_MODULE_EXPORT void set_md_combo (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  tmp_field -> md_opts[i] =  gtk_combo_box_get_active (box);
+  tmp_field -> md_opts[i] =  combo_get_active ((GtkWidget *)box);
   if (i == 3) widget_set_sensitive (step_button, (int)tmp_field -> md_opts[i]);
   if (i == 3 && tmp_field -> md_opts[i] == 1.0) show_advance_time_step (NULL, NULL);
   if (i == 1)
@@ -910,7 +910,7 @@ G_MODULE_EXPORT void set_equi_combo (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
   i = GPOINTER_TO_INT(data);
-  tmp_field -> equi_opts[i] =  gtk_combo_box_get_active (box);
+  tmp_field -> equi_opts[i] =  combo_get_active ((GtkWidget *)box);
   j = (i == 9) ? 11 : 14;
   k = (i == 9) ? 0 : 1;
   tmp_field -> equi_opts[j] = init_minop[(int)tmp_field -> equi_opts[i]];
@@ -1202,7 +1202,7 @@ G_MODULE_EXPORT void check_out (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void set_print_level (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> out_opts[12] =  gtk_combo_box_get_active (box);
+  tmp_field -> out_opts[12] =  combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -1670,7 +1670,7 @@ G_MODULE_EXPORT void set_io_method (GtkComboBox * box, gpointer data)
   int i, j, k;
   gboolean l;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   tmp_field -> io_opts[i] = (double)j;
   if (i < 12)
   {
@@ -2053,7 +2053,7 @@ GtkWidget * create_elec_param_box ()
 */
 G_MODULE_EXPORT void set_elec_eval (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> elec_opts[5] =  gtk_combo_box_get_active (box);
+  tmp_field -> elec_opts[5] =  combo_get_active ((GtkWidget *)box);
   elec_box[3] = destroy_this_widget (elec_box[3]);
   elec_box[3] = create_elec_param_box ();
   show_the_widgets (elec_box[3]);
@@ -2184,7 +2184,7 @@ G_MODULE_EXPORT void set_vdw_param (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void set_vdw_mix (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> vdw_opts[5] =  gtk_combo_box_get_active (box);
+  tmp_field -> vdw_opts[5] =  combo_get_active ((GtkWidget *)box);
 }
 
 #ifdef GTK4
@@ -2385,7 +2385,7 @@ gchar * sys_opts[10] = {"Relative dielectric constant &#949;<sub>r</sub>",
 */
 G_MODULE_EXPORT void set_sys_restart (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> sys_opts[15] =  gtk_combo_box_get_active (box);
+  tmp_field -> sys_opts[15] =  combo_get_active ((GtkWidget *)box);
 }
 
 #ifdef GTK4

@@ -1586,7 +1586,11 @@ G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data
           tmp_color = NULL;
         }
         GdkRGBA rgb_col =  colrgba_togtkrgba(col);
+#ifdef GTK4
+        gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(edit_colob), & rgb_col);
+#else
         gtk_color_button_set_rgba (GTK_COLOR_BUTTON(edit_colob), & rgb_col);
+#endif
       }
       break;
   }
@@ -2778,7 +2782,7 @@ GtkTreeModel * style_combo_tree ()
 G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   j = GPOINTER_TO_INT(data);
   tmp_opengl[j+1] = i;
 }
@@ -2914,7 +2918,7 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
 {
-  tmp_delta_t[1] = (double) gtk_combo_box_get_active(box);
+  tmp_delta_t[1] = (double) combo_get_active ((GtkWidget *)box);
 }
 
 /*!

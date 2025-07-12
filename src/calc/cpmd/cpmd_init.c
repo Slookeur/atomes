@@ -371,7 +371,7 @@ G_MODULE_EXPORT void changed_opt_box (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
   j = GPOINTER_TO_INT(data);
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (j != DEFLM && j != DEFLO)
   {
     if (i != (int)tmp_cpmd -> default_opts[j])
@@ -610,7 +610,7 @@ G_MODULE_EXPORT void changed_calc_opt_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_cpmd -> calc_opts[j])
   {
     tmp_cpmd -> calc_opts[j] = i;
@@ -741,7 +741,7 @@ GtkWidget * calc_qm_option_box (int c)
 G_MODULE_EXPORT void changed_calc_box (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_cpmd -> calc_type)
   {
     gtk_label_set_text (GTK_LABEL(calc_label), g_strdup_printf ("<u>%s option(s)</u>", calc_ds[i]));

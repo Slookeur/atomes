@@ -446,7 +446,7 @@ G_MODULE_EXPORT void set_frame_type (GtkComboBox * fbox, gpointer data)
   a = ad -> a;
   b = ad -> b;
   c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_type = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox));
+  get_project_by_id(a) -> curves[b][c] -> frame_type = combo_get_active ((GtkWidget *)fbox);
   set_frame_style (data);
 }
 
@@ -464,7 +464,7 @@ G_MODULE_EXPORT void set_frame_line (GtkComboBox * fbox, gpointer data)
   a = ad -> a;
   b = ad -> b;
   c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_dash = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox)) + 1;
+  get_project_by_id(a) -> curves[b][c] -> frame_dash = combo_get_active ((GtkWidget *)fbox) + 1;
   set_frame_style (data);
 }
 

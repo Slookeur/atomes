@@ -1419,7 +1419,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
   int i, j;
   dint * prop = (dint *)data;
   float * val, * vbl;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i)
   {
     tmp_match = up_match[prop -> b];

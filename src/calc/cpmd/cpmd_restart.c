@@ -118,7 +118,7 @@ G_MODULE_EXPORT void update_restart_check (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void changed_restart_box (GtkComboBox * box, gpointer data)
 {
-  tmp_cpmd -> restart[0] = gtk_combo_box_get_active (box);
+  tmp_cpmd -> restart[0] = combo_get_active ((GtkWidget *)box);
   int i;
   for (i=1; i<4; i++) print_the_section (i, 0, qmbuffer[i]);
 }

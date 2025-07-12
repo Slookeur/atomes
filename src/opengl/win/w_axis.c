@@ -97,7 +97,9 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
   int axis_type;
   double * axis_line;
   double * axis_rad;
+#ifdef GTK3
   gchar * str;
+#endif // GTK3
   const gchar * n = entry_get_text (res);
   double v = string_to_double ((gpointer)n);
   if (preferences)
@@ -164,7 +166,9 @@ G_MODULE_EXPORT void update_axis_length (GtkEntry * res, gpointer data)
 {
   glwin * view;
   double * axis_length;
+#ifdef GTK3
   gchar * str;
+#endif // GTK3
   const gchar * n = entry_get_text (res);
   double v = string_to_double ((gpointer)n);
   if (preferences)
@@ -229,7 +233,7 @@ void activate_pos_box (glwin * view, gboolean val)
 G_MODULE_EXPORT void set_axis_template (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
 #ifdef GTK4
   view -> anim -> last -> img -> axispos = i;
   view -> create_shaders[MAXIS] = TRUE;
@@ -265,7 +269,7 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
     the_axis = view -> axis_win;
     axis = & view -> anim -> last -> img -> box_axis[1];
   }
-  switch (gtk_combo_box_get_active (box))
+  switch (combo_get_active ((GtkWidget *)box))
   {
     case 0:
       * axis = WIREFRAME;
@@ -331,14 +335,17 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
   gboolean val;
   glwin * view;
   axis_edition * the_axis;
+  int axis_type;
   if (preferences)
   {
     the_axis = pref_axis_win;
+    axis_type = 0;
   }
   else
   {
     view = (glwin *)data;
     the_axis = view -> axis_win;
+    axis_type = view -> anim -> last -> img -> box_axis[AXIS];
   }
   val = button_get_status ((GtkWidget *)but);
 #ifdef GTK3
@@ -348,7 +355,7 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
   {
 #ifdef GTK4
     // set_box_axis_style ? then what about the menu items ... refresh the menu !
-    * axis = WIREFRAME;
+    axis_type = WIREFRAME;
 #else
     // GTK3 Menu Action To Check
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], TRUE);
@@ -359,7 +366,7 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
   {
 #ifdef GTK4
     // set_box_axis_style ? then what about the menu items ... refresh the menu !
-    * axis = NONE;
+    axis_type = NONE;
 #else
     // GTK3 Menu Action To Check
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], FALSE);

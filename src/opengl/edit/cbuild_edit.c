@@ -713,7 +713,7 @@ G_MODULE_EXPORT void set_lattice (GtkComboBox * box, gpointer data)
   glwin * view = get_project_by_id(id -> a) -> modelgl;
   builder_edition * cbuilder = view -> builder_win;
   cbuilder -> lattice_grid = destroy_this_widget (cbuilder -> lattice_grid);
-  cbuilder -> lattice_grid = prepare_lattice_grid (gtk_combo_box_get_active (box), cbuilder, view);
+  cbuilder -> lattice_grid = prepare_lattice_grid (combo_get_active ((GtkWidget *)box), cbuilder, view);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cbuilder -> lattice_box, cbuilder -> lattice_grid, FALSE, FALSE, 5);
   show_the_widgets (cbuilder -> lattice_grid);
 }
@@ -730,7 +730,7 @@ G_MODULE_EXPORT void set_so (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
   builder_edition * cbuilder = get_project_by_id(id -> a) -> modelgl -> builder_win;
-  int i = gtk_combo_box_get_active(box);
+  int i = combo_get_active ((GtkWidget *)box);
   gchar * str = g_strdup_printf ("(%s,%s,%s)", cbuilder -> cell.sp_group -> settings[i].pos[0],
                                                cbuilder -> cell.sp_group -> settings[i].pos[1],
                                                cbuilder -> cell.sp_group -> settings[i].pos[2]);
@@ -939,8 +939,8 @@ G_MODULE_EXPORT void set_bl (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
   int i, j;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(cbuilder -> cs_combo));
-  j = gtk_combo_box_get_active (box);
+  i = combo_get_active (cbuilder -> cs_combo);
+  j = combo_get_active ((GtkWidget *)box);
   adjust_sg_combo (cbuilder, i, j);
 }
 
@@ -980,7 +980,7 @@ GtkWidget * create_bl_combo (int cs, gpointer data)
 G_MODULE_EXPORT void set_cs (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   cbuilder -> bl_combo = destroy_this_widget(cbuilder -> bl_combo);
   cbuilder -> bl_combo = create_bl_combo (i, data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> bl_box, cbuilder -> bl_combo, FALSE, FALSE, 0);
@@ -1187,7 +1187,7 @@ G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data)
 G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
-  cbuilder -> rounding = gtk_combo_box_get_active (box);
+  cbuilder -> rounding = combo_get_active ((GtkWidget *)box);
 }
 
 /*!

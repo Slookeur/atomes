@@ -68,8 +68,10 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
   int box_type;
   double box_line;
   double box_rad;
-  gchar * str;
   const gchar * n = entry_get_text (res);
+#ifdef GTK3
+  gchar * str;
+#endif // GTK3
   double v = string_to_double ((gpointer)n);
   if (preferences)
   {
@@ -140,7 +142,7 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
 {
-  int i = gtk_combo_box_get_active (GTK_COMBO_BOX(widg));
+  int i = combo_get_active (widg);
   glwin * view;
   box_edition * box_win;
   if (! preferences)
@@ -200,8 +202,9 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
     update (view);
 #ifdef GTK4
     update_menu_bar (view);
-#else
+#endif
   }
+#ifdef GTK3
   from_box_or_axis = FALSE;
 #endif
 }

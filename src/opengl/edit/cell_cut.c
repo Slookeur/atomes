@@ -267,7 +267,7 @@ G_MODULE_EXPORT void set_slab_option (GtkComboBox * box, gpointer data)
 {
   project * this_proj = (project *)data;
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   for (j=0; j<6; j++)
   {
     hide_the_widgets (this_proj -> modelgl -> cell_win -> slab_box[j]);
@@ -330,7 +330,7 @@ G_MODULE_EXPORT void set_slab_type (GtkComboBox * box, gpointer data)
   project * this_proj = (project *)data;
   int i;
   for (i=0; i<3; i++) hide_the_widgets (this_proj -> modelgl -> cell_win -> slab_hbox[i]);
-  this_proj -> modelgl -> cell_win -> slab_type = i = gtk_combo_box_get_active (box);
+  this_proj -> modelgl -> cell_win -> slab_type = i = combo_get_active ((GtkWidget *)box);
   show_the_widgets (this_proj -> modelgl -> cell_win -> slab_hbox[i]);
   gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> cell_win -> slab_param[i]), 0);
   set_slab_option (GTK_COMBO_BOX(this_proj -> modelgl -> cell_win -> slab_param[i]), this_proj);

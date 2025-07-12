@@ -1093,7 +1093,7 @@ G_MODULE_EXPORT void set_axis_for_motion (GtkComboBox * box, gpointer data)
   project * this_proj = get_project_by_id (id -> a);
   int i, j;
   j = id -> b - TOLAB;
-  this_proj -> modelgl -> atom_win -> axis[j] = gtk_combo_box_get_active (box);
+  this_proj -> modelgl -> atom_win -> axis[j] = combo_get_active ((GtkWidget *)box);
   for (i=3*j; i<(j + 1)*3; i++)
   {
     update_range_and_entry (this_proj, this_proj -> modelgl -> search_widg[id -> c] -> status, this_proj -> modelgl -> atom_win -> axis[j], i);
