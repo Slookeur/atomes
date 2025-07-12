@@ -62,6 +62,7 @@ extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightnin
 extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 extern GtkWidget * labels_tab (glwin * view, int lid);
 extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
@@ -1467,18 +1468,6 @@ void set_atomes_preferences ()
 }
 
 /*!
-  \fn GtkWidget * view_preferences ()
-
-  \brief view preferences
-*/
-GtkWidget * view_preferences ()
-{
-  GtkWidget * vbox = create_vbox (BSEP);
-
-  return vbox;
-}
-
-/*!
   \fn GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gchar * end)
 
   \brief print information message with item list of elements
@@ -1514,6 +1503,34 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(end, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
   }
   return vbox;
+}
+
+/*!
+  \fn GtkWidget * view_preferences ()
+
+  \brief view preferences
+*/
+GtkWidget * view_preferences ()
+{
+  GtkWidget * notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+  GtkWidget * vbox = create_vbox (BSEP);
+  //GtkWidget * hbox;
+  //GtkWidget * combo;
+  gchar * info[2] = {"The <b>View</b> tab regroups representation options",
+                     "which effect apply to the general aspect of the model:"};
+  gchar * m_list[2][2] = {{"Representation", "scene orientation"},
+                          {"Axis", "axis options"}};
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
+  pref_axis_win = g_malloc0(sizeof*pref_axis_win);
+  axis_advanced (NULL, NULL);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_axis_win -> win, gtk_label_new ("Axis"));
+  show_the_widgets (notebook);
+  return notebook;
 }
 
 int the_object;
@@ -2642,7 +2659,6 @@ GtkWidget * model_preferences ()
   GtkWidget * notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-  show_the_widgets (notebook);
   GtkWidget * vbox = create_vbox (BSEP);
   //GtkWidget * hbox;
   //GtkWidget * combo;
@@ -2714,7 +2730,7 @@ GtkWidget * model_preferences ()
   pref_box_win = g_malloc0(sizeof*pref_box_win);
   box_advanced (NULL, NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_box_win -> win, gtk_label_new ("Box"));
-
+  show_the_widgets (notebook);
   return notebook;
 }
 
@@ -3088,6 +3104,56 @@ void clean_all_tmp ()
     g_free (tmp_box);
     tmp_box = NULL;
   }
+  if (tmp_axis)
+  {
+    g_free (tmp_axis);
+    tmp_axis = NULL;
+  }
+}
+
+/*!
+  \fn void duplicate_box_data (box_data * new_box, box_data * old_box)
+
+  \brief duplicate box_data data structure
+
+  \param new_box the new box_data structure
+  \param old_box the box_data structure to copy
+*/
+void duplicate_box_data (box_data * new_box, box_data * old_box)
+{
+  new_box -> box = old_box -> box;
+  new_box -> color = old_box -> color;
+  new_box -> line = old_box -> line;
+  new_box -> rad = old_box -> rad;
+}
+
+/*!
+  \fn void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis)
+
+  \brief duplicate axis_data data structure
+
+  \param new_axis the new axis_data structure
+  \param old_axis the axis_data structure to copy
+*/
+void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis)
+{
+  new_axis -> axis = old_axis -> axis;
+  new_axis -> length = old_axis -> length;
+  new_axis -> color = old_axis -> color;
+  new_axis -> line = old_axis -> line;
+  new_axis -> rad = old_axis -> rad;
+  new_axis -> t_pos = old_axis -> t_pos;
+  new_axis -> labels = old_axis -> labels;
+  int i;
+  for (i=0; i<3; i++)
+  {
+    new_axis -> c_pos[i] = old_axis -> c_pos[i];
+    if (old_axis -> title[i]) new_axis -> title[i] = g_strdup_printf ("%s", old_axis -> title[i]);
+  }
+  if (old_axis -> color)
+  {
+    new_axis -> color = duplicate_color (3, old_axis -> color);
+  }
 }
 
 /*!
@@ -3131,11 +3197,11 @@ void prepare_tmp_default ()
   tmp_mpattern = defaut_mpattern ;
   tmp_mfactor = default_mfactor;
   tmp_mwidth = default_mwidth;
+
   tmp_box = g_malloc0(sizeof*tmp_box);
-  tmp_box -> box = default_box.box;
-  tmp_box -> color = default_box.color;
-  tmp_box -> line = default_box.line;
-  tmp_box -> rad = default_box.rad;
+  duplicate_box_data (tmp_box, & default_box);
+  tmp_axis = g_malloc0(sizeof*tmp_axis);
+  duplicate_axis_data (tmp_axis, & default_axis);
 }
 
 /*!
@@ -3229,10 +3295,8 @@ void save_preferences ()
   default_mfactor = tmp_mfactor;
   default_mwidth = tmp_mwidth;
 
-  default_box.box = tmp_box -> box;
-  default_box.color = tmp_box -> color;
-  default_box.line = tmp_box -> line;
-  default_box.rad = tmp_box -> rad;
+  duplicate_box_data (& default_box, tmp_box);
+  duplicate_axis_data (& default_axis, tmp_axis);
 
   if (nprojects)
   {
@@ -3382,6 +3446,16 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_box.color.alpha = 1.0;
   default_box.line = DEFAULT_SIZE;
   default_box.rad = 0.05;
+
+  default_axis.axis = NONE;
+  default_axis.line = DEFAULT_SIZE;
+  default_axis.rad = 0.1;
+  default_axis.t_pos = BOTTOM_RIGHT;
+  default_axis.length = 2.0*DEFAULT_SIZE;
+  default_axis.c_pos[0] = default_axis.c_pos[1] = 50.0;
+  default_axis.c_pos[2] = 0.0;
+  if (default_axis.color) g_free (default_axis.color);
+  default_axis.color = NULL;
 
   if (preference_notebook)
   {

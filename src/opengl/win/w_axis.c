@@ -748,9 +748,9 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   double axis_length;
   int axis_labels;
   int axis_tpos;
-
+  GLdouble * axis_cpos;
   ColRGBA * axis_color = NULL;
-  int label_render;
+  screen_label * axis_label;
   int i;
   if (preferences)
   {
@@ -762,7 +762,8 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     axis_length = tmp_axis -> length;
     axis_labels = tmp_axis -> labels;
     axis_color = tmp_axis -> color;
-    label_render = tmp_label[2] -> render;
+    axis_cpos = tmp_axis -> c_pos;
+    axis_label = tmp_label[2];
   }
   else
   {
@@ -776,19 +777,22 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     axis_length = view -> anim -> last -> img -> axis_length;
     axis_labels = view -> anim -> last -> img -> axis_labels;
     axis_color = view -> anim -> last -> img -> axis_color;
-    label_render = view -> anim -> last -> img -> labels[2].render;
+    axis_cpos = view -> anim -> last -> img -> axis_pos;
+    axis_label = & view -> anim -> last -> img -> labels[2];
   }
 
-  GtkWidget * vbox;
+  GtkWidget * vbox = create_vbox (BSEP);
   if (preferences)
   {
-    vbox = create_vbox (BSEP);
-    the_axis -> win = adv_box (vbox, "<b>Axis settings</b>", 5, 120, 0.0);
+    the_axis -> win = create_vbox (BSEP);
+    adv_box (the_axis -> win, "<b>Axis settings</b>", 5, 120, 0.0);
+    GtkWidget * hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> win, hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
   }
   else
   {
     the_axis -> win = create_win ("Axis settings", view -> win, FALSE, FALSE);
-    vbox = create_vbox (BSEP);
     add_container_child (CONTAINER_WIN, the_axis -> win, vbox);
   }
   GtkWidget * box;
@@ -847,9 +851,9 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     gtk_label_align (ax_name, 0.5, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, ax_name, FALSE, TRUE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, create_hscale (axis_range[i][0], axis_range[i][1], 1.0,
-                                                     view -> anim -> last -> img -> axis_pos[i],
+                                                     axis_cpos[i],
                                                      GTK_POS_LEFT, 0, 170, G_CALLBACK(set_axis_position),
-                                                     G_CALLBACK(scroll_set_axis_position), & view -> colorp[i][0]),
+                                                     G_CALLBACK(scroll_set_axis_position), (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]),
                                                      FALSE, TRUE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_position_box, chbox, FALSE, TRUE, 5);
     ax_name = gtk_label_new (al[i]);
@@ -869,9 +873,9 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   {
     combo_text_append (the_axis -> styles, axis_style[i]);
   }
-  if (view -> anim -> last -> img -> box_axis[AXIS] == NONE) i = NONE;
-  if (view -> anim -> last -> img -> box_axis[AXIS] == WIREFRAME) i = 0;
-  if (view -> anim -> last -> img -> box_axis[AXIS] == CYLINDERS) i = 1;
+  if (axis_type == NONE) i = NONE;
+  if (axis_type == WIREFRAME) i = 0;
+  if (axis_type == CYLINDERS) i = 1;
   gtk_combo_box_set_active (GTK_COMBO_BOX(the_axis -> styles), i);
   gtk_widget_set_size_request (the_axis -> styles, 150, -1);
   g_signal_connect (G_OBJECT (the_axis -> styles), "changed", G_CALLBACK(set_axis_combo_style), data);
@@ -898,18 +902,18 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(config), label_render);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(config), axis_label -> render);
   gtk_widget_set_size_request (config, 150, -1);
-  g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), & view -> colorp[2][0]);
+  g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 0);
   box = abox (axis_label_box, "Font", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                      font_button(view -> anim -> last -> img -> labels[2].font, 150, 30, G_CALLBACK(set_labels_font), & view -> colorp[2][0]),
+                      font_button(axis_label -> font, 150, 30, G_CALLBACK(set_labels_font), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]),
                       FALSE, FALSE, 0);
   // Size / scale
   box = abox (axis_label_box, "Size", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                       check_button ("scale with zoom in/out", 150, -1, view -> anim -> last -> img -> labels[2].scale, G_CALLBACK(set_labels_scale), & view -> colorp[2][0]),
+                       check_button ("scale with zoom in/out", 150, -1, axis_label -> scale, G_CALLBACK(set_labels_scale), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]),
                        FALSE, FALSE, 10);
 
   // Colors
@@ -930,13 +934,13 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   for (i=0; i<3; i++)
   {
     chbox = create_hbox (0);
-    the_axis -> ax_title[i] = create_entry (G_CALLBACK(set_axis_title), 80, 10, FALSE, & view -> colorp[i][0]);
+    the_axis -> ax_title[i] = create_entry (G_CALLBACK(set_axis_title), 80, 10, FALSE, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
     update_entry_text (GTK_ENTRY(the_axis -> ax_title[i]), (preferences) ? tmp_axis -> title[i] : view -> anim -> last -> img -> axis_title[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, the_axis -> ax_title[i], FALSE, FALSE, 20);
     widget_set_sensitive (the_axis -> ax_title[i], axis_labels);
     if (axis_color != NULL)
     {
-      the_axis -> axis_color_title[i] = color_button (axis_color[i], TRUE, 80, -1, G_CALLBACK(set_axis_color), & view -> colorp[i][0]);
+      the_axis -> axis_color_title[i] = color_button (axis_color[i], TRUE, 80, -1, G_CALLBACK(set_axis_color), (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
     }
     else
     {
@@ -945,7 +949,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
       col.green = axis_init_color[i][1];
       col.blue = axis_init_color[i][2];
       col.alpha = 1.0;
-      the_axis -> axis_color_title[i] = color_button (col, TRUE, 80, -1, G_CALLBACK(set_axis_color),  & view -> colorp[i][0]);
+      the_axis -> axis_color_title[i] = color_button (col, TRUE, 80, -1, G_CALLBACK(set_axis_color), (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, the_axis -> axis_color_title[i], FALSE, FALSE, 0);
     widget_set_sensitive (the_axis -> axis_color_title[i], ! ac);

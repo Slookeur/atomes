@@ -1319,15 +1319,17 @@ void init_img (project * this_proj)
 
   img -> color_map[0] = 0;
   img -> color_map[1] = 0;
-  img -> axispos = BOTTOM_RIGHT;
-  img -> box_axis_rad[AXIS] = 0.1;
-  img -> box_axis_line[AXIS] = DEFAULT_SIZE;
-  img -> axis_length = 2.0*DEFAULT_SIZE;
-  img -> axis_color = NULL;
-  img -> axis_pos[0] = 50.0;
-  img -> axis_pos[1] = 50.0;
-  img -> axis_pos[2] = 0.0;
-  img -> axis_labels = 1;
+  img -> axispos = default_axis.t_pos;
+  img -> box_axis_rad[AXIS] = default_axis.rad;
+  img -> box_axis_line[AXIS] = default_axis.line;
+  img -> axis_length = default_axis.length;
+  if (default_axis.color)
+  {
+    img -> axis_color = duplicate_color (3, default_axis.color);
+  }
+  for (i=0; i<3; i++) img -> axis_pos[i] = default_axis.c_pos[i];
+  img -> axis_labels = default_axis.labels;
+
   img -> quality = default_opengl[3];
   img -> render = FILL;
   img -> rep = PERSPECTIVE;
