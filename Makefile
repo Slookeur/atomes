@@ -19,7 +19,8 @@ WINDOWS = 0
 # The next line defines the GTK version !
 GTKV = 3
 ifeq ($(GTKV),4)
-  DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+  DGTK = -DGTK4 -DGTKGLAREA
+  # -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
   # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
   IGTK = `pkg-config --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
   LGTK = `pkg-config --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
@@ -166,8 +167,9 @@ OBJ = obj/
 BIN = bin/
 
 INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
-INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
-# To enforce strickly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
+INCLUDES = $(INC) $(IGTK)
+# -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+# To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ifeq ($(MAKECMDGOALS),atomes)
   FCFLAGS = -O2 -cpp

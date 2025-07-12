@@ -1586,11 +1586,7 @@ G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data
           tmp_color = NULL;
         }
         GdkRGBA rgb_col =  colrgba_togtkrgba(col);
-#ifdef GTK4
         gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(edit_colob), & rgb_col);
-#else
-        gtk_color_button_set_rgba (GTK_COLOR_BUTTON(edit_colob), & rgb_col);
-#endif
       }
       break;
   }
