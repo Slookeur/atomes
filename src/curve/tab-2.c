@@ -649,15 +649,15 @@ G_MODULE_EXPORT void choose_set (GtkComboBox * box, gpointer data)
   }
   GdkRGBA col = colrgba_togtkrgba (layout -> datacolor);
   gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(data_color), & col);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_dash), layout -> dash);
+  combo_set_active (data_dash, layout -> dash);
   update_entry_double (GTK_ENTRY(data_thickness), layout -> thickness);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_glyph), layout -> glyph);
+  combo_set_active (data_glyph, layout -> glyph);
   update_entry_double (GTK_ENTRY(data_glyph_size), layout -> gsize);
   update_entry_int (GTK_ENTRY(data_glyph_freq), layout -> gfreq);
   update_entry_double (GTK_ENTRY(data_hist_width), layout -> hwidth);
   update_entry_double (GTK_ENTRY(data_hist_opac), layout -> hopac);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_hist_pos), layout -> hpos);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_aspect), layout -> aspect);
+  combo_set_active (data_hist_pos, layout -> hpos);
+  combo_set_active (data_aspect, layout -> aspect);
   set_data_style (& ad);
 }
 
@@ -680,7 +680,7 @@ G_MODULE_EXPORT void set_data_aspect (GtkComboBox * box, gpointer data)
   j = combo_get_active ((GtkWidget *)box);
   if (j == 1)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(data_glyph), 0);
+    combo_set_active (data_glyph, 0);
     widget_set_sensitive (data_glyph, 0);
     hide_the_widgets (Glyph_box);
     show_the_widgets (Hist_box);
@@ -880,7 +880,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, thesetbox, setcolorbox, FALSE, FALSE, 0);
   show_the_widgets (setcolorbox);
   prepbox (this_proj -> id, cid -> b, cid -> c);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (setcolorbox), m);
+  combo_set_active (setcolorbox, m);
   choose_set (GTK_COMBO_BOX(setcolorbox), NULL);
   update_curve (data);
 }
@@ -1001,7 +1001,7 @@ GtkWidget * create_tab_2 (gpointer data)
   {
     combo_text_append (data_aspect, aspects[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_aspect), this_proj -> curves[b][c] -> layout -> aspect);
+  combo_set_active (data_aspect, this_proj -> curves[b][c] -> layout -> aspect);
   gtk_widget_set_size_request (data_aspect, 120, -1);
   g_signal_connect (G_OBJECT(data_aspect), "changed", G_CALLBACK(set_data_aspect), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Plot type:"), data_aspect, FALSE, FALSE, 0);
@@ -1022,7 +1022,7 @@ GtkWidget * create_tab_2 (gpointer data)
      combo_text_append (data_dash, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (data_dash, 120, -1);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(data_dash), this_proj -> curves[b][c] -> layout -> dash);
+  combo_set_active (data_dash, this_proj -> curves[b][c] -> layout -> dash);
   g_signal_connect (G_OBJECT(data_dash), "changed", G_CALLBACK(set_data_dash), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Line style:"), data_dash, FALSE, FALSE, 0);
 
@@ -1047,7 +1047,7 @@ GtkWidget * create_tab_2 (gpointer data)
      combo_text_append (data_glyph, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (data_glyph, 120, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_glyph), this_proj -> curves[b][c] -> layout -> glyph);
+  combo_set_active (data_glyph, this_proj -> curves[b][c] -> layout -> glyph);
   g_signal_connect (G_OBJECT(data_glyph), "changed", G_CALLBACK(set_data_glyph), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Glyph_box, "Glyph type:"), data_glyph, FALSE, FALSE, 0);
 
@@ -1081,7 +1081,7 @@ GtkWidget * create_tab_2 (gpointer data)
   combo_text_append (data_hist_pos, "Transparent");
   combo_text_append (data_hist_pos, "Plain");
   gtk_widget_set_size_request (data_hist_pos, 120, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(data_hist_pos), this_proj -> curves[b][c] -> layout -> hpos);
+  combo_set_active (data_hist_pos, this_proj -> curves[b][c] -> layout -> hpos);
   g_signal_connect (G_OBJECT(data_hist_pos), "changed", G_CALLBACK(set_data_hist_pos), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Hist_box, "Bar opacity:"), data_hist_pos, FALSE, FALSE, 0);
 

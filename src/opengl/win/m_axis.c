@@ -93,7 +93,7 @@ G_MODULE_EXPORT void set_axis_template_pos (GtkWidget * widg, gpointer data)
     {
       if (this_proj -> modelgl -> axis_win -> templates && GTK_IS_WIDGET(this_proj -> modelgl -> axis_win -> templates))
       {
-        gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> axis_win -> templates), j);
+        combo_set_active (this_proj -> modelgl -> axis_win -> templates, j);
       }
     }
   }
@@ -252,7 +252,7 @@ G_MODULE_EXPORT void change_axis_pos_radio (GSimpleAction * action, GVariant * p
     {
       if (view -> axis_win -> templates && GTK_IS_WIDGET(view -> axis_win -> templates))
       {
-        gtk_combo_box_set_active (GTK_COMBO_BOX(view -> axis_win -> templates), i);
+        combo_set_active (view -> axis_win -> templates, i);
       }
     }
   }

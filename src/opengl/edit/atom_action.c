@@ -1042,7 +1042,7 @@ void clean_all_trees (atom_search * asearch, project * this_proj)
       j = get_asearch_filter (this_proj -> modelgl -> search_widg[i+2]);
       if ((j == 3 && ! this_proj -> modelgl -> adv_bonding[0]) || (j == 4 && ! this_proj -> modelgl -> adv_bonding[1]))
       {
-        gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[i+2] -> filter_box), 0);
+        combo_set_active (this_proj -> modelgl -> search_widg[i+2] -> filter_box, 0);
         set_filter_changed (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[i+2] -> filter_box), this_proj -> modelgl -> search_widg[i+2]);
       }
       else if (asearch -> action != DISPL && asearch -> action  != RANMOVE)

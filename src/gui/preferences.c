@@ -2812,7 +2812,7 @@ GtkWidget * combo_map (int obj)
   combo_text_append (combo, "Atomic species");
   combo_text_append (combo, "Total coordination(s)");
   combo_text_append (combo, "Partial coordination(s)");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), tmp_opengl[1+obj]);
+  combo_set_active (combo, tmp_opengl[1+obj]);
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_map), GINT_TO_POINTER(obj));
   return combo;
 }
@@ -2857,12 +2857,8 @@ GtkWidget * opengl_preferences ()
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), tmp_opengl[0]);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (combo, tmp_opengl[0]);
+  combo_set_markup (combo);
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
@@ -2987,7 +2983,7 @@ GtkWidget * calc_preferences ()
   GtkWidget * tcombo = create_combo ();
   for (i=0; i<5 ; i++) combo_text_append (tcombo, untime[i]);
 
-  gtk_combo_box_set_active (GTK_COMBO_BOX(tcombo), (int)tmp_delta_t[1]);
+  combo_set_active (tcombo, (int)tmp_delta_t[1]);
   g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(tunit_changed), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, tcombo, FALSE, FALSE, 0);
 

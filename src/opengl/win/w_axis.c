@@ -68,7 +68,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 gchar * axis[3] = {"X", "Y", "Z"};
 gchar * axis_style[AXIS_STYLES] = {"Wireframe", "Cylinders"};
 gchar * al[3] = {"% of the window width", "% of the window height", "% of the window depth"};
-gchar * axis_template[AXIS_TEMPLATES] = {"Top Right Corner *", "Top Left Corner *", "Bottom Right Corner *", "Bottom Left Corner *", "Center **"};
 
 double axis_init_color[3][3] = {{0.0, 0.0, 1.0},{0.0, 1.0, 0.0},{1.0, 0.0, 0.0}};
 double axis_range[3][2] = {{0.0,100.0}, {0.0, 100.0}, {0.0, 100.0}};
@@ -218,7 +217,7 @@ void activate_pos_box (glwin * view, gboolean val)
   {
     i = NONE;
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX((preferences) ? pref_axis_win -> templates : view -> axis_win -> templates), i);
+  combo_set_active ((preferences) ? pref_axis_win -> templates : view -> axis_win -> templates, i);
   widget_set_sensitive ((preferences) ? pref_axis_win -> templates : view -> axis_win -> templates, val);
 }
 
@@ -373,7 +372,7 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
     // GTK3 Menu Action To Check
     if (! preferences) gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], TRUE);
 #endif
-    if (the_axis -> styles && GTK_IS_WIDGET(the_axis -> styles)) gtk_combo_box_set_active (GTK_COMBO_BOX(the_axis -> styles), WIREFRAME-1);
+    if (the_axis -> styles && GTK_IS_WIDGET(the_axis -> styles)) combo_set_active (the_axis -> styles, WIREFRAME-1);
   }
   else
   {
@@ -384,7 +383,7 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
     // GTK3 Menu Action To Check
     if (! preferences) gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], FALSE);
 #endif
-    if (the_axis -> styles && GTK_IS_WIDGET(the_axis -> styles)) gtk_combo_box_set_active (GTK_COMBO_BOX(the_axis -> styles), NONE);
+    if (the_axis -> styles && GTK_IS_WIDGET(the_axis -> styles)) combo_set_active (the_axis -> styles, NONE);
   }
 #ifdef GTK3
   from_box_or_axis = FALSE;
@@ -834,20 +833,25 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   {
     ac = FALSE;
   }
+  gchar * axis_template[AXIS_TEMPLATES] = {"Top Right Corner <sup>*</sup>", "Top Left Corner <sup>*</sup>", "Bottom Right Corner <sup>*</sup>", "Bottom Left Corner <sup>*</sup>", "Center <sup>**</sup>"};
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, pos_box, check_button ("Use template positions", 120, 30, ac, G_CALLBACK(use_axis_default_positions), data), FALSE, FALSE, 0);
   the_axis -> templates = create_combo ();
   for (i=0; i < AXIS_TEMPLATES; i++)
   {
     combo_text_append (the_axis -> templates, axis_template[i]);
   }
+  combo_set_markup (the_axis -> templates);
   activate_pos_box (view, ac);
   gtk_widget_set_size_request (the_axis -> templates, 150, -1);
   g_signal_connect (G_OBJECT (the_axis -> templates), "changed", G_CALLBACK(set_axis_template), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, pos_box, the_axis -> templates, FALSE, FALSE, 10);
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, markup_label("\t\t* In front of the atomic model", -1, -1, 0.0, 0.5), FALSE, TRUE, 3);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, markup_label("\t\t** Inside the atomic model", -1, -1, 0.0, 0.5), FALSE, TRUE, 3);
 
+  if (! preferences)
+  {
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, markup_label("\t\t* In front of the atomic model", -1, -1, 0.0, 0.5), FALSE, TRUE, 3);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, markup_label("\t\t** Inside the atomic model", -1, -1, 0.0, 0.5), FALSE, TRUE, 3);
+  }
   GtkWidget * chbox;
   GtkWidget * ax_name;
   the_axis -> axis_position_box = create_vbox (BSEP);
@@ -888,7 +892,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   if (axis_type == NONE) i = NONE;
   if (axis_type == WIREFRAME) i = 0;
   if (axis_type == CYLINDERS) i = 1;
-  gtk_combo_box_set_active (GTK_COMBO_BOX(the_axis -> styles), i);
+  combo_set_active (the_axis -> styles, i);
   gtk_widget_set_size_request (the_axis -> styles, 150, -1);
   g_signal_connect (G_OBJECT (the_axis -> styles), "changed", G_CALLBACK(set_axis_combo_style), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_axis -> styles, FALSE, FALSE, 0);
@@ -914,7 +918,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(config), axis_label -> render);
+  combo_set_active (config, axis_label -> render);
   gtk_widget_set_size_request (config, 150, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 0);

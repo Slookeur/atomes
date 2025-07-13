@@ -61,7 +61,6 @@ void update_insert_combos ()
 {
   GtkTreeModel * model;
   project * this_proj;
-  GList * cell_list;
   GtkWidget * box;
   int i;
   for (i=0; i<nprojects; i++)
@@ -74,12 +73,8 @@ void update_insert_combos ()
         model = replace_combo_tree (TRUE, i);
         box = (this_proj -> modelgl -> builder_win) ? this_proj -> modelgl -> builder_win -> add_combo : this_proj -> modelgl -> atom_win -> atom_combo[3];
         gtk_combo_box_set_model (GTK_COMBO_BOX(box), model);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(box), 0);
-        cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(box));
-        if (cell_list && cell_list -> data)
-        {
-          gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(box), cell_list -> data, "markup", 0, NULL);
-        }
+        combo_set_active (box, 0);
+        combo_set_markup (box);
         g_object_unref (model);
       }
     }

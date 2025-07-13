@@ -167,11 +167,11 @@ G_MODULE_EXPORT void toggle_frac (GtkToggleButton * Button, gpointer data)
   /*if (gtk_toggle_button_get_active (Button))
   {
     widget_set_sensitive (frac_box, 1);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(frac_box), 0);
+    combo_set_active (frac_box, 0);
   }
   else
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(frac_box), -1);
+    combo_set_active (frac_box, -1);
     widget_set_sensitive (frac_box, 0);
   }*/
 }
@@ -353,7 +353,7 @@ G_MODULE_EXPORT void on_spec_changed (GtkComboBox * combo, gpointer data)
   {
     update_entry_double (GTK_ENTRY(chem_entry[j]), tmp_chem[j][i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(rad_box), -1);
+  combo_set_active (rad_box, -1);
 }
 
 /*!
@@ -448,7 +448,7 @@ void edit_chem (GtkWidget * vbox)
           {
             combo_text_append (rad_box, chem_rad[j]);
           }
-          gtk_combo_box_set_active (GTK_COMBO_BOX(rad_box), -1);
+          combo_set_active (rad_box, -1);
           g_signal_connect(G_OBJECT(rad_box), "changed", G_CALLBACK(on_rad_changed), NULL);
           gtk_grid_attach (GTK_GRID (table), rad_box, 1, i+1, 1, 1);
         }
@@ -471,7 +471,7 @@ void edit_chem (GtkWidget * vbox)
       }
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(spec_box), 0);
+  combo_set_active (spec_box, 0);
   gtk_fixed_put (GTK_FIXED (chem_fixed), spec_box, -1, -1);
 }
 

@@ -128,7 +128,7 @@ void prepbox (int k, int l, int m)
     widget_set_sensitive (setcolorbox, 0);
   }
   gtk_widget_set_size_request (setcolorbox, -1, 30);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (setcolorbox), 0);
+  combo_set_active (setcolorbox, 0);
   g_signal_connect (G_OBJECT(setcolorbox), "changed", G_CALLBACK(choose_set), NULL);
 }
 

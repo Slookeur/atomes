@@ -616,13 +616,9 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
       GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
       gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (answer), renderer, TRUE);
       gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (answer), renderer, "text", 0, NULL);
-      GList * cell_list = gtk_cell_layout_get_cells (GTK_CELL_LAYOUT(answer));
-      if(cell_list && cell_list -> data)
-      {
-        gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(answer), cell_list -> data, "markup", 0, NULL);
-      }
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(answer), 0);
+    combo_set_markup (answer);
+    combo_set_active (answer, 0);
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, answer, FALSE, FALSE, 10);
   if (id == 3)

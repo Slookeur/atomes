@@ -159,7 +159,7 @@ G_MODULE_EXPORT void set_box_axis_style (GtkWidget * widg, gpointer data)
       {
         if (view -> box_win -> styles && GTK_IS_WIDGET(view -> box_win -> styles))
         {
-          gtk_combo_box_set_active (GTK_COMBO_BOX(view -> box_win -> styles), i);
+          combo_set_active (view -> box_win -> styles, i);
         }
       }
       break;
@@ -168,7 +168,7 @@ G_MODULE_EXPORT void set_box_axis_style (GtkWidget * widg, gpointer data)
       {
         if (view -> axis_win -> styles && GTK_IS_WIDGET(view -> axis_win -> styles))
         {
-          gtk_combo_box_set_active (GTK_COMBO_BOX(view -> axis_win -> styles), i);
+          combo_set_active (view -> axis_win -> styles, i);
         }
       }
       break;

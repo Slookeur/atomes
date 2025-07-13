@@ -190,7 +190,7 @@ void create_dummy_param_box (int dummy_id)
         update_entry_double (GTK_ENTRY(widg), dummy -> xyz[i]);
       }
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(box), dummy -> type);
+    combo_set_active (box, dummy -> type);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, dummy_box[0], dummy_box[1], FALSE, FALSE, 0);
     show_the_widgets (dummy_box[1]);
   }
@@ -619,7 +619,7 @@ G_MODULE_EXPORT void atom_button (GtkWidget * but, gpointer data)
       combo_text_append (widg, str);
       g_free (str);
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cpmd -> default_opts[i+1]);
+    combo_set_active (widg, (int)tmp_cpmd -> default_opts[i+1]);
     g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_opt_box), GINT_TO_POINTER(i+1));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
     create_selection_button (vbox, tmp_cpmd -> fixat, 1, GINT_TO_POINTER(-1));

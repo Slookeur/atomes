@@ -1009,7 +1009,7 @@ void prepare_sp_box ()
     gtk_combo_box_text_append_text ((GtkComboBoxText *)combo, str);
     g_free (str);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+  combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(changed_spec_combo), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
   for (i=0; i<2; i++)

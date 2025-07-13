@@ -1231,8 +1231,7 @@ GtkWidget * add_motion_interaction (atom_search * asearch, int axd, project * th
   this_proj -> modelgl -> atom_win -> axis_combo[axd] = create_combo ();
   combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Model axis");
   combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Eye (viewer) axis");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> atom_win -> axis_combo[axd]),
-                                          this_proj -> modelgl -> atom_win -> axis[axd]);
+  combo_set_active (this_proj -> modelgl -> atom_win -> axis_combo[axd], this_proj -> modelgl -> atom_win -> axis[axd]);
   g_signal_connect (G_OBJECT (this_proj -> modelgl -> atom_win -> axis_combo[axd]), "changed", G_CALLBACK(set_axis_for_motion), & asearch -> pointer[axd]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, this_proj -> modelgl -> atom_win -> axis_combo[axd], FALSE, FALSE, 20);
   this_proj -> modelgl -> atom_win -> axis_but[axd] = check_button ("Show", 100, 35, FALSE, G_CALLBACK(set_show_motion_axis), & asearch -> pointer[axd]);

@@ -1512,7 +1512,7 @@ void create_selection_combo (int id, int num, int type, GCallback handler)
   j = type;
   if (num > 0)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo_id_box[id]), 0);
+    combo_set_active (combo_id_box[id], 0);
     if (id == 0)
     {
       create_nose_thermo_param_box (0);
@@ -1524,7 +1524,7 @@ void create_selection_combo (int id, int num, int type, GCallback handler)
   }
   else
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo_id_box[id]), -1);
+    combo_set_active (combo_id_box[id], -1);
     widget_set_sensitive (combo_id_box[id], FALSE);
   }
   g_signal_connect (G_OBJECT (combo_id_box[id]), "changed", handler, GINT_TO_POINTER(j));
@@ -1779,7 +1779,7 @@ void prepare_therm_ions ()
         g_free (str);
       }
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tbox, FALSE, FALSE, 0);
-      gtk_combo_box_set_active (GTK_COMBO_BOX (tbox), get_thermo () -> sys);
+      combo_set_active (tbox, get_thermo () -> sys);
       g_signal_connect (G_OBJECT (tbox), "changed", G_CALLBACK(changed_thermo_box_nose), NULL);
     }
   }
@@ -1865,12 +1865,12 @@ void thermo_type_box (GtkWidget * vbox, gchar * str, int id)
   }
   if (id == -1)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(tbox), tmp_cpmd -> elec_thermostat -> type);
+    combo_set_active (tbox, tmp_cpmd -> elec_thermostat -> type);
   }
   else
   {
     thermostat * thermo = get_thermo();
-    gtk_combo_box_set_active (GTK_COMBO_BOX(tbox), thermo -> type);
+    combo_set_active (tbox, thermo -> type);
   }
   g_signal_connect (G_OBJECT (tbox), "changed", G_CALLBACK(changed_thermo_box), GINT_TO_POINTER(id));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tbox, FALSE, FALSE, 0);

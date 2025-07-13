@@ -421,7 +421,7 @@ GtkWidget * create_tab_3 (gpointer data)
      combo_text_append (legend_dash_box, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (legend_dash_box, 120, -1);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(legend_dash_box), this_proj -> curves[b][c] -> legend_box_dash - 1);
+  combo_set_active (legend_dash_box, this_proj -> curves[b][c] -> legend_box_dash - 1);
   g_signal_connect (G_OBJECT(legend_dash_box), "changed", G_CALLBACK(set_legend_box_line), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, "Line style:"), legend_dash_box, FALSE, FALSE, 0);
 

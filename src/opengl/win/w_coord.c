@@ -1177,7 +1177,7 @@ GtkWidget * param_tab (glwin * view)
       break;
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(color_box), l);
+  combo_set_active (color_box, l);
   g_signal_connect (G_OBJECT (color_box), "changed", G_CALLBACK(set_atom_color_map_box), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_box, FALSE, FALSE, 100);
 
@@ -1216,7 +1216,7 @@ GtkWidget * param_tab (glwin * view)
       break;
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(color_box), l);
+  combo_set_active (color_box, l);
   g_signal_connect (G_OBJECT (color_box), "changed", G_CALLBACK(set_poly_color_map_box), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_box, FALSE, FALSE, 100);
   widget_set_sensitive (color_box, view -> bonding);

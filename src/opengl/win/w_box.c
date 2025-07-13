@@ -255,7 +255,7 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], TRUE);
 #endif
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), WIREFRAME-1);
+    combo_set_active (box_win -> styles, WIREFRAME-1);
   }
   else
   {
@@ -266,7 +266,7 @@ G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data)
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], FALSE);
 #endif
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(box_win -> styles), NONE);
+    combo_set_active (box_win -> styles, NONE);
   }
 #ifdef GTK3
   from_box_or_axis = FALSE;
@@ -391,7 +391,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   if (box_type == NONE) i = NONE;
   if (box_type == WIREFRAME) i = 0;
   if (box_type == CYLINDERS) i = 1;
-  gtk_combo_box_set_active (GTK_COMBO_BOX(the_box -> styles), i);
+  combo_set_active (the_box -> styles, i);
   gtk_widget_set_size_request (the_box -> styles, 120, -1);
   g_signal_connect (G_OBJECT (the_box -> styles), "changed", G_CALLBACK(set_box_combo_style), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_box -> styles, FALSE, FALSE, 10);

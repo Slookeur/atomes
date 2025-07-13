@@ -289,7 +289,7 @@ void calc_msd (GtkWidget * vbox)
     {
       GtkWidget * tcombo = create_combo ();
       for (j=0; j<5 ; j++) combo_text_append (tcombo, untime[j]);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(tcombo), active_project -> tunit);
+      combo_set_active (tcombo, active_project -> tunit);
       g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(combox_tunit_changed), NULL);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tcombo, FALSE, FALSE, 0);
     }
@@ -399,7 +399,7 @@ G_MODULE_EXPORT void combox_rings_changed (GtkComboBox * box, gpointer data)
     {
       active_project -> rsearch[0] = combo_get_active ((GtkWidget *)box);
       widget_set_sensitive (rings_box[1], (active_project -> rsearch[0]<0) ? 0 : 1);
-      gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), active_project -> rsparam[active_project -> rsearch[0]][0]);
+      combo_set_active (rings_box[1], active_project -> rsparam[active_project -> rsearch[0]][0]);
       for (i=0; i<2; i++) widget_set_sensitive (rings_entry[i], (active_project -> rsearch[0]<0) ? 0 : 1);
       for (i=0; i<3; i++) widget_set_sensitive (rings_check[i], (active_project -> rsearch[0]<0) ? 0 : 1);
       update_entry_int (GTK_ENTRY(rings_entry[0]), active_project -> rsparam[active_project -> rsearch[0]][1]);
@@ -611,18 +611,18 @@ void calc_rings (GtkWidget * vbox)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_e, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     i = 0;
     g_signal_connect(G_OBJECT(rings_box[0]), "changed", G_CALLBACK(combox_rings_changed), GINT_TO_POINTER(0));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[0]), (preferences) ? tmp_rsparam[0] : active_project -> rsearch[0]);
+    combo_set_active (rings_box[0], (preferences) ? tmp_rsparam[0] : active_project -> rsearch[0]);
     widget_set_sensitive (rings_box[1], (preferences) ? 1 : (active_project -> rsearch[0]<0) ? 0 : 1);
   }
   i = 1;
   g_signal_connect(G_OBJECT(rings_box[1]), "changed", G_CALLBACK(combox_rings_changed), GINT_TO_POINTER(i));
   if (preferences)
   {
-    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), (search_type) ? tmp_csparam[0] : tmp_rsparam[1]);
+    combo_set_active (rings_box[1], (search_type) ? tmp_csparam[0] : tmp_rsparam[1]);
   }
   else
   {
-    gtk_combo_box_set_active(GTK_COMBO_BOX(rings_box[1]), (search_type) ? active_project -> csparam[0] : active_project -> rsparam[j][0]);
+    combo_set_active (rings_box[1], (search_type) ? active_project -> csparam[0] : active_project -> rsparam[j][0]);
   }
 }
 

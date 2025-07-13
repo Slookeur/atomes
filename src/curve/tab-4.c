@@ -747,9 +747,9 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
   update_entry_double (GTK_ENTRY(vmin), this_proj -> curves[b][c] -> axmin[i]);
   update_entry_double (GTK_ENTRY(vmax), this_proj -> curves[b][c] -> axmax[i]);
   update_entry_double (GTK_ENTRY(majt), this_proj -> curves[b][c] -> majt[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ticks_inout_box), this_proj -> curves[b][c] -> ticks_io[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ticks_pos_box), this_proj -> curves[b][c] -> ticks_pos[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(labels_pos_box), this_proj -> curves[b][c] -> labels_pos[i]);
+  combo_set_active (ticks_inout_box, this_proj -> curves[b][c] -> ticks_io[i]);
+  combo_set_active (ticks_pos_box, this_proj -> curves[b][c] -> ticks_pos[i]);
+  combo_set_active (labels_pos_box, this_proj -> curves[b][c] -> labels_pos[i]);
   gtk_font_chooser_set_font (GTK_FONT_CHOOSER(ticks_labels_font), this_proj -> curves[b][c] -> labels_font[i]);
   gtk_range_set_value (GTK_RANGE(ticks_labels_angle), this_proj -> curves[b][c] -> labels_angle[i] * (180.0/pi));
   if (b < MS)
@@ -759,7 +759,7 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
   else
   {
     g_signal_handler_disconnect (G_OBJECT(scale_box), handler_id);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(scale_box), this_proj -> curves[b][c] -> scale[i]);
+    combo_set_active (scale_box, this_proj -> curves[b][c] -> scale[i]);
     handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
     widget_set_sensitive (scale_box, 1);
     /* widget_set_sensitive (vmax, ! this_proj -> curves[b][c] -> scale[i]);
@@ -824,7 +824,7 @@ GtkWidget * create_tab_4 (gpointer data)
   axischoice = create_combo ();
   combo_text_append (axischoice, "X axis");
   combo_text_append (axischoice, "Y axis");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(axischoice), 0);
+  combo_set_active (axischoice, 0);
   gtk_widget_set_size_request (axischoice, 80, 35);
   g_signal_connect (G_OBJECT(axischoice), "changed", G_CALLBACK(update_axis), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, axischoice, FALSE, FALSE, 25);
@@ -837,7 +837,7 @@ GtkWidget * create_tab_4 (gpointer data)
   scale_box = create_combo ();
   combo_text_append (scale_box, "Linear");
   combo_text_append (scale_box, "Log");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(scale_box), this_proj -> curves[b][c] -> scale[0]);
+  combo_set_active (scale_box, this_proj -> curves[b][c] -> scale[0]);
   gtk_widget_set_size_request (scale_box, 80, -1);
   handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, scale_box, FALSE, FALSE, 0);

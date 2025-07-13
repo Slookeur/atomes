@@ -337,7 +337,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
             GtkWidget * o_combo = create_combo();
             combo_text_append (o_combo, "s1");
             combo_text_append (o_combo, "s2");
-            gtk_combo_box_set_active (GTK_COMBO_BOX(o_combo), (int)tmp_field -> thermo_opts[i]);
+            combo_set_active (o_combo, (int)tmp_field -> thermo_opts[i]);
             g_signal_connect (G_OBJECT (o_combo), "changed", G_CALLBACK(set_order), NULL);
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, o_combo, FALSE, FALSE, 5);
           }
@@ -471,7 +471,7 @@ GtkWidget * create_thermo_box (int ensemble)
   {
     if (md_ens_opt[ensemble][i]) combo_text_append (thermo_box, md_thermo[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(thermo_box), tmp_field -> thermostat);
+  combo_set_active (thermo_box, tmp_field -> thermostat);
   g_signal_connect (G_OBJECT (thermo_box), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(0));
   if (ensemble)
   {
@@ -532,7 +532,7 @@ GtkWidget * create_ensemble_box ()
   {
     combo_text_append (ensemble, md_ensemble[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ensemble), tmp_field -> ensemble);
+  combo_set_active (ensemble, tmp_field -> ensemble);
   g_signal_connect (G_OBJECT (ensemble), "changed", G_CALLBACK(set_ensemble), NULL);
 
   ens_box = create_vbox (BSEP);
@@ -556,7 +556,7 @@ GtkWidget * create_ensemble_box ()
   combo_text_append (combo, "Langevin");
   combo_text_append (combo, "Gauss");
   combo_text_append (combo, "Direct");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> thermo_opts[7]);
+  combo_set_active (combo, (int)tmp_field -> thermo_opts[7]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(1));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("Thickness:", 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * entry = create_entry(G_CALLBACK(set_thermo_param), 100, 10, FALSE, GINT_TO_POINTER(8));
@@ -803,7 +803,7 @@ GtkWidget * create_md_box ()
           {
             combo_text_append (combo, md_combo[i][k]);
           }
-          gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+          combo_set_active (combo, 0);
           gtk_widget_set_size_request (combo, 100, -1);
           g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_md_combo), GINT_TO_POINTER(l));
           if (i)
@@ -1059,7 +1059,7 @@ GtkWidget * create_equi_box ()
       {
         combo = create_combo();
         for (m=0; m<3; m++) combo_text_append (combo, equi_min[m]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> equi_opts[l]);
+        combo_set_active (combo, (int)tmp_field -> equi_opts[l]);
         gtk_widget_set_size_request (combo, 100, -1);
         g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_equi_combo), GINT_TO_POINTER(l));
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], combo, FALSE, FALSE, 5);
@@ -1254,7 +1254,7 @@ GtkWidget * create_traj_box ()
         combo = create_combo();
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], combo, FALSE, FALSE, 0);
         for (l=0; l<3; l++) combo_text_append (combo, traj_level[l]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> out_opts[k+j+1]);
+        combo_set_active (combo, (int)tmp_field -> out_opts[k+j+1]);
         g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_print_level), NULL);
       }
     }
@@ -1749,7 +1749,7 @@ GtkWidget * create_io_box ()
       combo_text_append(combo, io_rw_m[j]);
     }
     k ++;
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+    combo_set_active (combo, (int)tmp_field -> io_opts[k]);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
     l = tmp_field -> io_opts[k] == 2.0 ? FALSE : TRUE;
@@ -1762,7 +1762,7 @@ GtkWidget * create_io_box ()
       combo = create_combo();
       for (j=0; j<2; j++) combo_text_append(combo, io_pres[j]);
       k ++;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+      combo_set_active (combo, (int)tmp_field -> io_opts[k]);
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_pre, combo, FALSE, FALSE, 5);
       widget_set_sensitive (io_pre, m);
@@ -1770,7 +1770,7 @@ GtkWidget * create_io_box ()
       combo = create_combo();
       for (j=0; j<2; j++) combo_text_append(combo, io_type[j]);
       k ++;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+      combo_set_active (combo, (int)tmp_field -> io_opts[k]);
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
     }
@@ -2132,7 +2132,7 @@ GtkWidget * create_electro_box ()
   {
     combo_text_append(combo, eval_m[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> elec_opts[5]);
+  combo_set_active (combo, (int)tmp_field -> elec_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_elec_eval), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
   elec_box[2] = create_vbox (BSEP);
@@ -2266,7 +2266,7 @@ GtkWidget * create_vdws_box ()
   {
     combo_text_append(combo, eval_vdw[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> vdw_opts[5]);
+  combo_set_active (combo, (int)tmp_field -> vdw_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_vdw_mix), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
 
@@ -2505,7 +2505,7 @@ GtkWidget * create_restart_box ()
   GtkWidget * combo = create_combo();
   int i;
   for (i=0; i<3; i++) combo_text_append(combo, rtype[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> sys_opts[15]);
+  combo_set_active (combo, (int)tmp_field -> sys_opts[15]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_sys_restart), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, sys_box[3], combo, FALSE, FALSE, 20);
   return vbox;

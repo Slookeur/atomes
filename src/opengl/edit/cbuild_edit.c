@@ -824,13 +824,8 @@ void adjust_so_combo (builder_edition * cbuilder)
   GtkTreeModel * model = so_combo_tree (cbuilder -> cell.sp_group);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> so_combo), model);
   g_object_unref (model);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), 0);
-
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> so_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> so_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> so_combo, 0);
+  combo_set_markup (cbuilder -> so_combo);
   widget_set_sensitive (cbuilder -> so_combo, cbuilder -> cell.sp_group -> nums-1);
   if (cbuilder -> cell.sp_group) get_origin (cbuilder -> cell.sp_group);
 }
@@ -918,12 +913,8 @@ void adjust_sg_combo (builder_edition * cbuilder, int cs, int bl)
   GtkTreeModel * model = sg_combo_tree (cs, bl);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> sg_combo), model);
   g_object_unref (model);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> sg_combo), 0);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> sg_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> sg_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> sg_combo, 0);
+  combo_set_markup (cbuilder -> sg_combo);
   adjust_lattice_parameters (cbuilder);
 }
 
@@ -963,7 +954,7 @@ GtkWidget * create_bl_combo (int cs, gpointer data)
   }
   i = (cs == 0 || cs == 5) ? 0 : 1;
   widget_set_sensitive (cbox, i);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbox), ! i);
+  combo_set_active (cbox, ! i);
   g_signal_connect (G_OBJECT(cbox), "changed", G_CALLBACK(set_bl), data);
   gtk_widget_set_size_request (cbox, 150, 25);
   return cbox;
@@ -1269,7 +1260,7 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
   GtkWidget * rounding = create_combo ();
   gtk_widget_set_size_request (rounding, -1, 30);
   for (i=0; i<3; i++) combo_text_append (rounding, cif_occupancies[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(rounding), cbuilder -> rounding);
+  combo_set_active (rounding, cbuilder -> rounding);
   g_signal_connect(G_OBJECT(rounding), "changed", G_CALLBACK(on_rounding_changed), & cbuilder);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rounding, FALSE, FALSE, 10);
   gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
@@ -1319,7 +1310,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   cbuilder -> cs_combo = create_combo();
 
   for (i=0; i<7;i++) combo_text_append (cbuilder -> cs_combo, crystal_sytems[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> cs_combo), 0);
+  combo_set_active (cbuilder -> cs_combo, 0);
   gtk_widget_set_size_request (cbuilder -> cs_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> cs_combo, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT(cbuilder -> cs_combo), "changed", G_CALLBACK(set_cs), (gpointer)cbuilder);
@@ -1355,13 +1346,8 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   g_signal_connect (G_OBJECT(cbuilder -> sg_combo), "changed", G_CALLBACK(set_sg), data);
   gtk_widget_set_size_request (cbuilder -> sg_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> sg_box, cbuilder -> sg_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> sg_combo), 0);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> sg_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> sg_combo), cell_list -> data, "markup", 0, NULL);
-  }
-
+  combo_set_active (cbuilder -> sg_combo, 0);
+  combo_set_markup (cbuilder -> sg_combo);
   // Space group option
   cbuilder -> so_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cbuilder -> so_box, FALSE, FALSE, 0);
@@ -1374,14 +1360,10 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (cbuilder -> so_combo), renderer, "text", 0, NULL);
   gtk_widget_set_size_request (cbuilder -> so_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> so_box, cbuilder -> so_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), 0);
+  combo_set_active (cbuilder -> so_combo, 0);
   widget_set_sensitive (cbuilder -> so_combo, 0);
   g_signal_connect (G_OBJECT(cbuilder -> so_combo), "changed", G_CALLBACK(set_so), data);
-  cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> so_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> so_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_markup (cbuilder -> so_combo);
 
   for (i=0; i<3; i++)
   {
@@ -1408,12 +1390,8 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   gtk_widget_set_size_request (cbuilder -> la_combo, 150, 25);
   g_signal_connect (G_OBJECT(cbuilder -> la_combo), "changed", G_CALLBACK(set_lattice), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> la_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> la_combo), 0);
-  cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> la_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> la_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> la_combo, 0);
+  combo_set_markup (cbuilder -> la_combo);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> lattice_box, FALSE, FALSE, 50);

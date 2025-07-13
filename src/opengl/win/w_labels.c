@@ -157,7 +157,7 @@ G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
       }
       else if (id -> b == 3 || id -> b == 4)
       {
-        gtk_combo_box_set_active (GTK_COMBO_BOX(tilt), this_proj -> modelgl -> anim -> last -> img -> mtilt);
+        combo_set_active (tilt, this_proj -> modelgl -> anim -> last -> img -> mtilt);
         this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
       }
       update (this_proj -> modelgl);
@@ -605,7 +605,7 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
       j = tmp_mpattern = -1;
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(lstyle), j);
+  combo_set_active (lstyle, j);
   if (id -> a != -1)
   {
     this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
@@ -671,7 +671,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     {
       combo_text_append (formats, lab_formats[i]);
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(formats), acl_format);
+    combo_set_active (formats, acl_format);
     gtk_widget_set_size_request (formats, 220, -1);
     g_signal_connect (G_OBJECT (formats), "changed", G_CALLBACK(set_labels_format), lab_pointer);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, formats, FALSE, FALSE, 10);
@@ -685,7 +685,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * config  = create_combo ();
   combo_text_append (config, "Basic text");
   combo_text_append (config, "Highlighted");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(config), label -> render);
+  combo_set_active (config, label -> render);
   gtk_widget_set_size_request (config, 220, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
@@ -705,7 +705,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * position = create_combo ();
   combo_text_append (position, "Always visible");
   combo_text_append (position, "Normal");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(position), label -> position);
+  combo_set_active (position, label -> position);
   gtk_widget_set_size_request (position, 220, -1);
   g_signal_connect (G_OBJECT (position), "changed", G_CALLBACK(set_labels_position), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, position, FALSE, FALSE, 10);
@@ -723,7 +723,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     tilt = create_combo ();
     combo_text_append (tilt, "None");
     combo_text_append (tilt, "Adapted");
-    gtk_combo_box_set_active (GTK_COMBO_BOX(tilt), mtilt);
+    combo_set_active (tilt, mtilt);
     gtk_widget_set_size_request (tilt, 220, -1);
     g_signal_connect (G_OBJECT (tilt), "changed", G_CALLBACK(set_labels_tilt), lab_pointer);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, tilt, FALSE, FALSE, 10);
@@ -810,7 +810,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(lstyle), renderer, FALSE );
     gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT(lstyle), renderer, "pixbuf", 0, NULL );
-    gtk_combo_box_set_active (GTK_COMBO_BOX(lstyle), mpattern);
+    combo_set_active (lstyle, mpattern);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lstyle, TRUE, TRUE, 10);
     gtk_widget_set_size_request (lstyle, 100, 35);
     g_signal_connect (G_OBJECT (lstyle), "changed", G_CALLBACK(set_measure_style), lab_pointer);

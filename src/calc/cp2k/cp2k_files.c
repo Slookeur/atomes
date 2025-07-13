@@ -331,7 +331,7 @@ GtkWidget * prepare_basis_combo (int sp, int obj)
   }
   if (tmp_cp2k -> spec_files[sp][obj] == NULL)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(widg), tmp_cp2k -> spec_data[sp][obj]);
+    combo_set_active (widg, tmp_cp2k -> spec_data[sp][obj]);
   }
   else
   {

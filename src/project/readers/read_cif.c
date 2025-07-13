@@ -347,7 +347,7 @@ G_MODULE_EXPORT void set_cif_to_insert (GtkComboBox * box, gpointer data)
   str = (done) ? g_strdup_printf (APPLY) : g_strdup_printf (DELETEB);
   set_image_from_icon_name (img_cif[i], str);
   g_free (str);
-  if (! done) gtk_combo_box_set_active (box, 0);
+  if (! done) combo_set_active ((GtkWidget *)box, 0);
 }
 
 /*!
@@ -371,7 +371,6 @@ gboolean get_missing_object_from_user ()
   GtkWidget * but;
   GtkCellRenderer * renderer;
   GtkTreeModel * model;
-  GList * cell_list;
   int i;
   for (i=0; i<this_reader -> object_to_insert; i++)
   {
@@ -387,13 +386,9 @@ gboolean get_missing_object_from_user ()
     renderer = gtk_cell_renderer_combo_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (but), renderer, TRUE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (but), renderer, "text", 0, NULL);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(but), 0);
+    combo_set_active (but, 0);
     g_signal_connect (G_OBJECT(but), "changed", G_CALLBACK(set_cif_to_insert), GINT_TO_POINTER(i));
-    cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(but));
-    if(cell_list && cell_list -> data)
-    {
-      gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(but), cell_list -> data, "markup", 0, NULL);
-    }
+    combo_set_markup (but);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, img_cif[i], FALSE, FALSE, 30);
   }

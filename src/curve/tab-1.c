@@ -725,7 +725,7 @@ GtkWidget * create_tab_1 (gpointer data)
     combo_text_append (fbox, ftb[i]);
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(fbox), this_proj -> curves[b][c] -> frame_type);
+  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_type);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_type), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Type:"), fbox, FALSE, FALSE, 0);
 
@@ -736,7 +736,7 @@ GtkWidget * create_tab_1 (gpointer data)
      combo_text_append (fbox, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(fbox), this_proj -> curves[b][c] -> frame_dash - 1);
+  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_dash - 1);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_line), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Line style:"), fbox, FALSE, FALSE, 0);
 

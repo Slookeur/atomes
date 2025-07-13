@@ -1068,7 +1068,7 @@ GtkWidget * vol_model_tab (glwin * view)
   GtkWidget * ang_combo = create_combo ();
   gchar * angpr[4] = {"°", "°/10", "°/100", "°/1000"};
   for (i=0; i<4; i++) combo_text_append (ang_combo, angpr[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ang_combo), view -> volume_win -> angp);
+  combo_set_active (ang_combo, view -> volume_win -> angp);
   g_signal_connect (G_OBJECT (ang_combo), "changed", G_CALLBACK(set_angular_precision), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ang_combo, FALSE, FALSE, 0);
 

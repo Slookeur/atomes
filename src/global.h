@@ -1118,6 +1118,8 @@ extern float * duplicate_float (int num, float * old_val);
 extern double * duplicate_double (int num, double * old_val);
 extern ColRGBA * duplicate_color (int num, ColRGBA * col);
 
+extern void combo_set_markup (GtkWidget * combo);
+extern void combo_set_active (GtkWidget * combo, int pos);
 extern int combo_get_active (GtkWidget * combo);
 extern void combo_text_append (GtkWidget * combo, gchar * text);
 extern void combo_text_prepend (GtkWidget * combo, gchar * text);

@@ -3261,20 +3261,7 @@ G_MODULE_EXPORT void to_edit_coords (GtkCellRenderer * cell, GtkCellEditable * e
 */
 G_MODULE_EXPORT void markup_action_renderer (GtkCellRendererCombo * cell, GtkCellEditable * editable, gchar * path_string, gpointer data)
 {
-  GtkComboBox * combo = GTK_COMBO_BOX(editable);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
-  }
-  /*GtkCellView * view = (GtkCellView *)gtk_bin_get_child(GTK_BIN(editable));
-  GList * list = gtk_cell_view_get_cell_renderers (view);
-  while (list)
-  {
-    GtkCellRenderer *render = (GtkCellRenderer *)list -> data;
-    list = list -> next;
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT(combo), renderer1, TaskStatusComboCellData, NULL, NULL);
-  }*/
+  combo_set_markup ((GtkWidget *)editable);
 }
 
 /*!
@@ -3876,7 +3863,7 @@ G_MODULE_EXPORT void set_filter_changed (GtkComboBox * box, gpointer data)
   widget_set_sensitive (asearch -> id_box, (object && filter > 2) ? 0 : 1);
   if (object && filter > 2)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> atom_box), 0);
+    combo_set_active (asearch -> atom_box, 0);
   }
   if (asearch -> action == DISPL) motion_to_zero (asearch);
   clean_todo (asearch);
@@ -3961,7 +3948,7 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
   }
 
   if (asearch -> action == DISPL) widget_set_sensitive (get_project_by_id(asearch -> proj) -> modelgl -> atom_win -> at_expand[2], object);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> filter_box), 0);
+  combo_set_active (asearch -> filter_box, 0);
   set_filter_changed (GTK_COMBO_BOX(asearch -> filter_box), asearch);
 }
 
@@ -4042,10 +4029,10 @@ G_MODULE_EXPORT void set_search_mode (GtkComboBox * box, gpointer data)
     {
       gtk_combo_box_text_remove ((GtkComboBoxText *)asearch -> filter_box, 2+i);
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> filter_box), 0);
+    combo_set_active (asearch -> filter_box, 0);
     set_filter_changed (GTK_COMBO_BOX(asearch -> filter_box), asearch);
   }*/
-  gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> object_box), 0);
+  combo_set_active (asearch -> object_box, 0);
   set_object_changed (GTK_COMBO_BOX(asearch -> object_box), asearch);
 }
 
@@ -4165,18 +4152,18 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     if (! i) combo_text_append (asearch -> object_box, "Atom(s): all");
     combo_text_append (asearch -> object_box, "Group of atoms");
     if (! i) combo_text_append (asearch -> object_box, "Group of atoms: all");
-    gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> object_box), asearch -> object);
+    combo_set_active (asearch -> object_box, asearch -> object);
     asearch -> filter_box  = create_combo ();
     gchar * filters[5]={"Chemical species", "Total coordination", "Partial coordination", "Fragment", "Molecule"};
     for (j=0; j<3; j++) combo_text_append (asearch -> filter_box, filters[j]);
     if (this_proj -> modelgl -> adv_bonding[0]) combo_text_append (asearch -> filter_box, filters[3]);
     if (this_proj -> modelgl -> adv_bonding[1]) combo_text_append (asearch -> filter_box, filters[4]);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> filter_box), asearch -> filter);
+    combo_set_active (asearch -> filter_box, asearch -> filter);
 
     asearch -> atom_box  = create_combo ();
     combo_text_append (asearch -> atom_box, "All");
     for (j=0; j<this_proj -> nspec; j++) combo_text_append (asearch -> atom_box, this_proj -> chemistry -> label[j]);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> atom_box), asearch -> spec);
+    combo_set_active (asearch -> atom_box, asearch -> spec);
 
     g_signal_connect (G_OBJECT (asearch -> object_box), "changed", G_CALLBACK(set_object_changed), asearch);
     g_signal_connect (G_OBJECT (asearch -> filter_box), "changed", G_CALLBACK(set_filter_changed), asearch);
@@ -4228,7 +4215,7 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     combo_text_append (cbox, "All objects");
     combo_text_append (cbox, "Selection");
     g_signal_connect (G_OBJECT(cbox), "changed", G_CALLBACK(set_too_much_type), asearch);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(cbox), asearch -> too_much);
+    combo_set_active (cbox, asearch -> too_much);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, cbox, FALSE, FALSE, 30);
     // asearch -> big_box = // Combo box with "All objects", "Selection" */
     vvbox = create_vbox (0);

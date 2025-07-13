@@ -407,7 +407,7 @@ void window_encode (glwin * view, gboolean video)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, form, TRUE, TRUE, 0);
   }
   codec = 0;
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cod), codec);
+  combo_set_active (cod, codec);
 
   if (! video) set_image_format (GTK_COMBO_BOX(cod), NULL);
 

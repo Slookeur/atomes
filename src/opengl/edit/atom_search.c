@@ -183,7 +183,7 @@ G_MODULE_EXPORT void set_atoms_for_action (GtkComboBox * box, gpointer data)
   {
     for (j=0; j<2; j++)
     {
-      gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> atom_win -> axis_combo[j]), this_proj -> modelgl -> atom_win -> axis[j]);
+      combo_set_active (this_proj -> modelgl -> atom_win -> axis_combo[j], this_proj -> modelgl -> atom_win -> axis[j]);
       for (k=0; k<6; k++)
       {
         gtk_range_set_value (GTK_RANGE(this_proj -> modelgl -> atom_win -> edit_scale[k]), this_proj -> modelgl -> atom_win -> new_param[i][j][k]);
@@ -215,12 +215,8 @@ GtkWidget * create_action_combo (int id, project * this_proj)
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);
     g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_atoms_to_insert), & this_proj -> modelgl -> search_widg[id+2] -> pointer[0]);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
-    GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
-    if(cell_list && cell_list -> data)
-    {
-      gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
-    }
+    combo_set_active (combo, 0);
+    combo_set_markup (combo);
     set_atoms_to_insert (GTK_COMBO_BOX(combo), & this_proj -> modelgl -> search_widg[id+2] -> pointer[0]);
   }
   else
@@ -228,7 +224,7 @@ GtkWidget * create_action_combo (int id, project * this_proj)
     combo = create_combo ();
     int i;
     for (i=0; i<3; i++) combo_text_append (combo, action_atoms[i]);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo), this_proj -> modelgl -> search_widg[id+2] -> status);
+    combo_set_active (combo, this_proj -> modelgl -> search_widg[id+2] -> status);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_atoms_for_action), & this_proj -> modelgl -> search_widg[id+2] -> pointer[0]);
   }
 
@@ -316,7 +312,7 @@ GtkWidget * action_tab (int aid, project * this_proj)
       asearch -> mode_box = create_combo ();
       combo_text_append (asearch -> mode_box, "Normally");
       combo_text_append (asearch -> mode_box, "Randomly");
-      gtk_combo_box_set_active (GTK_COMBO_BOX(asearch -> mode_box), 0);
+      combo_set_active (asearch -> mode_box, 0);
       g_signal_connect (G_OBJECT (asearch -> mode_box), "changed", G_CALLBACK(set_search_mode), asearch);
       GtkWidget * box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, sbox, box, FALSE, FALSE, 5);

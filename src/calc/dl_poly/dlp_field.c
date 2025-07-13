@@ -1583,7 +1583,7 @@ G_MODULE_EXPORT void toggle_field_params (GtkToggleButton * but, gpointer data)
     for (j=0; j<MOLIMIT-1; j++)
     {
       widget_set_sensitive (mol_box[j], tmp_field -> afp[MAXDATC]);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo_mol[j]), 0);
+      combo_set_active (combo_mol[j], 0);
     }
   }
   else if (i > MAXDATC)
@@ -2172,7 +2172,7 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
       tmp_field -> energy_unit = i;
     }
   }
-  gtk_combo_box_set_active (box, tmp_field -> energy_unit);
+  combo_set_active ((GtkWidget *)box, tmp_field -> energy_unit);
   update_field_trees ();
 }
 
@@ -2204,7 +2204,7 @@ GtkWidget * vbox_init (int p)
     combo_text_append (enbox, str);
     g_free (str);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(enbox), tmp_field -> energy_unit);
+  combo_set_active (enbox, tmp_field -> energy_unit);
   g_signal_connect (G_OBJECT (enbox), "changed", G_CALLBACK(changed_energy_unit), GINT_TO_POINTER(0));
   gtk_widget_set_size_request (enbox, 250, 30);
   widget_set_sensitive (enbox, ! activef);
@@ -2487,7 +2487,7 @@ GtkWidget * create_combo_mol (int f)
     if (tmp_fmol -> next != NULL) tmp_fmol = tmp_fmol -> next;
   }
   widget_set_sensitive (combo, (tmp_field -> molecules > 1) ? TRUE : FALSE);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+  combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(changed_mol_box), GINT_TO_POINTER(f+1));
   return combo;
 }
@@ -3554,7 +3554,7 @@ GtkWidget * create_field_tree (int f)
     if (is_special[f][i] == 1)
     {
       k = f-5;
-      field_renderer[f][i] = gtk_cell_renderer_combo_new();
+      field_renderer[f][i] = gtk_cell_renderer_combo_new ();
       list_store_combo = gtk_list_store_new (1, G_TYPE_STRING);
       for (j=0; j<fetypes[activef][k]; j++)
       {
@@ -3574,7 +3574,7 @@ GtkWidget * create_field_tree (int f)
     }
     else if (combox)
     {
-      field_renderer[f][i] = gtk_cell_renderer_text_new();
+      field_renderer[f][i] = gtk_cell_renderer_text_new ();
       field_col[f][i] = gtk_tree_view_column_new_with_attributes ("Parameter(s)", field_renderer[f][i], "text", i, NULL);
       m = 1;
       combox = FALSE;
@@ -4171,7 +4171,7 @@ G_MODULE_EXPORT void run_clean_field (GtkDialog * dial, gint response_id, gpoint
     int i;
     for (i=0; i<2; i++)
     {
-      gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), -1);
+      combo_set_active (field_i_combo[i], -1);
       //tmp_field -> prepare_file[i] = TRUE;
       widget_set_sensitive (field_i_combo[i], TRUE);
       widget_set_sensitive (field_i_lab[i], TRUE);
@@ -4410,7 +4410,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
         }
         else
         {
-          gtk_combo_box_set_active (box, -1);
+          combo_set_active ((GtkWidget *)box, -1);
         }
         break;
       case 1:
@@ -4704,16 +4704,16 @@ void create_classical_force_field (int p, int f)
     field_i_lab[i] = markup_label(i_titles[i][k], 210, -1, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, field_i_box[i], field_i_lab[i], FALSE, FALSE, 20);
     field_i_combo[i] = create_combo ();
-    gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), -1);
+    combo_set_active (field_i_combo[i], -1);
     switch (i)
     {
       case 0:
         for (j=0; j<N_FIELDS; j++) combo_text_append (field_i_combo[i], field_acro[j]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), tmp_field -> type);
+        combo_set_active (field_i_combo[i], tmp_field -> type);
         break;
       case 1:
         for (j=0; j<3; j++) combo_text_append (field_i_combo[i], field_init[j]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), tmp_field -> atom_init);
+        combo_set_active (field_i_combo[i], tmp_field -> atom_init);
         break;
     }
     widget_set_sensitive (field_i_combo[i], ! k);

@@ -144,7 +144,7 @@ GtkWidget * restart_box ()
   {
     combo_text_append (box, rest_opts[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(box), tmp_cpmd -> restart[0]);
+  combo_set_active (box, tmp_cpmd -> restart[0]);
   g_signal_connect (G_OBJECT (box), "changed", G_CALLBACK(changed_restart_box), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, box, FALSE, FALSE, 5);
 

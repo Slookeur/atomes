@@ -71,6 +71,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void text_view_set_monospace (GtkWidget * view);
   void gtk_label_align (GtkWidget * lab, float ax, float ay);
   void layout_add_widget (GtkWidget * layout, GtkWidget * child, int x_pos, int y_pos);
+  void combo_set_markup (GtkWidget * combo);
+  void combo_set_active (GtkWidget * combo, int pos);
   void combo_text_append (GtkWidget * combo, gchar * text);
   void combo_text_prepend (GtkWidget * combo, gchar * text);
   void setup_text_tags (GtkTextBuffer * buffer);
@@ -910,7 +912,7 @@ GtkWidget * create_layout (int x, int y)
 
   \brief retrieve the active item's position
 
-  \param combo the GtkWidget sending the signal
+  \param combo the target GtkWidget
 */
 int combo_get_active (GtkWidget * combo)
 {
@@ -926,6 +928,35 @@ int combo_get_active (GtkWidget * combo)
   return gtk_combo_box_get_active ((GtkComboBox *)combo);
 #endif // GTK4
 } */
+
+/*!
+  \fn void combo_set_active (GtkWidget * combo, int pos)
+
+  \brief set the active item's position
+
+  \param combo the target GtkWidget
+  \param pos the position to set
+*/
+void combo_set_active (GtkWidget * combo, int pos)
+{
+  gtk_combo_box_set_active ((GtkComboBox *)combo, pos);
+}
+
+/*!
+  \fn void combo_set_markup (GtkWidget * combo)
+
+  \brief use pango markup in combo widget
+
+  \param combo to the target widget
+*/
+void combo_set_markup (GtkWidget * combo)
+{
+  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
+  if (cell_list && cell_list -> data)
+  {
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
+  }
+}
 
 /*!
   \fn void combo_text_append (GtkWidget * combo, gchar * text)

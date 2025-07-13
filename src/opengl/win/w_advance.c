@@ -484,8 +484,8 @@ void update_light_data (int li, opengl_edition * ogl_win)
   {
     this_light = & tmp_lightning.spot[li];
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_win -> light_type), this_light -> type);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_win -> light_fix), this_light -> fix);
+  combo_set_active (ogl_win -> light_type, this_light -> type);
+  combo_set_active (ogl_win -> light_fix, this_light -> fix);
   show_active_light_data (ogl_win, li, this_light -> type);
   update_entry_double (GTK_ENTRY(ogl_win -> light_entry[0]), this_light -> attenuation.x);
   update_entry_double (GTK_ENTRY(ogl_win -> light_entry[1]), this_light -> attenuation.y);
@@ -636,7 +636,7 @@ void add_remove_lights (int val, gpointer data)
   create_lights_combo (this_lightning -> lights, ogl_edit);
   ogl_edit -> lights = destroy_this_widget (ogl_edit -> lights);
   show_the_widgets (ogl_edit -> lights);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> lights), 0);
+  combo_set_active (ogl_edit -> lights, 0);
   update_light_data (0, ogl_edit);
   if (! preferences)
   {
@@ -1018,7 +1018,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
     }
   }
   show_the_widgets (layout);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> lights), 0);
+  combo_set_active (ogl_edit -> lights, 0);
   update_light_data (0, ogl_edit);
 
   vbox = create_vbox (BSEP);
@@ -1093,7 +1093,7 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
         gtk_range_set_value (GTK_RANGE(ogl_edit -> m_scale[j]), the_mat -> param[k+1]);
       }
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> templates), i);
+    combo_set_active (ogl_edit -> templates, i);
     if (ogl_edit)
     {
       update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][0]), the_mat -> albedo.x);
@@ -1317,7 +1317,7 @@ GtkWidget * lightning_fix (glwin * view, Material * this_material)
   }
   g_signal_connect (G_OBJECT (lmodel), "changed", G_CALLBACK(set_l_model), view);
   gtk_widget_set_size_request (lmodel, 200, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(lmodel), this_material -> param[0]);
+  combo_set_active (lmodel, this_material -> param[0]);
   return fix;
 }
 
@@ -1355,7 +1355,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   {
     combo_text_append (ogl_edit -> templates, material_template[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ogl_edit -> templates), the_mat -> predefine-1);
+  combo_set_active (ogl_edit -> templates, the_mat -> predefine-1);
   g_signal_connect (G_OBJECT (ogl_edit -> templates), "changed", G_CALLBACK(set_template), view);
   gtk_widget_set_size_request (ogl_edit -> templates, 100, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ogl_edit -> templates, FALSE, FALSE, 0);
@@ -1582,7 +1582,7 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   combo_text_append (fogmod, "Exponential");
   combo_text_append (fogmod, "Exponential squared");
   gtk_widget_set_size_request (fogmod, 200, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(fogmod), the_fog -> mode);
+  combo_set_active (fogmod, the_fog -> mode);
   g_signal_connect (G_OBJECT (fogmod), "changed", G_CALLBACK(set_fog_mode), ogl_edit);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fogmod, FALSE, FALSE, 0);
 
@@ -1594,7 +1594,7 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   combo_text_append (fogtype, "Plane based");
   combo_text_append (fogtype, "Range based");
   gtk_widget_set_size_request (fogtype, 200, -1);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(fogtype), the_fog -> based);
+  combo_set_active (fogtype, the_fog -> based);
   g_signal_connect (G_OBJECT (fogtype), "changed", G_CALLBACK(set_fog_type), ogl_edit);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fogtype, FALSE, FALSE, 0);
 

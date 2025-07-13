@@ -129,5 +129,5 @@ G_MODULE_EXPORT void set_atoms_to_insert (GtkComboBox * box, gpointer data)
     prepare_to_instert (str, this_proj, this_proj -> modelgl -> search_widg[dat -> c], TRUE);
     g_free (str);
   }
-  gtk_combo_box_set_active (box, 0);
+  combo_set_active ((GtkWidget *)box, 0);
 }
