@@ -367,6 +367,9 @@ int save_preferences_to_xml_file ()
                               "Font",
                               "Shift",
                               "Colors"};
+  gchar * xml_axis_leg[3] = {"Legend on x",
+                             "Legend on y",
+                             "Legend on z"};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -559,7 +562,6 @@ int save_preferences_to_xml_file ()
   // End opengl
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
-
 
   // Model
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"model");
@@ -802,6 +804,73 @@ int save_preferences_to_xml_file ()
   }
 
   // End model
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
+  // View
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"view");
+  if (rc < 0) return 0;
+
+  if (default_axis.axis != NONE)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"axis");
+    if (rc < 0) return 0;
+    if (default_axis.t_pos != NONE)
+    {
+      str = g_strdup_printf ("%d", default_axis.t_pos);
+      rc = xml_save_parameter_to_file (writer, "Template position", "default_axis", TRUE, 0, str);
+      g_free (str);
+      if (! rc) return 0;
+    }
+    else
+    {
+      rc = xml_save_xyz_to_file (writer, 0, "Custom position", "default_axis", vec3(default_axis.c_pos[0], default_axis.c_pos[1], default_axis.c_pos[2]));
+      if (! rc) return 0;
+    }
+    str = g_strdup_printf ("%f", (default_axis.axis == WIREFRAME) ? default_axis.line : default_axis.rad);
+    rc = xml_save_parameter_to_file (writer, (default_axis.axis == WIREFRAME) ? "Wireframe width" : "Cylinder radius", "default_axis", TRUE, default_axis.axis, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%f", default_axis.length);
+    rc = xml_save_parameter_to_file (writer, "Length", "default_axis", TRUE, 2, str);
+    g_free (str);
+    if (! rc) return 0;
+    if (default_axis.labels)
+    {
+      rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
+      if (rc < 0) return 0;
+      str = g_strdup_printf ("%d", default_label[2].render);
+      rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+      g_free (str);
+      if (! rc) return 0;
+      str = g_strdup_printf ("%d", default_label[2].scale);
+      rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+      g_free (str);
+      if (! rc) return 0;
+      rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[2].font);
+      if (! rc) return 0;
+      for (i=0; i<3; i++)
+      {
+        rc = xml_save_parameter_to_file (writer, xml_axis_leg[i], "axis_legend", TRUE, i, default_axis.title[i]);
+        if (! rc) return 0;
+      }
+      rc = xmlTextWriterEndElement (writer);
+      if (rc < 0) return 0;
+    }
+    if (default_axis.color)
+    {
+      for (i=0; i<3; i++)
+      {
+        rc = xml_save_color_to_file (writer, i, "Color", "default_axis", default_axis.color[i]);
+        if (! rc) return 0;
+      }
+    }
+    // End axis
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
+
+  // End view
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
@@ -1085,6 +1154,41 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
         default_box.rad = xml_string_to_double(content);
       }
     }
+  }
+  else if (g_strcmp0(key, "default_axis") == 0)
+  {
+    if (vect)
+    {
+      default_axis.c_pos[0] = vect -> x;
+      default_axis.c_pos[1] = vect -> y;
+      default_axis.c_pos[2] = vect -> z;
+    }
+    else if (col)
+    {
+      if (! default_axis.color) default_axis.color = g_malloc0(3*sizeof*default_axis.color);
+      default_axis.color[vid] = * col;
+    }
+    else
+    {
+      if (vid == 1 || vid == 4)
+      {
+        default_axis.axis = vid;
+        if (vid == 1) default_axis.line = xml_string_to_double(content);
+        if (vid == 4) default_axis.rad = xml_string_to_double(content);
+      }
+      else if (vid == 2)
+      {
+        default_axis.length = xml_string_to_double(content);
+      }
+      else if (! vid)
+      {
+        default_axis.t_pos = (int) xml_string_to_double(content);
+      }
+    }
+  }
+  else if (g_strcmp0(key, "axis_legend") == 0)
+  {
+    default_axis.title[vid] = g_strdup_printf ("%s", content);
   }
 }
 
@@ -1435,6 +1539,28 @@ void read_preferences_from_xml_file ()
             read_preferences (p_node);
           }
         }
+        node = findnode(racine -> children, "view");
+        if (node)
+        {
+          read_preferences (node);
+          p_node = findnode(node -> children, "axis");
+          if (p_node)
+          {
+            read_preferences (p_node);
+            l_node = findnode(p_node -> children, "labels");
+            if (l_node)
+            {
+              label_id = 2;
+              default_axis.labels = TRUE;
+              read_preferences (l_node);
+            }
+            c_node = findnode(p_node -> children, "colors");
+            if (c_node)
+            {
+              read_preferences (c_node);
+            }
+          }
+        }
       }
       xmlFreeDoc(doc);
       xmlCleanupParser();
@@ -1516,8 +1642,6 @@ GtkWidget * view_preferences ()
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
   GtkWidget * vbox = create_vbox (BSEP);
-  //GtkWidget * hbox;
-  //GtkWidget * combo;
   gchar * info[2] = {"The <b>View</b> tab regroups representation options",
                      "which effect apply to the general aspect of the model:"};
   gchar * m_list[2][2] = {{"Representation", "scene orientation"},
@@ -2855,7 +2979,7 @@ GtkWidget * opengl_preferences ()
   combo_set_markup (combo);
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
   append_comments (vbox, "<sup>*</sup>", "<i>if 10 000 atoms or more: </i>Wireframe<i>, otherwise: </i>Ball and stick");
 
   hbox = create_hbox (BSEP);
@@ -3489,16 +3613,16 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       g_free (str);
       break;
     default:
+      destroy_this_dialog (edit_prefs);
+      preferences = FALSE;
+      clean_all_tmp ();
+      g_free (pref_pointer);
+      pref_pointer = NULL;
+      if (pref_box_win) g_free (pref_box_win);
+      pref_box_win = NULL;
+      preference_notebook = NULL;
       break;
   }
-  destroy_this_dialog (edit_prefs);
-  preferences = FALSE;
-  clean_all_tmp ();
-  g_free (pref_pointer);
-  pref_pointer = NULL;
-  if (pref_box_win) g_free (pref_box_win);
-  pref_box_win = NULL;
-  preference_notebook = NULL;
 }
 
 extern void update_light_data (int li, opengl_edition * ogl_win);

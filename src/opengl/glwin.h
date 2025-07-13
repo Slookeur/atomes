@@ -882,7 +882,7 @@ struct axis_edition
   GtkWidget * axis_data;
   GtkWidget * templates;
   GtkWidget * axis_position_box;
-  GtkWidget * axis_label_box;
+  GtkWidget * axis_label_box[2];
   GtkWidget * axis_color_title[3];
 };
 

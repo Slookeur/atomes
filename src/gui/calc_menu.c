@@ -365,12 +365,15 @@ GtkWidget * combox_rings (gchar * str, int num, gchar * list_item[num], int id)
 {
   int i;
   GtkWidget * hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
-  GtkWidget * fixed = gtk_fixed_new ();
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  // GtkWidget * fixed = gtk_fixed_new ();
   rings_box[id] = create_combo ();
+  gtk_widget_set_size_request (rings_box[id], 180, -1);
   for (i=0; i<num; i++) combo_text_append (rings_box[id], list_item[i]);
-  gtk_fixed_put (GTK_FIXED(fixed), rings_box[id], -1, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rings_box[id], FALSE, FALSE, 10);
+
+  //gtk_fixed_put (GTK_FIXED(fixed), rings_box[id], -1, 5);
+
   return hbox;
 }
 
@@ -525,9 +528,10 @@ void calc_rings (GtkWidget * vbox)
   gchar * val_c[2][4]={{"Only search for ABAB rings", "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>", "No homopolar bonds in the connectivity matrix", " "},
                        {"Only search for AAAA chains", "Only search for ABAB chains",
                         "No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>", "Only search for 1-(2)<sub>n</sub>-1 coordinated atom chains, ie. isolated chains."}};
-  gchar * val_d={"\n*\t<i><b>n</b><sub>max</sub></i> in total number of nodes (or atoms)\n"
-                 "**\tvalue used for memory allocation = f(<i><b>n</b><sub>max</sub></i>, system studied)\n"
-                 "***\tbut homopolar bonds can shorten the rings"};
+  gchar * start[3]={"<sup>*</sup>", "<sup>**</sup>", "<sup>***</sup>"};
+  gchar * val_d[3]={"<i><b>n</b><sub>max</sub></i> in total number of nodes (or atoms)",
+                    "value used for memory allocation = f(<i><b>n</b><sub>max</sub></i>, system studied)",
+                    "but homopolar bonds can shorten the rings"};
   gchar * val_e={"\n<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
                  "<sub>[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).</sub>\n"
                  "<sub>[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).</sub>\n"
@@ -537,7 +541,7 @@ void calc_rings (GtkWidget * vbox)
   gchar * list_node[(preferences) ? 2 : active_project -> nspec+1];
   int i, j, k;
   toggled_rings = FALSE;
-  if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[0], 5, defs, 0), FALSE, FALSE, 0);
+  if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[0], 5, defs, 0), FALSE, FALSE, 5);
 
   list_node[0] = g_strdup_printf ("All");
   if (preferences)
@@ -549,7 +553,7 @@ void calc_rings (GtkWidget * vbox)
     for (i=0; i<active_project -> nspec; i++) list_node[i+1] = g_strdup_printf ("%s", active_chem -> label[i]);
   }
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[1], (preferences) ? 2 : active_project -> nspec+1, list_node, 1), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[1], (preferences) ? 2 : active_project -> nspec+1, list_node, 1), FALSE, FALSE, 5);
 
   j = (preferences) ? tmp_rsparam[0] : active_project -> rsearch[0];
   k = RI + search_type;
@@ -605,7 +609,10 @@ void calc_rings (GtkWidget * vbox)
       if (! search_type && j < 0) widget_set_sensitive (rings_check[i], 0);
     }
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_d, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  for (i=0; i<3; i++)
+  {
+    append_comments (vbox, start[i], val_d[i]);
+  }
   if (! search_type)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_e, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);

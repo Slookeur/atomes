@@ -512,6 +512,9 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
     {
        hide_the_widgets ((tmp_box -> box == WIREFRAME) ? pref_box_win -> radius_box : pref_box_win -> width_box);
     }
+    hide_the_widgets ((tmp_axis -> axis == WIREFRAME) ? pref_axis_win -> radius_box : pref_axis_win -> width_box);
+    int i;
+    for (i=0; i<2; i++) widget_set_sensitive (pref_axis_win -> axis_label_box[i], tmp_axis -> labels);
   }
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);

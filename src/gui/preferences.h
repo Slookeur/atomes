@@ -83,7 +83,7 @@ struct axis_data
   double rad;            /*!< Radius for cylinders */
   double length;         /*!< Axis length */
   int t_pos;             /*!< Axis template position */
-  GLdouble c_pos[3];     /*!< Axis custom positions */
+  GLfloat c_pos[3];      /*!< Axis custom positions */
   int labels;            /*!< Show / hide axis labels */
   gchar * title[3];      /*!< Axis titles */
   ColRGBA * color;       /*!< Associated color */
