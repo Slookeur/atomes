@@ -363,7 +363,7 @@ struct image
 
   double axis_length;                           /*!< Axis length */
   int axispos;                                  /*!< Axis template position */
-  GLdouble axis_pos[3];                         /*!< Axis custom position */
+  GLfloat axis_pos[3];                          /*!< Axis custom position */
   int axis_labels;                              /*!< Show / hide axis labels */
   gchar * axis_title[3];                        /*!< Axis titles */
   ColRGBA * axis_color;                         /*!< Axis colors, if not default */

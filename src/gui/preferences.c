@@ -1159,6 +1159,7 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
   {
     if (vect)
     {
+      g_print ("Yes vect ?!\n");
       default_axis.c_pos[0] = vect -> x;
       default_axis.c_pos[1] = vect -> y;
       default_axis.c_pos[2] = vect -> z;

@@ -1348,16 +1348,8 @@ void init_img (project * this_proj)
     img -> style = SPACEFILL;
     img -> filled_type = - default_opengl[0] - 1;
   }
-  img -> box_axis[AXIS] = NONE; // (this_proj -> natomes <= 1000) ?  CYLINDERS : DEFAULT_STYLE;
-  if (this_proj -> cell.pbc)
-  {
-    img -> box_axis[BOX] = default_box.box;
-    // img -> box_axis[BOX] = (this_proj -> natomes <= 1000) ? CYLINDERS : DEFAULT_STYLE;
-  }
-  else
-  {
-    img -> box_axis[BOX] = NONE;
-  }
+  img -> box_axis[AXIS] = default_axis.axis;
+  img -> box_axis[BOX] = (this_proj -> cell.ltype) ? default_box.box : NONE;
 
   for (i=0; i<5; i++)
   {
