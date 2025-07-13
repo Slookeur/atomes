@@ -81,6 +81,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
   void adjust_label (GtkWidget * lab, int dimx, int dimy, float ax, float ay);
   void set_image_from_icon_name (GtkWidget * widg, gchar * icon);
+  void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend);
   void provide_gtk_css (gchar * css);
   void destroy_this_dialog (GtkDialog * dialog);
   void destroy_this_native_dialog (GtkNativeDialog * dialog);
@@ -1998,6 +1999,23 @@ void set_image_from_icon_name (GtkWidget * widg, gchar * icon)
 #else
   gtk_image_set_from_icon_name (GTK_IMAGE(widg), icon, GTK_ICON_SIZE_BUTTON);
 #endif
+}
+
+/*!
+  \fn void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend)
+
+  \brief append comments to a vertical box
+
+  \param vbox the target vertical box
+  \param symbol the symbol to legend
+  \param legend the associated legend
+*/
+void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend)
+{
+  GtkWidget * hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(symbol, 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(legend, -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 }
 
 /*!

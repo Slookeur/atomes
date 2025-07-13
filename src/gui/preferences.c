@@ -2692,15 +2692,9 @@ GtkWidget * model_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 30);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>the same parameters are also used for the </i>spheres<i> style</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>**</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>the same parameters are also used for the </i>dots<i> style</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  append_comments (vbox, "<sup>*</sup>", "<i>the same parameters are also used for the </i>spheres<i> style</i>");
+  append_comments (vbox, "<sup>**</sup>", "<i>the same parameters are also used for the </i>dots<i> style</i>");
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
@@ -2862,10 +2856,7 @@ GtkWidget * opengl_preferences ()
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-  hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>if 10 000 atoms or more: </i>Wireframe<i>, otherwise: </i>Ball and stick", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+  append_comments (vbox, "<sup>*</sup>", "<i>if 10 000 atoms or more: </i>Wireframe<i>, otherwise: </i>Ball and stick");
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Color maps</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);

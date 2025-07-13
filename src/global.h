@@ -1154,6 +1154,7 @@ extern GtkWidget * create_vscale (float min, float max, float delta,
                                   float val, int pos, int round, int size,
                                   GCallback handler, GCallback scroll_handler, gpointer data);
 
+extern void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend);
 extern void add_container_child (int type, GtkWidget * widg, GtkWidget * child);
 extern void add_box_child_end (GtkWidget * widg, GtkWidget * child, gboolean expand, gboolean fill, int padding);
 extern void add_box_child_start (int orientation, GtkWidget * widg, GtkWidget * child, gboolean expand, gboolean fill, int padding);
