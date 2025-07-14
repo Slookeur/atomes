@@ -54,6 +54,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
 
+  G_MODULE_EXPORT gboolean on_axis_delete (GtkWindow * widg, gpointer data);
+  G_MODULE_EXPORT gboolean on_axis_delete (GtkWidget * widg, GdkEvent * event, gpointer data);
+
 */
 
 #include "global.h"
@@ -73,7 +76,6 @@ double axis_init_color[3][3] = {{0.0, 0.0, 1.0},{0.0, 1.0, 0.0},{1.0, 0.0, 0.0}}
 double axis_range[3][2] = {{0.0,100.0}, {0.0, 100.0}, {0.0, 100.0}};
 
 extern gboolean from_box_or_axis;
-extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern G_MODULE_EXPORT void set_labels_render (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data);
 #ifdef GTK4
@@ -745,6 +747,36 @@ G_MODULE_EXPORT void set_axis_title (GtkEntry * entry, gpointer data)
 
 #ifdef GTK4
 /*!
+  \fn G_MODULE_EXPORT gboolean on_axis_delete (GtkWindow * widg, gpointer data)
+
+  \brief axis window delete event - GTK4
+
+  \param widg
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_axis_delete (GtkWindow * widg, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT gboolean on_axis_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+
+  \brief axis window delete event - GTK3
+
+  \param widg the GtkWidget sending the signal
+  \param event the GdkEvent triggering the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_axis_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+#endif
+{
+  glwin * view = (glwin *)data;
+  view -> axis_win -> win = destroy_this_widget (view -> axis_win -> win);
+  g_free (view -> axis_win);
+  view -> axis_win = NULL;
+  return TRUE;
+}
+
+#ifdef GTK4
+/*!
   \fn G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
 
   \brief create the axis advanced parameters window callback GTK4
@@ -794,7 +826,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   else
   {
     view = (glwin *)data;
-    if (view -> axis_win == NULL) view -> axis_win = g_malloc0(sizeof*view -> axis_win);
+    view -> axis_win = g_malloc0(sizeof*view -> axis_win);
     the_axis = view -> axis_win;
     axis_type = view -> anim -> last -> img -> box_axis[AXIS];
     axis_line = view -> anim -> last -> img -> box_axis_line[AXIS];
@@ -818,7 +850,10 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   }
   else
   {
-    the_axis -> win = create_win ("Axis settings", view -> win, FALSE, FALSE);
+    the_axis -> win = create_vbox (BSEP);
+    gchar * str = g_strdup_printf ("Axis settings - %s", get_project_by_id(view -> proj)->name);
+    the_axis -> win = create_win (str, view -> win, FALSE, FALSE);
+    g_free (str);
     add_container_child (CONTAINER_WIN, the_axis -> win, vbox);
   }
   GtkWidget * box;
@@ -997,6 +1032,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
   append_comments (the_axis -> axis_data, "<sup>**</sup>", "<i>Inside the atomic model</i>");
   if (! preferences)
   {
+    add_gtk_close_event (the_axis -> win, G_CALLBACK(on_axis_delete), view);
     show_the_widgets (the_axis -> win);
     if (axis_type == CYLINDERS)
     {

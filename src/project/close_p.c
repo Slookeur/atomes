@@ -100,6 +100,21 @@ void close_project (project * to_close)
 
   if (to_close -> initgl)
   {
+    if (to_close -> modelgl -> box_win)
+    {
+      to_close -> modelgl -> box_win -> win = destroy_this_widget (to_close -> modelgl -> box_win -> win);
+      g_free (to_close -> modelgl -> box_win);
+    }
+    if (to_close -> modelgl -> rep_win)
+    {
+      to_close -> modelgl -> rep_win -> win = destroy_this_widget (to_close -> modelgl -> rep_win -> win);
+      g_free (to_close -> modelgl -> rep_win);
+    }
+    if (to_close -> modelgl -> axis_win)
+    {
+      to_close -> modelgl -> axis_win -> win = destroy_this_widget (to_close -> modelgl -> axis_win -> win);
+      g_free (to_close -> modelgl -> axis_win);
+    }
     if (to_close -> modelgl -> measure_win)
     {
       to_close -> modelgl -> measure_win -> win = destroy_this_widget (to_close -> modelgl -> measure_win -> win);

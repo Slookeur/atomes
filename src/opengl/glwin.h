@@ -886,6 +886,13 @@ struct axis_edition
   GtkWidget * axis_color_title[3];
 };
 
+typedef struct rep_edition rep_edition;
+struct rep_edition
+{
+  GtkWidget * win;
+  GtkWidget * camera_widg[7];
+};
+
 /*! \typedef glwin
 
   \brief OpenGL window widget structure */
@@ -927,7 +934,6 @@ struct glwin
   GtkWidget * ogl_smode[NSELECTION];
   GtkWidget * ogl_anim[2];
 #endif
-  GtkWidget * camera_widg[7];
   GtkWidget * rbuild[2];
   GtkWidget * cbuilder;
 
@@ -955,6 +961,7 @@ struct glwin
   builder_edition * builder_win;
   box_edition * box_win;
   axis_edition * axis_win;
+  rep_edition * rep_win;
 
   // OpenGL plot
   GtkWidget * plot;

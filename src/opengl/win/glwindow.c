@@ -724,11 +724,11 @@ void set_motion (glwin * view, int axis, int da, int db, gboolean UpDown, GdkMod
     else
     {
       view -> anim -> last -> img -> c_shift[! axis] += (double) da / view -> pixels[axis];
-      if (view -> camera_widg[! axis + 5])
+      if (view -> rep_win)
       {
-        if (GTK_IS_WIDGET(view -> camera_widg[! axis + 5]))
+        if (view -> rep_win -> camera_widg[! axis + 5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[! axis + 5]))
         {
-          gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[! axis + 5], - view -> anim -> last -> img -> c_shift[! axis]);
+          gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[! axis + 5], - view -> anim -> last -> img -> c_shift[! axis]);
         }
       }
       update (view);

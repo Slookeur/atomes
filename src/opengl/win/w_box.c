@@ -48,8 +48,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #define BOX_STYLES 2
 
-extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
-
 gchar * box_style[BOX_STYLES] = {"Wireframe", "Cylinders"};
 
 gboolean from_box_or_axis = FALSE;
@@ -302,6 +300,36 @@ G_MODULE_EXPORT void set_color_box (GtkColorChooser * colob, gpointer data)
 
 #ifdef GTK4
 /*!
+  \fn G_MODULE_EXPORT gboolean on_box_delete (GtkWindow * widg, gpointer data)
+
+  \brief box window delete event - GTK4
+
+  \param widg
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_box_delete (GtkWindow * widg, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT gboolean on_box_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+
+  \brief box window delete event - GTK3
+
+  \param widg the GtkWidget sending the signal
+  \param event the GdkEvent triggering the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_box_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+#endif
+{
+  glwin * view = (glwin *)data;
+  view -> box_win -> win = destroy_this_widget (view -> box_win -> win);
+  g_free (view -> box_win);
+  view -> box_win = NULL;
+  return TRUE;
+}
+
+#ifdef GTK4
+/*!
   \fn G_MODULE_EXPORT void box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
 
   \brief create the box edition window callback GTK4
@@ -341,7 +369,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   else
   {
     view = (glwin *)data;
-    if (view -> box_win == NULL) view -> box_win = g_malloc0(sizeof*view -> box_win);
+    view -> box_win = g_malloc0(sizeof*view -> box_win);
     the_box = view -> box_win;
     box_type = view -> anim -> last -> img -> box_axis[BOX];
     box_color = view -> anim -> last -> img -> box_color;
@@ -360,7 +388,9 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   }
   else
   {
-    the_box -> win = create_win ("Box settings", view -> win, FALSE, FALSE);
+    gchar * str = g_strdup_printf ("Box settings - %s", get_project_by_id(view -> proj)->name);
+    the_box -> win = create_win (str, view -> win, FALSE, FALSE);
+    g_free (str);
     add_container_child (CONTAINER_WIN, the_box -> win, vbox);
   }
   GtkWidget * box;
@@ -409,6 +439,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
 
   if (! preferences)
   {
+    add_gtk_close_event (the_box -> win, G_CALLBACK(on_box_delete), view);
     show_the_widgets (the_box -> win);
     if (box_type)
     {

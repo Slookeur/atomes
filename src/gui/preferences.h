@@ -89,8 +89,25 @@ struct axis_data
   ColRGBA * color;       /*!< Associated color */
 };
 
+/*! \typedef rep_data
+
+  \brief representation data structure
+*/
+typedef struct rep_data rep_data;
+struct rep_data
+{
+  int rep;
+  GLdouble p_depth;      /*!< Camera depth */
+  GLdouble c_angle[2];   /*!< Camera angle: pitch and heading */
+  GLdouble c_shift[2];   /*!< Camera position: x and y */
+  GLdouble gnear;        /*!< Near plane position */
+  GLdouble gfar;         /*!< Far plane position */
+  GLdouble zoom;         /*!< Zoom factor */
+};
+
 extern float get_radius (int object, int col, int z, element_radius * rad_list);
 extern ColRGBA get_spec_color (int z, element_color * clist);
+extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 
 // Analysis parameters
 
@@ -149,6 +166,9 @@ extern box_edition * pref_box_win;
 extern axis_data default_axis;
 extern axis_data * tmp_axis;
 extern axis_edition * pref_axis_win;
+extern rep_data default_rep;
+extern rep_data * tmp_rep;
+extern rep_edition * pref_rep_win;
 
 extern element_color * default_label_color[2];
 extern element_color * default_atom_color[2];

@@ -63,6 +63,7 @@ extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_f
 extern GtkWidget * labels_tab (glwin * view, int lid);
 extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
@@ -153,10 +154,13 @@ int tmp_mfactor;
 double default_mwidth;
 double tmp_mwidth;
 box_data default_box;
-box_data * tmp_box;
+box_data * tmp_box = NULL;
 box_edition * pref_box_win = NULL;
+rep_data default_rep;
+rep_data * tmp_rep = NULL;
+rep_edition * pref_rep_win = NULL;
 axis_data default_axis;
-axis_data * tmp_axis;
+axis_data * tmp_axis = NULL;
 axis_edition * pref_axis_win = NULL;
 
 gboolean preferences = FALSE;
@@ -1645,12 +1649,22 @@ GtkWidget * view_preferences ()
   GtkWidget * vbox = create_vbox (BSEP);
   gchar * info[2] = {"The <b>View</b> tab regroups representation options",
                      "which effect apply to the general aspect of the model:"};
-  gchar * m_list[2][2] = {{"Representation", "scene orientation"},
+  gchar * m_list[2][2] = {{"Representation", "scene set-up and orientation"},
                           {"Axis", "axis options"}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
+  // Background color
+
+  // Projection combo
+
+  // Tab for representation
+  pref_rep_win = g_malloc0(sizeof*pref_rep_win);
+  representation_advanced (NULL, NULL);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_rep_win -> win, gtk_label_new ("Representation"));
+
+  // Axis
   pref_axis_win = g_malloc0(sizeof*pref_axis_win);
   axis_advanced (NULL, NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_axis_win -> win, gtk_label_new ("Axis"));
@@ -3221,6 +3235,11 @@ void clean_all_tmp ()
     g_free (tmp_axis);
     tmp_axis = NULL;
   }
+  if (tmp_rep)
+  {
+    g_free (tmp_rep);
+    tmp_rep = NULL;
+  }
 }
 
 /*!
@@ -3237,6 +3256,29 @@ void duplicate_box_data (box_data * new_box, box_data * old_box)
   new_box -> color = old_box -> color;
   new_box -> line = old_box -> line;
   new_box -> rad = old_box -> rad;
+}
+
+/*!
+  \fn void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
+
+  \brief duplicate rep_data data structure
+
+  \param new_rep the new rep_data structure
+  \param old_rep the rep_data structure to copy
+*/
+void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
+{
+  new_rep -> rep = old_rep -> rep;
+  new_rep -> zoom = old_rep -> zoom;
+  new_rep -> gnear = old_rep -> gnear;
+  new_rep -> gfar = old_rep -> gfar;
+  new_rep -> p_depth = old_rep -> p_depth;
+  int i;
+  for (i=0; i<2; i++)
+  {
+    new_rep -> c_angle[i] = old_rep -> c_angle[i];
+    new_rep -> c_shift[i] = old_rep -> c_shift[i];
+  }
 }
 
 /*!
@@ -3312,6 +3354,10 @@ void prepare_tmp_default ()
 
   tmp_box = g_malloc0(sizeof*tmp_box);
   duplicate_box_data (tmp_box, & default_box);
+
+  tmp_rep = g_malloc0(sizeof*tmp_rep);
+  duplicate_rep_data (tmp_rep, & default_rep);
+
   tmp_axis = g_malloc0(sizeof*tmp_axis);
   duplicate_axis_data (tmp_axis, & default_axis);
 }
@@ -3408,6 +3454,7 @@ void save_preferences ()
   default_mwidth = tmp_mwidth;
 
   duplicate_box_data (& default_box, tmp_box);
+  duplicate_rep_data (& default_rep, tmp_rep);
   duplicate_axis_data (& default_axis, tmp_axis);
 
   if (nprojects)
@@ -3559,6 +3606,17 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_box.line = DEFAULT_SIZE;
   default_box.rad = 0.05;
 
+  // Representation
+  default_rep.rep = PERSPECTIVE;
+  default_rep.zoom = ZOOM;
+  default_rep.c_angle[0] = - CAMERA_ANGLE_X;
+  default_rep.c_angle[1] = - CAMERA_ANGLE_Y;
+  for (i=0; i<2; i++) default_rep.c_shift[i] = 0.0;
+  default_rep.gnear = 6.0;
+  default_rep.p_depth = 100.0;
+  default_rep.gfar = 2.0;
+
+  // Axis
   default_axis.axis = NONE;
   default_axis.line = DEFAULT_SIZE;
   default_axis.rad = 0.1;
@@ -3621,6 +3679,11 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       pref_pointer = NULL;
       if (pref_box_win) g_free (pref_box_win);
       pref_box_win = NULL;
+      if (pref_rep_win) g_free (pref_rep_win);
+      pref_rep_win = NULL;
+      if (pref_axis_win) g_free (pref_axis_win);
+      pref_axis_win = NULL;
+
       preference_notebook = NULL;
       break;
   }

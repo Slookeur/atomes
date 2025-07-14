@@ -648,11 +648,11 @@ void motion (glwin * view, gint x, gint y, GdkModifierType state)
       view -> anim -> last -> img -> c_shift[1] += (double) (y - view -> mouseY) / view -> pixels[1];
       for (i=0; i<2; i++)
       {
-        if (view -> camera_widg[i+5])
+        if (view -> rep_win)
         {
-          if (GTK_IS_WIDGET(view -> camera_widg[i+5]))
+          if (view -> rep_win -> camera_widg[i+5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+5]))
           {
-            gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+5], - view -> anim -> last -> img -> c_shift[i]);
+            gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+5], - view -> anim -> last -> img -> c_shift[i]);
           }
         }
       }
@@ -1013,11 +1013,11 @@ G_MODULE_EXPORT void on_glwin_button_released (GtkGesture * gesture, int n_press
 void zoom (glwin * view, int delta)
 {
   view -> anim -> last -> img -> zoom += delta * view -> zoom_factor;
-  if (view -> camera_widg[0])
+  if (view -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[0]))
+    if (view -> rep_win  -> camera_widg[0] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[0]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[0], 1.0-0.5*view -> anim -> last -> img -> zoom);
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[0], 1.0-0.5*view -> anim -> last -> img -> zoom);
     }
   }
 }
@@ -1104,11 +1104,11 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
   for (i=0; i<2; i++)
   {
     if (fabs(view -> anim -> last -> img -> c_angle[i]) > 180.0) view -> anim -> last -> img -> c_angle[i] = 0.0;
-    if (view -> camera_widg[i+3])
+    if (view -> rep_win)
     {
-      if (GTK_IS_WIDGET(view -> camera_widg[i+3]))
+      if (view -> rep_win -> camera_widg[i+3] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+3]))
       {
-        gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
+        gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
       }
     }
   }
@@ -1140,19 +1140,19 @@ void init_camera (project * this_proj, int get_depth)
 {
   glwin * view = this_proj -> modelgl;
   if (get_depth) view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  if (view -> camera_widg[1])
+  if (view -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[1]))
+    if (view -> rep_win -> camera_widg[1] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[1]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[1], view -> anim -> last -> img -> p_depth);
+      gtk_spin_button_set_value ((GtkSpinButton *)view  -> rep_win -> camera_widg[1], view -> anim -> last -> img -> p_depth);
     }
   }
   view -> anim -> last -> img -> gnear = 6.0;//view -> anim -> last -> img -> p_depth/15.0;
-  if (view -> camera_widg[2])
+  if (view -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[2]))
+    if (view -> rep_win -> camera_widg[2] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[2]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[2], view -> anim -> last -> img -> gnear);
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[2], view -> anim -> last -> img -> gnear);
     }
   }
   view -> anim -> last -> img -> gfar = view -> anim -> last -> img -> p_depth*2.0;
@@ -1165,22 +1165,22 @@ void init_camera (project * this_proj, int get_depth)
   {
     view -> anim -> last -> img -> c_shift[i] = 0.0;
     view -> anim -> last -> img -> c_angle[i] = 0.0;
-    if (view -> camera_widg[i+5])
+    if (view -> rep_win)
     {
-      if (GTK_IS_WIDGET(view -> camera_widg[i+5]))
+      if (view  -> rep_win-> camera_widg[i+5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+5]))
       {
-        gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+5], view -> anim -> last -> img -> c_shift[i]);
+        gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+5], view -> anim -> last -> img -> c_shift[i]);
       }
     }
   }
   save_rotation_quaternion (view);
   rotate_x_y (view, CAMERA_ANGLE_X, CAMERA_ANGLE_Y);
   view -> anim -> last -> img -> zoom = ZOOM;
-  if (view -> camera_widg[0])
+  if (view  -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[0]))
+    if (view  -> rep_win -> camera_widg[0] && GTK_IS_WIDGET(view  -> rep_win -> camera_widg[0]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[0], 1.0 - 0.5*view -> anim -> last -> img -> zoom);
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[0], 1.0 - 0.5*view -> anim -> last -> img -> zoom);
     }
   }
 }
