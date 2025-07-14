@@ -91,7 +91,7 @@ void prepare_label (atom at, int id, double al)
   }
   else
   {
-    lcol = plot -> labels[id].color[k];
+    lcol = (plot -> labels[id].n_colors) ? plot -> labels[id].color[0] : plot -> labels[id].color[k];
     lcol.alpha = al;
   }
   switch (plot -> acl_format[id])

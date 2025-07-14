@@ -1001,7 +1001,7 @@ GtkWidget * create_combo ()
 /*!
   \fn void setup_text_tags (GtkTextBuffer * buffer)
 
-  \brief prepare the avialable text tags for the GtkTextBuffer
+  \brief prepare the available text tags for the GtkTextBuffer
 
   \param buffer the GtkTextBuffer
 */

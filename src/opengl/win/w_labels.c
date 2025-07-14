@@ -89,10 +89,10 @@ G_MODULE_EXPORT void set_measure_style (GtkComboBox * box, gpointer data)
   tint * id = (tint *) data;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> mpattern = combo_get_active ((GtkWidget *)box);
-    this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> mpattern = combo_get_active ((GtkWidget *)box);
+    view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -112,15 +112,15 @@ G_MODULE_EXPORT void set_labels_format (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
   int i = combo_get_active ((GtkWidget *)box);
-  if (id -> a != -1)
+  if (! preferences)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    if (i != this_proj -> modelgl -> anim -> last -> img -> acl_format[id -> b])
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    if (i != view -> anim -> last -> img -> acl_format[id -> b])
     {
-      this_proj -> modelgl -> anim -> last -> img -> acl_format[id -> b] = i;
-      if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-      if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-      update (this_proj -> modelgl);
+      view -> anim -> last -> img -> acl_format[id -> b] = i;
+      if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+      if (id -> b == 3 || id -> b == 4) view -> create_shaders[MEASU] = TRUE;
+      update (view);
     }
   }
   else
@@ -141,26 +141,26 @@ G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
   int i = combo_get_active ((GtkWidget *)box);
-  if (id -> a != -1)
+  if (! preferences)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    if (i != this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].render)
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    if (i != view -> anim -> last -> img -> labels[id -> b].render)
     {
-      this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].render = i;
+      view -> anim -> last -> img -> labels[id -> b].render = i;
       if (id -> b < 2)
       {
-        this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
+        view -> create_shaders[LABEL] = TRUE;
       }
       else if (id -> b == 2)
       {
-        this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
+        view -> create_shaders[MAXIS] = TRUE;
       }
       else if (id -> b == 3 || id -> b == 4)
       {
-        combo_set_active (tilt, this_proj -> modelgl -> anim -> last -> img -> mtilt);
-        this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
+        combo_set_active (tilt, view -> anim -> last -> img -> mtilt);
+        view -> create_shaders[MEASU] = TRUE;
       }
-      update (this_proj -> modelgl);
+      update (view);
     }
   }
   else
@@ -252,22 +252,22 @@ G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data)
   tint * id = (tint *) data;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    g_free (this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].font);
-    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    g_free (view -> anim -> last -> img -> labels[id -> b].font);
+    view -> anim -> last -> img -> labels[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
     if (id -> b < 2)
     {
-      this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
+      view -> create_shaders[LABEL] = TRUE;
     }
     else if (id -> b == 2)
     {
-      this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
+      view -> create_shaders[MAXIS] = TRUE;
     }
     else if (id -> b == 3 || id -> b == 4)
     {
-      this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
+      view -> create_shaders[MEASU] = TRUE;
     }
-    update (this_proj -> modelgl);
+    update (view);
   }
   else
   {
@@ -288,11 +288,11 @@ G_MODULE_EXPORT void set_label_color (GtkColorChooser * colob, gpointer data)
   tint * id = (tint *) data;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].color[id -> c] = get_button_color (colob);
-    if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-    if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> labels[id -> b].color[id -> c] = get_button_color (colob);
+    if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+    if (id -> b == 3 || id -> b == 4) view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -314,11 +314,11 @@ G_MODULE_EXPORT void set_labels_position (GtkComboBox * box, gpointer data)
   int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].position = i;
-    if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-    if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> labels[id -> b].position = i;
+    if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+    if (id -> b == 3 || id -> b == 4) view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -341,10 +341,10 @@ void label_shift_has_changed (gpointer data, double value)
   int j = id -> b - i * 10;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> labels[i].shift[j] = value;
-    if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> labels[i].shift[j] = value;
+    if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+    update (view);
   }
   else
   {
@@ -407,12 +407,12 @@ G_MODULE_EXPORT void set_labels_scale (GtkToggleButton * but, gpointer data)
   int i = button_get_status ((GtkWidget *)but);
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> labels[id -> b].scale = i;
-    if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-    if (id -> b == 2) this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
-    if (id -> b == 3 || id -> b == 4) this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> labels[id -> b].scale = i;
+    if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+    if (id -> b == 2) view -> create_shaders[MAXIS] = TRUE;
+    if (id -> b == 3 || id -> b == 4) view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -434,11 +434,11 @@ G_MODULE_EXPORT void set_labels_tilt (GtkComboBox * box, gpointer data)
   int i = combo_get_active ((GtkWidget *)box);
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> mtilt = i;
-    if (id -> b < 2) this_proj -> modelgl -> create_shaders[LABEL] = TRUE;
-    if (id -> b == 3 || id -> b == 4) this_proj -> modelgl  -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> mtilt = i;
+    if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
+    if (id -> b == 3 || id -> b == 4) view  -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -459,10 +459,10 @@ void mesure_factor_has_changed (gpointer data, double value)
   tint * id = (tint *) data;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> mfactor = (int)value;
-    this_proj -> modelgl  -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> mfactor = (int)value;
+    view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -512,10 +512,10 @@ void measure_width_has_changed (gpointer data, double value)
   tint * id = (tint *) data;
   if (id -> a != -1)
   {
-    project * this_proj = get_project_by_id(id -> a);
-    this_proj -> modelgl -> anim -> last -> img -> mwidth = value;
-    this_proj -> modelgl  -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> mwidth = value;
+    view  -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
   else
   {
@@ -578,8 +578,8 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
 #endif
 {
   tint * id = (tint *) data;
-  project * this_proj;
-  if (id -> a != -1) this_proj = get_project_by_id(id -> a);
+  glwin * view;
+  if (id -> a != -1) view = get_project_by_id(id -> a) -> modelgl;
   int i, j;
   i = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (line_box, i);
@@ -587,7 +587,7 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
   {
     if (id -> a != -1)
     {
-      j = this_proj -> modelgl -> anim -> last -> img -> mpattern = 0;
+      j = view -> anim -> last -> img -> mpattern = 0;
     }
     else
     {
@@ -598,7 +598,7 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
   {
     if (id -> a != -1)
     {
-      j = this_proj -> modelgl -> anim -> last -> img -> mpattern = -1;
+      j = view -> anim -> last -> img -> mpattern = -1;
     }
     else
     {
@@ -608,8 +608,8 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
   combo_set_active (lstyle, j);
   if (id -> a != -1)
   {
-    this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
-    update (this_proj -> modelgl);
+    view -> create_shaders[MEASU] = TRUE;
+    update (view);
   }
 }
 

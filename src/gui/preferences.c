@@ -734,16 +734,17 @@ int save_preferences_to_xml_file ()
     if (! rc) return 0;
     rc = xml_save_xyz_to_file (writer, 4, xml_label_leg[4], "default_label", vec3(default_label[i].shift[0], default_label[i].shift[1], default_label[i].shift[2]));
     if (! rc) return 0;
-    str = g_strdup_printf ("%d", default_label[i].n_colors);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[5], "default_label", TRUE, 5, str);
+    str = g_strdup_printf ("%d", default_acl_format[i]);
+    rc = xml_save_parameter_to_file (writer, "Format", "default_label", TRUE, 5, str);
     g_free (str);
+    if (! rc) return 0;
     if (default_label[i].n_colors || default_label_color[i])
     {
       rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
       if (rc < 0) return 0;
       if (default_label[i].n_colors)
       {
-        xml_save_color_to_file (writer, 0, "only_label_color", "default_label_color", default_label[i].color[0]);
+        xml_save_color_to_file (writer, i, "Only label color", "only_label_color", default_label[i].color[0]);
       }
       else
       {
@@ -814,6 +815,53 @@ int save_preferences_to_xml_file ()
   // View
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"view");
   if (rc < 0) return 0;
+
+  // Representation
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"representation");
+  if (rc < 0) return 0;
+
+  str = g_strdup_printf ("%d", default_rep.rep);
+  rc = xml_save_parameter_to_file (writer, "Representation type", "default_rep", TRUE, 0, str);
+  g_free (str);
+  if (! rc) return 0;
+  if (default_rep.rep)
+  {
+
+    str = g_strdup_printf ("%lf", default_rep.p_depth);
+    rc = xml_save_parameter_to_file (writer, "Perspective depth", "default_rep", TRUE, 1, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%lf", default_rep.gnear);
+    rc = xml_save_parameter_to_file (writer, "Near", "default_rep", TRUE, 2, str);
+    g_free (str);
+    if (! rc) return 0;
+  }
+  str = g_strdup_printf ("%lf", default_rep.gfar);
+  rc = xml_save_parameter_to_file (writer, "Far", "default_rep", TRUE, 3, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%lf", default_rep.zoom);
+  rc = xml_save_parameter_to_file (writer, "Zoom", "default_rep", TRUE, 4, str);
+  g_free (str) ;
+  if (! rc) return 0;
+  for (i=0; i<2; i++)
+  {
+    str = g_strdup_printf ("%lf", default_rep.c_angle[i]);
+    rc = xml_save_parameter_to_file (writer, (i) ? "Camera pitch" : "Camera heading", "default_rep", TRUE, 5, str);
+    g_free (str) ;
+    if (! rc) return 0;
+  }
+  for (i=0; i<2; i++)
+  {
+    str = g_strdup_printf ("%lf", default_rep.c_shift[i]);
+    rc = xml_save_parameter_to_file (writer, (i) ? "Camera x" : "Camera y", "default_rep", TRUE, 7, str);
+    g_free (str) ;
+    if (! rc) return 0;
+  }
+  // End representation
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
 
   if (default_axis.axis != NONE)
   {
@@ -1088,7 +1136,7 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
         default_label[label_id].shift[2] = vect -> z;
         break;
       case 5:
-        default_label[label_id].n_colors = (int)xml_string_to_double(content);
+        default_acl_format[label_id] = (int)xml_string_to_double(content);
         break;
     }
   }
@@ -1140,6 +1188,12 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
     tmp_col -> Z = vid;
     tmp_col -> col = * col;
   }
+  else if (g_strcmp0(key, "only_label_color") == 0)
+  {
+    default_label[label_id].n_colors = 1;
+    default_label[label_id].color = g_malloc0(sizeof*default_label[label_id].color);
+    default_label[label_id].color[0] = * col;
+  }
   else if (g_strcmp0(key, "default_box") == 0)
   {
     if (col)
@@ -1159,11 +1213,41 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
       }
     }
   }
+  else if (g_strcmp0(key, "default_rep") == 0)
+  {
+    switch (vid)
+    {
+      case 0:
+        default_rep.rep = (int) xml_string_to_double(content);
+        break;
+      case 1:
+        default_rep.p_depth = xml_string_to_double(content);
+        break;
+      case 2:
+        default_rep.gnear = xml_string_to_double(content);
+        break;
+      case 3:
+        default_rep.gfar = xml_string_to_double(content);
+        break;
+      case 4:
+        default_rep.zoom = xml_string_to_double(content);
+        break;
+      default:
+        if (vid < 7)
+        {
+          default_rep.c_angle[vid-5] = xml_string_to_double(content);
+        }
+        else
+        {
+          default_rep.c_shift[vid-7] = xml_string_to_double(content);
+        }
+        break;
+    }
+  }
   else if (g_strcmp0(key, "default_axis") == 0)
   {
     if (vect)
     {
-      g_print ("Yes vect ?!\n");
       default_axis.c_pos[0] = vect -> x;
       default_axis.c_pos[1] = vect -> y;
       default_axis.c_pos[2] = vect -> z;
@@ -1548,6 +1632,11 @@ void read_preferences_from_xml_file ()
         if (node)
         {
           read_preferences (node);
+           p_node = findnode(node -> children, "represenatation");
+          if (p_node)
+          {
+            read_preferences (p_node);
+          }
           p_node = findnode(node -> children, "axis");
           if (p_node)
           {
@@ -3269,6 +3358,7 @@ void duplicate_box_data (box_data * new_box, box_data * old_box)
 void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
 {
   new_rep -> rep = old_rep -> rep;
+  new_rep -> proj = old_rep -> proj;
   new_rep -> zoom = old_rep -> zoom;
   new_rep -> gnear = old_rep -> gnear;
   new_rep -> gfar = old_rep -> gfar;
@@ -3608,6 +3698,7 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
 
   // Representation
   default_rep.rep = PERSPECTIVE;
+  default_rep.proj = -1;
   default_rep.zoom = ZOOM;
   default_rep.c_angle[0] = - CAMERA_ANGLE_X;
   default_rep.c_angle[1] = - CAMERA_ANGLE_Y;

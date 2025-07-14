@@ -296,6 +296,11 @@ int read_this_image_label (FILE * fp, screen_label * label)
       if (fread (& label -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
     }
   }
+  else if (label -> color)
+  {
+    g_free (label -> color);
+    label -> color = NULL;
+  }
   label -> font = read_this_string (fp);
   if (label -> font == NULL) return ERROR_RW;
   return OK;

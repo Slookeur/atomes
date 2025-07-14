@@ -97,6 +97,7 @@ typedef struct rep_data rep_data;
 struct rep_data
 {
   int rep;
+  int proj;
   GLdouble p_depth;      /*!< Camera depth */
   GLdouble c_angle[2];   /*!< Camera angle: pitch and heading */
   GLdouble c_shift[2];   /*!< Camera position: x and y */

@@ -1332,7 +1332,7 @@ void init_img (project * this_proj)
   }
   img -> quality = default_opengl[3];
   img -> render = FILL;
-  img -> rep = PERSPECTIVE;
+  img -> rep = default_rep.rep;
   img -> filled_type = NONE;
   // Visual styles
   if (! default_opengl[0])
@@ -1361,8 +1361,8 @@ void init_img (project * this_proj)
   for (i=0; i<2; i++)
   {
     img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
+    img -> acl_format[i] = default_acl_format[i];
   }
-
   if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
   set_img_lights (this_proj, img);
