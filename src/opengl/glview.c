@@ -1364,7 +1364,7 @@ void init_img (project * this_proj)
     img -> style = SPACEFILL;
     img -> filled_type = - default_opengl[0] - 1;
   }
-  img -> box_axis[AXIS] = default_axis.axis;
+  img -> box_axis[AXIS] = (this_proj -> natomes) ? default_axis.axis : NONE;
   img -> box_axis[BOX] = (this_proj -> cell.ltype) ? default_box.box : NONE;
 
   for (i=0; i<5; i++)

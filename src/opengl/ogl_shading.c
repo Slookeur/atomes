@@ -826,7 +826,7 @@ void set_lights_data (glsl_program * glsl)
   for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[3+j], plot -> m_terial.param[j+1]);
   glUniform1i (glsl -> light_uniform[8], plot -> f_g.mode);
   glUniform1i (glsl -> light_uniform[9], plot -> f_g.based);
-  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density);
+  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density/plot -> p_depth);
   glUniform2f (glsl -> light_uniform[11], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
   glUniform3f (glsl -> light_uniform[12], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
   glUniform1i (glsl -> light_uniform[13], plot -> l_ghtning.lights);

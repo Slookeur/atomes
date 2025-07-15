@@ -1408,15 +1408,18 @@ void fog_param_changed (gpointer data, GLfloat u, GtkRange * range)
 {
   dint * fid = (dint *)data;
   Fog * this_fog;
+  opengl_edition * ogl_edit;
   glwin * view;
   if (! preferences)
   {
     view = get_project_by_id (fid -> a) -> modelgl;
     this_fog = & view -> anim -> last -> img -> f_g;
+    ogl_edit = view -> opengl_win;
   }
   else
   {
     this_fog = & tmp_fog;
+    ogl_edit = pref_ogl_edit;
   }
   GLfloat v, w;
   if (fid -> b > 0)
@@ -1431,7 +1434,7 @@ void fog_param_changed (gpointer data, GLfloat u, GtkRange * range)
     {
       this_fog -> depth[1] = u;
     }
-    else if (view -> opengl_win)
+    else if (ogl_edit)
     {
       if (fid -> b == 1)
       {
@@ -1599,7 +1602,7 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fogtype, FALSE, FALSE, 0);
 
   ogl_edit -> dens_box =  adv_box (ogl_edit -> param_fog, "<b>Fog density</b>", 10, 150.0, 0.0);
-  ogl_edit -> fog_range[0] = create_hscale (0.0, 1.0, 0.0001, the_fog -> density, GTK_POS_TOP, 5,
+  ogl_edit -> fog_range[0] = create_hscale (0.0, 1.0, 0.01, the_fog -> density, GTK_POS_TOP, 3,
                                             250, G_CALLBACK(set_fog_param), G_CALLBACK(scroll_set_fog_param), & ogl_edit -> pointer[0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ogl_edit -> dens_box, ogl_edit -> fog_range[0], FALSE, FALSE, 0);
 

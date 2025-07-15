@@ -682,7 +682,7 @@ void insert_object (int action, gpointer data)
       inserted_from_lib = 0;
     }
     clean_other_window_after_edit (opengl_project);
-    show_info (str, 0, opengl_project -> modelgl -> win);
+    if (action == 1) show_info (str, 0, opengl_project -> modelgl -> win);
     g_free (str);
   }
   insert_search = free_this_search_data (insert_search);

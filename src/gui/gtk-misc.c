@@ -747,8 +747,8 @@ gboolean is_the_widget_visible (GtkWidget * widg)
 
 /*!
   \fn GtkWidget * create_hscale (float min, float max, float delta,
-                              float val, int pos, int round, int size,
-                              GCallback handler, GCallback scroll_handler, gpointer data)
+                                 float val, int pos, int round, int size,
+                                 GCallback handler, GCallback scroll_handler, gpointer data)
 
   \brief create an horizontal scale GtkWidget
 

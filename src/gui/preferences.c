@@ -2725,14 +2725,18 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 
   edit_scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, edit_scrol, pref_tree);
-  if (num_col == 8)
+  if (! do_label)
   {
-    gchar * legend={"\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
-                    "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
-                    "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
-                    "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
-                    "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
-     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<i>User defined values appear in colored bold font.</i>", -1, 40, 0.5, 0.5), FALSE, FALSE, 0);
+    if (num_col == 8)
+    {
+      gchar * legend={"\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
+                      "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
+                      "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
+                      "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
+                      "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
+       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
+   }
   }
   else if (do_label)
   {
@@ -3638,9 +3642,9 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   // Fog
   default_fog.mode = 0;
   default_fog.based = 0;
-  default_fog.density = 0.05;
-  default_fog.depth[0] = 1.0;
-  default_fog.depth[1] = 90.0;
+  default_fog.density = 0.5;
+  default_fog.depth[0] = 15.0;
+  default_fog.depth[1] = 40.0;
   default_fog.color = vec3 (0.01f, 0.01f, 0.01f);
 
   // Model

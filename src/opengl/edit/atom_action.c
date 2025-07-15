@@ -49,6 +49,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "atom_edit.h"
 #include "curve.h"
+#include "preferences.h"
 
 /*!
   \fn void free_dummies (dummy_atom * tmp_pick)
@@ -227,6 +228,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   else if (! this_proj -> natomes)
   {
     edit -> coord = NULL;
+    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = default_axis.axis;
   }
   gboolean passivate = FALSE;
   if (asearch -> action == REMOVE)
