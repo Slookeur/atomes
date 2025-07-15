@@ -35,7 +35,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT gboolean on_rep_delete (GtkWidget * widg, GdkEvent * event, gpointer data);
 
   void update_labels (glwin * view);
-  void camera_has_changed (gdouble value, gpointer data, gboolean update_it);
+  void camera_has_changed (gdouble value, gpointer data);
 
   G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void to_reset_view (GSimpleAction * action, GVariant * parameter, gpointer data);
@@ -91,15 +91,14 @@ void update_labels (glwin * view)
 }
 
 /*!
-  \fn void camera_has_changed (gdouble value, gpointer data, gboolean update_it)
+  \fn void camera_has_changed (gdouble value, gpointer data)
 
   \brief update camera data
 
   \param value the new value
   \param data the associated data pointer
-  \param update_it update rendering (1/0)
 */
-void camera_has_changed (gdouble value, gpointer data, gboolean update_it)
+void camera_has_changed (gdouble value, gpointer data)
 {
   tint * cid = (tint *)data;
   glwin * view;
@@ -112,7 +111,8 @@ void camera_has_changed (gdouble value, gpointer data, gboolean update_it)
   if (preferences)
   {
     the_rep = pref_rep_win;
-    p_depth = & tmp_rep -> p_depth;
+    GLdouble val = 10000.0;
+    p_depth = & val;
     c_angle = tmp_rep -> c_angle;
     c_shift = tmp_rep -> c_shift;
     gnear = & tmp_rep -> gnear;
@@ -171,21 +171,14 @@ void camera_has_changed (gdouble value, gpointer data, gboolean update_it)
           else
           {
             v = c_angle[cid -> b - 3] - value;
-            if (update_it)
+            save_rotation_quaternion (view);
+            if (cid -> b == 3)
             {
-              save_rotation_quaternion (view);
-              if (cid -> b == 3)
-              {
-                rotate_x_y (view, v, 0.0);
-              }
-              else
-              {
-                rotate_x_y (view, 0.0, v);
-              }
+              rotate_x_y (view, v, 0.0);
             }
             else
             {
-              c_angle[cid -> b - 3] = value;
+              rotate_x_y (view, 0.0, v);
             }
           }
           gtk_spin_button_set_value ((GtkSpinButton *)the_rep -> camera_widg[cid -> b], value);
@@ -200,6 +193,7 @@ void camera_has_changed (gdouble value, gpointer data, gboolean update_it)
   if (! preferences)
   {
     update_labels (view);
+    if (view -> anim -> last -> img -> box_axis[1] != NONE) view -> create_shaders[MAXIS] = TRUE;
     update (view);
   }
 }
@@ -223,14 +217,8 @@ G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data)
     tmp_rep -> c_angle[1] = - CAMERA_ANGLE_Y;
     for (i=0; i<2; i++) tmp_rep -> c_shift[i] = 0.0;
     tmp_rep -> gnear = 6.0;
-    tmp_rep -> p_depth = 100.0;
-    tmp_rep -> gfar = 2.0;
     if (pref_rep_win)
     {
-      if (pref_rep_win -> camera_widg[1] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[1]))
-      {
-        gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[1], tmp_rep -> p_depth);
-      }
       if (pref_rep_win -> camera_widg[2] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[2]))
       {
         gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[2], tmp_rep -> gnear);
@@ -248,7 +236,7 @@ G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data)
       }
       if (pref_rep_win -> camera_widg[0] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[0]))
       {
-        gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[0], tmp_rep -> zoom);
+        gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[0], 1.0 - 0.5*tmp_rep -> zoom);
       }
     }
   }
@@ -302,7 +290,7 @@ G_MODULE_EXPORT void to_reset_view (GtkWidget * widg, gpointer data)
 */
 G_MODULE_EXPORT gboolean scroll_set_camera (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data)
 {
-  camera_has_changed (value, data, TRUE);
+  camera_has_changed (value, data);
   return FALSE;
 }
 
@@ -316,7 +304,7 @@ G_MODULE_EXPORT gboolean scroll_set_camera (GtkRange * range, GtkScrollType scro
 */
 G_MODULE_EXPORT void set_camera (GtkRange * range, gpointer data)
 {
-  camera_has_changed (gtk_range_get_value (range), data, TRUE);
+  camera_has_changed (gtk_range_get_value (range), data);
 }
 
 /*!
@@ -329,7 +317,7 @@ G_MODULE_EXPORT void set_camera (GtkRange * range, gpointer data)
 */
 G_MODULE_EXPORT void set_camera_spin (GtkSpinButton * res, gpointer data)
 {
-  camera_has_changed (gtk_spin_button_get_value(res), data, TRUE);
+  camera_has_changed (gtk_spin_button_get_value(res), data);
 }
 
 #ifdef GTK4
@@ -444,7 +432,8 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
   double sdel[7] = {0.001, 0.01, 0.01, 0.1, 0.1, 0.01, 0.01};
   int sdig[7] = {3, 2, 2, 1, 1, 2, 2};
   int i;
-  double v;
+  double max_depth;
+  double v, v_max;
   glwin * view;
   rep_edition * the_rep;
   GtkWidget * hbox;
@@ -457,11 +446,13 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     the_rep = pref_rep_win;
     the_rep -> win = create_vbox (BSEP);
     rep = tmp_rep -> rep;
+    max_depth = 100.0;
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_rep -> win, vbox, FALSE, FALSE, 10);
   }
   else
   {
     view = (glwin *)data;
+    max_depth = view -> anim -> last -> img -> m_depth;
     if (view -> rep_win)
     {
       if (view -> rep_win -> win && GTK_IS_WIDGET(view -> rep_win -> win))
@@ -526,58 +517,62 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
       pvbox = create_vbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
     }
+
     for (i=0; i<7; i++)
     {
-      hbox = abox ((preferences) ? pvbox : vbox, cam_opts[i], 0);
-      switch (i)
+      if (! preferences || i != 1)
       {
-        case 0:
-          v = 1.0-0.5*((preferences) ? tmp_rep -> zoom : view -> anim -> last -> img -> zoom);
-          break;
-        case 1:
-          v = (preferences) ? tmp_rep -> p_depth : view -> anim -> last -> img -> p_depth;
-          break;
-        case 2:
-          v = (preferences) ? tmp_rep -> gnear : view -> anim -> last -> img -> gnear;
-          break;
-        default:
-          if (i < 5)
-          {
-            v = (preferences) ? tmp_rep -> c_angle[i-3] : view -> anim -> last -> img -> c_angle[i-3];
-          }
-          else
-          {
-            if (preferences)
+        hbox = abox ((preferences) ? pvbox : vbox, cam_opts[i], 0);
+        switch (i)
+        {
+          case 0:
+            v = 1.0-0.5*((preferences) ? tmp_rep -> zoom : view -> anim -> last -> img -> zoom);
+            break;
+          case 1:
+            v = view -> anim -> last -> img -> p_depth;
+            break;
+          case 2:
+            v = (preferences) ? tmp_rep -> gnear : view -> anim -> last -> img -> gnear;
+            break;
+          default:
+            if (i < 5)
             {
-              v = (tmp_rep -> c_shift[i-5] == 0.0) ? 0.0 : - tmp_rep -> c_shift[i-5];
+              v = (preferences) ? tmp_rep -> c_angle[i-3] : view -> anim -> last -> img -> c_angle[i-3];
             }
             else
             {
-              v = (view -> anim -> last -> img -> c_shift[i-5] == 0.0) ? 0.0 : - view -> anim -> last -> img -> c_shift[i-5];
+              if (preferences)
+              {
+                v = (tmp_rep -> c_shift[i-5] == 0.0) ? 0.0 : - tmp_rep -> c_shift[i-5];
+              }
+              else
+              {
+                v = (view -> anim -> last -> img -> c_shift[i-5] == 0.0) ? 0.0 : - view -> anim -> last -> img -> c_shift[i-5];
+              }
             }
-          }
-          break;
+            break;
+        }
+        if (the_rep -> camera_widg[i]) the_rep -> camera_widg[i] = destroy_this_widget (the_rep -> camera_widg[i]);
+        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 10000.0 : smax[i];
+        the_rep -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], v_max, sdel[i], sdig[i], 150, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
+        if (i > 2 || i == 0)
+        {
+          str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
+        }
+        else if (i == 1)
+        {
+          str = g_strdup_printf ("in [<b>C</b>. depth, %.1f]", max_depth);
+        }
+        else
+        {
+          str = (preferences) ? g_strdup_printf ("in [%.1f, <b>P</b>. depth<sup>*</sup>]", smin[i]) : g_strdup_printf ("in [%.1f, <b>P</b>. depth]", smin[i]);
+        }
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
+        g_free (str);
+        if ((i == 1 || i == 2) && rep == ORTHOGRAPHIC) widget_set_sensitive (the_rep -> camera_widg[i], 0);
       }
-      if (the_rep -> camera_widg[i]) the_rep -> camera_widg[i] = destroy_this_widget (the_rep -> camera_widg[i]);
-      the_rep -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], smax[i], sdel[i], sdig[i], 150, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
-      if (i > 2 || i == 0)
-      {
-        str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
-      }
-      else if (i == 1)
-      {
-        str = g_strdup_printf ("in [<b>C</b>. depth, %.1f]", smax[i]);
-      }
-      else
-      {
-        str = g_strdup_printf ("in [%.1f, <b>P</b>. depth]", smin[i]);
-      }
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
-      g_free (str);
-      if(i < 3 && rep == ORTHOGRAPHIC) widget_set_sensitive (the_rep -> camera_widg[i], 0);
     }
-
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? "Reset" : "Reset view", IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
@@ -585,6 +580,10 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     {
       add_gtk_close_event (the_rep -> win, G_CALLBACK(on_rep_delete), view);
       show_the_widgets (the_rep -> win);
+    }
+    else
+    {
+      append_comments (the_rep -> win, "<sup>*</sup>", "<i>Perspective depth evaluated from the model</i>");
     }
   }
 }

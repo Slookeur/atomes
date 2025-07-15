@@ -98,11 +98,9 @@ struct rep_data
 {
   int rep;
   int proj;
-  GLdouble p_depth;      /*!< Camera depth */
   GLdouble c_angle[2];   /*!< Camera angle: pitch and heading */
   GLdouble c_shift[2];   /*!< Camera position: x and y */
-  GLdouble gnear;        /*!< Near plane position */
-  GLdouble gfar;         /*!< Far plane position */
+  GLdouble gnear;        /*!< Camera depth position */
   GLdouble zoom;         /*!< Zoom factor */
 };
 

@@ -292,7 +292,7 @@ gchar * set_field_atom_name (field_atom* ato, field_molecule * mol)
 /*!
   \fn field_atom* init_field_atom (int id, int type, int at, int nat, int coo, int * list)
 
-  \brief intialize a new type of field atom
+  \brief initialize a new type of field atom
 
   \param id the new field atom id
   \param type the new field atom coordination type
@@ -502,7 +502,7 @@ field_rigid * init_field_rigid (int id, int num, int * list)
 /*!
   \fn field_tethered * init_field_tethered (int id, int num)
 
-  \brief intialize new field tethered potential
+  \brief initialize new field tethered potential
 
   \param id the new field tethered potential id
   \param num the atom id in the field molecule
@@ -729,7 +729,7 @@ field_struct * init_field_struct (int st, int ai, int an, int * aid)
 /*!
   \fn field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int ** ba)
 
-  \brief intialize new field non bonded interaction
+  \brief initialize new field non bonded interaction
 
   \param bi the new non bonded interaction id
   \param bd the type of non bonded interaction
@@ -783,7 +783,7 @@ field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int *
 /*!
   \fn field_external * init_field_external (int bi)
 
-  \brief intialize new field external potential
+  \brief initialize new field external potential
 
   \param bi the id of the new field external potential
 */

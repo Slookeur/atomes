@@ -54,7 +54,7 @@ enum position {
   BACK   = 5  /*!< 5 */
 };
 
-extern void camera_has_changed (gdouble value, gpointer data, gboolean update_it);
+extern void camera_has_changed (gdouble value, gpointer data);
 
 /*!
   \fn G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
@@ -97,8 +97,8 @@ G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
   }
   if (preferences)
   {
-    camera_has_changed (angle_x, & pref_pointer[3], FALSE);
-    camera_has_changed (angle_y, & pref_pointer[4], FALSE);
+    camera_has_changed (angle_x, & pref_pointer[3]);
+    camera_has_changed (angle_y, & pref_pointer[4]);
   }
   else
   {
@@ -115,10 +115,18 @@ G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
     glwin * view = get_project_by_id(id -> a) -> modelgl;
     view -> anim -> last -> img -> rotation_quaternion = q4_mul (q_a, q_b);
     update (view);
-    if (view -> rep_win)
+    view -> anim -> last -> img -> c_angle[0] = - angle_x;
+    view -> anim -> last -> img -> c_angle[1] = - angle_y;
+    int i;
+    for (i=0; i<2; i++)
     {
-      camera_has_changed (angle_x, & view -> colorp[3][0], FALSE);
-      camera_has_changed (angle_y, & view -> colorp[4][0], FALSE);
+      if (view -> rep_win)
+      {
+        if (view -> rep_win -> camera_widg[i+3] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+3]))
+        {
+          gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
+        }
+      }
     }
   }
 }

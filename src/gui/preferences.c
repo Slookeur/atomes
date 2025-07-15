@@ -826,35 +826,27 @@ int save_preferences_to_xml_file ()
   if (! rc) return 0;
   if (default_rep.rep)
   {
-
-    str = g_strdup_printf ("%lf", default_rep.p_depth);
-    rc = xml_save_parameter_to_file (writer, "Perspective depth", "default_rep", TRUE, 1, str);
-    g_free (str);
-    if (! rc) return 0;
     str = g_strdup_printf ("%lf", default_rep.gnear);
-    rc = xml_save_parameter_to_file (writer, "Near", "default_rep", TRUE, 2, str);
+    rc = xml_save_parameter_to_file (writer, "Camera depth", "default_rep", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
   }
-  str = g_strdup_printf ("%lf", default_rep.gfar);
-  rc = xml_save_parameter_to_file (writer, "Far", "default_rep", TRUE, 3, str);
-  g_free (str);
-  if (! rc) return 0;
-  str = g_strdup_printf ("%lf", default_rep.zoom);
-  rc = xml_save_parameter_to_file (writer, "Zoom", "default_rep", TRUE, 4, str);
+
+  str = g_strdup_printf ("%lf", 1.0 - 0.5*default_rep.zoom);
+  rc = xml_save_parameter_to_file (writer, "Zoom", "default_rep", TRUE, 2, str);
   g_free (str) ;
   if (! rc) return 0;
   for (i=0; i<2; i++)
   {
-    str = g_strdup_printf ("%lf", default_rep.c_angle[i]);
-    rc = xml_save_parameter_to_file (writer, (i) ? "Camera pitch" : "Camera heading", "default_rep", TRUE, 5, str);
+    str = g_strdup_printf ("%lf", - default_rep.c_angle[i]);
+    rc = xml_save_parameter_to_file (writer, (i) ? "Camera pitch" : "Camera heading", "default_rep", TRUE, 3+i, str);
     g_free (str) ;
     if (! rc) return 0;
   }
   for (i=0; i<2; i++)
   {
     str = g_strdup_printf ("%lf", default_rep.c_shift[i]);
-    rc = xml_save_parameter_to_file (writer, (i) ? "Camera x" : "Camera y", "default_rep", TRUE, 7, str);
+    rc = xml_save_parameter_to_file (writer, (i) ? "Camera x" : "Camera y", "default_rep", TRUE, 5+i, str);
     g_free (str) ;
     if (! rc) return 0;
   }
@@ -1221,25 +1213,19 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
         default_rep.rep = (int) xml_string_to_double(content);
         break;
       case 1:
-        default_rep.p_depth = xml_string_to_double(content);
-        break;
-      case 2:
         default_rep.gnear = xml_string_to_double(content);
         break;
-      case 3:
-        default_rep.gfar = xml_string_to_double(content);
-        break;
-      case 4:
-        default_rep.zoom = xml_string_to_double(content);
+      case 2:
+        default_rep.zoom = 2.0*(1.0 - xml_string_to_double(content));
         break;
       default:
-        if (vid < 7)
+        if (vid < 5)
         {
-          default_rep.c_angle[vid-5] = xml_string_to_double(content);
+          default_rep.c_angle[vid-3] = - xml_string_to_double(content);
         }
         else
         {
-          default_rep.c_shift[vid-7] = xml_string_to_double(content);
+          default_rep.c_shift[vid-5] = xml_string_to_double(content);
         }
         break;
     }
@@ -1632,7 +1618,7 @@ void read_preferences_from_xml_file ()
         if (node)
         {
           read_preferences (node);
-           p_node = findnode(node -> children, "represenatation");
+           p_node = findnode(node -> children, "representation");
           if (p_node)
           {
             read_preferences (p_node);
@@ -3361,8 +3347,6 @@ void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
   new_rep -> proj = old_rep -> proj;
   new_rep -> zoom = old_rep -> zoom;
   new_rep -> gnear = old_rep -> gnear;
-  new_rep -> gfar = old_rep -> gfar;
-  new_rep -> p_depth = old_rep -> p_depth;
   int i;
   for (i=0; i<2; i++)
   {
@@ -3549,7 +3533,7 @@ void save_preferences ()
 
   if (nprojects)
   {
-    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active sesssion !\n Do you want to apply prefernces to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
       // To write apply to opened projects
     }
@@ -3704,8 +3688,6 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_rep.c_angle[1] = - CAMERA_ANGLE_Y;
   for (i=0; i<2; i++) default_rep.c_shift[i] = 0.0;
   default_rep.gnear = 6.0;
-  default_rep.p_depth = 100.0;
-  default_rep.gfar = 2.0;
 
   // Axis
   default_axis.axis = NONE;

@@ -35,6 +35,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   GLfloat ** allocdGLfloat (int xal, int yal);
 
+  GLdouble get_max_depth (GLdouble depth);
+
   gboolean is_GLExtension_Supported (const char * extension);
 
   G_MODULE_EXPORT gboolean on_motion (GtkWidget * widg, GdkEvent * event, gpointer data);
@@ -1129,9 +1131,36 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
 }
 
 /*!
+  \fn GLdouble get_max_depth (GLdouble depth)
+
+  \brief guess a reasonable maximum OpenGL window depth
+
+  \param depth the calculated model depth
+*/
+GLdouble get_max_depth (GLdouble depth)
+{
+  if (depth < 10.0)
+  {
+    return 10.0;
+  }
+  else if (depth < 100.0)
+  {
+    return 100.0;
+  }
+  else if (depth < 1000.0)
+  {
+    return 1000.0;
+  }
+  else
+  {
+    return 10000.0;
+  }
+}
+
+/*!
   \fn void init_camera (project * this_proj, int get_depth)
 
-  \brief intialize the OpenGL camera settings
+  \brief initialize the OpenGL camera settings
 
   \param this_proj the target project
   \param get_depth estimate the OpenGL depth ? (1/0)
@@ -1139,22 +1168,12 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
 void init_camera (project * this_proj, int get_depth)
 {
   glwin * view = this_proj -> modelgl;
-  if (get_depth) view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  if (view -> rep_win)
+  if (get_depth)
   {
-    if (view -> rep_win -> camera_widg[1] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[1]))
-    {
-      gtk_spin_button_set_value ((GtkSpinButton *)view  -> rep_win -> camera_widg[1], view -> anim -> last -> img -> p_depth);
-    }
+    view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+    view -> anim -> last -> img -> m_depth = get_max_depth (view -> anim -> last -> img -> p_depth);
   }
-  view -> anim -> last -> img -> gnear = 6.0;//view -> anim -> last -> img -> p_depth/15.0;
-  if (view -> rep_win)
-  {
-    if (view -> rep_win -> camera_widg[2] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[2]))
-    {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[2], view -> anim -> last -> img -> gnear);
-    }
-  }
+  view -> anim -> last -> img -> gnear = default_rep.gnear;
   view -> anim -> last -> img -> gfar = view -> anim -> last -> img -> p_depth*2.0;
   view -> anim -> last -> img -> rotation_quaternion.w = 0.0;
   view -> anim -> last -> img -> rotation_quaternion.x = 0.0;
@@ -1163,24 +1182,24 @@ void init_camera (project * this_proj, int get_depth)
   int i;
   for (i=0; i<2; i++)
   {
-    view -> anim -> last -> img -> c_shift[i] = 0.0;
     view -> anim -> last -> img -> c_angle[i] = 0.0;
-    if (view -> rep_win)
-    {
-      if (view  -> rep_win-> camera_widg[i+5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+5]))
-      {
-        gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+5], view -> anim -> last -> img -> c_shift[i]);
-      }
-    }
   }
   save_rotation_quaternion (view);
-  rotate_x_y (view, CAMERA_ANGLE_X, CAMERA_ANGLE_Y);
-  view -> anim -> last -> img -> zoom = ZOOM;
-  if (view  -> rep_win)
+  rotate_x_y (view, default_rep.c_angle[0], default_rep.c_angle[1]);
+  view -> anim -> last -> img -> zoom = default_rep.zoom;
+  if (view -> rep_win)
   {
-    if (view  -> rep_win -> camera_widg[0] && GTK_IS_WIDGET(view  -> rep_win -> camera_widg[0]))
+    if (view -> rep_win -> camera_widg[0] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[0]))
     {
       gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[0], 1.0 - 0.5*view -> anim -> last -> img -> zoom);
+    }
+    if (view -> rep_win -> camera_widg[1] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[1]))
+    {
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[1], view -> anim -> last -> img -> p_depth);
+    }
+    if (view -> rep_win -> camera_widg[2] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[2]))
+    {
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[2], view -> anim -> last -> img -> gnear);
     }
   }
 }
@@ -1365,6 +1384,8 @@ void init_img (project * this_proj)
   }
   if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+  img -> m_depth = get_max_depth (img -> p_depth);
+
   set_img_lights (this_proj, img);
 
   duplicate_material (& img -> m_terial, & default_material);

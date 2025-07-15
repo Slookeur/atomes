@@ -372,6 +372,7 @@ struct image
   ColRGBA ** spcolor[10];                       /*!<  Coordination sphere colors */
 
   GLdouble p_depth;                             /*!< Camera depth */
+  GLdouble m_depth;                             /*!< Maximum camera depth */
   GLdouble c_angle[2];                          /*!< Camera angle: pitch and heading */
   GLdouble c_shift[2];                          /*!< Camera position: x and y */
   GLdouble gnear;                               /*!< Near plane position */
