@@ -133,6 +133,7 @@ extern Lightning default_lightning;
 extern Lightning tmp_lightning;
 extern Fog default_fog;
 extern Fog tmp_fog;
+extern ColRGBA default_background;
 
 // Model
 extern element_radius * default_atomic_rad[16];

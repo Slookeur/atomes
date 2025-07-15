@@ -162,6 +162,8 @@ rep_edition * pref_rep_win = NULL;
 axis_data default_axis;
 axis_data * tmp_axis = NULL;
 axis_edition * pref_axis_win = NULL;
+ColRGBA default_background;
+ColRGBA tmp_background;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -816,10 +818,19 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"view");
   if (rc < 0) return 0;
 
+  // Background
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"background");
+  if (rc < 0) return 0;
+  rc = xml_save_color_to_file (writer, -1, "Color", "default_background", default_background);
+  if (! rc) return 0;
+
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
+
   // Representation
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"representation");
   if (rc < 0) return 0;
-
   str = g_strdup_printf ("%d", default_rep.rep);
   rc = xml_save_parameter_to_file (writer, "Representation type", "default_rep", TRUE, 0, str);
   g_free (str);
@@ -1204,6 +1215,10 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
         default_box.rad = xml_string_to_double(content);
       }
     }
+  }
+  else if (g_strcmp0(key, "default_background") == 0 && col)
+  {
+    default_background = * col;
   }
   else if (g_strcmp0(key, "default_rep") == 0)
   {
@@ -1618,7 +1633,12 @@ void read_preferences_from_xml_file ()
         if (node)
         {
           read_preferences (node);
-           p_node = findnode(node -> children, "representation");
+          p_node = findnode(node -> children, "background");
+          if (p_node)
+          {
+            read_preferences (p_node);
+          }
+          p_node = findnode(node -> children, "representation");
           if (p_node)
           {
             read_preferences (p_node);
@@ -1712,6 +1732,19 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
 }
 
 /*!
+  \fn G_MODULE_EXPORT void set_default_background (GtkColorChooser * colob, gpointer data)
+
+  \brief change default background color
+
+  \param colob the GtkColorChooser sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_default_background (GtkColorChooser * colob, gpointer data)
+{
+  tmp_background = get_button_color (colob);
+}
+
+/*!
   \fn GtkWidget * view_preferences ()
 
   \brief view preferences
@@ -1728,11 +1761,11 @@ GtkWidget * view_preferences ()
                           {"Axis", "axis options"}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
+
+  GtkWidget * hbox = adv_box (vbox, "Background color", 5, 150, 1.0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_button (tmp_background, 1.0, 100, -1, G_CALLBACK(set_default_background), NULL), FALSE, FALSE, 30);
+
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
-
-  // Background color
-
-  // Projection combo
 
   // Tab for representation
   pref_rep_win = g_malloc0(sizeof*pref_rep_win);
@@ -3429,6 +3462,7 @@ void prepare_tmp_default ()
   tmp_box = g_malloc0(sizeof*tmp_box);
   duplicate_box_data (tmp_box, & default_box);
 
+  tmp_background = default_background;
   tmp_rep = g_malloc0(sizeof*tmp_rep);
   duplicate_rep_data (tmp_rep, & default_rep);
 
@@ -3472,6 +3506,7 @@ void save_preferences ()
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
   duplicate_fog (& default_fog, & tmp_fog);
+
   // Model
   default_clones = tmp_clones;
   default_cell = tmp_cell;
@@ -3528,6 +3563,8 @@ void save_preferences ()
   default_mwidth = tmp_mwidth;
 
   duplicate_box_data (& default_box, tmp_box);
+
+  default_background = tmp_background;
   duplicate_rep_data (& default_rep, tmp_rep);
   duplicate_axis_data (& default_axis, tmp_axis);
 
@@ -3681,6 +3718,13 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   default_box.rad = 0.05;
 
   // Representation
+
+  // Background color
+  default_background.red = 0.0;
+  default_background.green = 0.0;
+  default_background.blue = 0.0;
+  default_background.alpha = 1.0;
+
   default_rep.rep = PERSPECTIVE;
   default_rep.proj = -1;
   default_rep.zoom = ZOOM;

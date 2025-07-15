@@ -1328,10 +1328,7 @@ void init_img (project * this_proj)
   int i;
   this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
   image * img = this_proj -> modelgl -> anim -> last -> img;
-  img -> backcolor.red = 0.0;
-  img -> backcolor.green = 0.0;
-  img -> backcolor.blue = 0.0;
-  img -> backcolor.alpha = 1.0;
+  img -> backcolor = default_background;
   img -> box_color = default_box.color;
   img -> box_axis_rad[BOX] = default_box.rad;
   img -> box_axis_line[BOX] = default_box.line;
