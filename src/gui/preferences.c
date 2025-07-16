@@ -1705,7 +1705,187 @@ void read_preferences_from_xml_file ()
   }
 }
 
-G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data);
+/*!
+  \fn void set_atomes_defaults ()
+
+  \brief set atomes default parameters
+*/
+void set_atomes_defaults ()
+{
+  int i, j;
+  // Analysis preferences
+  default_num_delta[GR] = 1000;
+  default_num_delta[SQ] = 1000;
+  default_num_delta[SK] = 1000;
+  default_num_delta[GK] = 1000;
+  default_num_delta[BD] = 100;
+  default_num_delta[AN] = 90;
+  default_num_delta[CH-1] = 20;
+  default_num_delta[MS-2] = 0;
+  default_delta_t[0] = 0.0;
+  default_delta_t[1] = -1.0;
+
+  default_rsparam[0] = -1;
+  default_rsparam[1] = 0;
+  default_rsparam[2] = 10;
+  default_rsparam[3] = 500;
+  default_rsparam[4] = 0;
+  default_rsparam[5] = 0;
+  default_rsparam[6] = 0;
+
+  default_csparam[0] = 0;
+  default_csparam[1] = 10;
+  default_csparam[2] = 500;
+  default_csparam[3] = 0;
+  default_csparam[4] = 0;
+  default_csparam[5] = 0;
+
+  for (i=0; i<3; i++) default_opengl[i] = 0;
+  default_opengl[3] = QUALITY;
+  // Material
+  default_material.predefine = 4; // Plastic
+  default_material.albedo = vec3(0.5, 0.5, 0.5);
+  default_material.param[0] = DEFAULT_LIGHTNING;
+  default_material.param[1] = DEFAULT_METALLIC;
+  default_material.param[2] = DEFAULT_ROUGHNESS;
+  default_material.param[3] = DEFAULT_AMBIANT_OCCLUSION;
+  default_material.param[4] = DEFAULT_GAMMA_CORRECTION;
+  default_material.param[5] = DEFAULT_OPACITY;
+
+  // Lights
+  default_lightning.lights = 3;
+  if (default_lightning.spot) g_free (default_lightning.spot);
+  default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
+  default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
+  default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
+  default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
+
+  // Fog
+  default_fog.mode = 0;
+  default_fog.based = 0;
+  default_fog.density = 0.5;
+  default_fog.depth[0] = 15.0;
+  default_fog.depth[1] = 40.0;
+  default_fog.color = vec3 (0.01f, 0.01f, 0.01f);
+
+  // Model
+  default_clones = FALSE;
+  default_cell = TRUE;
+  for (i=0; i<5; i++)
+  {
+    default_o_at_rs[i] = default_o_at_rs[i+5] = FALSE;
+    default_at_rs[i] = default_at_rs[i+5] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+  }
+
+  for (i=0; i<16; i++)
+  {
+    if (default_atomic_rad[i])
+    {
+      g_free (default_atomic_rad[i]);
+      default_atomic_rad[i] = NULL;
+    }
+  }
+  for (i=0; i<3; i++)
+  {
+    default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
+    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+  }
+  for (i=0; i<6; i++)
+  {
+    if (default_bond_rad[i])
+    {
+      g_free (default_bond_rad[i]);
+      default_bond_rad[i] = NULL;
+    }
+  }
+  for (i=0; i<2; i++)
+  {
+    if (default_atom_color[i])
+    {
+      g_free (default_atom_color[i]);
+      default_atom_color[i] = NULL;
+    }
+    if (default_label_color[i])
+    {
+      g_free (default_label_color[i]);
+      default_label_color[i] = NULL;
+    }
+  }
+  for (i=0; i<5; i++)
+  {
+    default_label[i].position = 1;
+    default_label[i].render = BETTER_TEXT;
+    default_label[i].scale = 0;
+    for (j=0; j<3; j++) default_label[i].shift[j] = 0.0;
+    default_label[i].n_colors = (i > 2) ? 1 : 0;
+    if (default_label[i].n_colors)
+    {
+      default_label[i].color = g_malloc (sizeof*default_label[i].color);
+      default_label[i].color[0].red = 1.0;
+      default_label[i].color[0].green = 1.0;
+      default_label[i].color[0].blue = 1.0;
+      default_label[i].color[0].alpha = 1.0;
+    }
+    default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
+  }
+  for (i=0; i<2; i++)
+  {
+    default_acl_format[i] = SYMBOL_AND_NUM;
+    default_mtilt[i] = TRUE;
+    default_mpattern[i] = 0;
+    default_mfactor[i] = 1;
+    default_mwidth[i] = 1.0;
+  }
+
+  default_box.box = WIREFRAME;
+  default_box.color.red = 0.0;
+  default_box.color.green = 1.0;
+  default_box.color.blue = 0.0;
+  default_box.color.alpha = 1.0;
+  default_box.line = DEFAULT_SIZE;
+  default_box.rad = 0.05;
+
+  // Representation
+
+  // Background color
+  default_background.color.red = 0.0;
+  default_background.color.green = 0.0;
+  default_background.color.blue = 0.0;
+  default_background.color.alpha = 1.0;
+  default_background.gradient = 1;
+  default_background.direction = 0;
+  default_background.gradient_color[0].red = 0.10;
+  default_background.gradient_color[0].green = 0.37;
+  default_background.gradient_color[0].blue = 0.70;
+  default_background.gradient_color[0].alpha = 1.0;
+  default_background.gradient_color[1].red = 0.0;
+  default_background.gradient_color[1].green = 0.01;
+  default_background.gradient_color[1].blue = 0.21;
+  default_background.gradient_color[1].alpha = 1.0;
+
+
+  default_rep.rep = PERSPECTIVE;
+  default_rep.proj = -1;
+  default_rep.zoom = ZOOM;
+  default_rep.c_angle[0] = - CAMERA_ANGLE_X;
+  default_rep.c_angle[1] = - CAMERA_ANGLE_Y;
+  for (i=0; i<2; i++) default_rep.c_shift[i] = 0.0;
+  default_rep.gnear = 6.0;
+
+  // Axis
+  default_axis.axis = NONE;
+  default_axis.line = DEFAULT_SIZE;
+  default_axis.rad = 0.1;
+  default_axis.t_pos = BOTTOM_RIGHT;
+  default_axis.length = 2.0*DEFAULT_SIZE;
+  default_axis.c_pos[0] = default_axis.c_pos[1] = 50.0;
+  default_axis.c_pos[2] = 0.0;
+  default_axis.title[0] = "x";
+  default_axis.title[1] = "y";
+  default_axis.title[2] = "z";
+  if (default_axis.color) g_free (default_axis.color);
+  default_axis.color = NULL;
+}
 
 /*!
   \fn void set_atomes_preferences ()
@@ -1724,7 +1904,7 @@ void set_atomes_preferences ()
   default_bd_rw = allocdouble (6);
   default_o_bd_rw = allocbool (6);
   preferences = TRUE;
-  restore_defaults_parameters (NULL, NULL);
+  set_atomes_defaults();
   preferences = FALSE;
   read_preferences_from_xml_file ();
 }
@@ -3672,188 +3852,15 @@ void adjust_preferences_window ()
 */
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
-  int i, j;
-  // Analysis preferences
-  default_num_delta[GR] = 1000;
-  default_num_delta[SQ] = 1000;
-  default_num_delta[SK] = 1000;
-  default_num_delta[GK] = 1000;
-  default_num_delta[BD] = 100;
-  default_num_delta[AN] = 90;
-  default_num_delta[CH-1] = 20;
-  default_num_delta[MS-2] = 0;
-  default_delta_t[0] = 0.0;
-  default_delta_t[1] = -1.0;
 
-  default_rsparam[0] = -1;
-  default_rsparam[1] = 0;
-  default_rsparam[2] = 10;
-  default_rsparam[3] = 500;
-  default_rsparam[4] = 0;
-  default_rsparam[5] = 0;
-  default_rsparam[6] = 0;
-
-  default_csparam[0] = 0;
-  default_csparam[1] = 10;
-  default_csparam[2] = 500;
-  default_csparam[3] = 0;
-  default_csparam[4] = 0;
-  default_csparam[5] = 0;
-
-  for (i=0; i<3; i++) default_opengl[i] = 0;
-  default_opengl[3] = QUALITY;
-  // Material
-  default_material.predefine = 4; // Plastic
-  default_material.albedo = vec3(0.5, 0.5, 0.5);
-  default_material.param[0] = DEFAULT_LIGHTNING;
-  default_material.param[1] = DEFAULT_METALLIC;
-  default_material.param[2] = DEFAULT_ROUGHNESS;
-  default_material.param[3] = DEFAULT_AMBIANT_OCCLUSION;
-  default_material.param[4] = DEFAULT_GAMMA_CORRECTION;
-  default_material.param[5] = DEFAULT_OPACITY;
-
-  // Lights
-  default_lightning.lights = 3;
-  if (default_lightning.spot) g_free (default_lightning.spot);
-  default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
-  default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
-  default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
-  default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
-
-  // Fog
-  default_fog.mode = 0;
-  default_fog.based = 0;
-  default_fog.density = 0.5;
-  default_fog.depth[0] = 15.0;
-  default_fog.depth[1] = 40.0;
-  default_fog.color = vec3 (0.01f, 0.01f, 0.01f);
-
-  // Model
-  default_clones = FALSE;
-  default_cell = TRUE;
-  for (i=0; i<5; i++)
+  if (ask_yes_no("Restore default parameters", "Are you sure ?", GTK_MESSAGE_QUESTION, MainWindow))
   {
-    default_o_at_rs[i] = default_o_at_rs[i+5] = FALSE;
-    default_at_rs[i] = default_at_rs[i+5] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
-  }
-
-  for (i=0; i<16; i++)
-  {
-    if (default_atomic_rad[i])
-    {
-      g_free (default_atomic_rad[i]);
-      default_atomic_rad[i] = NULL;
-    }
-  }
-  for (i=0; i<3; i++)
-  {
-    default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
-    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
-  }
-  for (i=0; i<6; i++)
-  {
-    if (default_bond_rad[i])
-    {
-      g_free (default_bond_rad[i]);
-      default_bond_rad[i] = NULL;
-    }
-  }
-  for (i=0; i<2; i++)
-  {
-    if (default_atom_color[i])
-    {
-      g_free (default_atom_color[i]);
-      default_atom_color[i] = NULL;
-    }
-    if (default_label_color[i])
-    {
-      g_free (default_label_color[i]);
-      default_label_color[i] = NULL;
-    }
-  }
-  for (i=0; i<5; i++)
-  {
-    default_label[i].position = 1;
-    default_label[i].render = BETTER_TEXT;
-    default_label[i].scale = 0;
-    for (j=0; j<3; j++) default_label[i].shift[j] = 0.0;
-    default_label[i].n_colors = (i > 2) ? 1 : 0;
-    if (default_label[i].n_colors)
-    {
-      default_label[i].color = g_malloc (sizeof*default_label[i].color);
-      default_label[i].color[0].red = 1.0;
-      default_label[i].color[0].green = 1.0;
-      default_label[i].color[0].blue = 1.0;
-      default_label[i].color[0].alpha = 1.0;
-    }
-    default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
-  }
-  for (i=0; i<2; i++)
-  {
-    default_acl_format[i] = SYMBOL_AND_NUM;
-    default_mtilt[i] = TRUE;
-    default_mpattern[i] = 0;
-    default_mfactor[i] = 1;
-    default_mwidth[i] = 1.0;
-  }
-
-  default_box.box = WIREFRAME;
-  default_box.color.red = 0.0;
-  default_box.color.green = 1.0;
-  default_box.color.blue = 0.0;
-  default_box.color.alpha = 1.0;
-  default_box.line = DEFAULT_SIZE;
-  default_box.rad = 0.05;
-
-  // Representation
-
-  // Background color
-  default_background.color.red = 0.0;
-  default_background.color.green = 0.0;
-  default_background.color.blue = 0.0;
-  default_background.color.alpha = 1.0;
-  default_background.gradient = 1;
-  default_background.direction = 0;
-  default_background.gradient_color[0].red = 0.10;
-  default_background.gradient_color[0].green = 0.37;
-  default_background.gradient_color[0].blue = 0.70;
-  default_background.gradient_color[0].alpha = 1.0;
-  default_background.gradient_color[1].red = 0.0;
-  default_background.gradient_color[1].green = 0.01;
-  default_background.gradient_color[1].blue = 0.21;
-  default_background.gradient_color[1].alpha = 1.0;
-
-
-  default_rep.rep = PERSPECTIVE;
-  default_rep.proj = -1;
-  default_rep.zoom = ZOOM;
-  default_rep.c_angle[0] = - CAMERA_ANGLE_X;
-  default_rep.c_angle[1] = - CAMERA_ANGLE_Y;
-  for (i=0; i<2; i++) default_rep.c_shift[i] = 0.0;
-  default_rep.gnear = 6.0;
-
-  // Axis
-  default_axis.axis = NONE;
-  default_axis.line = DEFAULT_SIZE;
-  default_axis.rad = 0.1;
-  default_axis.t_pos = BOTTOM_RIGHT;
-  default_axis.length = 2.0*DEFAULT_SIZE;
-  default_axis.c_pos[0] = default_axis.c_pos[1] = 50.0;
-  default_axis.c_pos[2] = 0.0;
-  default_axis.title[0] = "x";
-  default_axis.title[1] = "y";
-  default_axis.title[2] = "z";
-  if (default_axis.color) g_free (default_axis.color);
-  default_axis.color = NULL;
-
-  if (preference_notebook)
-  {
-    GtkWidget * tab;
+    set_atomes_defaults ();
     prepare_tmp_default ();
+    int i;
     for (i=4; i>0; i--)
     {
-     tab = gtk_notebook_get_nth_page (GTK_NOTEBOOK (preference_notebook), i);
-     destroy_this_widget (tab);
+      destroy_this_widget (gtk_notebook_get_nth_page (GTK_NOTEBOOK (preference_notebook), i));
     }
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
@@ -3879,14 +3886,16 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
-
-      save_preferences ();
-      gchar * str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
-      if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+      if (ask_yes_no("Save parameters", "Are you sure ?", GTK_MESSAGE_QUESTION, MainWindow))
       {
-        save_preferences_to_xml_file ();
+        save_preferences ();
+        gchar * str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
+        if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+        {
+          save_preferences_to_xml_file ();
+        }
+        g_free (str);
       }
-      g_free (str);
       break;
     default:
       destroy_this_dialog (edit_prefs);
