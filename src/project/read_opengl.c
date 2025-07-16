@@ -42,6 +42,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "glview.h"
 #include "initcoord.h"
+#include "preferences.h"
 
 extern gboolean old_labels_and_gradient;
 
@@ -317,6 +318,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   int i, j, k, l, m, n;
   gboolean val;
   img -> back = g_malloc0(sizeof*img -> back);
+  duplicate_background_data (img -> back, & default_background);
   if (! old_labels_and_gradient)
   {
     if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
@@ -332,6 +334,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   else
   {
+    img -> back -> gradient = 0;
     if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   }
   if (fread (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;

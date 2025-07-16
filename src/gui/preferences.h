@@ -107,6 +107,7 @@ struct rep_data
 extern float get_radius (int object, int col, int z, element_radius * rad_list);
 extern ColRGBA get_spec_color (int z, element_color * clist);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
+extern void duplicate_background_data (background * new_back, background * old_back);
 
 // Analysis parameters
 

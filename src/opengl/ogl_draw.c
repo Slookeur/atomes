@@ -52,12 +52,12 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "glview.h"
 #include "dlp_field.h"
+#include "preferences.h"
 #include <time.h>
 
 extern ColRGBA init_color (int id, int numid);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern atom_selection * duplicate_ogl_selection (atom_selection * old_sel);
-extern void duplicate_background_data (background * new_back, background * old_back);
 double x, y, z;
 GLUquadricObj * quadric;
 glwin * wingl;
@@ -631,6 +631,7 @@ void draw (glwin * view)
     //draw_labels ();
     if (wingl -> record) add_image ();
   }
+
 /* #ifdef DEBUG
   glEndQuery (GL_TIME_ELAPSED);
   GLint done = 0;

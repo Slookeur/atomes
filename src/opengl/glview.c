@@ -116,7 +116,6 @@ extern atomic_object * create_object_from_frag_mol (project * this_proj, int coo
 extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
-extern void duplicate_background_data (background * new_back, background * old_back);
 
 GLenum ogl_texture;
 
