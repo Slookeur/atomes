@@ -97,9 +97,12 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][6]), str);
         g_free (str);
 #endif
-        if (opengl_project -> modelgl -> axis_win -> radius)
+        if (opengl_project -> modelgl -> axis_win)
         {
-          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> radius), v);
+          if (opengl_project -> modelgl -> axis_win -> radius && GTK_IS_WIDGET(opengl_project -> modelgl -> axis_win -> radius))
+          {
+            update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> radius), v);
+          }
         }
       }
       else
@@ -112,9 +115,12 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         g_free (str);
 #endif
       }
-      if (opengl_project -> modelgl -> axis_win -> width)
+      if (opengl_project -> modelgl -> axis_win)
       {
-        update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> width), v);
+        if (opengl_project -> modelgl -> axis_win -> width && GTK_IS_WIDGET(opengl_project -> modelgl -> axis_win -> width))
+        {
+          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> axis_win -> width), v);
+        }
       }
       opengl_project -> modelgl -> create_shaders[MAXIS] = TRUE;
       break;
@@ -129,9 +135,12 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][6]), str);
         g_free (str);
 #endif
-        if (opengl_project -> modelgl -> box_win -> radius)
+        if (opengl_project -> modelgl -> box_win)
         {
-          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> radius), v);
+          if (opengl_project -> modelgl -> box_win -> radius && GTK_IS_WIDGET(opengl_project -> modelgl -> box_win -> radius))
+          {
+            update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> radius), v);
+          }
         }
       }
       else
@@ -144,9 +153,12 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][4]), str);
         g_free (str);
 #endif
-        if (opengl_project -> modelgl -> box_win -> width)
+        if (opengl_project -> modelgl -> box_win)
         {
-          update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> width), v);
+          if (opengl_project -> modelgl -> box_win -> width && GTK_IS_WIDGET(opengl_project -> modelgl -> box_win -> width))
+          {
+            update_entry_double (GTK_ENTRY(opengl_project -> modelgl -> box_win -> width), v);
+          }
         }
       }
       opengl_project -> modelgl -> create_shaders[MDBOX] = TRUE;
