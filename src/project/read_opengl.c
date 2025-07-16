@@ -421,6 +421,15 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
       img -> labels[i].font = read_this_string (fp);
       if (img -> labels[i].font == NULL) return ERROR_RW;
     }
+
+    if (fread (& img -> mtilt[0], sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+    img -> mtilt[1] = img -> mtilt[0];
+    if (fread (& img -> mpattern[0], sizeof(int), 1, fp) != 1) return ERROR_RW;
+    img -> mpattern[1] = img -> mpattern[0];
+    if (fread (& img -> mfactor[0], sizeof(int), 1, fp) != 1) return ERROR_RW;
+    img -> mfactor[1] = img -> mfactor[0];
+    if (fread (& img -> mwidth[0], sizeof(double), 1, fp) != 1) return ERROR_RW;
+    img -> mwidth[1] = img -> mwidth[0];
   }
   else
   {
@@ -429,12 +438,12 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
       if (read_this_image_label (fp, & img -> labels[i])) return ERROR_RW;
     }
     if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> mtilt, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> mpattern, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> mfactor, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> mwidth, sizeof(double), 2, fp) != 2) return ERROR_RW;
+
   }
-  // Measures
-  if (fread (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> mfactor, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> mwidth, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
   // Model box and axis

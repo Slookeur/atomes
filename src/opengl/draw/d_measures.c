@@ -598,71 +598,68 @@ void bonds_loop (glwin * view, int id, int pi, GtkTreeStore * store)
 }
 
 /*!
-  \fn int prepare_measure_shaders (int type, int shaders)
+  \fn void prepare_measure_shaders (int mode)
 
   \brief prepare measure OpenGL rendering
 
-  \param type the measure type (0 = distances, 1 = angles, 2 = dihedrals)
-  \param shaders the shader id
+  \param mode (0 = analysis mode, 1 = edition mode)
 */
-int prepare_measure_shaders (int type, int shaders)
+void prepare_measure_shaders (int mode)
 {
   int nshaders = 0;
-  if (plot -> selected[type] -> selected > 1 && plot -> selected[type] -> selected < MAX_IN_SELECTION)
+  if (plot -> selected[mode] -> selected > 1 && plot -> selected[mode] -> selected < MAX_IN_SELECTION)
   {
-    if (plot -> mpattern > -1)
+    if (plot -> mpattern[mode] > -1)
     {
       // First the bond distances
       measure = g_malloc0 (sizeof*measure);
       measure -> vert_buffer_size = LINE_BUFF_SIZE;
-      measure -> num_vertices = 2 * num_bonds (plot -> selected[type] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      measure -> num_vertices = 2 * num_bonds (plot -> selected[mode] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
       measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
       nbs = 0;
-      bonds_loop (wingl, 0, type, NULL);
+      bonds_loop (wingl, 0, mode, NULL);
 
-      if (plot -> mpattern != 2)
+      if (plot -> mpattern[mode] != 2)
       {
-        wingl -> ogl_glsl[MEASU][0][shaders] = init_shader_program (MEASU, GLSL_LINES, line_vertex, line_stipple, line_stipple_color, GL_LINES, 2, 7, FALSE, measure);
+        wingl -> ogl_glsl[MEASU][mode][0] = init_shader_program (MEASU, GLSL_LINES, line_vertex, line_stipple, line_stipple_color, GL_LINES, 2, 7, FALSE, measure);
       }
       else
       {
-        wingl -> ogl_glsl[MEASU][0][shaders] = init_shader_program (MEASU, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 7, FALSE, measure);
+        wingl -> ogl_glsl[MEASU][mode][0] = init_shader_program (MEASU, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 7, FALSE, measure);
       }
-      wingl -> ogl_glsl[MEASU][0][shaders] -> line_width = plot -> mwidth;
+      wingl -> ogl_glsl[MEASU][mode][0] -> line_width = plot -> mwidth[mode];
       nshaders ++;
       g_free (measure);
 
       // The angles
-      if (plot -> selected[type] -> selected > 2)
+      if (plot -> selected[mode] -> selected > 2)
       {
         measure = g_malloc0 (sizeof*measure);
         measure -> vert_buffer_size = LINE_BUFF_SIZE;
-        measure -> num_vertices = 3 * num_angles (plot -> selected[type] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+        measure -> num_vertices = 3 * num_angles (plot -> selected[mode] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
         measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
         nbs = 0;
-        angles_loop (wingl, 0, type, NULL);
-        if (plot -> mpattern != 2)
+        angles_loop (wingl, 0, mode, NULL);
+        if (plot -> mpattern[mode] != 2)
         {
-          wingl -> ogl_glsl[MEASU][0][shaders+1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, line_stipple_color, GL_TRIANGLES, 2, 7, FALSE, measure);
+          wingl -> ogl_glsl[MEASU][mode][1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, line_stipple_color, GL_TRIANGLES, 2, 7, FALSE, measure);
         }
         else
         {
-          wingl -> ogl_glsl[MEASU][0][shaders+1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, angle_color, GL_TRIANGLES, 2, 7, FALSE, measure);
+          wingl -> ogl_glsl[MEASU][mode][1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, angle_color, GL_TRIANGLES, 2, 7, FALSE, measure);
         }
-        wingl -> ogl_glsl[MEASU][0][shaders+1] -> line_width = plot -> mwidth;
+        wingl -> ogl_glsl[MEASU][mode][1] -> line_width = plot -> mwidth[mode];
         nshaders ++;
         g_free (measure);
       }
     }
      // When all labels are found we render the text if any
-    if (plot -> labels[3+type].list != NULL)
+    if (plot -> labels[3+mode].list != NULL)
     {
-      measures_drawing = nshaders + shaders;
-      render_all_strings (MEASU, 3+type);
-      nshaders += (plot -> labels[3+type].render+1) * (plot -> labels[3+type].list -> last -> id + 1);
+      measures_drawing = nshaders;
+      render_all_strings (MEASU, 3+mode);
     }
   }
-  return nshaders;
 }
 
 /*!
@@ -680,7 +677,7 @@ void create_measures_lists ()
   clean_labels (3);
   clean_labels (4);
   wingl -> create_shaders[MEASU] = FALSE;
-  wingl -> n_shaders[MEASU][0] = 0;
+  wingl -> n_shaders[MEASU][0] = wingl -> n_shaders[MEASU][1] = 0;
 
   int i, j, k;
   i = (is_atom_win_active(wingl) || (wingl -> mode == EDITION && wingl -> selection_mode == NSELECTION-1)) ? 1 : 0;
@@ -688,10 +685,10 @@ void create_measures_lists ()
   {
     if (plot -> selected[j] -> selected > 1 && plot -> selected[j] -> selected < MAX_IN_SELECTION)
     {
-      if (plot -> mpattern > -1)
+      if (plot -> mpattern[j] > -1)
       {
-        wingl -> n_shaders[MEASU][0] ++;
-        if (plot -> selected[j] -> selected > 2) wingl -> n_shaders[MEASU][0] ++;
+        wingl -> n_shaders[MEASU][j] ++;
+        if (plot -> selected[j] -> selected > 2) wingl -> n_shaders[MEASU][j] ++;
       }
       // First we need to prepare the labels
       type_of_measure = 6;
@@ -706,18 +703,18 @@ void create_measures_lists ()
       if (plot -> labels[3+j].list != NULL)
       {
         // shaders for the labels if any
-        wingl -> n_shaders[MEASU][0] += (plot -> labels[3+j].render+1) * (plot -> labels[3+j].list -> last -> id + 1);
+        wingl -> n_shaders[MEASU][j] += (plot -> labels[3+j].render+1) * (plot -> labels[3+j].list -> last -> id + 1);
       }
     }
   }
-  if (wingl -> n_shaders[MEASU][0])
+
+  if (wingl -> n_shaders[MEASU][0] || wingl -> n_shaders[MEASU][1])
   {
-    wingl -> ogl_glsl[MEASU][0] = g_malloc0 (wingl -> n_shaders[MEASU][0]*sizeof*wingl -> ogl_glsl[MEASU][0]);
     measures_drawing = 0;
-    j = 0;
     for (k=i; k<2; k++)
     {
-      j += prepare_measure_shaders (k, j);
+      wingl -> ogl_glsl[MEASU][k] = g_malloc0 (wingl -> n_shaders[MEASU][k]*sizeof*wingl -> ogl_glsl[MEASU][k]);
+      prepare_measure_shaders (k);
     }
   }
 }

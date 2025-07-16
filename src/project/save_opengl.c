@@ -208,10 +208,10 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fwrite (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
   // Measures
-  if (fwrite (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mfactor, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mwidth, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (img -> mtilt, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mpattern, sizeof(int), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mfactor, sizeof(int), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mwidth, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
   // Model box and axis

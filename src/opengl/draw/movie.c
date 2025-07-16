@@ -955,12 +955,12 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
   }
 
   if (img_a -> m_is_pressed != img_b -> m_is_pressed) view -> create_shaders[MEASU] = shaders = TRUE;
-  if (img_a -> mtilt != img_b -> mtilt) view -> create_shaders[MEASU] = shaders = TRUE;
-  if (img_a -> mpattern != img_b -> mpattern) view -> create_shaders[MEASU] = shaders = TRUE;
-  if (img_a -> mfactor != img_b -> mfactor) view -> create_shaders[MEASU] = shaders = TRUE;
-  if (img_a -> mwidth != img_b -> mwidth) view -> create_shaders[MEASU] = shaders = TRUE;
   for (i=0; i<2; i++)
   {
+    if (img_a -> mtilt[i] != img_b -> mtilt[i]) view -> create_shaders[MEASU] = shaders = TRUE;
+    if (img_a -> mpattern[i] != img_b -> mpattern[i]) view -> create_shaders[MEASU] = shaders = TRUE;
+    if (img_a -> mfactor[i] != img_b -> mfactor[i]) view -> create_shaders[MEASU] = shaders = TRUE;
+    if (img_a -> mwidth[i] != img_b -> mwidth[i]) view -> create_shaders[MEASU] = shaders = TRUE;
     if (g_strcmp0 (img_a -> labels[3+i].font, img_b -> labels[3+i].font) != 0) view -> create_shaders[MEASU] = shaders = TRUE;
     if (img_a -> labels[3+i].position != img_b -> labels[3+i].position) view -> create_shaders[MEASU] = shaders = TRUE;
     if (img_a -> labels[3+i].scale != img_b -> labels[3+i].scale) view -> create_shaders[MEASU] = shaders = TRUE;

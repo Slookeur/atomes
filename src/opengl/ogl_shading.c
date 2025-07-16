@@ -888,6 +888,9 @@ void set_lights_data (glsl_program * glsl)
 }
 
 uint16_t stipple_pattern[NDOTS]={ 0xAAAA, 0x1111, 0x0000, 0x55FF, 0x24FF, 0x3F3F, 0x33FF, 0x27FF};
+int this_tilt;
+int this_pattern;
+int this_factor;
 
 /*!
   \fn void shading_glsl_text (glsl_program * glsl)
@@ -906,7 +909,7 @@ void shading_glsl_text (glsl_program * glsl)
                                        glsl -> obj -> shift[2], glsl -> obj -> shift[3]);
   glUniform4f (glsl -> uniform_loc[6], glsl -> col -> red, glsl -> col -> green,
                                        glsl -> col -> blue, glsl -> col -> alpha);
-  if (glsl -> object == MEASU) glUniform1i (glsl -> uniform_loc[7], (plot -> mtilt) ? 1 : 0);
+  if (glsl -> object == MEASU) glUniform1i (glsl -> uniform_loc[7], this_tilt);
 }
 
 /*!
@@ -961,8 +964,8 @@ void render_this_shader (glsl_program * glsl, int ids)
     }
     else
     {
-      glUniform1i (glsl -> uniform_loc[1], plot -> mfactor);
-      glUniform1ui (glsl -> uniform_loc[2], stipple_pattern[plot -> mpattern]);
+      glUniform1i (glsl -> uniform_loc[1], this_factor);
+      glUniform1ui (glsl -> uniform_loc[2], stipple_pattern[this_pattern]);
       if (glsl -> vert_type == GL_TRIANGLES)
       {
         wingl -> label_projection_matrix = create_label_matrices ();
@@ -1067,15 +1070,35 @@ void draw_vertices (int id)
 {
   int i, j;
   glsl_program * glsl;
-
-  i = (in_md_shaders(proj_gl, id)) ? step : 0;
-  for (j=0; j<wingl -> n_shaders[id][i]; j++)
+  if (id != MEASU)
   {
-    if (wingl -> ogl_glsl[id][i][j])
+    i = (in_md_shaders(proj_gl, id)) ? step : 0;
+    for (j=0; j<wingl -> n_shaders[id][i]; j++)
     {
-      glsl = wingl -> ogl_glsl[id][i][j];
-      glUseProgram (glsl -> id);
-      render_this_shader (glsl, j);
+      if (wingl -> ogl_glsl[id][i][j])
+      {
+        glsl = wingl -> ogl_glsl[id][i][j];
+        glUseProgram (glsl -> id);
+        render_this_shader (glsl, j);
+      }
+    }
+  }
+  else
+  {
+    for (i=0; i<2; i++)
+    {
+      this_pattern = plot -> mpattern[i];
+      this_tilt = plot -> mtilt[i];
+      this_factor = plot -> mfactor[i];
+      for (j=0; j<wingl -> n_shaders[id][i]; j++)
+      {
+        if (wingl -> ogl_glsl[id][i][j])
+        {
+          glsl = wingl -> ogl_glsl[id][i][j];
+          glUseProgram (glsl -> id);
+          render_this_shader (glsl, j);
+        }
+      }
     }
   }
 }

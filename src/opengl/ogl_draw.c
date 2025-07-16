@@ -57,6 +57,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern ColRGBA init_color (int id, int numid);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern atom_selection * duplicate_ogl_selection (atom_selection * old_sel);
+extern void duplicate_background_data (background * new_back, background * old_back);
 double x, y, z;
 GLUquadricObj * quadric;
 glwin * wingl;
@@ -283,6 +284,8 @@ image * duplicate_image (image * old_img)
   // This line will copy all the stuff that is not dynamically allocated
   * new_img = * old_img;
 
+  new_img -> back = g_malloc0(sizeof*new_img -> back);
+  duplicate_background_data (new_img -> back, old_img -> back);
   j = proj_gl -> nspec;
   for (i=0; i<2; i++)
   {

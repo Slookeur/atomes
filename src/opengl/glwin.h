@@ -367,10 +367,11 @@ struct image
                                                     1 = atomic symbol, \n
                                                     2 = atomic symbol + ID number (default), \n
                                                     3 = ID number */
-  gboolean mtilt;                               /*!< Measure tilt, if any */
-  int mpattern;                                 /*!< Measure line pattern */
-  int mfactor;                                  /*!< Measure  */
-  double mwidth;                                /*!< Measure line width */
+  // In the following: 0 = measure in analysis mode, 1 = measure in edition mode
+  gboolean mtilt[2];                             /*!< Measure tilt, if any */
+  int mpattern[2];                               /*!< Measure line pattern */
+  int mfactor[2];                                /*!< Measure  */
+  double mwidth[2];                              /*!< Measure line width */
 
   int m_is_pressed;                             /*!< is the key m pressed ? */
   // Atom selection: 0 = normal mode, 1 = edition mode

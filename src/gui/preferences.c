@@ -146,14 +146,14 @@ screen_label default_label[5];
 screen_label * tmp_label[5];
 int default_acl_format[2];
 int tmp_acl_format[2];
-gboolean default_mtilt;
-gboolean tmp_mtilt;
-int defaut_mpattern;
-int tmp_mpattern;
-int default_mfactor;
-int tmp_mfactor;
-double default_mwidth;
-double tmp_mwidth;
+gboolean default_mtilt[2];
+gboolean tmp_mtilt[2];
+int default_mpattern[2];
+int tmp_mpattern[2];
+int default_mfactor[2];
+int tmp_mfactor[2];
+double default_mwidth[2];
+double tmp_mwidth[2];
 box_data default_box;
 box_data * tmp_box = NULL;
 box_edition * pref_box_win = NULL;
@@ -1725,6 +1725,12 @@ void set_atomes_preferences ()
   restore_defaults_parameters (NULL, NULL);
   preferences = FALSE;
   read_preferences_from_xml_file ();
+
+  int i;
+  for (i=0; i<2; i++)
+  {
+    g_print ("After pref col.r= %f, col.g= %f, col.b= %f\n", default_background.gradient_color[i].red, default_background.gradient_color[i].green, default_background.gradient_color[i].blue);
+  }
 }
 
 /*!
@@ -3500,11 +3506,14 @@ void prepare_tmp_default ()
     tmp_label[i] = g_malloc(sizeof*tmp_label[i]);
     duplicate_screen_label (tmp_label[i], & default_label[i]);
   }
-  for (i=0; i<2; i++) tmp_acl_format[i] = default_acl_format[i];
-  tmp_mtilt = default_mtilt;
-  tmp_mpattern = defaut_mpattern ;
-  tmp_mfactor = default_mfactor;
-  tmp_mwidth = default_mwidth;
+  for (i=0; i<2; i++)
+  {
+    tmp_acl_format[i] = default_acl_format[i];
+    tmp_mtilt[i] = default_mtilt[i];
+    tmp_mpattern[i] = default_mpattern[i];
+    tmp_mfactor[i] = default_mfactor[i];
+    tmp_mwidth[i] = default_mwidth[i];
+  }
 
   tmp_box = g_malloc0(sizeof*tmp_box);
   duplicate_box_data (tmp_box, & default_box);
@@ -3605,12 +3614,14 @@ void save_preferences ()
   {
     duplicate_screen_label (& default_label[i], tmp_label[i]);
   }
-  for (i=0; i<2; i++) default_acl_format[i] = tmp_acl_format[i];
-  default_mtilt = tmp_mtilt;
-  defaut_mpattern = tmp_mpattern;
-  default_mfactor = tmp_mfactor;
-  default_mwidth = tmp_mwidth;
-
+  for (i=0; i<2; i++)
+  {
+    default_acl_format[i] = tmp_acl_format[i];
+    default_mtilt[i] = tmp_mtilt[i];
+    default_mpattern[i] = tmp_mpattern[i];
+    default_mfactor[i] = tmp_mfactor[i];
+    default_mwidth[i] = tmp_mwidth[i];
+  }
   duplicate_box_data (& default_box, tmp_box);
 
   duplicate_background_data (& default_background, tmp_background);
@@ -3752,11 +3763,14 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
     }
     default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
   }
-  default_acl_format[0] = default_acl_format[1] = SYMBOL_AND_NUM;
-  default_mtilt = TRUE;
-  defaut_mpattern = 0;
-  default_mfactor = 1;
-  default_mwidth = 1.0;
+  for (i=0; i<2; i++)
+  {
+    default_acl_format[i] = SYMBOL_AND_NUM;
+    default_mtilt[i] = TRUE;
+    default_mpattern[i] = 0;
+    default_mfactor[i] = 1;
+    default_mwidth[i] = 1.0;
+  }
 
   default_box.box = WIREFRAME;
   default_box.color.red = 0.0;

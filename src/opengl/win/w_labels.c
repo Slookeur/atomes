@@ -90,13 +90,13 @@ G_MODULE_EXPORT void set_measure_style (GtkComboBox * box, gpointer data)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
-    view -> anim -> last -> img -> mpattern = combo_get_active ((GtkWidget *)box);
+    view -> anim -> last -> img -> mpattern[id -> b] = combo_get_active ((GtkWidget *)box);
     view -> create_shaders[MEASU] = TRUE;
     update (view);
   }
   else
   {
-    tmp_mpattern = combo_get_active ((GtkWidget *)box);
+    tmp_mpattern[id -> b] = combo_get_active ((GtkWidget *)box);
   }
 }
 
@@ -157,7 +157,7 @@ G_MODULE_EXPORT void set_labels_render (GtkComboBox * box, gpointer data)
       }
       else if (id -> b == 3 || id -> b == 4)
       {
-        combo_set_active (tilt, view -> anim -> last -> img -> mtilt);
+        combo_set_active (tilt, view -> anim -> last -> img -> mtilt[id -> b-3]);
         view -> create_shaders[MEASU] = TRUE;
       }
       update (view);
@@ -437,14 +437,14 @@ G_MODULE_EXPORT void set_labels_tilt (GtkComboBox * box, gpointer data)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
-    view -> anim -> last -> img -> mtilt = i;
+    view -> anim -> last -> img -> mtilt[id -> b] = i;
     if (id -> b < 2) view -> create_shaders[LABEL] = TRUE;
     if (id -> b == 3 || id -> b == 4) view  -> create_shaders[MEASU] = TRUE;
     update (view);
   }
   else
   {
-    tmp_mtilt = i;
+    tmp_mtilt[id -> b] = i;
   }
 }
 
@@ -462,13 +462,13 @@ void mesure_factor_has_changed (gpointer data, double value)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
-    view -> anim -> last -> img -> mfactor = (int)value;
+    view -> anim -> last -> img -> mfactor[id -> b] = (int)value;
     view -> create_shaders[MEASU] = TRUE;
     update (view);
   }
   else
   {
-    tmp_mfactor = (int)value;
+    tmp_mfactor[id -> b] = (int)value;
   }
 }
 
@@ -515,13 +515,13 @@ void measure_width_has_changed (gpointer data, double value)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
-    view -> anim -> last -> img -> mwidth = value;
+    view -> anim -> last -> img -> mwidth[id -> b] = value;
     view  -> create_shaders[MEASU] = TRUE;
     update (view);
   }
   else
   {
-    tmp_mwidth = value;
+    tmp_mwidth[id -> b] = value;
   }
 }
 
@@ -589,22 +589,22 @@ G_MODULE_EXPORT void enable_lines (GtkToggleButton * but, gpointer data)
   {
     if (id -> a != -1)
     {
-      j = view -> anim -> last -> img -> mpattern = 0;
+      j = view -> anim -> last -> img -> mpattern[id -> b] = 0;
     }
     else
     {
-      j = tmp_mpattern = 0;
+      j = tmp_mpattern[id -> b] = 0;
     }
   }
   else
   {
     if (id -> a != -1)
     {
-      j = view -> anim -> last -> img -> mpattern = -1;
+      j = view -> anim -> last -> img -> mpattern[id -> b] = -1;
     }
     else
     {
-      j = tmp_mpattern = -1;
+      j = tmp_mpattern[id -> b] = -1;
     }
   }
   combo_set_active (lstyle, j);
@@ -635,42 +635,48 @@ GtkWidget * labels_tab (glwin * view, int lid)
   int mfactor;
   double mwidth;
   tint * lab_pointer;
+  tint * measure_pointer;
   tint * shift_pointer[2];
-  g_print ("In label tab lid= %d !\n", lid);
   if (! preferences)
   {
     this_proj = get_project_by_id (view -> proj);
     label = & view -> anim -> last -> img -> labels[lid];
-    g_print ("label -> position= %d\n", label -> position);
-    g_print ("label -> render= %d\n", label -> render);
-    g_print ("label -> scale= %d\n", label -> scale);
-    g_print ("label -> s.x= %f s.y= %f, s.z= %f\n", label -> shift[0], label -> shift[1], label -> shift[2]);
-    g_print ("label -> n_colors= %d\n", label -> n_colors);
-    for (i=0; i<label -> n_colors; i++) g_print ("i= %d, c.r= %lf, c.g= %lf, c.b= %lf\n", i, label -> color[i].red, label -> color[i].green, label -> color[i].blue);
-    g_print ("label -> font= %s\n", label -> font);
     lab_pointer = & view -> colorp[lid][0];
+    measure_pointer = (lid > 2) ? & view -> colorp[lid-3][0] : NULL;
     for (i=0; i<2; i++) shift_pointer[i] = & view -> colorp[lid*10+i][0];
-    mtilt = view -> anim -> last -> img -> mtilt;
-    mpattern = view -> anim -> last -> img -> mpattern;
-    mfactor = view -> anim -> last -> img -> mfactor;
-    mwidth = view -> anim -> last -> img -> mwidth;
-    if (lid < 2) acl_format = view -> anim -> last -> img -> acl_format[lid];
+    if (lid < 2)
+    {
+      acl_format = view -> anim -> last -> img -> acl_format[lid];
+    }
+    else
+    {
+      mtilt = view -> anim -> last -> img -> mtilt[lid-3];
+      mpattern = view -> anim -> last -> img -> mpattern[lid-3];
+      mfactor = view -> anim -> last -> img -> mfactor[lid-3];
+      mwidth = view -> anim -> last -> img -> mwidth[lid-3];
+    }
   }
   else
   {
     label = tmp_label[lid];
     lab_pointer = & pref_pointer[lid];
+    measure_pointer = (lid > 2) ? & pref_pointer[lid-3] : NULL;
     for (i=0; i<2; i++) shift_pointer[i] = & pref_pointer[lid*10+i];
-    mtilt = tmp_mtilt;
-    mpattern = tmp_mpattern;
-    mfactor = tmp_mfactor;
-    mwidth = tmp_mwidth;
-    if (lid < 2) acl_format = tmp_acl_format[lid];
+    if (lid < 2)
+    {
+      acl_format = tmp_acl_format[lid];
+    }
+    else
+    {
+      mtilt = tmp_mtilt[lid-3];
+      mpattern = tmp_mpattern[lid-3];
+      mfactor = tmp_mfactor[lid-3];
+      mwidth = tmp_mwidth[lid-3];
+    }
   }
   GtkWidget * tbox = create_vbox (BSEP);
   GtkWidget * vbox = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, vbox, FALSE, FALSE, 5);
-  g_print ("label -> font= %s\n", label -> font);
 
   GtkWidget * box;
   if (lid < 2)
@@ -699,15 +705,14 @@ GtkWidget * labels_tab (glwin * view, int lid)
   gtk_widget_set_size_request (config, 220, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
-  g_print ("label -> font= %s\n", label -> font);
   // Font
   box = abox (vbox, "Font", 0);
+  // There is a bug next for label[3] and label[4] only : no idea why but the name of the font is not displayed
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
-  g_print ("label -> font= %s (after) \n", label -> font);
   if (lid == 3)
   {
     box = abox (vbox, "Font color", 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, color_button(label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), lab_pointer), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, color_button (label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), lab_pointer), FALSE, FALSE, 10);
   }
 
   // Position
@@ -726,7 +731,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
                        check_button ("scale with zoom in/out", 220, -1, label -> scale, G_CALLBACK(set_labels_scale), lab_pointer),
                        FALSE, FALSE, 10);
 
-  if (lid == 3)
+  if (lid == 3 || lid == 4)
   {
     // Tilt
     box = abox (vbox, "Tilt", 0);
@@ -735,7 +740,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     combo_text_append (tilt, "Adapted");
     combo_set_active (tilt, mtilt);
     gtk_widget_set_size_request (tilt, 220, -1);
-    g_signal_connect (G_OBJECT (tilt), "changed", G_CALLBACK(set_labels_tilt), lab_pointer);
+    g_signal_connect (G_OBJECT (tilt), "changed", G_CALLBACK(set_labels_tilt), measure_pointer);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, tilt, FALSE, FALSE, 10);
   }
 
@@ -803,7 +808,9 @@ GtkWidget * labels_tab (glwin * view, int lid)
   else if (lid >= 3)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b><u>Line(s):</u></b>", -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("Show / hide: ", -1, 40, mpattern+1, G_CALLBACK(enable_lines), lab_pointer), FALSE, FALSE, 0);
+    GtkWidget * hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Show / hide", -1, 40, mpattern+1, G_CALLBACK(enable_lines), measure_pointer), FALSE, FALSE, 30);
     line_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, line_box, TRUE, TRUE, 0);
     box = abox (line_box, "Pattern", 0);
@@ -823,16 +830,16 @@ GtkWidget * labels_tab (glwin * view, int lid)
     combo_set_active (lstyle, mpattern);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lstyle, TRUE, TRUE, 10);
     gtk_widget_set_size_request (lstyle, 100, 35);
-    g_signal_connect (G_OBJECT (lstyle), "changed", G_CALLBACK(set_measure_style), lab_pointer);
+    g_signal_connect (G_OBJECT (lstyle), "changed", G_CALLBACK(set_measure_style), measure_pointer);
 
     box = abox (line_box, "Factor", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                         create_hscale(1.0, 10.0, 1.0, (double)mfactor, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_factor), G_CALLBACK(scroll_set_measure_factor), lab_pointer),
+                         create_hscale(1.0, 10.0, 1.0, (double)mfactor, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_factor), G_CALLBACK(scroll_set_measure_factor), measure_pointer),
                          TRUE, TRUE, 0);
 
     box = abox (line_box, "Width", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                         create_hscale(1.0, 10.0, 1.0, mwidth, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_width), G_CALLBACK(scroll_set_measure_width), lab_pointer),
+                         create_hscale(1.0, 10.0, 1.0, mwidth, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_width), G_CALLBACK(scroll_set_measure_width), measure_pointer),
                          TRUE, TRUE, 0);
   }
   return tbox;

@@ -116,6 +116,7 @@ extern atomic_object * create_object_from_frag_mol (project * this_proj, int coo
 extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
+extern void duplicate_background_data (background * new_back, background * old_back);
 
 GLenum ogl_texture;
 
@@ -1330,10 +1331,7 @@ void init_img (project * this_proj)
   image * img = this_proj -> modelgl -> anim -> last -> img;
 
   if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
-  img -> back -> gradient = default_background.gradient;
-  img -> back -> direction = default_background.direction;
-  img -> back -> color = default_background.color;
-  for (i=0; i<2; i++) img -> back -> gradient_color[i] = default_background.gradient_color[i];
+  duplicate_background_data (img -> back, & default_background);
 
   img -> box_color = default_box.color;
   img -> box_axis_rad[BOX] = default_box.rad;
@@ -1377,11 +1375,12 @@ void init_img (project * this_proj)
   {
     duplicate_screen_label (& img -> labels[i], & default_label[i]);
   }
-  img -> mtilt = default_mtilt;
-  img -> mfactor = default_mfactor;
-  img -> mwidth = default_mwidth;
   for (i=0; i<2; i++)
   {
+    img -> mtilt[i] = default_mtilt[i];
+    img -> mfactor[i] = default_mfactor[i];
+    img -> mpattern[i] = default_mpattern[i];
+    img -> mwidth[i] = default_mwidth[i];
     img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
     img -> acl_format[i] = default_acl_format[i];
   }

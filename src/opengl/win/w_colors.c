@@ -374,14 +374,18 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
     g_free (str);
     add_container_child (CONTAINER_WIN, the_gradient -> win, vbox);
   }
-
+  int i;
+  for (i=0; i<2; i++)
+  {
+    g_print ("dcol.r= %f, dcol.g= %f, dcol.b= %f\n", default_background.gradient_color[i].red, default_background.gradient_color[i].green, default_background.gradient_color[i].blue);
+  }
   gchar * g_name[2] = {"Gradient type", "Gradient direction"};
   gchar * g_type[3] = {"No gradient", "Linear", "Circular"};
   gchar * g_direction[2][9] = {{"Top to bottom", "Right to left", "Bottom right to top left", "Top right to bottom left", "", "", "", "", ""},
                                {"Right to left", "Left to right", "Top to bottom", "Bottom to top",
                                 "Bottom right to top left", "Bottom left to top right", "Top right to bottom left", "Top left to bottom right", "Center"}};
   int n_val[2] = {4, 9};
-  int i, j;
+  int j;
   hbox = abox (vbox, g_name[0], 5);
   the_gradient -> g_box = create_combo ();
   for (i=0; i<3; i++)
@@ -435,7 +439,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   for (i=0; i<2; i++)
   {
     hhbox = create_hbox (BSEP);
-    // g_print ("col.r= %f, col.g= %f, col.b= %f\n", gradient_color[i].red, gradient_color[i].green, gradient_color[i].blue);
+    g_print ("col.r= %f, col.g= %f, col.b= %f\n", gradient_color[i].red, gradient_color[i].green, gradient_color[i].blue);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (c_name[i], 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox,
