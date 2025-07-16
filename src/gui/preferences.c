@@ -1727,12 +1727,6 @@ void set_atomes_preferences ()
   restore_defaults_parameters (NULL, NULL);
   preferences = FALSE;
   read_preferences_from_xml_file ();
-
-  int i;
-  for (i=0; i<2; i++)
-  {
-    g_print ("After pref col.r= %f, col.g= %f, col.b= %f\n", default_background.gradient_color[i].red, default_background.gradient_color[i].green, default_background.gradient_color[i].blue);
-  }
 }
 
 /*!
