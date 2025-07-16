@@ -61,6 +61,8 @@ extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Mater
 extern GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
 extern GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 extern GtkWidget * labels_tab (glwin * view, int lid);
+extern void update_light_data (int li, opengl_edition * ogl_win);
+extern void setup_fog_dialogs (opengl_edition * ogl_edit, int fid);
 extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data);
@@ -3638,6 +3640,35 @@ void save_preferences ()
 }
 
 /*!
+  \fn void adjust_preferences_window ()
+
+  \brief adjust the widgets of the preferences window
+*/
+void adjust_preferences_window ()
+{
+  int i;
+  update_light_data (0, pref_ogl_edit);
+  setup_fog_dialogs (pref_ogl_edit, tmp_fog.mode);
+  if (tmp_box -> box > NONE)
+  {
+    hide_the_widgets ((tmp_box -> box == WIREFRAME) ? pref_box_win -> radius_box : pref_box_win -> width_box);
+  }
+  hide_the_widgets ((tmp_axis -> axis == WIREFRAME) ? pref_axis_win -> radius_box : pref_axis_win -> width_box);
+  for (i=0; i<2; i++) widget_set_sensitive (pref_axis_win -> axis_label_box[i], tmp_axis -> labels);
+  if (tmp_background -> gradient)
+  {
+    hide_the_widgets (pref_gradient_win -> color_box[0]);
+    hide_the_widgets (pref_gradient_win -> d_box[(tmp_background -> gradient == 1) ? 1 : 0]);
+    combo_set_active (pref_gradient_win -> d_box[tmp_background -> gradient-1], tmp_background -> direction);
+  }
+  else
+  {
+    hide_the_widgets (pref_gradient_win -> color_box[1]);
+    for (i=0; i<2; i++) hide_the_widgets (pref_gradient_win -> d_box[i]);
+  }
+}
+
+/*!
   \fn G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data)
 
   \brief restore all default parameters
@@ -3836,6 +3867,7 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
     gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
     show_the_widgets (preference_notebook);
+    adjust_preferences_window ();
   }
 }
 

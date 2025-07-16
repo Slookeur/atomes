@@ -170,8 +170,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "preferences.h"
 #include "glview.h"
 
-extern void update_light_data (int li, opengl_edition * ogl_win);
-extern void setup_fog_dialogs (opengl_edition * ogl_edit, int fid);
+extern void adjust_preferences_window ();
 
 /*!
   \fn void show_the_widgets (GtkWidget * widg)
@@ -504,29 +503,7 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
   gtk_window_set_modal (GTK_WINDOW(dial), TRUE);
   if (handler) g_signal_connect (G_OBJECT(dial), "response", handler, data);
   show_the_widgets (dial);
-  if (preferences)
-  {
-    update_light_data (0, pref_ogl_edit);
-    setup_fog_dialogs (pref_ogl_edit, tmp_fog.mode);
-    if (tmp_box -> box > NONE)
-    {
-       hide_the_widgets ((tmp_box -> box == WIREFRAME) ? pref_box_win -> radius_box : pref_box_win -> width_box);
-    }
-    hide_the_widgets ((tmp_axis -> axis == WIREFRAME) ? pref_axis_win -> radius_box : pref_axis_win -> width_box);
-    int i;
-    for (i=0; i<2; i++) widget_set_sensitive (pref_axis_win -> axis_label_box[i], tmp_axis -> labels);
-    if (tmp_background -> gradient)
-    {
-      hide_the_widgets (pref_gradient_win -> color_box[0]);
-      hide_the_widgets (pref_gradient_win -> d_box[(tmp_background -> gradient == 1) ? 1 : 0]);
-      combo_set_active (pref_gradient_win -> d_box[tmp_background -> gradient-1], tmp_background -> direction);
-    }
-    else
-    {
-      hide_the_widgets (pref_gradient_win -> color_box[1]);
-      for (i=0; i<2; i++) hide_the_widgets (pref_gradient_win -> d_box[i]);
-    }
-  }
+  if (preferences) adjust_preferences_window ();
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);
   g_main_loop_run (Event_loop[dialog_id]);
