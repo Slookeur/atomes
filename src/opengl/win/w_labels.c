@@ -253,8 +253,10 @@ G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
+    g_print ("id= %d, label_font= %s\n", id -> b, view -> anim -> last -> img -> labels[id -> b].font);
     g_free (view -> anim -> last -> img -> labels[id -> b].font);
     view -> anim -> last -> img -> labels[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
+    g_print ("id= %d, label_font= %s\n", id -> b, view -> anim -> last -> img -> labels[id -> b].font);
     if (id -> b < 2)
     {
       view -> create_shaders[LABEL] = TRUE;
@@ -634,11 +636,18 @@ GtkWidget * labels_tab (glwin * view, int lid)
   double mwidth;
   tint * lab_pointer;
   tint * shift_pointer[2];
-
+  g_print ("In label tab lid= %d !\n", lid);
   if (! preferences)
   {
     this_proj = get_project_by_id (view -> proj);
     label = & view -> anim -> last -> img -> labels[lid];
+    g_print ("label -> position= %d\n", label -> position);
+    g_print ("label -> render= %d\n", label -> render);
+    g_print ("label -> scale= %d\n", label -> scale);
+    g_print ("label -> s.x= %f s.y= %f, s.z= %f\n", label -> shift[0], label -> shift[1], label -> shift[2]);
+    g_print ("label -> n_colors= %d\n", label -> n_colors);
+    for (i=0; i<label -> n_colors; i++) g_print ("i= %d, c.r= %lf, c.g= %lf, c.b= %lf\n", i, label -> color[i].red, label -> color[i].green, label -> color[i].blue);
+    g_print ("label -> font= %s\n", label -> font);
     lab_pointer = & view -> colorp[lid][0];
     for (i=0; i<2; i++) shift_pointer[i] = & view -> colorp[lid*10+i][0];
     mtilt = view -> anim -> last -> img -> mtilt;
@@ -661,6 +670,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * tbox = create_vbox (BSEP);
   GtkWidget * vbox = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, vbox, FALSE, FALSE, 5);
+  g_print ("label -> font= %s\n", label -> font);
 
   GtkWidget * box;
   if (lid < 2)
@@ -689,11 +699,11 @@ GtkWidget * labels_tab (glwin * view, int lid)
   gtk_widget_set_size_request (config, 220, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
-
+  g_print ("label -> font= %s\n", label -> font);
   // Font
   box = abox (vbox, "Font", 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
-
+  g_print ("label -> font= %s (after) \n", label -> font);
   if (lid == 3)
   {
     box = abox (vbox, "Font color", 0);

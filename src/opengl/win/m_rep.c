@@ -583,7 +583,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     }
     else
     {
-      append_comments (the_rep -> win, "<sup>*</sup>", "<i>Perspective depth evaluated from the model</i>");
+      append_comments (the_rep -> win, "<sup>*</sup>", "Perspective depth evaluated from the model");
     }
   }
 }

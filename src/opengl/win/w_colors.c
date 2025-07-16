@@ -81,6 +81,7 @@ G_MODULE_EXPORT void run_window_color (GtkDialog * win, gint response_id, gpoint
     {
       this_proj -> modelgl -> anim -> last -> img -> back -> color = colo;
       this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
+      cleaning_shaders (this_proj -> modelgl, BACKG);
     }
     else if (wc_cid == -1)
     {
@@ -210,7 +211,11 @@ G_MODULE_EXPORT void set_gradient_color (GtkColorChooser * colob, gpointer data)
   }
   if (! preferences)
   {
-    if (bid -> b) view -> create_shaders[BACKG] = TRUE;
+    if (bid -> b)
+    {
+      view -> create_shaders[BACKG] = TRUE;
+    }
+    view -> create_shaders[MEASU] = TRUE;
     update (view);
   }
 }
@@ -262,10 +267,15 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
     hide_the_widgets (the_gradient -> d_box[1]);
     show_the_widgets (the_gradient -> color_box[0]);
     hide_the_widgets (the_gradient -> color_box[1]);
+    if (! preferences) cleaning_shaders (view, BACKG);
   }
   else
   {
-    view -> create_shaders[BACKG] = TRUE;
+    if (! preferences)
+    {
+      view -> create_shaders[BACKG] = TRUE;
+      // view -> create_shaders[MEASU] = TRUE;
+    }
     show_the_widgets (the_gradient -> color_box[1]);
     hide_the_widgets (the_gradient -> color_box[0]);
     if (!  bid -> b)
@@ -320,28 +330,7 @@ G_MODULE_EXPORT gboolean on_gradient_delete (GtkWidget * widg, GdkEvent * event,
   return TRUE;
 }
 
-#ifdef GTK4
-/*!
-  \fn G_MODULE_EXPORT void to_run_gradient_color_window (GSimpleAction * action, GVariant * parameter, gpointer data)
-
-  \brief to run background gradient color selection window callback GTK4
-
-  \param action the GAction sending the signal
-  \param parameter GVariant parameter of the GAction, if any
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void to_run_gradient_color_window (GSimpleAction * action, GVariant * parameter, gpointer data)
-#else
-/*!
-  \fn G_MODULE_EXPORT void to_run_gradient_color_window (GtkWidget * widg, gpointer data)
-
-  \brief to run background gradient color selection window callback GTK3
-
-  \param widg the GtkWidget sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void to_run_gradient_color_window (GtkWidget * widg, gpointer data)
-#endif
+G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
 {
   GtkWidget * hbox, * vbox;
   GtkWidget * hhbox, * vvbox;

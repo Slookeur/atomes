@@ -756,9 +756,12 @@ G_MODULE_EXPORT void window_measures (GtkWidget * widg, gpointer data)
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 0), gtk_label_new ("Distances"));
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 1), gtk_label_new ("Angles"));
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 2), gtk_label_new ("Dihedrals"));
-    str = g_strdup_printf (" <sub>* You can select up to %d atoms for both inter-atomic distance(s) and angle(s),\n"
-                           "     and up to %d atoms for dihedral angle(s) measurement(s)</sub>", MAX_IN_SELECTION-1, MAX_IN_SELECTION-11);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+
+    str = g_strdup_printf ("You can select up to %d atoms for both inter-atomic distance(s) and angle(s),",  MAX_IN_SELECTION-1);
+    append_comments (vbox, "<sup>*</sup>", str);
+    g_free (str);
+    str = g_strdup_printf ("and up to %d atoms for dihedral angle(s) measurement(s)", MAX_IN_SELECTION-11);
+    append_comments (vbox, " ", str);
     g_free (str);
     GtkWidget * hbox = create_hbox (0);
     GtkWidget * but = create_button ("Font and style", IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(measure_labels), view);

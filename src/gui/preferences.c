@@ -64,6 +64,7 @@ extern GtkWidget * labels_tab (glwin * view, int lid);
 extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
@@ -1782,7 +1783,9 @@ GtkWidget * view_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
 
-
+  pref_gradient_win = g_malloc0(sizeof*pref_gradient_win);
+  gradient_advanced (NULL, NULL);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_gradient_win -> win, FALSE, FALSE, 5);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
@@ -2963,8 +2966,8 @@ GtkWidget * model_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
 
-  append_comments (vbox, "<sup>*</sup>", "<i>the same parameters are also used for the </i>spheres<i> style</i>");
-  append_comments (vbox, "<sup>**</sup>", "<i>the same parameters are also used for the </i>dots<i> style</i>");
+  append_comments (vbox, "<sup>*</sup>", "the same parameters are also used for the <b>spheres</b> style");
+  append_comments (vbox, "<sup>**</sup>", "the same parameters are also used for the <b>dots</b> style");
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
@@ -3126,7 +3129,7 @@ GtkWidget * opengl_preferences ()
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-  append_comments (vbox, "<sup>*</sup>", "<i>if 10 000 atoms or more: </i>Wireframe<i>, otherwise: </i>Ball and stick");
+  append_comments (vbox, "<sup>*</sup>", "if 10 000 atoms or more: <b>Wireframe</b>, otherwise: <b>Ball and stick</b>");
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Color maps</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
@@ -3144,6 +3147,7 @@ GtkWidget * opengl_preferences ()
   show_the_widgets (vbox);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (NULL, pref_ogl_edit, & tmp_material), gtk_label_new ("Material"));
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new ("Lights"));
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new ("Fog"));

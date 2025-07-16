@@ -35,7 +35,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void set_show_box_toggle (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void set_show_box_toggle (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void set_color_box (GtkColorChooser * colob, gpointer data);
-  G_MODULE_EXPORT void box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 
 */
@@ -328,28 +327,15 @@ G_MODULE_EXPORT gboolean on_box_delete (GtkWidget * widg, GdkEvent * event, gpoi
   return TRUE;
 }
 
-#ifdef GTK4
-/*!
-  \fn G_MODULE_EXPORT void box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
-
-  \brief create the box edition window callback GTK4
-
-  \param action the GAction sending the signal
-  \param parameter GVariant parameter of the GAction, if any
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
-#else
 /*!
   \fn G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
 
-  \brief create the box edition window callback GTK3
+  \brief create the box edition window
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
-#endif
 {
   int i;
   glwin * view;

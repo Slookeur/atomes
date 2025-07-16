@@ -775,28 +775,15 @@ G_MODULE_EXPORT gboolean on_axis_delete (GtkWidget * widg, GdkEvent * event, gpo
   return TRUE;
 }
 
-#ifdef GTK4
-/*!
-  \fn G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
-
-  \brief create the axis advanced parameters window callback GTK4
-
-  \param action the GAction sending the signal
-  \param parameter GVariant parameter of the GAction, if any
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
-#else
 /*!
   \fn G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
 
-  \brief create the axis advanced parameters window callback GTK3
+  \brief create the axis advanced parameters window
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
 */
 G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
-#endif
 {
   glwin * view;
   axis_edition * the_axis;
@@ -1041,8 +1028,8 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, col_v_box, chbox, FALSE, FALSE, 0);
     }
 
-    append_comments (the_axis -> axis_data, "<sup>*</sup>", "<i>In front of the atomic model</i>");
-    append_comments (the_axis -> axis_data, "<sup>**</sup>", "<i>Inside the atomic model</i>");
+    append_comments (the_axis -> axis_data, "<sup>*</sup>", "In front of the atomic model");
+    append_comments (the_axis -> axis_data, "<sup>**</sup>", "Inside the atomic model");
     if (! preferences)
     {
       add_gtk_close_event (the_axis -> win, G_CALLBACK(on_axis_delete), view);

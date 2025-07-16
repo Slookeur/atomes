@@ -154,7 +154,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern atom_search * allocate_atom_search (int proj, int action, int searchid, int tsize);
 extern void check_all_trees (project * this_proj);
 extern int action_atoms_from_project (project * this_proj, atom_search * asearch, gboolean visible);
-extern G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void render_gl_image (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void coord_properties (GtkWidget * widg, gpointer data);
 extern void apply_project (gboolean showtools);

@@ -515,6 +515,17 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
     hide_the_widgets ((tmp_axis -> axis == WIREFRAME) ? pref_axis_win -> radius_box : pref_axis_win -> width_box);
     int i;
     for (i=0; i<2; i++) widget_set_sensitive (pref_axis_win -> axis_label_box[i], tmp_axis -> labels);
+    if (tmp_background -> gradient)
+    {
+      hide_the_widgets (pref_gradient_win -> color_box[0]);
+      hide_the_widgets (pref_gradient_win -> d_box[(tmp_background -> gradient == 1) ? 1 : 0]);
+      combo_set_active (pref_gradient_win -> d_box[tmp_background -> gradient-1], tmp_background -> direction);
+    }
+    else
+    {
+      hide_the_widgets (pref_gradient_win -> color_box[1]);
+      for (i=0; i<2; i++) hide_the_widgets (pref_gradient_win -> d_box[i]);
+    }
   }
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);
@@ -2016,8 +2027,10 @@ void set_image_from_icon_name (GtkWidget * widg, gchar * icon)
 void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend)
 {
   GtkWidget * hbox = create_hbox (BSEP);
+  gchar * str = g_strdup_printf ("<i><sub>%s</sub></i>", legend);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(symbol, 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(legend, -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 }
 

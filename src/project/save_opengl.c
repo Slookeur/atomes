@@ -161,10 +161,16 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   int i, j, k, l;
   gboolean val;
 
-  if (fwrite (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
+  if (img -> back -> gradient)
+  {
+    if (fwrite (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
+  }
+  else
+  {
+    if (fwrite (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  }
   if (this_proj -> modelgl -> custom_map != NULL) img -> color_map[0] += 10;
   if (fwrite (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;
   if (this_proj -> modelgl -> custom_map != NULL)

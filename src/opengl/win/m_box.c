@@ -56,7 +56,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "submenus.h"
 
 #ifdef GTK4
-G_MODULE_EXPORT void box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data);
 extern G_MODULE_EXPORT void window_bonds (GSimpleAction * action, GVariant * parameter, gpointer data);
 #else
 G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
@@ -65,6 +64,22 @@ extern G_MODULE_EXPORT void window_lines (GtkWidget * widg, gpointer data);
 #endif
 
 extern gboolean from_box_or_axis;
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void to_box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+
+  \brief open box configuration window callback GTK4
+
+  \param action the GAction sending the signal
+  \param parameter GVariant parameter of the GAction, if any
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void to_box_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+{
+  box_advanced (NULL, data);
+}
+#endif
 
 /*!
   \fn void update_show_hide_box_axis (glwin * view, int box_or_axis, int status)
@@ -559,7 +574,7 @@ GMenuItem * menu_box_axis (glwin * view, int popm, int ab)
     append_submenu (menu, "Color", menuc);
     g_object_unref (menuc);
     append_opengl_item (view, menu, "Advanced", "box-advanced", popm, popm, NULL, IMG_STOCK, DPROPERTIES, FALSE,
-                      G_CALLBACK(box_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+                      G_CALLBACK(to_box_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   }
   else
   {

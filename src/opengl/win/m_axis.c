@@ -48,12 +48,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "submenus.h"
 
-#ifdef GTK4
-extern G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data);
-#else
 extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
-#endif
 extern GtkWidget * create_layout_widget (gchar * str, GtkWidget * menu, int vab, gpointer data);
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void to_axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+
+  \brief create the axis advanced parameters window callback GTK4
+
+  \param action the GAction sending the signal
+  \param parameter GVariant parameter of the GAction, if any
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void to_axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+{
+  axis_advanced (NULL, data);
+}
+#endif
 
 #ifdef GTK3
 /*!
@@ -323,6 +335,6 @@ void menu_axis (GMenu * menu_ab, glwin * view, int popm)
   g_menu_append_item (menu_ab, item);
   append_submenu (menu_ab, "Position", axis_position_submenu(view, popm));
   append_opengl_item (view, menu_ab, "Advanced", "axis-advanced", popm, popm, NULL, IMG_STOCK, DPROPERTIES, FALSE,
-                      G_CALLBACK(axis_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+                      G_CALLBACK(to_axis_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
 }
 #endif

@@ -954,7 +954,7 @@ void render_this_shader (glsl_program * glsl, int ids)
   }
   else if (glsl -> object == MEASU)
   {
-    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> model_matrix.m00);
+    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> proj_model_view_matrix.m00);
     if (glsl -> vert_type == GL_TRIANGLE_STRIP)
     {
       shading_glsl_text (glsl);

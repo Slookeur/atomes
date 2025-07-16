@@ -1001,7 +1001,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> advanced_light_box, markup_label("<b>Advanced parameters</b>", -1, -1, 0.1, 0.5), FALSE, FALSE, 10);
   GtkWidget * lbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> advanced_light_box, lbox, FALSE, FALSE, 0);
-  GtkWidget * lvbox =create_vbox (BSEP);
+  GtkWidget * lvbox = create_vbox (BSEP);
   add_box_child_start ( GTK_ORIENTATION_HORIZONTAL, lbox, lvbox, FALSE, FALSE, 20);
   k = 0;
   for (i=0; i<2; i++)
@@ -1021,20 +1021,9 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
   combo_set_active (ogl_edit -> lights, 0);
   update_light_data (0, ogl_edit);
 
-  vbox = create_vbox (BSEP);
-  hbox = create_hbox(BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>*</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>Note that light N°1 must be a directional light</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  if (preferences)
-  {
-    hbox = create_hbox(BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<sup>**</sup>", 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<i>Intensity and position will be corrected based on model depth</i>", -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  }
+  append_comments (vbox, "<sup>*</sup>", "Note that light N°1 must be a directional light");
+  if (preferences) append_comments (vbox, "<sup>**</sup>", "Intensity and position will be corrected based on model depth");
 
-  layout_add_widget (layout, vbox, 0, (preferences) ? 565 : 590);
   return layout;
 }
 
