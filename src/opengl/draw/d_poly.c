@@ -116,7 +116,7 @@ vec3_t get_triangle_normal (vec3_t v1, vec3_t v2, vec3_t v3)
 /*!
   \fn void setup_triangles (float * vertices, vec3_t sa, vec3_t sb, vec3_t sc)
 
-  \brief setup triangle veertices
+  \brief setup triangle vertices
 
   \param vertices
   \param sa 1st summit

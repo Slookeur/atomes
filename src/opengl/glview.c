@@ -1328,7 +1328,13 @@ void init_img (project * this_proj)
   int i;
   this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
   image * img = this_proj -> modelgl -> anim -> last -> img;
-  img -> backcolor = default_background;
+
+  if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
+  img -> back -> gradient = default_background.gradient;
+  img -> back -> direction = default_background.direction;
+  img -> back -> color = default_background.color;
+  for (i=0; i<2; i++) img -> back -> gradient_color[i] = default_background.gradient_color[i];
+
   img -> box_color = default_box.color;
   img -> box_axis_rad[BOX] = default_box.rad;
   img -> box_axis_line[BOX] = default_box.line;

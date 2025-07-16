@@ -51,6 +51,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "glview.h"
 #include "color_box.h"
+#include "preferences.h"
 
 /*
   The object type for color change
@@ -78,7 +79,7 @@ G_MODULE_EXPORT void run_window_color (GtkDialog * win, gint response_id, gpoint
     ColRGBA colo = get_window_color (GTK_WIDGET(win));
     if (wc_cid == -2)
     {
-      this_proj -> modelgl -> anim -> last -> img -> backcolor = colo;
+      this_proj -> modelgl -> anim -> last -> img -> back -> color = colo;
       this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
     }
     else if (wc_cid == -1)
@@ -114,7 +115,7 @@ void window_color (project * this_proj, glwin * view)
   if (wc_cid == -2)
   {
     str = g_strdup_printf ("Background color");
-    col = colrgba_togtkrgba (view -> anim -> last -> img -> backcolor);
+    col = colrgba_togtkrgba (view -> anim -> last -> img -> back -> color);
   }
   else if (wc_cid == -1)
   {
@@ -168,6 +169,306 @@ G_MODULE_EXPORT void to_run_back_color_window (GtkWidget * widg, gpointer data)
   wc_cid = -2;
   window_color (get_project_by_id(view -> proj), view);
   update (view);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_gradient_color (GtkColorChooser * colob, gpointer data)
+
+  \brief change background color
+
+  \param colob the GtkColorChooser sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_gradient_color (GtkColorChooser * colob, gpointer data)
+{
+  tint * bid = (tint *)data;
+  glwin * view;
+  if (preferences)
+  {
+    switch (bid -> b)
+    {
+      case 0:
+        tmp_background -> color = get_button_color (colob);
+        break;
+      default:
+        tmp_background -> gradient_color[bid -> b -1] = get_button_color (colob);
+        break;
+    }
+  }
+  else
+  {
+    view = get_project_by_id(bid -> a) -> modelgl;
+    switch (bid -> b)
+    {
+      case 0:
+        view -> anim -> last -> img -> back -> color = get_button_color (colob);
+        break;
+      default:
+        view -> anim -> last -> img -> back -> gradient_color[bid -> b -1] = get_button_color (colob);
+        break;
+    }
+  }
+  if (! preferences)
+  {
+    if (bid -> b) view -> create_shaders[BACKG] = TRUE;
+    update (view);
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
+
+  \brief set gradient parameter callback
+
+  \param widg the GtkWidget sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
+{
+  tint * bid = (tint *)data;
+  glwin * view;
+  gradient_edition * the_gradient;
+  int i = combo_get_active (widg);
+  if (preferences)
+  {
+    the_gradient = pref_gradient_win;
+    switch (bid -> b)
+    {
+      case 0:
+        tmp_background -> gradient = i;
+        break;
+      case 1:
+        tmp_background -> direction = i;
+        break;
+    }
+  }
+  else
+  {
+    view = get_project_by_id(bid -> a) -> modelgl;
+    the_gradient = view -> gradient_win;
+    switch (bid -> b)
+    {
+      case 0:
+        view -> anim -> last -> img -> back -> gradient = i;
+        break;
+      default:
+        view -> anim -> last -> img -> back -> direction = i;
+        break;
+    }
+  }
+  if (! bid -> b && ! i)
+  {
+    hide_the_widgets (the_gradient -> d_box[0]);
+    hide_the_widgets (the_gradient -> d_box[1]);
+    show_the_widgets (the_gradient -> color_box[0]);
+    hide_the_widgets (the_gradient -> color_box[1]);
+  }
+  else
+  {
+    view -> create_shaders[BACKG] = TRUE;
+    show_the_widgets (the_gradient -> color_box[1]);
+    hide_the_widgets (the_gradient -> color_box[0]);
+    if (!  bid -> b)
+    {
+      if (i == 1)
+      {
+        show_the_widgets (the_gradient -> d_box[0]);
+        hide_the_widgets (the_gradient -> d_box[1]);
+        combo_set_active (the_gradient -> d_box[0], 0);
+      }
+      else
+      {
+        hide_the_widgets (the_gradient -> d_box[0]);
+        show_the_widgets (the_gradient -> d_box[1]);
+        combo_set_active (the_gradient -> d_box[1], 0);
+      }
+    }
+  }
+  if (! preferences)
+  {
+    update (view);
+  }
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT gboolean on_gradient_delete (GtkWindow * widg, gpointer data)
+
+  \brief gradient window delete event - GTK4
+
+  \param widg
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_gradient_delete (GtkWindow * widg, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT gboolean on_gradient_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+
+  \brief gradient window delete event - GTK3
+
+  \param widg the GtkWidget sending the signal
+  \param event the GdkEvent triggering the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean on_gradient_delete (GtkWidget * widg, GdkEvent * event, gpointer data)
+#endif
+{
+  glwin * view = (glwin *)data;
+  view -> gradient_win -> win = destroy_this_widget (view -> gradient_win -> win);
+  g_free (view -> gradient_win);
+  view -> gradient_win = NULL;
+  return TRUE;
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void to_run_gradient_color_window (GSimpleAction * action, GVariant * parameter, gpointer data)
+
+  \brief to run background gradient color selection window callback GTK4
+
+  \param action the GAction sending the signal
+  \param parameter GVariant parameter of the GAction, if any
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void to_run_gradient_color_window (GSimpleAction * action, GVariant * parameter, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void to_run_gradient_color_window (GtkWidget * widg, gpointer data)
+
+  \brief to run background gradient color selection window callback GTK3
+
+  \param widg the GtkWidget sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void to_run_gradient_color_window (GtkWidget * widg, gpointer data)
+#endif
+{
+  GtkWidget * hbox, * vbox;
+  GtkWidget * hhbox, * vvbox;
+  gradient_edition * the_gradient;
+  int back_gradient;
+  int back_direction;
+  ColRGBA back_color;
+  ColRGBA * gradient_color;
+  glwin * view;
+  vbox = create_vbox (BSEP);
+  if (preferences)
+  {
+    the_gradient = pref_gradient_win;
+    back_gradient = tmp_background -> gradient;
+    back_direction = tmp_background -> direction;
+    back_color = tmp_background -> color;
+    gradient_color = tmp_background -> gradient_color;
+  }
+  else
+  {
+    view = (glwin *)data;
+    view -> gradient_win = g_malloc0(sizeof*view -> gradient_win);
+    the_gradient = view -> gradient_win;
+    back_gradient = view -> anim -> last -> img -> back -> gradient;
+    back_direction = view -> anim -> last -> img -> back -> direction;
+    back_color = view -> anim -> last -> img -> back -> color;
+    gradient_color = view -> anim -> last -> img -> back -> gradient_color;
+  }
+  if (preferences)
+  {
+    the_gradient -> win = create_vbox (BSEP);
+    adv_box (the_gradient -> win, "<b>Background settings</b>", 5, 120, 0.0);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> win, hbox, FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
+  }
+  else
+  {
+    gchar * str = g_strdup_printf ("Background settings - %s", get_project_by_id(view -> proj)->name);
+    the_gradient -> win = create_win (str, view -> win, FALSE, FALSE);
+    g_free (str);
+    add_container_child (CONTAINER_WIN, the_gradient -> win, vbox);
+  }
+
+  gchar * g_name[2] = {"Gradient type", "Gradient direction"};
+  gchar * g_type[3] = {"No gradient", "Linear", "Circular"};
+  gchar * g_direction[2][9] = {{"Top to bottom", "Right to left", "Bottom right to top left", "Top right to bottom left", "", "", "", "", ""},
+                               {"Right to left", "Left to right", "Top to bottom", "Bottom to top",
+                                "Bottom right to top left", "Bottom left to top right", "Top right to bottom left", "Top left to bottom right", "Center"}};
+  int n_val[2] = {4, 9};
+  int i, j;
+  hbox = abox (vbox, g_name[0], 5);
+  the_gradient -> g_box = create_combo ();
+  for (i=0; i<3; i++)
+  {
+    combo_text_append (the_gradient -> g_box, g_type[i]);
+  }
+  combo_set_active (the_gradient -> g_box, back_gradient);
+  gtk_widget_set_size_request (the_gradient -> g_box, 200, -1);
+  g_signal_connect (G_OBJECT (the_gradient -> g_box), "changed", G_CALLBACK(set_gradient_parameter), (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_gradient -> g_box, FALSE, FALSE, 20);
+
+  hbox = abox (vbox, g_name[1], 5);
+  for (i=0; i<2; i++)
+  {
+    the_gradient -> d_box[i] = create_combo ();
+    for (j=0; j<n_val[i]; j++)
+    {
+      combo_text_append (the_gradient -> d_box[i], g_direction[i][j]);
+    }
+    gtk_widget_set_size_request (the_gradient -> d_box[i], 200, -1);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_gradient -> d_box[i], FALSE, FALSE, 20);
+  }
+  if (back_gradient)
+  {
+    combo_set_active (the_gradient -> d_box[back_gradient-1], back_direction);
+  }
+  for (i=0; i<2; i++)
+  {
+    g_signal_connect (G_OBJECT (the_gradient -> d_box[i]), "changed", G_CALLBACK(set_gradient_parameter),  (preferences) ? & pref_pointer[1] : & view -> colorp[1][0]);
+  }
+  the_gradient -> color_box[0] = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_gradient -> color_box[0], FALSE, FALSE, 20);
+  abox (the_gradient -> color_box[0], "Background color", 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> color_box[0], hbox, FALSE, FALSE, 5);
+  vvbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
+  hhbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("Single color", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, color_button (back_color, FALSE, 100, -1, G_CALLBACK(set_gradient_color),  (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]), FALSE, FALSE, 0);
+
+  the_gradient -> color_box[1] = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_gradient -> color_box[1], FALSE, FALSE, 20);
+  abox (the_gradient -> color_box[1], "Gradient colors", 5);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> color_box[1], hbox, FALSE, FALSE, 5);
+  vvbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
+  gchar * c_name[2] = {"First color", "Second color"};
+  for (i=0; i<2; i++)
+  {
+    hhbox = create_hbox (BSEP);
+    // g_print ("col.r= %f, col.g= %f, col.b= %f\n", gradient_color[i].red, gradient_color[i].green, gradient_color[i].blue);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (c_name[i], 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox,
+                         color_button (gradient_color[i], FALSE, 100, -1, G_CALLBACK(set_gradient_color), (preferences) ? & pref_pointer[i+1] : & view -> colorp[i+1][0]), FALSE, FALSE, 0);
+  }
+
+  if (! preferences)
+  {
+    add_gtk_close_event (the_gradient -> win, G_CALLBACK(on_gradient_delete), view);
+    show_the_widgets (the_gradient -> win);
+    if (! back_gradient)
+    {
+      hide_the_widgets (the_gradient -> color_box[1]);
+      for (i=0; i<2; i++) hide_the_widgets (the_gradient -> d_box[i]);
+    }
+    else
+    {
+      hide_the_widgets (the_gradient -> color_box[0]);
+      if (back_gradient == 1) hide_the_widgets (the_gradient -> d_box[1]);
+      if (back_gradient == 2) hide_the_widgets (the_gradient -> d_box[0]);
+    }
+  }
 }
 
 #ifdef GTK4

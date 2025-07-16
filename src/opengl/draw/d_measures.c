@@ -122,9 +122,9 @@ void set_measure_color (int selected, int id, int num)
   }
   else
   {
-    col.red   = 1.0 - plot -> backcolor.red;
-    col.green = 1.0 - plot -> backcolor.green;
-    col.blue  = 1.0 - plot -> backcolor.blue;
+    col.red   = 1.0 - plot -> back -> color.red;
+    col.green = 1.0 - plot -> back -> color.green;
+    col.blue  = 1.0 - plot -> back -> color.blue;
     col.alpha = 1.0;
   }
 }

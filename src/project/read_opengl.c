@@ -320,7 +320,14 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 {
   int i, j, k, l, m, n;
   gboolean val;
-  if (fread (& img -> backcolor, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  img -> back = g_malloc0(sizeof*img -> back);
+  if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (! old_img_labels)
+  {
+    if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
+  }
   if (fread (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;
   if (img -> color_map[0] > ATOM_MAPS-1)
   {

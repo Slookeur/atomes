@@ -47,6 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void glsl_bind_cylinders (glsl_program * glsl, object_3d * obj);
   void glsl_bind_caps (glsl_program * glsl, object_3d * obj);
   void glsl_bind_polyhedra (glsl_program * glsl, object_3d * obj);
+  void glsl_bind_background (glsl_program * glsl, object_3d * obj);
   void update_string_instances (glsl_program * glsl, object_3d * obj);
   void glsl_bind_string (glsl_program * glsl, object_3d * obj);
   void re_create_all_md_shaders (glwin * view);
@@ -404,6 +405,27 @@ void glsl_bind_polyhedra (glsl_program * glsl, object_3d * obj)
 }
 
 /*!
+  \fn void glsl_bind_background (glsl_program * glsl, object_3d * obj)
+
+  \brief bind background data to an OpenGL shader program
+
+  \param glsl the target glsl
+  \param obj the 3D object to bind
+*/
+void glsl_bind_background (glsl_program * glsl, object_3d * obj)
+{
+
+  glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "first_color");
+  glsl -> uniform_loc[1] = glGetUniformLocation (glsl -> id, "second_color");
+  glsl -> uniform_loc[2] = glGetUniformLocation (glsl -> id, "gradient");
+
+  glBindBuffer(GL_ARRAY_BUFFER, glsl -> vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, obj -> vert_buffer_size * obj -> num_vertices*sizeof(GLfloat), obj -> vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(glsl -> array_pointer[0]);
+  glVertexAttribPointer(glsl -> array_pointer[0], 2, GL_FLOAT, GL_FALSE, obj -> vert_buffer_size*sizeof(GLfloat), (GLvoid*) 0);
+}
+
+/*!
   \fn void update_string_instances (glsl_program * glsl, object_3d * obj)
 
   \brief Update OpenGL string texture instances
@@ -520,7 +542,7 @@ object_3d * duplicate_object_3d (object_3d * old_obj)
   \brief create an OpenGL shader program
 
   \param object shader id (in enum shaders)
-  \param object_id shader type in: GLSL_SPHERES, GLSL_POINTS, GLSL_LINES, GLSL_CYLINDERS, GLSL_CAPS, GLSL_POLYEDRA, GLSL_STRING
+  \param object_id shader type in: GLSL_SPHERES, GLSL_POINTS, GLSL_LINES, GLSL_CYLINDERS, GLSL_CAPS, GLSL_POLYEDRA, GLSL_STRING, GLSL_BACK
   \param vertex general shader: in the shaders defined in 'ogl_shaders.c'
   \param geometry geometry shader, if any: in the shaders defined in 'ogl_shaders.c'
   \param fragment color shader, if any: in the shaders defined in 'ogl_shaders.c'
@@ -562,8 +584,8 @@ glsl_program * init_shader_program (int object, int object_id,
   glsl -> array_pointer = alloc_shader_pointer (glsl -> array_pointer, narray);
   glsl -> uniform_loc = alloc_shader_pointer (glsl -> uniform_loc, nunif);
 
-  // Always the MVP matrix as uniform 0
-  glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "mvp");
+  // For other than background always the MVP matrix as uniform 0
+  if (object_id != GLSL_BACK) glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "mvp");
   // and always the vertices as array 0
   glsl -> array_pointer[0] = glGetAttribLocation (glsl -> id, "vert");
 
@@ -612,6 +634,9 @@ glsl_program * init_shader_program (int object, int object_id,
       break;
     case GLSL_STRING:
       glsl_bind_string (glsl, glsl -> obj);
+      break;
+    case GLSL_BACK:
+      glsl_bind_background (glsl, glsl -> obj);
       break;
   }
   glDetachShader (glsl -> id,glsl -> vertex_shader);
@@ -916,9 +941,20 @@ void render_this_shader (glsl_program * glsl, int ids)
     glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> proj_model_view_matrix.m00);
     shading_glsl_text (glsl);
   }
+  else if (glsl -> object == BACKG)
+  {
+    for (j=0; j<2; j++)
+    {
+      glUniform4f (glsl -> uniform_loc[j], plot -> back -> gradient_color[j].red,
+                                           plot -> back -> gradient_color[j].green,
+                                           plot -> back -> gradient_color[j].blue,
+                                           plot -> back -> gradient_color[j].alpha);
+    }
+    glUniform1i (glsl -> uniform_loc[2], plot -> back -> direction);
+  }
   else if (glsl -> object == MEASU)
   {
-    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> proj_model_view_matrix.m00);
+    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> model_matrix.m00);
     if (glsl -> vert_type == GL_TRIANGLE_STRIP)
     {
       shading_glsl_text (glsl);
@@ -1012,7 +1048,9 @@ void render_this_shader (glsl_program * glsl, int ids)
   }
   else
   {
+    if (glsl -> draw_type == GLSL_BACK) glDisable (GL_DEPTH_TEST);
     glDrawArrays (glsl -> vert_type, 0, glsl -> obj -> num_vertices);
+    if (glsl -> draw_type == GLSL_BACK) glEnable (GL_DEPTH_TEST);
   }
   if (glsl_disable_cull_face (glsl)) glEnable (GL_CULL_FACE);
   glBindVertexArray (0);

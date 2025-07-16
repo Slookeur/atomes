@@ -162,8 +162,9 @@ rep_edition * pref_rep_win = NULL;
 axis_data default_axis;
 axis_data * tmp_axis = NULL;
 axis_edition * pref_axis_win = NULL;
-ColRGBA default_background;
-ColRGBA tmp_background;
+background default_background;
+background * tmp_background = NULL;
+gradient_edition * pref_gradient_win = NULL;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -820,9 +821,27 @@ int save_preferences_to_xml_file ()
 
   // Background
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"background");
-  if (rc < 0) return 0;
-  rc = xml_save_color_to_file (writer, -1, "Color", "default_background", default_background);
+  str = g_strdup_printf ("%d", default_background.gradient);
+  rc = xml_save_parameter_to_file (writer, "Gradient", "default_background", TRUE, 0, str);
+  g_free (str);
   if (! rc) return 0;
+  if (default_background.gradient)
+  {
+    str = g_strdup_printf ("%d", default_background.direction);
+    rc = xml_save_parameter_to_file (writer, "Direction", "default_background", TRUE, 1, str);
+    g_free (str);
+    if (! rc) return 0;
+    for (i=0; i<2; i++)
+    {
+      rc = xml_save_color_to_file (writer, i+2, "Color", "default_background", default_background.gradient_color[i]);
+      if (! rc) return 0;
+    }
+  }
+  else
+  {
+    rc = xml_save_color_to_file (writer, -1, "Color", "default_background", default_background.color);
+    if (! rc) return 0;
+  }
 
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
@@ -1216,9 +1235,23 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
       }
     }
   }
-  else if (g_strcmp0(key, "default_background") == 0 && col)
+  else if (g_strcmp0(key, "default_background") == 0)
   {
-    default_background = * col;
+    switch (vid)
+    {
+      case -1:
+        if (col) default_background.color = * col;
+        break;
+      case 0:
+        default_background.gradient = (int) xml_string_to_double(content);
+        break;
+      case 1:
+        default_background.direction = (int) xml_string_to_double(content);
+        break;
+      default:
+        if (col) default_background.gradient_color[vid-2] = * col;
+        break;
+    }
   }
   else if (g_strcmp0(key, "default_rep") == 0)
   {
@@ -1732,19 +1765,6 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
 }
 
 /*!
-  \fn G_MODULE_EXPORT void set_default_background (GtkColorChooser * colob, gpointer data)
-
-  \brief change default background color
-
-  \param colob the GtkColorChooser sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_default_background (GtkColorChooser * colob, gpointer data)
-{
-  tmp_background = get_button_color (colob);
-}
-
-/*!
   \fn GtkWidget * view_preferences ()
 
   \brief view preferences
@@ -1762,8 +1782,7 @@ GtkWidget * view_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
 
-  GtkWidget * hbox = adv_box (vbox, "Background color", 5, 150, 1.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_button (tmp_background, 1.0, 100, -1, G_CALLBACK(set_default_background), NULL), FALSE, FALSE, 30);
+
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
 
@@ -3393,6 +3412,26 @@ void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
 }
 
 /*!
+  \fn void duplicate_background_data (background * new_back, background * old_back)
+
+  \brief duplicate background data structure
+
+  \param new_back the new background structure
+  \param old_back the background structure to copy
+*/
+void duplicate_background_data (background * new_back, background * old_back)
+{
+  new_back -> gradient = old_back -> gradient;
+  new_back -> direction = old_back -> direction;
+  new_back -> color = old_back -> color;
+  int i;
+  for (i=0; i<2; i++)
+  {
+    new_back -> gradient_color[i] = old_back -> gradient_color[i];
+  }
+}
+
+/*!
   \fn void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis)
 
   \brief duplicate axis_data data structure
@@ -3466,7 +3505,9 @@ void prepare_tmp_default ()
   tmp_box = g_malloc0(sizeof*tmp_box);
   duplicate_box_data (tmp_box, & default_box);
 
-  tmp_background = default_background;
+  tmp_background = g_malloc0(sizeof*tmp_background);
+  duplicate_background_data (tmp_background, & default_background);
+
   tmp_rep = g_malloc0(sizeof*tmp_rep);
   duplicate_rep_data (tmp_rep, & default_rep);
 
@@ -3568,7 +3609,7 @@ void save_preferences ()
 
   duplicate_box_data (& default_box, tmp_box);
 
-  default_background = tmp_background;
+  duplicate_background_data (& default_background, tmp_background);
   duplicate_rep_data (& default_rep, tmp_rep);
   duplicate_axis_data (& default_axis, tmp_axis);
 
@@ -3724,10 +3765,21 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
   // Representation
 
   // Background color
-  default_background.red = 0.0;
-  default_background.green = 0.0;
-  default_background.blue = 0.0;
-  default_background.alpha = 1.0;
+  default_background.color.red = 0.0;
+  default_background.color.green = 0.0;
+  default_background.color.blue = 0.0;
+  default_background.color.alpha = 1.0;
+  default_background.gradient = 1;
+  default_background.direction = 0;
+  default_background.gradient_color[0].red = 0.10;
+  default_background.gradient_color[0].green = 0.37;
+  default_background.gradient_color[0].blue = 0.70;
+  default_background.gradient_color[0].alpha = 1.0;
+  default_background.gradient_color[1].red = 0.0;
+  default_background.gradient_color[1].green = 0.01;
+  default_background.gradient_color[1].blue = 0.21;
+  default_background.gradient_color[1].alpha = 1.0;
+
 
   default_rep.rep = PERSPECTIVE;
   default_rep.proj = -1;

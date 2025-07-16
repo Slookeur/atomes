@@ -41,6 +41,12 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 
 #ifdef GTK3
+  extern G_MODULE_EXPORT void to_run_gradient_color_window (GtkWidget * widg, gpointer data);
+#else
+  extern G_MODULE_EXPORT void to_run_gradient_color_window (GSimpleAction * action, GVariant * parameter, gpointer data);
+#endif
+
+#ifdef GTK3
 /*!
   \fn GtkWidget * menu_back (glwin * view)
 
@@ -54,6 +60,9 @@ GtkWidget * menu_back (glwin * view)
   GtkWidget * bc = create_menu_item (FALSE, "Color");
   gtk_menu_shell_append ((GtkMenuShell *)menub, bc);
   gtk_menu_item_set_submenu ((GtkMenuItem *)bc, color_box(view, -2, 0, 0));
+  GtkWidget * gc = create_menu_item (FALSE, "Gradient color");
+  g_signal_connect (G_OBJECT (gc), "activate", G_CALLBACK(to_run_gradient_color_window), view);
+  gtk_menu_shell_append ((GtkMenuShell *)menub, gc);
   return menub;
 }
 #else
@@ -70,6 +79,7 @@ GMenu * menu_back (glwin * view, int popm)
   GMenu * menu = g_menu_new ();
   append_opengl_item (view, menu, "back-color", "back-color", popm, popm, NULL, IMG_NONE, NULL, TRUE, NULL, NULL, FALSE, FALSE, FALSE, FALSE);
   append_opengl_item (view, menu, "More colors ...", "back-color", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_run_back_color_window), view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, "Gradient colors", "back-gradient", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_run_gradient_color_window), view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 #endif

@@ -66,7 +66,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #define NINPUTS 6
 #define NSELECTION 7
 
-#define NGLOBAL_SHADERS 14
+#define NGLOBAL_SHADERS 15
 
 /*! \enum object_types */
 enum object_types
@@ -99,7 +99,8 @@ enum shaders {
   MEASU = 10, /*!< 10 */
   LIGHT = 11, /*!< 11 */
   SLABS = 12, /*!< 12 */
-  VOLMS = 13  /*!< 13 */
+  VOLMS = 13, /*!< 13 */
+  BACKG = 14  /*!< 14 */
 };
 
 #define FILLED_STYLES 4
@@ -292,14 +293,44 @@ struct atom_selection
   atom_in_selection * last;
 };
 
+/*! \typedef background
+
+  \brief a background data structure
+*/
+typedef struct background background;
+struct background
+{
+  int gradient;   /*!< 0 = none \n
+                       1 = linear \n
+                       2 = circular */
+  int direction;  /*!< If linear: \n
+                         0 = right to left \n
+                         1 = top to bottom \n
+                         2 = bottom right to top left \n
+                         3 = top right to bottom left \n
+                         4 = center \n
+                       If circular: \n
+                         0 = right to left \n
+                         1 = left to right \n
+                         2 = top to bottom \n
+                         3 = bottom to top \n
+                         4 = bottom right to top left \n
+                         5 = bottom left to top right \n
+                         6 = top right to bottom left \n
+                         7 = top left to bottom right \n
+                         8 = center  */
+  ColRGBA color;
+  ColRGBA gradient_color[2];
+};
+
 /*! \typedef image
 
-  \brief a structure to describe the content of the OpenGL rendering
+  \brief a structure to describe the visual content of the OpenGL rendering
 */
 typedef struct image image;
 struct image
 {
-  ColRGBA backcolor;                            /*!< Background color */
+  background * back;                            /*!< Background data structure */
   // Color maps for atoms [0] and polyhedra [1]
   int color_map[2];                             /*!< Color maps, 0= atoms, 1 = polyhedra */
 
@@ -894,6 +925,15 @@ struct rep_edition
   GtkWidget * camera_widg[7];
 };
 
+typedef struct gradient_edition gradient_edition;
+struct gradient_edition
+{
+  GtkWidget * win;
+  GtkWidget * g_box;
+  GtkWidget * d_box[2];
+  GtkWidget * color_box[2];
+};
+
 /*! \typedef glwin
 
   \brief OpenGL window widget structure */
@@ -963,6 +1003,7 @@ struct glwin
   box_edition * box_win;
   axis_edition * axis_win;
   rep_edition * rep_win;
+  gradient_edition * gradient_win;
 
   // OpenGL plot
   GtkWidget * plot;

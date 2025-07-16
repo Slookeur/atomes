@@ -86,6 +86,7 @@ extern void create_measures_lists ();
 extern void create_light_lists ();
 extern void create_slab_lists (project * this_proj);
 extern void create_volumes_lists ();
+extern void create_background_lists ();
 
 /*!
   \fn void print_matrices ()
@@ -542,7 +543,9 @@ void draw (glwin * view)
   {
     int i;
     for (i=0; i<NGLOBAL_SHADERS; i++) cleaning_shaders (wingl, i);
+    if (plot -> back -> gradient) wingl -> create_shaders[BACKG] = TRUE;
   }
+  if (plot -> back -> gradient && wingl -> create_shaders[BACKG]) create_background_lists ();
   if (wingl -> create_shaders[MDBOX]) wingl -> n_shaders[MDBOX][box_step] = create_box_lists (box_step);
   if (wingl -> create_shaders[MAXIS]) wingl -> n_shaders[MAXIS][0] = create_axis_lists ();
   if (wingl -> create_shaders[LIGHT]) create_light_lists ();
@@ -554,9 +557,9 @@ void draw (glwin * view)
   {
     // Picking mode scene
     glDisable (GL_LIGHTING);
-    glClearColor (plot -> backcolor.red,
-                  plot -> backcolor.green,
-                  plot -> backcolor.blue,
+    glClearColor (plot -> back -> color.red,
+                  plot -> back -> color.green,
+                  plot -> back -> color.blue,
                   1.0);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -567,8 +570,14 @@ void draw (glwin * view)
   else
   {
     // Normal mode scene
-    glClearColor (plot -> backcolor.red, plot -> backcolor.green, plot -> backcolor.blue, plot -> backcolor.alpha);
+    glClearColor (plot -> back -> color.red,
+                  plot -> back -> color.green,
+                  plot -> back -> color.blue,
+                  plot -> back -> color.alpha);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    // Gradient background
+    draw_vertices (BACKG);
 
     // We want to draw the elements by reverse order
     // so that atoms will be last and and will appear on

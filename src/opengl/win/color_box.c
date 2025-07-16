@@ -108,7 +108,7 @@ G_MODULE_EXPORT void set_back_color (GtkWidget * widg, gpointer data)
 {
   tint * col = (tint *) data;
   project * this_proj = get_project_by_id(col -> a);
-  get_color (& this_proj -> modelgl -> anim -> last -> img -> backcolor, col -> b);
+  get_color (& this_proj -> modelgl -> anim -> last -> img -> back -> color, col -> b);
   this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
   update (this_proj -> modelgl);
 }
@@ -360,7 +360,6 @@ GtkWidget * color_box (glwin * view, int ideo, int spec, int geo)
 #ifdef GTK3
   but = create_menu_item (FALSE, "More colors ...");
   gtk_menu_shell_append ((GtkMenuShell *)coltable, but);
-// #endif
   if (ideo < -2)
   {
     g_signal_connect (G_OBJECT (but), "activate", G_CALLBACK(window_color_coord), & view -> gcid[4+spec][geo][4+spec]);
