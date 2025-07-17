@@ -1078,8 +1078,8 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
       the_mat -> param[k+1] = template_parameters[i][k];
       if (ogl_edit)
       {
-        update_entry_double (GTK_ENTRY(ogl_edit -> m_entry[j]), the_mat -> param[k+1]);
-        gtk_range_set_value (GTK_RANGE(ogl_edit -> m_scale[j]), the_mat -> param[k+1]);
+        update_entry_double (GTK_ENTRY(ogl_edit -> m_entry[k]), the_mat -> param[k+1]);
+        gtk_range_set_value (GTK_RANGE(ogl_edit -> m_scale[k]), the_mat -> param[k+1]);
       }
     }
     combo_set_active (ogl_edit -> templates, i);
@@ -1098,7 +1098,10 @@ G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer da
   the_mat -> predefine = k;
   widget_set_sensitive (ogl_edit -> templates, the_mat -> predefine);
   widget_set_sensitive (ogl_edit -> param_mat, ! the_mat -> predefine);
-  if (! preferences) update (view);
+  if (! preferences)
+  {
+    update (view);
+  }
 }
 
 /*!

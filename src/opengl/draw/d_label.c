@@ -77,6 +77,7 @@ void prepare_label (atom at, int id, double al)
 
   k = at.sp;
   double rad = get_sphere_radius ((at.style == NONE) ? plot -> style : at.style, k, id, (at.pick[0] || at.pick[1]));
+  if (at.style == CYLINDERS || (plot -> style == CYLINDERS && at.style == NONE)) rad += (at.pick[0] || at.pick[1]) ? 0.9 : 1.0;
   for (l=0; l<3; l++) shift[l] = plot -> labels[id].shift[l];
   shift[2] += rad;
 
