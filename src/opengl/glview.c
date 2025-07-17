@@ -1373,7 +1373,7 @@ void setup_default_image (project * this_proj, image * img)
   // Visual styles
   if (! default_opengl[0])
   {
-    img -> style = (this_proj -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
+    img -> style = (this_proj -> natomes <= 10000) ? BALL_AND_STICK : DEFAULT_STYLE;
   }
   else if (default_opengl[0] > 0)
   {

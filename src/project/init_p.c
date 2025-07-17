@@ -46,6 +46,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 
+extern void init_camera (project * this_proj, int get_depth);
 extern void setup_default_image (project * this_proj, image * img);
 extern void setup_default_species_parameters_for_image (project * this_proj, image * img);
 extern void init_shaders (glwin * view);
@@ -101,6 +102,7 @@ void apply_default_parameters_to_project (project * this_proj)
     if (img)
     {
       setup_default_image (this_proj, img);
+      init_camera (this_proj, FALSE);
       setup_default_species_parameters_for_image (this_proj, img);
       init_shaders (this_proj -> modelgl);
       update (this_proj -> modelgl);
