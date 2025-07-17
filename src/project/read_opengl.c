@@ -34,6 +34,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int read_atom_b (FILE * fp, project * this_proj, int s, int a);
   int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size, int steps);
   int read_this_image_label (FILE * fp, screen_label * label);
+  int read_this_box (FILE * fp, box * abc);
+  int read_this_axis (FILE * fp, axis * xyz);
   int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
 
 */
@@ -44,7 +46,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "initcoord.h"
 #include "preferences.h"
 
-extern gboolean old_labels_and_gradient;
+extern gboolean old_la_bo_ax_gr;
 
 /*!
   \fn int read_atom_a (FILE * fp, project * this_proj, int s, int a)
@@ -304,6 +306,62 @@ int read_this_image_label (FILE * fp, screen_label * label)
 }
 
 /*!
+  \fn int read_this_box (FILE * fp, box * abc)
+
+  \brief read OpenGL image box properties to file
+
+  \param fp the file pointer
+  \param box the target box data
+*/
+int read_this_box (FILE * fp, box * abc)
+{
+  if (fread (& abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fread (abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+  return OK;
+}
+
+/*!
+  \fn int read_this_axis (FILE * fp, axis * xyz)
+
+  \brief read OpenGL image axis properties to file
+
+  \param fp the file pointer
+  \param axis the target axis data
+*/
+int read_this_axis (FILE * fp, axis * xyz)
+{
+  if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  gboolean val;
+  int i;
+  if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (val)
+  {
+    xyz -> color = g_malloc (3*sizeof*xyz -> color);
+    for (i=0; i<3; i++)
+    {
+      if (fread (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    }
+  }
+  if (fread (& xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<3; i++)
+  {
+    xyz -> title[i] = read_this_string (fp);
+    if (xyz -> title[i] == NULL) return ERROR_RW;
+  }
+  return OK;
+}
+
+
+/*!
   \fn int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 
   \brief read OpenGL image properties from file
@@ -317,9 +375,9 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 {
   int i, j, k, l, m, n;
   gboolean val;
-  img -> back = g_malloc0(sizeof*img -> back);
+
   duplicate_background_data (img -> back, & default_background);
-  if (! old_labels_and_gradient)
+  if (! old_la_bo_ax_gr)
   {
     if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (img -> back -> gradient)
@@ -374,7 +432,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fread (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fread (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (old_labels_and_gradient)
+  if (old_la_bo_ax_gr)
   {
     for (i=0; i<5; i++)
     {
@@ -452,31 +510,43 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fread (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
   // Model box and axis
-  if (fread (img -> box_axis, sizeof(int), 2, fp) != 2) return ERROR_RW;
-  if (fread (img -> box_axis_rad, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fread (img -> box_axis_line, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fread (& img -> box_color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
-
-  // Axis
-  if (fread (& img -> axispos, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> axis_length, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> axis_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
-
-  if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (val)
+  if (old_la_bo_ax_gr)
   {
-    img -> axis_color = g_malloc (3*sizeof*img -> axis_color);
+    if (fread (& img -> abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    if (fread (img -> abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+    // Axis
+    if (fread (& img -> xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (img -> xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+
+    if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+    if (val)
+    {
+      img -> xyz -> color = g_malloc (3*sizeof*img -> xyz -> color);
+      for (i=0; i<3; i++)
+      {
+        if (fread (& img -> xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+      }
+    }
+    if (fread (& img -> xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
     for (i=0; i<3; i++)
     {
-      if (fread (& img -> axis_color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+      img -> xyz -> title[i] = read_this_string (fp);
+      if (img -> xyz -> title[i] == NULL) return ERROR_RW;
     }
   }
-  if (fread (& img -> axis_labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  for (i=0; i<3; i++)
+  else
   {
-    img -> axis_title[i] = read_this_string (fp);
-    if (img -> axis_title[i] == NULL) return ERROR_RW;
+    // Model box
+    if (read_this_box (fp, img -> abc)) return ERROR_RW;
+    // Axis
+    if (read_this_axis (fp, img -> xyz)) return ERROR_RW;
   }
   // OpenGL
   if (fread (& img -> p_depth, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;

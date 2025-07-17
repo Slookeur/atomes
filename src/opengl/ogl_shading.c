@@ -937,7 +937,7 @@ void render_this_shader (glsl_program * glsl, int ids)
     }
     wingl -> axis_proj_model_view_matrix = create_axis_matrices (j);
     glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
-    j = (plot -> box_axis[AXIS] == WIREFRAME) ? 1 : 3;
+    j = (plot -> xyz -> axis == WIREFRAME) ? 1 : 3;
     if (ids > j) shading_glsl_text (glsl);
   }
   else if (glsl -> object == LABEL)

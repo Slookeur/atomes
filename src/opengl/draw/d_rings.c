@@ -238,7 +238,7 @@ void create_ring_lists ()
       wingl -> n_shaders[RINGS][step] = 1;
       object_3d * rings = g_malloc0 (sizeof*rings);
       rings -> vert_buffer_size = POLY_BUFF_SIZE;
-      rings -> num_vertices = rtot * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      rings -> num_vertices = rtot * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       rings -> vertices = allocfloat (rings -> vert_buffer_size*rings -> num_vertices);
       nba = 0;
       for (i=0; i < 5; i++)

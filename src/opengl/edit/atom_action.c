@@ -228,7 +228,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   else if (! this_proj -> natomes)
   {
     edit -> coord = NULL;
-    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = default_axis.axis;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = default_axis.axis;
   }
   gboolean passivate = FALSE;
   if (asearch -> action == REMOVE)

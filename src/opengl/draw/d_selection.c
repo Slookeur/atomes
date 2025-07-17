@@ -506,13 +506,13 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
   if (cylinder)
   {
     cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
-    cyl -> num_instances =  (bonds/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    cyl -> num_instances =  (bonds/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
     cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
     if (caps)
     {
       cap = draw_cylinder_cap (plot -> quality, 1.0, TRUE);
-      cap -> num_instances =  (ncaps/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      cap -> num_instances =  (ncaps/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       cap -> inst_buffer_size = CAPS_BUFF_SIZE;
       cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
     }
@@ -555,7 +555,7 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
           {
             cyl = g_malloc0 (sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
-            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
             nbs = 0;
             sel = plot -> selected[type] -> first;
@@ -601,13 +601,13 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
   if (cylinder)
   {
     cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
-    cyl -> num_instances =  (bonds/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    cyl -> num_instances =  (bonds/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
     cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
     if (caps)
     {
       cap = draw_cylinder_cap (plot -> quality, 1.0, TRUE);
-      cap -> num_instances =  (ncaps/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      cap -> num_instances =  (ncaps/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       cap -> inst_buffer_size = CAPS_BUFF_SIZE;
       cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
     }
@@ -651,7 +651,7 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
           {
             cyl = g_malloc0 (sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
-            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
             nbs = 0;
             for (k=0; k<proj_at; k++)
@@ -727,7 +727,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
     atos -> vertices[0] = atos -> vertices[1] = atos -> vertices[2] = 0.0;
   }
 
-  atos -> num_instances = atoms[style][type] * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+  atos -> num_instances = atoms[style][type] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
   atos -> inst_buffer_size = ATOM_BUFF_SIZE;
   atos -> instances = allocfloat (atos -> num_instances*ATOM_BUFF_SIZE);
 

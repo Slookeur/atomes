@@ -324,6 +324,38 @@ struct background
   ColRGBA gradient_color[2];
 };
 
+/*! \typedef axis
+
+  \brief axis layout data structure
+*/
+typedef struct axis axis;
+struct axis
+{
+  int axis;              /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double line;           /*!< Width for wireframe */
+  double rad;            /*!< Radius for cylinders */
+  double length;         /*!< Axis length */
+  int t_pos;             /*!< Axis template position */
+  GLfloat c_pos[3];      /*!< Axis custom positions */
+  int labels;            /*!< Show / hide axis labels */
+  gchar * title[3];      /*!< Axis titles */
+  ColRGBA * color;       /*!< Associated color */
+};
+
+/*! \typedef box
+
+  \brief box layout data structure
+*/
+typedef struct box box;
+struct box
+{
+  int box;             /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double line;         /*!< Width for wireframe */
+  double rad;          /*!< Radius for cylinders */
+  ColRGBA color;       /*!< Associated color */
+  int extra_cell[3];   /*!< Extra cells (if any) on x, y and z */
+};
+
 /*! \typedef image
 
   \brief a structure to describe the visual content of the OpenGL rendering
@@ -332,6 +364,9 @@ typedef struct image image;
 struct image
 {
   background * back;                            /*!< Background data structure */
+  axis * xyz;                                   /*!< Axis layout data structure */
+  box * abc;                                    /*!< Box layout data structure */
+
   // Color maps for atoms [0] and polyhedra [1]
   int color_map[2];                             /*!< Color maps, 0= atoms, 1 = polyhedra */
 
@@ -379,27 +414,6 @@ struct image
   atom_selection * selected[2];          /*!< atom(s) selection lists \n
                                                     0 = analysis mode, \n
                                                     1 = edition mode */
-  // Model box and partial axis data
-  // BOX = 0, AXIS = 1
-  int box_axis[2];                              /*!< Show (1) / hide (0): \n
-                                                   0 = model box, \n
-                                                   1 = axis */
-  double box_axis_rad[2];                       /*!< Cylinder radius (if used): \n
-                                                   0 = model box, \n
-                                                   1 = axis */
-  double box_axis_line[2];                      /*!< Wireframe line width (if used):
-                                                   0 = model box, \n
-                                                   1 = axis */
-  ColRGBA box_color;                            /*!< Model box color */
-  // Extra cell on a/b/c
-  int extra_cell[3];                            /*!< Extra cells (if any) on x, y and z */
-
-  double axis_length;                           /*!< Axis length */
-  int axispos;                                  /*!< Axis template position */
-  GLfloat axis_pos[3];                          /*!< Axis custom position */
-  int axis_labels;                              /*!< Show / hide axis labels */
-  gchar * axis_title[3];                        /*!< Axis titles */
-  ColRGBA * axis_color;                         /*!< Axis colors, if not default */
 
  // Coordination(s)
   ColRGBA ** spcolor[10];                       /*!<  Coordination sphere colors */

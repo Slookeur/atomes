@@ -68,7 +68,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #define AXIS_STYLES 2
 #define AXIS_TEMPLATES 5
 
-gchar * axis[3] = {"X", "Y", "Z"};
+gchar * axis_symbols[3] = {"X", "Y", "Z"};
 gchar * axis_style[AXIS_STYLES] = {"Wireframe", "Cylinders"};
 gchar * al[3] = {"% of the window width", "% of the window height", "% of the window depth"};
 
@@ -112,9 +112,9 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
   else
   {
     view = (glwin *)data;
-    axis_type = view -> anim -> last -> img -> box_axis[AXIS];
-    axis_line = & view -> anim -> last -> img -> box_axis_line[AXIS];
-    axis_rad = & view -> anim -> last -> img -> box_axis_rad[AXIS];
+    axis_type = view -> anim -> last -> img -> xyz -> axis;
+    axis_line = & view -> anim -> last -> img -> xyz -> line;
+    axis_rad = & view -> anim -> last -> img -> xyz -> rad;
   }
   if (axis_type == CYLINDERS)
   {
@@ -179,7 +179,7 @@ G_MODULE_EXPORT void update_axis_length (GtkEntry * res, gpointer data)
   else
   {
     view = (glwin *)data;
-    axis_length = & view -> anim -> last -> img -> axis_length;
+    axis_length = & view -> anim -> last -> img -> xyz -> length;
   }
   if (v > 0.0) * axis_length = v;
   v = * axis_length;
@@ -213,7 +213,7 @@ void activate_pos_box (glwin * view, gboolean val)
   int i;
   if (val)
   {
-    i = (preferences) ? tmp_axis -> t_pos : view -> anim -> last -> img -> axispos;
+    i = (preferences) ? tmp_axis -> t_pos : view -> anim -> last -> img -> xyz -> t_pos;
   }
   else
   {
@@ -243,7 +243,7 @@ G_MODULE_EXPORT void set_axis_template (GtkComboBox * box, gpointer data)
   {
     view = (glwin *)data;
 #ifdef GTK4
-    view -> anim -> last -> img -> axispos = i;
+    view -> anim -> last -> img -> xyz -> t_pos = i;
 #endif
   }
   if (! preferences)
@@ -281,7 +281,7 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
   {
     view = (glwin *)data;
     the_axis = view -> axis_win;
-    axis = & view -> anim -> last -> img -> box_axis[1];
+    axis = & view -> anim -> last -> img -> xyz -> axis;
   }
   switch (combo_get_active ((GtkWidget *)box))
   {
@@ -360,7 +360,7 @@ G_MODULE_EXPORT void set_show_axis_toggle (GtkToggleButton * but, gpointer data)
     view = (glwin *)data;
     the_axis = view -> axis_win;
 #ifdef GTK4
-    axis_type = & view -> anim -> last -> img -> box_axis[AXIS];
+    axis_type = & view -> anim -> last -> img -> xyz -> axis;
 #endif // GTK4
   }
   val = button_get_status ((GtkWidget *)but);
@@ -450,7 +450,7 @@ G_MODULE_EXPORT void use_axis_default_positions (GtkToggleButton * but, gpointer
   {
     view = (glwin *)data;
     the_axis = view -> axis_win;
-    pos = & view -> anim -> last -> img -> axispos;
+    pos = & view -> anim -> last -> img -> xyz -> t_pos;
   }
   val = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (the_axis -> axis_position_box, ! val);
@@ -547,18 +547,18 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
   {
     view = (glwin *)data;
     the_axis = view -> axis_win;
-    col = view -> anim -> last -> img -> axis_color;
+    col = view -> anim -> last -> img -> xyz -> color;
   }
   val = button_get_status ((GtkWidget *)but);
   if (val)
   {
     if (col != NULL)
     {
-      init_axis_colors ((preferences) ? tmp_axis -> color : view -> anim -> last -> img -> axis_color, the_axis);
+      init_axis_colors ((preferences) ? tmp_axis -> color : view -> anim -> last -> img -> xyz -> color, the_axis);
       if (! preferences)
       {
-        g_free (view -> anim -> last -> img -> axis_color);
-        view -> anim -> last -> img -> axis_color = NULL;
+        g_free (view -> anim -> last -> img -> xyz -> color);
+        view -> anim -> last -> img -> xyz -> color = NULL;
       }
       else
       {
@@ -571,8 +571,8 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
   {
     if (! preferences)
     {
-      view -> anim -> last -> img -> axis_color = g_malloc (3*sizeof*view -> anim -> last -> img -> axis_color);
-      init_axis_colors (view -> anim -> last -> img -> axis_color, the_axis);
+      view -> anim -> last -> img -> xyz -> color = g_malloc (3*sizeof*view -> anim -> last -> img -> xyz -> color);
+      init_axis_colors (view -> anim -> last -> img -> xyz -> color, the_axis);
     }
     else
     {
@@ -603,7 +603,7 @@ G_MODULE_EXPORT void set_axis_color (GtkColorChooser * colob, gpointer data)
   if (! preferences)
   {
     glwin * view = get_project_by_id(dat -> a) -> modelgl;
-    view -> anim -> last -> img -> axis_color[dat -> b] = get_button_color (colob);
+    view -> anim -> last -> img -> xyz -> color[dat -> b] = get_button_color (colob);
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
   }
@@ -627,7 +627,7 @@ void axis_position_has_changed (gpointer data, double v)
   if (! preferences)
   {
     glwin * view = get_project_by_id(dat -> a) -> modelgl;
-    if (v >= 0.0 && v <= 100.0) view -> anim -> last -> img -> axis_pos[dat -> b] = v;
+    if (v >= 0.0 && v <= 100.0) view -> anim -> last -> img -> xyz -> c_pos[dat -> b] = v;
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
 #ifdef GTK4
@@ -704,7 +704,7 @@ G_MODULE_EXPORT void set_axis_labels (GtkToggleButton * but, gpointer data)
   {
     view = (glwin *)data;
     the_axis = view -> axis_win;
-    axis_labels = & view -> anim -> last -> img -> axis_labels;
+    axis_labels = & view -> anim -> last -> img -> xyz -> labels;
   }
   val = button_get_status ((GtkWidget *)but);
   * axis_labels = val;
@@ -738,8 +738,8 @@ G_MODULE_EXPORT void set_axis_title (GtkEntry * entry, gpointer data)
   else
   {
     view = get_project_by_id (dat ->a) -> modelgl;
-    if (view -> anim -> last -> img -> axis_title[dat -> b]) g_free (view -> anim -> last -> img -> axis_title[dat -> b]);
-    view -> anim -> last -> img -> axis_title[dat -> b] = g_strdup_printf ("%s", m);
+    if (view -> anim -> last -> img -> xyz -> title[dat -> b]) g_free (view -> anim -> last -> img -> xyz -> title[dat -> b]);
+    view -> anim -> last -> img -> xyz -> title[dat -> b] = g_strdup_printf ("%s", m);
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
   }
@@ -826,14 +826,14 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     {
       view -> axis_win = g_malloc0(sizeof*view -> axis_win);
       the_axis = view -> axis_win;
-      axis_type = view -> anim -> last -> img -> box_axis[AXIS];
-      axis_line = view -> anim -> last -> img -> box_axis_line[AXIS];
-      axis_rad = view -> anim -> last -> img -> box_axis_rad[AXIS];
-      axis_tpos = view -> anim -> last -> img -> axispos;
-      axis_length = view -> anim -> last -> img -> axis_length;
-      axis_labels = view -> anim -> last -> img -> axis_labels;
-      axis_color = view -> anim -> last -> img -> axis_color;
-      axis_cpos = view -> anim -> last -> img -> axis_pos;
+      axis_type = view -> anim -> last -> img -> xyz -> axis;
+      axis_line = view -> anim -> last -> img -> xyz -> line;
+      axis_rad = view -> anim -> last -> img -> xyz -> rad;
+      axis_tpos = view -> anim -> last -> img -> xyz -> t_pos;
+      axis_length = view -> anim -> last -> img -> xyz -> length;
+      axis_labels = view -> anim -> last -> img -> xyz -> labels;
+      axis_color = view -> anim -> last -> img -> xyz -> color;
+      axis_cpos = view -> anim -> last -> img -> xyz -> c_pos;
       axis_label = & view -> anim -> last -> img -> labels[2];
     }
   }
@@ -906,7 +906,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     for (i=0; i<2; i++)
     {
       chbox = create_hbox (0);
-      ax_name = gtk_label_new (axis[i]);
+      ax_name = gtk_label_new (axis_symbols[i]);
       gtk_widget_set_size_request (ax_name, 20, -1);
       gtk_label_align (ax_name, 0.5, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, ax_name, FALSE, TRUE, 0);
@@ -985,7 +985,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     {
       chbox = create_hbox (0);
       ax_title[i] = create_entry (G_CALLBACK(set_axis_title), 80, 10, FALSE, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
-      update_entry_text (GTK_ENTRY(ax_title[i]), (preferences) ? tmp_axis -> title[i] : view -> anim -> last -> img -> axis_title[i]);
+      update_entry_text (GTK_ENTRY(ax_title[i]), (preferences) ? tmp_axis -> title[i] : view -> anim -> last -> img -> xyz -> title[i]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, ax_title[i], FALSE, FALSE, 20);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_label_box[1], chbox, FALSE, FALSE, 2);
     }

@@ -1134,11 +1134,11 @@ G_MODULE_EXPORT void set_show_motion_axis (GtkToggleButton * but, gpointer data)
   this_proj -> modelgl -> atom_win -> show_axis[j] = i;
   if (i)
   {
-    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = CYLINDERS;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = CYLINDERS;
   }
   else
   {
-    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = this_proj -> modelgl -> atom_win -> old_axis;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = this_proj -> modelgl -> atom_win -> old_axis;
   }
   this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
   update (this_proj -> modelgl);

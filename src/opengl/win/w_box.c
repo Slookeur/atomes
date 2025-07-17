@@ -79,9 +79,9 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
   else
   {
     view = (glwin *)data;
-    box_type = view -> anim -> last -> img -> box_axis[BOX];
-    box_line = view -> anim -> last -> img -> box_axis_line[BOX];
-    box_rad = view -> anim -> last -> img -> box_axis_rad[BOX];
+    box_type = view -> anim -> last -> img -> abc -> box;
+    box_line = view -> anim -> last -> img -> abc -> line;
+    box_rad = view -> anim -> last -> img -> abc -> rad;
   }
   if (box_type == CYLINDERS)
   {
@@ -95,7 +95,7 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][6]), str);
       g_free (str);
 #endif
-      view -> anim -> last -> img -> box_axis_rad[BOX] = v;
+      view -> anim -> last -> img -> abc -> rad = v;
     }
     else
     {
@@ -114,7 +114,7 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][4]), str);
       g_free (str);
 #endif
-      view -> anim -> last -> img -> box_axis_line[BOX] = v;
+      view -> anim -> last -> img -> abc -> line = v;
     }
     else
     {
@@ -154,7 +154,7 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
 #ifdef GTK4
   if (! preferences)
   {
-    view -> anim -> last -> img -> box_axis[0] = (i < 0) ? (NONE) : (i == 0) ? WIREFRAME : CYLINDERS;
+    view -> anim -> last -> img -> abc -> box = (i < 0) ? (NONE) : (i == 0) ? WIREFRAME : CYLINDERS;
     view -> create_shaders[MDBOX] = TRUE;
     update (view);
   }
@@ -291,7 +291,7 @@ G_MODULE_EXPORT void set_color_box (GtkColorChooser * colob, gpointer data)
   else
   {
     glwin * view = (glwin *)data;
-    view -> anim -> last -> img -> box_color = get_button_color (colob);
+    view -> anim -> last -> img -> abc -> color = get_button_color (colob);
     view -> create_shaders[MDBOX] = TRUE;
     update (view);
   }
@@ -344,6 +344,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   double box_line;
   double box_rad;
   ColRGBA box_color;
+
   if (preferences)
   {
     the_box = pref_box_win;
@@ -357,10 +358,10 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
     view = (glwin *)data;
     view -> box_win = g_malloc0(sizeof*view -> box_win);
     the_box = view -> box_win;
-    box_type = view -> anim -> last -> img -> box_axis[BOX];
-    box_color = view -> anim -> last -> img -> box_color;
-    box_line = view -> anim -> last -> img -> box_axis_line[BOX];
-    box_rad = view -> anim -> last -> img -> box_axis_rad[BOX];
+    box_type = view -> anim -> last -> img -> abc -> box;
+    box_color = view -> anim -> last -> img -> abc -> color;
+    box_line = view -> anim -> last -> img -> abc -> line;
+    box_rad = view -> anim -> last -> img -> abc -> rad;
   }
 
   GtkWidget * vbox = create_vbox (BSEP);

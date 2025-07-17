@@ -60,10 +60,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
   void clean_all_tmp ();
-  void duplicate_box_data (box_data * new_box, box_data * old_box);
   void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep);
   void duplicate_background_data (background * new_back, background * old_back);
-  void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis);
+  void duplicate_box_data (box * new_box, box * old_box);
+  void duplicate_axis_data (axis * new_axis, axis * old_axis);
   void prepare_tmp_default ();
   void save_preferences ();
   void adjust_preferences_window ();
@@ -223,17 +223,19 @@ int default_mfactor[2];
 int tmp_mfactor[2];
 double default_mwidth[2];
 double tmp_mwidth[2];
-box_data default_box;
-box_data * tmp_box = NULL;
-box_edition * pref_box_win = NULL;
+
 rep_data default_rep;
 rep_data * tmp_rep = NULL;
 rep_edition * pref_rep_win = NULL;
-axis_data default_axis;
-axis_data * tmp_axis = NULL;
-axis_edition * pref_axis_win = NULL;
 background default_background;
 background * tmp_background = NULL;
+box default_box;
+box * tmp_box = NULL;
+box_edition * pref_box_win = NULL;
+axis default_axis;
+axis * tmp_axis = NULL;
+axis_edition * pref_axis_win = NULL;
+
 gradient_edition * pref_gradient_win = NULL;
 
 gboolean preferences = FALSE;
@@ -3640,22 +3642,6 @@ void clean_all_tmp ()
 }
 
 /*!
-  \fn void duplicate_box_data (box_data * new_box, box_data * old_box)
-
-  \brief duplicate box_data data structure
-
-  \param new_box the new box_data structure
-  \param old_box the box_data structure to copy
-*/
-void duplicate_box_data (box_data * new_box, box_data * old_box)
-{
-  new_box -> box = old_box -> box;
-  new_box -> color = old_box -> color;
-  new_box -> line = old_box -> line;
-  new_box -> rad = old_box -> rad;
-}
-
-/*!
   \fn void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep)
 
   \brief duplicate rep_data data structure
@@ -3698,15 +3684,32 @@ void duplicate_background_data (background * new_back, background * old_back)
   }
 }
 
+
 /*!
-  \fn void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis)
+  \fn void duplicate_box_data (box * new_box, box * old_box)
+
+  \brief duplicate box_data data structure
+
+  \param new_box the new box structure
+  \param old_box the box structure to copy
+*/
+void duplicate_box_data (box * new_box, box * old_box)
+{
+  new_box -> box = old_box -> box;
+  new_box -> color = old_box -> color;
+  new_box -> line = old_box -> line;
+  new_box -> rad = old_box -> rad;
+}
+
+/*!
+  \fn void duplicate_axis_data (axis * new_axis, axis * old_axis)
 
   \brief duplicate axis_data data structure
 
   \param new_axis the new axis_data structure
   \param old_axis the axis_data structure to copy
 */
-void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis)
+void duplicate_axis_data (axis * new_axis, axis * old_axis)
 {
   new_axis -> axis = old_axis -> axis;
   new_axis -> length = old_axis -> length;

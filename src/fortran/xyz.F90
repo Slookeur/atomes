@@ -14,7 +14,7 @@
 ! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
 !
 !>
-!! @file xyz.F90
+!! @file xyz -> F90
 !! @short Write XYZ atomic coordinates
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 

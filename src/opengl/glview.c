@@ -1344,28 +1344,12 @@ void setup_default_image (project * this_proj, image * img)
 {
   int i;
   duplicate_background_data (img -> back, & default_background);
-  img -> box_color = default_box.color;
-  img -> box_axis_rad[BOX] = default_box.rad;
-  img -> box_axis_line[BOX] = default_box.line;
+  duplicate_box_data (img -> abc, & default_box);
+  duplicate_axis_data (img -> xyz, & default_axis);
+
   for (i=0; i<2; i++)
   {
     img -> color_map[i] = default_opengl[i+1];
-  }
-  img -> axispos = default_axis.t_pos;
-  img -> box_axis_rad[AXIS] = default_axis.rad;
-  img -> box_axis_line[AXIS] = default_axis.line;
-  img -> axis_length = default_axis.length;
-  img -> axis_labels = default_axis.labels;
-  if (img -> axis_color)
-  {
-    g_free (img -> axis_color);
-    img -> axis_color = NULL;
-  }
-  if (default_axis.color) img -> axis_color = duplicate_color (3, default_axis.color);
-  for (i=0; i<3; i++)
-  {
-    img -> axis_pos[i] = default_axis.c_pos[i];
-    img -> axis_title[i] = g_strdup_printf ("%s", default_axis.title[i]);
   }
   img -> quality = default_opengl[3];
   img -> rep = default_rep.rep;
@@ -1384,8 +1368,8 @@ void setup_default_image (project * this_proj, image * img)
     img -> style = SPACEFILL;
     img -> filled_type = - default_opengl[0] - 1;
   }
-  img -> box_axis[AXIS] = (this_proj -> natomes) ? default_axis.axis : NONE;
-  img -> box_axis[BOX] = (this_proj -> cell.ltype) ? default_box.box : NONE;
+  img -> xyz -> axis = (this_proj -> natomes) ? default_axis.axis : NONE;
+  img -> abc -> box = (this_proj -> cell.ltype) ? default_box.box : NONE;
   for (i=0; i<5; i++)
   {
     duplicate_screen_label (& img -> labels[i], & default_label[i]);
@@ -1415,6 +1399,8 @@ void init_img (project * this_proj)
   this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
   image * img = this_proj -> modelgl -> anim -> last -> img;
   if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
+  if (! img -> abc) img -> abc = g_malloc0(sizeof*img -> abc);
+  if (! img -> xyz) img -> xyz = g_malloc0(sizeof*img -> xyz);
   img -> render = FILL;
   setup_default_image (this_proj, img);
   int i;

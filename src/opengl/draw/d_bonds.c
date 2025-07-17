@@ -386,11 +386,11 @@ void setup_this_bond (int sty, gboolean to_pick, gboolean picked, int cap, int b
     }
     delta = ((show_a && show_b) && (sta == stb)) ? 0.0 : 0.1;
   }
-  for (p=0; p<plot -> extra_cell[0]+1;p++)
+  for (p=0; p<plot -> abc -> extra_cell[0]+1;p++)
   {
-    for (q=0; q<plot -> extra_cell[1]+1; q++)
+    for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
     {
-      for (r=0; r<plot -> extra_cell[2]+1; r++)
+      for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
       {
         shift[0]=p*box_gl -> vect[0][0]+q*box_gl -> vect[1][0]+r*box_gl -> vect[2][0];
         shift[1]=p*box_gl -> vect[0][1]+q*box_gl -> vect[1][1]+r*box_gl -> vect[2][1];
@@ -741,7 +741,7 @@ int create_bond_lists (gboolean to_pick)
       if (to_pick || (! f && (plot -> style == BALL_AND_STICK || plot -> style == CYLINDERS)) || (f && (f-1 == BALL_AND_STICK || f-1 == CYLINDERS)))
       {
         cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
-        cyl -> num_instances =  (nbds[f]/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+        cyl -> num_instances =  (nbds[f]/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
         cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
         nbs = 0;
@@ -758,7 +758,7 @@ int create_bond_lists (gboolean to_pick)
           if (ncap[f] > 0)
           {
             cap = draw_cylinder_cap (plot -> quality, 1.0, FALSE);
-            cap -> num_instances =  (ncap[f]/2) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+            cap -> num_instances =  (ncap[f]/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cap -> inst_buffer_size = CAPS_BUFF_SIZE;
             cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
             nbs = 0;
@@ -789,7 +789,7 @@ int create_bond_lists (gboolean to_pick)
               {
                 cyl = g_malloc0 (sizeof*cyl);
                 cyl -> vert_buffer_size = LINE_BUFF_SIZE;
-                cyl -> num_vertices = nbonds[f][h][i][j] * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+                cyl -> num_vertices = nbonds[f][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
                 cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
                 nbs = 0;
                 setup_line_vertices (f-1, 0, h, i, j, cyl -> vertices);

@@ -119,7 +119,7 @@ GtkWidget * menu_cell_edit (glwin * view , int id, int j)
       if (i == 3)
       {
         k = 0;
-        for (l=0; l<3; l++) k += view -> anim -> last -> img-> extra_cell[l];
+        for (l=0; l<3; l++) k += view -> anim -> last -> img-> abc -> extra_cell[l];
         widget_set_sensitive (view -> ogl_box[2+i], k);
       }
       gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_box[2+i]);
@@ -148,7 +148,7 @@ GtkWidget * menu_cell_edit (glwin * view , int id, int j)
       if (i == 3)
       {
         k = 0;
-        for (l=0; l<3; l++) k += view -> anim -> last -> img-> extra_cell[l];
+        for (l=0; l<3; l++) k += view -> anim -> last -> img-> abc -> extra_cell[l];
         widget_set_sensitive (widg, k);
       }
       gtk_menu_shell_append ((GtkMenuShell *)menu, widg);
@@ -244,7 +244,7 @@ GMenu * menu_cell_edit (glwin * view, int popm, int sensitive)
     if (i == 3)
     {
       k = 0;
-      for (l=0; l<3; l++) k += view -> anim -> last -> img-> extra_cell[l];
+      for (l=0; l<3; l++) k += view -> anim -> last -> img-> abc -> extra_cell[l];
       sens = k;
     }
     act = g_strdup_printf ("ceed-%d", i);

@@ -463,7 +463,7 @@ void render_string (int glsl, int id, screen_string * this_string)
     }
     if (id == 2)
     {
-      j += (plot -> box_axis[AXIS] == WIREFRAME) ? 2 : 4;
+      j += (plot -> xyz -> axis == WIREFRAME) ? 2 : 4;
     }
     else if (id == 3 || id == 4)
     {

@@ -130,7 +130,7 @@ G_MODULE_EXPORT void set_box_color (GtkWidget * widg, gpointer data)
 {
   tint * col = (tint *) data;
   project * this_proj = get_project_by_id(col -> a);
-  get_color (& this_proj -> modelgl -> anim -> last -> img -> box_color, col -> b);
+  get_color (& this_proj -> modelgl -> anim -> last -> img -> abc -> color, col -> b);
   this_proj -> modelgl -> create_shaders[MDBOX] = TRUE;
   update (this_proj -> modelgl);
 }

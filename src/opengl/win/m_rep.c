@@ -193,7 +193,7 @@ void camera_has_changed (gdouble value, gpointer data)
   if (! preferences)
   {
     update_labels (view);
-    if (view -> anim -> last -> img -> box_axis[1] != NONE) view -> create_shaders[MAXIS] = TRUE;
+    if (view -> anim -> last -> img -> xyz -> axis != NONE) view -> create_shaders[MAXIS] = TRUE;
     update (view);
   }
 }

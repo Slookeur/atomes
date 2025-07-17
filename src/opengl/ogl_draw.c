@@ -331,12 +331,12 @@ image * duplicate_image (image * old_img)
 
   for (i=0; i<3; i++)
   {
-    new_img -> axis_title[i] = g_strdup_printf ("%s", old_img -> axis_title[i]);
+    new_img -> xyz -> title[i] = g_strdup_printf ("%s", old_img -> xyz -> title[i]);
   }
-  new_img -> axis_color = NULL;
-  if (old_img -> axis_color != NULL)
+  new_img -> xyz -> color = NULL;
+  if (old_img -> xyz -> color != NULL)
   {
-    new_img -> axis_color = duplicate_color (3, old_img -> axis_color);
+    new_img -> xyz -> color = duplicate_color (3, old_img -> xyz -> color);
   }
 
   for (i=0; i<5; i++) duplicate_screen_label (& new_img -> labels[i], & old_img -> labels[i]);
@@ -605,7 +605,7 @@ void draw (glwin * view)
     draw_vertices (LABEL);
 
     // Axis if centered
-    if (view -> anim -> last -> img -> axispos == 4) draw_vertices (MAXIS);
+    if (view -> anim -> last -> img -> xyz -> t_pos == 4) draw_vertices (MAXIS);
 
     // Last the coordination polyhedra
     draw_vertices (POLYS);
@@ -621,7 +621,7 @@ void draw (glwin * view)
     draw_vertices (VOLMS);
 
     // Axis if not centered
-    if (view -> anim -> last -> img -> axispos != 4) draw_vertices (MAXIS);
+    if (view -> anim -> last -> img -> xyz -> t_pos != 4) draw_vertices (MAXIS);
 
     // Lights
     draw_vertices (LIGHT);

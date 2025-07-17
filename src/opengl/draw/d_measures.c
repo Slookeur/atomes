@@ -151,11 +151,11 @@ void setup_this_measured_angle (int s, int sa, int sb, int sc, int pi)
   bt = & proj_gl -> atoms[step][sb];
   ct = & proj_gl -> atoms[step][sc];
 
-  for (p=0; p<plot -> extra_cell[0]+1;p++)
+  for (p=0; p<plot -> abc -> extra_cell[0]+1;p++)
   {
-    for (q=0; q<plot -> extra_cell[1]+1; q++)
+    for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
     {
-      for (r=0; r<plot -> extra_cell[2]+1; r++)
+      for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
       {
         shift[0]=p*box_gl -> vect[0][0]+q*box_gl -> vect[1][0]+r*box_gl -> vect[2][0];
         shift[1]=p*box_gl -> vect[0][1]+q*box_gl -> vect[1][1]+r*box_gl -> vect[2][1];
@@ -481,11 +481,11 @@ void setup_this_measured_bond (int s, int sa, int sb, int pi)
   at = & proj_gl -> atoms[step][sa];
   bt = & proj_gl -> atoms[step][sb];
 
-  for (p=0; p<plot -> extra_cell[0]+1;p++)
+  for (p=0; p<plot -> abc -> extra_cell[0]+1;p++)
   {
-    for (q=0; q<plot -> extra_cell[1]+1; q++)
+    for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
     {
-      for (r=0; r<plot -> extra_cell[2]+1; r++)
+      for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
       {
         shift[0]=p*box_gl -> vect[0][0]+q*box_gl -> vect[1][0]+r*box_gl -> vect[2][0];
         shift[1]=p*box_gl -> vect[0][1]+q*box_gl -> vect[1][1]+r*box_gl -> vect[2][1];
@@ -614,7 +614,7 @@ void prepare_measure_shaders (int mode)
       // First the bond distances
       measure = g_malloc0 (sizeof*measure);
       measure -> vert_buffer_size = LINE_BUFF_SIZE;
-      measure -> num_vertices = 2 * num_bonds (plot -> selected[mode] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      measure -> num_vertices = 2 * num_bonds (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
       nbs = 0;
       bonds_loop (wingl, 0, mode, NULL);
@@ -636,7 +636,7 @@ void prepare_measure_shaders (int mode)
       {
         measure = g_malloc0 (sizeof*measure);
         measure -> vert_buffer_size = LINE_BUFF_SIZE;
-        measure -> num_vertices = 3 * num_angles (plot -> selected[mode] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+        measure -> num_vertices = 3 * num_angles (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
         nbs = 0;
         angles_loop (wingl, 0, mode, NULL);

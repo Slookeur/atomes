@@ -161,7 +161,7 @@ void clean_other_window_after_edit (project * this_proj)
 */
 void clean_atom_win (project * this_proj)
 {
-  this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = this_proj -> modelgl -> atom_win -> old_axis;
+  this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = this_proj -> modelgl -> atom_win -> old_axis;
   this_proj -> modelgl -> atom_win -> win = destroy_this_widget (this_proj -> modelgl -> atom_win -> win);
   if (! this_proj -> modelgl -> builder_win)
   {
@@ -461,7 +461,7 @@ void prepare_atom_edition (gpointer data, gboolean visible)
     for (i=0; i<2; i++) this_proj -> modelgl -> atom_win -> adv_bonding[i] = this_proj -> modelgl -> adv_bonding[i];
     if (this_proj -> modelgl -> anim)
     {
-      this_proj -> modelgl -> atom_win -> old_axis = this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS];
+      this_proj -> modelgl -> atom_win -> old_axis = this_proj -> modelgl -> anim -> last -> img -> xyz -> axis;
     }
     for (i=0; i<2; i++)
     {

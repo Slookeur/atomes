@@ -1735,7 +1735,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       }
     }
     init_camera (active_project, TRUE);
-    active_image -> box_axis[0] = 1;
+    active_image -> abc -> box = 1;
     if (to_wrap)
     {
       shift_it (vec3(0.0,0.0,0.0), 1, activep);

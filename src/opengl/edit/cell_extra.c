@@ -52,12 +52,12 @@ G_MODULE_EXPORT void add_cell (GtkSpinButton * res, gpointer data)
   int i;
   project * this_proj = get_project_by_id (dat -> a);
   image * last = this_proj -> modelgl -> anim -> last -> img;
-  i = max(last -> extra_cell[0], last -> extra_cell[1]);
-  i = max(i, last -> extra_cell[2]);
+  i = max(last -> abc -> extra_cell[0], last -> abc -> extra_cell[1]);
+  i = max(i, last -> abc -> extra_cell[2]);
   last -> p_depth /= (i+1);
-  last -> extra_cell[dat -> b] = gtk_spin_button_get_value_as_int(res) - 1;
-  i = max(last -> extra_cell[0], last -> extra_cell[1]);
-  i = max(i, last -> extra_cell[2]);
+  last -> abc -> extra_cell[dat -> b] = gtk_spin_button_get_value_as_int(res) - 1;
+  i = max(last -> abc -> extra_cell[0], last -> abc -> extra_cell[1]);
+  i = max(i, last -> abc -> extra_cell[2]);
   last -> p_depth *= (i+1);
   double fact = last -> p_depth*2.0 / last -> gfar;
   last -> gfar = last -> p_depth*2.0;
@@ -92,7 +92,7 @@ GtkWidget * add_extra_cell_tab (glwin * view)
   for (i=0; i<3; i++)
   {
     hhbox = create_hbox (0);
-    view -> cell_win -> ax_cell[i] = spin_button (G_CALLBACK(add_cell), view -> anim -> last -> img -> extra_cell[i]+1, 1, 1000, 1, 0, 100, & view -> colorp[i][0]);
+    view -> cell_win -> ax_cell[i] = spin_button (G_CALLBACK(add_cell), view -> anim -> last -> img -> abc -> extra_cell[i]+1, 1, 1000, 1, 0, 100, & view -> colorp[i][0]);
     str = g_strdup_printf ("%s x ", box_prop[0][i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 40);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, view -> cell_win -> ax_cell[i], FALSE, FALSE, 0);

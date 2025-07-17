@@ -935,8 +935,8 @@ void prepare_preview (int active, int id, gboolean visible)
       on_calc_bonds_released (NULL, NULL);
       lib_proj -> modelgl -> anim -> last -> img -> quality = 30;
       lib_proj -> modelgl -> anim -> last -> img -> rep = ORTHOGRAPHIC;
-      lib_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = NONE;
-      lib_proj -> modelgl -> anim -> last -> img -> box_axis[BOX] = NONE;
+      lib_proj -> modelgl -> anim -> last -> img -> xyz -> axis = NONE;
+      lib_proj -> modelgl -> anim -> last -> img -> abc -> box = NONE;
       if (visible)
       {
         gtk_widget_set_size_request (lib_proj -> modelgl -> plot, 150, 150);

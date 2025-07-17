@@ -141,7 +141,7 @@ G_MODULE_EXPORT void run_window_color (GtkDialog * win, gint response_id, gpoint
     }
     else if (wc_cid == -1)
     {
-      this_proj -> modelgl -> anim -> last -> img -> box_color = colo;
+      this_proj -> modelgl -> anim -> last -> img -> abc -> color = colo;
       this_proj -> modelgl -> create_shaders[MDBOX] = TRUE;
     }
     else
@@ -177,7 +177,7 @@ void window_color (project * this_proj, glwin * view)
   else if (wc_cid == -1)
   {
     str = g_strdup_printf ("Model box color");
-    col = colrgba_togtkrgba (view -> anim -> last -> img -> box_color);
+    col = colrgba_togtkrgba (view -> anim -> last -> img -> abc -> color);
   }
   else
   {

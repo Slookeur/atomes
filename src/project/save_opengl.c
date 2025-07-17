@@ -34,6 +34,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int save_atom_b (FILE * fp, project * this_proj, int s, int a);
   int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_max, int ** num_data, gboolean *** show, int **** all_data);
   int write_this_image_label (FILE * fp, screen_label label);
+  int write_this_box (FILE * fp, box * abc);
+  int write_this_axis (FILE * fp, axis * xyz);
   int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
 
 */
@@ -147,6 +149,67 @@ int write_this_image_label (FILE * fp, screen_label label)
 }
 
 /*!
+  \fn int write_this_box (FILE * fp, box * abc)
+
+  \brief save OpenGL image box properties to file
+
+  \param fp the file pointer
+  \param box the target box data
+*/
+int write_this_box (FILE * fp, box * abc)
+{
+  if (fwrite (& abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+  return OK;
+}
+
+/*!
+  \fn int write_this_axis (FILE * fp, axis * xyz)
+
+  \brief save OpenGL image axis properties to file
+
+  \param fp the file pointer
+  \param axis the target axis data
+*/
+int write_this_axis (FILE * fp, axis * xyz)
+{
+  if (fwrite (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  gboolean val;
+  int i;
+  if (xyz -> color != NULL)
+  {
+    val = TRUE;
+  }
+  else
+  {
+    val = FALSE;
+  }
+  if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (val)
+  {
+    for (i=0; i<3; i++)
+    {
+      if (fwrite (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    }
+  }
+  if (fwrite (& xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<3; i++)
+  {
+    if (save_this_string (fp, xyz -> title[i]) != OK) return ERROR_RW;
+  }
+  return OK;
+}
+
+/*!
   \fn int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 
   \brief save OpenGL image properties to file
@@ -159,7 +222,6 @@ int write_this_image_label (FILE * fp, screen_label label)
 int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 {
   int i, j, k, l;
-  gboolean val;
 
   if (fwrite (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (img -> back -> gradient)
@@ -215,38 +277,11 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fwrite (img -> mwidth, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
-  // Model box and axis
-  if (fwrite (img -> box_axis, sizeof(int), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (img -> box_axis_rad, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (img -> box_axis_line, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (& img -> box_color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
-
+  // Model box
+  if (write_this_box (fp, img -> abc)) return ERROR_RW;
   // Axis
-  if (fwrite (& img -> axispos, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> axis_length, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> axis_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
-  if (img -> axis_color != NULL)
-  {
-    val = TRUE;
-  }
-  else
-  {
-    val = FALSE;
-  }
-  if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (val)
-  {
-    for (i=0; i<3; i++)
-    {
-      if (fwrite (& img -> axis_color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-    }
-  }
-  if (fwrite (& img -> axis_labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  for (i=0; i<3; i++)
-  {
-    if (save_this_string (fp, img -> axis_title[i]) != OK) return ERROR_RW;
-  }
+  if (write_this_axis (fp, img -> xyz)) return ERROR_RW;
+
   // OpenGL
   if (fwrite (& img -> p_depth, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> gnear, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;

@@ -72,8 +72,8 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
   switch (id)
   {
     case -5:
-      if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> axis_length = v;
-      v = opengl_project -> modelgl -> anim -> last -> img -> axis_length;
+      if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> xyz -> length = v;
+      v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> length;
 #ifdef GTK3
       // GTK3 Menu Action To Check
       str = g_strdup_printf ("_Axis length [ %f Å ]", v);
@@ -87,10 +87,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       opengl_project -> modelgl -> create_shaders[MAXIS] = TRUE;
       break;
     case -4:
-      if (opengl_project -> modelgl -> anim -> last -> img -> box_axis[AXIS] == CYLINDERS)
+      if (opengl_project -> modelgl -> anim -> last -> img -> xyz -> axis == CYLINDERS)
       {
-        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[AXIS] = v;
-        v = opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[AXIS];
+        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> xyz -> rad = v;
+        v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
         str = g_strdup_printf ("_Radius [ %f Å ]", v);
@@ -107,8 +107,8 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       }
       else
       {
-        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> box_axis_line[AXIS] = v;
-        v = opengl_project -> modelgl -> anim -> last -> img -> box_axis_line[AXIS];
+        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> xyz -> line = v;
+        v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> line;
 #ifdef GTK3
         str = g_strdup_printf ("_Width [ %f pts ]", v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][4]), str);
@@ -125,10 +125,10 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       opengl_project -> modelgl -> create_shaders[MAXIS] = TRUE;
       break;
     case -3:
-      if (opengl_project -> modelgl -> anim -> last -> img -> box_axis[BOX] == CYLINDERS)
+      if (opengl_project -> modelgl -> anim -> last -> img -> abc -> box == CYLINDERS)
       {
-        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[BOX] = v;
-        v = opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[BOX];
+        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> abc -> rad = v;
+        v = opengl_project -> modelgl -> anim -> last -> img -> abc -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
         str = g_strdup_printf ("_Radius [ %f Å ]", v);
@@ -145,8 +145,8 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       }
       else
       {
-        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> box_axis_line[BOX] = v;
-        v = opengl_project -> modelgl -> anim -> last -> img -> box_axis_line[BOX];
+        if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> abc -> line = v;
+        v = opengl_project -> modelgl -> anim -> last -> img -> abc -> line;
 #ifdef GTK3
         // GTK3 Menu Action To Check
         str = g_strdup_printf ("_Width [ %f pts ]", v);
@@ -459,13 +459,13 @@ G_MODULE_EXPORT void window_bonds (GtkWidget * widg, gpointer data)
   switch (bid -> b)
   {
     case 0:
-      update_entry_double (GTK_ENTRY(rad), opengl_project -> modelgl -> anim -> last -> img -> axis_length);
+      update_entry_double (GTK_ENTRY(rad), opengl_project -> modelgl -> anim -> last -> img -> xyz -> length);
       break;
     case 1:
-      update_entry_double (GTK_ENTRY(rad), opengl_project -> modelgl -> anim -> last -> img -> box_axis_line[bid -> c]);
+      update_entry_double (GTK_ENTRY(rad), (bid -> c) ? opengl_project -> modelgl -> anim -> last -> img -> xyz -> line : opengl_project -> modelgl -> anim -> last -> img -> abc -> line);
       break;
     case 4:
-      update_entry_double (GTK_ENTRY(rad), opengl_project -> modelgl -> anim -> last -> img -> box_axis_rad[bid -> c]);
+      update_entry_double (GTK_ENTRY(rad), (bid -> c) ? opengl_project -> modelgl -> anim -> last -> img -> xyz -> rad : opengl_project -> modelgl -> anim -> last -> img -> abc -> rad);
       break;
     default:
       update_entry_double (GTK_ENTRY(rad), opengl_project -> modelgl -> anim -> last -> img -> radall[bid -> b-2]);

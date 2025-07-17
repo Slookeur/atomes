@@ -546,7 +546,7 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
 
   for (i=0; i<3; i++)
   {
-    if (img_a -> extra_cell[i] != img_b -> extra_cell[i])
+    if (img_a -> abc -> extra_cell[i] != img_b -> abc -> extra_cell[i])
     {
       view -> create_shaders[MDBOX] = TRUE;
       view -> create_shaders[MAXIS] = TRUE;
@@ -706,40 +706,40 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
     view -> n_shaders[VOLMS][stp] = -1;
   }
 
-  if (img_a -> box_axis[0] != img_b -> box_axis[0]) view -> create_shaders[MDBOX] = shaders = TRUE;
-  if (img_a -> box_axis_rad[0] != img_b -> box_axis_rad[0]) view -> create_shaders[MDBOX] = shaders = TRUE;
-  if (img_a -> box_axis_line[0] != img_b -> box_axis_line[0]) view -> create_shaders[MDBOX] = shaders = TRUE;
-  if (img_a -> box_color.red != img_b -> box_color.red) view -> create_shaders[MDBOX] = shaders = TRUE;
-  if (img_a -> box_color.green != img_b -> box_color.green) view -> create_shaders[MDBOX] = shaders = TRUE;
-  if (img_a -> box_color.blue != img_b -> box_color.blue) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> box != img_b -> abc -> box) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> rad != img_b -> abc -> rad) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> line != img_b -> abc -> line) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> color.red != img_b -> abc -> color.red) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> color.green != img_b -> abc -> color.green) view -> create_shaders[MDBOX] = shaders = TRUE;
+  if (img_a -> abc -> color.blue != img_b -> abc -> color.blue) view -> create_shaders[MDBOX] = shaders = TRUE;
 
-  if (img_a -> box_axis[1] != img_b -> box_axis[1]) view -> create_shaders[MAXIS] = shaders = TRUE;
-  if (img_a -> box_axis_rad[1] != img_b -> box_axis_rad[1]) view -> create_shaders[MAXIS] = shaders = TRUE;
-  if (img_a -> box_axis_line[1] != img_b -> box_axis_line[1]) view -> create_shaders[MAXIS] = shaders = TRUE;
-  if (img_a -> axis_length != img_b -> axis_length) view -> create_shaders[MAXIS] = shaders = TRUE;
-  if (img_a -> axispos != img_b -> axispos) view -> create_shaders[MAXIS] = shaders = TRUE;
-  if (img_a -> axis_color == NULL && img_b -> axis_color != NULL)
+  if (img_a -> xyz -> axis != img_b -> xyz -> axis) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> rad != img_b -> xyz -> rad) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> line != img_b -> xyz -> line) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> length != img_b -> xyz -> length) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> t_pos != img_b -> xyz -> t_pos) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> color == NULL && img_b -> xyz -> color != NULL)
   {
     view -> create_shaders[MAXIS] = shaders = TRUE;
   }
-  else if (img_a -> axis_color != NULL && img_b -> axis_color == NULL)
+  else if (img_a -> xyz -> color != NULL && img_b -> xyz -> color == NULL)
   {
     view -> create_shaders[MAXIS] = shaders = TRUE;
   }
-  else if (img_a -> axis_color != NULL && img_b -> axis_color != NULL)
+  else if (img_a -> xyz -> color != NULL && img_b -> xyz -> color != NULL)
   {
     for (i=0; i<3; i++)
     {
-      if (img_a -> axis_color[i].red != img_b -> axis_color[i].red) view -> create_shaders[MAXIS] = shaders = TRUE;
-      if (img_a -> axis_color[i].green != img_b -> axis_color[i].green) view -> create_shaders[MAXIS] = shaders = TRUE;
-      if (img_a -> axis_color[i].blue != img_b -> axis_color[i].blue) view -> create_shaders[MAXIS] = shaders = TRUE;
+      if (img_a -> xyz -> color[i].red != img_b -> xyz -> color[i].red) view -> create_shaders[MAXIS] = shaders = TRUE;
+      if (img_a -> xyz -> color[i].green != img_b -> xyz -> color[i].green) view -> create_shaders[MAXIS] = shaders = TRUE;
+      if (img_a -> xyz -> color[i].blue != img_b -> xyz -> color[i].blue) view -> create_shaders[MAXIS] = shaders = TRUE;
     }
   }
-  if (img_a -> axis_labels != img_b -> axis_labels) view -> create_shaders[MAXIS] = shaders = TRUE;
+  if (img_a -> xyz -> labels != img_b -> xyz -> labels) view -> create_shaders[MAXIS] = shaders = TRUE;
   for (i=0; i<3; i++)
   {
-    if (g_strcmp0 (img_a -> axis_title[i], img_b -> axis_title[i]) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
-    if (img_a -> axis_pos[i] != img_b -> axis_pos[i]) view -> create_shaders[MAXIS] = shaders = TRUE;
+    if (g_strcmp0 (img_a -> xyz -> title[i], img_b -> xyz -> title[i]) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
+    if (img_a -> xyz -> c_pos[i] != img_b -> xyz -> c_pos[i]) view -> create_shaders[MAXIS] = shaders = TRUE;
   }
   if (g_strcmp0 (img_a -> labels[2].font, img_b -> labels[2].font) != 0) view -> create_shaders[MAXIS] = shaders = TRUE;
   if (img_a -> labels[2].position != img_b -> labels[2].position) view -> create_shaders[MAXIS] = shaders = TRUE;

@@ -58,37 +58,6 @@ struct element_color
   element_color * prev;
 };
 
-/*! \typedef box_data
-
-  \brief box information data structure
-*/
-typedef struct box_data box_data;
-struct box_data
-{
-  int box;             /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
-  double line;         /*!< Width for wireframe */
-  double rad;          /*!< Radius for cylinders */
-  ColRGBA color;       /*!< Associated color */
-};
-
-/*! \typedef axis_data
-
-  \brief axis information data structure
-*/
-typedef struct axis_data axis_data;
-struct axis_data
-{
-  int axis;              /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
-  double line;           /*!< Width for wireframe */
-  double rad;            /*!< Radius for cylinders */
-  double length;         /*!< Axis length */
-  int t_pos;             /*!< Axis template position */
-  GLfloat c_pos[3];      /*!< Axis custom positions */
-  int labels;            /*!< Show / hide axis labels */
-  gchar * title[3];      /*!< Axis titles */
-  ColRGBA * color;       /*!< Associated color */
-};
-
 /*! \typedef rep_data
 
   \brief representation data structure
@@ -108,6 +77,8 @@ extern float get_radius (int object, int col, int z, element_radius * rad_list);
 extern ColRGBA get_spec_color (int z, element_color * clist);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern void duplicate_background_data (background * new_back, background * old_back);
+extern void duplicate_box_data (box * new_box, box * old_box);
+extern void duplicate_axis_data (axis * new_axis, axis * old_axis);
 
 // Analysis parameters
 
@@ -159,17 +130,18 @@ extern int tmp_mfactor[2];
 extern double default_mwidth[2];
 extern double tmp_mwidth[2];
 
-extern box_data default_box;
-extern box_data * tmp_box;
-extern box_edition * pref_box_win;
-extern axis_data default_axis;
-extern axis_data * tmp_axis;
-extern axis_edition * pref_axis_win;
 extern rep_data default_rep;
 extern rep_data * tmp_rep;
 extern rep_edition * pref_rep_win;
 extern background default_background;
 extern background * tmp_background;
+extern box default_box;
+extern box * tmp_box;
+extern box_edition * pref_box_win;
+extern axis default_axis;
+extern axis * tmp_axis;
+extern axis_edition * pref_axis_win;
+
 extern gradient_edition * pref_gradient_win;
 
 extern element_color * default_label_color[2];
