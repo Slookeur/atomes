@@ -932,10 +932,13 @@ struct gradient_edition
 {
   GtkWidget * win;
   GtkWidget * g_box;
+  GtkWidget * dir;
   GtkWidget * d_box[2];
   GtkWidget * color_box[2];
   GtkWidget * p_box;
   GtkWidget * p_scale;
+  GtkWidget * col_but;
+  GtkWidget * grad_but[2];
 };
 
 /*! \typedef glwin

@@ -55,6 +55,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "color_box.h"
 #include "glview.h"
 
+extern void update_gradient_widgets (gradient_edition * gradient_win, background * back);
+
 /*!
   \fn void get_color (ColRGBA * but, int cid)
 
@@ -109,6 +111,9 @@ G_MODULE_EXPORT void set_back_color (GtkWidget * widg, gpointer data)
   tint * col = (tint *) data;
   project * this_proj = get_project_by_id(col -> a);
   get_color (& this_proj -> modelgl -> anim -> last -> img -> back -> color, col -> b);
+  this_proj -> modelgl -> anim -> last -> img -> back -> gradient = 0;
+  cleaning_shaders (this_proj -> modelgl, BACKG);
+  if (this_proj -> modelgl -> gradient_win) update_gradient_widgets (this_proj -> modelgl -> gradient_win, this_proj -> modelgl -> anim -> last -> img -> back);
   this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
   update (this_proj -> modelgl);
 }

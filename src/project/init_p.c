@@ -51,6 +51,12 @@ extern void setup_default_image (project * this_proj, image * img);
 extern void clean_atom_style (project * this_proj);
 extern void setup_default_species_parameters_for_image (project * this_proj, image * img);
 extern void init_shaders (glwin * view);
+extern G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data);
+extern void update_gradient_widgets (gradient_edition * gradient_win, background * back);
+extern G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data);
 
 /*!
   \fn void init_curves_and_calc (project * this_proj)
@@ -108,6 +114,35 @@ void apply_default_parameters_to_project (project * this_proj)
       clean_atom_style (this_proj);
       init_shaders (this_proj -> modelgl);
       update (this_proj -> modelgl);
+      if (this_proj -> modelgl -> box_win)
+      {
+        if (this_proj -> modelgl -> box_win -> win) this_proj -> modelgl -> box_win -> win = destroy_this_widget (this_proj -> modelgl -> box_win -> win);
+        g_free (this_proj -> modelgl -> box_win);
+        this_proj -> modelgl -> box_win = NULL;
+        box_advanced (NULL, this_proj -> modelgl);
+      }
+      if (this_proj -> modelgl -> axis_win)
+      {
+        if (this_proj -> modelgl -> axis_win -> win) this_proj -> modelgl -> axis_win -> win = destroy_this_widget (this_proj -> modelgl -> axis_win -> win);
+        g_free (this_proj -> modelgl -> axis_win);
+        this_proj -> modelgl -> axis_win = NULL;
+        axis_advanced (NULL, this_proj -> modelgl);
+      }
+      if (this_proj -> modelgl -> rep_win)
+      {
+        if (this_proj -> modelgl -> rep_win -> win) this_proj -> modelgl -> rep_win -> win = destroy_this_widget (this_proj -> modelgl -> rep_win -> win);
+        g_free (this_proj -> modelgl -> rep_win);
+        this_proj -> modelgl -> rep_win = NULL;
+        representation_advanced (NULL, this_proj -> modelgl);
+      }
+      if (this_proj -> modelgl -> opengl_win)
+      {
+        if (this_proj -> modelgl -> opengl_win -> win) this_proj -> modelgl -> opengl_win -> win = destroy_this_widget (this_proj -> modelgl -> opengl_win -> win);
+        g_free (this_proj -> modelgl -> opengl_win);
+        this_proj -> modelgl -> opengl_win = NULL;
+        opengl_advanced (NULL, this_proj -> modelgl);
+      }
+      if (this_proj -> modelgl -> gradient_win) update_gradient_widgets (this_proj -> modelgl -> gradient_win, img -> back);
     }
   }
 }
