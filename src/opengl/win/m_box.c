@@ -500,7 +500,14 @@ G_MODULE_EXPORT void change_box_axis_radio (GSimpleAction * action, GVariant * p
       style_name = g_strdup_printf ("%s.%d.0", str, j);
       if (g_strcmp0(style, (const gchar *)style_name) == 0)
       {
-        view -> anim -> last -> img -> box_axis[i] = (j == 0) ? WIREFRAME : CYLINDERS;
+        if (i)
+        {
+          view -> anim -> last -> img -> xyz -> axis = (j == 0) ? WIREFRAME : CYLINDERS;
+        }
+        else
+        {
+          view -> anim -> last -> img -> abc -> box = (j == 0) ? WIREFRAME : CYLINDERS;
+        }
         view -> create_shaders[i+MDBOX] = TRUE;
         update (view);
         g_free (style_name);
@@ -589,7 +596,7 @@ GMenu * axis_box_param (glwin * view, int popm, int ab, int style)
 GMenuItem * menu_box_axis (glwin * view, int popm, int ab)
 {
   GMenuItem * ab_item = g_menu_item_new ((ab) ? "Axis" : "Box", (ab) ? NULL : (get_project_by_id(view -> proj) -> cell.ltype) ? NULL : "None");
-  int i = view -> anim -> last -> img -> box_axis[ab];
+  int i = (ab) ? view -> anim -> last -> img -> xyz -> axis : view -> anim -> last -> img -> abc -> box;
   GMenu * menu = g_menu_new ();
   append_opengl_item (view, menu, "Show/Hide", (ab) ? "show-axis" : "show-box", popm, popm, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(show_hide_box_axis), & view -> colorp[0][ab], TRUE, (i != NONE) ? TRUE : FALSE, FALSE, (ab) ? TRUE : get_project_by_id(view -> proj) -> cell.ltype);
