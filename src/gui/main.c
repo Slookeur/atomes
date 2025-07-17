@@ -65,6 +65,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #ifdef G_OS_WIN32
 #define APP_EXTENSION ".exe"
+#include <shlobj.h>
 #else
 #include <pwd.h>
 #define APP_EXTENSION
@@ -826,9 +827,8 @@ int main (int argc, char *argv[])
     atomes_visual = ! (abs(atomes_visual));
 
 #ifdef G_OS_WIN32
-    PWSTR roamingPath = NULL;
-    gchar * str;
-    HRESULT hr = SHGetKnownFolderPath (& FOLDERID_RoamingAppData, 0, NULL, &r oamingPath);
+    PWSTR localPath = NULL;
+    HRESULT hr = SHGetKnownFolderPath (& FOLDERID_LocalAppData, 0, NULL, & localPath);
     if (FAILED(hr))
     {
       fprintf (stderr, "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s", hr);
@@ -838,11 +838,11 @@ int main (int argc, char *argv[])
     else
     {
       char appdata[MAX_PATH];
-      wcstombs(appdata, roamingPath, MAX_PATH);
-      CoTaskMemFree(roamingPath);  // libérer mémoire retournée par SHGetKnownFolderPath
+      wcstombs (appdata, localPath, MAX_PATH);
+      CoTaskMemFree (localPath);  // libérer mémoire retournée par SHGetKnownFolderPath
       // Build the folder path for atomes
-      ATOMES_CONFIG_DIR = g_strdup_print ("%s\\atomes", appdata);
-      ATOMES_CONFIG = g_strdup_print ("%s\\atomes\\atomes.pml", ATOMES_CONFIG_DIR);
+      ATOMES_CONFIG_DIR = g_strdup_printf ("%s\\atomes", appdata);
+      ATOMES_CONFIG = g_strdup_printf ("%s\\atomes.pml", ATOMES_CONFIG_DIR);
     }
 #else
     struct passwd * pw = getpwuid(getuid());

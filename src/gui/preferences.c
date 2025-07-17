@@ -51,7 +51,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <unistd.h>
 #include <sys/types.h>
 #ifndef G_OS_WIN32
-#  include <pwd.h>
+#include <pwd.h>
 #endif
 
 
