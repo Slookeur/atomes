@@ -1697,8 +1697,8 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       initcwidgets ();
       active_project_changed (activep);
       init_camera (active_project, TRUE);
-      set_img_lights (active_project, active_image);
-      image_init_spec_data (active_image, active_project, active_project -> nspec);
+      setup_default_lights (active_project, active_image);
+      setup_image_spec_data (active_project, active_image);
       glwin_init_spec_data (active_project, active_project -> nspec);
 #ifdef GTK3
       // GTK3 Menu Action To Check

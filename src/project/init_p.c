@@ -31,6 +31,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   void init_curves_and_calc (project * this_proj);
+  void apply_default_parameters_to_project (project * this_proj);
   void init_project (gboolean alloc_box);
 
 */
@@ -44,6 +45,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 #include "glview.h"
 #include "glwindow.h"
+
+extern void setup_default_image (project * this_proj, image * img);
+extern void setup_default_species_parameters_for_image (project * this_proj, image * img);
+extern void init_shaders (glwin * view);
 
 /*!
   \fn void init_curves_and_calc (project * this_proj)
@@ -64,6 +69,46 @@ void init_curves_and_calc (project * this_proj)
 }
 
 /*!
+  \fn void apply_default_parameters_to_project (project * this_proj)
+
+  \brief apply new default parameters to project
+
+  \param this_proj the target project
+*/
+void apply_default_parameters_to_project (project * this_proj)
+{
+  int i, j;
+  // Calc parameters
+  for (i=0; i<6; i++) this_proj -> num_delta[i] = default_num_delta[i];
+  this_proj -> num_delta[SP] = default_num_delta[6];
+  this_proj -> num_delta[MS] = default_num_delta[7];
+  this_proj -> delta[MS] = default_delta_t[0];
+  for (i=0; i<5; i++)
+  {
+    this_proj -> rsparam[i][0] = default_rsparam[1];
+    this_proj -> rsparam[i][1] = default_rsparam[2];
+    for (j=2; j<5; j++) this_proj -> rsparam[i][j] = default_rsparam[j+2];
+  }
+  this_proj -> rsearch[0] = default_rsparam[0];
+  this_proj -> rsearch[1] = default_rsparam[3];
+  this_proj -> csparam[0] = default_csparam[0];
+  for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
+  this_proj -> csparam[5] = default_csparam[1];
+  this_proj -> csearch = default_csparam[2];
+  if (this_proj -> modelgl)
+  {
+    image * img = this_proj -> modelgl -> anim -> last -> img;
+    if (img)
+    {
+      setup_default_image (this_proj, img);
+      setup_default_species_parameters_for_image (this_proj, img);
+      init_shaders (this_proj -> modelgl);
+      update (this_proj -> modelgl);
+    }
+  }
+}
+
+/*!
   \fn void init_project (gboolean alloc_box)
 
   \brief initialize a new project
@@ -72,35 +117,15 @@ void init_curves_and_calc (project * this_proj)
 */
 void init_project (gboolean alloc_box)
 {
-  int i, j;
   project * new_proj = g_malloc0 (sizeof*proj);
   nprojects ++;
   activep = nprojects - 1;
   new_proj -> id = activep;
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
-
-  for (i=0; i<6; i++) new_proj -> num_delta[i] = default_num_delta[i];
-  new_proj -> num_delta[SP] = default_num_delta[6];
-  new_proj -> num_delta[MS] = default_num_delta[7];
-
   new_proj -> delta[RI] = new_proj -> delta[CH] = 1.0;
   new_proj -> min[RI] = new_proj -> min[CH] = 1;
   new_proj -> delta[SP] = 2.0;
-  new_proj -> delta[MS] = default_delta_t[0];
-  for (i=0; i<5; i++)
-  {
-    new_proj -> rsparam[i][0] = default_rsparam[1];
-    new_proj -> rsparam[i][1] = default_rsparam[2];
-    for (j=2; j<5; j++) new_proj -> rsparam[i][j] = default_rsparam[j+2];
-  }
-  new_proj -> rsearch[0] = default_rsparam[0];
-  new_proj -> rsearch[1] = default_rsparam[3];
-
-  new_proj -> csparam[0] = default_csparam[0];
-  for (i=1; i<4; i++) new_proj -> csparam[i]= default_csparam[i+2];
-  new_proj -> csparam[5] = default_csparam[1];
-  new_proj -> csearch = default_csparam[2];
-
+  apply_default_parameters_to_project (new_proj);
   new_proj -> tfile = -1;
   new_proj -> newproj = TRUE;
   new_proj -> steps = 1;

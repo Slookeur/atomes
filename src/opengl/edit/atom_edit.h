@@ -54,7 +54,7 @@ extern void update_search_tree (atom_search * asearch);
 extern int selected_aspec;
 extern int is_selected;
 extern chemical_data * alloc_chem_data (int spec);
-extern void image_init_spec_data (image * img, project * this_proj, int nsp);
+extern void setup_image_spec_data (project * this_proj, image * img);
 extern void free_glwin_spec_data (project * this_proj, int spec);
 extern void glwin_init_spec_data (project * this_proj, int nspec);
 extern void prepare_opengl_menu_bar (glwin * view);

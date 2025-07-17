@@ -52,6 +52,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <sys/types.h>
 #include <pwd.h>
 
+extern void apply_default_parameters_to_project (project * this_proj);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void calc_rings (GtkWidget * vbox);
@@ -3806,9 +3807,13 @@ void save_preferences ()
 
   if (nprojects)
   {
-    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    if (ask_yes_no("Apply to all projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
       // To write apply to opened projects
+      for (i=0; i<nprojects; i++)
+      {
+        apply_default_parameters_to_project (get_project_by_id(i));
+      }
     }
   }
 }

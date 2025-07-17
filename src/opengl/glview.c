@@ -66,8 +66,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void zoom (glwin * view, int delta);
   void rotate_x_y (glwin * view, double angle_x, double angle_y);
   void init_camera (project * this_proj, int get_depth);
-  void image_init_spec_data (image * img, project * this_proj, int nsp);
-  void set_img_lights (project * this_proj, image * img);
+  void setup_default_species_parameters_for_image (project * this_proj, image * img);
+  void setup_image_spec_data (project * this_proj, image * img);
+  void setup_default_lights (project * this_proj, image * img);
+  void setup_default_image (project * this_proj, image * img);
   void init_img (project * this_proj);
   void init_opengl ();
   void center_molecule (project * this_proj);
@@ -1205,31 +1207,17 @@ void init_camera (project * this_proj, int get_depth)
 }
 
 /*!
-  \fn void image_init_spec_data (image * img, project * this_proj, int nsp)
+  \fn void setup_default_species_parameters_for_image (project * this_proj, image * img)
 
-  \brief initialize the chemical species related pointers in an image data structure
+  \brief setup default chemical species related parameters for image
 
-  \param img the target image
   \param this_proj the target project
-  \param nsp the number of chemical species
+  \param img the target image
 */
-void image_init_spec_data (image * img, project * this_proj, int nsp)
+void setup_default_species_parameters_for_image (project * this_proj, image * img)
 {
   int i, j;
-  // Chemical species related
-  for (i = 0; i<2; i++)
-  {
-    img -> show_label[i] = allocbool(nsp);
-    img -> show_atom[i] = allocbool(nsp);
-    for (j=0; j<nsp; j++) img -> show_atom[i][j] = TRUE;
-  }
-  img -> at_color = g_malloc0 (2*nsp*sizeof*img -> at_color);
-  img -> sphererad = allocdouble (2*nsp);
-  img -> pointrad = allocdouble (2*nsp);
-  img -> atomicrad = allocdouble (2*nsp);
-  img -> bondrad = allocddouble (2*nsp, 2*nsp);
-  img -> linerad = allocddouble (2*nsp, 2*nsp);
-
+  int nsp = this_proj -> nspec;
   img -> radall[0] = default_bd_rw[2];
   img -> radall[1] = default_bd_rw[5];
   for (i = 0; i < nsp; i++)
@@ -1262,6 +1250,34 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
       img -> bondrad[i+nsp][j+nsp] = img -> bondrad[j+nsp][i+nsp] = min(img -> bondrad[i+nsp][i+nsp], img -> bondrad[j+nsp][j+nsp]);
     }
   }
+}
+
+/*!
+  \fn void setup_image_spec_data (project * this_proj, image * img)
+
+  \brief initialize the chemical species related pointers in an image data structure
+
+  \param this_proj the target project
+  \param img the target image
+*/
+void setup_image_spec_data (project * this_proj, image * img)
+{
+  int i, j;
+  int nsp = this_proj -> nspec;
+  // Chemical species related
+  for (i = 0; i<2; i++)
+  {
+    img -> show_label[i] = allocbool(nsp);
+    img -> show_atom[i] = allocbool(nsp);
+    for (j=0; j<nsp; j++) img -> show_atom[i][j] = TRUE;
+  }
+  img -> at_color = g_malloc0 (2*nsp*sizeof*img -> at_color);
+  img -> sphererad = allocdouble (2*nsp);
+  img -> pointrad = allocdouble (2*nsp);
+  img -> atomicrad = allocdouble (2*nsp);
+  img -> bondrad = allocddouble (2*nsp, 2*nsp);
+  img -> linerad = allocddouble (2*nsp, 2*nsp);
+  setup_default_species_parameters_for_image (this_proj, img);
   for (i=0; i<10; i++)
   {
     img -> spcolor[i] = NULL;
@@ -1278,14 +1294,14 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
 }
 
 /*!
-  \fn void set_img_lights (project * this_proj, image * img)
+  \fn void setup_default_lights (project * this_proj, image * img)
 
   \brief initialize lightning for an image data structure
 
   \param this_proj the target project
   \param img the target image
 */
-void set_img_lights (project * this_proj, image * img)
+void setup_default_lights (project * this_proj, image * img)
 {
   img -> l_ghtning.lights = default_lightning.lights;
   if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
@@ -1317,32 +1333,34 @@ void set_img_lights (project * this_proj, image * img)
 }
 
 /*!
-  \fn void init_img (project * this_proj)
+  \fn void setup_default_image (project * this_proj, image * img)
 
-  \brief initialize an image data structure
+  \brief setup default image parameters
 
   \param this_proj the target project
+  \param img the target image
 */
-void init_img (project * this_proj)
+void setup_default_image (project * this_proj, image * img)
 {
   int i;
-  this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
-  image * img = this_proj -> modelgl -> anim -> last -> img;
-
-  if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
   duplicate_background_data (img -> back, & default_background);
-
   img -> box_color = default_box.color;
   img -> box_axis_rad[BOX] = default_box.rad;
   img -> box_axis_line[BOX] = default_box.line;
-
-  img -> color_map[0] = 0;
-  img -> color_map[1] = 0;
+  for (i=0; i<2; i++)
+  {
+    img -> color_map[i] = default_opengl[i+1];
+  }
   img -> axispos = default_axis.t_pos;
   img -> box_axis_rad[AXIS] = default_axis.rad;
   img -> box_axis_line[AXIS] = default_axis.line;
   img -> axis_length = default_axis.length;
   img -> axis_labels = default_axis.labels;
+  if (img -> axis_color)
+  {
+    g_free (img -> axis_color);
+    img -> axis_color = NULL;
+  }
   if (default_axis.color) img -> axis_color = duplicate_color (3, default_axis.color);
   for (i=0; i<3; i++)
   {
@@ -1350,7 +1368,6 @@ void init_img (project * this_proj)
     img -> axis_title[i] = g_strdup_printf ("%s", default_axis.title[i]);
   }
   img -> quality = default_opengl[3];
-  img -> render = FILL;
   img -> rep = default_rep.rep;
   img -> filled_type = NONE;
   // Visual styles
@@ -1369,7 +1386,6 @@ void init_img (project * this_proj)
   }
   img -> box_axis[AXIS] = (this_proj -> natomes) ? default_axis.axis : NONE;
   img -> box_axis[BOX] = (this_proj -> cell.ltype) ? default_box.box : NONE;
-
   for (i=0; i<5; i++)
   {
     duplicate_screen_label (& img -> labels[i], & default_label[i]);
@@ -1380,17 +1396,32 @@ void init_img (project * this_proj)
     img -> mfactor[i] = default_mfactor[i];
     img -> mpattern[i] = default_mpattern[i];
     img -> mwidth[i] = default_mwidth[i];
-    img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
     img -> acl_format[i] = default_acl_format[i];
   }
-  if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
-  this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  img -> m_depth = get_max_depth (img -> p_depth);
-
-  set_img_lights (this_proj, img);
-
+  setup_default_lights (this_proj, img);
   duplicate_material (& img -> m_terial, & default_material);
   duplicate_fog (& img -> f_g, & default_fog);
+}
+
+/*!
+  \fn void init_img (project * this_proj)
+
+  \brief initialize an image data structure
+
+  \param this_proj the target project
+*/
+void init_img (project * this_proj)
+{
+  this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
+  image * img = this_proj -> modelgl -> anim -> last -> img;
+  if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
+  img -> render = FILL;
+  setup_default_image (this_proj, img);
+  int i;
+  for (i=0; i<2; i++) img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
+  if (this_proj -> nspec) setup_image_spec_data (this_proj, img);
+  this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+  img -> m_depth = get_max_depth (img -> p_depth);
 }
 
 /*!

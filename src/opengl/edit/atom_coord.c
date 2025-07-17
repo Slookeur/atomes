@@ -571,7 +571,7 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
   {
     int h, i, j, k, l, m, n, o, p, q;
     image * new_img = g_malloc0 (sizeof*new_img);
-    image_init_spec_data (new_img, this_proj, new_spec);
+    setup_image_spec_data (this_proj, new_img);
     image * old_img = this_proj -> modelgl -> anim -> last -> img;
     // copy info in new data, then clean old data and copy it back
     for (i=0; i<2; i++)
@@ -673,7 +673,7 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
   }
   else if (add)
   {
-    image_init_spec_data (this_proj -> modelgl -> anim -> last -> img, this_proj, new_spec);
+    setup_image_spec_data (this_proj, this_proj -> modelgl -> anim -> last -> img);
   }
 
   if (add || rem)

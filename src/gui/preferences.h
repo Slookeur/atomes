@@ -114,7 +114,6 @@ extern void duplicate_background_data (background * new_back, background * old_b
 extern gboolean preferences;
 
 extern gboolean default_clones;
-extern gchar * default_delta_num_leg[8];
 extern int * default_num_delta;
 extern int * tmp_num_delta;
 extern double * default_delta_t;
