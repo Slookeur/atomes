@@ -50,7 +50,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <libxml/parser.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <pwd.h>
+#ifndef G_OS_WIN32
+#  include <pwd.h>
+#endif
+
 
 extern void apply_default_parameters_to_project (project * this_proj);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
@@ -172,6 +175,7 @@ gradient_edition * pref_gradient_win = NULL;
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
+gchar * pref_error = NULL;
 
 tint * pref_pointer = NULL;
 
@@ -316,11 +320,16 @@ int xml_save_parameter_to_file (xmlTextWriterPtr writer, gchar * xml_leg, gchar 
 int save_preferences_to_xml_file ()
 {
   int rc;
+  pref_error = NULL;
 #ifdef G_OS_WIN32
-  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.pml", NULL);
-#else
-  struct passwd * pw = getpwuid(getuid());
-  ATOMES_CONFIG = g_strdup_printf ("%s/.config/atomes/atomes.pml", pw -> pw_dir);
+  if (ATOMES_CONFIG_DIR)
+  {
+    if (! CreateDirectory(ATOMES_CONFIG_DIR, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+    {
+      pref_error = g_strdup_printf ("Error: impossible to create %s (code: %lu)\n", ATOMES_CONFIG_DIR, GetLastError());
+      return 0;
+    }
+  }
 #endif
 
   xmlTextWriterPtr writer;
@@ -1907,7 +1916,7 @@ void set_atomes_preferences ()
   preferences = TRUE;
   set_atomes_defaults();
   preferences = FALSE;
-  read_preferences_from_xml_file ();
+  if (ATOMES_CONFIG) read_preferences_from_xml_file ();
 }
 
 /*!
@@ -3897,7 +3906,12 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
         gchar * str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
         if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
         {
-          save_preferences_to_xml_file ();
+          if (! save_preferences_to_xml_file ())
+          {
+            show_error ((pref_error) ? pref_error : "Error while trying to save preferences to file", 0, MainWindow);
+            g_free (pref_error);
+            pref_error = NULL;
+          }
         }
         g_free (str);
       }

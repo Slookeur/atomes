@@ -132,6 +132,7 @@ gchar * PACKAGE_SGOF = NULL;
 gchar * PACKAGE_SGMP = NULL;
 gchar * PACKAGE_SGMI = NULL;
 gchar * PACKAGE_SGTC = NULL;
+gchar * ATOMES_CONFIG_DIR = NULL;
 gchar * ATOMES_CONFIG = NULL;
 gchar * ATOMES_URL = "https://atomes.ipcms.fr";
 gchar * mode_name[2]={"Analysis", "Edition"};

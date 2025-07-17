@@ -399,6 +399,7 @@ extern gchar * PACKAGE_SGOF;
 extern gchar * PACKAGE_SGMP;
 extern gchar * PACKAGE_SGMI;
 extern gchar * PACKAGE_SGTC;
+extern gchar * ATOMES_CONFIG_DIR;
 extern gchar * ATOMES_CONFIG;
 extern gchar * ATOMES_URL;
 
