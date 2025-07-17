@@ -165,6 +165,7 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (img -> back -> gradient)
   {
     if (fwrite (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> back -> position, sizeof(float), 1, fp) != 1) return ERROR_RW;
     if (fwrite (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
   }
   else

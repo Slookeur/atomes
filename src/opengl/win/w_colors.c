@@ -31,6 +31,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   void window_color (project * this_proj, glwin * view);
+  void back_position_has_changed (gpointer data, GLfloat v);
 
   G_MODULE_EXPORT void run_window_color (GtkDialog * win, gint response_id, gpointer data);
   G_MODULE_EXPORT void to_run_back_color_window (GSimpleAction * action, GVariant * parameter, gpointer data);
@@ -43,6 +44,13 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void window_color_coord (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void window_color_coord (GtkWidget * widg, gpointer data);
 
+  G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data);
+  G_MODULE_EXPORT void set_gradient_color (GtkColorChooser * colob, gpointer data);
+  G_MODULE_EXPORT void set_back_position (GtkRange * range, gpointer data);
+  G_MODULE_EXPORT gboolean scroll_set_back_position (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
+  G_MODULE_EXPORT gboolean on_gradient_delete (GtkWindow * widg, gpointer data);
+  G_MODULE_EXPORT gboolean on_gradient_delete (GtkWidget * widg, GdkEvent * event, gpointer data);
+  G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data);
 */
 
 #include "global.h"
@@ -267,6 +275,7 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
     hide_the_widgets (the_gradient -> d_box[1]);
     show_the_widgets (the_gradient -> color_box[0]);
     hide_the_widgets (the_gradient -> color_box[1]);
+    hide_the_widgets (the_gradient -> p_box);
     if (! preferences) cleaning_shaders (view, BACKG);
   }
   else
@@ -278,6 +287,7 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
     }
     show_the_widgets (the_gradient -> color_box[1]);
     hide_the_widgets (the_gradient -> color_box[0]);
+    show_the_widgets (the_gradient -> p_box);
     if (!  bid -> b)
     {
       if (i == 1)
@@ -298,6 +308,59 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
   {
     update (view);
   }
+}
+
+/*!
+  \fn void back_position_has_changed (gpointer data, GLfloat v)
+
+  \brief change gradient mixed position
+
+  \param data the associated data pointer
+  \param v the new position value
+*/
+void back_position_has_changed (gpointer data, GLfloat v)
+{
+  tint * bid = (tint *)data;
+  if (preferences)
+  {
+    if (v >= 0.0 && v <= 1.0) tmp_background -> position = v;
+  }
+  else
+  {
+    glwin * view = get_project_by_id (bid -> a) -> modelgl;
+    if (v >= 0.0 && v <= 1.0) view -> anim -> last -> img -> back -> position = v;
+    view -> create_shaders[BACKG] = TRUE;
+    update (view);
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT gboolean scroll_set_back_position (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data)
+
+  \brief set gradient mixed position - scroll callback
+
+  \param range the GtkRange sending the signal
+  \param scroll the associated scroll type
+  \param value the range value
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean scroll_set_back_position (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data)
+{
+  back_position_has_changed (data, (GLfloat) value);
+  return FALSE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_back_position (GtkRange * range, gpointer data)
+
+  \brief set gradient mixed position - range callback
+
+  \param range the GtkRange sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_back_position (GtkRange * range, gpointer data)
+{
+  back_position_has_changed (data, (GLfloat) gtk_range_get_value (range));
 }
 
 #ifdef GTK4
@@ -330,6 +393,14 @@ G_MODULE_EXPORT gboolean on_gradient_delete (GtkWidget * widg, GdkEvent * event,
   return TRUE;
 }
 
+/*!
+  \fn G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
+
+  \brief Background configuration window
+
+  \param widg the widget sending the signal, if any
+  \param the associated data pointer
+*/
 G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
 {
   GtkWidget * hbox, * vbox;
@@ -337,6 +408,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   gradient_edition * the_gradient;
   int back_gradient;
   int back_direction;
+  float back_position;
   ColRGBA back_color;
   ColRGBA * gradient_color;
   glwin * view;
@@ -346,6 +418,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
     the_gradient = pref_gradient_win;
     back_gradient = tmp_background -> gradient;
     back_direction = tmp_background -> direction;
+    back_position = tmp_background -> position;
     back_color = tmp_background -> color;
     gradient_color = tmp_background -> gradient_color;
   }
@@ -356,6 +429,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
     the_gradient = view -> gradient_win;
     back_gradient = view -> anim -> last -> img -> back -> gradient;
     back_direction = view -> anim -> last -> img -> back -> direction;
+    back_position = view -> anim -> last -> img -> back -> position;
     back_color = view -> anim -> last -> img -> back -> color;
     gradient_color = view -> anim -> last -> img -> back -> gradient_color;
   }
@@ -441,6 +515,10 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
                          color_button (gradient_color[i], FALSE, 100, -1, G_CALLBACK(set_gradient_color), (preferences) ? & pref_pointer[i+1] : & view -> colorp[i+1][0]), FALSE, FALSE, 0);
   }
 
+  the_gradient -> p_box = abox (the_gradient -> color_box[1], "Mixed position", 5);
+  the_gradient -> p_scale = create_hscale (0.0, 1.0, 0.001, back_position, GTK_POS_TOP, 3, 150, G_CALLBACK(set_back_position), G_CALLBACK(scroll_set_back_position), (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_gradient -> p_box, the_gradient -> p_scale, FALSE, FALSE, 20);
+
   if (! preferences)
   {
     add_gtk_close_event (the_gradient -> win, G_CALLBACK(on_gradient_delete), view);
@@ -449,6 +527,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
     {
       hide_the_widgets (the_gradient -> color_box[1]);
       for (i=0; i<2; i++) hide_the_widgets (the_gradient -> d_box[i]);
+      hide_the_widgets (the_gradient -> p_box);
     }
     else
     {

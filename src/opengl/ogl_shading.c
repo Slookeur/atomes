@@ -418,6 +418,7 @@ void glsl_bind_background (glsl_program * glsl, object_3d * obj)
   glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "first_color");
   glsl -> uniform_loc[1] = glGetUniformLocation (glsl -> id, "second_color");
   glsl -> uniform_loc[2] = glGetUniformLocation (glsl -> id, "gradient");
+  glsl -> uniform_loc[3] = glGetUniformLocation (glsl -> id, "position");
 
   glBindBuffer(GL_ARRAY_BUFFER, glsl -> vbo[0]);
   glBufferData(GL_ARRAY_BUFFER, obj -> vert_buffer_size * obj -> num_vertices*sizeof(GLfloat), obj -> vertices, GL_STATIC_DRAW);
@@ -954,6 +955,7 @@ void render_this_shader (glsl_program * glsl, int ids)
                                            plot -> back -> gradient_color[j].alpha);
     }
     glUniform1i (glsl -> uniform_loc[2], plot -> back -> direction);
+    glUniform1f (glsl -> uniform_loc[3], plot -> back -> position);
   }
   else if (glsl -> object == MEASU)
   {

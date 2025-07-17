@@ -325,6 +325,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     if (img -> back -> gradient)
     {
       if (fread (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& img -> back -> position, sizeof(float), 1, fp) != 1) return ERROR_RW;
       if (fread (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
     }
     else
@@ -335,6 +336,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   else
   {
     img -> back -> gradient = 0;
+    img -> back -> position = 0.5;
     if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   }
   if (fread (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;

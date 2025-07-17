@@ -319,6 +319,7 @@ struct background
                          6 = top right to bottom left \n
                          7 = top left to bottom right \n
                          8 = center  */
+  float position; /*!< Equal mixed position */
   ColRGBA color;
   ColRGBA gradient_color[2];
 };
@@ -933,6 +934,8 @@ struct gradient_edition
   GtkWidget * g_box;
   GtkWidget * d_box[2];
   GtkWidget * color_box[2];
+  GtkWidget * p_box;
+  GtkWidget * p_scale;
 };
 
 /*! \typedef glwin

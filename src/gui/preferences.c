@@ -31,7 +31,70 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  int xml_save_color_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, ColRGBA col);
+  int xml_save_xyz_to_file (xmlTextWriterPtr writer, int did, gchar * legend, gchar * key, vec3_t data);
+  int xml_save_parameter_to_file (xmlTextWriterPtr writer, gchar * xml_leg, gchar * xml_key, gboolean doid, int xml_id, gchar * value);
+  int save_preferences_to_xml_file ();
 
+  ColRGBA get_spec_color (int z, , element_color * clist);
+
+  gboolean are_identical_colors (ColRGBA col_a, ColRGBA col_b);
+  float get_radius (int object, int col, int z, element_radius * rad_list);
+
+  double xml_string_to_double (gchar * content);
+
+  G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEventButton * event, gpointer data);
+
+  element_radius * duplicate_element_radius (element_radius * old_list);
+  element_color * duplicate_element_color (element_color * old_list);
+
+  void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col);
+  void read_parameter (xmlNodePtr parameter_node);
+  void read_light (xmlNodePtr light_node);
+  void read_preferences (xmlNodePtr preference_node);
+  void read_style_from_xml_file (xmlNodePtr style_node, int style);
+  void read_preferences_from_xml_file ();
+  void set_atomes_defaults ();
+  void set_atomes_preferences ();
+  void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
+  void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
+  void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
+  void clean_all_tmp ();
+  void duplicate_box_data (box_data * new_box, box_data * old_box);
+  void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep);
+  void duplicate_background_data (background * new_back, background * old_back);
+  void duplicate_axis_data (axis_data * new_axis, axis_data * old_axis);
+  void prepare_tmp_default ();
+  void save_preferences ();
+  void adjust_preferences_window ();
+  void create_configuration_dialog ();
+
+  G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data);
+  G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data);
+  G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data);
+  G_MODULE_EXPORT void edit_pref (GtkCellRendererText * cell, gchar * path_string, gchar * new_text, gpointer user_data);
+  G_MODULE_EXPORT void edit_chem_preferences (GtkDialog * edit_chem, gint response_id, gpointer data);
+  G_MODULE_EXPORT void run_ac_color (GtkDialog * win, gint response_id, gpointer data);
+  G_MODULE_EXPORT void pref_color_button_pressed (GtkGesture * gesture, int n_press, double x, double y, gpointer data);
+  G_MODULE_EXPORT void set_stuff_color (GtkColorChooser * colob, gpointer data);
+  G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data);
+  G_MODULE_EXPORT void set_default_style (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data);
+  G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data);
+  G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id, gpointer data);
+
+  GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gchar * end);
+  GtkWidget * view_preferences ();
+  GtkWidget * over_param (int object, int style);
+  GtkWidget * style_tab (int style);
+  GtkWidget * model_preferences ();
+  GtkWidget * combo_map (int obj);
+  GtkWidget * opengl_preferences ();
+  GtkWidget * calc_preferences ();
+
+  GtkTreeModel * style_combo_tree ();
 
 */
 
@@ -844,9 +907,13 @@ int save_preferences_to_xml_file ()
     rc = xml_save_parameter_to_file (writer, "Direction", "default_background", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
+    str = g_strdup_printf ("%f", default_background.position);
+    rc = xml_save_parameter_to_file (writer, "Mixed position", "default_background", TRUE, 2, str);
+    g_free (str);
+    if (! rc) return 0;
     for (i=0; i<2; i++)
     {
-      rc = xml_save_color_to_file (writer, i+2, "Color", "default_background", default_background.gradient_color[i]);
+      rc = xml_save_color_to_file (writer, i+3, "Color", "default_background", default_background.gradient_color[i]);
       if (! rc) return 0;
     }
   }
@@ -1261,8 +1328,11 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
       case 1:
         default_background.direction = (int) xml_string_to_double(content);
         break;
+      case 2:
+        default_background.position = xml_string_to_double(content);
+        break;
       default:
-        if (col) default_background.gradient_color[vid-2] = * col;
+        if (col) default_background.gradient_color[vid-3] = * col;
         break;
     }
   }
@@ -1864,6 +1934,7 @@ void set_atomes_defaults ()
   default_background.color.alpha = 1.0;
   default_background.gradient = 1;
   default_background.direction = 0;
+  default_background.position = 0.5;
   default_background.gradient_color[0].red = 0.10;
   default_background.gradient_color[0].green = 0.37;
   default_background.gradient_color[0].blue = 0.70;
@@ -1872,7 +1943,6 @@ void set_atomes_defaults ()
   default_background.gradient_color[1].green = 0.01;
   default_background.gradient_color[1].blue = 0.21;
   default_background.gradient_color[1].alpha = 1.0;
-
 
   default_rep.rep = PERSPECTIVE;
   default_rep.proj = -1;
@@ -3619,6 +3689,7 @@ void duplicate_background_data (background * new_back, background * old_back)
 {
   new_back -> gradient = old_back -> gradient;
   new_back -> direction = old_back -> direction;
+  new_back -> position = old_back -> position;
   new_back -> color = old_back -> color;
   int i;
   for (i=0; i<2; i++)
@@ -3853,6 +3924,7 @@ void adjust_preferences_window ()
   {
     hide_the_widgets (pref_gradient_win -> color_box[1]);
     for (i=0; i<2; i++) hide_the_widgets (pref_gradient_win -> d_box[i]);
+    hide_the_widgets (pref_gradient_win -> p_box);
   }
 }
 

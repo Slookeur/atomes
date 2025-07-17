@@ -1743,7 +1743,6 @@ const GLchar * background_vertex = GLSL(
   in vec2 vert;
 
   out vec2 fragment_coord;
-
   void main ()
   {
      fragment_coord = 0.5*vert + 0.5;
@@ -1756,33 +1755,34 @@ const GLchar * background_linear = GLSL(
   uniform vec4 first_color;
   uniform vec4 second_color;
   uniform int gradient;
+  uniform float position;
 
   out vec4 fragment_color;
   void main ()
   {
-    float horizontal;
-    float vertical;
+    float horizontal = 1.0 - fragment_coord.x;
+    float vertical = fragment_coord.y;
+    float factor;
     switch (gradient)
     {
       case 1:
         // Linear right to left
-        fragment_color = mix(first_color, second_color, fragment_coord.x);
+        factor = clamp ((horizontal - position) * 2.0 + 0.5, 0.0, 1.0);
         break;
       case 2:
         // Linear bottom right to top left
-        horizontal = 1.0 - fragment_coord.x;
-        vertical = fragment_coord.y;
-        fragment_color = mix(first_color, second_color, 0.5*(horizontal + vertical));
+         factor = clamp ((0.5*(horizontal + vertical) - position) * 2.0 + 0.5, 0.0, 1.0);
         break;
       case 3:
         // Linear bottom left to top right
-        fragment_color = mix(first_color, second_color, 0.5*(fragment_coord.x + fragment_coord.y));
+        factor = clamp ((0.5*(fragment_coord.x + vertical) - position) * 2.0 + 0.5, 0.0, 1.0);
         break;
       default:
         // Linear top to bottom
-        fragment_color = mix(first_color, second_color, 1.0 - fragment_coord.y);
+        factor = clamp ((vertical - position) * 2.0 + 0.5, 0.0, 1.0);
         break;
     }
+    fragment_color = mix(first_color, second_color, factor);
   }
 );
 
@@ -1791,78 +1791,71 @@ const GLchar * background_circular = GLSL(
   uniform vec4 first_color;
   uniform vec4 second_color;
   uniform int gradient;
+  uniform float position;
 
   out vec4 fragment_color;
   void main ()
   {
     float dist;
-    float alpha;
+    float factor;
     vec2 center;
     switch (gradient)
     {
       case 0:
         // Circular right to left
-        center = vec2(0.0, 0.5); // left side centered vertically
-        dist = distance (fragment_coord, center);
+        center = vec2 (0.0, 0.5); // left side centered vertically
+        dist = distance (fragment_coord, center) + position - 0.5;
         // sqrt((1.0 - 0.0)^2 + (1.0 - 0.5)^2) ~ 1.118
-        alpha = clamp (dist / 1.118, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        factor = clamp (dist / 1.118, 0.0, 1.0);
         break;
       case 1:
         // Circular left to right
-        center = vec2(fragment_coord.x, 0.5); // right side centered vertically
-        dist = distance (fragment_coord, center);
-        alpha = clamp (dist / 1.118, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (1.0, 0.5); // right side centered vertically
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.118, 0.0, 1.0);
         break;
       case 2:
         // Top to bottom
-        center = vec2(0.5, 1.0); // right side centered vertically
-        dist = distance (fragment_coord, center);
-        alpha = clamp (dist / 1.118, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (0.5, 1.0); // right side centered vertically
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.118, 0.0, 1.0);
         break;
       case 3:
         // Bottom to top
-        center = vec2(0.5, 0.0); // right side centered vertically
-        dist = distance (fragment_coord, center);
-        alpha = clamp (dist / 1.118, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (0.5, 0.0); // right side centered vertically
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.118, 0.0, 1.0);
         break;
       case 4:
         // Circular bottom right to top left
-        center = vec2(1.0, 0.0); // bottom right corner
-        dist = distance (fragment_coord, center);
-        alpha = clamp(dist / 1.4142, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (1.0, 0.0); // bottom right corner
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.4142, 0.0, 1.0);
         break;
       case 5:
         // Circular bottom left to top right
-        center = vec2(0.0, 0.0); // bottom right corner
-        dist = distance (fragment_coord, center);
-        alpha = clamp(dist / 1.4142, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (0.0, 0.0); // bottom right corner
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.4142, 0.0, 1.0);
         break;
       case 6:
         // Circular top right to bottom left
-        center = vec2(1.0, 1.0); // top right corner
-        dist = distance (fragment_coord, center);
-        alpha = clamp(dist / 1.4142, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (1.0, 1.0); // top right corner
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.4142, 0.0, 1.0);
         break;
       case 7:
         // Circular top left to bottom right
-        center = vec2(0.0, 1.0); // top left corner
-        dist = distance (fragment_coord, center);
-        alpha = clamp(dist / 1.4142, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (0.0, 1.0); // top left corner
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 1.4142, 0.0, 1.0);
         break;
       default:
-        center = vec2(0.5, 0.5); // from the center
-        dist = distance (fragment_coord, center);
-        alpha = clamp(dist / 0.707, 0.0, 1.0);
-        fragment_color = mix (first_color, second_color, alpha);
+        center = vec2 (0.5, 0.5); // from the center
+        dist = distance (fragment_coord, center)  + position - 0.5;
+        factor = clamp (dist / 0.707, 0.0, 1.0);
         break;
     }
+    fragment_color = mix (first_color, second_color, factor);
   }
 );

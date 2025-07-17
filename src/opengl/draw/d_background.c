@@ -59,10 +59,10 @@ void create_background_lists ()
   switch (plot -> back -> gradient)
   {
     case 1:
-      wingl -> ogl_glsl[BACKG][0][0] = init_shader_program (BACKG, GLSL_BACK, background_vertex, NULL, background_linear, GL_TRIANGLE_STRIP, 1, 4, FALSE, back);
+      wingl -> ogl_glsl[BACKG][0][0] = init_shader_program (BACKG, GLSL_BACK, background_vertex, NULL, background_linear, GL_TRIANGLE_STRIP, 1, 5, FALSE, back);
       break;
     case 2:
-      wingl -> ogl_glsl[BACKG][0][0] = init_shader_program (BACKG, GLSL_BACK, background_vertex, NULL, background_circular, GL_TRIANGLE_STRIP, 1, 4, FALSE, back);
+      wingl -> ogl_glsl[BACKG][0][0] = init_shader_program (BACKG, GLSL_BACK, background_vertex, NULL, background_circular, GL_TRIANGLE_STRIP, 1, 5, FALSE, back);
       break;
   }
   g_free (back);

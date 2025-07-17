@@ -55,12 +55,12 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "color_box.h"
 #include "submenus.h"
 
+
+G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 #ifdef GTK4
 extern G_MODULE_EXPORT void window_bonds (GSimpleAction * action, GVariant * parameter, gpointer data);
 #else
-G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void window_bonds (GtkWidget * widg, gpointer data);
-extern G_MODULE_EXPORT void window_lines (GtkWidget * widg, gpointer data);
 #endif
 
 extern gboolean from_box_or_axis;
