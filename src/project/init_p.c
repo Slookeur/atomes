@@ -48,6 +48,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 extern void init_camera (project * this_proj, int get_depth);
 extern void setup_default_image (project * this_proj, image * img);
+extern void clean_atom_style (project * this_proj);
 extern void setup_default_species_parameters_for_image (project * this_proj, image * img);
 extern void init_shaders (glwin * view);
 
@@ -104,6 +105,7 @@ void apply_default_parameters_to_project (project * this_proj)
       setup_default_image (this_proj, img);
       init_camera (this_proj, FALSE);
       setup_default_species_parameters_for_image (this_proj, img);
+      clean_atom_style (this_proj);
       init_shaders (this_proj -> modelgl);
       update (this_proj -> modelgl);
     }
