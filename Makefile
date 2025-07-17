@@ -422,6 +422,7 @@ OBJ_DRAW = \
 	$(OBJ)d_box.o \
 	$(OBJ)d_axis.o \
 	$(OBJ)d_measures.o \
+	$(OBJ)d_background.o \
 	$(OBJ)ogl_text.o \
 	$(OBJ)movie.o \
 	$(OBJ)image.o
@@ -1009,6 +1010,8 @@ $(OBJ)d_axis.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_axis.o $(GLDRAW)d_axis.c $(INCLUDES)
 $(OBJ)d_measures.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_measures.o $(GLDRAW)d_measures.c $(INCLUDES)
+$(OBJ)d_background.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_background.o $(GLDRAW)d_background.c $(INCLUDES)
 $(OBJ)ogl_text.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)ogl_text.o $(GLDRAW)ogl_text.c $(INCLUDES)
 $(OBJ)movie.o:
