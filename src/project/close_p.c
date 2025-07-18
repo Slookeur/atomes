@@ -100,15 +100,20 @@ void close_project (project * to_close)
 
   if (to_close -> modelgl)
   {
-    if (to_close -> modelgl -> box_win)
-    {
-      to_close -> modelgl -> box_win -> win = destroy_this_widget (to_close -> modelgl -> box_win -> win);
-      g_free (to_close -> modelgl -> box_win);
-    }
     if (to_close -> modelgl -> rep_win)
     {
       to_close -> modelgl -> rep_win -> win = destroy_this_widget (to_close -> modelgl -> rep_win -> win);
       g_free (to_close -> modelgl -> rep_win);
+    }
+    if (to_close -> modelgl -> gradient_win)
+    {
+      to_close -> modelgl -> gradient_win -> win = destroy_this_widget (to_close -> modelgl -> gradient_win -> win);
+      g_free (to_close -> modelgl -> gradient_win);
+    }
+    if (to_close -> modelgl -> box_win)
+    {
+      to_close -> modelgl -> box_win -> win = destroy_this_widget (to_close -> modelgl -> box_win -> win);
+      g_free (to_close -> modelgl -> box_win);
     }
     if (to_close -> modelgl -> axis_win)
     {
@@ -246,7 +251,7 @@ void close_project (project * to_close)
     for (i=0 ; i<nprojects ; i++)
     {
       this_proj -> id = i;
-      if (this_proj -> initgl)
+      if (this_proj -> initgl && this_proj -> modelgl)
       {
         this_proj -> modelgl -> proj = i;
         for (j=0; j<NUM_COLORS; j++)
