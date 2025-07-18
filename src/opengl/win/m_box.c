@@ -458,6 +458,7 @@ G_MODULE_EXPORT void show_hide_box_axis (GSimpleAction * action, GVariant * para
       }
     }
     view -> create_shaders[the_data -> c+MDBOX] = TRUE;
+    update_menu_bar (view);
     update (view);
     g_action_change_state (G_ACTION (action), g_variant_new_boolean (show));
     g_variant_unref (state);
@@ -510,6 +511,7 @@ G_MODULE_EXPORT void change_box_axis_radio (GSimpleAction * action, GVariant * p
         }
         view -> create_shaders[i+MDBOX] = TRUE;
         update (view);
+        update_menu_bar (view);
         g_free (style_name);
         style_name = NULL;
         break;

@@ -92,15 +92,16 @@ void update_gradient_widgets (gradient_edition * gradient_win, background * back
     col = colrgba_togtkrgba (back -> gradient_color[i]);
     gtk_color_chooser_set_rgba ((GtkColorChooser *)gradient_win -> grad_but[i], & col);
   }
-
   combo_set_active (gradient_win -> g_box, back -> gradient);
   if (back -> gradient)
   {
     show_the_widgets (gradient_win -> dir);
     hide_the_widgets (gradient_win -> color_box[0]);
     show_the_widgets (gradient_win -> color_box[1]);
-    hide_the_widgets (gradient_win -> d_box[(back -> gradient == 1) ? 1 : 0]);
+    hide_the_widgets (gradient_win -> d_box[(back -> gradient == 2) ? 0 : 1]);
+    show_the_widgets (gradient_win -> d_box[back -> gradient - 1]);
     combo_set_active (gradient_win -> d_box[back -> gradient - 1], back -> direction);
+    show_the_widgets (gradient_win -> p_box);
   }
   else
   {
@@ -680,7 +681,6 @@ G_MODULE_EXPORT void window_color_coord (GtkWidget * widg, gpointer data)
   s = cid -> b;
   c = cid -> c;
   g = cid -> d;
-  g_debug ("s= %d, c= %d, g= %d", s, c, g);
   switch (g)
   {
     case 0:

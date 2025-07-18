@@ -98,7 +98,7 @@ void close_project (project * to_close)
   g_debug ("CLOSE_PROJECT: activep      = %d", activep);
 #endif
 
-  if (to_close -> initgl)
+  if (to_close -> modelgl)
   {
     if (to_close -> modelgl -> box_win)
     {
