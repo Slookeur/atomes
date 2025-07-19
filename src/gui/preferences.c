@@ -39,16 +39,19 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   ColRGBA get_spec_color (int z, , element_color * clist);
 
   gboolean are_identical_colors (ColRGBA col_a, ColRGBA col_b);
+  gboolean not_in_cutoffs (int z_a, int z_b);
+
   float get_radius (int object, int col, int z, element_radius * rad_list);
 
   double xml_string_to_double (gchar * content);
 
   G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEventButton * event, gpointer data);
 
+  bond_cutoff * duplicate_cutoffs (bond_cutoff * old_cutoff);
   element_radius * duplicate_element_radius (element_radius * old_list);
   element_color * duplicate_element_color (element_color * old_list);
 
-  void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col);
+  void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col);
   void read_parameter (xmlNodePtr parameter_node);
   void read_light (xmlNodePtr light_node);
   void read_preferences (xmlNodePtr preference_node);
@@ -59,6 +62,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void color_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
+  void add_cut_box ();
   void clean_all_tmp ();
   void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep);
   void duplicate_background_data (background * new_back, background * old_back);
@@ -69,6 +73,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void adjust_preferences_window ();
   void create_configuration_dialog ();
 
+  G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data);
@@ -82,6 +87,15 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data);
   G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void edit_pc_value (GtkEntry * res, gpointer data);
+  G_MODULE_EXPORT void toggle_use_cutoff (GtkCheckButton * but, gpointer data);
+  G_MODULE_EXPORT void toggle_use_cutoff (GtkToggleButton * but, gpointer data);
+  G_MODULE_EXPORT void totcut_changed (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void cut_spec_changed (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data);
+  G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data);
+  G_MODULE_EXPORT void toggle_select_project (GtkCheckButton * but, gpointer data);
+  G_MODULE_EXPORT void toggle_select_project (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id, gpointer data);
 
@@ -120,6 +134,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern void apply_default_parameters_to_project (project * this_proj);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
+extern void edit_bonds (GtkWidget * vbox);
 extern void calc_rings (GtkWidget * vbox);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
@@ -147,8 +162,14 @@ extern gchar * ogl_settings[3][10];
 
 GtkWidget * atom_entry_over[8];
 GtkWidget * bond_entry_over[6];
+GtkWidget * meas_combo;
+GtkWidget * meas_box[2];
 GtkWidget * preference_notebook = NULL;
 
+double default_totcut;
+double tmp_totcut;
+bond_cutoff * default_bond_cutoff;
+bond_cutoff * tmp_bond_cutoff;
 int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd */
 int * tmp_num_delta = NULL;
 double * default_delta_t = NULL;  /*!< 0 = time step, \n 1 = time unit , in: fs, ps, ns, µs, ms */
@@ -477,6 +498,53 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
   int i, j, k, l, m, n, o;
   gchar * str;
+
+  if (default_totcut > 0.0 || default_bond_cutoff)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"cutoffs");
+    if (rc < 0) return 0;
+    if (default_totcut > 0.0)
+    {
+       str = g_strdup_printf ("%lf",  default_totcut);
+       rc = xml_save_parameter_to_file (writer, "Total cutoff", "default_totcut", TRUE, 0, str);
+       g_free (str);
+       if (! rc) return 0;
+    }
+    if (default_bond_cutoff)
+    {
+      rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"partials");
+      if (rc < 0) return 0;
+      bond_cutoff * tmp_cut = default_bond_cutoff;
+      while (tmp_cut)
+      {
+        rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
+        if (rc < 0) return 0;
+        str = g_strdup_printf ("cutoff %s-%s", periodic_table_info[tmp_cut -> Z[0]].lab, periodic_table_info[tmp_cut -> Z[1]].lab);
+        rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST str);
+        g_free (str);
+        if (rc < 0) return 0;
+        str =  g_strdup_printf ("%d", tmp_cut -> Z[0]);
+        rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"α", BAD_CAST str);
+        g_free (str);
+        if (rc < 0) return 0;
+        str =  g_strdup_printf ("%d", tmp_cut -> Z[1]);
+        rc = xmlTextWriterWriteAttribute (writer, BAD_CAST (const xmlChar *)"β", BAD_CAST str);
+        g_free (str);
+        if (rc < 0) return 0;
+        str = g_strdup_printf ("%lf",  tmp_cut -> cutoff);
+        rc = xmlTextWriterWriteFormatString (writer, "%s", str);
+        g_free (str);
+        if (rc < 0) return 0;
+        rc = xmlTextWriterEndElement (writer);
+        if (rc < 0) return 0;
+        tmp_cut = tmp_cut -> next;
+      }
+      rc = xmlTextWriterEndElement (writer);
+      if (rc < 0) return 0;
+    }
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
 
   for (i=0; i<8; i++)
   {
@@ -1026,6 +1094,63 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
   }
 
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"measures");
+  if (rc < 0) return 0;
+  gchar * m_key[2]={"standard", "selection"};
+  for (i=0; i<2; i++)
+  {
+    rc = xmlTextWriterStartElement (writer, BAD_CAST m_key[i]);
+    if (rc < 0) return 0;
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
+    if (rc < 0) return 0;
+    str = g_strdup_printf ("%d", default_label[i+3].position);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[0], "default_label", TRUE, 0, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%d", default_label[i+3].render);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+    g_free (str);
+    if (! rc) return 0;
+    str = g_strdup_printf ("%d", default_label[i+3].scale);
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+    g_free (str);
+    if (! rc) return 0;
+    rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[i+3].font);
+    if (! rc) return 0;
+    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
+    if (rc < 0) return 0;
+    xml_save_color_to_file (writer, i+3, "Font color", "default_label_color", default_label[i+3].color[0]);
+    if (! rc) return 0;
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+
+    // mtilt
+    str = g_strdup_printf ("%d", default_mtilt[i]);
+    rc = xml_save_parameter_to_file (writer, "Tilt along", "default_mtilt", TRUE, i, str);
+    g_free (str);
+    if (! rc) return 0;
+    // mtilt
+    str = g_strdup_printf ("%d", default_mpattern[i]);
+    rc = xml_save_parameter_to_file (writer, "Pattern", "default_mpattern", TRUE, i, str);
+    g_free (str);
+    if (! rc) return 0;
+    // mfactor
+    str = g_strdup_printf ("%d", default_mfactor[i]);
+    rc = xml_save_parameter_to_file (writer, "Factor", "default_mfactor", TRUE, i, str);
+    g_free (str);
+    if (! rc) return 0;
+    // mfactor
+    str = g_strdup_printf ("%lf", default_mwidth[i]);
+    rc = xml_save_parameter_to_file (writer, "Width", "default_mwidth", TRUE, i, str);
+    g_free (str);
+    if (! rc) return 0;
+
+    rc = xmlTextWriterEndElement (writer);
+    if (rc < 0) return 0;
+  }
+  rc = xmlTextWriterEndElement (writer);
+  if (rc < 0) return 0;
+
   // End view
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
@@ -1055,24 +1180,51 @@ double xml_string_to_double (gchar * content)
 }
 
 /*!
-  \fn void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col)
+  \fn void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 
   \brief set default parameter
 
   \param content the string content
   \param key the name of variable to set
   \param vid the id number to set
+  \param bond atoms, if any
   \param vect vector to set, if any
   \param start initial value, if any, -1.0 otherwise
   \param end final value, if any, -1.0 otherwise
   \param col color to set, if any
-
 */
-void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float start, float end, ColRGBA * col)
+void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 {
   element_radius * tmp_rad;
   element_color * tmp_col;
-  if (g_strcmp0(key, "default_num_delta") == 0)
+  if (bond)
+  {
+    bond_cutoff * cut;
+    if (default_bond_cutoff)
+    {
+      cut = default_bond_cutoff;
+      while (cut -> next)
+      {
+        cut = cut -> next;
+      }
+      cut -> next = g_malloc0(sizeof*cut);
+      cut = cut -> next;
+    }
+    else
+    {
+      default_bond_cutoff = g_malloc0(sizeof*default_bond_cutoff);
+      cut = default_bond_cutoff;
+    }
+    cut -> Z[0] = bond -> a;
+    cut -> Z[1] = bond -> b;
+    cut -> use = TRUE;
+    cut -> cutoff = xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_totcut") == 0)
+  {
+    default_totcut = xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_num_delta") == 0)
   {
     default_num_delta[vid] = (int)xml_string_to_double(content);
   }
@@ -1398,6 +1550,22 @@ void set_parameter (gchar * content, gchar * key, int vid, vec3_t * vect, float 
   {
     default_axis.title[vid] = g_strdup_printf ("%s", content);
   }
+  else if (g_strcmp0(key, "default_mtilt") == 0)
+  {
+    default_mtilt[vid] = (int) xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_mpattern") == 0)
+  {
+    default_mpattern[vid] = (int) xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_mfactor") == 0)
+  {
+    default_mfactor[vid] = (int) xml_string_to_double(content);
+  }
+    else if (g_strcmp0(key, "default_mwidth") == 0)
+  {
+    default_mwidth[vid] = xml_string_to_double(content);
+  }
 }
 
 /*!
@@ -1414,10 +1582,12 @@ void read_parameter (xmlNodePtr parameter_node)
   gboolean set_codevar, set_id;
   gboolean set_x, set_y, set_z;
   gboolean set_r, set_g, set_b, set_a;
+  gboolean set_alpha, set_beta;
   ColRGBA col;
   gchar * key;
   gchar * content;
   int id;
+  dint bond;
   float start, end;
   vec3_t vec;
   while (parameter_node)
@@ -1427,6 +1597,7 @@ void read_parameter (xmlNodePtr parameter_node)
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
     set_r = set_g = set_b = set_a = FALSE;
+    set_alpha = set_beta = FALSE;
     start = end = -1.0;
     while (p_details)
     {
@@ -1442,6 +1613,16 @@ void read_parameter (xmlNodePtr parameter_node)
         {
           id = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
           set_id = TRUE;
+        }
+        else if (g_strcmp0("α",(char *)p_details -> name) == 0)
+        {
+          bond.a = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_alpha = TRUE;
+        }
+        else if (g_strcmp0("β",(char *)p_details -> name) == 0)
+        {
+          bond.b = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          set_beta = TRUE;
         }
         else if (g_strcmp0("x",(char *)p_details -> name) == 0)
         {
@@ -1489,10 +1670,11 @@ void read_parameter (xmlNodePtr parameter_node)
       }
       p_details = p_details -> next;
     }
-    if (set_codevar && (set_id || (set_r && set_g && set_b && set_a)))
+
+    if ((set_codevar && (set_id || (set_r && set_g && set_b && set_a))) || (set_alpha && set_beta))
     {
       // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
-      set_parameter (content, key, id, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
+      set_parameter (content, key, id, (set_alpha && set_beta) ? & bond : NULL, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
     }
     g_free (content);
     parameter_node = parameter_node -> next;
@@ -1572,7 +1754,7 @@ void read_light (xmlNodePtr light_node)
       }
       if (set_codevar)
       {
-        set_parameter (content, key, lid, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0, NULL);
+        set_parameter (content, key, lid, NULL, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0, NULL);
       }
       g_free (content);
       parameter_node = parameter_node -> next;
@@ -1665,6 +1847,16 @@ void read_preferences_from_xml_file ()
         node = findnode(racine -> children, "analysis");
         if (node)
         {
+          p_node = findnode (node  -> children, "cutoffs");
+          if (p_node)
+          {
+            read_preferences (p_node);
+            l_node = findnode(p_node -> children, "partials");
+            if (l_node)
+            {
+              read_preferences (l_node);
+            }
+          }
           read_preferences (node);
         }
         node = findnode(racine -> children, "opengl");
@@ -1778,6 +1970,32 @@ void read_preferences_from_xml_file ()
               read_preferences (c_node);
             }
           }
+          p_node = findnode(node -> children, "measures");
+          if (p_node)
+          {
+            l_node = findnode(p_node -> children, "standard");
+            if (l_node)
+            {
+              c_node = findnode(l_node -> children, "labels");
+              if (c_node)
+              {
+                label_id = 3;
+                read_preferences (c_node);
+              }
+              read_preferences (l_node);
+            }
+            l_node = findnode(p_node -> children, "selection");
+            if (l_node)
+            {
+              c_node = findnode(l_node -> children, "labels");
+              if (c_node)
+              {
+                label_id = 4;
+                read_preferences (c_node);
+              }
+              read_preferences (l_node);
+            }
+          }
         }
       }
       xmlFreeDoc(doc);
@@ -1796,6 +2014,10 @@ void set_atomes_defaults ()
 {
   int i, j;
   // Analysis preferences
+
+  default_totcut = 0.0;
+  if (default_bond_cutoff) g_free (default_bond_cutoff);
+  default_bond_cutoff = NULL;
   default_num_delta[GR] = 1000;
   default_num_delta[SQ] = 1000;
   default_num_delta[SK] = 1000;
@@ -1909,6 +2131,7 @@ void set_atomes_defaults ()
       default_label[i].color[0].alpha = 1.0;
     }
     default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
+    default_label[i].list = NULL;
   }
   for (i=0; i<2; i++)
   {
@@ -1934,16 +2157,16 @@ void set_atomes_defaults ()
   default_background.color.green = 0.0;
   default_background.color.blue = 0.0;
   default_background.color.alpha = 1.0;
-  default_background.gradient = 1;
-  default_background.direction = 0;
+  default_background.gradient = 2;
+  default_background.direction = 8;
   default_background.position = 0.5;
-  default_background.gradient_color[0].red = 0.10;
-  default_background.gradient_color[0].green = 0.37;
-  default_background.gradient_color[0].blue = 0.70;
+  default_background.gradient_color[0].red = 0.0;
+  default_background.gradient_color[0].green = 0.01;
+  default_background.gradient_color[0].blue = 0.21;
   default_background.gradient_color[0].alpha = 1.0;
   default_background.gradient_color[1].red = 0.0;
-  default_background.gradient_color[1].green = 0.01;
-  default_background.gradient_color[1].blue = 0.21;
+  default_background.gradient_color[1].green = 0.0;
+  default_background.gradient_color[1].blue = 0.0;
   default_background.gradient_color[1].alpha = 1.0;
 
   default_rep.rep = PERSPECTIVE;
@@ -2030,6 +2253,22 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
 }
 
 /*!
+  \fn G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data)
+
+  \brief change measure type
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data)
+{
+  int i;
+  i = combo_get_active ((GtkWidget *)box);
+  hide_the_widgets (meas_box[! i]);
+  show_the_widgets (meas_box[i]);
+}
+
+/*!
   \fn GtkWidget * view_preferences ()
 
   \brief view preferences
@@ -2042,10 +2281,11 @@ GtkWidget * view_preferences ()
   GtkWidget * vbox = create_vbox (BSEP);
   gchar * info[2] = {"The <b>View</b> tab regroups representation options",
                      "which effect apply to the general aspect of the model:"};
-  gchar * m_list[2][2] = {{"Representation", "scene set-up and orientation"},
-                          {"Axis", "axis options"}};
+  gchar * m_list[3][2] = {{"Representation", "scene set-up and orientation"},
+                          {"Axis", "axis options"},
+                          {"Measures", "measurements layout option"}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, NULL), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 30);
 
   pref_gradient_win = g_malloc0(sizeof*pref_gradient_win);
   gradient_advanced (NULL, NULL);
@@ -2062,7 +2302,31 @@ GtkWidget * view_preferences ()
   pref_axis_win = g_malloc0(sizeof*pref_axis_win);
   axis_advanced (NULL, NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_axis_win -> win, gtk_label_new ("Axis"));
+
+  // Measures
+  vbox = create_vbox (BSEP);
+  GtkWidget * hbox;
+  gchar * mbj[2]={"<b>Standard measures</b>", "<b>Edition mode measures</b>"};
+  hbox = adv_box (vbox, "<b>Select measure type</b>", 5, 120, 0.0);
+  meas_combo = create_combo ();
+  combo_text_append (meas_combo, "Standard measures");
+  combo_text_append (meas_combo, "Edition mode measures");
+  combo_set_active (meas_combo, 0);
+  g_signal_connect (G_OBJECT(meas_combo), "changed", G_CALLBACK(set_measures), NULL);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, meas_combo , FALSE, FALSE, 40);
+  int i;
+  for (i=0; i<2; i++)
+  {
+    meas_box[i] = create_vbox (BSEP);
+    hbox = adv_box (meas_box[i], mbj[i], 5, 120, 0.0);
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i+3), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, meas_box[i], hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, meas_box[i], FALSE, FALSE, 10);
+  }
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Measures"));
   show_the_widgets (notebook);
+
   return notebook;
 }
 
@@ -2205,7 +2469,6 @@ element_radius * duplicate_element_radius (element_radius * old_list)
   \param col modifier for tabulated radii
   \param z atomic number
   \param rad_list pre allocated data, if any
-
 */
 float get_radius (int object, int col, int z, element_radius * rad_list)
 {
@@ -2229,7 +2492,7 @@ float get_radius (int object, int col, int z, element_radius * rad_list)
       if (z < 119)
       {
         ft = 0;
-        return set_radius_ (& z, & ft) / 2.0;
+        return set_radius_ (& z, & ft) / 4.0;
       }
     }
     else
@@ -2256,7 +2519,7 @@ float get_radius (int object, int col, int z, element_radius * rad_list)
     else if (object == 0 || object == 3 || object == 5 ||  object == 8)
     {
       ft = 0;
-      return set_radius_ (& z, & ft);
+      return set_radius_ (& z, & ft) / 2.0;
     }
   }
   return 0.0;
@@ -2298,7 +2561,6 @@ element_color * duplicate_element_color (element_color * old_list)
 
   \param z atomic number
   \param clist the target color list, if any
-
 */
 ColRGBA get_spec_color (int z, element_color * clist)
 {
@@ -3091,7 +3353,7 @@ GtkWidget * over_param (int object, int style)
   }
   if (object)
   {
-    bond_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, TRUE, GINT_TO_POINTER(mod*(style+2)));
+    bond_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, FALSE, GINT_TO_POINTER(mod*(style+2)));
     update_entry_double (GTK_ENTRY(bond_entry_over[style]), tmp_bd_rw[style]);
     if (over) widget_set_sensitive (bond_entry_over[style], tmp_o_bd_rw[style]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, bond_entry_over[style], FALSE, FALSE, 0);
@@ -3099,7 +3361,7 @@ GtkWidget * over_param (int object, int style)
   }
   else
   {
-    atom_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, TRUE, GINT_TO_POINTER(mod*(style+2)));
+    atom_entry_over[style] = create_entry(G_CALLBACK(set_default_stuff), 100, 10, FALSE, GINT_TO_POINTER(mod*(style+2)));
     update_entry_double (GTK_ENTRY(atom_entry_over[style]), tmp_at_rs[style]);
     if (over) widget_set_sensitive (atom_entry_over[style], tmp_o_at_rs[style]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, atom_entry_over[style], FALSE, FALSE, 0);
@@ -3433,14 +3695,22 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
   int i = GPOINTER_TO_INT(data);
   const gchar * m = entry_get_text (res);
   double value = string_to_double ((gpointer)m);
-  if (i < 8)
+  if (i == -1)
   {
-    tmp_num_delta[i] = (int) value;
+    if (value > 0.0)
+    {
+      tmp_totcut = value;
+    }
+    update_entry_double (res, tmp_totcut);
+  }
+  else if (i < 8)
+  {
+    if (value > 0) tmp_num_delta[i] = (int) value;
     update_entry_int (res, tmp_num_delta[i]);
   }
   else
   {
-    tmp_delta_t[0] = value;
+    if (value > 0.0) tmp_delta_t[0] = value;
     update_entry_double (res, tmp_delta_t[0]);
   }
 }
@@ -3458,6 +3728,310 @@ G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
   tmp_delta_t[1] = (double) combo_get_active ((GtkWidget *)box);
 }
 
+GtkWidget * all_cut_box;
+GtkWidget * cut_combo[2];
+GtkWidget * pcut_box[2];
+GtkWidget * tcut_entry;
+GtkWidget * tcut_box;
+GtkWidget * cut_comments;
+bond_cutoff * cut_list;
+
+/*!
+  \fn G_MODULE_EXPORT void totcut_changed (GtkComboBox * box, gpointer data)
+
+  \brief change method to evaluate the total cutoff
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void totcut_changed (GtkComboBox * box, gpointer data)
+{
+  if (combo_get_active((GtkWidget *)box))
+  {
+    tmp_totcut = 2.0;
+    show_the_widgets (tcut_box);
+  }
+  else
+  {
+    tmp_totcut = 0.0;
+    hide_the_widgets (tcut_box);
+  }
+  update_entry_double((GtkEntry *)tcut_entry, tmp_totcut);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void edit_pc_value (GtkEntry * res, gpointer data)
+
+  \brief update partial cutoff value
+
+  \param res the GtkEntry the signal is coming from
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_pc_value (GtkEntry * res, gpointer data)
+{
+  bond_cutoff * cut = (bond_cutoff *)data;
+  const gchar * m = entry_get_text (res);
+  double value = string_to_double ((gpointer)m);
+  if (value > 0.0)
+  {
+    cut -> cutoff = value;
+  }
+  update_entry_double (res, cut -> cutoff);
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void toggled_use_cutoff (GtkCheckButton * but, gpointer data)
+
+  \brief toggle select / unselect this cutoff callback GTK4
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_use_cutoff (GtkCheckButton * but, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void toggle_use_cutoff (GtkToggleButton * but, gpointer data)
+
+  \brief toggle select / unselect this cutoff callback GTK3
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_use_cutoff (GtkToggleButton * but, gpointer data)
+#endif
+{
+  bond_cutoff * cut = (bond_cutoff *)data;
+  cut -> use = button_get_status ((GtkWidget *)but);
+}
+
+/*!
+  \fn void add_cut_box ()
+
+  \brief update partial cutoffs widgets
+*/
+void add_cut_box ()
+{
+  GtkWidget * hbox;
+  GtkWidget * entry;
+
+  int i;
+  for (i=0; i<2; i++)
+  {
+    if (pcut_box[i])
+    {
+     pcut_box[i] = destroy_this_widget(pcut_box[i]);
+    }
+  }
+  pcut_box[0] = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, pcut_box[0], FALSE, FALSE, 10);
+  if (cut_list)
+  {
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, pcut_box[0], hbox, FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B1;", 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B2;", 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("R<sub>cut</sub> (&#x3B1;, &#x3B2;)", 100, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Use <sup>*</sup>", 20, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  }
+  pcut_box[1] = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, pcut_box[1], FALSE, FALSE, 10);
+  bond_cutoff * tmp_cut = cut_list;
+  while (tmp_cut)
+  {
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, pcut_box[1], hbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(periodic_table_info[tmp_cut -> Z[0]].lab, 60, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(periodic_table_info[tmp_cut -> Z[1]].lab, 60, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    entry = create_entry (G_CALLBACK(edit_pc_value), 100, 10, FALSE, (gpointer)tmp_cut);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+    update_entry_double ((GtkEntry *)entry, tmp_cut -> cutoff);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (NULL, 20, -1, tmp_cut -> use, G_CALLBACK(toggled_use_cutoff), (gpointer)tmp_cut), FALSE, FALSE, 10);
+    tmp_cut = tmp_cut -> next;
+  }
+
+  cut_comments = destroy_this_widget (cut_comments);
+  cut_comments = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, cut_comments, FALSE, FALSE, 10);
+  if (cut_list) append_comments (cut_comments, "<sup>*</sup>", "Unused values will not be saved !");
+
+  for (i=0; i<2; i++) combo_set_active (cut_combo[i], -1);
+  show_the_widgets (all_cut_box);
+}
+
+/*!
+  \fn gboolean not_in_cutoffs (int z_a, int z_b)
+
+  \brief look in bond cutoff between species a and b is already defined
+*/
+gboolean not_in_cutoffs (int z_a, int z_b)
+{
+  bond_cutoff * tmp_cut = cut_list;
+  while (tmp_cut)
+  {
+    if (tmp_cut -> Z[0] == z_a && tmp_cut -> Z[1] == z_b) return FALSE;
+    tmp_cut = tmp_cut -> next;
+  }
+  return TRUE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void cut_spec_changed (GtkComboBox * box, gpointer data)
+
+  \brief partial cutoff chemical species
+
+  \param box the GtkWidget sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void cut_spec_changed (GtkComboBox * box, gpointer data)
+{
+  int i, j, k, l;
+  i = combo_get_active (cut_combo[0]);
+  j = combo_get_active (cut_combo[1]);
+  k = min (i+1, j+1);
+  l = max (i+1, j+1);
+  if (k && l)
+  {
+    if (not_in_cutoffs(k, l))
+    {
+      bond_cutoff * tmp_cut;
+      if (! cut_list)
+      {
+        cut_list = g_malloc0(sizeof*cut_list);
+        tmp_cut = cut_list;
+      }
+      else
+      {
+        tmp_cut = cut_list;
+        while (tmp_cut -> next)
+        {
+          tmp_cut = tmp_cut -> next;
+        }
+        tmp_cut -> next = g_malloc0(sizeof*tmp_cut -> next);
+        tmp_cut -> next -> prev = tmp_cut;
+        tmp_cut = tmp_cut -> next;
+      }
+      tmp_cut -> Z[0] = min(k, l);
+      tmp_cut -> Z[1] = max(k, l);
+      tmp_cut -> use = FALSE;
+      tmp_cut -> cutoff = 1.0;
+      add_cut_box ();
+    }
+  }
+}
+
+/*!
+  \fn bond_cutoff * duplicate_cutoffs (bond_cutoff * old_cutoff)
+
+   \brief duplicate bond cutoff data structure
+
+   \param old_cutoff the cutoff data structure to duplicate
+*/
+bond_cutoff * duplicate_cutoffs (bond_cutoff * old_cutoff)
+{
+  bond_cutoff * new_cutoff = NULL;
+  bond_cutoff * cut_a, * cut_b;
+  cut_a = old_cutoff;
+  while (cut_a)
+  {
+    if (cut_a -> use)
+    {
+      if (! new_cutoff)
+      {
+        new_cutoff = g_malloc0(sizeof*new_cutoff);
+        cut_b = new_cutoff;
+      }
+      else
+      {
+        cut_b -> next = g_malloc0(sizeof*cut_b -> next);
+        cut_b -> next -> prev = cut_b;
+        cut_b = cut_b -> next;
+      }
+      cut_b -> Z[0] = cut_a -> Z[0];
+      cut_b -> Z[1] = cut_a -> Z[1];
+      cut_b -> use = cut_a -> use;
+      cut_b -> cutoff = cut_a -> cutoff;
+    }
+    cut_a = cut_a -> next;
+  }
+  return new_cutoff;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void edit_cutoffs (GtkDialog * edit_cuts, gint response_id, gpointer data)
+
+  \brief edit partial cutoffs - running the dialog
+
+  \param edit_cuts the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void edit_cutoffs (GtkDialog * edit_cuts, gint response_id, gpointer data)
+{
+  switch (response_id)
+  {
+    case GTK_RESPONSE_APPLY:
+      tmp_bond_cutoff = duplicate_cutoffs (cut_list);
+      break;
+  }
+  if (cut_list)
+  {
+    g_free (cut_list);
+    cut_list = NULL;
+  }
+  int i;
+  for (i=0; i<2; i++)
+  {
+    cut_combo[i] = destroy_this_widget (cut_combo[i]);
+    pcut_box[i] = destroy_this_widget (pcut_box[i]);
+  }
+  cut_comments = destroy_this_widget (cut_comments);
+  all_cut_box = destroy_this_widget (all_cut_box);
+  destroy_this_widget ((GtkWidget *)edit_cuts);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
+
+  \brief set default cutoff radii
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
+{
+  GtkWidget * win = dialog_cancel_apply ("Select partial cutoffs(s)", MainWindow, TRUE);
+  GtkWidget * vbox = dialog_get_content_area (win);
+  GtkWidget * hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  all_cut_box = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, all_cut_box, FALSE, FALSE, 50);
+  cut_list = duplicate_cutoffs (tmp_bond_cutoff);
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, hbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B1;", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  int i, j;
+  for (i=0; i<2; i++)
+  {
+    cut_combo[i] = NULL;
+    cut_combo[i] = create_combo ();
+    for (j=1; j<119; j++)
+    {
+       combo_text_append (cut_combo[i], periodic_table_info[j].lab);
+    }
+    g_signal_connect(G_OBJECT(cut_combo[i]), "changed", G_CALLBACK(cut_spec_changed), NULL);
+    show_the_widgets (cut_combo[i]);
+  }
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cut_combo[0], FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 20, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B2;", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cut_combo[1], FALSE, FALSE, 5);
+
+  add_cut_box ();
+
+  run_this_gtk_dialog (win, G_CALLBACK(edit_cutoffs), NULL);
+}
+
 /*!
   \fn GtkWidget * calc_preferences ()
 
@@ -3466,59 +4040,97 @@ G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
 GtkWidget * calc_preferences ()
 {
   GtkWidget * notebook = gtk_notebook_new ();
-  GtkWidget * vbox, * vvbox;
-  GtkWidget * hbox, * hhbox;
+  GtkWidget * vbox;
+  GtkWidget * hbox;
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-  show_the_widgets (notebook);
-  vbox = create_vbox (BSEP);
   gchar * default_delta_num_leg[8] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
                                       "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
                                       "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "step(s) between configurations"};
-
   gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
                      "use it to setup your own default parameters:"};
-  gchar * m_list[2][2] = {{"Rings", "ring statistics options"},
+  gchar * m_list[3][2] = {{"Calculations", "most analysis options"},
+                          {"Rings", "ring statistics options"},
                           {"Chains", "chain statistics options"}};
-  gchar * end = {"Other options are listed below"};
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 2, m_list, end), FALSE, FALSE, 20);
+  vbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 20);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("To determine the existence, or the absence, of a chemical bond", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("between 2 atoms is a key feature in the <b>atomes</b> software", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  GtkWidget * vvbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label("It is used for analysis purposes, and, to draw bonds in the OpenGL window.", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  edit_bonds (vbox);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("You can adapt below the distance cutoffs:", -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-  vvbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 10);
+  GtkWidget * hhbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 40);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>Total cutoff</b>", 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  GtkWidget * combo = create_combo();
+  combo_text_append (combo, "Evaluated by <b>atomes</b>");
+  combo_text_append (combo, "User defined <sup>*</sup>");
+  combo_set_markup (combo);
+  gtk_widget_set_size_request (combo, 180, -1);
+  combo_set_active (combo, (tmp_totcut == 0.0) ? 0 : 1);
+  g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(totcut_changed), NULL);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, combo, FALSE, FALSE, 10);
+
+  tcut_box = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, tcut_box, FALSE, FALSE, 10);
+  tcut_entry = create_entry (G_CALLBACK(set_default_num_delta), 100, 10, FALSE, GINT_TO_POINTER(-1));
+  update_entry_double ((GtkEntry *)tcut_entry, tmp_totcut);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, tcut_box, tcut_entry, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, tcut_box, markup_label ("&#xC5;", -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  hhbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 40);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>Partial cutoff(s)</b>", 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button ("Set default cutoff(s)", IMG_NONE, NULL, 180, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_cutoffs_default), NULL), FALSE, FALSE, 10);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 20, 0.0, 0.0), FALSE, FALSE, 0);
+  append_comments (vbox, "<sup>*</sup>", "The highest this value is, the highest the number of neighbors around an atom.");
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+
   GtkWidget * entry;
+  vbox = create_vbox (BSEP);
   int i;
   for (i=0; i<8; i++)
   {
     if (i == 7)
     {
-      hhbox = create_hbox (BSEP);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("<b>Mean Squared Displacement</b>:", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
+      hbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Mean Squared Displacement</b>:", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     }
-    hhbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
-    entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, TRUE, GINT_TO_POINTER(i));
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
+    entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
     update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   }
-  hhbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("time step(s) &#x3b4;t", 285, -1, 0.0, 0.5), FALSE, FALSE, 30);
-  entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, TRUE, GINT_TO_POINTER(i));
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("time step(s) &#x3b4;t", 285, -1, 0.0, 0.5), FALSE, FALSE, 30);
+  entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
   update_entry_double ((GtkEntry *)entry, tmp_delta_t[0]);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, entry, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
   GtkWidget * tcombo = create_combo ();
   for (i=0; i<5 ; i++) combo_text_append (tcombo, untime[i]);
 
   combo_set_active (tcombo, (int)tmp_delta_t[1]);
   g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(tunit_changed), NULL);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, tcombo, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tcombo, FALSE, FALSE, 0);
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Calculations"));
+
   for (i=0; i<2; i++)
   {
     vbox = create_vbox (BSEP);
@@ -3526,6 +4138,7 @@ GtkWidget * calc_preferences ()
     calc_rings (vbox);
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? "Chains" : "Rings"));
   }
+  show_the_widgets (notebook);
   return notebook;
 }
 
@@ -3684,7 +4297,6 @@ void duplicate_background_data (background * new_back, background * old_back)
   }
 }
 
-
 /*!
   \fn void duplicate_box_data (box * new_box, box * old_box)
 
@@ -3738,6 +4350,8 @@ void duplicate_axis_data (axis * new_axis, axis * old_axis)
 void prepare_tmp_default ()
 {
   clean_all_tmp ();
+  tmp_totcut = default_totcut;
+  tmp_bond_cutoff = duplicate_cutoffs (default_bond_cutoff);
   tmp_num_delta = duplicate_int (8, default_num_delta);
   tmp_delta_t = duplicate_double (2, default_delta_t);
   tmp_rsparam = duplicate_int (7, default_rsparam);
@@ -3788,6 +4402,62 @@ void prepare_tmp_default ()
   duplicate_axis_data (tmp_axis, & default_axis);
 }
 
+gboolean * up_project;
+
+/*!
+  \fn G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data)
+
+  \brief update projects in the workspace using new preferences
+
+  \param proj_sel the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data)
+{
+  switch (response_id)
+  {
+    case GTK_RESPONSE_OK:
+      // To write apply to opened projects
+      int i;
+      for (i=0; i<nprojects; i++)
+      {
+        if (up_project[i]) apply_default_parameters_to_project (get_project_by_id(i));
+      }
+      break;
+    default:
+      break;
+  }
+  g_free (up_project);
+  up_project = NULL;
+  destroy_this_dialog (proj_sel);
+}
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void toggled_select_project (GtkCheckButton * but, gpointer data)
+
+  \brief toggle select / unselect project to update callback GTK4
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_select_project (GtkCheckButton * but, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void toggled_select_project (GtkToggleButton * but, gpointer data)
+
+  \brief toggle select / unselect project to update callback GTK3
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggled_select_project (GtkToggleButton * but, gpointer data)
+#endif
+{
+  up_project[GPOINTER_TO_INT(data)] = button_get_status ((GtkWidget *)but);
+}
+
 /*!
   \fn void save_preferences ()
 
@@ -3795,6 +4465,13 @@ void prepare_tmp_default ()
 */
 void save_preferences ()
 {
+  default_totcut = tmp_totcut;
+  if (default_bond_cutoff)
+  {
+    g_free (default_bond_cutoff);
+    default_bond_cutoff = NULL;
+  }
+  default_bond_cutoff = duplicate_cutoffs (tmp_bond_cutoff);
   if (default_num_delta)
   {
     g_free (default_num_delta);
@@ -3882,21 +4559,27 @@ void save_preferences ()
     default_mfactor[i] = tmp_mfactor[i];
     default_mwidth[i] = tmp_mwidth[i];
   }
-  duplicate_box_data (& default_box, tmp_box);
-
-  duplicate_background_data (& default_background, tmp_background);
   duplicate_rep_data (& default_rep, tmp_rep);
+  duplicate_background_data (& default_background, tmp_background);
+  duplicate_box_data (& default_box, tmp_box);
   duplicate_axis_data (& default_axis, tmp_axis);
 
   if (nprojects)
   {
-    if (ask_yes_no("Apply to all projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
-      // To write apply to opened projects
-      for (i=0; i<nprojects; i++)
-      {
-        apply_default_parameters_to_project (get_project_by_id(i));
-      }
+     // Select project here
+     GtkWidget * proj_sel = message_dialogmodal ("Project selection", "Select to apply preferences", GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);
+     GtkWidget * vbox = dialog_get_content_area (proj_sel);
+     GtkWidget * hbox;
+     up_project = allocbool (nprojects);
+     for (i=0; i<nprojects; i++)
+     {
+       hbox = create_hbox (BSEP);
+       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (get_project_by_id(i) -> name, 200, -1, FALSE, G_CALLBACK(toggled_select_project), GINT_TO_POINTER(i)), FALSE, FALSE, 40);
+     }
+     run_this_gtk_dialog (proj_sel, G_CALLBACK(update_projects), NULL);
     }
   }
 }
@@ -3909,6 +4592,15 @@ void save_preferences ()
 void adjust_preferences_window ()
 {
   int i;
+  if (tmp_totcut == 0.0)
+  {
+    hide_the_widgets (tcut_box);
+  }
+  else
+  {
+    show_the_widgets (tcut_box);
+  }
+  update_entry_double ((GtkEntry *)tcut_entry, tmp_totcut);
   update_light_data (0, pref_ogl_edit);
   setup_fog_dialogs (pref_ogl_edit, tmp_fog.mode);
   if (tmp_box -> box > NONE)
@@ -3917,8 +4609,11 @@ void adjust_preferences_window ()
   }
   hide_the_widgets ((tmp_axis -> axis == WIREFRAME) ? pref_axis_win -> radius_box : pref_axis_win -> width_box);
   for (i=0; i<2; i++) widget_set_sensitive (pref_axis_win -> axis_label_box[i], tmp_axis -> labels);
-
   update_gradient_widgets (pref_gradient_win, tmp_background);
+  i = combo_get_active (meas_combo);
+  i = (i < 0) ? 0 : i;
+  hide_the_widgets (meas_box[! i]);
+  show_the_widgets (meas_box[i]);
 }
 
 /*!
@@ -3993,13 +4688,13 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       pref_rep_win = NULL;
       if (pref_axis_win) g_free (pref_axis_win);
       pref_axis_win = NULL;
-
+      if (pref_gradient_win) g_free (pref_gradient_win);
+      pref_gradient_win = NULL;
       preference_notebook = NULL;
       break;
   }
 }
 
-extern void update_light_data (int li, opengl_edition * ogl_win);
 /*!
   \fn void create_configuration_dialog ()
 
@@ -4007,25 +4702,6 @@ extern void update_light_data (int li, opengl_edition * ogl_win);
 */
 void create_user_preferences_dialog ()
 {
-  /*
-    - delta t for dynamics + unit
-    - Steps between configurations
-  */
-
-  // Model prefs
-
-  /*
-  - Atoms / Bonds, etc
-  -
-  - Default show clones
-  - Default show box and box option
-  */
-
-  // Representation prefs
-
-  /* Ortho / persp
-
-  */
   GtkWidget * win = dialog_cancel_apply ("User preferences", MainWindow, TRUE);
   preferences = TRUE;
   prepare_tmp_default ();
@@ -4037,8 +4713,8 @@ void create_user_preferences_dialog ()
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(preference_notebook), GTK_POS_LEFT);
   gtk_widget_set_size_request (preference_notebook, 600, 635);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
-  GtkWidget * gbox = create_vbox (BSEP);
 
+  GtkWidget * gbox = create_vbox (BSEP);
   gchar * mess[2] = {"Browse the following to modify the default configuration of <b>atomes</b>",
                      "by replacing internal parameters by user defined preferences."};
   gchar * mlist[4][2]= {{"Analysis", "calculation preferences"},
@@ -4062,9 +4738,10 @@ void create_user_preferences_dialog ()
   GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
   GtkWidget * but_lab = markup_label ("Restore <b>atomes</b> default parameters", -1, -1, 0.5, 0.5);
   add_container_child (CONTAINER_BUT, but, but_lab);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 130);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 150);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
+
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));

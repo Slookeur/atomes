@@ -253,10 +253,8 @@ G_MODULE_EXPORT void set_labels_font (GtkFontButton * fontb, gpointer data)
   if (id -> a != -1)
   {
     glwin * view = get_project_by_id(id -> a) -> modelgl;
-    g_print ("id= %d, label_font= %s\n", id -> b, view -> anim -> last -> img -> labels[id -> b].font);
     g_free (view -> anim -> last -> img -> labels[id -> b].font);
     view -> anim -> last -> img -> labels[id -> b].font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
-    g_print ("id= %d, label_font= %s\n", id -> b, view -> anim -> last -> img -> labels[id -> b].font);
     if (id -> b < 2)
     {
       view -> create_shaders[LABEL] = TRUE;
@@ -298,7 +296,7 @@ G_MODULE_EXPORT void set_label_color (GtkColorChooser * colob, gpointer data)
   }
   else
   {
-    tmp_label[id -> b] -> color[id -> c] = get_button_color (colob);
+    tmp_label[id -> b] -> color[0] = get_button_color (colob);
   }
 }
 
@@ -709,7 +707,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   box = abox (vbox, "Font", 0);
   // There is a bug next for label[3] and label[4] only : no idea why but the name of the font is not displayed
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
-  if (lid == 3)
+  if (lid == 3 || lid == 4)
   {
     box = abox (vbox, "Font color", 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, color_button (label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), lab_pointer), FALSE, FALSE, 10);

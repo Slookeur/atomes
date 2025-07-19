@@ -346,9 +346,7 @@ Light init_light_source (int type, float size, float depth)
   {
     intensity *= exp (size/depth);
   }
-
   if (! preferences && depth <= 50.0) intensity *= depth / 100.0;
-
   new_light.intensity = vec3 (intensity, intensity, intensity);
   new_light.attenuation = vec3 (1.0, 0.14, 0.07);
   new_light.spot_data = vec3 (20.0, 20.0, 20.0);

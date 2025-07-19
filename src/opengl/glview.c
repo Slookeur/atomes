@@ -1402,12 +1402,12 @@ void init_img (project * this_proj)
   if (! img -> abc) img -> abc = g_malloc0(sizeof*img -> abc);
   if (! img -> xyz) img -> xyz = g_malloc0(sizeof*img -> xyz);
   img -> render = FILL;
+  this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+  img -> m_depth = get_max_depth (img -> p_depth);
   setup_default_image (this_proj, img);
   int i;
   for (i=0; i<2; i++) img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
   if (this_proj -> nspec) setup_image_spec_data (this_proj, img);
-  this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  img -> m_depth = get_max_depth (img -> p_depth);
 }
 
 /*!
@@ -1705,7 +1705,8 @@ void init_glwin (glwin * view)
   view -> anim -> first = snap;
   view -> anim -> last = snap;
   init_img (this_proj);
-  init_camera (this_proj, FALSE);
+  init_camera (this_proj, TRUE);
+
   view -> mouseStatus = RELEASED;
   view -> mouseAction = ANALYZE;
   // Warning, if not centered at start-up, dmtx could fail

@@ -87,6 +87,10 @@ void apply_default_parameters_to_project (project * this_proj)
 {
   int i, j;
   // Calc parameters
+  if (this_proj -> chemistry)
+  {
+    this_proj -> chemistry -> grtotcutoff = default_totcut;
+  }
   for (i=0; i<6; i++) this_proj -> num_delta[i] = default_num_delta[i];
   this_proj -> num_delta[SP] = default_num_delta[6];
   this_proj -> num_delta[MS] = default_num_delta[7];
@@ -108,7 +112,9 @@ void apply_default_parameters_to_project (project * this_proj)
     image * img = this_proj -> modelgl -> anim -> last -> img;
     if (img)
     {
+      preferences = FALSE;
       setup_default_image (this_proj, img);
+      preferences = TRUE;
       init_camera (this_proj, FALSE);
       setup_default_species_parameters_for_image (this_proj, img);
       clean_atom_style (this_proj);

@@ -68,6 +68,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 #include "glwindow.h"
+#include "preferences.h"
 
 char * box_p[2]={"<b>Edges [&#xC5;]</b>", "<b>Angles [&#xB0;]</b>"};
 char * box_prop[2][3]={{"<b><i>a</i></b>", "<b><i>b</i></b>", "<b><i>c</i></b>"},
@@ -693,33 +694,50 @@ gboolean test_cutoffs ()
 
   \brief creation of the edit bond cutoff widgets
 
-  \param vbox GtkWidget that will receive the data
+  \param vbox the GtkWidget to store the data
 */
 void edit_bonds (GtkWidget * vbox)
 {
-  gchar * mess = "To define the existence of a bond between two atoms i (&#x3B1;) and j (&#x3B2;)."
-                 "\n\tA bond exits if the two following conditions are verified:\n"
-                 "\n\t\t1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)"
-                 "\n\t\t2) D<sub>ij</sub> &#x3c; first minimum of the partial gr<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)\n"
-                 "\n\t0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>";
-  gchar * fin = "\n\tD<sub>max</sub> is the maximum inter-atomic distance in the model\n";
+  gchar * mess[2] = {"To define the existence of a bond between two atoms i (&#x3B1;) and j (&#x3B2;), ",
+                     "a bond exits if the two following conditions are verified:"};
+  gchar * cond[2] = {"1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)",
+                     "2) D<sub>ij</sub> &#x3c; first minimum of the partial gr<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)"};
+  gchar * m_end= "0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>";
+  gchar * fin = "D<sub>max</sub> is the maximum inter-atomic distance in the model\n";
   gchar * str;
-  if (active_project -> max[0] != 0.0)
+  if (! preferences)
   {
-    str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;%s",
-                           mess, active_project -> max[0], fin);
+    if (active_project -> max[0] != 0.0)
+    {
+      str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
+                             m_end, active_project -> max[0]);
+    }
+    else
+    {
+      str = g_strdup_printf ("With %s", m_end);
+    }
   }
-  else
-  {
-    str = g_strdup_printf ("%s%s", mess, fin);
-  }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  g_free (str);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[0], -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[1], -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  GtkWidget * vvbox = create_vbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
   GtkWidget * hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  GtkWidget * boxv = create_vbox (BSEP);
-  cut_box (active_project, boxv);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, boxv, FALSE, FALSE, 50);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[0], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[1], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  if (! preferences)
+  {
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(fin, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+    g_free (str);
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+    GtkWidget * boxv = create_vbox (BSEP);
+    cut_box (active_project, boxv);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, boxv, FALSE, FALSE, 50);
+  }
 }
 
 /*!

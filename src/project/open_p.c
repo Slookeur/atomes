@@ -51,6 +51,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "curve.h"
 #include "glview.h"
+#include "preferences.h"
 
 extern void alloc_curves (int c);
 extern void init_box_calc ();
@@ -192,6 +193,7 @@ chemical_data * alloc_chem_data (int spec)
   chem -> element = g_malloc0 (spec*sizeof*chem -> element);
   chem -> nsps = allocint (spec);
   chem -> formula = allocint (spec);
+  chem -> grtotcutoff = default_totcut;
   chem -> cutoffs = allocddouble (spec, spec);
   chem -> chem_prop = allocddouble (CHEM_PARAMS, spec);
   return chem;

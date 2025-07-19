@@ -50,6 +50,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "atom_edit.h"
 #include "curve.h"
 #include "preferences.h"
+#include "bind.h"
+
+extern GLdouble get_max_depth (GLdouble depth);
+extern void setup_default_lights (project * this_proj, image * img);
 
 /*!
   \fn void free_dummies (dummy_atom * tmp_pick)

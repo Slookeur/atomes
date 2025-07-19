@@ -300,6 +300,7 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
     {
       case 0:
         tmp_background -> gradient = i;
+        tmp_background -> direction = 0;
         break;
       case 1:
         tmp_background -> direction = i;
@@ -315,6 +316,7 @@ G_MODULE_EXPORT void set_gradient_parameter (GtkWidget * widg, gpointer data)
     {
       case 0:
         view -> anim -> last -> img -> back -> gradient = i;
+        view -> anim -> last -> img -> back -> direction = 0;
         break;
       default:
         view -> anim -> last -> img -> back -> direction = i;

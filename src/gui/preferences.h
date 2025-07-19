@@ -32,6 +32,20 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #define PREFERENCES_H_
 
+/*! \typedef bond_cutoff
+
+  \brief bond cutoff data structure
+*/
+typedef struct bond_cutoff bond_cutoff;
+struct bond_cutoff
+{
+  int Z[2];         /*!< Atomic numbers */
+  double cutoff;    /*!< Associated radius */
+  gboolean use;     /*!< Use or not */
+  bond_cutoff * next;
+  bond_cutoff * prev;
+};
+
 /*! \typedef element_radius
 
   \brief element radius data structure
@@ -84,7 +98,11 @@ extern void duplicate_axis_data (axis * new_axis, axis * old_axis);
 
 extern gboolean preferences;
 
-extern gboolean default_clones;
+extern double default_totcut;
+extern double tmp_totcut;
+extern bond_cutoff * default_bond_cutoff;
+extern bond_cutoff * tmp_bond_cutoff;
+
 extern int * default_num_delta;
 extern int * tmp_num_delta;
 extern double * default_delta_t;
@@ -112,6 +130,7 @@ extern element_radius * tmp_atomic_rad[16];
 extern element_radius * default_bond_rad[6];
 extern element_radius * tmp_bond_rad[6];
 
+extern gboolean default_clones;
 extern gboolean * default_o_at_rs;
 extern double * default_at_rs;
 extern gboolean * default_o_bd_rw;
