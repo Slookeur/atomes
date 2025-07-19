@@ -2318,7 +2318,6 @@ GtkWidget * view_preferences ()
   for (i=0; i<2; i++)
   {
     meas_box[i] = create_vbox (BSEP);
-    hbox = adv_box (meas_box[i], mbj[i], 5, 120, 0.0);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i+3), FALSE, FALSE, 60);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, meas_box[i], hbox, FALSE, FALSE, 5);

@@ -216,7 +216,7 @@ double get_cutoff (double s_a, double s_b)
     int z_b = max (s_a, s_b);
     while (cut)
     {
-      if (cut -> Z[0] == s_a && cut -> Z[1] == s_b) return cut -> cutoff;
+      if (cut -> Z[0] == z_a && cut -> Z[1] == z_b) return cut -> cutoff;
       cut = cut -> next;
     }
     return 0.0;
