@@ -473,7 +473,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   }
   else
   {
-    gchar * str = g_strdup_printf ("Background settings - %s", get_project_by_id(view -> proj)->name);
+    gchar * str = g_strdup_printf ("%s - background settings", get_project_by_id(view -> proj)->name);
     the_gradient -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
     add_container_child (CONTAINER_WIN, the_gradient -> win, vbox);

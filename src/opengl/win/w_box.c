@@ -375,7 +375,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   }
   else
   {
-    gchar * str = g_strdup_printf ("Box settings - %s", get_project_by_id(view -> proj)->name);
+    gchar * str = g_strdup_printf ("%s - box settings", get_project_by_id(view -> proj)->name);
     the_box -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
     add_container_child (CONTAINER_WIN, the_box -> win, vbox);

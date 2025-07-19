@@ -851,7 +851,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     else
     {
       the_axis -> win = create_vbox (BSEP);
-      gchar * str = g_strdup_printf ("Axis settings - %s", get_project_by_id(view -> proj)->name);
+      gchar * str = g_strdup_printf ("%s - axis settings", get_project_by_id(view -> proj)->name);
       the_axis -> win = create_win (str, view -> win, FALSE, FALSE);
       g_free (str);
       add_container_child (CONTAINER_WIN, the_axis -> win, vbox);

@@ -465,7 +465,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     {
       view -> rep_win =  g_malloc0(sizeof*view -> rep_win);
       the_rep = view -> rep_win;
-      str = g_strdup_printf ("OpenGL camera set-up - %s", get_project_by_id(view -> proj)->name);
+      str = g_strdup_printf ("%s - OpenGL camera set-up", get_project_by_id(view -> proj)->name);
       the_rep -> win =  create_win (str, view -> win, FALSE, FALSE);
       g_free (str);
       add_container_child (CONTAINER_WIN, the_rep -> win, vbox);
