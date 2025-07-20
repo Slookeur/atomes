@@ -705,7 +705,6 @@ GtkWidget * labels_tab (glwin * view, int lid)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
   // Font
   box = abox (vbox, "Font", 0);
-  // There is a bug next for label[3] and label[4] only : no idea why but the name of the font is not displayed
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
   if (lid == 3 || lid == 4)
   {

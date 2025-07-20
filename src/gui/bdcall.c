@@ -240,7 +240,7 @@ void initcutoffs (chemical_data * chem, int species)
   int i, j;
   for (i = 0; i < species; i++)
   {
-    chem -> cutoffs[i][i] = get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][i]);
+    chem -> cutoffs[i][i] = (chem -> cutoffs[i][i] != 0.0) ? chem -> cutoffs[i][i] : get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][i]);
     if (chem -> cutoffs[i][i] == 0.0)
     {
       chem -> cutoffs[i][i] = 2.0*chem -> chem_prop[CHEM_R][i];
@@ -252,7 +252,7 @@ void initcutoffs (chemical_data * chem, int species)
   {
     for (j = i+1; j < species; j++)
     {
-      chem -> cutoffs[i][j] = chem -> cutoffs[j][i] = get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][j]);
+      chem -> cutoffs[i][j] = (chem -> cutoffs[i][j] != 0.0) ? chem -> cutoffs[i][j] : get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][j]);
       if (chem -> cutoffs[i][j] == 0.0)
       {
         chem -> cutoffs[i][j] = chem -> chem_prop[CHEM_R][i] + chem -> chem_prop[CHEM_R][j];
@@ -261,11 +261,11 @@ void initcutoffs (chemical_data * chem, int species)
         if (chem -> chem_prop[CHEM_Z][j] == 1.0 && chem -> chem_prop[CHEM_Z][i] == 6.0) chem -> cutoffs[j][i] = 1.2;
         if (chem -> chem_prop[CHEM_Z][i] == 1.0 && chem -> chem_prop[CHEM_Z][j] == 8.0) chem -> cutoffs[i][j] = 1.2;
         if (chem -> chem_prop[CHEM_Z][j] == 1.0 && chem -> chem_prop[CHEM_Z][i] == 8.0) chem -> cutoffs[j][i] = 1.2;
-        chem -> cutoffs[j][i] = chem -> cutoffs[i][j];
       }
+      chem -> cutoffs[j][i] = chem -> cutoffs[i][j];
     }
   }
-  chem -> grtotcutoff = default_totcut;
+  chem -> grtotcutoff = (chem -> grtotcutoff != 0.0) ? chem -> grtotcutoff : default_totcut;
   if (chem -> grtotcutoff == 0.0)
   {
     for (i = 0; i < species; i++)

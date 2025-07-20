@@ -1350,6 +1350,7 @@ void setup_default_image (project * this_proj, image * img)
   for (i=0; i<2; i++)
   {
     img -> color_map[i] = default_opengl[i+1];
+    img -> sel_color[i] = default_sel_color[i];
   }
   img -> quality = default_opengl[3];
   img -> rep = default_rep.rep;

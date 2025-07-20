@@ -160,6 +160,7 @@ extern box_edition * pref_box_win;
 extern axis default_axis;
 extern axis * tmp_axis;
 extern axis_edition * pref_axis_win;
+extern ColRGBA default_sel_color[2];
 
 extern gradient_edition * pref_gradient_win;
 

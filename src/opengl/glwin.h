@@ -414,6 +414,8 @@ struct image
   atom_selection * selected[2];          /*!< atom(s) selection lists \n
                                                     0 = analysis mode, \n
                                                     1 = edition mode */
+  // Colors for atom selections
+  ColRGBA sel_color[2];
 
  // Coordination(s)
   ColRGBA ** spcolor[10];                       /*!<  Coordination sphere colors */

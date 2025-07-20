@@ -74,6 +74,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void create_configuration_dialog ();
 
   G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_selection_color (GtkColorChooser * colob, gpointer data);
   G_MODULE_EXPORT void toggled_default_stuff (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void toggled_default_stuff (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void set_default_stuff (GtkEntry * res, gpointer data);
@@ -164,6 +165,8 @@ GtkWidget * atom_entry_over[8];
 GtkWidget * bond_entry_over[6];
 GtkWidget * meas_combo;
 GtkWidget * meas_box[2];
+GtkWidget * sel_combo;
+GtkWidget * sel_box[2];
 GtkWidget * preference_notebook = NULL;
 
 double default_totcut;
@@ -250,14 +253,15 @@ rep_data * tmp_rep = NULL;
 rep_edition * pref_rep_win = NULL;
 background default_background;
 background * tmp_background = NULL;
+gradient_edition * pref_gradient_win = NULL;
 box default_box;
 box * tmp_box = NULL;
 box_edition * pref_box_win = NULL;
 axis default_axis;
 axis * tmp_axis = NULL;
 axis_edition * pref_axis_win = NULL;
-
-gradient_edition * pref_gradient_win = NULL;
+ColRGBA default_sel_color[2];
+ColRGBA tmp_sel_color[2];
 
 gboolean preferences = FALSE;
 opengl_edition * pref_ogl_edit = NULL;
@@ -1117,13 +1121,11 @@ int save_preferences_to_xml_file ()
     if (! rc) return 0;
     rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[i+3].font);
     if (! rc) return 0;
-    rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"colors");
-    if (rc < 0) return 0;
-    xml_save_color_to_file (writer, i+3, "Font color", "default_label_color", default_label[i+3].color[0]);
+    xml_save_color_to_file (writer, i+3, "Font color", "default_font_color", default_label[i+3].color[0]);
     if (! rc) return 0;
-    rc = xmlTextWriterEndElement (writer);
-    if (rc < 0) return 0;
 
+    rc = xmlTextWriterEndElement (writer); // End label
+    if (rc < 0) return 0;
     // mtilt
     str = g_strdup_printf ("%d", default_mtilt[i]);
     rc = xml_save_parameter_to_file (writer, "Tilt along", "default_mtilt", TRUE, i, str);
@@ -1145,8 +1147,19 @@ int save_preferences_to_xml_file ()
     g_free (str);
     if (! rc) return 0;
 
-    rc = xmlTextWriterEndElement (writer);
+    rc = xmlTextWriterEndElement (writer); // End measures type
     if (rc < 0) return 0;
+  }
+
+  rc = xmlTextWriterEndElement (writer); // End measures
+  if (rc < 0) return 0;
+
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atom-selections");
+  if (rc < 0) return 0;
+  for (i=0; i<2; i++)
+  {
+    xml_save_color_to_file (writer, i, "Selection color", "default_sel_color", default_sel_color[i]);
+    if (! rc) return 0;
   }
   rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
@@ -1424,6 +1437,11 @@ void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t *
       tmp_col -> col = * col;
     }
   }
+  else if (g_strcmp0(key, "default_font_color") == 0)
+  {
+    default_label[label_id].color = g_malloc0(sizeof*default_label[label_id].color);
+    default_label[label_id].color[0] = * col;
+  }
   else if (g_strcmp0(key, "default_atom_color") == 0)
   {
     if (default_atom_color[label_id])
@@ -1562,9 +1580,16 @@ void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t *
   {
     default_mfactor[vid] = (int) xml_string_to_double(content);
   }
-    else if (g_strcmp0(key, "default_mwidth") == 0)
+  else if (g_strcmp0(key, "default_mwidth") == 0)
   {
     default_mwidth[vid] = xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_sel_color") == 0)
+  {
+    if (col)
+    {
+      default_sel_color[vid] = * col;
+    }
   }
 }
 
@@ -1996,6 +2021,11 @@ void read_preferences_from_xml_file ()
               read_preferences (l_node);
             }
           }
+          p_node = findnode(node -> children, "atom-selections");
+          if (p_node)
+          {
+            read_preferences (p_node);
+          }
         }
       }
       xmlFreeDoc(doc);
@@ -2065,7 +2095,7 @@ void set_atomes_defaults ()
   default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
 
   // Fog
-  default_fog.mode = 0;
+  default_fog.mode = 1;
   default_fog.based = 0;
   default_fog.density = 0.5;
   default_fog.depth[0] = 15.0;
@@ -2130,7 +2160,7 @@ void set_atomes_defaults ()
       default_label[i].color[0].blue = 1.0;
       default_label[i].color[0].alpha = 1.0;
     }
-    default_label[i].font = (i > 2) ? g_strdup_printf ("Courier New Bold 18") : g_strdup_printf ("Sans Bold 12");
+    default_label[i].font = (i > 2) ? g_strdup_printf ("FreeMono Bold 18") : g_strdup_printf ("Sans Bold 12");
     default_label[i].list = NULL;
   }
   for (i=0; i<2; i++)
@@ -2190,6 +2220,17 @@ void set_atomes_defaults ()
   default_axis.title[2] = "z";
   if (default_axis.color) g_free (default_axis.color);
   default_axis.color = NULL;
+
+  // Selection color
+  default_sel_color[0].red = 0.0;
+  default_sel_color[0].green = 1.0;
+  default_sel_color[0].blue = 1.0;
+  default_sel_color[0].alpha = DEFAULT_OPACITY*0.75;
+  // Selection color - edition mode
+  default_sel_color[1].red = 1.0;
+  default_sel_color[1].green = 0.00;
+  default_sel_color[1].blue = 0.84;
+  default_sel_color[1].alpha = DEFAULT_OPACITY*0.75;
 }
 
 /*!
@@ -2262,10 +2303,33 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
 */
 G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data)
 {
-  int i;
-  i = combo_get_active ((GtkWidget *)box);
-  hide_the_widgets (meas_box[! i]);
-  show_the_widgets (meas_box[i]);
+  int i, j;
+  i = GPOINTER_TO_INT (data);
+  j = combo_get_active ((GtkWidget *)box);
+  if (i)
+  {
+    hide_the_widgets (sel_box[! j]);
+    show_the_widgets (sel_box[j]);
+  }
+  else
+  {
+    hide_the_widgets (meas_box[! j]);
+    show_the_widgets (meas_box[j]);
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_selection_color (GtkColorChooser * colob, gpointer data)
+
+  \brief change selection color
+
+  \param colob the GtkColorChooser sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_selection_color (GtkColorChooser * colob, gpointer data)
+{
+  int i = GPOINTER_TO_INT (data);
+  tmp_sel_color[i] = get_button_color (colob);
 }
 
 /*!
@@ -2283,7 +2347,7 @@ GtkWidget * view_preferences ()
                      "which effect apply to the general aspect of the model:"};
   gchar * m_list[3][2] = {{"Representation", "scene set-up and orientation"},
                           {"Axis", "axis options"},
-                          {"Measures", "measurements layout option"}};
+                          {"Tools", "measures and selections option"}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 30);
 
@@ -2306,13 +2370,12 @@ GtkWidget * view_preferences ()
   // Measures
   vbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  gchar * mbj[2]={"<b>Standard measures</b>", "<b>Edition mode measures</b>"};
   hbox = adv_box (vbox, "<b>Select measure type</b>", 5, 120, 0.0);
   meas_combo = create_combo ();
-  combo_text_append (meas_combo, "Standard measures");
-  combo_text_append (meas_combo, "Edition mode measures");
+  combo_text_append (meas_combo, "Standard");
+  combo_text_append (meas_combo, "Edition mode");
   combo_set_active (meas_combo, 0);
-  g_signal_connect (G_OBJECT(meas_combo), "changed", G_CALLBACK(set_measures), NULL);
+  g_signal_connect (G_OBJECT(meas_combo), "changed", G_CALLBACK(set_measures), GINT_TO_POINTER(0));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, meas_combo , FALSE, FALSE, 40);
   int i;
   for (i=0; i<2; i++)
@@ -2321,9 +2384,31 @@ GtkWidget * view_preferences ()
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, labels_tab(NULL, i+3), FALSE, FALSE, 60);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, meas_box[i], hbox, FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, meas_box[i], FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, meas_box[i], FALSE, FALSE, 0);
   }
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Measures"));
+
+  hbox = adv_box (vbox, "<b>Select selection type</b>", 15, 120, 0.0);
+  sel_combo = create_combo ();
+  combo_text_append (sel_combo, "Standard");
+  combo_text_append (sel_combo, "Edition mode");
+  combo_set_active (sel_combo, 0);
+  g_signal_connect (G_OBJECT(sel_combo), "changed", G_CALLBACK(set_measures), GINT_TO_POINTER(1));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, sel_combo , FALSE, FALSE, 40);
+  GtkWidget * hhbox, * vvbox;
+   for (i=0; i<2; i++)
+  {
+    sel_box[i] = create_vbox (BSEP);
+    hbox = create_hbox (BSEP);
+    vvbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
+    hhbox = abox (vvbox, "Color", 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, color_button(tmp_sel_color[i], TRUE, 100, -1, G_CALLBACK(set_selection_color), GINT_TO_POINTER(i)), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, sel_box[i], hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, sel_box[i], FALSE, FALSE, 0);
+  }
+
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Tools"));
+
   show_the_widgets (notebook);
 
   return notebook;
@@ -4399,6 +4484,8 @@ void prepare_tmp_default ()
 
   tmp_axis = g_malloc0(sizeof*tmp_axis);
   duplicate_axis_data (tmp_axis, & default_axis);
+
+  for (i=0; i<2; i++) tmp_sel_color[i] = default_sel_color[i];
 }
 
 gboolean * up_project;
@@ -4563,6 +4650,8 @@ void save_preferences ()
   duplicate_box_data (& default_box, tmp_box);
   duplicate_axis_data (& default_axis, tmp_axis);
 
+  for (i=0; i<2; i++) default_sel_color[i] = tmp_sel_color[i];
+
   if (nprojects)
   {
     if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
@@ -4613,6 +4702,10 @@ void adjust_preferences_window ()
   i = (i < 0) ? 0 : i;
   hide_the_widgets (meas_box[! i]);
   show_the_widgets (meas_box[i]);
+  i = combo_get_active (sel_combo);
+  i = (i < 0) ? 0 : i;
+  hide_the_widgets (sel_box[! i]);
+  show_the_widgets (sel_box[i]);
 }
 
 /*!

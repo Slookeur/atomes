@@ -55,6 +55,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "ogl_shading.h"
 #include "dlp_field.h"
+#include "preferences.h"
 
 int atom_id;
 int gColorID[3];
@@ -106,19 +107,7 @@ ColRGBA get_atom_color (int i, int j, double al, int picked, gboolean to_pick)
     }
     else
     {
-      if (picked == 1)
-      {
-        colo.red = 0.0;
-        colo.green = 1.0;
-        colo.blue = 1.0;
-      }
-      else
-      {
-        colo.red = 1.0;
-        colo.green = 0.0;
-        colo.blue = 0.84;
-      }
-      colo.alpha = DEFAULT_OPACITY*0.75;
+      colo = plot -> sel_color[(picked == 1) ? 0 : 1];
     }
   }
   else
