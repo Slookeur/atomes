@@ -128,8 +128,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <libxml/parser.h>
 #include <unistd.h>
 #include <sys/types.h>
+
 #ifndef G_OS_WIN32
 #include <pwd.h>
+#else
+#include <errno.h>
 #endif
 
 extern void apply_default_parameters_to_project (project * this_proj);
@@ -411,17 +414,22 @@ int save_preferences_to_xml_file ()
 {
   int rc;
   pref_error = NULL;
-#ifdef G_OS_WIN32
   if (ATOMES_CONFIG_DIR)
   {
+#ifdef G_OS_WIN32
     if (! CreateDirectory(ATOMES_CONFIG_DIR, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
     {
       pref_error = g_strdup_printf ("Error: impossible to create %s (code: %lu)\n", ATOMES_CONFIG_DIR, GetLastError());
       return 0;
     }
-  }
+#else
+    if (mkdir(ATOMES_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IRWXO) && errno != EEXIST)
+    {
+      pref_error = g_strdup_printf ("Error: impossible to create %s (code: %s)\n", ATOMES_CONFIG_DIR, strerror(errno));
+      return 0;
+    }
 #endif
-
+  }
   xmlTextWriterPtr writer;
 
   gchar * xml_delta_num_leg[8] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
@@ -1624,6 +1632,7 @@ void read_parameter (xmlNodePtr parameter_node)
     set_r = set_g = set_b = set_a = FALSE;
     set_alpha = set_beta = FALSE;
     start = end = -1.0;
+    id = -1;
     while (p_details)
     {
       p_node = p_details -> children;
