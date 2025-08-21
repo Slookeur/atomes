@@ -4851,3 +4851,65 @@ void create_user_preferences_dialog ()
   gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
   run_this_gtk_dialog (win, G_CALLBACK(edit_preferences), NULL);
 }
+
+/*!
+  \fn G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
+
+  \brief set options as default options
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
+{
+  tint * oid = (tint *)data;
+  gchar * str = g_strdup_printf ("Set pre
+  if (ask_yes_no("Set preferences as default preferences ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+  {
+    project * this_proj = get_project_by_id(oid -> a);
+    image * img = this_proj -> modelgl -> anim -> last -> img;
+    switch (oid -> b)
+    {
+      case 0:
+        // OpenGL preferences
+        // default_opengl[0] = ;// duplicate_int (5, tmp_opengl);
+        // duplicate_material (& default_material, & img -> );
+        // default_lightning.lights = img -> ;
+        // default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
+        // duplicate_fog (& default_fog, & tmp_fog);
+
+        break;
+      case 1:
+
+        break;
+    }
+    str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
+    if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+    {
+      if (! save_preferences_to_xml_file ())
+      {
+        show_error ((pref_error) ? pref_error : "Error while trying to save preferences to file", 0, MainWindow);
+        g_free (pref_error);
+        pref_error = NULL;
+      }
+    }
+    g_free (str);
+  }
+}
+
+/*!
+  \fn void add_global_option (GtkWidget * vbox, tint * oid)
+
+  \brief add a button to update global user preferences
+
+  \param the widget to insert the button in
+  \param oid the option id pointer
+*/
+void add_global_option (GtkWidget * vbox, tint * oid)
+{
+
+  GtkWidget * hbox = create_hbox (5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, FALSE, 0);
+  GtkWidget * but = create_button ("Set default", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_default_options), oid);
+  add_box_child_end (hbox, but, FALSE, FALSE, 0);
+}
