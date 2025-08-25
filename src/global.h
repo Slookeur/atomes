@@ -1165,6 +1165,7 @@ extern GtkWidget * dialog_get_content_area (GtkWidget * widg);
 extern void layout_add_widget (GtkWidget * layout, GtkWidget * child, int x_pos, int y_pos);
 extern GtkWidget * add_vbox_to_layout (GtkWidget * layout, int size_x, int size_y);
 extern GtkWidget * create_layout (int x, int y);
+extern void add_global_option (GtkWidget * vbox, tint * oid);
 
 #ifdef GTK4
 extern void run_this_gtk_native_dialog (GtkNativeDialog * dial, GCallback handler, gpointer data);

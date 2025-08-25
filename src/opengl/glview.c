@@ -1185,6 +1185,7 @@ void init_camera (project * this_proj, int get_depth)
   for (i=0; i<2; i++)
   {
     view -> anim -> last -> img -> c_angle[i] = 0.0;
+    view -> anim -> last -> img -> c_shift[i] = default_rep.c_shift[i];
   }
   save_rotation_quaternion (view);
   rotate_x_y (view, default_rep.c_angle[0], default_rep.c_angle[1]);

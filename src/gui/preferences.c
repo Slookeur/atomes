@@ -72,6 +72,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void save_preferences ();
   void adjust_preferences_window ();
   void create_configuration_dialog ();
+  void add_global_option (GtkWidget * vbox, tint * oid);
 
   G_MODULE_EXPORT void set_measures (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void set_selection_color (GtkColorChooser * colob, gpointer data);
@@ -99,6 +100,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void toggle_select_project (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void restore_all_defaults (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id, gpointer data);
+  G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data);
 
   GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gchar * end);
   GtkWidget * view_preferences ();
@@ -214,7 +216,6 @@ element_color * tmp_label_color[2];
 
 int radius_id;
 
-gchar * default_ogl_leg[5] = {"Default style", "Atom(s) color map", "Polyhedra color map", "Quality", "Number of light sources"};
 int * default_opengl = NULL;
 int * tmp_opengl = NULL;
 Material default_material;
@@ -450,13 +451,10 @@ int save_preferences_to_xml_file ()
                               "Only search for ABAB chains",
                               "No homopolar bonds in the chains (A-A, B-B ...)",
                               "Only search for 1-(2)n-1 chains"};
-  gchar * xml_opengl_leg[7] = {"Default style",
+  gchar * xml_opengl_leg[4] = {"Default style",
                                "Atom(s) color map",
                                "Polyhedra color map",
-                               "Quality",
-                               "Lightning model",
-                               "Material",
-                               "Fog"};
+                               "Quality"};
   gchar * xml_material_leg[8] = {"Predefine material",
                                  "Lightning model",
                                  "Metallic",
@@ -2253,7 +2251,7 @@ void set_atomes_preferences ()
   default_delta_t = allocdouble (2);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
-  default_opengl = allocint (5);
+  default_opengl = allocint (4);
   default_at_rs = allocdouble (10);
   default_o_at_rs = allocbool (10);
   default_bd_rw = allocdouble (6);
@@ -4449,7 +4447,7 @@ void prepare_tmp_default ()
   tmp_delta_t = duplicate_double (2, default_delta_t);
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
-  tmp_opengl = duplicate_int (5, default_opengl);
+  tmp_opengl = duplicate_int (4, default_opengl);
   duplicate_material (& tmp_material, & default_material);
   tmp_lightning.lights = default_lightning.lights;
   tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
@@ -4591,7 +4589,7 @@ void save_preferences ()
     g_free (default_opengl);
     default_opengl = NULL;
   }
-  default_opengl = duplicate_int (5, tmp_opengl);
+  default_opengl = duplicate_int (4, tmp_opengl);
   duplicate_material (& default_material, & tmp_material);
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
@@ -4863,28 +4861,50 @@ void create_user_preferences_dialog ()
 G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
 {
   tint * oid = (tint *)data;
-  gchar * str = g_strdup_printf ("Set pre
-  if (ask_yes_no("Set preferences as default preferences ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+  gchar * pstring[5]={"rendering", "box", "axis", "backgorund", "representation"};
+  gchar * str = g_strdup_printf ("Set %s preferences as default preferences ?", pstring[oid -> b]);
+  project * this_proj = get_project_by_id(oid -> a);
+  if (ask_yes_no("Set model preferences as default ?", str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
   {
-    project * this_proj = get_project_by_id(oid -> a);
+    g_free (str);
     image * img = this_proj -> modelgl -> anim -> last -> img;
     switch (oid -> b)
     {
       case 0:
-        // OpenGL preferences
-        // default_opengl[0] = ;// duplicate_int (5, tmp_opengl);
-        // duplicate_material (& default_material, & img -> );
-        // default_lightning.lights = img -> ;
-        // default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
-        // duplicate_fog (& default_fog, & tmp_fog);
-
+        // OpenGL preferences, style and color mpas not included : rendering only
+        default_opengl[3] = img -> quality;
+        duplicate_material (& default_material, & img -> m_terial);
+        default_lightning.lights = img -> l_ghtning.lights;
+        default_lightning.spot = copy_light_sources (img -> l_ghtning.lights, img -> l_ghtning.lights, img ->  l_ghtning.spot);
+        duplicate_fog (& default_fog, & img -> f_g);
         break;
       case 1:
-
+        // Box
+        duplicate_box_data (& default_box, img -> abc);
+        break;
+      case 2:
+        // Axis
+        duplicate_axis_data (& default_axis, img -> xyz);
+        break;
+      case 3:
+        // Background
+        duplicate_background_data (& default_background, img -> back);
+        break;
+      case 4:
+        // Representation
+        default_rep.rep = img -> rep;
+        default_rep.zoom =  img -> zoom;
+        default_rep.gnear = img -> gnear;
+        int i;
+        for (i=0; i<2; i++)
+        {
+          default_rep.c_angle[i] = img -> c_angle[i];
+          default_rep.c_shift[i] = img -> c_shift[i];
+        }
         break;
     }
     str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
-    if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+    if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
     {
       if (! save_preferences_to_xml_file ())
       {
@@ -4893,6 +4913,10 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
         pref_error = NULL;
       }
     }
+    g_free (str);
+  }
+  else
+  {
     g_free (str);
   }
 }
@@ -4907,7 +4931,6 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
 */
 void add_global_option (GtkWidget * vbox, tint * oid)
 {
-
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, FALSE, 0);
   GtkWidget * but = create_button ("Set default", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_default_options), oid);

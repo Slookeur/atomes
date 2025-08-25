@@ -1703,6 +1703,7 @@ G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data)
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (view, view -> opengl_win, & view -> anim -> last -> img -> l_ghtning),
                                                       markup_label("<b>Configure light sources</b>", -1, -1, 0.0, 0.5));
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (view, view -> opengl_win, & view -> anim -> last -> img -> f_g), markup_label("<b>Configure fog</b>", -1, -1, 0.0, 0.5));
+    add_global_option (vbox, & view -> colorp[0][0]);
     add_gtk_close_event (view -> opengl_win -> win, G_CALLBACK(close_advanced), view);
   }
   show_the_widgets (view -> opengl_win -> win);

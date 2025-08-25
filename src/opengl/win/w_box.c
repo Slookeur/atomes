@@ -426,6 +426,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
 
   if (! preferences)
   {
+    add_global_option (vbox, & view -> colorp[1][0]);
     add_gtk_close_event (the_box -> win, G_CALLBACK(on_box_delete), view);
     show_the_widgets (the_box -> win);
     if (box_type)

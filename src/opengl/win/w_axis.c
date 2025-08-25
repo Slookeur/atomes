@@ -1032,6 +1032,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     append_comments (the_axis -> axis_data, "<sup>**</sup>", "Inside the atomic model");
     if (! preferences)
     {
+      add_global_option (vbox, & view -> colorp[2][0]);
       add_gtk_close_event (the_axis -> win, G_CALLBACK(on_axis_delete), view);
       show_the_widgets (the_axis -> win);
       if (axis_type == CYLINDERS)

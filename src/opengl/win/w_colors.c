@@ -555,6 +555,7 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
 
   if (! preferences)
   {
+    add_global_option (vbox, & view -> colorp[3][0]);
     add_gtk_close_event (the_gradient -> win, G_CALLBACK(on_gradient_delete), view);
     show_the_widgets (the_gradient -> win);
     update_gradient_widgets (the_gradient, view -> anim -> last -> img -> back);
