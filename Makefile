@@ -17,7 +17,7 @@ LINUX = 1
 WINDOWS = 0
 
 # The next line defines the GTK version !
-GTKV = 3
+GTKV = 4
 ifeq ($(GTKV),4)
   DGTK = -DGTK4 -DGTKGLAREA
   # -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
@@ -85,7 +85,6 @@ ifeq ($(WINDOWS),1)
   LD = $(COMP)$(CPU)-w64-mingw32-gfortran $(DOMP)
 
   CPPFLAGS =
-  LDFLG = -lz -liphlpapi
 
   ifeq ($(GTKV), 4)
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-4.0 -IC:/msys64/mingw64/include/cairo \
@@ -101,6 +100,7 @@ ifeq ($(WINDOWS),1)
     LGTK = -LC:/msys64/mingw64/lib -lgtk-4 -lpangowin32-1.0 -lharfbuzz -lpangocairo-1.0 -lpango-1.0 -lgdk_pixbuf-2.0 \
 		-lcairo-gobject -lcairo -lgraphene-1.0 -lgio-2.0 -lglib-2.0 -lintl -lgobject-2.0 -lxml2  -lpangoft2-1.0 \
 		-lepoxy -lavutil -lavcodec -lavformat -lswscale
+    LDTK = -lole32 -luuid
   else
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-3.0 -IC:/msys64/mingw64/include/cairo \
 		-IC:/msys64/mingw64/include/pango-1.0 -IC:/msys64/mingw64/include/atk-1.0 \
@@ -115,7 +115,9 @@ ifeq ($(WINDOWS),1)
 		-Wl,-luuid -lwinmm -ldwmapi -lsetupapi -lcfgmgr32 -lpangowin32-1.0 -lpangocairo-1.0 \
 		-latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lepoxy -lxml2 -lpangoft2-1.0 \
 		-lpango-1.0 -lgobject-2.0 -lglib-2.0 -lintl -lfontconfig -lfreetype -lavutil -lavcodec -lavformat -lswscale
+    LDTK =
   endif
+  LDFLG = -lz -liphlpapi $(LDTK)
   LIB = $(LGTK)
 
   ifeq ($(MAKECMDGOALS), atomes)
