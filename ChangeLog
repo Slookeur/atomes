@@ -2,9 +2,13 @@
          Release of version 1.2.0
          * New features:
 	        New user preferences window and associated features
+		Gradient backgrounds
          * Improvments: 
-	        Reading of CIF file, better occupancy treatment 'read_cif.c'
+	        Reading of CIF file: 
+		  - better occupancy treatment 'read_cif.c'
+		  - multiconfiguration CIF files
          * Bug corrections:
+	        Several issues fixed for advanced OpenGL rendering 'w_advance.c'
 
 2025-05-15 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.18
