@@ -490,9 +490,11 @@ void open_this_data_file (int file_type, gchar * file_name)
 G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
 {
   GtkSettings * default_settings = gtk_settings_get_default ();
+/*
 #ifndef G_OS_WIN32
   g_object_set (default_settings, "gtk-application-prefer-dark-theme", TRUE, NULL);
 #endif
+*/
 #ifdef GTK3
   g_object_set (default_settings, "gtk-button-images", TRUE, NULL);
 #endif

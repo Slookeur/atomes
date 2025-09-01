@@ -1199,7 +1199,7 @@ int settime(xmlNodePtr timenode)
   }
   data = xmlNodeGetContent(tn);
   j=-1;
-  for ( i=0 ; i<6 ; i++)
+  for ( i=0 ; i<5 ; i++)
   {
     if (g_strcmp0 ((char *)data, g_strdup_printf ("t [%s]", untime[i])) == 0) j=i;
   }
