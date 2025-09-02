@@ -4508,11 +4508,11 @@ gboolean * up_project;
 */
 G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data)
 {
+  int i;
   switch (response_id)
   {
     case GTK_RESPONSE_OK:
       // To write apply to opened projects
-      int i;
       for (i=0; i<nprojects; i++)
       {
         if (up_project[i]) apply_default_parameters_to_project (get_project_by_id(i));
