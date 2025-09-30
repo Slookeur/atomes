@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/> */
 ATOMES_ICON ICON "../misc/win/atomes.ico"
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    1,2,0
-PRODUCTVERSION 1,2,0
+FILEVERSION    1,2,1
+PRODUCTVERSION 1,2,1
 FILEOS         VOS_NT
 FILETYPE       VFT_APP
 BEGIN
@@ -27,12 +27,12 @@ BEGIN
 		BEGIN
 			VALUE "Comments", "atomes"
 			VALUE "CompanyName", "CNRS - IPCMS - DMO"
-			VALUE "FileDescription", "atomes 1.2.0"
-			VALUE "FileVersion", "1.2.0"
+			VALUE "FileDescription", "atomes 1.2.1"
+			VALUE "FileVersion", "1.2.1"
 			VALUE "LegalCopyright", "\251 2025 S\351bastien Le Roux"
 			VALUE "OriginalFileName", "atomes.exe"
-			VALUE "ProductName", "atomes 1.2.0"
-			VALUE "ProductVersion", "1.2.0"
+			VALUE "ProductName", "atomes 1.2.1"
+			VALUE "ProductVersion", "1.2.1"
 		END
 	END
 	BLOCK "VarFileInfo"

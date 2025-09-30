@@ -1,4 +1,10 @@
-2025-09-   Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+2025-09-30 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+         Release of version 1.2.1
+         * Bug corrections:
+	        Linux package fix
+	        Windows bug fix to read preferences file 'preferences.c'
+
+2025-09-05 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.2.0
          * New features:
 	        New user preferences window and associated features:

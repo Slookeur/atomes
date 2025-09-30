@@ -2036,10 +2036,10 @@ void read_preferences_from_xml_file ()
         }
       }
       xmlFreeDoc(doc);
-      xmlCleanupParser();
     }
     xmlFreeTextReader(reader);
   }
+  xmlCleanupParser();
 }
 
 /*!
