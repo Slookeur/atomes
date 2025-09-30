@@ -76,9 +76,9 @@ float label_pos;
 */
 ColRGBA color_axis (int id)
 {
-  if (plot -> axis_color != NULL)
+  if (plot -> xyz -> color != NULL)
   {
-    return plot -> axis_color[id];
+    return plot -> xyz -> color[id];
   }
   else
   {
@@ -110,7 +110,7 @@ mat4_t create_axis_matrices (int type)
   mat4_t axis_model_matrix;
   mat4_t axis_view_matrix;
   mat4_t axis_model_view_matrix;
-  if (plot -> axispos == CENTER)
+  if (plot -> xyz -> t_pos == CENTER)
   {
     if (plot -> rep == ORTHOGRAPHIC)
     {
@@ -122,31 +122,31 @@ mat4_t create_axis_matrices (int type)
   else
   {
     axis_projection_matrix = m4_ortho (plot -> gleft, plot -> gright, plot -> gbottom, plot -> gtop, -plot -> gfar, plot -> gfar);
-    if (plot -> axispos == TOP_RIGHT)
+    if (plot -> xyz -> t_pos == TOP_RIGHT)
     {
       x = sx - from_edge;
       y = from_edge;
     }
-    else if (plot -> axispos == TOP_LEFT)
+    else if (plot -> xyz -> t_pos == TOP_LEFT)
     {
       x = from_edge;
       y = from_edge;
     }
-    else if (plot -> axispos == BOTTOM_RIGHT)
+    else if (plot -> xyz -> t_pos == BOTTOM_RIGHT)
     {
       x = sx - from_edge;
       y = sy - from_edge;
     }
-    else if (plot -> axispos == BOTTOM_LEFT)
+    else if (plot -> xyz -> t_pos == BOTTOM_LEFT)
     {
       x = from_edge;
       y = sy - from_edge;
     }
-    else if (plot -> axispos == CUSTOM)
+    else if (plot -> xyz -> t_pos == CUSTOM)
     {
       // Custom position
-      x = plot -> axis_pos[0] * sx / 100.0;
-      y = plot -> axis_pos[1] * sy / 100.0;
+      x = plot -> xyz -> c_pos[0] * sx / 100.0;
+      y = plot -> xyz -> c_pos[1] * sy / 100.0;
     }
   }
   win_coord = v3_un_project (vec3(x, y, z), wingl -> view_port, axis_projection_matrix);
@@ -195,11 +195,11 @@ void setup_arrow (float * vert, vec3_t a, vec3_t b, vec3_t c, vec3_t d, vec3_t e
 void init_axis_param ()
 {
   arrow_length = 0.5;
-  axis_size = plot -> axis_length;
-  axis_radius = plot -> box_axis_rad[AXIS];
+  axis_size = plot -> xyz -> length;
+  axis_radius = plot -> xyz -> rad;
   arrow_base = 0.1;
   label_pos = 0.2;
-  if (plot -> rep == PERSPECTIVE && plot -> axispos != CENTER)
+  if (plot -> rep == PERSPECTIVE && plot -> xyz -> t_pos != CENTER)
   {
     arrow_base /= (plot -> p_depth / plot -> gnear);
     arrow_length /= (plot -> p_depth / plot -> gnear);
@@ -233,7 +233,7 @@ void prepare_axis_data (float * vert_a, float * vert_b, float * vert_c)
     pcol = color_axis (i);
     a = vec3(0.0, 0.0, 0.0);
     b = vec3((i==0)? axis_size-arrow_length : 0.0, (i==1)? axis_size-arrow_length : 0.0, (i==2)? axis_size-arrow_length : 0.0);
-    if (plot -> box_axis[AXIS] == WIREFRAME)
+    if (plot -> xyz -> axis == WIREFRAME)
     {
       setup_line_vertice (vert_a, a, pcol, 1.0);
       setup_line_vertice (vert_a, b, pcol, 1.0);
@@ -273,9 +273,9 @@ int create_axis_lists ()
 
   cleaning_shaders (wingl, MAXIS);
   wingl -> create_shaders[MAXIS] = FALSE;
-  if (plot -> box_axis[AXIS] == NONE) return nshaders;
+  if (plot -> xyz -> axis == NONE) return nshaders;
 
-  if (plot -> box_axis[AXIS] == WIREFRAME)
+  if (plot -> xyz -> axis == WIREFRAME)
   {
     axis_a = g_malloc0 (sizeof*axis_a);
     axis_a -> vert_buffer_size = LINE_BUFF_SIZE;
@@ -305,20 +305,20 @@ int create_axis_lists ()
     axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
     axis_d -> instances = allocfloat (ATOM_BUFF_SIZE);
   }
-  nshaders = (plot -> box_axis[AXIS] == WIREFRAME) ? 2 : 4;
-  prepare_axis_data ((plot -> box_axis[AXIS] == WIREFRAME) ? axis_a -> vertices :  axis_a -> instances,
-                     (plot -> box_axis[AXIS] == WIREFRAME) ? axis_b -> vertices :  axis_b -> instances,
-                     (plot -> box_axis[AXIS] == WIREFRAME) ? NULL :  axis_c -> instances);
+  nshaders = (plot -> xyz -> axis == WIREFRAME) ? 2 : 4;
+  prepare_axis_data ((plot -> xyz -> axis == WIREFRAME) ? axis_a -> vertices :  axis_a -> instances,
+                     (plot -> xyz -> axis == WIREFRAME) ? axis_b -> vertices :  axis_b -> instances,
+                     (plot -> xyz -> axis == WIREFRAME) ? NULL :  axis_c -> instances);
   clean_labels (2);
-  if (plot -> axis_labels)
+  if (plot -> xyz -> labels)
   {
     int i;
     for (i=0; i<3; i++)
     {
       pos = vec3 ((i==0) ? axis_size+label_pos : 0.0, (i==1) ? axis_size+label_pos : 0.0, (i==2) ? axis_size+label_pos : 0.0);
-      prepare_string (plot -> axis_title[i], 2, color_axis (i), pos, shift, NULL, NULL, NULL);
+      prepare_string (plot -> xyz -> title[i], 2, color_axis (i), pos, shift, NULL, NULL, NULL);
     }
-    nshaders += (plot -> labels_render[2]+1) * (plot -> labels_list[2] -> last -> id + 1);
+    nshaders += (plot -> labels[2].render+1) * (plot -> labels[2].list -> last -> id + 1);
     wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
     render_all_strings (MAXIS, 2);
   }
@@ -326,11 +326,11 @@ int create_axis_lists ()
   {
     wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
   }
-  if (plot -> box_axis[AXIS] == WIREFRAME)
+  if (plot -> xyz -> axis == WIREFRAME)
   {
     // Lines
     wingl -> ogl_glsl[MAXIS][0][0] = init_shader_program (MAXIS, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, FALSE, axis_a);
-    wingl -> ogl_glsl[MAXIS][0][0] -> line_width = plot -> box_axis_line[AXIS];
+    wingl -> ogl_glsl[MAXIS][0][0] -> line_width = plot -> xyz -> line;
     // Arrows
     wingl -> ogl_glsl[MAXIS][0][1] = init_shader_program (MAXIS, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, axis_b);
   }

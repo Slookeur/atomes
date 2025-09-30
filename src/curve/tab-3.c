@@ -135,11 +135,7 @@ G_MODULE_EXPORT void show_data_legend (GtkToggleButton * leg, gpointer data)
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_legend = gtk_check_button_get_active (leg);
-#else
-  this_proj -> curves[b][c] -> show_legend = gtk_toggle_button_get_active (leg);
-#endif
+  this_proj -> curves[b][c] -> show_legend = button_get_status ((GtkWidget *)leg);
   widget_set_sensitive (legend_box, this_proj -> curves[b][c] -> show_legend);
   if (! this_proj -> curves[b][c] -> show_legend)
   {
@@ -210,11 +206,7 @@ G_MODULE_EXPORT void show_data_legend_box (GtkToggleButton * bleg, gpointer data
   b = cd -> b;
   c = cd -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_legend_box = gtk_check_button_get_active (bleg);
-#else
-  this_proj -> curves[b][c] -> show_legend_box = gtk_toggle_button_get_active (bleg);
-#endif
+  this_proj -> curves[b][c] -> show_legend_box = button_get_status ((GtkWidget *)bleg);
   widget_set_sensitive (legend_box_style, this_proj -> curves[b][c] -> show_legend_box);
   update_curve (data);
 }
@@ -310,7 +302,7 @@ G_MODULE_EXPORT void set_legend_box_line (GtkComboBox * fbox, gpointer data)
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  get_project_by_id(a) -> curves[b][c] -> legend_box_dash = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox)) + 1;
+  get_project_by_id(a) -> curves[b][c] -> legend_box_dash = combo_get_active ((GtkWidget *)fbox) + 1;
   set_legend_box_style (data);
 }
 
@@ -429,7 +421,7 @@ GtkWidget * create_tab_3 (gpointer data)
      combo_text_append (legend_dash_box, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (legend_dash_box, 120, -1);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(legend_dash_box), this_proj -> curves[b][c] -> legend_box_dash - 1);
+  combo_set_active (legend_dash_box, this_proj -> curves[b][c] -> legend_box_dash - 1);
   g_signal_connect (G_OBJECT(legend_dash_box), "changed", G_CALLBACK(set_legend_box_line), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, "Line style:"), legend_dash_box, FALSE, FALSE, 0);
 

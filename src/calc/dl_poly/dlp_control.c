@@ -187,7 +187,7 @@ GtkWidget * thermo_option_box;
 */
 G_MODULE_EXPORT void set_order (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> thermo_opts[0] = gtk_combo_box_get_active (box);
+  tmp_field -> thermo_opts[0] = combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -303,12 +303,7 @@ G_MODULE_EXPORT void check_semi (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> thermo_opts[i] = j;
   if (i == 6) widget_set_sensitive (bath_box, j);
 }
@@ -342,7 +337,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
             GtkWidget * o_combo = create_combo();
             combo_text_append (o_combo, "s1");
             combo_text_append (o_combo, "s2");
-            gtk_combo_box_set_active (GTK_COMBO_BOX(o_combo), (int)tmp_field -> thermo_opts[i]);
+            combo_set_active (o_combo, (int)tmp_field -> thermo_opts[i]);
             g_signal_connect (G_OBJECT (o_combo), "changed", G_CALLBACK(set_order), NULL);
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, o_combo, FALSE, FALSE, 5);
           }
@@ -440,7 +435,7 @@ G_MODULE_EXPORT void set_thermostat (GtkComboBox * box, gpointer data)
   switch (i)
   {
     case 0:
-      tmp_field -> thermostat = gtk_combo_box_get_active (box);
+      tmp_field -> thermostat = combo_get_active ((GtkWidget *)box);
       for (j=0; j<6; j++) tmp_field -> thermo_opts[j] = 0.0;
       if (tmp_field -> ensemble)
       {
@@ -451,7 +446,7 @@ G_MODULE_EXPORT void set_thermostat (GtkComboBox * box, gpointer data)
       }
       break;
     case 1:
-      tmp_field -> thermo_opts[7] = gtk_combo_box_get_active (box);
+      tmp_field -> thermo_opts[7] = combo_get_active ((GtkWidget *)box);
       break;
   }
 }
@@ -476,7 +471,7 @@ GtkWidget * create_thermo_box (int ensemble)
   {
     if (md_ens_opt[ensemble][i]) combo_text_append (thermo_box, md_thermo[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(thermo_box), tmp_field -> thermostat);
+  combo_set_active (thermo_box, tmp_field -> thermostat);
   g_signal_connect (G_OBJECT (thermo_box), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(0));
   if (ensemble)
   {
@@ -507,7 +502,7 @@ G_MODULE_EXPORT void set_ensemble (GtkComboBox * box, gpointer data)
     }
     thermo_option_box = destroy_this_widget (thermo_option_box);
   }
-  tmp_field -> ensemble = gtk_combo_box_get_active (box);
+  tmp_field -> ensemble = combo_get_active ((GtkWidget *)box);
   tmp_field -> thermostat = 0;
 
   for (i=0; i<6; i++) tmp_field -> thermo_opts[i] = 0.0;
@@ -537,7 +532,7 @@ GtkWidget * create_ensemble_box ()
   {
     combo_text_append (ensemble, md_ensemble[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ensemble), tmp_field -> ensemble);
+  combo_set_active (ensemble, tmp_field -> ensemble);
   g_signal_connect (G_OBJECT (ensemble), "changed", G_CALLBACK(set_ensemble), NULL);
 
   ens_box = create_vbox (BSEP);
@@ -561,7 +556,7 @@ GtkWidget * create_ensemble_box ()
   combo_text_append (combo, "Langevin");
   combo_text_append (combo, "Gauss");
   combo_text_append (combo, "Direct");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> thermo_opts[7]);
+  combo_set_active (combo, (int)tmp_field -> thermo_opts[7]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(1));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("Thickness:", 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * entry = create_entry(G_CALLBACK(set_thermo_param), 100, 10, FALSE, GINT_TO_POINTER(8));
@@ -664,7 +659,7 @@ G_MODULE_EXPORT void set_md_combo (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  tmp_field -> md_opts[i] =  gtk_combo_box_get_active (box);
+  tmp_field -> md_opts[i] =  combo_get_active ((GtkWidget *)box);
   if (i == 3) widget_set_sensitive (step_button, (int)tmp_field -> md_opts[i]);
   if (i == 3 && tmp_field -> md_opts[i] == 1.0) show_advance_time_step (NULL, NULL);
   if (i == 1)
@@ -703,12 +698,7 @@ G_MODULE_EXPORT void check_impact (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void check_impact (GtkToggleButton * but, gpointer data)
 #endif
 {
-  gboolean i;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  gboolean i = button_get_status ((GtkWidget *)but);
   tmp_field -> md_opts[13] = (i) ? 1.0 : 0.0;
   widget_set_sensitive (impact_but, i);
 }
@@ -813,7 +803,7 @@ GtkWidget * create_md_box ()
           {
             combo_text_append (combo, md_combo[i][k]);
           }
-          gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+          combo_set_active (combo, 0);
           gtk_widget_set_size_request (combo, 100, -1);
           g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_md_combo), GINT_TO_POINTER(l));
           if (i)
@@ -920,7 +910,7 @@ G_MODULE_EXPORT void set_equi_combo (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
   i = GPOINTER_TO_INT(data);
-  tmp_field -> equi_opts[i] =  gtk_combo_box_get_active (box);
+  tmp_field -> equi_opts[i] =  combo_get_active ((GtkWidget *)box);
   j = (i == 9) ? 11 : 14;
   k = (i == 9) ? 0 : 1;
   tmp_field -> equi_opts[j] = init_minop[(int)tmp_field -> equi_opts[i]];
@@ -997,12 +987,7 @@ G_MODULE_EXPORT void check_equi (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   k = 2*i + 2*(i/5) + i/6 - i/7;
   tmp_field -> equi_opts[k] = (j) ? 1.0 : 0.0;
   if (i < 6) widget_set_sensitive (equi_box[i], j);
@@ -1074,7 +1059,7 @@ GtkWidget * create_equi_box ()
       {
         combo = create_combo();
         for (m=0; m<3; m++) combo_text_append (combo, equi_min[m]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> equi_opts[l]);
+        combo_set_active (combo, (int)tmp_field -> equi_opts[l]);
         gtk_widget_set_size_request (combo, 100, -1);
         g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_equi_combo), GINT_TO_POINTER(l));
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], combo, FALSE, FALSE, 5);
@@ -1188,12 +1173,7 @@ G_MODULE_EXPORT void check_out (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i < 7)
   {
     k = 4*i - i/4 - 2*(i/5) - 2*(i/6);
@@ -1222,7 +1202,7 @@ G_MODULE_EXPORT void check_out (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void set_print_level (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> out_opts[12] =  gtk_combo_box_get_active (box);
+  tmp_field -> out_opts[12] =  combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -1274,7 +1254,7 @@ GtkWidget * create_traj_box ()
         combo = create_combo();
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], combo, FALSE, FALSE, 0);
         for (l=0; l<3; l++) combo_text_append (combo, traj_level[l]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> out_opts[k+j+1]);
+        combo_set_active (combo, (int)tmp_field -> out_opts[k+j+1]);
         g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_print_level), NULL);
       }
     }
@@ -1460,12 +1440,7 @@ G_MODULE_EXPORT void check_ana (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> ana_opts[i] = (j) ? 1.0 : 0.0;
   switch (i)
   {
@@ -1661,12 +1636,7 @@ G_MODULE_EXPORT void check_io (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i < 2)
   {
     tmp_field -> io_opts[2*i] = (j) ? 1.0 : 0.0;
@@ -1700,7 +1670,7 @@ G_MODULE_EXPORT void set_io_method (GtkComboBox * box, gpointer data)
   int i, j, k;
   gboolean l;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   tmp_field -> io_opts[i] = (double)j;
   if (i < 12)
   {
@@ -1779,7 +1749,7 @@ GtkWidget * create_io_box ()
       combo_text_append(combo, io_rw_m[j]);
     }
     k ++;
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+    combo_set_active (combo, (int)tmp_field -> io_opts[k]);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
     l = tmp_field -> io_opts[k] == 2.0 ? FALSE : TRUE;
@@ -1792,7 +1762,7 @@ GtkWidget * create_io_box ()
       combo = create_combo();
       for (j=0; j<2; j++) combo_text_append(combo, io_pres[j]);
       k ++;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+      combo_set_active (combo, (int)tmp_field -> io_opts[k]);
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_pre, combo, FALSE, FALSE, 5);
       widget_set_sensitive (io_pre, m);
@@ -1800,7 +1770,7 @@ GtkWidget * create_io_box ()
       combo = create_combo();
       for (j=0; j<2; j++) combo_text_append(combo, io_type[j]);
       k ++;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> io_opts[k]);
+      combo_set_active (combo, (int)tmp_field -> io_opts[k]);
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
     }
@@ -2083,7 +2053,7 @@ GtkWidget * create_elec_param_box ()
 */
 G_MODULE_EXPORT void set_elec_eval (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> elec_opts[5] =  gtk_combo_box_get_active (box);
+  tmp_field -> elec_opts[5] =  combo_get_active ((GtkWidget *)box);
   elec_box[3] = destroy_this_widget (elec_box[3]);
   elec_box[3] = create_elec_param_box ();
   show_the_widgets (elec_box[3]);
@@ -2113,12 +2083,7 @@ G_MODULE_EXPORT void check_elec (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> elec_opts[i] = (j) ? 1.0 : 0.0;
   if (! i) widget_set_sensitive (elec_box[j], j);
   if (i == 2) widget_set_sensitive (elec_box[1], j);
@@ -2167,7 +2132,7 @@ GtkWidget * create_electro_box ()
   {
     combo_text_append(combo, eval_m[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> elec_opts[5]);
+  combo_set_active (combo, (int)tmp_field -> elec_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_elec_eval), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
   elec_box[2] = create_vbox (BSEP);
@@ -2219,7 +2184,7 @@ G_MODULE_EXPORT void set_vdw_param (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void set_vdw_mix (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> vdw_opts[5] =  gtk_combo_box_get_active (box);
+  tmp_field -> vdw_opts[5] =  combo_get_active ((GtkWidget *)box);
 }
 
 #ifdef GTK4
@@ -2246,11 +2211,7 @@ G_MODULE_EXPORT void check_vdw (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  i = button_get_status ((GtkWidget *)but);
   tmp_field -> vdw_opts[j] = (double)i;
   if (j == 0) widget_set_sensitive (vdw_box[0], i);
   if (j == 4) widget_set_sensitive (vdw_box[1], i);
@@ -2305,7 +2266,7 @@ GtkWidget * create_vdws_box ()
   {
     combo_text_append(combo, eval_vdw[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> vdw_opts[5]);
+  combo_set_active (combo, (int)tmp_field -> vdw_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_vdw_mix), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
 
@@ -2336,11 +2297,7 @@ G_MODULE_EXPORT void check_met (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-#else
-  i = gtk_toggle_button_get_active (but);
-#endif
+  i = button_get_status ((GtkWidget *)but);
   tmp_field -> met_opts[j] = (double)i;
 }
 
@@ -2428,7 +2385,7 @@ gchar * sys_opts[10] = {"Relative dielectric constant &#949;<sub>r</sub>",
 */
 G_MODULE_EXPORT void set_sys_restart (GtkComboBox * box, gpointer data)
 {
-  tmp_field -> sys_opts[15] =  gtk_combo_box_get_active (box);
+  tmp_field -> sys_opts[15] =  combo_get_active ((GtkWidget *)box);
 }
 
 #ifdef GTK4
@@ -2455,12 +2412,7 @@ G_MODULE_EXPORT void check_sys (GtkToggleButton * but, gpointer data)
 {
   int i, k;
   i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_field -> sys_opts[i] = (j) ? 1.0 : 0.0;
   if (i > 5)
   {
@@ -2553,7 +2505,7 @@ GtkWidget * create_restart_box ()
   GtkWidget * combo = create_combo();
   int i;
   for (i=0; i<3; i++) combo_text_append(combo, rtype[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (int)tmp_field -> sys_opts[15]);
+  combo_set_active (combo, (int)tmp_field -> sys_opts[15]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_sys_restart), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, sys_box[3], combo, FALSE, FALSE, 20);
   return vbox;

@@ -434,7 +434,7 @@ G_MODULE_EXPORT void update_cross_parameter (GtkEntry * res, gpointer data)
   const gchar * m = entry_get_text (res);
   double v = string_to_double ((gpointer)m);
   update_entry_double (res, v);
-  j = gtk_combo_box_get_active (GTK_COMBO_BOX(cross_box));
+  j = combo_get_active (cross_box);
   cross[tmp_fbody -> id][j][k] = cross[j][tmp_fbody -> id][k] = v;
 }
 
@@ -449,7 +449,7 @@ G_MODULE_EXPORT void update_cross_parameter (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void changed_cross_combo (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   for (j=0; j<3; j++)
   {
     // g_debug ("Updating entry:: id= %d, i= %d, j= %d", tmp_fbody -> id, i, j);
@@ -582,7 +582,7 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
         }
         else
         {
-          gtk_combo_box_set_active (GTK_COMBO_BOX(cross_box), 0);
+          combo_set_active (cross_box, 0);
         }
       }
     }
@@ -742,7 +742,7 @@ G_MODULE_EXPORT void changed_field_key_combo (GtkComboBox * box, gpointer data)
   int i, j;
   gboolean changeit = FALSE;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   if (i > 6 && i < MOLIMIT)
   {
     if (j != tmp_fprop -> key)
@@ -799,7 +799,7 @@ G_MODULE_EXPORT void changed_field_key_combo (GtkComboBox * box, gpointer data)
           }
           else
           {
-            gtk_combo_box_set_active (box, tmp_fbody -> key);
+            combo_set_active ((GtkWidget *)box, tmp_fbody -> key);
           }
         }
         break;
@@ -807,8 +807,8 @@ G_MODULE_EXPORT void changed_field_key_combo (GtkComboBox * box, gpointer data)
   }
   if (changeit)
   {
-    if (ff_p_combo[0]) gtk_combo_box_set_active (GTK_COMBO_BOX(ff_p_combo[0]), 0);
-    if (ff_p_combo[1]) gtk_combo_box_set_active (GTK_COMBO_BOX(ff_p_combo[1]), 0);
+    if (ff_p_combo[0]) combo_set_active (ff_p_combo[0], 0);
+    if (ff_p_combo[1]) combo_set_active (ff_p_combo[1], 0);
     p_box = destroy_this_widget (p_box);
     p_box = param_prop_param_box (i);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, param_box, p_box, FALSE, FALSE, 0);
@@ -842,14 +842,10 @@ G_MODULE_EXPORT void visualize_it (GtkToggleButton * but, gpointer data)
   int i, j;
   i = GPOINTER_TO_INT (data);
   j = 0;
-#ifdef GTK4
-  toviz.c = gtk_check_button_get_active (but);
-#else
-  toviz.c = gtk_toggle_button_get_active (but);
-#endif
+  toviz.c = button_get_status ((GtkWidget *)but);
   if (i < MOLIMIT)
   {
-    j = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[i-1]));
+    j = combo_get_active (combo_mol[i-1]);
     tmp_fmol = get_active_field_molecule (j);
   }
   if (is_moy)
@@ -894,12 +890,8 @@ G_MODULE_EXPORT void select_it (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  toviz.c = gtk_check_button_get_active (but);
-#else
-  toviz.c = gtk_toggle_button_get_active (but);
-#endif
-  if (i < MOLIMIT) j = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[i-1]));
+  toviz.c = button_get_status ((GtkWidget *)but);
+  if (i < MOLIMIT) j = combo_get_active (combo_mol[i-1]);
   if (is_moy)
   {
     select_object (i, row_id, j);
@@ -1769,7 +1761,7 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     else
     {
       widget_set_sensitive (cross_vbox, TRUE);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(cross_box), 0);
+      combo_set_active (cross_box, 0);
     }
     gtk_label_set_text (GTK_LABEL(body_lab), body_str (tmp_fbody -> bd));
     gtk_label_set_use_markup (GTK_LABEL(body_lab), TRUE);
@@ -1884,7 +1876,7 @@ G_MODULE_EXPORT void changed_atom_combo (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   switch (i)
   {
     case 0:
@@ -1897,7 +1889,7 @@ G_MODULE_EXPORT void changed_atom_combo (GtkComboBox * box, gpointer data)
           if (atoms_id_list[tmp_fat -> sp][k] == tmp_fat -> afid) break;
         }
       }
-      gtk_combo_box_set_active (GTK_COMBO_BOX(afftype), k+1);
+      combo_set_active (afftype, k+1);
       if (j)
       {
         tmp_fat -> mass =(tmp_fat -> afid < 0) ? tmp_proj -> chemistry -> chem_prop[CHEM_M][tmp_fat -> sp] : get_force_field_atom_mass (tmp_fat -> sp, tmp_fat -> afid);
@@ -2228,11 +2220,7 @@ G_MODULE_EXPORT void shell_in_vdw (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void shell_in_vdw (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_fshell -> vdw = gtk_check_button_get_active (but);
-#else
-  tmp_fshell -> vdw = gtk_toggle_button_get_active (but);
-#endif
+  tmp_fshell -> vdw = button_get_status ((GtkWidget *)but);
   adjust_vdw_interactions (tmp_fshell -> vdw);
 }
 
@@ -2300,7 +2288,7 @@ void edit_parameters (int f, int id)
   for (i=0; i<2; i++) ff_p_combo[i] = NULL;
   if (f < MOLIMIT)
   {
-   i = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[f-1]));
+   i = combo_get_active (combo_mol[f-1]);
    lab = markup_label (g_strdup_printf ("\tMolecule: \t<b>%s</b>", get_active_field_molecule(i) -> name), -1, 30, 0.0, 0.5);
    add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
    tmp_fmol = get_active_field_molecule (i);
@@ -2331,7 +2319,7 @@ void edit_parameters (int f, int id)
       combo = create_combo ();
       combo_text_append (combo, "Manual");
       combo_text_append (combo, "Automatic");
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo), (tmp_fat -> afid > -1) ? 1 : 0);
+      combo_set_active (combo, (tmp_fat -> afid > -1) ? 1 : 0);
       widget_set_sensitive (combo, atoms_id[tmp_fat -> sp]);
       g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(changed_atom_combo), GINT_TO_POINTER(0));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
@@ -2353,7 +2341,7 @@ void edit_parameters (int f, int id)
         g_free (str);
         if (atoms_id_list[tmp_fat -> sp][i] == tmp_fat -> afid) k = i+1;
       }
-      gtk_combo_box_set_active (GTK_COMBO_BOX(afftype), k);
+      combo_set_active (afftype, k);
       g_signal_connect (G_OBJECT(afftype), "changed", G_CALLBACK(changed_atom_combo), GINT_TO_POINTER(1));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, afftype, FALSE, FALSE, 0);
       widget_set_sensitive (afftype, (tmp_fat -> afid > -1) ? TRUE : FALSE);
@@ -2465,7 +2453,7 @@ void edit_parameters (int f, int id)
               break;
           }
           l = (! k) ? tmp_fshell -> ia[k]+1 : (tmp_fshell -> ia[k] < 1) ? tmp_fshell -> ia[k]+1 : 2;
-          gtk_combo_box_set_active (GTK_COMBO_BOX(shell_cbox[k]), l);
+          combo_set_active (shell_cbox[k], l);
           g_signal_connect (G_OBJECT(shell_cbox[k]), "changed", G_CALLBACK(changed_shell_combo), GINT_TO_POINTER(k));
           gtk_widget_set_size_request (shell_cbox[k], 150, -1);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, shell_hbox[k], shell_cbox[k], FALSE, FALSE, 0);
@@ -2857,20 +2845,20 @@ void edit_parameters (int f, int id)
       {
         case 6:
           // Tethered
-          gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_ftet -> key);
+          combo_set_active (field_key_combo, tmp_ftet -> key);
           break;
         case SEXTERN:
-          gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_fext -> key);
+          combo_set_active (field_key_combo, tmp_fext -> key);
           break;
         default:
           if (f < MOLIMIT)
           {
-            gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_fprop -> key);
+            combo_set_active (field_key_combo, tmp_fprop -> key);
           }
           else
           {
             // non nonded
-            gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_fbody -> key);
+            combo_set_active (field_key_combo, tmp_fbody -> key);
           }
           break;
       }
@@ -3063,7 +3051,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
   field_molecule * fmol;
   if (i < MOLIMIT)
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+    j = combo_get_active (combo_mol[i-1]);
     tmp_fmol = fmol = get_active_field_molecule (j);
   }
   if (i == 2)
@@ -3302,7 +3290,7 @@ G_MODULE_EXPORT void remove_field_prop (GSimpleAction * action, GVariant * param
   gchar * str;
   if (i < MOLIMIT)
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+    j = combo_get_active (combo_mol[i-1]);
     tmp_fmol = get_active_field_molecule (j);
     str = g_strdup_printf ("Delete %s N°%d from molecule %s, is this correct ?", elemts[i], row_id+1, tmp_fmol -> name);
   }

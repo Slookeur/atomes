@@ -132,6 +132,7 @@ gchar * PACKAGE_SGOF = NULL;
 gchar * PACKAGE_SGMP = NULL;
 gchar * PACKAGE_SGMI = NULL;
 gchar * PACKAGE_SGTC = NULL;
+gchar * ATOMES_CONFIG_DIR = NULL;
 gchar * ATOMES_CONFIG = NULL;
 gchar * ATOMES_URL = "https://atomes.ipcms.fr";
 gchar * mode_name[2]={"Analysis", "Edition"};
@@ -146,12 +147,11 @@ char * rings_type[5] = {"All (No rules)",
                         "Primitive",
                         "Strong"};
 
-char * untime[6] = {"fs",
+char * untime[5] = {"fs",
                     "ps",
                     "ns",
                     "µs",
-                    "ms",
-                    " "};
+                    "ms"};
 
 gchar * workspacefile = NULL;
 
@@ -627,7 +627,7 @@ double string_to_double (gpointer string)
   double value = strtod ((char *)string, & endPtr);
   if (endPtr == (char *)string)
   {
-     g_print ("Error in string format: string = %s - value == %lf\n", endPtr, value);
+     g_print ("Error in string format: string = \"%s\" - value == %lf\n", endPtr, value);
   }
   return value;
 }

@@ -42,7 +42,8 @@ enum glsl_styles {
   GLSL_CAPS      = 4, /*!< 4 */
   GLSL_POLYEDRA  = 5, /*!< 5 */
   GLSL_STRING    = 6, /*!< 6 */
-  GLSL_LIGHT     = 7  /*!< 7 */
+  GLSL_LIGHT     = 7, /*!< 7 */
+  GLSL_BACK      = 8  /*!< 8 */
 };
 
 #define POLY_BUFF_SIZE 10  // p(x,y,z), n(x,y,z), color (r,g,b,a)
@@ -100,6 +101,10 @@ extern const GLchar * string_vertex;
 extern const GLchar * string_color;
 extern const GLchar * string_color_2d;
 
+extern const GLchar * background_vertex;
+extern const GLchar * background_linear;
+extern const GLchar * background_circular;
+
 /*! \typedef object_3d */
 typedef struct object_3d object_3d;
 struct object_3d
@@ -128,7 +133,7 @@ struct glsl_program
   int object;              /*!< The number of 3D object(s) to render */
   GLuint vertex_shader;    /*!< The vertex shader ID */
   GLuint geometry_shader;  /*!< The geometry shader ID */
-  GLuint fragment_shader;  /*!< The fragement shader ID */
+  GLuint fragment_shader;  /*!< The fragment shader ID */
   GLenum vert_type;        /*!< The type of vertex */
   int draw_type;           /*!< In \enum glsl_styles */
   gboolean draw_instanced; /*!< 0 = single instance, 1 = multiple instances */

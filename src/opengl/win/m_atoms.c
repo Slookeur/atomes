@@ -478,7 +478,7 @@ GtkWidget * menu_atoms (glwin * view, int id, int at)
   str = label_atpts (this_proj, view, 1+2*at);
   if (id == 0)
   {
-    view -> ogl_atoms[4*at+2] = create_menu_item(FALSE, "Point size(s)");
+    view -> ogl_atoms[4*at+2] = create_menu_item(FALSE, "Dot size(s)");
     gtk_menu_shell_append ((GtkMenuShell *)menua, view -> ogl_atoms[4*at+2]);
     view -> ogl_atoms[4*at+3] = create_atom_layout_widget (str, view -> ogl_atoms[4*at+2], & view -> colorp[at][1]);
     if (at == 1 && ! view -> anim -> last -> img -> draw_clones)
@@ -488,7 +488,7 @@ GtkWidget * menu_atoms (glwin * view, int id, int at)
   }
   else if (i == WIREFRAME || i == PUNT)
   {
-    widg = create_menu_item (FALSE, "Point size(s)");
+    widg = create_menu_item (FALSE, "Dot size(s)");
     gtk_menu_shell_append ((GtkMenuShell *)menua, widg);
     widg = create_atom_layout_widget (str, widg, & view -> colorp[at][1]);
     if (at == 1 && ! view -> anim -> last -> img -> draw_clones)
@@ -814,7 +814,7 @@ GMenu * menu_atoms (glwin * view, int popm, int at)
   }
   if (i == WIREFRAME || i == PUNT)
   {
-    item = g_menu_item_new ("Point size(s)", (sensitive) ? NULL : "None");
+    item = g_menu_item_new ("Dot size(s)", (sensitive) ? NULL : "None");
     g_menu_item_set_attribute (item, "custom", "s", (at) ? "clone-pts" : "atom-pts", NULL);
     g_menu_append_item (menu, item);
   }

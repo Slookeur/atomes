@@ -77,7 +77,8 @@ void prepare_label (atom at, int id, double al)
 
   k = at.sp;
   double rad = get_sphere_radius ((at.style == NONE) ? plot -> style : at.style, k, id, (at.pick[0] || at.pick[1]));
-  for (l=0; l<3; l++) shift[l] = plot -> labels_shift[id][l];
+  if (at.style == CYLINDERS || (plot -> style == CYLINDERS && at.style == NONE)) rad += (at.pick[0] || at.pick[1]) ? 0.9 : 1.0;
+  for (l=0; l<3; l++) shift[l] = plot -> labels[id].shift[l];
   shift[2] += rad;
 
   if (field_color && (field_object < 7 || field_object > 14))
@@ -85,16 +86,16 @@ void prepare_label (atom at, int id, double al)
     lcol = init_color (at.coord[4], num_field_objects);
     lcol.alpha = al*0.75;
   }
-  else if (plot -> labels_color[id] == NULL)
+  else if (plot -> labels[id].color == NULL)
   {
     lcol = get_atom_color (k+id*proj_sp, at.id, al, 0, FALSE);
   }
   else
   {
-    lcol = plot -> labels_color[id][k];
+    lcol = (plot -> labels[id].n_colors) ? plot -> labels[id].color[0] : plot -> labels[id].color[k];
     lcol.alpha = al;
   }
-  switch (plot -> labels_format[id])
+  switch (plot -> acl_format[id])
   {
     case ELEMENT_NAME:
       str = g_strdup_printf ("%s", exact_name(proj_gl -> chemistry -> element[k]));
@@ -142,10 +143,10 @@ void prepare_label (atom at, int id, double al)
 */
 void clean_labels (int id)
 {
-  if (plot -> labels_list[id] != NULL)
+  if (plot -> labels[id].list != NULL)
   {
-    g_free (plot -> labels_list[id]);
-    plot -> labels_list[id] = NULL;
+    g_free (plot -> labels[id].list);
+    plot -> labels[id].list = NULL;
   }
 }
 
@@ -248,13 +249,13 @@ int create_label_lists ()
     }
   }
 
-  if (plot -> labels_list[0] != NULL || plot -> labels_list[1] != NULL)
+  if (plot -> labels[0].list != NULL || plot -> labels[1].list != NULL)
   {
     nshaders = 0;
-    if (plot -> labels_list[0] != NULL) nshaders += (plot -> labels_render[0] + 1) * (plot -> labels_list[0] -> last -> id + 1);
-    if (plot -> draw_clones && plot -> labels_list[1] != NULL)
+    if (plot -> labels[0].list != NULL) nshaders += (plot -> labels[0].render + 1) * (plot -> labels[0].list -> last -> id + 1);
+    if (plot -> draw_clones && plot -> labels[1].list != NULL)
     {
-      nshaders += (plot -> labels_render[1] + 1) * (plot -> labels_list[1] -> last -> id + 1);
+      nshaders += (plot -> labels[1].render + 1) * (plot -> labels[1].list -> last -> id + 1);
     }
     wingl -> ogl_glsl[LABEL][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[LABEL][0]);
     for (i=0; i<2; i++) render_all_strings (LABEL, i);

@@ -454,6 +454,33 @@ gchar * npt_type[4]={"A\tB\tC\t&#x3B1;\t&#x3B2;\t&#x263;",
 gchar * npt_info[3]={"1 line by step, as many lines as MD steps",
                      "2 lines by step, twice as many lines as MD steps",
                      "3 lines by step, three times as many lines as MD steps"};
+gchar * cif_configurations[3]={"Single step chemical reaction",
+                               "MD trajectory",
+                               "Single configuration"};
+gchar * cif_occupancies[3]={"Round up to lowest integer",
+                            "Round up to highest integer",
+                            "Round up to nearest integer"};
+gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
+                            "\t\tConsider each configuration as a step in a chemical reaction:\n"
+                            "\t\t\t- Atomic coordinates are sorted based on occupancy or disorder site\n"
+                            "\t\t\t- Each describeing the proportion of a reactant\n"
+                            "\t\t\t- A super lattice is build to respect these proportions\n\n"
+                            "\t<b>MD trajectory</b>\n"
+                            "\t\tConsider the CIF file a MD trajectory\n\n"
+                            "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
+                            "\t<b>Single configuration </b>\n"
+                            "\t\tSelect a single configuration in the CIF file"};
+gchar * cif_config_leg={"\t<b>MD trajectory</b>\n"
+                        "\t\tConsider the CIF file a MD trajectory\n\n"
+                        "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
+                        "\t<b>Single configuration </b>\n"
+                        "\t\tSelect a single configuration in the CIF file"};
+gchar * cif_occ[3]={"to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌋</b>",
+                    "to highest integer: <b>⌈</b>n<sub>sites</sub> x occupancy<b>⌉</b>",
+                    "to nearest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌉</b>"};
+gchar * cif_sites[2]={"with n<sub>sites</sub> = f(space group, crystalline positions)",
+                      "with n<sub>sites</sub> = f(symmetry positions, crystalline positions)"};
+
 GtkWidget * answer_info;
 
 /*!
@@ -467,7 +494,7 @@ GtkWidget * answer_info;
 G_MODULE_EXPORT void on_answer_changed (GtkWidget * widg, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(widg));
+  i = combo_get_active (widg);
   j = (! i || i == 2) ? 0 : (i == 1) ? 1 : 2;
   gtk_label_set_text (GTK_LABEL(answer_info), npt_info[j]);
 }
@@ -490,11 +517,11 @@ G_MODULE_EXPORT void run_iask (GtkDialog * iask, gint response_id, gpointer data
   const gchar * riask;
   if (response_id == GTK_RESPONSE_OK)
   {
-    if (i == 0 || i > 3)
+    if (i == 0 || i > 5)
     {
       riask = entry_get_text (GTK_ENTRY(answer));
       res_int = string_to_double ((gpointer)riask);
-      if (i > 4)
+      if (i > 5)
       {
         if (res_int > 0 && res_int < i+1)
         {
@@ -510,7 +537,7 @@ G_MODULE_EXPORT void run_iask (GtkDialog * iask, gint response_id, gpointer data
     else
     {
       done = TRUE;
-      res_int = gtk_combo_box_get_active (GTK_COMBO_BOX(answer));
+      res_int = combo_get_active (answer);
     }
   }
   if (done) destroy_this_dialog (iask);
@@ -541,7 +568,7 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   quest = gtk_label_new (lab);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, quest, TRUE, TRUE, 0);
 
-  if (id == 0 || id > 3)
+  if (id == 0 || id > 6)
   {
     answer = gtk_entry_new ();
     gtk_widget_set_size_request (answer, 100, -1);
@@ -549,13 +576,32 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   }
   else
   {
-    if (id < 3)
+    if (id < 6)
     {
       answer = create_combo ();
-      gtk_widget_set_size_request (answer, -1, 40);
-      if (id < 0) for (i=0; i<3; i++) combo_text_append (answer, field_init[i]);
-      if (id == 1) for (i=0; i<3; i++) combo_text_append (answer, coord_type[i]);
-      if (id == 2) for (i=0; i<NCFORMATS; i++) combo_text_append (answer, coord_files[i]);
+      gtk_widget_set_size_request (answer, -1, 30);
+      switch (id)
+      {
+        case 1:
+          for (i=0; i<3; i++) combo_text_append (answer, coord_type[i]);
+          break;
+        case 2:
+          for (i=0; i<NCFORMATS; i++) combo_text_append (answer, coord_files[i]);
+          break;
+        case 3:
+          for (i=0; i<3; i++) combo_text_append (answer, cif_configurations[i]);
+          break;
+        case 4:
+          for (i=1; i<3; i++) combo_text_append (answer, cif_configurations[i]);
+          break;
+        case 5:
+          for (i=0; i<3; i++) combo_text_append (answer, cif_occupancies[i]);
+          break;
+        default:
+          // id < 0
+          for (i=0; i<3; i++) combo_text_append (answer, field_init[i]);
+          break;
+      }
     }
     else
     {
@@ -570,22 +616,37 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
       GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
       gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (answer), renderer, TRUE);
       gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (answer), renderer, "text", 0, NULL);
-      GList * cell_list = gtk_cell_layout_get_cells (GTK_CELL_LAYOUT(answer));
-      if(cell_list && cell_list -> data)
-      {
-        gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(answer), cell_list -> data, "markup", 0, NULL);
-      }
     }
-    gtk_combo_box_set_active (GTK_COMBO_BOX(answer), 0);
+    combo_set_markup (answer);
+    combo_set_active (answer, 0);
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, answer, FALSE, FALSE, 10);
   if (id == 3)
   {
-    answer_info = markup_label(npt_info[0], -1, -1, 0.5, 0.5);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
+    answer_info = markup_label (cif_config_legends, 450, -1, 0.5, 0.5);
+  }
+  if (id == 4)
+  {
+    answer_info = markup_label (cif_config_leg, 450, -1, 0.5, 0.5);
+  }
+  if (id == 5)
+  {
+    gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.76⌋ = 8\n\n"
+                                   "\t<b>Highest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n\n"
+                                   "\t<b>Nearest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n\n"
+                                   "\t\t%s\n", cif_occ[0], cif_occ[1], cif_occ[2], cif_sites[cif_use_symmetry_positions]);
+    answer_info = markup_label (str, 450, -1, 0.5, 0.5);
+    g_free (str);
+  }
+  if (id == 6)
+  {
+    answer_info = markup_label (npt_info[0], -1, -1, 0.5, 0.5);
     g_signal_connect(G_OBJECT(answer), "changed", G_CALLBACK(on_answer_changed), NULL);
   }
-
+  if (id > 2 && id < 7) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
   run_this_gtk_dialog (iask, G_CALLBACK(run_iask), GINT_TO_POINTER(id));
   return res_int;
 }
@@ -690,9 +751,9 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid)
 
 /*!
   \fn void spec_data_ (int * status, int * ind, int * atd, int * nsp,
-*                   char * lbel, char * el_nme,
-*                   double * amss, double * rdus,
-*                   double * nscatt, double * xscatt)
+                       char * lbel, char * el_nme,
+                       double * amss, double * rdus,
+                       double * nscatt, double * xscatt)
 
   \brief update project data using information from Fortran90
 

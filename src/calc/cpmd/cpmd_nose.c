@@ -984,11 +984,7 @@ G_MODULE_EXPORT void select_atoms_not_thermostated (GtkToggleButton * but, gpoin
 {
   int h, i, j, k, l, m;
   h = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  j = button_get_status ((GtkWidget *)but);
   for (i=0; i<qm_proj -> natomes; i++)
   {
     m = 0;
@@ -1486,7 +1482,7 @@ void create_nose_thermo_param_box (int therm_id)
 G_MODULE_EXPORT void changed_nose_thermo_id_box (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   create_nose_thermo_param_box (i);
 }
 
@@ -1516,7 +1512,7 @@ void create_selection_combo (int id, int num, int type, GCallback handler)
   j = type;
   if (num > 0)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo_id_box[id]), 0);
+    combo_set_active (combo_id_box[id], 0);
     if (id == 0)
     {
       create_nose_thermo_param_box (0);
@@ -1528,7 +1524,7 @@ void create_selection_combo (int id, int num, int type, GCallback handler)
   }
   else
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(combo_id_box[id]), -1);
+    combo_set_active (combo_id_box[id], -1);
     widget_set_sensitive (combo_id_box[id], FALSE);
   }
   g_signal_connect (G_OBJECT (combo_id_box[id]), "changed", handler, GINT_TO_POINTER(j));
@@ -1666,7 +1662,7 @@ G_MODULE_EXPORT void update_thermo_parameter (GtkEntry * res, gpointer data)
   {
     if (get_num_thermo () > 1)
     {
-      j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_id_box[0]));
+      j = combo_get_active (combo_id_box[0]);
     }
     else
     {
@@ -1738,7 +1734,7 @@ GtkWidget * create_nose_box (int n)
 G_MODULE_EXPORT void changed_thermo_box_nose (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != get_thermo () -> sys)
   {
     clean_thermostat (get_thermo () -> type);
@@ -1783,7 +1779,7 @@ void prepare_therm_ions ()
         g_free (str);
       }
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tbox, FALSE, FALSE, 0);
-      gtk_combo_box_set_active (GTK_COMBO_BOX (tbox), get_thermo () -> sys);
+      combo_set_active (tbox, get_thermo () -> sys);
       g_signal_connect (G_OBJECT (tbox), "changed", G_CALLBACK(changed_thermo_box_nose), NULL);
     }
   }
@@ -1823,7 +1819,7 @@ void prepare_therm_elec ()
 G_MODULE_EXPORT void changed_thermo_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   j = GPOINTER_TO_INT (data);
   if (j == 0 && i != get_thermo () -> type)
   {
@@ -1869,12 +1865,12 @@ void thermo_type_box (GtkWidget * vbox, gchar * str, int id)
   }
   if (id == -1)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(tbox), tmp_cpmd -> elec_thermostat -> type);
+    combo_set_active (tbox, tmp_cpmd -> elec_thermostat -> type);
   }
   else
   {
     thermostat * thermo = get_thermo();
-    gtk_combo_box_set_active (GTK_COMBO_BOX(tbox), thermo -> type);
+    combo_set_active (tbox, thermo -> type);
   }
   g_signal_connect (G_OBJECT (tbox), "changed", G_CALLBACK(changed_thermo_box), GINT_TO_POINTER(id));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tbox, FALSE, FALSE, 0);

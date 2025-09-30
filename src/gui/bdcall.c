@@ -34,6 +34,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 
+  double get_cutoff (double s_a, double s_b);
+
   void restore_color_map (glwin * view, int * colm);
   void recup_dmin_dmax_ (double * min, double * max);
   void initbd ();
@@ -62,6 +64,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "dlp_field.h"
 #include "glview.h"
 #include "initcoord.h"
+#include "preferences.h"
 
 extern G_MODULE_EXPORT void set_color_map (GtkWidget * widg, gpointer data);
 extern void clean_coord_window (project * this_proj);
@@ -197,6 +200,34 @@ void initang ()
 }
 
 /*!
+  \fn double get_cutoff (double s_a, double s_b)
+
+  \param retrieve cutoff radius between spec a and spec b
+
+  \param s_a species a
+  \param s_b species b
+*/
+double get_cutoff (double s_a, double s_b)
+{
+  if (default_bond_cutoff)
+  {
+    bond_cutoff * cut = default_bond_cutoff;
+    int z_a = min (s_a, s_b);
+    int z_b = max (s_a, s_b);
+    while (cut)
+    {
+      if (cut -> Z[0] == z_a && cut -> Z[1] == z_b) return cut -> cutoff;
+      cut = cut -> next;
+    }
+    return 0.0;
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
+/*!
   \fn void initcutoffs (chemical_data * chem, int species)
 
   \brief initialize bond cutoffs
@@ -209,8 +240,19 @@ void initcutoffs (chemical_data * chem, int species)
   int i, j;
   for (i = 0; i < species; i++)
   {
-    for (j = 0; j < species; j++)
+    chem -> cutoffs[i][i] = (chem -> cutoffs[i][i] != 0.0) ? chem -> cutoffs[i][i] : get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][i]);
+    if (chem -> cutoffs[i][i] == 0.0)
     {
+      chem -> cutoffs[i][i] = 2.0*chem -> chem_prop[CHEM_R][i];
+      chem -> cutoffs[i][i] = max(MINCUT, chem -> cutoffs[i][i]);
+      if (chem -> chem_prop[CHEM_Z][i] == 1.0) chem -> cutoffs[i][i] = 0.5;
+    }
+  }
+  for (i = 0; i < species-1; i++)
+  {
+    for (j = i+1; j < species; j++)
+    {
+      chem -> cutoffs[i][j] = (chem -> cutoffs[i][j] != 0.0) ? chem -> cutoffs[i][j] : get_cutoff (chem -> chem_prop[CHEM_Z][i], chem -> chem_prop[CHEM_Z][j]);
       if (chem -> cutoffs[i][j] == 0.0)
       {
         chem -> cutoffs[i][j] = chem -> chem_prop[CHEM_R][i] + chem -> chem_prop[CHEM_R][j];
@@ -220,9 +262,10 @@ void initcutoffs (chemical_data * chem, int species)
         if (chem -> chem_prop[CHEM_Z][i] == 1.0 && chem -> chem_prop[CHEM_Z][j] == 8.0) chem -> cutoffs[i][j] = 1.2;
         if (chem -> chem_prop[CHEM_Z][j] == 1.0 && chem -> chem_prop[CHEM_Z][i] == 8.0) chem -> cutoffs[j][i] = 1.2;
       }
+      chem -> cutoffs[j][i] = chem -> cutoffs[i][j];
     }
-    if (chem -> chem_prop[CHEM_Z][i] == 1.0) chem -> cutoffs[i][i] = 0.5;
   }
+  chem -> grtotcutoff = (chem -> grtotcutoff != 0.0) ? chem -> grtotcutoff : default_totcut;
   if (chem -> grtotcutoff == 0.0)
   {
     for (i = 0; i < species; i++)

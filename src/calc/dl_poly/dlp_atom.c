@@ -155,7 +155,7 @@ G_MODULE_EXPORT void select_field_atom (GtkCellRendererToggle * cell_renderer, g
   gtk_tree_view_column_set_cell_data_func (remove_col[3],
                                            remove_renderer[3],
                                            set_sensitive_atom, NULL, NULL);
-  i = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[0]));
+  i = combo_get_active (combo_mol[0]);
   if (new_at[0] == -1)
   {
     gtk_label_set_text (GTK_LABEL(remove_label), remove_text(-2, 0, at_to_remove -> name));
@@ -317,7 +317,7 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
         if (selection_confirmed)
         {
           done = TRUE;
-          i = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[0]));
+          i = combo_get_active (combo_mol[0]);
           tmp_fbt = get_active_atom (i, tmp_fmol -> atoms-1);
           new_at = allocint(a_ato);
           j = 0;
@@ -659,7 +659,7 @@ G_MODULE_EXPORT void run_remove_atom_from_field_molecule (GtkDialog * rmol, gint
     case GTK_RESPONSE_APPLY:
       if (a_ato)
       {
-        i = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_mol[0]));
+        i = combo_get_active (combo_mol[0]);
         field_atom* to_merge = get_active_atom(i, new_at[0]);
         str = g_strdup_printf ("Merging with atom N°%d - %s !\nIs this correct ?",
                                new_at[0]+1, to_merge -> name);

@@ -1577,17 +1577,13 @@ G_MODULE_EXPORT void toggle_field_params (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT (data);
-#ifdef GTK4
-  tmp_field -> afp[i] = gtk_check_button_get_active (but);
-#else
-  tmp_field -> afp[i] = gtk_toggle_button_get_active (but);
-#endif
+  tmp_field -> afp[i] = button_get_status ((GtkWidget *)but);
   if (i == MAXDATC)
   {
     for (j=0; j<MOLIMIT-1; j++)
     {
       widget_set_sensitive (mol_box[j], tmp_field -> afp[MAXDATC]);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(combo_mol[j]), 0);
+      combo_set_active (combo_mol[j], 0);
     }
   }
   else if (i > MAXDATC)
@@ -1771,7 +1767,7 @@ G_MODULE_EXPORT void changed_mol_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   gtk_label_set_text (GTK_LABEL(field_label[i]), set_field_label(i, j));
   gtk_label_set_use_markup (GTK_LABEL(field_label[i]), TRUE);
   gtk_tree_store_clear (field_model[i]);
@@ -2073,7 +2069,7 @@ G_MODULE_EXPORT void run_changed_energy_unit (GtkDialog * dialog, gint response_
 G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
 {
   int i, j, k, l;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_field -> energy_unit)
   {
     if (field_file_has_energy_parameters(FALSE, 0, 0))
@@ -2176,7 +2172,7 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
       tmp_field -> energy_unit = i;
     }
   }
-  gtk_combo_box_set_active (box, tmp_field -> energy_unit);
+  combo_set_active ((GtkWidget *)box, tmp_field -> energy_unit);
   update_field_trees ();
 }
 
@@ -2208,7 +2204,7 @@ GtkWidget * vbox_init (int p)
     combo_text_append (enbox, str);
     g_free (str);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(enbox), tmp_field -> energy_unit);
+  combo_set_active (enbox, tmp_field -> energy_unit);
   g_signal_connect (G_OBJECT (enbox), "changed", G_CALLBACK(changed_energy_unit), GINT_TO_POINTER(0));
   gtk_widget_set_size_request (enbox, 250, 30);
   widget_set_sensitive (enbox, ! activef);
@@ -2356,7 +2352,7 @@ G_MODULE_EXPORT void changed_field_key_renderer (GtkCellRendererCombo * combo, g
     l = get_field_data_id (i-5, str);
     if (l > -1)
     {
-      if (i < MOLIMIT) k = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+      if (i < MOLIMIT) k = combo_get_active (combo_mol[i-1]);
       if (i > 6 && i < MOLIMIT)
       {
         tmp_fstr = get_active_struct (i-7, k, j);
@@ -2491,7 +2487,7 @@ GtkWidget * create_combo_mol (int f)
     if (tmp_fmol -> next != NULL) tmp_fmol = tmp_fmol -> next;
   }
   widget_set_sensitive (combo, (tmp_field -> molecules > 1) ? TRUE : FALSE);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+  combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(changed_mol_box), GINT_TO_POINTER(f+1));
   return combo;
 }
@@ -2522,7 +2518,7 @@ gchar * pop_info (int i, int id)
     default:
       if (i < MOLIMIT)
       {
-        j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+        j = combo_get_active (combo_mol[i-1]);
         tmp_fmol = get_active_field_molecule (j);
       }
       switch (i)
@@ -2853,7 +2849,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
       default:
         if (i == 1)
         {
-          j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+          j = combo_get_active (combo_mol[i-1]);
           tmp_fmol = get_active_field_molecule (j);
           if (actel > 1)
           {
@@ -2955,7 +2951,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
       default:
         if (i == 1)
         {
-          j = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[i-1]));
+          j = combo_get_active (combo_mol[i-1]);
           tmp_fmol = get_active_field_molecule (j);
           if (actel > 1)
           {
@@ -3168,7 +3164,7 @@ void field_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
       if (is_special[tree][k] == 2) break;
     }
     gtk_tree_model_get (mod, iter, k, & j, -1);
-    l = (tree && tree < MOLIMIT) ? gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[tree-1])) : 0;
+    l = (tree && tree < MOLIMIT) ? combo_get_active (combo_mol[tree-1]) : 0;
     k = get_field_objects (tree, l);
     set_renderer_color (j, renderer, init_color (i-1, k));
   }
@@ -3449,7 +3445,7 @@ G_MODULE_EXPORT void edit_field_cell (GtkCellRendererText * cell, gchar * path_s
   GtkTreePath * path = gtk_tree_path_new_from_string (path_string);
   gtk_tree_model_get_iter (GTK_TREE_MODEL(field_model[j]), & iter, path);
   gtk_tree_model_get (GTK_TREE_MODEL(field_model[j]), & iter, 0, & k, -1);
-  l = gtk_combo_box_get_active (GTK_COMBO_BOX(combo_mol[j-1]));
+  l = combo_get_active (combo_mol[j-1]);
   float val = string_to_double ((gpointer)new_text);
   k --;
   if (i == 0) get_active_atom (l, k) -> mass = val;
@@ -3558,7 +3554,7 @@ GtkWidget * create_field_tree (int f)
     if (is_special[f][i] == 1)
     {
       k = f-5;
-      field_renderer[f][i] = gtk_cell_renderer_combo_new();
+      field_renderer[f][i] = gtk_cell_renderer_combo_new ();
       list_store_combo = gtk_list_store_new (1, G_TYPE_STRING);
       for (j=0; j<fetypes[activef][k]; j++)
       {
@@ -3578,7 +3574,7 @@ GtkWidget * create_field_tree (int f)
     }
     else if (combox)
     {
-      field_renderer[f][i] = gtk_cell_renderer_text_new();
+      field_renderer[f][i] = gtk_cell_renderer_text_new ();
       field_col[f][i] = gtk_tree_view_column_new_with_attributes ("Parameter(s)", field_renderer[f][i], "text", i, NULL);
       m = 1;
       combox = FALSE;
@@ -3932,8 +3928,8 @@ void close_the_assistant (GtkAssistant * assistant)
   field_color = FALSE;
   for (j=0; j<2; j++)
   {
-    tmp_view -> anim -> last -> img -> labels_format[j] = saved_label_format[j];
-    tmp_view -> anim -> last -> img -> labels_position[j] = saved_label_position[j];
+    tmp_view -> anim -> last -> img -> acl_format[j] = saved_label_format[j];
+    tmp_view -> anim -> last -> img -> labels[j].position = saved_label_position[j];
   }
   field_unselect_all ();
 /*
@@ -4175,7 +4171,7 @@ G_MODULE_EXPORT void run_clean_field (GtkDialog * dial, gint response_id, gpoint
     int i;
     for (i=0; i<2; i++)
     {
-      gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), -1);
+      combo_set_active (field_i_combo[i], -1);
       //tmp_field -> prepare_file[i] = TRUE;
       widget_set_sensitive (field_i_combo[i], TRUE);
       widget_set_sensitive (field_i_lab[i], TRUE);
@@ -4198,18 +4194,10 @@ G_MODULE_EXPORT void run_clean_field (GtkDialog * dial, gint response_id, gpoint
     hide_the_widgets (preview_but);
     for (i=0; i<19; i++)
     {
-#ifdef GTK4
-      gtk_check_button_set_active (GTK_CHECK_BUTTON(ff_but[i]), afp_init[i+MAXDATC+2]);
-#else
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(ff_but[i]), afp_init[i+MAXDATC+2]);
-#endif
+      button_set_status (ff_but[i], afp_init[i+MAXDATC+2]);
     }
     if (append_pages) remove_classical_assistant_pages ();
-#ifdef GTK4
-    gtk_check_button_set_active (GTK_CHECK_BUTTON(data), FALSE);
-#else
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(data), FALSE);
-#endif
+    button_set_status (data, FALSE);
     assist_init = FALSE;
   }
   destroy_this_dialog (dial);
@@ -4237,11 +4225,7 @@ G_MODULE_EXPORT void clean_field (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void clean_field (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  if (gtk_check_button_get_active (but))
-#else
-  if (gtk_toggle_button_get_active (but))
-#endif
+  if (button_get_status ((GtkWidget *)but))
   {
     GtkWidget * dial = dialog_cancel_apply ("Clean all force field parameter(s) ?", field_assistant, FALSE);
     GtkWidget * box = dialog_get_content_area (dial);
@@ -4276,11 +4260,7 @@ G_MODULE_EXPORT void select_field_action (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_field -> prepare_file[i] = gtk_check_button_get_active (but);
-#else
-  tmp_field -> prepare_file[i] = gtk_toggle_button_get_active (but);
-#endif
+  tmp_field -> prepare_file[i] = button_get_status ((GtkWidget *)but);
   if (i == 1)
   {
     for (j=0; j<2; j++)
@@ -4380,11 +4360,7 @@ void create_ff_structure (int ai, int type)
     }
     else
     {
-#ifdef GTK4
-      tmp_field -> prepare_file[i] = gtk_check_button_get_active (GTK_CHECK_BUTTON(field_i_prep[i]));
-#else
-      tmp_field -> prepare_file[i] = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(field_i_prep[i]));
-#endif
+      tmp_field -> prepare_file[i] = button_get_status (field_i_prep[i]);
     }
     widget_set_sensitive (field_i_lab[i], FALSE);
   }
@@ -4417,7 +4393,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   if (j > -1)
   {
     switch (i)
@@ -4434,7 +4410,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
         }
         else
         {
-          gtk_combo_box_set_active (box, -1);
+          combo_set_active ((GtkWidget *)box, -1);
         }
         break;
       case 1:
@@ -4728,16 +4704,16 @@ void create_classical_force_field (int p, int f)
     field_i_lab[i] = markup_label(i_titles[i][k], 210, -1, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, field_i_box[i], field_i_lab[i], FALSE, FALSE, 20);
     field_i_combo[i] = create_combo ();
-    gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), -1);
+    combo_set_active (field_i_combo[i], -1);
     switch (i)
     {
       case 0:
         for (j=0; j<N_FIELDS; j++) combo_text_append (field_i_combo[i], field_acro[j]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), tmp_field -> type);
+        combo_set_active (field_i_combo[i], tmp_field -> type);
         break;
       case 1:
         for (j=0; j<3; j++) combo_text_append (field_i_combo[i], field_init[j]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(field_i_combo[i]), tmp_field -> atom_init);
+        combo_set_active (field_i_combo[i], tmp_field -> atom_init);
         break;
     }
     widget_set_sensitive (field_i_combo[i], ! k);
@@ -4813,10 +4789,10 @@ void create_classical_force_field (int p, int f)
 
   for (i=0; i<2; i++)
   {
-    saved_label_format[i] = tmp_view -> anim -> last -> img -> labels_format[i];
-    saved_label_position[i] = tmp_view -> anim -> last -> img -> labels_position[i];
-    tmp_view -> anim -> last -> img -> labels_position[i] = 0;
-    tmp_view -> anim -> last -> img -> labels_format[i] = ID_IN_MOLECULE;
+    saved_label_format[i] = tmp_view -> anim -> last -> img -> acl_format[i];
+    saved_label_position[i] = tmp_view -> anim -> last -> img -> labels[i].position;
+    tmp_view -> anim -> last -> img -> labels[i].position = 0;
+    tmp_view -> anim -> last -> img -> acl_format[i] = ID_IN_MOLECULE;
   }
 
   //g_debug ("Number of pages in the assitant: %d", gtk_assistant_get_n_pages (GTK_ASSISTANT (field_assistant)));

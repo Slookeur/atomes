@@ -58,12 +58,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "bind.h"
 #include "callbacks.h"
+#include "preferences.h"
 #include "interface.h"
 #include "project.h"
 #include "workspace.h"
 
 #ifdef G_OS_WIN32
 #define APP_EXTENSION ".exe"
+#include <shlobj.h>
 #else
 #include <pwd.h>
 #define APP_EXTENSION
@@ -488,9 +490,11 @@ void open_this_data_file (int file_type, gchar * file_name)
 G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
 {
   GtkSettings * default_settings = gtk_settings_get_default ();
+/*
 #ifndef G_OS_WIN32
   g_object_set (default_settings, "gtk-application-prefer-dark-theme", TRUE, NULL);
 #endif
+*/
 #ifdef GTK3
   g_object_set (default_settings, "gtk-button-images", TRUE, NULL);
 #endif
@@ -714,13 +718,6 @@ int main (int argc, char *argv[])
   PACKAGE_SGMI = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Monoclinic-I.png", NULL);
   PACKAGE_SGTC = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Triclinic.png", NULL);
 
-/*#ifdef G_OS_WIN32
-  ATOMES_CONFIG = g_build_filename (PACKAGE_PREFIX, "atomes.cfg", NULL);
-#else
-  struct passwd * pw = getpwuid (getuid());
-  ATOMES_CONFIG = g_strdup_printf ("%s/.atomes.cfg", pw -> pw_dir);
-#endif*/
-
   int i, j, k;
   switch (argc)
   {
@@ -831,6 +828,30 @@ int main (int argc, char *argv[])
 #endif
     atomes_visual = ! (abs(atomes_visual));
 
+#ifdef G_OS_WIN32
+    PWSTR localPath = NULL;
+    HRESULT hr = SHGetKnownFolderPath (& FOLDERID_LocalAppData, 0, NULL, & localPath);
+    if (FAILED(hr))
+    {
+      fprintf (stderr, "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s", hr);
+      ATOMES_CONFIG_DIR = NULL;
+      ATOMES_CONFIG = NULL;
+    }
+    else
+    {
+      char appdata[MAX_PATH];
+      wcstombs (appdata, localPath, MAX_PATH);
+      CoTaskMemFree (localPath);  // libérer mémoire retournée par SHGetKnownFolderPath
+      // Build the folder path for atomes
+      ATOMES_CONFIG_DIR = g_strdup_printf ("%s\\atomes", appdata);
+      ATOMES_CONFIG = g_strdup_printf ("%s\\atomes.pml", ATOMES_CONFIG_DIR);
+    }
+#else
+    struct passwd * pw = getpwuid(getuid());
+    ATOMES_CONFIG_DIR = g_strdup_printf ("%s/.config/atomes", pw -> pw_dir);
+    ATOMES_CONFIG = g_strdup_printf ("%s/atomes.pml", ATOMES_CONFIG_DIR);
+#endif
+    set_atomes_preferences ();
     // setlocale(LC_ALL,"en_US");
     gtk_disable_setlocale ();
 #if GLIB_MINOR_VERSION < 74

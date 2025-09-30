@@ -417,6 +417,22 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
       {
         correct_this_window_title (this_proj -> modelgl -> measure_win -> win, g_strdup_printf ("%s - measures", tmp_title));
       }
+      if (this_proj -> modelgl -> gradient_win != NULL)
+      {
+        correct_this_window_title (this_proj -> modelgl -> gradient_win -> win, g_strdup_printf ("%s - background settings", tmp_title));
+      }
+      if (this_proj -> modelgl -> box_win != NULL)
+      {
+        correct_this_window_title (this_proj -> modelgl -> box_win -> win, g_strdup_printf ("%s - box settings", tmp_title));
+      }
+      if (this_proj -> modelgl -> axis_win != NULL)
+      {
+        correct_this_window_title (this_proj -> modelgl -> axis_win -> win, g_strdup_printf ("%s - axis settings", tmp_title));
+      }
+      if (this_proj -> modelgl -> rep_win != NULL)
+      {
+        correct_this_window_title (this_proj -> modelgl -> rep_win -> win, g_strdup_printf ("%s - OpenGL camera set-up", tmp_title));
+      }
     }
     g_free (tmp_title);
     for (j=0; j<NGRAPHS; j++)

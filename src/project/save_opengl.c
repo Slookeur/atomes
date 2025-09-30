@@ -33,6 +33,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   int save_atom_a (FILE * fp, project * this_proj, int s, int a);
   int save_atom_b (FILE * fp, project * this_proj, int s, int a);
   int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_max, int ** num_data, gboolean *** show, int **** all_data);
+  int write_this_image_label (FILE * fp, screen_label label);
+  int write_this_box (FILE * fp, box * abc);
+  int write_this_axis (FILE * fp, axis * xyz);
   int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
 
 */
@@ -122,6 +125,91 @@ int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_m
 }
 
 /*!
+  \fn int write_this_image_label (FILE * fp, screen_label label)
+
+  \brief save image label to file
+
+  \param fp the file pointer
+  \param label the target label
+*/
+int write_this_image_label (FILE * fp, screen_label label)
+{
+  int i;
+  if (fwrite (& label.position, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& label.render, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& label.scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (label.shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  if (fwrite (& label.n_colors, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<label.n_colors; i++)
+  {
+    if (fwrite (& label.color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  }
+  if (save_this_string (fp, label.font) != OK) return ERROR_RW;
+  return OK;
+}
+
+/*!
+  \fn int write_this_box (FILE * fp, box * abc)
+
+  \brief save OpenGL image box properties to file
+
+  \param fp the file pointer
+  \param box the target box data
+*/
+int write_this_box (FILE * fp, box * abc)
+{
+  if (fwrite (& abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+  return OK;
+}
+
+/*!
+  \fn int write_this_axis (FILE * fp, axis * xyz)
+
+  \brief save OpenGL image axis properties to file
+
+  \param fp the file pointer
+  \param axis the target axis data
+*/
+int write_this_axis (FILE * fp, axis * xyz)
+{
+  if (fwrite (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  gboolean val;
+  int i;
+  if (xyz -> color != NULL)
+  {
+    val = TRUE;
+  }
+  else
+  {
+    val = FALSE;
+  }
+  if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (val)
+  {
+    for (i=0; i<3; i++)
+    {
+      if (fwrite (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    }
+  }
+  if (fwrite (& xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<3; i++)
+  {
+    if (save_this_string (fp, xyz -> title[i]) != OK) return ERROR_RW;
+  }
+  return OK;
+}
+
+/*!
   \fn int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 
   \brief save OpenGL image properties to file
@@ -134,8 +222,18 @@ int save_rings_chains_data (FILE * fp, int type, int size, int steps, int data_m
 int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
 {
   int i, j, k, l;
-  gboolean val;
-  if (fwrite (& img -> backcolor, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+
+  if (fwrite (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (img -> back -> gradient)
+  {
+    if (fwrite (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> back -> position, sizeof(float), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
+  }
+  else
+  {
+    if (fwrite (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  }
   if (this_proj -> modelgl -> custom_map != NULL) img -> color_map[0] += 10;
   if (fwrite (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;
   if (this_proj -> modelgl -> custom_map != NULL)
@@ -166,81 +264,24 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fwrite (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> labels_position, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_render, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_scale, sizeof(int), 5, fp) != 5) return ERROR_RW;
-  if (fwrite (img -> labels_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+
   for (i=0; i<5; i++)
   {
-    if (fwrite (img -> labels_shift[i], sizeof(double), 3, fp) != 3) return ERROR_RW;
-    if (img -> labels_color[i] != NULL)
-    {
-      val = TRUE;
-      if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-      if (i < 2)
-      {
-        j = 2*sid;
-      }
-      else if (i == 2)
-      {
-        j = 3;
-      }
-      else
-      {
-        j = 1;
-      }
-      for (k=0; k<j; k++)
-      {
-        if (fwrite (& img -> labels_color[i][k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-      }
-    }
-    else
-    {
-      val = FALSE;
-      if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-    }
-    if (save_this_string (fp, img -> labels_font[i]) != OK) return ERROR_RW;
+    if (write_this_image_label(fp, img -> labels[i])) return ERROR_RW;
   }
-
+  if (fwrite (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
   // Measures
-  if (fwrite (& img -> mtilt, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mpattern, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mfactor, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> mwidth, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (img -> mtilt, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mpattern, sizeof(int), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mfactor, sizeof(int), 2, fp) != 2) return ERROR_RW;
+  if (fwrite (img -> mwidth, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
-  // Model box and axis
-  if (fwrite (img -> box_axis, sizeof(int), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (img -> box_axis_rad, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (img -> box_axis_line, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fwrite (& img -> box_color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
-
+  // Model box
+  if (write_this_box (fp, img -> abc)) return ERROR_RW;
   // Axis
-  if (fwrite (& img -> axispos, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> axis_length, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (img -> axis_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
-  if (img -> axis_color != NULL)
-  {
-    val = TRUE;
-  }
-  else
-  {
-    val = FALSE;
-  }
-  if (fwrite (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (val)
-  {
-    for (i=0; i<3; i++)
-    {
-      if (fwrite (& img -> axis_color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-    }
-  }
-  if (fwrite (& img -> axis_labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  for (i=0; i<3; i++)
-  {
-    if (save_this_string (fp, img -> axis_title[i]) != OK) return ERROR_RW;
-  }
+  if (write_this_axis (fp, img -> xyz)) return ERROR_RW;
+
   // OpenGL
   if (fwrite (& img -> p_depth, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> gnear, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
@@ -256,17 +297,17 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fwrite (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& img -> lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  for (i=0; i<img -> lights; i++)
+  if (fwrite (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fwrite (& img -> l_ght[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& img -> l_ght[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
   }
   if (fwrite (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;

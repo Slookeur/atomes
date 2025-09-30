@@ -165,11 +165,11 @@ void setup_extra_box_vertices (vec3_t a, vec3_t b, float * c_vert, float * s_ver
   vec3_t t_a, t_b;
   for (j=-1.0; j<2.0; j=j+2.0)
   {
-    for (p=0; p<plot -> extra_cell[0]+1; p++)
+    for (p=0; p<plot -> abc -> extra_cell[0]+1; p++)
     {
-      for (q=0; q<plot -> extra_cell[1]+1; q++)
+      for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
       {
-        for (r=0; r<plot -> extra_cell[2]+1; r++)
+        for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
         {
           if (p > 0 || q > 0 || r > 0)
           {
@@ -181,16 +181,16 @@ void setup_extra_box_vertices (vec3_t a, vec3_t b, float * c_vert, float * s_ver
             t_b = v3_add (v3_muls (b, j), shift);
             if (not_in_already (t_a, t_b, c_vert))
             {
-              if (plot -> box_axis[BOX] == WIREFRAME)
+              if (plot -> abc -> box == WIREFRAME)
               {
                 setup_line_vertice (c_vert, t_a, pcol, 0.5);
                 setup_line_vertice (c_vert, t_b, pcol, 0.5);
               }
               else
               {
-                if (not_in_corners(t_a, s_vert)) setup_sphere_vertice (s_vert, t_a, pcol, plot -> box_axis_rad[BOX], pcol.alpha*0.5);
-                if (not_in_corners(t_b, s_vert)) setup_sphere_vertice (s_vert, t_b, pcol, plot -> box_axis_rad[BOX], pcol.alpha*0.5);
-                setup_cylinder_vertice (c_vert, t_a, t_b, pcol, plot -> box_axis_rad[BOX], 0.5, 0.0);
+                if (not_in_corners(t_a, s_vert)) setup_sphere_vertice (s_vert, t_a, pcol, plot -> abc -> rad, pcol.alpha*0.5);
+                if (not_in_corners(t_b, s_vert)) setup_sphere_vertice (s_vert, t_b, pcol, plot -> abc -> rad, pcol.alpha*0.5);
+                setup_cylinder_vertice (c_vert, t_a, t_b, pcol, plot -> abc -> rad, 0.5, 0.0);
               }
             }
           }
@@ -228,16 +228,16 @@ void setup_box_vertices (vec3_t ax, vec3_t bx, float * c_vert, float * s_vert)
     b = v3_sub (v3_muls (bx, j), lattice);*/
     a = v3_muls (ax, j);
     b = v3_muls (bx, j);
-    if (plot -> box_axis[BOX] == WIREFRAME)
+    if (plot -> abc -> box == WIREFRAME)
     {
       setup_line_vertice (c_vert, a, pcol, 1.0);
       setup_line_vertice (c_vert, b, pcol, 1.0);
     }
     else
     {
-      if (not_in_corners(a, s_vert)) setup_sphere_vertice (s_vert, a, pcol, plot -> box_axis_rad[BOX], pcol.alpha*1.0);
-      if (not_in_corners(b, s_vert)) setup_sphere_vertice (s_vert, b, pcol, plot -> box_axis_rad[BOX], pcol.alpha*1.0);
-      setup_cylinder_vertice (c_vert, a, b, pcol, plot -> box_axis_rad[BOX], 1.0, 0.0);
+      if (not_in_corners(a, s_vert)) setup_sphere_vertice (s_vert, a, pcol, plot -> abc -> rad, pcol.alpha*1.0);
+      if (not_in_corners(b, s_vert)) setup_sphere_vertice (s_vert, b, pcol, plot -> abc -> rad, pcol.alpha*1.0);
+      setup_cylinder_vertice (c_vert, a, b, pcol, plot -> abc -> rad, 1.0, 0.0);
     }
   }
 }
@@ -297,12 +297,12 @@ int create_box_lists (int b_step)
   cleaning_shaders (wingl, MDBOX);
   wingl -> create_shaders[MDBOX] = FALSE;
 
-  if (plot -> box_axis[BOX] == NONE) return 0;
+  if (plot -> abc -> box == NONE) return 0;
 
   int shaders;
-  vertex *= (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+  vertex *= (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
 
-  if (plot -> box_axis[BOX] == WIREFRAME)
+  if (plot -> abc -> box == WIREFRAME)
   {
     shaders = 1;
     BOX_BUFF_SIZE = LINE_BUFF_SIZE;
@@ -330,20 +330,20 @@ int create_box_lists (int b_step)
   wingl -> ogl_glsl[MDBOX][b_step] = g_malloc0 (shaders*sizeof*wingl -> ogl_glsl[MDBOX][b_step]);
 
   nbs = nbl = 0;
-  pcol = plot -> box_color;
+  pcol = plot -> abc -> color;
 
   prepare_box_vertices (setup_box_vertices,
-                        (plot -> box_axis[BOX] == WIREFRAME) ? box_b -> vertices: box_b -> instances,
-                        (plot -> box_axis[BOX] == WIREFRAME) ? NULL : box_a -> instances);
-  if (plot -> extra_cell[0] > 0 || plot -> extra_cell[1] > 0 || plot -> extra_cell[2] > 0)
+                        (plot -> abc -> box == WIREFRAME) ? box_b -> vertices: box_b -> instances,
+                        (plot -> abc -> box == WIREFRAME) ? NULL : box_a -> instances);
+  if (plot -> abc -> extra_cell[0] > 0 || plot -> abc -> extra_cell[1] > 0 || plot -> abc -> extra_cell[2] > 0)
   {
-    prepare_box_vertices (setup_extra_box_vertices, (plot -> box_axis[BOX] == WIREFRAME) ? box_b -> vertices: box_b -> instances,
-                                                    (plot -> box_axis[BOX] == WIREFRAME) ? NULL : box_a -> instances);
+    prepare_box_vertices (setup_extra_box_vertices, (plot -> abc -> box == WIREFRAME) ? box_b -> vertices: box_b -> instances,
+                                                    (plot -> abc -> box == WIREFRAME) ? NULL : box_a -> instances);
   }
-  if (plot -> box_axis[BOX] == WIREFRAME)
+  if (plot -> abc -> box == WIREFRAME)
   {
     wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, FALSE, box_b);
-    wingl -> ogl_glsl[MDBOX][b_step][0] -> line_width = plot -> box_axis_line[BOX];
+    wingl -> ogl_glsl[MDBOX][b_step][0] -> line_width = plot -> abc -> line;
   }
   else
   {
@@ -471,9 +471,9 @@ void create_light_lists ()
   int i, j;
   j = 0;
   cleaning_shaders (wingl, LIGHT);
-  for (i=0; i<plot -> lights; i++)
+  for (i=0; i<plot -> l_ghtning.lights; i++)
   {
-    if (plot -> l_ght[i].show) j++;
+    if (plot -> l_ghtning.spot[i].show) j++;
   }
   wingl -> n_shaders[LIGHT][0] = j;
   if (plot -> light_loc != NULL)
@@ -487,12 +487,12 @@ void create_light_lists ()
     wingl -> ogl_glsl[LIGHT][0] = g_malloc0 (wingl -> n_shaders[LIGHT][0]*sizeof*wingl -> ogl_glsl[LIGHT][0]);
     plot -> light_loc = allocint (j);
     j = 0;
-    for (i=0; i<plot -> lights; i++)
+    for (i=0; i<plot -> l_ghtning.lights; i++)
     {
-      if (plot -> l_ght[i].show)
+      if (plot -> l_ghtning.spot[i].show)
       {
-        prepare_cuboid (plot -> l_ght[i].position, j);
-        if (plot -> l_ght[i].type > 0 && plot -> l_ght[i].fix == 0) plot -> light_loc[j] = 1;
+        prepare_cuboid (plot -> l_ghtning.spot[i].position, j);
+        if (plot -> l_ghtning.spot[i].type > 0 && plot -> l_ghtning.spot[i].fix == 0) plot -> light_loc[j] = 1;
         j ++;
       }
     }
@@ -535,7 +535,7 @@ double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t c
   {
     object_3d * slab = g_malloc0 (sizeof*slab);
     slab -> vert_buffer_size = POLY_BUFF_SIZE;
-    slab -> num_vertices = 36*(plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    slab -> num_vertices = 36*(plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     slab -> vertices = allocfloat (slab -> vert_buffer_size*slab -> num_vertices);
     for (i=0; i<36; i++)
     {
@@ -552,11 +552,11 @@ double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t c
       slab -> vertices[j+2] = pos.z + cpos.z;
     }
     n = 0;
-    for (i=0; i<plot -> extra_cell[0]+1; i++)
+    for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
     {
-      for (j=0; j<plot -> extra_cell[1]+1; j++)
+      for (j=0; j<plot -> abc -> extra_cell[1]+1; j++)
       {
-        for (k=0; k<plot -> extra_cell[2]+1; k++)
+        for (k=0; k<plot -> abc -> extra_cell[2]+1; k++)
         {
           for (l=0; l<3; l++) shift[l] = i*box_gl -> vect[0][l] + j*box_gl -> vect[1][l] + k*box_gl -> vect[2][l];
           for (l=0; l<36; l++)
@@ -745,7 +745,7 @@ void cylinder_slab (mat4_t rot)
     object_3d * slab = g_malloc0 (sizeof*slab);
     object_3d * slab_cap = g_malloc0 (sizeof*slab_cap);
     slab = draw_cylinder (30, 1.0, 1.0);
-    slab -> num_instances = (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     slab -> inst_buffer_size = CYLI_BUFF_SIZE;
     slab -> instances = allocfloat (slab -> num_instances*CYLI_BUFF_SIZE);
     slab_cap = draw_cylinder_cap (50, 1.0, FALSE);
@@ -758,11 +758,11 @@ void cylinder_slab (mat4_t rot)
     col.green = 1.0;
     col.alpha = wingl -> cell_win -> slab_alpha;
     vec3_t shift;
-    for (i=0; i<plot -> extra_cell[0]+1; i++)
+    for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
     {
-      for (j=0; j<plot -> extra_cell[1]+1; j++)
+      for (j=0; j<plot -> abc -> extra_cell[1]+1; j++)
       {
-        for (k=0; k<plot -> extra_cell[2]+1; k++)
+        for (k=0; k<plot -> abc -> extra_cell[2]+1; k++)
         {
           shift.x = i*box_gl -> vect[0][0]+j*box_gl -> vect[1][0]+k*box_gl -> vect[2][0];
           shift.y = i*box_gl -> vect[0][1]+j*box_gl -> vect[1][1]+k*box_gl -> vect[2][1];
@@ -778,11 +778,11 @@ void cylinder_slab (mat4_t rot)
     wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, slab);
     g_free (slab);
     nbs = 0;
-    for (i=0; i<plot -> extra_cell[0]+1; i++)
+    for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
     {
-      for (j=0; j<plot -> extra_cell[1]+1; j++)
+      for (j=0; j<plot -> abc -> extra_cell[1]+1; j++)
       {
-        for (k=0; k<plot -> extra_cell[2]+1; k++)
+        for (k=0; k<plot -> abc -> extra_cell[2]+1; k++)
         {
           shift.x = i*box_gl -> vect[0][0]+j*box_gl -> vect[1][0]+k*box_gl -> vect[2][0];
           shift.y = i*box_gl -> vect[0][1]+j*box_gl -> vect[1][1]+k*box_gl -> vect[2][1];
@@ -841,7 +841,7 @@ void spherical_slab ()
     object_3d * slab = g_malloc0 (sizeof*slab);
     slab = draw_sphere (50);
     slab -> inst_buffer_size = ATOM_BUFF_SIZE;
-    slab -> num_instances = (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     slab -> instances = allocfloat (slab -> num_instances*ATOM_BUFF_SIZE);
     ColRGBA col;
     col.red = 0.0;
@@ -849,11 +849,11 @@ void spherical_slab ()
     col.green = 1.0;
     col.alpha = wingl -> cell_win -> slab_alpha;
     double shift[3];
-    for (i=0; i<plot -> extra_cell[0]+1; i++)
+    for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
     {
-      for (j=0; j<plot -> extra_cell[1]+1; j++)
+      for (j=0; j<plot -> abc -> extra_cell[1]+1; j++)
       {
-        for (k=0; k<plot -> extra_cell[2]+1; k++)
+        for (k=0; k<plot -> abc -> extra_cell[2]+1; k++)
         {
           for (l=0; l<3; l++) shift[l] = i*box_gl -> vect[0][l] + j*box_gl -> vect[1][l] + k*box_gl -> vect[2][l] + wingl -> cell_win -> cparam[l+6];
           pos = vec3(shift[0], shift[1], shift[2]);

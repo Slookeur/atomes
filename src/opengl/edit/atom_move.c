@@ -1093,7 +1093,7 @@ G_MODULE_EXPORT void set_axis_for_motion (GtkComboBox * box, gpointer data)
   project * this_proj = get_project_by_id (id -> a);
   int i, j;
   j = id -> b - TOLAB;
-  this_proj -> modelgl -> atom_win -> axis[j] = gtk_combo_box_get_active (box);
+  this_proj -> modelgl -> atom_win -> axis[j] = combo_get_active ((GtkWidget *)box);
   for (i=3*j; i<(j + 1)*3; i++)
   {
     update_range_and_entry (this_proj, this_proj -> modelgl -> search_widg[id -> c] -> status, this_proj -> modelgl -> atom_win -> axis[j], i);
@@ -1128,22 +1128,17 @@ G_MODULE_EXPORT void set_show_motion_axis (GtkToggleButton * but, gpointer data)
   project * this_proj = get_project_by_id (id -> a);
   int i, j;
   j = id -> b - TOLAB;
-#ifdef GTK4
-  i = gtk_check_button_get_active (but);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(this_proj -> modelgl -> atom_win -> axis_but[! j]), i);
-#else
-  i = gtk_toggle_button_get_active (but);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(this_proj -> modelgl -> atom_win -> axis_but[! j]), i);
-#endif
+  i = button_get_status ((GtkWidget *)but);
+  button_set_status (this_proj -> modelgl -> atom_win -> axis_but[! j], i);
   this_proj -> modelgl -> atom_win -> active = j;
   this_proj -> modelgl -> atom_win -> show_axis[j] = i;
   if (i)
   {
-    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = CYLINDERS;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = CYLINDERS;
   }
   else
   {
-    this_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = this_proj -> modelgl -> atom_win -> old_axis;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = this_proj -> modelgl -> atom_win -> old_axis;
   }
   this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
   update (this_proj -> modelgl);
@@ -1236,8 +1231,7 @@ GtkWidget * add_motion_interaction (atom_search * asearch, int axd, project * th
   this_proj -> modelgl -> atom_win -> axis_combo[axd] = create_combo ();
   combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Model axis");
   combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Eye (viewer) axis");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> atom_win -> axis_combo[axd]),
-                                          this_proj -> modelgl -> atom_win -> axis[axd]);
+  combo_set_active (this_proj -> modelgl -> atom_win -> axis_combo[axd], this_proj -> modelgl -> atom_win -> axis[axd]);
   g_signal_connect (G_OBJECT (this_proj -> modelgl -> atom_win -> axis_combo[axd]), "changed", G_CALLBACK(set_axis_for_motion), & asearch -> pointer[axd]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, this_proj -> modelgl -> atom_win -> axis_combo[axd], FALSE, FALSE, 20);
   this_proj -> modelgl -> atom_win -> axis_but[axd] = check_button ("Show", 100, 35, FALSE, G_CALLBACK(set_show_motion_axis), & asearch -> pointer[axd]);

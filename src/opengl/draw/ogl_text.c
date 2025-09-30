@@ -321,7 +321,7 @@ object_3d * gl_pango_render_layout (PangoLayout * layout, GLenum texture, int id
   bitmap.pixel_mode = ft_pixel_mode_grays;
   pango_ft2_render_layout (& bitmap, layout, PANGO_PIXELS (-prect.x)+OUTLINE_WIDTH, OUTLINE_WIDTH);
   pixels = paint_bitmap (vec4(1.0,0.0,0.0,0.0), 1.0, cwidth, cheight, bitmap.buffer);
-  if (! plot -> labels_render[id])
+  if (! plot -> labels[id].render)
   {
     new_string = g_malloc0 (sizeof*new_string);
     new_string -> texture = -1;
@@ -425,17 +425,17 @@ void render_string (int glsl, int id, screen_string * this_string)
   PangoFontDescription * pfont;
   object_3d * string_to_render = NULL;
   int arr_size = (this_string -> type == 4) ? 5 : (this_string -> type == 5) ? 6 : this_string -> type;
-
+  int shid = (id == 4) ? 1 : 0;
   //pcontext = pango_ft2_get_context (PANGO_TEXT_SIZE, PANGO_TEXT_SIZE);
   pcontext = pango_font_map_create_context (pango_ft2_font_map_new ());
   playout = pango_layout_new (pcontext);
   pango_layout_set_alignment (playout, PANGO_ALIGN_CENTER);
-  pfont = pango_font_description_from_string (plot -> labels_font[id]);
+  pfont = pango_font_description_from_string (plot -> labels[id].font);
   j = pango_font_description_get_size (pfont);
   font_size = j / PANGO_SCALE;
 
   //g_debug ("Zoom = %f, gnear= %f, p_moy= %f, p_depth= %f", plot -> zoom, plot -> gnear, wingl -> p_moy, plot -> p_depth);
-  if (plot -> labels_scale[id]) font_size *= ((ZOOM/plot -> zoom)*(plot -> gnear/6.0)*(wingl -> p_moy/plot -> p_depth));
+  if (plot -> labels[id].scale) font_size *= ((ZOOM/plot -> zoom)*(plot -> gnear/6.0)*(wingl -> p_moy/plot -> p_depth));
   if (in_movie_encoding)
   {
     l = (wingl -> pixels[0] > wingl -> pixels[1]) ? 1 : 0;
@@ -448,64 +448,64 @@ void render_string (int glsl, int id, screen_string * this_string)
   if (string_to_render == NULL)
   {
     g_warning ("TEXT_RENDER:: For some reason it is impossible to render");
-    g_warning ("TEXT_RENDER:: this string: '%s', using this font: %s", this_string -> word, plot -> labels_font[id]);
+    g_warning ("TEXT_RENDER:: this string: '%s', using this font: %s", this_string -> word, plot -> labels[id].font);
   }
   else
   {
     for (k=0; k<3; k++) string_to_render -> shift[k] = this_string -> shift[k];
-    string_to_render -> shift[3] = (float) plot -> labels_position[id];
+    string_to_render -> shift[3] = (float) plot -> labels[id].position;
     string_to_render -> quality = this_string -> type;
     j = this_string -> id;
-    j *= (plot -> labels_render[id] + 1);
-    if (id == 1 && plot -> labels_list[0] != NULL)
+    j *= (plot -> labels[id].render + 1);
+    if (id == 1 && plot -> labels[0].list != NULL)
     {
-      j += (plot -> labels_render[0] + 1) * (plot -> labels_list[0] -> last -> id + 1);
+      j += (plot -> labels[0].render + 1) * (plot -> labels[0].list -> last -> id + 1);
     }
     if (id == 2)
     {
-      j += (plot -> box_axis[AXIS] == WIREFRAME) ? 2 : 4;
+      j += (plot -> xyz -> axis == WIREFRAME) ? 2 : 4;
     }
     else if (id == 3 || id == 4)
     {
       j += measures_drawing;
     }
-    if (! plot -> labels_render[id])
+    if (! plot -> labels[id].render)
     {
       if (ogl_texture == GL_TEXTURE_RECTANGLE_ARB)
       {
-        wingl -> ogl_glsl[glsl][0][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                             NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
       }
       else
       {
-        wingl -> ogl_glsl[glsl][0][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                             NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
       }
-      wingl -> ogl_glsl[glsl][0][j] -> col = duplicate_color(1, & (this_string -> col));
+      wingl -> ogl_glsl[glsl][shid][j] -> col = duplicate_color(1, & (this_string -> col));
     }
     else
     {
       if (ogl_texture == GL_TEXTURE_RECTANGLE_ARB)
       {
         string_to_render -> texture = textures_id[0];
-        wingl -> ogl_glsl[glsl][0][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                             NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
-        wingl -> ogl_glsl[glsl][0][j] -> col = opposite_color(this_string -> col);
+        wingl -> ogl_glsl[glsl][shid][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j] -> col = opposite_color(this_string -> col);
         string_to_render -> texture = textures_id[1];
-        wingl -> ogl_glsl[glsl][0][j+1] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                               NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
-        wingl -> ogl_glsl[glsl][0][j+1] -> col = duplicate_color(1, & (this_string -> col));
+        wingl -> ogl_glsl[glsl][shid][j+1] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                  NULL, string_color, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j+1] -> col = duplicate_color(1, & (this_string -> col));
       }
       else
       {
         string_to_render -> texture = textures_id[0];
-        wingl -> ogl_glsl[glsl][0][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                             NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
-        wingl -> ogl_glsl[glsl][0][j] -> col = opposite_color(this_string -> col);
+        wingl -> ogl_glsl[glsl][shid][j] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j] -> col = opposite_color(this_string -> col);
         string_to_render -> texture = textures_id[1];
-        wingl -> ogl_glsl[glsl][0][j+1] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
-                                                               NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
-        wingl -> ogl_glsl[glsl][0][j+1] -> col = duplicate_color(1, & (this_string -> col));
+        wingl -> ogl_glsl[glsl][shid][j+1] = init_shader_program (glsl, GLSL_STRING, (this_string -> type == 3) ? string_vertex : (this_string -> type == 4) ? angstrom_vertex : degree_vertex,
+                                                                  NULL, string_color_2d, GL_TRIANGLE_STRIP, arr_size, (this_string -> type == 3) ? 7 : 8, FALSE, string_to_render);
+        wingl -> ogl_glsl[glsl][shid][j+1] -> col = duplicate_color(1, & (this_string -> col));
       }
     }
     g_free (string_to_render);
@@ -548,9 +548,9 @@ void debug_string (screen_string  * this_string)
 */
 void render_all_strings (int glsl, int id)
 {
-  if (plot -> labels_list[id] != NULL)
+  if (plot -> labels[id].list != NULL)
   {
-    screen_string  * this_string = plot -> labels_list[id] -> last;
+    screen_string  * this_string = plot -> labels[id].list -> last;
     while (this_string != NULL)
     {
       //if (glsl == MEASU) debug_string (this_string);
@@ -654,24 +654,24 @@ void add_string_instance (screen_string * string, vec3_t pos, atom * at, atom * 
 */
 void add_string (char * text, int id, ColRGBA col, vec3_t pos, float lshift[3], atom * at, atom * bt, atom * ct)
 {
-  if (plot -> labels_list[id] == NULL)
+  if (plot -> labels[id].list == NULL)
   {
-    plot -> labels_list[id] = g_malloc0 (sizeof*plot -> labels_list[id]);
-    plot -> labels_list[id] -> last = plot -> labels_list[id];
+    plot -> labels[id].list = g_malloc0 (sizeof*plot -> labels[id].list);
+    plot -> labels[id].list -> last = plot -> labels[id].list;
   }
   else
   {
     screen_string * s_tring = g_malloc0 (sizeof*s_tring);
-    s_tring -> prev = plot -> labels_list[id] -> last;
-    s_tring -> id = plot -> labels_list[id] -> last -> id + 1;
-    plot -> labels_list[id] -> last = s_tring;
+    s_tring -> prev = plot -> labels[id].list -> last;
+    s_tring -> id = plot -> labels[id].list -> last -> id + 1;
+    plot -> labels[id].list -> last = s_tring;
   }
-  plot -> labels_list[id] -> last -> word = g_strdup_printf ("%s", text);
-  plot -> labels_list[id] -> last -> col = col;
-  plot -> labels_list[id] -> last -> type = (id < 3) ? 3 : (type_of_measure == 6) ? 4 : 5;
+  plot -> labels[id].list -> last -> word = g_strdup_printf ("%s", text);
+  plot -> labels[id].list -> last -> col = col;
+  plot -> labels[id].list -> last -> type = (id < 3) ? 3 : (type_of_measure == 6) ? 4 : 5;
   int i;
-  for (i=0; i<3; i++) plot -> labels_list[id] -> last -> shift[i] = lshift[i];
-  add_string_instance (plot -> labels_list[id] -> last, pos, at, bt, ct);
+  for (i=0; i<3; i++) plot -> labels[id].list -> last -> shift[i] = lshift[i];
+  add_string_instance (plot -> labels[id].list -> last, pos, at, bt, ct);
 }
 
 /*!
@@ -690,7 +690,7 @@ void add_string (char * text, int id, ColRGBA col, vec3_t pos, float lshift[3], 
 */
 void prepare_string (char * text, int id, ColRGBA col, vec3_t pos, float lshift[3], atom * at, atom * bt, atom * ct)
 {
-  screen_string * this_string = was_not_rendered_already (text, plot -> labels_list[id]);
+  screen_string * this_string = was_not_rendered_already (text, plot -> labels[id].list);
   if (this_string == NULL)
   {
     add_string (text, id, col, pos, lshift, at, bt, ct);

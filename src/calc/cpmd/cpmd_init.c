@@ -350,12 +350,7 @@ G_MODULE_EXPORT void update_cpmd_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   if (i == DEFCO || i == DEFDU)
   {
     widget_set_sensitive (but_at[(i == DEFCO) ? 0 : 1], j);
@@ -376,7 +371,7 @@ G_MODULE_EXPORT void changed_opt_box (GtkComboBox * box, gpointer data)
 {
   int i, j, k;
   j = GPOINTER_TO_INT(data);
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (j != DEFLM && j != DEFLO)
   {
     if (i != (int)tmp_cpmd -> default_opts[j])
@@ -385,8 +380,8 @@ G_MODULE_EXPORT void changed_opt_box (GtkComboBox * box, gpointer data)
       if (j == DEFSP)
       {
         k = (int)tmp_cpmd -> default_opts[j];
-        gtk_combo_box_set_active (GTK_COMBO_BOX(ppbox[0]), tmp_cpmd -> pp[k][0]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(ppbox[1]), tmp_cpmd -> pp[k][1]);
+        combo_set_active (ppbox[0], tmp_cpmd -> pp[k][0]);
+        combo_set_active (ppbox[1], tmp_cpmd -> pp[k][1]);
       }
       else if (j == DEFFI)
       {
@@ -507,12 +502,12 @@ GtkWidget * prepare_qm_option_box (int s)
           }
           if (ident == DEFLM || ident == DEFLO)
           {
-            gtk_combo_box_set_active (GTK_COMBO_BOX(ppbox[ident - DEFLM]), tmp_cpmd -> pp[(int)tmp_cpmd -> default_opts[DEFSP]][ident - DEFLM]);
+            combo_set_active (ppbox[ident - DEFLM], tmp_cpmd -> pp[(int)tmp_cpmd -> default_opts[DEFSP]][ident - DEFLM]);
             g_signal_connect (G_OBJECT (ppbox[ident - DEFLM]), "changed", G_CALLBACK(changed_opt_box), GINT_TO_POINTER(j));
           }
           else
           {
-            gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cpmd -> default_opts[j]);
+            combo_set_active (widg, (int)tmp_cpmd -> default_opts[j]);
             g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_opt_box), GINT_TO_POINTER(j));
           }
           break;
@@ -615,7 +610,7 @@ G_MODULE_EXPORT void changed_calc_opt_box (GtkComboBox * box, gpointer data)
 {
   int i, j;
   j = GPOINTER_TO_INT(data);
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_cpmd -> calc_opts[j])
   {
     tmp_cpmd -> calc_opts[j] = i;
@@ -646,11 +641,7 @@ G_MODULE_EXPORT void update_calc_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cpmd -> calc_opts[i] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cpmd -> calc_opts[i] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cpmd -> calc_opts[i] = (double) button_get_status ((GtkWidget *)but);
   for (i=1; i<4; i++) print_the_section (i, 0, qmbuffer[i]);
 }
 
@@ -715,7 +706,7 @@ GtkWidget * calc_qm_option_box (int c)
             combo_text_append (widg, str);
             g_free (str);
           }
-          gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cpmd -> calc_opts[j]);
+          combo_set_active (widg, (int)tmp_cpmd -> calc_opts[j]);
           g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_calc_opt_box), GINT_TO_POINTER(j));
           break;
         case 3:
@@ -750,7 +741,7 @@ GtkWidget * calc_qm_option_box (int c)
 G_MODULE_EXPORT void changed_calc_box (GtkComboBox * box, gpointer data)
 {
   int i;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_cpmd -> calc_type)
   {
     gtk_label_set_text (GTK_LABEL(calc_label), g_strdup_printf ("<u>%s option(s)</u>", calc_ds[i]));
@@ -852,7 +843,7 @@ GtkWidget * section_box (int s)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, calc_box[i], FALSE, FALSE, 0);
     }
     g_signal_connect (G_OBJECT (calc_combo), "changed", G_CALLBACK(changed_calc_box), NULL);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(calc_combo), tmp_cpmd -> calc_type);
+    combo_set_active (calc_combo, tmp_cpmd -> calc_type);
   }
   else if (s == 2)
   {

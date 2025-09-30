@@ -1,14 +1,14 @@
-# This file is part of Atomes.
+# This file is part of atomes.
 
-# Atomes is free software: you can redistribute it and/or modify it under the terms
+# atomes is free software: you can redistribute it and/or modify it under the terms
 # of the GNU Affero General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 
-# Atomes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# atomes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 
-# You should have received a copy of the GNU Affero General Public License along with Atomes.
+# You should have received a copy of the GNU Affero General Public License along with atomes.
 # If not, see <https://www.gnu.org/licenses/>
 
 # The targets to build are 'atomes' or 'debug'
@@ -17,9 +17,11 @@ LINUX = 1
 WINDOWS = 0
 
 # The next line defines the GTK version !
-GTKV = 3
+GTKV = 4
 ifeq ($(GTKV),4)
-  DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS
+  DGTK = -DGTK4 -DGTKGLAREA
+  # -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+  # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
   IGTK = `pkg-config --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
   LGTK = `pkg-config --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 else
@@ -83,7 +85,6 @@ ifeq ($(WINDOWS),1)
   LD = $(COMP)$(CPU)-w64-mingw32-gfortran $(DOMP)
 
   CPPFLAGS =
-  LDFLG = -lz -liphlpapi
 
   ifeq ($(GTKV), 4)
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-4.0 -IC:/msys64/mingw64/include/cairo \
@@ -99,6 +100,7 @@ ifeq ($(WINDOWS),1)
     LGTK = -LC:/msys64/mingw64/lib -lgtk-4 -lpangowin32-1.0 -lharfbuzz -lpangocairo-1.0 -lpango-1.0 -lgdk_pixbuf-2.0 \
 		-lcairo-gobject -lcairo -lgraphene-1.0 -lgio-2.0 -lglib-2.0 -lintl -lgobject-2.0 -lxml2  -lpangoft2-1.0 \
 		-lepoxy -lavutil -lavcodec -lavformat -lswscale
+    LDTK = -lole32 -luuid
   else
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-3.0 -IC:/msys64/mingw64/include/cairo \
 		-IC:/msys64/mingw64/include/pango-1.0 -IC:/msys64/mingw64/include/atk-1.0 \
@@ -113,7 +115,9 @@ ifeq ($(WINDOWS),1)
 		-Wl,-luuid -lwinmm -ldwmapi -lsetupapi -lcfgmgr32 -lpangowin32-1.0 -lpangocairo-1.0 \
 		-latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lepoxy -lxml2 -lpangoft2-1.0 \
 		-lpango-1.0 -lgobject-2.0 -lglib-2.0 -lintl -lfontconfig -lfreetype -lavutil -lavcodec -lavformat -lswscale
+    LDTK =
   endif
+  LDFLG = -lz -liphlpapi $(LDTK)
   LIB = $(LGTK)
 
   ifeq ($(MAKECMDGOALS), atomes)
@@ -165,11 +169,13 @@ OBJ = obj/
 BIN = bin/
 
 INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
-INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATED
+INCLUDES = $(INC) $(IGTK)
+# -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+# To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ifeq ($(MAKECMDGOALS),atomes)
-  FCFLAGS = -O3 -cpp
-  CFLAGS = -O3
+  FCFLAGS = -O2 -cpp
+  CFLAGS = -O2
   LDFLAGS = $(LIBS) $(LDFLGS)
   DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS)
 endif
@@ -199,6 +205,7 @@ OBJ_GUI = \
 	$(OBJ)calc_menu.o \
 	$(OBJ)tools.o \
 	$(OBJ)gui.o \
+	$(OBJ)preferences.o \
 	$(OBJ)initc.o \
 	$(OBJ)callbacks.o \
 	$(OBJ)interface.o \
@@ -417,6 +424,7 @@ OBJ_DRAW = \
 	$(OBJ)d_box.o \
 	$(OBJ)d_axis.o \
 	$(OBJ)d_measures.o \
+	$(OBJ)d_background.o \
 	$(OBJ)ogl_text.o \
 	$(OBJ)movie.o \
 	$(OBJ)image.o
@@ -592,6 +600,8 @@ $(OBJ)calc_menu.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)calc_menu.o $(GUI)calc_menu.c $(INCLUDES)
 $(OBJ)tools.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)tools.o $(GUI)tools.c $(INCLUDES)
+$(OBJ)preferences.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)preferences.o $(GUI)preferences.c $(INCLUDES)
 $(OBJ)gui.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)gui.o $(GUI)gui.c $(INCLUDES)
 $(OBJ)initc.o:
@@ -1002,6 +1012,8 @@ $(OBJ)d_axis.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_axis.o $(GLDRAW)d_axis.c $(INCLUDES)
 $(OBJ)d_measures.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_measures.o $(GLDRAW)d_measures.c $(INCLUDES)
+$(OBJ)d_background.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)d_background.o $(GLDRAW)d_background.c $(INCLUDES)
 $(OBJ)ogl_text.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)ogl_text.o $(GLDRAW)ogl_text.c $(INCLUDES)
 $(OBJ)movie.o:

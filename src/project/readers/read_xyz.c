@@ -92,7 +92,6 @@ int xyz_get_atom_coordinates ()
       {
         if (res == 2) goto enda;
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         if (! this_word)
         {
@@ -163,7 +162,6 @@ int xyz_get_atom_coordinates ()
       for (j=0; j<this_reader -> natomes; j++)
       {
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         if (! this_word)
         {

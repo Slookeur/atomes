@@ -101,7 +101,7 @@ void draw_angle_label (atom * at, atom * bt, atom * ct, int pi)
   }
   float ls[3] = {15.0, 15.0, 0.0};
   vec3_t pos = vec3(bt -> x, bt -> y, bt -> z);
-  prepare_string (str, 3+pi, plot -> labels_color[3+pi][0], pos, ls, at, bt, ct);
+  prepare_string (str, 3+pi, plot -> labels[3+pi].color[0], pos, ls, at, bt, ct);
   g_free (str);
 }
 
@@ -122,9 +122,9 @@ void set_measure_color (int selected, int id, int num)
   }
   else
   {
-    col.red   = 1.0 - plot -> backcolor.red;
-    col.green = 1.0 - plot -> backcolor.green;
-    col.blue  = 1.0 - plot -> backcolor.blue;
+    col.red   = 1.0 - plot -> back -> color.red;
+    col.green = 1.0 - plot -> back -> color.green;
+    col.blue  = 1.0 - plot -> back -> color.blue;
     col.alpha = 1.0;
   }
 }
@@ -151,11 +151,11 @@ void setup_this_measured_angle (int s, int sa, int sb, int sc, int pi)
   bt = & proj_gl -> atoms[step][sb];
   ct = & proj_gl -> atoms[step][sc];
 
-  for (p=0; p<plot -> extra_cell[0]+1;p++)
+  for (p=0; p<plot -> abc -> extra_cell[0]+1;p++)
   {
-    for (q=0; q<plot -> extra_cell[1]+1; q++)
+    for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
     {
-      for (r=0; r<plot -> extra_cell[2]+1; r++)
+      for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
       {
         shift[0]=p*box_gl -> vect[0][0]+q*box_gl -> vect[1][0]+r*box_gl -> vect[2][0];
         shift[1]=p*box_gl -> vect[0][1]+q*box_gl -> vect[1][1]+r*box_gl -> vect[2][1];
@@ -457,7 +457,7 @@ void draw_bond_label (atom * at, atom * bt, int pi)
     str = g_strdup_printf("%.3lf Å", dist.length);
   }
   float ls[3] = {-15.0, 15.0, 0.0};
-  prepare_string (str, 3+pi, plot -> labels_color[3+pi][0], pos, ls, at, bt, NULL);
+  prepare_string (str, 3+pi, plot -> labels[3+pi].color[0], pos, ls, at, bt, NULL);
   g_free (str);
 }
 
@@ -481,11 +481,11 @@ void setup_this_measured_bond (int s, int sa, int sb, int pi)
   at = & proj_gl -> atoms[step][sa];
   bt = & proj_gl -> atoms[step][sb];
 
-  for (p=0; p<plot -> extra_cell[0]+1;p++)
+  for (p=0; p<plot -> abc -> extra_cell[0]+1;p++)
   {
-    for (q=0; q<plot -> extra_cell[1]+1; q++)
+    for (q=0; q<plot -> abc -> extra_cell[1]+1; q++)
     {
-      for (r=0; r<plot -> extra_cell[2]+1; r++)
+      for (r=0; r<plot -> abc -> extra_cell[2]+1; r++)
       {
         shift[0]=p*box_gl -> vect[0][0]+q*box_gl -> vect[1][0]+r*box_gl -> vect[2][0];
         shift[1]=p*box_gl -> vect[0][1]+q*box_gl -> vect[1][1]+r*box_gl -> vect[2][1];
@@ -598,71 +598,68 @@ void bonds_loop (glwin * view, int id, int pi, GtkTreeStore * store)
 }
 
 /*!
-  \fn int prepare_measure_shaders (int type, int shaders)
+  \fn void prepare_measure_shaders (int mode)
 
   \brief prepare measure OpenGL rendering
 
-  \param type the measure type (0 = distances, 1 = angles, 2 = dihedrals)
-  \param shaders the shader id
+  \param mode (0 = analysis mode, 1 = edition mode)
 */
-int prepare_measure_shaders (int type, int shaders)
+void prepare_measure_shaders (int mode)
 {
   int nshaders = 0;
-  if (plot -> selected[type] -> selected > 1 && plot -> selected[type] -> selected < MAX_IN_SELECTION)
+  if (plot -> selected[mode] -> selected > 1 && plot -> selected[mode] -> selected < MAX_IN_SELECTION)
   {
-    if (plot -> mpattern > -1)
+    if (plot -> mpattern[mode] > -1)
     {
       // First the bond distances
       measure = g_malloc0 (sizeof*measure);
       measure -> vert_buffer_size = LINE_BUFF_SIZE;
-      measure -> num_vertices = 2 * num_bonds (plot -> selected[type] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+      measure -> num_vertices = 2 * num_bonds (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
       nbs = 0;
-      bonds_loop (wingl, 0, type, NULL);
+      bonds_loop (wingl, 0, mode, NULL);
 
-      if (plot -> mpattern != 2)
+      if (plot -> mpattern[mode] != 2)
       {
-        wingl -> ogl_glsl[MEASU][0][shaders] = init_shader_program (MEASU, GLSL_LINES, line_vertex, line_stipple, line_stipple_color, GL_LINES, 2, 7, FALSE, measure);
+        wingl -> ogl_glsl[MEASU][mode][0] = init_shader_program (MEASU, GLSL_LINES, line_vertex, line_stipple, line_stipple_color, GL_LINES, 2, 7, FALSE, measure);
       }
       else
       {
-        wingl -> ogl_glsl[MEASU][0][shaders] = init_shader_program (MEASU, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 7, FALSE, measure);
+        wingl -> ogl_glsl[MEASU][mode][0] = init_shader_program (MEASU, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 7, FALSE, measure);
       }
-      wingl -> ogl_glsl[MEASU][0][shaders] -> line_width = plot -> mwidth;
+      wingl -> ogl_glsl[MEASU][mode][0] -> line_width = plot -> mwidth[mode];
       nshaders ++;
       g_free (measure);
 
       // The angles
-      if (plot -> selected[type] -> selected > 2)
+      if (plot -> selected[mode] -> selected > 2)
       {
         measure = g_malloc0 (sizeof*measure);
         measure -> vert_buffer_size = LINE_BUFF_SIZE;
-        measure -> num_vertices = 3 * num_angles (plot -> selected[type] -> selected) * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+        measure -> num_vertices = 3 * num_angles (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
         nbs = 0;
-        angles_loop (wingl, 0, type, NULL);
-        if (plot -> mpattern != 2)
+        angles_loop (wingl, 0, mode, NULL);
+        if (plot -> mpattern[mode] != 2)
         {
-          wingl -> ogl_glsl[MEASU][0][shaders+1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, line_stipple_color, GL_TRIANGLES, 2, 7, FALSE, measure);
+          wingl -> ogl_glsl[MEASU][mode][1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, line_stipple_color, GL_TRIANGLES, 2, 7, FALSE, measure);
         }
         else
         {
-          wingl -> ogl_glsl[MEASU][0][shaders+1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, angle_color, GL_TRIANGLES, 2, 7, FALSE, measure);
+          wingl -> ogl_glsl[MEASU][mode][1] = init_shader_program (MEASU, GLSL_LINES, angle_vertex, angle_stipple, angle_color, GL_TRIANGLES, 2, 7, FALSE, measure);
         }
-        wingl -> ogl_glsl[MEASU][0][shaders+1] -> line_width = plot -> mwidth;
+        wingl -> ogl_glsl[MEASU][mode][1] -> line_width = plot -> mwidth[mode];
         nshaders ++;
         g_free (measure);
       }
     }
      // When all labels are found we render the text if any
-    if (plot -> labels_list[3+type] != NULL)
+    if (plot -> labels[3+mode].list != NULL)
     {
-      measures_drawing = nshaders + shaders;
-      render_all_strings (MEASU, 3+type);
-      nshaders += (plot -> labels_render[3+type]+1) * (plot -> labels_list[3+type] -> last -> id + 1);
+      measures_drawing = nshaders;
+      render_all_strings (MEASU, 3+mode);
     }
   }
-  return nshaders;
 }
 
 /*!
@@ -680,7 +677,7 @@ void create_measures_lists ()
   clean_labels (3);
   clean_labels (4);
   wingl -> create_shaders[MEASU] = FALSE;
-  wingl -> n_shaders[MEASU][0] = 0;
+  wingl -> n_shaders[MEASU][0] = wingl -> n_shaders[MEASU][1] = 0;
 
   int i, j, k;
   i = (is_atom_win_active(wingl) || (wingl -> mode == EDITION && wingl -> selection_mode == NSELECTION-1)) ? 1 : 0;
@@ -688,10 +685,10 @@ void create_measures_lists ()
   {
     if (plot -> selected[j] -> selected > 1 && plot -> selected[j] -> selected < MAX_IN_SELECTION)
     {
-      if (plot -> mpattern > -1)
+      if (plot -> mpattern[j] > -1)
       {
-        wingl -> n_shaders[MEASU][0] ++;
-        if (plot -> selected[j] -> selected > 2) wingl -> n_shaders[MEASU][0] ++;
+        wingl -> n_shaders[MEASU][j] ++;
+        if (plot -> selected[j] -> selected > 2) wingl -> n_shaders[MEASU][j] ++;
       }
       // First we need to prepare the labels
       type_of_measure = 6;
@@ -703,21 +700,21 @@ void create_measures_lists ()
         angles_loop (wingl, 1, j, NULL);
       }
 
-      if (plot -> labels_list[3+j] != NULL)
+      if (plot -> labels[3+j].list != NULL)
       {
         // shaders for the labels if any
-        wingl -> n_shaders[MEASU][0] += (plot -> labels_render[3+j]+1) * (plot -> labels_list[3+j] -> last -> id + 1);
+        wingl -> n_shaders[MEASU][j] += (plot -> labels[3+j].render+1) * (plot -> labels[3+j].list -> last -> id + 1);
       }
     }
   }
-  if (wingl -> n_shaders[MEASU][0])
+
+  if (wingl -> n_shaders[MEASU][0] || wingl -> n_shaders[MEASU][1])
   {
-    wingl -> ogl_glsl[MEASU][0] = g_malloc0 (wingl -> n_shaders[MEASU][0]*sizeof*wingl -> ogl_glsl[MEASU][0]);
     measures_drawing = 0;
-    j = 0;
     for (k=i; k<2; k++)
     {
-      j += prepare_measure_shaders (k, j);
+      wingl -> ogl_glsl[MEASU][k] = g_malloc0 (wingl -> n_shaders[MEASU][k]*sizeof*wingl -> ogl_glsl[MEASU][k]);
+      prepare_measure_shaders (k);
     }
   }
 }

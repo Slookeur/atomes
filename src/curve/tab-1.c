@@ -208,11 +208,7 @@ G_MODULE_EXPORT void set_title (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_title = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> show_title = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> show_title = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (title_box, this_proj -> curves[b][c] -> show_title);
   update_curve (data);
 }
@@ -244,11 +240,7 @@ G_MODULE_EXPORT void set_title_default (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> default_title = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> default_title = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> default_title = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (custom_title, ! this_proj -> curves[b][c] -> default_title);
   if (this_proj -> curves[b][c] -> default_title)
   {
@@ -416,11 +408,7 @@ G_MODULE_EXPORT void set_show_frame (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-#ifdef GTK4
-  this_proj -> curves[b][c] -> show_frame = gtk_check_button_get_active (but);
-#else
-  this_proj -> curves[b][c] -> show_frame = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> curves[b][c] -> show_frame = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (frame_box, this_proj -> curves[b][c] -> show_frame);
   update_curve (data);
 }
@@ -458,7 +446,7 @@ G_MODULE_EXPORT void set_frame_type (GtkComboBox * fbox, gpointer data)
   a = ad -> a;
   b = ad -> b;
   c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_type = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox));
+  get_project_by_id(a) -> curves[b][c] -> frame_type = combo_get_active ((GtkWidget *)fbox);
   set_frame_style (data);
 }
 
@@ -476,7 +464,7 @@ G_MODULE_EXPORT void set_frame_line (GtkComboBox * fbox, gpointer data)
   a = ad -> a;
   b = ad -> b;
   c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_dash = gtk_combo_box_get_active (GTK_COMBO_BOX(fbox)) + 1;
+  get_project_by_id(a) -> curves[b][c] -> frame_dash = combo_get_active ((GtkWidget *)fbox) + 1;
   set_frame_style (data);
 }
 
@@ -737,7 +725,7 @@ GtkWidget * create_tab_1 (gpointer data)
     combo_text_append (fbox, ftb[i]);
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(fbox), this_proj -> curves[b][c] -> frame_type);
+  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_type);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_type), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Type:"), fbox, FALSE, FALSE, 0);
 
@@ -748,7 +736,7 @@ GtkWidget * create_tab_1 (gpointer data)
      combo_text_append (fbox, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(fbox), this_proj -> curves[b][c] -> frame_dash - 1);
+  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_dash - 1);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_line), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Line style:"), fbox, FALSE, FALSE, 0);
 

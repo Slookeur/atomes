@@ -88,6 +88,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #  endif
 #endif
 
+#define MY_ENCODING "UTF-8"
+
 #include "math_3d.h"
 
 // dint, tint and qint structures are used for pointer purposes.
@@ -315,7 +317,7 @@ enum ImageFormats {
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
 */
-#define NCFORMATS 12
+#define NCFORMATS 13
 
 #define NITEMS 16
 #define OT 4
@@ -397,6 +399,7 @@ extern gchar * PACKAGE_SGOF;
 extern gchar * PACKAGE_SGMP;
 extern gchar * PACKAGE_SGMI;
 extern gchar * PACKAGE_SGTC;
+extern gchar * ATOMES_CONFIG_DIR;
 extern gchar * ATOMES_CONFIG;
 extern gchar * ATOMES_URL;
 
@@ -412,7 +415,7 @@ extern char * coord_files_ext[NCFORMATS+1];
 extern char * calc_name[NCALCS-2];
 extern char * graph_name[NGRAPHS] ;
 extern char * rings_type[5];
-extern char * untime[6];
+extern char * untime[5];
 extern gchar * workspacefile;
 
 extern int nprojects;
@@ -506,12 +509,14 @@ struct coord_file
   int * nsps;                              /*!< Number of atoms by species */
   double ** coord;                         /*!< Atomic coordinates */
   gboolean cartesian;                      /*!< Cartesian (1) or Fractional coordinates (0) */
+  gboolean chemical;                       /*!< CIF file describing chemical reaction */
   int * lot;                               /*!< Chemical species by atom */
   int ndummy;                              /*!< Number of dummy atom(s), if any */
   gchar ** dummy;                          /*!< List of dummy atom(s), if any */
   cell_info lattice;                       /*!< Description of the periodicity */
   int mid;                                 /*!< Message type (0 = error, 1 = warning), if any */
-  gchar * info;                            /*!< Information message, if required */
+  int msg;                                 /*!< Number of message(s) */
+  gchar ** info;                           /*!< Information message(s), if required */
   gchar ** label;                          /*!< VAS or TRJ: list of chemical labels, \n CIF: Label list of mis-labelled object(s) */
   // The following line is only used for DL_POLY history files:
   int traj;                                /*!< */
@@ -520,9 +525,11 @@ struct coord_file
   gchar *** sym_pos;                       /*!< The symmetry positions, if any */
   int setting;                             /*!< Space group setting */
   int * wyckoff;                           /*!< Wyckoff positions */
+  int rounding;                            /*!< Occupancy rounding */
   double * occupancy;                      /*!< Site(s) occupancy */
-  int ** occupied;                         /*!< Occupancy status */
   int * multi;                             /*!< Multiplicity */
+  int dis;                                 /*!< Number of disorder group */
+  int * disorder;                          /*!< Site disorder group */
   int atom_unlabelled;                     /*!< Number of atom(s) unlabelled */
   int * u_atom_list;                       /*!< List of unlabelled atom(s) */
   int object_to_insert;                    /*!< Number of object(s) to label */
@@ -1112,6 +1119,9 @@ extern float * duplicate_float (int num, float * old_val);
 extern double * duplicate_double (int num, double * old_val);
 extern ColRGBA * duplicate_color (int num, ColRGBA * col);
 
+extern void combo_set_markup (GtkWidget * combo);
+extern void combo_set_active (GtkWidget * combo, int pos);
+extern int combo_get_active (GtkWidget * combo);
 extern void combo_text_append (GtkWidget * combo, gchar * text);
 extern void combo_text_prepend (GtkWidget * combo, gchar * text);
 extern GtkWidget * create_combo ();
@@ -1145,6 +1155,7 @@ extern GtkWidget * create_vscale (float min, float max, float delta,
                                   float val, int pos, int round, int size,
                                   GCallback handler, GCallback scroll_handler, gpointer data);
 
+extern void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend);
 extern void add_container_child (int type, GtkWidget * widg, GtkWidget * child);
 extern void add_box_child_end (GtkWidget * widg, GtkWidget * child, gboolean expand, gboolean fill, int padding);
 extern void add_box_child_start (int orientation, GtkWidget * widg, GtkWidget * child, gboolean expand, gboolean fill, int padding);
@@ -1154,6 +1165,7 @@ extern GtkWidget * dialog_get_content_area (GtkWidget * widg);
 extern void layout_add_widget (GtkWidget * layout, GtkWidget * child, int x_pos, int y_pos);
 extern GtkWidget * add_vbox_to_layout (GtkWidget * layout, int size_x, int size_y);
 extern GtkWidget * create_layout (int x, int y);
+extern void add_global_option (GtkWidget * vbox, tint * oid);
 
 #ifdef GTK4
 extern void run_this_gtk_native_dialog (GtkNativeDialog * dial, GCallback handler, gpointer data);
@@ -1241,6 +1253,8 @@ extern GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, flo
 extern GtkWidget * color_button (ColRGBA col, gboolean alpha, int dimx, int dimy, GCallback handler, gpointer data);
 extern GtkWidget * font_button (gchar * font, int dimx, int dimy, GCallback handler, gpointer data);
 extern GtkWidget * spin_button (GCallback handler, double value, double start, double end, double step, int digits, int dim,  gpointer data);
+extern int button_get_status (GtkWidget * button);
+extern void button_set_status (GtkWidget * button, int status);
 extern GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data);
 extern GtkWidget * radio_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data);
 extern GtkWidget * create_button (gchar * text, int image_format, gchar * image, int dimx, int dimy, int relief, GCallback handler, gpointer data);

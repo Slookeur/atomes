@@ -92,13 +92,14 @@ char * coord_files[NCFORMATS+1] = {"XYZ file",
                                    "VASP trajectory - NPT",
                                    "Protein Data Bank file",
                                    "Protein Data Bank file",
-                                   "Crystallographic information (crystal build)",
-                                   "Crystallographic information (symmetry positions)",
+                                   "Cryst. information (crystal build) - single configuration",
+                                   "Cryst. information (crystal build) - multiple configurations",
+                                   "Cryst. information (symmetry positions) - single configuration",
                                    "DL-POLY HISTORY file",
                                    "ISAACS Project File"};
 
 char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar", "xdatcar",
-                                    "pdb", "ent", "cif", "cif", "hist", "ipf"};
+                                    "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
 
 char ** las;
 void initcwidgets ();
@@ -194,9 +195,6 @@ int open_save (FILE * fp, int i, int pid, int aid, int npi, gchar * pfile)
     }
     else
     {
-#ifdef DEBUG
-      g_debug ("pid= %d, pfile= %s", pid, pfile);
-#endif
       get_project_by_id (pid) -> projfile = g_strdup_printf ("%s", pfile);
       add_project_to_workspace ();
       prep_calc_actions ();
@@ -973,7 +971,7 @@ G_MODULE_EXPORT void update_sa (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void changed_spec_combo (GtkComboBox * box, gpointer data)
 {
-  update_sa_info (gtk_combo_box_get_active (box));
+  update_sa_info (combo_get_active ((GtkWidget *)box));
 }
 
 /*!
@@ -1011,7 +1009,7 @@ void prepare_sp_box ()
     gtk_combo_box_text_append_text ((GtkComboBoxText *)combo, str);
     g_free (str);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+  combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(changed_spec_combo), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 5);
   for (i=0; i<2; i++)
@@ -1210,7 +1208,7 @@ G_MODULE_EXPORT void run_read_npt_data (GtkDialog * info, gint response_id, gpoi
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     npt_file = file_chooser_get_file_name (chooser);
-    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 3, MainWindow);
+    npt_selection = iask ("Please select the file format of the NPT cell data", "Select format :", 6, MainWindow);
   }
   else
   {
@@ -1272,7 +1270,7 @@ int open_coordinate_file (int id)
   int result;
   int length = strlen(active_project -> coordfile);
   clock_gettime (CLOCK_MONOTONIC, & sta_time);
-  this_reader = g_malloc0(sizeof*this_reader);
+  this_reader = g_malloc0 (sizeof*this_reader);
   // Set default message type to warning
   this_reader -> mid = 1;
   switch (id)
@@ -1330,8 +1328,12 @@ int open_coordinate_file (int id)
       result = open_coord_file (active_project -> coordfile, 10);
       break;
     case 11:
-      // DL-POLY file
+      // CIF file using symmetry positions
       result = open_coord_file (active_project -> coordfile, 11);
+      break;
+    case 12:
+      // DL-POLY file
+      result = open_coord_file (active_project -> coordfile, 12);
       break;
     default:
       result = 2;
@@ -1341,23 +1343,31 @@ int open_coordinate_file (int id)
   g_print ("Time to read atomic coordinates: %s\n", calculation_time(FALSE, get_calc_time (sta_time, sto_time)));
   if (this_reader)
   {
-    if (this_reader -> info && (! silent_input || cif_use_symmetry_positions))
+    if (this_reader -> msg && (! silent_input || cif_use_symmetry_positions))
     {
+      gchar * info = g_strdup_printf ("%s", this_reader -> info[0]);
+      int i;
+      for (i=1; i<this_reader -> msg; i++)
+      {
+        info = g_strdup_printf ("%s\n%s", info, this_reader -> info[i]);
+      }
       switch (this_reader -> mid)
       {
         case 0:
-          show_error (this_reader -> info, 0, MainWindow);
+          show_error (info, 0, MainWindow);
           break;
         case 1:
-          show_warning (this_reader -> info, MainWindow);
+          show_warning (info, MainWindow);
           break;
       }
+      g_free (info);
     }
     if (this_reader)
     {
       if (this_reader -> info) g_free (this_reader -> info);
       if (this_reader -> z) g_free (this_reader -> z);
       if (this_reader -> nsps) g_free (this_reader -> nsps);
+      if (this_reader -> dummy) g_free (this_reader -> dummy);
       if (this_reader -> label) g_free (this_reader -> label);
       if (this_reader -> object_list) g_free (this_reader -> object_list);
       if (this_reader -> u_atom_list) g_free (this_reader -> u_atom_list);
@@ -1366,6 +1376,7 @@ int open_coordinate_file (int id)
       if (this_reader -> sym_pos) g_free (this_reader -> sym_pos);
       if (this_reader -> wyckoff) g_free (this_reader -> wyckoff);
       if (this_reader -> occupancy) g_free (this_reader -> occupancy);
+      if (this_reader -> disorder) g_free (this_reader -> disorder);
       if (this_reader -> multi) g_free (this_reader -> multi);
       if (this_reader -> lattice.sp_group) g_free (this_reader -> lattice.sp_group);
       if (this_reader -> lattice.box) g_free (this_reader -> lattice.box);
@@ -1433,7 +1444,7 @@ void open_this_coordinate_file (int format, gchar * proj_name)
       g_free (str);
     }
     on_edit_activate (NULL, GINT_TO_POINTER(0));
-    if (format != 1 && format != 4 && format != 6 && format != 9 && format != 10 && format != 11) on_edit_activate (NULL, GINT_TO_POINTER(4));
+    if (format != 1 && format != 4 && format != 6 && format != 9 && format != 10 && format != 11 && format != 12) on_edit_activate (NULL, GINT_TO_POINTER(4));
     initcutoffs (active_chem, active_project -> nspec);
     on_edit_activate (NULL, GINT_TO_POINTER(2));
     active_project_changed (activep);
@@ -1442,7 +1453,7 @@ void open_this_coordinate_file (int format, gchar * proj_name)
     chemistry_ ();
     apply_project (TRUE);
     active_project_changed (activep);
-    if ((format == 9 || format == 10) && active_cell -> has_a_box)
+    if ((format == 9 || format == 10 || format == 11) && active_cell -> has_a_box)
     {
 #ifdef GTK3
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_rep[0], TRUE);
@@ -1455,14 +1466,14 @@ void open_this_coordinate_file (int format, gchar * proj_name)
       active_glwin -> wrapped = TRUE;
     }
     add_project_to_workspace ();
-    if (format == 9 && cif_use_symmetry_positions)
+    if ((format == 9 || format == 10) && cif_use_symmetry_positions)
     {
       gchar * file_name = g_strdup_printf ("%s", active_project -> coordfile);
       gchar * proj_name = g_strdup_printf ("%s - symmetry position(s)", active_project -> name);
       init_project (TRUE);
       active_project -> coordfile = g_strdup_printf ("%s", file_name);
       g_free (file_name);
-      open_this_coordinate_file (10, proj_name);
+      open_this_coordinate_file (11, proj_name);
       g_free (proj_name);
     }
   }

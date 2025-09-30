@@ -96,6 +96,7 @@ extern int get_atom_id_from_periodic_table (atom_search * asearch);
 extern G_MODULE_EXPORT void leaving_from_menu (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data);
+extern void create_user_preferences_dialog ();
 
 #ifdef GTK3
 GtkWidget * MainEvent;
@@ -167,7 +168,7 @@ int main_shortcut_by_group[] = { 3, 3, 2 };
 
 /*!
   \fn GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int groups, int shortcut_by_group[groups],
-*                                   gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[])
+                                    gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[])
 
   \brief Create the shortcuts information window
 
@@ -595,6 +596,10 @@ G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * 
     atomes_shortcuts = shortcuts_window (G_N_ELEMENTS(main_group_by_section), main_group_by_section, G_N_ELEMENTS(main_shortcut_by_group),
                                          main_shortcut_by_group, main_section_names, main_group_names, main_shortcuts);
   }
+  else if (g_strcmp0 (name, "help.preferences") == 0)
+  {
+    create_user_preferences_dialog ();
+  }
   g_free (name);
 }
 
@@ -624,7 +629,7 @@ GIcon * get_gicon_from_data (int format, const gchar * icon)
 
 /*!
   \fn void widget_add_action (GSimpleActionGroup * action_group, const gchar * act, GCallback handler, gpointer data,
-*                          gboolean check, gboolean status, gboolean radio, const gchar * stat)
+                              gboolean check, gboolean status, gboolean radio, const gchar * stat)
 
   \brief add an action to an action group
 
@@ -662,8 +667,8 @@ void widget_add_action (GSimpleActionGroup * action_group, const gchar * act, GC
 
 /*!
   \fn GMenuItem * create_gmenu_item (const gchar * label, const gchar * action, const gchar * accel,
-*                                    const gchar * custom, int format, const gchar * icon,
-*                                    gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
+                                     const gchar * custom, int format, const gchar * icon,
+                                     gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
 
   \brief create menu item
 
@@ -737,8 +742,8 @@ void append_submenu (GMenu * menu, const gchar * label, GMenu * submenu)
 
 /*!
   \fn void append_menu_item (GMenu * menu, const gchar * label, const gchar * action, const gchar * accel,
-*                            const gchar * custom, int format, const gchar * icon,
-*                            gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
+                             const gchar * custom, int format, const gchar * icon,
+                             gboolean check, gboolean status, gboolean radio, const gchar * rstatus)
 
   \brief create a menu item, then append it to a menu
 
@@ -1016,6 +1021,7 @@ GMenu * create_help_menu ()
 {
   GMenu * menu = g_menu_new ();
   append_menu_item (menu, "Periodic Table", "app.help.periodic", "<CTRL>P", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, "Preferences", "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "Shortcuts", "app.help.shortcuts", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "About", "app.help.about", "<CTRL>A", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   return menu;
@@ -1120,9 +1126,10 @@ GtkWidget * create_main_window (GApplication * atomes)
                                   { "analyze.tool-box", NULL},
                                   { "help.periodic", NULL},
                                   { "help.about", NULL},
-                                  { "help.shortcuts", NULL}};
+                                  { "help.shortcuts", NULL},
+                                  { "help.preferences", NULL}};
 
-  GSimpleAction * main_act[18];
+  GSimpleAction ** main_act = g_malloc0 (G_N_ELEMENTS(main_actions)*sizeof*main_act);
   for (i=0; i<G_N_ELEMENTS(main_actions); i++)
   {
     main_act[i] = g_simple_action_new (main_actions[i].action_name, NULL);

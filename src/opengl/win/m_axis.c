@@ -48,12 +48,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "submenus.h"
 
-#ifdef GTK4
-extern G_MODULE_EXPORT void axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data);
-#else
 extern G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data);
-#endif
 extern GtkWidget * create_layout_widget (gchar * str, GtkWidget * menu, int vab, gpointer data);
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void to_axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+
+  \brief create the axis advanced parameters window callback GTK4
+
+  \param action the GAction sending the signal
+  \param parameter GVariant parameter of the GAction, if any
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void to_axis_advanced (GSimpleAction * action, GVariant * parameter, gpointer data)
+{
+  axis_advanced (NULL, data);
+}
+#endif
 
 #ifdef GTK3
 /*!
@@ -73,11 +85,11 @@ G_MODULE_EXPORT void set_axis_template_pos (GtkWidget * widg, gpointer data)
    CENTER = 4 */
   tint * the_data = (tint *)data;
   project * this_proj = get_project_by_id(the_data -> a);
-  int i = this_proj -> modelgl -> anim -> last -> img -> axispos;
+  int i = this_proj -> modelgl -> anim -> last -> img -> xyz -> t_pos;
   int j = the_data -> b;
   if (gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg) && i != j)
   {
-    this_proj -> modelgl -> anim -> last -> img -> axispos = NONE;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> t_pos = NONE;
     if (i != CUSTOM)
     {
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_box_axis[1][8+i], FALSE);
@@ -86,9 +98,16 @@ G_MODULE_EXPORT void set_axis_template_pos (GtkWidget * widg, gpointer data)
     {
       gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_box_axis[1][8+j], TRUE);
     }
-    this_proj -> modelgl -> anim -> last -> img -> axispos = j;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> t_pos = j;
     this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
     update (this_proj -> modelgl);
+    if (this_proj -> modelgl -> axis_win)
+    {
+      if (this_proj -> modelgl -> axis_win -> templates && GTK_IS_WIDGET(this_proj -> modelgl -> axis_win -> templates))
+      {
+        combo_set_active (this_proj -> modelgl -> axis_win -> templates, j);
+      }
+    }
   }
   else if (i == j && ! gtk_check_menu_item_get_active ((GtkCheckMenuItem *)widg))
   {
@@ -127,14 +146,14 @@ GtkWidget * axis_position_submenu (glwin * view, int id)
       if (id == 0)
       {
         view -> ogl_box_axis[1][8+i] = gtk3_menu_item (udm, lrlab[k], IMG_NONE, NULL, G_CALLBACK(set_axis_template_pos), & view -> colorp[i][0],
-                                                       FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> axispos == i) ? TRUE: FALSE);
-        if (view -> anim -> last -> img -> box_axis[AXIS] == NONE) widget_set_sensitive (view -> ogl_box_axis[1][8+i], 0);
+                                                       FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> xyz -> t_pos == i) ? TRUE: FALSE);
+        if (view -> anim -> last -> img -> xyz -> axis == NONE) widget_set_sensitive (view -> ogl_box_axis[1][8+i], 0);
       }
       else
       {
         widg = gtk3_menu_item (udm, lrlab[k], IMG_NONE, NULL, G_CALLBACK(set_axis_template_pos), & view -> colorp[i][0],
-                               FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> axispos == i) ? TRUE: FALSE);
-        if (view -> anim -> last -> img -> box_axis[AXIS] == NONE) widget_set_sensitive (widg, 0);
+                               FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> xyz -> t_pos == i) ? TRUE: FALSE);
+        if (view -> anim -> last -> img -> xyz -> axis == NONE) widget_set_sensitive (widg, 0);
       }
       i += 1;
     }
@@ -142,14 +161,14 @@ GtkWidget * axis_position_submenu (glwin * view, int id)
   if (id == 0)
   {
     view -> ogl_box_axis[1][8+i] = gtk3_menu_item (menup, "Center", IMG_NONE, NULL, G_CALLBACK(set_axis_template_pos), & view -> colorp[i][0],
-                                                   FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> axispos == i) ? TRUE: FALSE);
-    if (view -> anim -> last -> img -> box_axis[AXIS] == NONE) widget_set_sensitive (view -> ogl_box_axis[1][8+i], 0);
+                                                   FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> xyz -> t_pos == i) ? TRUE: FALSE);
+    if (view -> anim -> last -> img -> xyz -> axis == NONE) widget_set_sensitive (view -> ogl_box_axis[1][8+i], 0);
   }
   else
   {
     widg = gtk3_menu_item (menup, "Center", IMG_NONE, NULL, G_CALLBACK(set_axis_template_pos), & view -> colorp[i][0],
-                           FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> axispos == i) ? TRUE: FALSE);
-    if (view -> anim -> last -> img -> box_axis[AXIS] == NONE) widget_set_sensitive (widg, 0);
+                           FALSE, 0, 0, TRUE, TRUE, (view -> anim -> last -> img -> xyz -> t_pos == i) ? TRUE: FALSE);
+    if (view -> anim -> last -> img -> xyz -> axis == NONE) widget_set_sensitive (widg, 0);
   }
   return menup;
 }
@@ -170,19 +189,19 @@ void menu_axis (GtkWidget * menu_ab, glwin * view, int id)
   GtkWidget * menul = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menul);
 
-  gchar * str = g_strdup_printf (" Length [ %f Å ]", view -> anim -> last -> img -> axis_length);
+  gchar * str = g_strdup_printf (" Length [ %f Å ]", view -> anim -> last -> img -> xyz -> length);
   if (id == 0)
   {
-    view -> ogl_box_axis[1][7] = create_layout_widget (str, menul, view -> anim -> last -> img -> box_axis[AXIS], & view -> colorp[0][AXIS]);
-    if (view -> anim -> last -> img -> box_axis[AXIS] == NONE)
+    view -> ogl_box_axis[1][7] = create_layout_widget (str, menul, view -> anim -> last -> img -> xyz -> axis, & view -> colorp[0][AXIS]);
+    if (view -> anim -> last -> img -> xyz -> axis == NONE)
     {
       widget_set_sensitive (view -> ogl_box_axis[1][7], 0);
     }
   }
   else
   {
-    widg = create_layout_widget (str, menul, view -> anim -> last -> img -> box_axis[AXIS], & view -> colorp[0][AXIS]);
-    if (view -> anim -> last -> img -> box_axis[AXIS] == NONE)
+    widg = create_layout_widget (str, menul, view -> anim -> last -> img -> xyz -> axis, & view -> colorp[0][AXIS]);
+    if (view -> anim -> last -> img -> xyz -> axis == NONE)
     {
       widget_set_sensitive (widg, 0);
     }
@@ -229,7 +248,7 @@ G_MODULE_EXPORT void change_axis_pos_radio (GSimpleAction * action, GVariant * p
       pos_name = g_strdup_printf ("set-axis-pos.%d.0", i);
       if (g_strcmp0(pos, (const gchar *)pos_name) == 0)
       {
-        view -> anim -> last -> img -> axispos = i;
+        view -> anim -> last -> img -> xyz -> t_pos = i;
         g_free (pos_name);
         pos_name = NULL;
         break;
@@ -241,6 +260,13 @@ G_MODULE_EXPORT void change_axis_pos_radio (GSimpleAction * action, GVariant * p
     view -> create_shaders[MAXIS] = TRUE;
     update (view);
     g_action_change_state (G_ACTION (action), parameter);
+    if (view -> axis_win)
+    {
+      if (view -> axis_win -> templates && GTK_IS_WIDGET(view -> axis_win -> templates))
+      {
+        combo_set_active (view -> axis_win -> templates, i);
+      }
+    }
   }
 }
 
@@ -263,7 +289,7 @@ GMenu * position_submenu (glwin * view, int popm, int pos)
   {
     append_opengl_item (view, menu, lrlab[j], "axis-pos", popm, i, NULL, IMG_NONE, NULL, FALSE,
                         G_CALLBACK(change_axis_pos_radio), & view -> colorp[i][0],
-                        FALSE, (view -> anim -> last -> img -> axispos == i) ? TRUE: FALSE, TRUE, TRUE);
+                        FALSE, (view -> anim -> last -> img -> xyz -> t_pos == i) ? TRUE: FALSE, TRUE, TRUE);
     i ++;
   }
   return menu;
@@ -288,7 +314,7 @@ GMenu * axis_position_submenu (glwin * view, int popm)
   }
   append_opengl_item (view, menu, "Center", "axis-pos", popm, 4, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(change_axis_pos_radio), & view -> colorp[4][0],
-                      FALSE, (view -> anim -> last -> img -> axispos == 4) ? TRUE: FALSE, TRUE, TRUE);
+                      FALSE, (view -> anim -> last -> img -> xyz -> t_pos == 4) ? TRUE: FALSE, TRUE, TRUE);
   return menu;
 }
 
@@ -303,12 +329,12 @@ GMenu * axis_position_submenu (glwin * view, int popm)
 */
 void menu_axis (GMenu * menu_ab, glwin * view, int popm)
 {
-  GMenuItem * item = g_menu_item_new ("Length", (view -> anim -> last -> img -> box_axis[AXIS]) != NONE ? NULL : "None");
+  GMenuItem * item = g_menu_item_new ("Length", (view -> anim -> last -> img -> xyz -> axis) != NONE ? NULL : "None");
   g_menu_item_set_attribute (item, "custom", "s", "axis-length", NULL);
   g_menu_item_set_submenu (item, (GMenuModel *)axis_box_param (view, popm, AXIS, NONE));
   g_menu_append_item (menu_ab, item);
   append_submenu (menu_ab, "Position", axis_position_submenu(view, popm));
   append_opengl_item (view, menu_ab, "Advanced", "axis-advanced", popm, popm, NULL, IMG_STOCK, DPROPERTIES, FALSE,
-                      G_CALLBACK(axis_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+                      G_CALLBACK(to_axis_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
 }
 #endif

@@ -96,7 +96,6 @@ int pdb_get_atoms_data (int linec)
   {
     if (! res) goto ends;
     this_line = g_strdup_printf ("%s", coord_line[i]);
-    saved_line = g_strdup_printf ("%s", this_line);
     this_word = strtok_r (this_line, " ", & saved_line);
     if (this_word)
     {

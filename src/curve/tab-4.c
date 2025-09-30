@@ -120,7 +120,7 @@ extern int a, b, c, d;
 */
 int get_active_axis ()
 {
-  return gtk_combo_box_get_active (GTK_COMBO_BOX(axischoice));
+  return combo_get_active (axischoice);
 }
 
 /*!
@@ -425,7 +425,7 @@ G_MODULE_EXPORT void set_io_ticks (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> ticks_io[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> ticks_io[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -444,7 +444,7 @@ G_MODULE_EXPORT void set_pos_ticks (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> ticks_pos[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> ticks_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -463,7 +463,7 @@ G_MODULE_EXPORT void set_pos_labels (GtkComboBox * box, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-  get_project_by_id(a) -> curves[b][c] -> labels_pos[i] = gtk_combo_box_get_active (box);
+  get_project_by_id(a) -> curves[b][c] -> labels_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -563,11 +563,7 @@ G_MODULE_EXPORT void to_axis_title (GtkToggleButton * but, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  if (gtk_check_button_get_active (but))
-#else
-  if (gtk_toggle_button_get_active (but))
-#endif
+  if (button_get_status ((GtkWidget *)but))
   {
     widget_set_sensitive (axis_title, 0);
     project * this_proj = get_project_by_id(a);
@@ -609,11 +605,7 @@ G_MODULE_EXPORT void set_grid (GtkToggleButton * grid, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = gtk_check_button_get_active (grid);
-#else
-  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = gtk_toggle_button_get_active (grid);
-#endif
+  get_project_by_id(a) -> curves[b][c] -> show_grid[i] = button_get_status ((GtkWidget *)grid);
   update_curve (data);
 }
 
@@ -663,11 +655,7 @@ G_MODULE_EXPORT void set_axis (GtkToggleButton * axis, gpointer data)
   b = ad -> b;
   c = ad -> c;
   int i = get_active_axis ();
-#ifdef GTK4
-  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = gtk_check_button_get_active (axis);
-#else
-  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = gtk_toggle_button_get_active (axis);
-#endif
+  get_project_by_id(a) -> curves[b][c] -> show_axis[i] = button_get_status ((GtkWidget *)axis);
   update_curve (data);
 }
 
@@ -729,9 +717,10 @@ G_MODULE_EXPORT void set_scale (GtkComboBox * sbox, gpointer data)
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
   int i = get_active_axis ();
-  this_proj -> curves[b][c] -> scale[i] = gtk_combo_box_get_active(sbox);
-  widget_set_sensitive (majt, ! gtk_combo_box_get_active(sbox));
-  widget_set_sensitive (nmi[i], ! gtk_combo_box_get_active(sbox));
+  int j = combo_get_active((GtkWidget *)sbox);
+  this_proj -> curves[b][c] -> scale[i] = j;
+  widget_set_sensitive (majt, ! j);
+  widget_set_sensitive (nmi[i], ! j);
   this_proj -> curves[b][c]-> autoscale[i] = TRUE;
   update_curve (data);
 }
@@ -739,14 +728,14 @@ G_MODULE_EXPORT void set_scale (GtkComboBox * sbox, gpointer data)
 int handler_id;
 
 /*!
-  \fn G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
+  \fn G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
 
   \brief change the axis
 
-  \param widg the GtkComboBox sending the signal
+  \param box the GtkComboBox sending the signal
   \param data the associated data pointer
 */
-G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
+G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
 {
   int i;
   tint * ad = (tint *)data;
@@ -754,13 +743,13 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
   b = ad -> b;
   c = ad -> c;
   project * this_proj = get_project_by_id(a);
-  i = gtk_combo_box_get_active (widg);
+  i = combo_get_active ((GtkWidget *)box);
   update_entry_double (GTK_ENTRY(vmin), this_proj -> curves[b][c] -> axmin[i]);
   update_entry_double (GTK_ENTRY(vmax), this_proj -> curves[b][c] -> axmax[i]);
   update_entry_double (GTK_ENTRY(majt), this_proj -> curves[b][c] -> majt[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ticks_inout_box), this_proj -> curves[b][c] -> ticks_io[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ticks_pos_box), this_proj -> curves[b][c] -> ticks_pos[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(labels_pos_box), this_proj -> curves[b][c] -> labels_pos[i]);
+  combo_set_active (ticks_inout_box, this_proj -> curves[b][c] -> ticks_io[i]);
+  combo_set_active (ticks_pos_box, this_proj -> curves[b][c] -> ticks_pos[i]);
+  combo_set_active (labels_pos_box, this_proj -> curves[b][c] -> labels_pos[i]);
   gtk_font_chooser_set_font (GTK_FONT_CHOOSER(ticks_labels_font), this_proj -> curves[b][c] -> labels_font[i]);
   gtk_range_set_value (GTK_RANGE(ticks_labels_angle), this_proj -> curves[b][c] -> labels_angle[i] * (180.0/pi));
   if (b < MS)
@@ -770,7 +759,7 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
   else
   {
     g_signal_handler_disconnect (G_OBJECT(scale_box), handler_id);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(scale_box), this_proj -> curves[b][c] -> scale[i]);
+    combo_set_active (scale_box, this_proj -> curves[b][c] -> scale[i]);
     handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
     widget_set_sensitive (scale_box, 1);
     /* widget_set_sensitive (vmax, ! this_proj -> curves[b][c] -> scale[i]);
@@ -796,15 +785,10 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data)
   show_the_widgets (tptx[i]);
   show_the_widgets (tpty[i]);
 
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(show_axis), this_proj -> curves[b][c] -> show_axis[i]);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(show_grid), this_proj -> curves[b][c] -> show_grid[i]);
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(axis_default_title), this_proj -> curves[b][c] -> axis_defaut_title[i]);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(show_axis), this_proj -> curves[b][c] -> show_axis[i]);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(show_grid), this_proj -> curves[b][c] -> show_grid[i]);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(axis_default_title), this_proj -> curves[b][c] -> axis_defaut_title[i]);
-#endif
+  button_set_status (show_axis, this_proj -> curves[b][c] -> show_axis[i]);
+  button_set_status (show_grid, this_proj -> curves[b][c] -> show_grid[i]);
+  button_set_status (axis_default_title, this_proj -> curves[b][c] -> axis_defaut_title[i]);
+
   widget_set_sensitive (axis_title, ! this_proj -> curves[b][c] -> axis_defaut_title[i]);
   update_entry_text (GTK_ENTRY(axis_title), this_proj -> curves[b][c] -> axis_title[i]);
   gtk_font_chooser_set_font (GTK_FONT_CHOOSER(axis_title_font), this_proj -> curves[b][c] -> axis_title_font[i]);
@@ -840,7 +824,7 @@ GtkWidget * create_tab_4 (gpointer data)
   axischoice = create_combo ();
   combo_text_append (axischoice, "X axis");
   combo_text_append (axischoice, "Y axis");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(axischoice), 0);
+  combo_set_active (axischoice, 0);
   gtk_widget_set_size_request (axischoice, 80, 35);
   g_signal_connect (G_OBJECT(axischoice), "changed", G_CALLBACK(update_axis), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, axischoice, FALSE, FALSE, 25);
@@ -853,7 +837,7 @@ GtkWidget * create_tab_4 (gpointer data)
   scale_box = create_combo ();
   combo_text_append (scale_box, "Linear");
   combo_text_append (scale_box, "Log");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(scale_box), this_proj -> curves[b][c] -> scale[0]);
+  combo_set_active (scale_box, this_proj -> curves[b][c] -> scale[0]);
   gtk_widget_set_size_request (scale_box, 80, -1);
   handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, scale_box, FALSE, FALSE, 0);

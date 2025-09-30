@@ -328,7 +328,7 @@ G_MODULE_EXPORT void create_field (GtkWidget * widg, gpointer data)
     int tmp_v = activev;
     tint t_data;
     t_data.a = p;
-    t_data.b = iask (info, "Enter the selected MD step: ", 2+opengl_project -> steps, opengl_project -> modelgl -> win);
+    t_data.b = iask (info, "Enter the selected MD step: ", 5+opengl_project -> steps, opengl_project -> modelgl -> win);
     t_data.c = 1;
     g_free (info);
 

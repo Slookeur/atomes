@@ -311,11 +311,7 @@ G_MODULE_EXPORT void update_cp2k_option_check (GtkToggleButton * but, gpointer d
 {
   int i;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cp2k -> extra_opts[i][(i==2)?2:3] = (double) button_get_status ((GtkWidget *)but);
   print_start_buffer ();
 }
 
@@ -342,7 +338,7 @@ G_MODULE_EXPORT void changed_cp2k_option_box (GtkComboBox * box, gpointer data)
     j = 0;
     k = i - CP2VDW;
   }
-  tmp_cp2k -> extra_opts[j][k] = (double) gtk_combo_box_get_active (box);
+  tmp_cp2k -> extra_opts[j][k] = (double) combo_get_active ((GtkWidget *)box);
   if (i == CP2VDW)
   {
     cp2k_vdw_box[1] = destroy_this_widget (cp2k_vdw_box[1]);
@@ -378,7 +374,7 @@ GtkWidget * create_vdw_box (int id)
       case 0:
         widg = create_combo ();
         for (k=0; k<3; k++) combo_text_append (widg, cp2k_vdw_text[id][k]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cp2k -> extra_opts[0][j+1]);
+        combo_set_active (widg, (int)tmp_cp2k -> extra_opts[0][j+1]);
         g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_option_box), GINT_TO_POINTER(CP2VDW+1));
         break;
       case 1:
@@ -486,7 +482,7 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
       widg = create_combo ();
       for (j=0; j<2; j++)  combo_text_append (widg, cp2k_vdw_options[j]);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cp2k -> extra_opts[0][0]);
+      combo_set_active (widg, (int)tmp_cp2k -> extra_opts[0][0]);
       g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_option_box), GINT_TO_POINTER(CP2VDW));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Type of functional for the van der Waals interactions", 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 5);
@@ -512,7 +508,7 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
           widg = create_combo ();
           combo_text_append (widg, "alpha - α");
           combo_text_append (widg, "beta - β");
-          gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cp2k -> extra_opts[1][1]);
+          combo_set_active (widg, (int)tmp_cp2k -> extra_opts[1][1]);
           g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_option_box), GINT_TO_POINTER(j));
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 10);
         }
@@ -593,11 +589,7 @@ G_MODULE_EXPORT void update_cp2k_check (GtkToggleButton * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-#ifdef GTK4
-  tmp_cp2k -> opts[i] = (double) gtk_check_button_get_active (but);
-#else
-  tmp_cp2k -> opts[i] = (double) gtk_toggle_button_get_active (but);
-#endif
+  tmp_cp2k -> opts[i] = (double) button_get_status ((GtkWidget *)but);
   if (i == CP2RES)
   {
     for (j=0; j<2; j++) widget_set_sensitive (checked_box[j], (int)tmp_cp2k -> opts[CP2RES]);
@@ -651,19 +643,19 @@ G_MODULE_EXPORT void cp2k_file_info (GtkTextBuffer * textbuf, gpointer data)
   }
   else
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(cp2k_spec_combo));
+    j = combo_get_active (cp2k_spec_combo);
     k = i + CP2FRE - 10;
     if (tmp_cp2k -> spec_files[j][k] != NULL) g_free (tmp_cp2k -> spec_files[j][k]);
     tmp_cp2k -> spec_files[j][k] = g_strdup_printf ("%s", gtk_text_buffer_get_text (textbuf, & bStart, & bEnd, FALSE));
     if (g_strcmp0 (tmp_cp2k -> spec_files[j][k], "") == 0)
     {
       tmp_cp2k -> spec_files[j][k] = NULL;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(spec_data_combo[k]), tmp_cp2k -> spec_data[j][k]);
+      combo_set_active (spec_data_combo[k], tmp_cp2k -> spec_data[j][k]);
       widget_set_sensitive (spec_data_combo[k], TRUE);
     }
     else if (spec_data_combo[k] != NULL)
     {
-      gtk_combo_box_set_active (GTK_COMBO_BOX(spec_data_combo[k]), -1);
+      combo_set_active (spec_data_combo[k], -1);
       widget_set_sensitive (spec_data_combo[k], FALSE);
     }
   }
@@ -736,20 +728,20 @@ G_MODULE_EXPORT void changed_cp2k_box (GtkComboBox * box, gpointer data)
   int i, j;
   gboolean motion;
   i = GPOINTER_TO_INT(data);
-  j = gtk_combo_box_get_active (box);
+  j = combo_get_active ((GtkWidget *)box);
   if (j != (int)tmp_cp2k -> opts[i])
   {
     if (i == CP2SYM)
     {
       cp2k_spec_box[1] = destroy_this_widget (cp2k_spec_box[1]);
-      cp2k_spec_box[1] = create_cp2k_spec_box (gtk_combo_box_get_active (box));
+      cp2k_spec_box[1] = create_cp2k_spec_box (combo_get_active ((GtkWidget *)box));
       show_the_widgets (cp2k_spec_box[1]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cp2k_spec_box[0], cp2k_spec_box[1], FALSE, FALSE, 0);
     }
     else
     {
       if (i == CP2RUN) motion = cp2k_with_motion ();
-      tmp_cp2k -> opts[i] = (double) gtk_combo_box_get_active (box);
+      tmp_cp2k -> opts[i] = (double) combo_get_active ((GtkWidget *)box);
 
       if (i == CP2RUN)
       {
@@ -894,7 +886,7 @@ GtkWidget * cp2k_section_box (int s)
           icomb ++;
           widg = create_combo ();
           for (k=0; k<cp2k_default_num[icomb]; k++) combo_text_append (widg, cp2k_default_text[icomb][k]);
-          gtk_combo_box_set_active (GTK_COMBO_BOX(widg), (int)tmp_cp2k -> opts[j]);
+          combo_set_active (widg, (int)tmp_cp2k -> opts[j]);
           g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_box), GINT_TO_POINTER(j));
           break;
         case 3:
@@ -949,7 +941,7 @@ GtkWidget * cp2k_section_box (int s)
         hbox = cpmd_box (vbox, "\t\t\t\tChemical species", 20, 5, 300);
         cp2k_spec_combo = create_combo ();
         for (k=0; k<qm_proj -> nspec; k++) combo_text_append (cp2k_spec_combo, qm_proj -> chemistry -> label[k]);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(cp2k_spec_combo), 0);
+        combo_set_active (cp2k_spec_combo, 0);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cp2k_spec_combo, FALSE, FALSE, 5);
         cp2k_spec_box[0] = create_hbox (0);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cp2k_spec_box[0], FALSE, FALSE, 0);

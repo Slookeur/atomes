@@ -1222,6 +1222,7 @@
 		<Unit filename="src/fortran/chains.F90" />
 		<Unit filename="src/fortran/chains_ogl.F90" />
 		<Unit filename="src/fortran/chemistry.F90" />
+		<Unit filename="src/fortran/clean.F90" />
 		<Unit filename="src/fortran/cqvf.F90" />
 		<Unit filename="src/fortran/dmtx.F90" />
 		<Unit filename="src/fortran/dvtb.F90" />
@@ -1394,6 +1395,10 @@
 			<Option target="cleancpmd" />
 			<Option target="cleancp2k" />
 		</Unit>
+		<Unit filename="src/gui/preferences.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/preferences.h" />
 		<Unit filename="src/gui/ringscall.c">
 			<Option compilerVar="CC" />
 			<Option target="atomes" />
@@ -1518,6 +1523,9 @@
 			<Option target="cleancurve" />
 			<Option target="cleancpmd" />
 			<Option target="cleancp2k" />
+		</Unit>
+		<Unit filename="src/opengl/draw/d_background.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/opengl/draw/d_bonds.c">
 			<Option compilerVar="CC" />

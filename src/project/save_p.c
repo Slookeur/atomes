@@ -88,7 +88,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
 
   // First 2 lines for compatibility issues
   i = 2;
-  j = 7;
+  j = 8;
   ver = g_strdup_printf ("%%\n%% project file v-%1d.%1d\n%%\n", i, j);
   if (save_this_string (fp, ver) != OK)
   {

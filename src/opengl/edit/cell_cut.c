@@ -84,12 +84,12 @@ G_MODULE_EXPORT void setup_passivate (GtkButton * but, gpointer data)
   show_the_widgets (dial);
   if (! this_proj -> modelgl -> search_widg[8] -> in_selection)
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[8] -> atom_box), 0);
+    combo_set_active (this_proj -> modelgl -> search_widg[8] -> atom_box, 0);
     set_filter_changed (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[8] -> atom_box), this_proj -> modelgl -> search_widg[8]);
   }
   else
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[8] -> atom_box), 0);
+    combo_set_active (this_proj -> modelgl -> search_widg[8] -> atom_box, 0);
     set_spec_changed (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[8] -> atom_box), this_proj -> modelgl -> search_widg[8]);
   }
   g_signal_connect (G_OBJECT(dial), "response", G_CALLBACK(destroy_this_dialog), NULL);
@@ -164,12 +164,7 @@ G_MODULE_EXPORT void set_slab_property (GtkToggleButton * but, gpointer data)
 {
   dint * dat = (dint *)data;
   glwin * view = get_project_by_id(dat -> a) -> modelgl;
-  gboolean status;
-#ifdef GTK4
-  status = gtk_check_button_get_active (but);
-#else
-  status = gtk_toggle_button_get_active (but);
-#endif
+  gboolean status = button_get_status ((GtkWidget *)but);
   switch (dat -> b)
   {
     case 0:
@@ -272,7 +267,7 @@ G_MODULE_EXPORT void set_slab_option (GtkComboBox * box, gpointer data)
 {
   project * this_proj = (project *)data;
   int i, j;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   for (j=0; j<6; j++)
   {
     hide_the_widgets (this_proj -> modelgl -> cell_win -> slab_box[j]);
@@ -317,7 +312,7 @@ GtkWidget * create_slab_param_combo (int sid, project * this_proj)
     k = (! sid) ? j : (sid == 1 && j == 2) ? 3 : j;
     combo_text_append (combo, options[k]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), 0);
+  combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_slab_option), this_proj);
   return combo;
 }
@@ -335,9 +330,9 @@ G_MODULE_EXPORT void set_slab_type (GtkComboBox * box, gpointer data)
   project * this_proj = (project *)data;
   int i;
   for (i=0; i<3; i++) hide_the_widgets (this_proj -> modelgl -> cell_win -> slab_hbox[i]);
-  this_proj -> modelgl -> cell_win -> slab_type = i = gtk_combo_box_get_active (box);
+  this_proj -> modelgl -> cell_win -> slab_type = i = combo_get_active ((GtkWidget *)box);
   show_the_widgets (this_proj -> modelgl -> cell_win -> slab_hbox[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> cell_win -> slab_param[i]), 0);
+  combo_set_active (this_proj -> modelgl -> cell_win -> slab_param[i], 0);
   set_slab_option (GTK_COMBO_BOX(this_proj -> modelgl -> cell_win -> slab_param[i]), this_proj);
   if (this_proj -> modelgl -> n_shaders[SLABS][0])
   {
@@ -688,7 +683,7 @@ GtkWidget * cut_in_model (project * this_proj)
   GtkWidget * combo = create_combo ();
   gchar * type[3] = {"Parallelepiped", "Cylinder", "Sphere"};
   for (i=0; i<3; i++) combo_text_append (combo, type[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(combo), this_proj -> modelgl -> cell_win -> slab_type);
+  combo_set_active (combo, this_proj -> modelgl -> cell_win -> slab_type);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_slab_type), this_proj);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, markup_label("- Shape of the slab: ", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, combo, FALSE, FALSE, 5);

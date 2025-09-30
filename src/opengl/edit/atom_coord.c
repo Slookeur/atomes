@@ -223,8 +223,8 @@ coord_info * duplicate_coord_info (coord_info * old_coord)
 
 /*!
   \fn void clean_coords_and_geoms (project * this_proj, atom_edition * edit,
-*                               int new_spec, int rem, int adds, int * spid, int *** tmpgeo,
-*                               gboolean * showcoord[2], gboolean * showpoly[2])
+                                   int new_spec, int rem, int adds, int * spid, int *** tmpgeo,
+                                   gboolean * showcoord[2], gboolean * showpoly[2])
 
   \brief clean coordination data and atomic coordination id data
 
@@ -401,8 +401,8 @@ void clean_coords_and_geoms (project * this_proj, atom_edition * edit,
 
 /*!
   \fn void new_coord_menus (project * this_proj, coord_info * coord, int new_spec, int nmols,
-*                        gboolean * showcoord[2], gboolean * showpoly[2], gboolean * showfrag,
-*                        gboolean update_it, gboolean update_frag, gboolean update_mol)
+                            gboolean * showcoord[2], gboolean * showpoly[2], gboolean * showfrag,
+                            gboolean update_it, gboolean update_frag, gboolean update_mol)
 
   \brief update coordination(s), fragment(s) and molecule(s) OpenGL menus and associated data pointers
 
@@ -571,7 +571,7 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
   {
     int h, i, j, k, l, m, n, o, p, q;
     image * new_img = g_malloc0 (sizeof*new_img);
-    image_init_spec_data (new_img, this_proj, new_spec);
+    setup_image_spec_data (this_proj, new_img);
     image * old_img = this_proj -> modelgl -> anim -> last -> img;
     // copy info in new data, then clean old data and copy it back
     for (i=0; i<2; i++)
@@ -673,7 +673,7 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
   }
   else if (add)
   {
-    image_init_spec_data (this_proj -> modelgl -> anim -> last -> img, this_proj, new_spec);
+    setup_image_spec_data (this_proj, this_proj -> modelgl -> anim -> last -> img);
   }
 
   if (add || rem)

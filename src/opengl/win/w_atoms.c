@@ -265,11 +265,10 @@ G_MODULE_EXPORT void toggled_show_hide_atom (GtkToggleButton * but, gpointer dat
   i = id -> a;
   j = id -> b;
   k = id -> c;
-  gboolean show;
+  gboolean show = button_get_status ((GtkWidget *)but);
 #ifdef GTK4
   project * this_proj = get_project_by_id (i);
   int l, m;
-  show = gtk_check_button_get_active (but);
   for (l=0; l<this_proj -> steps; l++)
   {
     for (m=0; m<this_proj -> natomes; m++)
@@ -285,7 +284,6 @@ G_MODULE_EXPORT void toggled_show_hide_atom (GtkToggleButton * but, gpointer dat
   init_default_shaders (this_proj -> modelgl);
   update_menu_bar (this_proj -> modelgl);
 #else
-  show = gtk_toggle_button_get_active (but);
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)get_project_by_id(i) -> modelgl -> ogl_spec[j][k], show);
 #endif
 }
@@ -317,11 +315,10 @@ G_MODULE_EXPORT void toggled_show_hide_label (GtkToggleButton * but, gpointer da
   i = id -> a;
   j = id -> b;
   k = id -> c;
-  gboolean show;
+  gboolean show = button_get_status ((GtkWidget *)but);
   project * this_proj = get_project_by_id (i);
 #ifdef GTK4
   int l, m;
-  show = gtk_check_button_get_active (but);
   for (l=0; l<this_proj -> steps; l++)
   {
     for (m=0; m<this_proj -> natomes; m++)
@@ -338,7 +335,6 @@ G_MODULE_EXPORT void toggled_show_hide_label (GtkToggleButton * but, gpointer da
   update_menu_bar (this_proj -> modelgl);
 #else
   // GTK3 Menu Action To Check
-  show = gtk_toggle_button_get_active (but);
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_lab[j][k], show);
 #endif
 }
@@ -506,7 +502,7 @@ G_MODULE_EXPORT gboolean close_event_model (GtkWidget * widg, GdkEvent * event, 
   \brief create atom(s) advanced properties notebook
 
   \param view the target glwin
-  \param atom_or_clone atom(s) (0) or clone(s) (1)
+  \param atom_or_clone atom(s) or clone(s) (0/1)
 */
 GtkWidget * advance_atom_notebook (glwin * view, int atom_or_clone)
 {
@@ -556,7 +552,7 @@ GtkWidget * advanced_atom_properties (int atom_or_clone, glwin * view)
 /*!
   \fn G_MODULE_EXPORT void atom_properties (GtkWidget * widg, gpointer data)
 
-  \brief atom(s) propery callback GTK3
+  \brief atom(s) property callback GTK3
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
@@ -566,7 +562,7 @@ G_MODULE_EXPORT void atom_properties (GtkWidget * widg, gpointer data)
 /*!
   \fn G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * parameter, gpointer data)
 
-  \brief atom(s) propery callback GTK4
+  \brief atom(s) property callback GTK4
 
   \param action the GAction sending the signal
   \param parameter GVariant parameter of the GAction, if any
@@ -598,6 +594,6 @@ G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * paramet
   }
   else
   {
-    show_warning (g_strdup_printf ("Error impossible to display the model window for %s !", (atom_or_clone) ? "clones" : "atomes"), this_proj -> modelgl -> win);
+    show_warning (g_strdup_printf ("Error impossible to display the model window for %s !", (atom_or_clone) ? "clones" : "atoms"), this_proj -> modelgl -> win);
   }
 }

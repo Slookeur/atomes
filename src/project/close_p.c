@@ -61,7 +61,6 @@ void update_insert_combos ()
 {
   GtkTreeModel * model;
   project * this_proj;
-  GList * cell_list;
   GtkWidget * box;
   int i;
   for (i=0; i<nprojects; i++)
@@ -74,12 +73,8 @@ void update_insert_combos ()
         model = replace_combo_tree (TRUE, i);
         box = (this_proj -> modelgl -> builder_win) ? this_proj -> modelgl -> builder_win -> add_combo : this_proj -> modelgl -> atom_win -> atom_combo[3];
         gtk_combo_box_set_model (GTK_COMBO_BOX(box), model);
-        gtk_combo_box_set_active (GTK_COMBO_BOX(box), 0);
-        cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(box));
-        if (cell_list && cell_list -> data)
-        {
-          gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(box), cell_list -> data, "markup", 0, NULL);
-        }
+        combo_set_active (box, 0);
+        combo_set_markup (box);
         g_object_unref (model);
       }
     }
@@ -103,8 +98,28 @@ void close_project (project * to_close)
   g_debug ("CLOSE_PROJECT: activep      = %d", activep);
 #endif
 
-  if (to_close -> initgl)
+  if (to_close -> modelgl)
   {
+    if (to_close -> modelgl -> rep_win)
+    {
+      to_close -> modelgl -> rep_win -> win = destroy_this_widget (to_close -> modelgl -> rep_win -> win);
+      g_free (to_close -> modelgl -> rep_win);
+    }
+    if (to_close -> modelgl -> gradient_win)
+    {
+      to_close -> modelgl -> gradient_win -> win = destroy_this_widget (to_close -> modelgl -> gradient_win -> win);
+      g_free (to_close -> modelgl -> gradient_win);
+    }
+    if (to_close -> modelgl -> box_win)
+    {
+      to_close -> modelgl -> box_win -> win = destroy_this_widget (to_close -> modelgl -> box_win -> win);
+      g_free (to_close -> modelgl -> box_win);
+    }
+    if (to_close -> modelgl -> axis_win)
+    {
+      to_close -> modelgl -> axis_win -> win = destroy_this_widget (to_close -> modelgl -> axis_win -> win);
+      g_free (to_close -> modelgl -> axis_win);
+    }
     if (to_close -> modelgl -> measure_win)
     {
       to_close -> modelgl -> measure_win -> win = destroy_this_widget (to_close -> modelgl -> measure_win -> win);
@@ -174,6 +189,14 @@ void close_project (project * to_close)
       }
     }
   }
+  if (to_close -> atoms)
+  {
+    for (i=0; i<to_close -> steps; i++)
+    {
+      if (to_close -> atoms[i]) g_free (to_close -> atoms[i]);
+    }
+    g_free (to_close -> atoms);
+  }
   if (to_close -> run)
   {
     for (i=0 ; i<NGRAPHS ; i++)
@@ -219,8 +242,8 @@ void close_project (project * to_close)
       to_close -> prev -> next = to_close -> next;
       to_close -> next -> prev = to_close -> prev;
     }
-    g_free (to_close);
   }
+  g_free (to_close);
   nprojects --;
   if (nprojects)
   {
@@ -228,7 +251,7 @@ void close_project (project * to_close)
     for (i=0 ; i<nprojects ; i++)
     {
       this_proj -> id = i;
-      if (this_proj -> initgl)
+      if (this_proj -> initgl && this_proj -> modelgl)
       {
         this_proj -> modelgl -> proj = i;
         for (j=0; j<NUM_COLORS; j++)

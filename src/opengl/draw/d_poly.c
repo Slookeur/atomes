@@ -116,7 +116,7 @@ vec3_t get_triangle_normal (vec3_t v1, vec3_t v2, vec3_t v3)
 /*!
   \fn void setup_triangles (float * vertices, vec3_t sa, vec3_t sb, vec3_t sc)
 
-  \brief setup triangle veertices
+  \brief setup triangle vertices
 
   \param vertices
   \param sa 1st summit
@@ -155,11 +155,11 @@ void setup_polyhedron (float * vertices, GLfloat ** xyz, int s)
   vec3_t a, b, c;
   float shift[3];
   poly_alpha = 1.0;
-  for (n=0; n<plot -> extra_cell[0]+1;n++)
+  for (n=0; n<plot -> abc -> extra_cell[0]+1;n++)
   {
-    for (o=0; o<plot -> extra_cell[1]+1; o++)
+    for (o=0; o<plot -> abc -> extra_cell[1]+1; o++)
     {
-      for (p=0; p<plot -> extra_cell[2]+1; p++)
+      for (p=0; p<plot -> abc -> extra_cell[2]+1; p++)
       {
         shift[0]=n*box_gl -> vect[0][0]+o*box_gl -> vect[1][0]+p*box_gl -> vect[2][0];
         shift[1]=n*box_gl -> vect[0][1]+o*box_gl -> vect[1][1]+p*box_gl -> vect[2][1];
@@ -229,11 +229,11 @@ void setup_tetrahedron (float * vertices, GLfloat ** xyz)
   int n, o, p, q, r;
   float shift[3];
   poly_alpha = 1.0;
-  for (n=0; n<plot -> extra_cell[0]+1;n++)
+  for (n=0; n<plot -> abc -> extra_cell[0]+1;n++)
   {
-    for (o=0; o<plot -> extra_cell[1]+1; o++)
+    for (o=0; o<plot -> abc -> extra_cell[1]+1; o++)
     {
-      for (p=0; p<plot -> extra_cell[2]+1; p++)
+      for (p=0; p<plot -> abc -> extra_cell[2]+1; p++)
       {
         shift[0]=n*box_gl -> vect[0][0]+o*box_gl -> vect[1][0]+p*box_gl -> vect[2][0];
         shift[1]=n*box_gl -> vect[0][1]+o*box_gl -> vect[1][1]+p*box_gl -> vect[2][1];
@@ -698,7 +698,7 @@ void create_poly_lists ()
         wingl -> n_shaders[POLYS][step] = 1;
         object_3d * poly = g_malloc0 (sizeof*poly);
         poly -> vert_buffer_size = POLY_BUFF_SIZE;
-        poly -> num_vertices = ptot * (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+        poly -> num_vertices = ptot * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         poly -> vertices = allocfloat (poly -> vert_buffer_size*poly -> num_vertices);
         nba = 0;
         for (i=0; i<2; i++)

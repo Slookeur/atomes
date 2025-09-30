@@ -55,6 +55,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "color_box.h"
 #include "glview.h"
 
+extern void update_gradient_widgets (gradient_edition * gradient_win, background * back);
+
 /*!
   \fn void get_color (ColRGBA * but, int cid)
 
@@ -108,7 +110,10 @@ G_MODULE_EXPORT void set_back_color (GtkWidget * widg, gpointer data)
 {
   tint * col = (tint *) data;
   project * this_proj = get_project_by_id(col -> a);
-  get_color (& this_proj -> modelgl -> anim -> last -> img -> backcolor, col -> b);
+  get_color (& this_proj -> modelgl -> anim -> last -> img -> back -> color, col -> b);
+  this_proj -> modelgl -> anim -> last -> img -> back -> gradient = 0;
+  cleaning_shaders (this_proj -> modelgl, BACKG);
+  if (this_proj -> modelgl -> gradient_win) update_gradient_widgets (this_proj -> modelgl -> gradient_win, this_proj -> modelgl -> anim -> last -> img -> back);
   this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
   update (this_proj -> modelgl);
 }
@@ -125,7 +130,7 @@ G_MODULE_EXPORT void set_box_color (GtkWidget * widg, gpointer data)
 {
   tint * col = (tint *) data;
   project * this_proj = get_project_by_id(col -> a);
-  get_color (& this_proj -> modelgl -> anim -> last -> img -> box_color, col -> b);
+  get_color (& this_proj -> modelgl -> anim -> last -> img -> abc -> color, col -> b);
   this_proj -> modelgl -> create_shaders[MDBOX] = TRUE;
   update (this_proj -> modelgl);
 }
@@ -360,7 +365,6 @@ GtkWidget * color_box (glwin * view, int ideo, int spec, int geo)
 #ifdef GTK3
   but = create_menu_item (FALSE, "More colors ...");
   gtk_menu_shell_append ((GtkMenuShell *)coltable, but);
-// #endif
   if (ideo < -2)
   {
     g_signal_connect (G_OBJECT (but), "activate", G_CALLBACK(window_color_coord), & view -> gcid[4+spec][geo][4+spec]);

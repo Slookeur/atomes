@@ -1419,7 +1419,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
   int i, j;
   dint * prop = (dint *)data;
   float * val, * vbl;
-  i = gtk_combo_box_get_active (box);
+  i = combo_get_active ((GtkWidget *)box);
   if (i)
   {
     tmp_match = up_match[prop -> b];
@@ -1452,7 +1452,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
           tmp_fprop -> val[2] = tmp_fprop -> val[2]*v;
         }
       }
-      gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_fprop -> key);
+      combo_set_active (field_key_combo, tmp_fprop -> key);
     }
     else
     {
@@ -1460,7 +1460,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
       tmp_fbody -> key = abs(ff_data -> key) - 1;
       tmp_fbody -> fpid[prop -> b] = tmp_match -> oid;
       val = duplicate_float (ff_data -> npar, ff_data -> param[tmp_match -> oid]);
-      gtk_combo_box_set_active (GTK_COMBO_BOX(field_key_combo), tmp_fbody -> key);
+      combo_set_active (field_key_combo, tmp_fbody -> key);
     }
   }
   else
@@ -1652,14 +1652,10 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
         }
         tmp_obj_id = tmp_obj_id -> next;
       }
-      GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(ff_p_combo[j]));
-      if (cell_list && cell_list -> data)
-      {
-        gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(ff_p_combo[j]), cell_list -> data, "markup", 0, NULL);
-      }
+      combo_set_markup (ff_p_combo[j]);
       pup[j].a = f;
       pup[j].b = j;
-      gtk_combo_box_set_active (GTK_COMBO_BOX(ff_p_combo[j]), n);
+      combo_set_active (ff_p_combo[j], n);
       if (m == 0) widget_set_sensitive (ff_p_combo[j], FALSE);
       g_signal_connect (G_OBJECT(ff_p_combo[j]), "changed", G_CALLBACK(changed_field_prop_combo), & pup[j]);
     }

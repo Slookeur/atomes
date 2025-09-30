@@ -127,8 +127,8 @@ void prepbox (int k, int l, int m)
   {
     widget_set_sensitive (setcolorbox, 0);
   }
-  gtk_widget_set_size_request (setcolorbox, -1, 40);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (setcolorbox), 0);
+  gtk_widget_set_size_request (setcolorbox, -1, 30);
+  combo_set_active (setcolorbox, 0);
   g_signal_connect (G_OBJECT(setcolorbox), "changed", G_CALLBACK(choose_set), NULL);
 }
 
@@ -402,7 +402,7 @@ void edit_curve (gpointer data)
 
   add_gtk_close_event (edit_box, G_CALLBACK(destroy_this_window), NULL);
 
-  if (gtk_combo_box_get_active (GTK_COMBO_BOX(data_aspect)))
+  if (combo_get_active (data_aspect))
   {
     hide_the_widgets (Glyph_box);
   }

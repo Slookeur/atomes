@@ -68,6 +68,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void toggle_occ (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void toggle_overlap (GtkCheckButton * Button, gpointer data);
   G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data);
+  G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data);
   G_MODULE_EXPORT void crystal_window (GSimpleAction * action, GVariant * parameter, gpointer data);
   G_MODULE_EXPORT void crystal_window (GtkWidget * widg, gpointer data);
@@ -96,7 +97,7 @@ extern G_MODULE_EXPORT void show_sg_info (GtkButton * but, gpointer data);
 
 extern void get_origin (space_group * spg);
 extern int test_lattice (builder_edition * cbuilder, cell_info * cif_cell);
-extern int build_crystal (gboolean visible, project * this_proj, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
+extern int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 
 gchar * crystal_sytems[7] = {"Triclinic", "Monoclinic", "Othorhombic", "Tetragonal", "Trigonal", "Hexagonal", "Cubic"};
 gchar * bravais_keys[7][4] = {{"Primitive", NULL, NULL, NULL},
@@ -712,7 +713,7 @@ G_MODULE_EXPORT void set_lattice (GtkComboBox * box, gpointer data)
   glwin * view = get_project_by_id(id -> a) -> modelgl;
   builder_edition * cbuilder = view -> builder_win;
   cbuilder -> lattice_grid = destroy_this_widget (cbuilder -> lattice_grid);
-  cbuilder -> lattice_grid = prepare_lattice_grid (gtk_combo_box_get_active (box), cbuilder, view);
+  cbuilder -> lattice_grid = prepare_lattice_grid (combo_get_active ((GtkWidget *)box), cbuilder, view);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cbuilder -> lattice_box, cbuilder -> lattice_grid, FALSE, FALSE, 5);
   show_the_widgets (cbuilder -> lattice_grid);
 }
@@ -729,7 +730,7 @@ G_MODULE_EXPORT void set_so (GtkComboBox * box, gpointer data)
 {
   tint * id = (tint *) data;
   builder_edition * cbuilder = get_project_by_id(id -> a) -> modelgl -> builder_win;
-  int i = gtk_combo_box_get_active(box);
+  int i = combo_get_active ((GtkWidget *)box);
   gchar * str = g_strdup_printf ("(%s,%s,%s)", cbuilder -> cell.sp_group -> settings[i].pos[0],
                                                cbuilder -> cell.sp_group -> settings[i].pos[1],
                                                cbuilder -> cell.sp_group -> settings[i].pos[2]);
@@ -823,13 +824,8 @@ void adjust_so_combo (builder_edition * cbuilder)
   GtkTreeModel * model = so_combo_tree (cbuilder -> cell.sp_group);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> so_combo), model);
   g_object_unref (model);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), 0);
-
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> so_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> so_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> so_combo, 0);
+  combo_set_markup (cbuilder -> so_combo);
   widget_set_sensitive (cbuilder -> so_combo, cbuilder -> cell.sp_group -> nums-1);
   if (cbuilder -> cell.sp_group) get_origin (cbuilder -> cell.sp_group);
 }
@@ -917,12 +913,8 @@ void adjust_sg_combo (builder_edition * cbuilder, int cs, int bl)
   GtkTreeModel * model = sg_combo_tree (cs, bl);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> sg_combo), model);
   g_object_unref (model);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> sg_combo), 0);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> sg_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> sg_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> sg_combo, 0);
+  combo_set_markup (cbuilder -> sg_combo);
   adjust_lattice_parameters (cbuilder);
 }
 
@@ -938,8 +930,8 @@ G_MODULE_EXPORT void set_bl (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
   int i, j;
-  i = gtk_combo_box_get_active (GTK_COMBO_BOX(cbuilder -> cs_combo));
-  j = gtk_combo_box_get_active (box);
+  i = combo_get_active (cbuilder -> cs_combo);
+  j = combo_get_active ((GtkWidget *)box);
   adjust_sg_combo (cbuilder, i, j);
 }
 
@@ -962,7 +954,7 @@ GtkWidget * create_bl_combo (int cs, gpointer data)
   }
   i = (cs == 0 || cs == 5) ? 0 : 1;
   widget_set_sensitive (cbox, i);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbox), ! i);
+  combo_set_active (cbox, ! i);
   g_signal_connect (G_OBJECT(cbox), "changed", G_CALLBACK(set_bl), data);
   gtk_widget_set_size_request (cbox, 150, 25);
   return cbox;
@@ -979,7 +971,7 @@ GtkWidget * create_bl_combo (int cs, gpointer data)
 G_MODULE_EXPORT void set_cs (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   cbuilder -> bl_combo = destroy_this_widget(cbuilder -> bl_combo);
   cbuilder -> bl_combo = create_bl_combo (i, data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> bl_box, cbuilder -> bl_combo, FALSE, FALSE, 0);
@@ -1010,11 +1002,7 @@ G_MODULE_EXPORT void set_wr (GtkToggleButton * but, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> wrap = gtk_check_button_get_active (but);
-#else
-  cbuilder -> wrap = gtk_toggle_button_get_active (but);
-#endif
+  cbuilder -> wrap = button_get_status ((GtkWidget *)but);
 }
 
 #ifdef GTK4
@@ -1040,11 +1028,7 @@ G_MODULE_EXPORT void set_shc (GtkToggleButton * but, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> clones = gtk_check_button_get_active (but);
-#else
-  cbuilder -> clones = gtk_toggle_button_get_active (but);
-#endif
+  cbuilder -> clones = button_get_status ((GtkWidget *)but);
 }
 
 /*!
@@ -1076,8 +1060,11 @@ G_MODULE_EXPORT void apply_build (GtkButton * but, gpointer data)
   project * this_proj = get_project_by_id(id);
   if (test_lattice(this_proj -> modelgl -> builder_win, NULL))
   {
-    build_crystal (TRUE, this_proj, this_proj -> modelgl -> builder_win -> wrap, this_proj -> modelgl -> builder_win -> clones,
-                                  & this_proj -> modelgl -> builder_win -> cell, this_proj -> modelgl -> builder_win -> win);
+    crystal_dist_chk = TRUE;
+    crystal_crowded = FALSE;
+    crystal_low_warning = TRUE;
+    build_crystal (TRUE, this_proj, 0, this_proj -> modelgl -> builder_win -> wrap, this_proj -> modelgl -> builder_win -> clones,
+                                     & this_proj -> modelgl -> builder_win -> cell, this_proj -> modelgl -> builder_win -> win);
   }
 }
 
@@ -1177,11 +1164,21 @@ G_MODULE_EXPORT void toggle_overlap (GtkToggleButton * Button, gpointer data)
 #endif
 {
   builder_edition * cbuilder = (builder_edition * )data;
-#ifdef GTK4
-  cbuilder -> overlapping = gtk_check_button_get_active (Button);
-#else
-  cbuilder -> overlapping = gtk_toggle_button_get_active (Button);
-#endif
+  cbuilder -> overlapping = button_get_status ((GtkWidget *)Button);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data)
+
+  \brief changed rounding method for occupancy
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void on_rounding_changed (GtkComboBox * box, gpointer data)
+{
+  builder_edition * cbuilder = (builder_edition *)data;
+  cbuilder -> rounding = combo_get_active ((GtkWidget *)box);
 }
 
 /*!
@@ -1211,6 +1208,7 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
                       "   the final crystal is considered as a whole.</i>",
                       "<i>Sites are filled successively: all object(s) A, then all object(s) B ... </i>",
                       "<i>Sites are filled alternatively: object A, object B, object A ...</i>"};
+
   GtkWidget * occ_but[5];
   int i;
   for (i=0; i<5; i++)
@@ -1246,20 +1244,34 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (occup[i], 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
   }
   i = cbuilder -> occupancy;
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(occ_but[i]), TRUE);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(occ_but[i]), TRUE);
-#endif
-  hbox = create_hbox(0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  button_set_status (occ_but[i], TRUE);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("<b>Allow overlapping</b>", -1, 25, cbuilder -> overlapping, G_CALLBACK(toggle_overlap), (gpointer)cbuilder), FALSE, FALSE, 0);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   gchar * overlap = "<i>Instead of ensuring that sites are filled by a single object,\n"
                     "this allows object(s) to share the same crystalline position. \n"
-                    "The option above describes how filled and empty positions alternate.</i>";
+                    "The option above describes how filled and empty positions alternate.</i>\n";
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (overlap, 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
+
+  // Rounding occupancy here
+  hbox = create_hbox(0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Occupancy rounding:</b>", 200, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  GtkWidget * rounding = create_combo ();
+  gtk_widget_set_size_request (rounding, -1, 30);
+  for (i=0; i<3; i++) combo_text_append (rounding, cif_occupancies[i]);
+  combo_set_active (rounding, cbuilder -> rounding);
+  g_signal_connect(G_OBJECT(rounding), "changed", G_CALLBACK(on_rounding_changed), & cbuilder);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rounding, FALSE, FALSE, 10);
+  gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.75⌋ = 8\n"
+                                 "\t<b>Highest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n"
+                                 "\t<b>Nearest integer: </b>\n"
+                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n"
+                                 "\n\t\t%s\n", cif_occ[0], cif_occ[1], cif_occ[2], cif_sites[0]);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (str, 450, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  g_free (str);
 
   show_the_widgets (info);
   run_this_gtk_dialog (info, G_CALLBACK(run_destroy_dialog), NULL);
@@ -1298,7 +1310,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   cbuilder -> cs_combo = create_combo();
 
   for (i=0; i<7;i++) combo_text_append (cbuilder -> cs_combo, crystal_sytems[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> cs_combo), 0);
+  combo_set_active (cbuilder -> cs_combo, 0);
   gtk_widget_set_size_request (cbuilder -> cs_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> cs_combo, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT(cbuilder -> cs_combo), "changed", G_CALLBACK(set_cs), (gpointer)cbuilder);
@@ -1334,13 +1346,8 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   g_signal_connect (G_OBJECT(cbuilder -> sg_combo), "changed", G_CALLBACK(set_sg), data);
   gtk_widget_set_size_request (cbuilder -> sg_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> sg_box, cbuilder -> sg_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> sg_combo), 0);
-  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> sg_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> sg_combo), cell_list -> data, "markup", 0, NULL);
-  }
-
+  combo_set_active (cbuilder -> sg_combo, 0);
+  combo_set_markup (cbuilder -> sg_combo);
   // Space group option
   cbuilder -> so_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cbuilder -> so_box, FALSE, FALSE, 0);
@@ -1353,14 +1360,10 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (cbuilder -> so_combo), renderer, "text", 0, NULL);
   gtk_widget_set_size_request (cbuilder -> so_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> so_box, cbuilder -> so_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), 0);
+  combo_set_active (cbuilder -> so_combo, 0);
   widget_set_sensitive (cbuilder -> so_combo, 0);
   g_signal_connect (G_OBJECT(cbuilder -> so_combo), "changed", G_CALLBACK(set_so), data);
-  cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> so_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> so_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_markup (cbuilder -> so_combo);
 
   for (i=0; i<3; i++)
   {
@@ -1387,12 +1390,8 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   gtk_widget_set_size_request (cbuilder -> la_combo, 150, 25);
   g_signal_connect (G_OBJECT(cbuilder -> la_combo), "changed", G_CALLBACK(set_lattice), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> la_combo, FALSE, FALSE, 0);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> la_combo), 0);
-  cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(cbuilder -> la_combo));
-  if (cell_list && cell_list -> data)
-  {
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(cbuilder -> la_combo), cell_list -> data, "markup", 0, NULL);
-  }
+  combo_set_active (cbuilder -> la_combo, 0);
+  combo_set_markup (cbuilder -> la_combo);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> lattice_box, FALSE, FALSE, 50);
@@ -1456,6 +1455,7 @@ void prepare_crystal_builder (gpointer data)
     this_proj -> modelgl -> builder_win = g_malloc0(sizeof*this_proj -> modelgl -> builder_win);
     this_proj -> modelgl -> builder_win -> cell.box = g_malloc0(sizeof*this_proj -> modelgl -> builder_win -> cell.box);
     this_proj -> modelgl -> builder_win -> win = builder_win (this_proj, data);
+    this_proj -> modelgl -> builder_win -> rounding = 2;
   }
   show_the_widgets (this_proj -> modelgl -> builder_win -> win);
 }

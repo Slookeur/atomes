@@ -49,6 +49,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "atom_edit.h"
 #include "curve.h"
+#include "preferences.h"
+#include "bind.h"
+
+extern GLdouble get_max_depth (GLdouble depth);
+extern void setup_default_lights (project * this_proj, image * img);
 
 /*!
   \fn void free_dummies (dummy_atom * tmp_pick)
@@ -227,6 +232,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   else if (! this_proj -> natomes)
   {
     edit -> coord = NULL;
+    this_proj -> modelgl -> anim -> last -> img -> xyz -> axis = default_axis.axis;
   }
   gboolean passivate = FALSE;
   if (asearch -> action == REMOVE)
@@ -1042,7 +1048,7 @@ void clean_all_trees (atom_search * asearch, project * this_proj)
       j = get_asearch_filter (this_proj -> modelgl -> search_widg[i+2]);
       if ((j == 3 && ! this_proj -> modelgl -> adv_bonding[0]) || (j == 4 && ! this_proj -> modelgl -> adv_bonding[1]))
       {
-        gtk_combo_box_set_active (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[i+2] -> filter_box), 0);
+        combo_set_active (this_proj -> modelgl -> search_widg[i+2] -> filter_box, 0);
         set_filter_changed (GTK_COMBO_BOX(this_proj -> modelgl -> search_widg[i+2] -> filter_box), this_proj -> modelgl -> search_widg[i+2]);
       }
       else if (asearch -> action != DISPL && asearch -> action  != RANMOVE)

@@ -35,6 +35,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   GLfloat ** allocdGLfloat (int xal, int yal);
 
+  GLdouble get_max_depth (GLdouble depth);
+
   gboolean is_GLExtension_Supported (const char * extension);
 
   G_MODULE_EXPORT gboolean on_motion (GtkWidget * widg, GdkEvent * event, gpointer data);
@@ -64,8 +66,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void zoom (glwin * view, int delta);
   void rotate_x_y (glwin * view, double angle_x, double angle_y);
   void init_camera (project * this_proj, int get_depth);
-  void image_init_spec_data (image * img, project * this_proj, int nsp);
-  void set_img_lights (project * this_proj, image * img);
+  void setup_default_species_parameters_for_image (project * this_proj, image * img);
+  void setup_image_spec_data (project * this_proj, image * img);
+  void setup_default_lights (project * this_proj, image * img);
+  void setup_default_image (project * this_proj, image * img);
   void init_img (project * this_proj);
   void init_opengl ();
   void center_molecule (project * this_proj);
@@ -91,6 +95,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
 #include "initcoord.h"
 #include "bind.h"
 #include "project.h"
@@ -110,6 +115,9 @@ extern void prepare_atom_edition (gpointer data, gboolean visible);
 extern atom_search * allocate_atom_search (int proj, int action, int searchid, int tsize);
 extern int action_atoms_from_project (project * this_proj, atom_search * asearch, gboolean visible);
 extern atomic_object * create_object_from_frag_mol (project * this_proj, int coord, int geo, atom_search * remove);
+extern void duplicate_material (Material * new_mat, Material * old_mat);
+extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
+extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
 
 GLenum ogl_texture;
 
@@ -187,121 +195,124 @@ const float light_pos[MAX_LIGHTS][4] = {{-0.1f,  0.1f,  1.0f, 0.0f},
 ColRGBA set_default_color (int z)
 {
   ColRGBA col;
-  double colors[116][3]={{1.00, 1.00, 1.00},
-	              {0.85, 1.00, 1.00},
-                  {0.80, 0.50, 1.00},
-                  {0.76, 1.00, 0.00},
-                  {1.00, 0.71, 0.71},
-                  {0.56, 0.56, 0.56},
-                  {0.18, 0.31, 0.97},
-                  {1.00, 0.05, 0.05},
-                  {0.56, 0.87, 0.31},
-                  {0.70, 0.89, 0.96},
-                  {0.67, 0.36, 0.95},
-                  {0.54, 1.00, 0.00},
-                  {0.75, 0.65, 0.65},
-                  {0.94, 0.78, 0.62},
-                  {1.00, 0.50, 0.00},
-                  {1.00, 1.00, 0.19},
-                  {0.12, 0.94, 0.12},
-                  {0.50, 0.82, 0.89},
-                  {0.56, 0.25, 0.83},
-                  {0.24, 1.00, 0.00},
-                  {0.90, 0.90, 0.90},
-                  {0.75, 0.76, 0.78},
-                  {0.65, 0.65, 0.67},
-                  {0.54, 0.60, 0.78},
-                  {0.61, 0.48, 0.78},
-                  {0.87, 0.40, 0.20},
-                  {0.94, 0.56, 0.62},
-                  {0.31, 0.81, 0.31},
-                  {0.78, 0.50, 0.20},
-                  {0.49, 0.50, 0.69},
-                  {0.76, 0.56, 0.56},
-                  {0.40, 0.56, 0.56},
-                  {0.74, 0.50, 0.89},
-                  {1.00, 0.63, 0.00},
-                  {0.65, 0.16, 0.16},
-                  {0.36, 0.72, 0.82},
-                  {0.44, 0.18, 0.69},
-                  {0.00, 1.00, 0.00},
-                  {0.58, 1.00, 1.00},
-                  {0.58, 0.88, 0.88},
-                  {0.45, 0.76, 0.79},
-                  {0.33, 0.71, 0.71},
-                  {0.23, 0.62, 0.62},
-                  {0.14, 0.56, 0.56},
-                  {0.04, 0.49, 0.55},
-                  {0.00, 0.41, 0.52},
-                  {0.75, 0.75, 0.75},
-                  {1.00, 0.85, 0.56},
-                  {0.65, 0.46, 0.45},
-                  {0.40, 0.50, 0.50},
-                  {0.62, 0.39, 0.71},
-                  {0.83, 0.48, 0.00},
-                  {0.58, 0.00, 0.58},
-                  {0.26, 0.62, 0.69},
-                  {0.34, 0.09, 0.56},
-                  {0.00, 0.79, 0.00},
-                  {0.44, 0.83, 1.00},
-                  {1.00, 1.00, 0.78},
-                  {0.85, 1.00, 0.78},
-                  {0.78, 1.00, 0.78},
-                  {0.64, 1.00, 0.78},
-                  {0.56, 1.00, 0.78},
-                  {0.38, 1.00, 0.78},
-                  {0.27, 1.00, 0.78},
-                  {0.19, 1.00, 0.78},
-                  {0.12, 1.00, 0.78},
-                  {0.00, 1.00, 0.61},
-                  {0.00, 0.90, 0.46},
-                  {0.00, 0.83, 0.32},
-                  {0.00, 0.75, 0.22},
-                  {0.00, 0.67, 0.14},
-                  {0.30, 0.76, 1.00},
-                  {0.30, 0.65, 1.00},
-                  {0.13, 0.58, 0.84},
-                  {0.15, 0.49, 0.67},
-                  {0.15, 0.40, 0.59},
-                  {0.09, 0.33, 0.53},
-                  {0.81, 0.81, 0.87},
-                  {1.00, 0.81, 0.13},
-                  {0.72, 0.72, 0.81},
-                  {0.65, 0.33, 0.30},
-                  {0.34, 0.35, 0.38},
-                  {0.62, 0.31, 0.71},
-                  {0.67, 0.36, 0.00},
-                  {0.46, 0.31, 0.27},
-                  {0.26, 0.51, 0.59},
-                  {0.26, 0.00, 0.40},
-                  {0.00, 0.49, 0.00},
-                  {0.44, 0.67, 0.98},
-                  {0.00, 0.73, 1.00},
-                  {0.00, 0.63, 1.00},
-                  {0.00, 0.56, 1.00},
-                  {0.00, 0.50, 1.00},
-                  {0.00, 0.42, 1.00},
-                  {0.33, 0.36, 0.95},
-                  {0.54, 0.31, 0.89},
-                  {0.63, 0.21, 0.83},
-                  {0.70, 0.12, 0.83},
-                  {0.70, 0.12, 0.73},
-                  {0.70, 0.05, 0.65},
-                  {0.74, 0.05, 0.53},
-                  {0.78, 0.00, 0.40},
-                  {0.80, 0.00, 0.35},
-                  {0.82, 0.00, 0.31},
-                  {0.85, 0.00, 0.27},
-                  {0.88, 0.00, 0.22},
-                  {0.90, 0.00, 0.18},
-                  {0.92, 0.00, 0.15},
-                  {0.93, 0.00, 0.14},
-                  {0.94, 0.00, 0.13},
-                  {0.95, 0.00, 0.12},
-                  {0.96, 0.00, 0.10},
-                  {0.97, 0.00, 0.10},
-                  {0.98, 0.00, 0.10},
-                  {0.99, 0.00, 0.10}};
+  double colors[118][3]={{1.00, 1.00, 1.00},
+                         {0.85, 1.00, 1.00},
+                         {0.80, 0.50, 1.00},
+                         {0.76, 1.00, 0.00},
+                         {1.00, 0.71, 0.71},
+                         {0.56, 0.56, 0.56},
+                         {0.18, 0.31, 0.97},
+                         {1.00, 0.05, 0.05},
+                         {0.56, 0.87, 0.31},
+                         {0.70, 0.89, 0.96},
+                         {0.67, 0.36, 0.95},
+                         {0.54, 1.00, 0.00},
+                         {0.75, 0.65, 0.65},
+                         {0.94, 0.78, 0.62},
+                         {1.00, 0.50, 0.00},
+                         {1.00, 1.00, 0.19},
+                         {0.12, 0.94, 0.12},
+                         {0.50, 0.82, 0.89},
+                         {0.56, 0.25, 0.83},
+                         {0.24, 1.00, 0.00},
+                         {0.90, 0.90, 0.90},
+                         {0.75, 0.76, 0.78},
+                         {0.65, 0.65, 0.67},
+                         {0.54, 0.60, 0.78},
+                         {0.61, 0.48, 0.78},
+                         {0.87, 0.40, 0.20},
+                         {0.94, 0.56, 0.62},
+                         {0.31, 0.81, 0.31},
+                         {0.78, 0.50, 0.20},
+                         {0.49, 0.50, 0.69},
+                         {0.76, 0.56, 0.56},
+                         {0.40, 0.56, 0.56},
+                         {0.74, 0.50, 0.89},
+                         {1.00, 0.63, 0.00},
+                         {0.65, 0.16, 0.16},
+                         {0.36, 0.72, 0.82},
+                         {0.44, 0.18, 0.69},
+                         {0.00, 1.00, 0.00},
+                         {0.58, 1.00, 1.00},
+                         {0.58, 0.88, 0.88},
+                         {0.45, 0.76, 0.79},
+                         {0.33, 0.71, 0.71},
+                         {0.23, 0.62, 0.62},
+                         {0.14, 0.56, 0.56},
+                         {0.04, 0.49, 0.55},
+                         {0.00, 0.41, 0.52},
+                         {0.75, 0.75, 0.75},
+                         {1.00, 0.85, 0.56},
+                         {0.65, 0.46, 0.45},
+                         {0.40, 0.50, 0.50},
+                         {0.62, 0.39, 0.71},
+                         {0.83, 0.48, 0.00},
+                         {0.58, 0.00, 0.58},
+                         {0.26, 0.62, 0.69},
+                         {0.34, 0.09, 0.56},
+                         {0.00, 0.79, 0.00},
+                         {0.44, 0.83, 1.00},
+                         {1.00, 1.00, 0.78},
+                         {0.85, 1.00, 0.78},
+                         {0.78, 1.00, 0.78},
+                         {0.64, 1.00, 0.78},
+                         {0.56, 1.00, 0.78},
+                         {0.38, 1.00, 0.78},
+                         {0.27, 1.00, 0.78},
+                         {0.19, 1.00, 0.78},
+                         {0.12, 1.00, 0.78},
+                         {0.00, 1.00, 0.61},
+                         {0.00, 0.90, 0.46},
+                         {0.00, 0.83, 0.32},
+                         {0.00, 0.75, 0.22},
+                         {0.00, 0.67, 0.14},
+                         {0.30, 0.76, 1.00},
+                         {0.30, 0.65, 1.00},
+                         {0.13, 0.58, 0.84},
+                         {0.15, 0.49, 0.67},
+                         {0.15, 0.40, 0.59},
+                         {0.09, 0.33, 0.53},
+                         {0.81, 0.81, 0.87},
+                         {1.00, 0.81, 0.13},
+                         {0.72, 0.72, 0.81},
+                         {0.65, 0.33, 0.30},
+                         {0.34, 0.35, 0.38},
+                         {0.62, 0.31, 0.71},
+                         {0.67, 0.36, 0.00},
+                         {0.46, 0.31, 0.27},
+                         {0.26, 0.51, 0.59},
+                         {0.26, 0.00, 0.40},
+                         {0.00, 0.49, 0.00},
+                         {0.44, 0.67, 0.98},
+                         {0.00, 0.73, 1.00},
+                         {0.00, 0.63, 1.00},
+                         {0.00, 0.56, 1.00},
+                         {0.00, 0.50, 1.00},
+                         {0.00, 0.42, 1.00},
+                         {0.33, 0.36, 0.95},
+                         {0.54, 0.31, 0.89},
+                         {0.63, 0.21, 0.83},
+                         {0.70, 0.12, 0.83},
+                         {0.70, 0.12, 0.73},
+                         {0.70, 0.05, 0.65},
+                         {0.74, 0.05, 0.53},
+                         {0.78, 0.00, 0.40},
+                         {0.80, 0.00, 0.35},
+                         {0.82, 0.00, 0.31},
+                         {0.85, 0.00, 0.27},
+                         {0.88, 0.00, 0.22},
+                         {0.90, 0.00, 0.18},
+                         {0.92, 0.00, 0.15},
+                         {0.93, 0.00, 0.14},
+                         {0.94, 0.00, 0.13},
+                         {0.95, 0.00, 0.12},
+                         {0.96, 0.00, 0.10},
+                         {0.97, 0.00, 0.10},
+                         {0.98, 0.00, 0.10},
+                         {0.99, 0.00, 0.10},
+                         {1.00, 0.00, 0.10},
+                         {1.00, 0.00, 0.15},
+                         {1.00, 0.00, 0.20}};
   // Dumy atoms have z < 1
   int Z = (z < 1) ? 1 : z;
   col.red = colors[Z-1][0];
@@ -313,8 +324,8 @@ ColRGBA set_default_color (int z)
 
 /*!
   \fn void update_bonds_ (int * bd, int * stp,
-*                         int * bdim, int bda[*bdim], int bdb[*bdim],
-*                         double * x, double * y, double * z)
+                          int * bdim, int bda[*bdim], int bdb[*bdim],
+                          double * x, double * y, double * z)
 
   \brief update bonding information from Fortran90
 
@@ -388,7 +399,7 @@ void sort (int dim, int * tab)
       if (tab[j] <= val) break;
       tab[j+1] = tab[j];
     }
-    tab[j+1]=val;
+    tab[j+1] = val;
   }
 }
 
@@ -641,11 +652,11 @@ void motion (glwin * view, gint x, gint y, GdkModifierType state)
       view -> anim -> last -> img -> c_shift[1] += (double) (y - view -> mouseY) / view -> pixels[1];
       for (i=0; i<2; i++)
       {
-        if (view -> camera_widg[i+5])
+        if (view -> rep_win)
         {
-          if (GTK_IS_WIDGET(view -> camera_widg[i+5]))
+          if (view -> rep_win -> camera_widg[i+5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+5]))
           {
-            gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+5], - view -> anim -> last -> img -> c_shift[i]);
+            gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+5], - view -> anim -> last -> img -> c_shift[i]);
           }
         }
       }
@@ -1006,11 +1017,11 @@ G_MODULE_EXPORT void on_glwin_button_released (GtkGesture * gesture, int n_press
 void zoom (glwin * view, int delta)
 {
   view -> anim -> last -> img -> zoom += delta * view -> zoom_factor;
-  if (view -> camera_widg[0])
+  if (view -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[0]))
+    if (view -> rep_win  -> camera_widg[0] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[0]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[0], 1.0-0.5*view -> anim -> last -> img -> zoom);
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[0], 1.0-0.5*view -> anim -> last -> img -> zoom);
     }
   }
 }
@@ -1097,11 +1108,11 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
   for (i=0; i<2; i++)
   {
     if (fabs(view -> anim -> last -> img -> c_angle[i]) > 180.0) view -> anim -> last -> img -> c_angle[i] = 0.0;
-    if (view -> camera_widg[i+3])
+    if (view -> rep_win)
     {
-      if (GTK_IS_WIDGET(view -> camera_widg[i+3]))
+      if (view -> rep_win -> camera_widg[i+3] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+3]))
       {
-        gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
+        gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
       }
     }
   }
@@ -1122,9 +1133,36 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
 }
 
 /*!
+  \fn GLdouble get_max_depth (GLdouble depth)
+
+  \brief guess a reasonable maximum OpenGL window depth
+
+  \param depth the calculated model depth
+*/
+GLdouble get_max_depth (GLdouble depth)
+{
+  if (depth < 10.0)
+  {
+    return 10.0;
+  }
+  else if (depth < 100.0)
+  {
+    return 100.0;
+  }
+  else if (depth < 1000.0)
+  {
+    return 1000.0;
+  }
+  else
+  {
+    return 10000.0;
+  }
+}
+
+/*!
   \fn void init_camera (project * this_proj, int get_depth)
 
-  \brief intialize the OpenGL camera settings
+  \brief initialize the OpenGL camera settings
 
   \param this_proj the target project
   \param get_depth estimate the OpenGL depth ? (1/0)
@@ -1132,22 +1170,12 @@ void rotate_x_y (glwin * view, double angle_x, double angle_y)
 void init_camera (project * this_proj, int get_depth)
 {
   glwin * view = this_proj -> modelgl;
-  if (get_depth) view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  if (view -> camera_widg[1])
+  if (get_depth)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[1]))
-    {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[1], view -> anim -> last -> img -> p_depth);
-    }
+    view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+    view -> anim -> last -> img -> m_depth = get_max_depth (view -> anim -> last -> img -> p_depth);
   }
-  view -> anim -> last -> img -> gnear = 6.0;//view -> anim -> last -> img -> p_depth/15.0;
-  if (view -> camera_widg[2])
-  {
-    if (GTK_IS_WIDGET(view -> camera_widg[2]))
-    {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[2], view -> anim -> last -> img -> gnear);
-    }
-  }
+  view -> anim -> last -> img -> gnear = default_rep.gnear;
   view -> anim -> last -> img -> gfar = view -> anim -> last -> img -> p_depth*2.0;
   view -> anim -> last -> img -> rotation_quaternion.w = 0.0;
   view -> anim -> last -> img -> rotation_quaternion.x = 0.0;
@@ -1156,40 +1184,87 @@ void init_camera (project * this_proj, int get_depth)
   int i;
   for (i=0; i<2; i++)
   {
-    view -> anim -> last -> img -> c_shift[i] = 0.0;
     view -> anim -> last -> img -> c_angle[i] = 0.0;
-    if (view -> camera_widg[i+5])
-    {
-      if (GTK_IS_WIDGET(view -> camera_widg[i+5]))
-      {
-        gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[i+5], view -> anim -> last -> img -> c_shift[i]);
-      }
-    }
+    view -> anim -> last -> img -> c_shift[i] = default_rep.c_shift[i];
   }
   save_rotation_quaternion (view);
-  rotate_x_y (view, CAMERA_ANGLE_X, CAMERA_ANGLE_Y);
-  view -> anim -> last -> img -> zoom = ZOOM;
-  if (view -> camera_widg[0])
+  rotate_x_y (view, default_rep.c_angle[0], default_rep.c_angle[1]);
+  view -> anim -> last -> img -> zoom = default_rep.zoom;
+  if (view -> rep_win)
   {
-    if (GTK_IS_WIDGET(view -> camera_widg[0]))
+    if (view -> rep_win -> camera_widg[0] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[0]))
     {
-      gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[0], 1.0 - 0.5*view -> anim -> last -> img -> zoom);
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[0], 1.0 - 0.5*view -> anim -> last -> img -> zoom);
+    }
+    if (view -> rep_win -> camera_widg[1] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[1]))
+    {
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[1], view -> anim -> last -> img -> p_depth);
+    }
+    if (view -> rep_win -> camera_widg[2] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[2]))
+    {
+      gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[2], view -> anim -> last -> img -> gnear);
     }
   }
 }
 
 /*!
-  \fn void image_init_spec_data (image * img, project * this_proj, int nsp)
+  \fn void setup_default_species_parameters_for_image (project * this_proj, image * img)
+
+  \brief setup default chemical species related parameters for image
+
+  \param this_proj the target project
+  \param img the target image
+*/
+void setup_default_species_parameters_for_image (project * this_proj, image * img)
+{
+  int i, j;
+  int nsp = this_proj -> nspec;
+  img -> radall[0] = default_bd_rw[2];
+  img -> radall[1] = default_bd_rw[5];
+  for (i = 0; i < nsp; i++)
+  {
+    j = this_proj -> chemistry -> chem_prop[CHEM_Z][i];
+    // B & S
+    img -> sphererad[i] = (default_o_at_rs[0]) ? default_at_rs[0] : get_radius (2, 0, j, default_atomic_rad[0]);
+    img -> sphererad[i+nsp] = (default_o_at_rs[5]) ? default_at_rs[5] : get_radius (7, 0, j, default_atomic_rad[5]);
+    img -> bondrad[i][i] = (default_o_bd_rw[0]) ? default_bd_rw[0] : get_radius (-2, 0, j, default_bond_rad[0]);
+    img -> bondrad[i+nsp][i+nsp] = (default_o_bd_rw[3]) ? default_bd_rw[3] : get_radius (-5, 0, j, default_bond_rad[3]);;
+    // Filled
+    img -> atomicrad[i] = (default_o_at_rs[3]) ? default_at_rs[3] : get_radius (5, 0, j, default_atomic_rad[3]);
+    img -> atomicrad[i+nsp] = (default_o_at_rs[8]) ? default_at_rs[8] : get_radius (10, 0, j, default_atomic_rad[8]);
+    // Wireframe & Dots
+    img -> pointrad[i] = (default_o_at_rs[1]) ? default_at_rs[1] : get_radius (3, 0, j, default_atomic_rad[1]);
+    img -> pointrad[i+nsp] = (default_o_at_rs[6]) ? default_at_rs[6] : get_radius (8, 0, j, default_atomic_rad[6]);
+    img -> linerad[i][i] = (default_o_bd_rw[1]) ? default_bd_rw[1] : get_radius (-3, 0, j, default_bond_rad[1]);
+    img -> linerad[i+nsp][i+nsp] = (default_o_bd_rw[4]) ? default_bd_rw[4] : get_radius (-6, 0, j, default_bond_rad[4]);
+
+    img -> at_color[i] = get_spec_color (j, default_atom_color[0]);
+    img -> at_color[i+nsp] = get_spec_color (j, default_atom_color[1]);
+  }
+  for (i=0; i < nsp-1; i++)
+  {
+    for (j=i+1; j < nsp; j++)
+    {
+      img -> linerad[i][j] = img -> linerad[j][i] = min (img -> linerad[i][i], img -> linerad[j][j]);
+      img -> linerad[i+nsp][j+nsp] = img -> linerad[j+nsp][i+nsp] = min (img -> linerad[i+nsp][i+nsp], img -> linerad[j+nsp][j+nsp]);
+      img -> bondrad[i][j] = img -> bondrad[j][i] = min(img -> bondrad[i][i], img -> bondrad[j][j]);
+      img -> bondrad[i+nsp][j+nsp] = img -> bondrad[j+nsp][i+nsp] = min(img -> bondrad[i+nsp][i+nsp], img -> bondrad[j+nsp][j+nsp]);
+    }
+  }
+}
+
+/*!
+  \fn void setup_image_spec_data (project * this_proj, image * img)
 
   \brief initialize the chemical species related pointers in an image data structure
 
-  \param img the target image
   \param this_proj the target project
-  \param nsp the number of chemical species
+  \param img the target image
 */
-void image_init_spec_data (image * img, project * this_proj, int nsp)
+void setup_image_spec_data (project * this_proj, image * img)
 {
   int i, j;
+  int nsp = this_proj -> nspec;
   // Chemical species related
   for (i = 0; i<2; i++)
   {
@@ -1203,29 +1278,7 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
   img -> atomicrad = allocdouble (2*nsp);
   img -> bondrad = allocddouble (2*nsp, 2*nsp);
   img -> linerad = allocddouble (2*nsp, 2*nsp);
-  for (i = 0; i < nsp; i++)
-  {
-    img -> sphererad[i] = img -> sphererad[i+nsp] = this_proj -> chemistry -> chem_prop[CHEM_R][i]/2.0;
-    img -> atomicrad[i] = img -> atomicrad[i+nsp] = this_proj -> chemistry -> chem_prop[CHEM_R][i];
-    img -> pointrad[i] = img -> pointrad[i+nsp] = DEFAULT_SIZE;
-    img -> at_color[i] = img -> at_color[i+nsp] = set_default_color ((int)this_proj -> chemistry -> chem_prop[CHEM_Z][i]);
-    img -> linerad[i][i] = img -> linerad[i+nsp][i+nsp] = DEFAULT_SIZE;
-    img -> bondrad[i][i] = img -> bondrad[i+nsp][i+nsp] = min(1.0, img -> sphererad[i]/2.0);
-  }
-  for (i=0; i < nsp-1; i++)
-  {
-    for (j=i+1; j < nsp; j++)
-    {
-      img -> linerad[i][j] = img -> linerad[j][i]
-                           = img -> linerad[i+nsp][j+nsp]
-                           = img -> linerad[j+nsp][i+nsp] = DEFAULT_SIZE;
-      img -> bondrad[i][j] = min(1.0, img -> sphererad[i]/2.0);
-      img -> bondrad[i][j] = min(img -> bondrad[i][j], img -> sphererad[j]/2.0);
-      img -> bondrad[j][i] = img -> bondrad[i+nsp][j+nsp]
-                           = img -> bondrad[j+nsp][i+nsp]
-                           = img -> bondrad[i][j];
-    }
-  }
+  setup_default_species_parameters_for_image (this_proj, img);
   for (i=0; i<10; i++)
   {
     img -> spcolor[i] = NULL;
@@ -1242,31 +1295,98 @@ void image_init_spec_data (image * img, project * this_proj, int nsp)
 }
 
 /*!
-  \fn void set_img_lights (project * this_proj, image * img)
+  \fn void setup_default_lights (project * this_proj, image * img)
 
   \brief initialize lightning for an image data structure
 
   \param this_proj the target project
   \param img the target image
 */
-void set_img_lights (project * this_proj, image * img)
+void setup_default_lights (project * this_proj, image * img)
 {
-  img -> lights = 3;
-  if (img -> l_ght) g_free (img -> l_ght);
-  img -> l_ght = g_malloc0 (3*sizeof*img -> l_ght);
-  float val;
+  img -> l_ghtning.lights = default_lightning.lights;
+  if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
+  img -> l_ghtning.spot = g_malloc0 (img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
+  float size = 0.0;
+  int i;
   if (this_proj -> cell.box)
   {
-    val = (this_proj -> cell.box[0].param[0][0] == 0.0) ? img -> p_depth : this_proj -> cell.box[0].param[0][0];
+    for (i=0; i<3; i++) size = max (size, this_proj -> cell.box[0].param[0][i]);
+  }
+  size = (size) ? size : img -> p_depth;
+  for (i=0; i<img -> l_ghtning.lights; i++)
+  {
+    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, size, img -> p_depth);
+    img -> l_ghtning.spot[i].fix = default_lightning.spot[i].fix;
+    img -> l_ghtning.spot[i].intensity = default_lightning.spot[i].intensity;
+    if (img -> p_depth <= 50.0)
+    {
+      img -> l_ghtning.spot[i].intensity = v3_muls (img -> l_ghtning.spot[i].intensity, img -> p_depth/100.0);
+    }
+    img -> l_ghtning.spot[i].attenuation = default_lightning.spot[i].attenuation;
+    img -> l_ghtning.spot[i].direction = default_lightning.spot[i].direction;
+    img ->l_ghtning.spot[i].position = default_lightning.spot[i].position;
+    if (img -> l_ghtning.spot[i].type)
+    {
+      img -> l_ghtning.spot[i].position = v3_muls (img -> l_ghtning.spot[i].position, img -> p_depth);
+    }
+  }
+}
+
+/*!
+  \fn void setup_default_image (project * this_proj, image * img)
+
+  \brief setup default image parameters
+
+  \param this_proj the target project
+  \param img the target image
+*/
+void setup_default_image (project * this_proj, image * img)
+{
+  int i;
+  duplicate_background_data (img -> back, & default_background);
+  duplicate_box_data (img -> abc, & default_box);
+  duplicate_axis_data (img -> xyz, & default_axis);
+
+  for (i=0; i<2; i++)
+  {
+    img -> color_map[i] = default_opengl[i+1];
+    img -> sel_color[i] = default_sel_color[i];
+  }
+  img -> quality = default_opengl[3];
+  img -> rep = default_rep.rep;
+  img -> filled_type = NONE;
+  // Visual styles
+  if (! default_opengl[0])
+  {
+    img -> style = (this_proj -> natomes <= 10000) ? BALL_AND_STICK : DEFAULT_STYLE;
+  }
+  else if (default_opengl[0] > 0)
+  {
+    img -> style = (default_opengl[0] < 2) ? default_opengl[0] - 1 : default_opengl[0];
   }
   else
   {
-    val = img -> p_depth;
+    img -> style = SPACEFILL;
+    img -> filled_type = - default_opengl[0] - 1;
   }
-  float vbl = img -> p_depth;
-  img -> l_ght[0] = init_light_source (0, val, vbl);
-  img -> l_ght[1] = init_light_source (1, val, vbl);
-  img -> l_ght[2] = init_light_source (1, val, vbl);
+  img -> xyz -> axis = (this_proj -> natomes) ? default_axis.axis : NONE;
+  img -> abc -> box = (this_proj -> cell.ltype) ? default_box.box : NONE;
+  for (i=0; i<5; i++)
+  {
+    duplicate_screen_label (& img -> labels[i], & default_label[i]);
+  }
+  for (i=0; i<2; i++)
+  {
+    img -> mtilt[i] = default_mtilt[i];
+    img -> mfactor[i] = default_mfactor[i];
+    img -> mpattern[i] = default_mpattern[i];
+    img -> mwidth[i] = default_mwidth[i];
+    img -> acl_format[i] = default_acl_format[i];
+  }
+  setup_default_lights (this_proj, img);
+  duplicate_material (& img -> m_terial, & default_material);
+  duplicate_fog (& img -> f_g, & default_fog);
 }
 
 /*!
@@ -1278,89 +1398,18 @@ void set_img_lights (project * this_proj, image * img)
 */
 void init_img (project * this_proj)
 {
-  int i;
   this_proj -> modelgl -> anim -> last -> img = g_malloc0(sizeof*this_proj -> modelgl -> anim -> last -> img);
   image * img = this_proj -> modelgl -> anim -> last -> img;
-  img -> backcolor.red = 0.0;
-  img -> backcolor.green = 0.0;
-  img -> backcolor.blue = 0.0;
-  img -> backcolor.alpha = 1.0;
-  img -> box_color.red = 0.0;
-  img -> box_color.green = 1.0;
-  img -> box_color.blue = 0.0;
-  img -> box_color.alpha = 1.0;
-  img -> color_map[0] = 0;
-  img -> color_map[1] = 0;
-  img -> box_axis_rad[BOX] = 0.05;
-  img -> box_axis_line[BOX] = DEFAULT_SIZE;
-  img -> axispos = BOTTOM_RIGHT;
-  img -> box_axis_rad[AXIS] = 0.1;
-  img -> box_axis_line[AXIS] = DEFAULT_SIZE;
-  img -> axis_length = 2.0*DEFAULT_SIZE;
-  img -> axis_color = NULL;
-  img -> axis_pos[0] = 50.0;
-  img -> axis_pos[1] = 50.0;
-  img -> axis_pos[2] = 0.0;
-  img -> axis_labels = 1;
-  img -> filled_type = NONE;
-  img -> quality = QUALITY;
+  if (! img -> back) img -> back = g_malloc0(sizeof*img -> back);
+  if (! img -> abc) img -> abc = g_malloc0(sizeof*img -> abc);
+  if (! img -> xyz) img -> xyz = g_malloc0(sizeof*img -> xyz);
   img -> render = FILL;
-  img -> rep = PERSPECTIVE;
-
-  // Visual styles
-  img -> style = (this_proj -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
-  img -> box_axis[AXIS] = NONE; // (this_proj -> natomes <= 1000) ?  CYLINDERS : DEFAULT_STYLE;
-  if (this_proj -> cell.pbc)
-  {
-    img -> box_axis[BOX] = (this_proj -> natomes <= 1000) ? CYLINDERS : DEFAULT_STYLE;
-  }
-  else
-  {
-    img -> box_axis[BOX] = NONE;
-  }
-
-  for (i=0; i<5; i++)
-  {
-    img -> labels_position[i] = 1;
-    img -> labels_render[i] = BETTER_TEXT;
-    if (i < 2) img -> labels_format[i] = SYMBOL_AND_NUM;
-    img -> labels_font[i] = g_strdup_printf ("Sans Bold 12");
-  }
-  img -> mtilt = TRUE;
-  img -> mfactor = 1;
-  img -> mwidth = 1.0;
-  for (i=0; i<2; i++)
-  {
-    img -> labels_font[3+i] = g_strdup_printf ("Courier New Bold 18");
-    img -> labels_color[3+i] = g_malloc (sizeof*img -> labels_color[3]);
-    img -> labels_color[3+i][0].red = 1.0;
-    img -> labels_color[3+i][0].green = 1.0;
-    img -> labels_color[3+i][0].blue = 1.0;
-    img -> labels_color[3+i][0].alpha = 1.0;
-    img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
-  }
-  img -> axis_title[0] = g_strdup_printf ("x");
-  img -> axis_title[1] = g_strdup_printf ("y");
-  img -> axis_title[2] = g_strdup_printf ("z");
-
-  img -> radall[0] = img -> radall[1] = 0.1;
-
-  if (this_proj -> nspec) image_init_spec_data (img, this_proj, this_proj -> nspec);
   this_proj -> modelgl -> p_moy = img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-  set_img_lights (this_proj, img);
-  img -> m_terial.predefine = 4;
-  img -> m_terial.albedo = vec3(0.5, 0.5, 0.5);
-  img -> m_terial.param[0] = DEFAULT_LIGHTNING;
-  img -> m_terial.param[1] = DEFAULT_METALLIC;
-  img -> m_terial.param[2] = DEFAULT_ROUGHNESS;
-  img -> m_terial.param[3] = DEFAULT_AMBIANT_OCCLUSION;
-  img -> m_terial.param[4] = DEFAULT_GAMMA_CORRECTION;
-  img -> m_terial.param[5] = DEFAULT_OPACITY;
-
-  img -> f_g.density = 0.005;
-  img -> f_g.depth[0] = 1.0;
-  img -> f_g.depth[1] = 90.0;
-  img -> f_g.color = vec3 (0.01f, 0.01f, 0.01f);
+  img -> m_depth = get_max_depth (img -> p_depth);
+  setup_default_image (this_proj, img);
+  int i;
+  for (i=0; i<2; i++) img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
+  if (this_proj -> nspec) setup_image_spec_data (this_proj, img);
 }
 
 /*!
@@ -1658,7 +1707,8 @@ void init_glwin (glwin * view)
   view -> anim -> first = snap;
   view -> anim -> last = snap;
   init_img (this_proj);
-  init_camera (this_proj, FALSE);
+  init_camera (this_proj, TRUE);
+
   view -> mouseStatus = RELEASED;
   view -> mouseAction = ANALYZE;
   // Warning, if not centered at start-up, dmtx could fail

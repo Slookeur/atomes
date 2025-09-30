@@ -63,6 +63,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void run_this_gtk_native_dialog (GtkNativeDialog * dial, GCallback handler, gpointer data);
   void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data);
   void resize_this_window (GtkWidget * window, int x, int y);
+  void button_set_status (GtkWidget * button, int status);
   void update_entry_int (GtkEntry * entry, int intval);
   void update_entry_double (GtkEntry * entry, double doubleval);
   void update_entry_long_double (GtkEntry * entry, double doubleval);
@@ -70,6 +71,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void text_view_set_monospace (GtkWidget * view);
   void gtk_label_align (GtkWidget * lab, float ax, float ay);
   void layout_add_widget (GtkWidget * layout, GtkWidget * child, int x_pos, int y_pos);
+  void combo_set_markup (GtkWidget * combo);
+  void combo_set_active (GtkWidget * combo, int pos);
   void combo_text_append (GtkWidget * combo, gchar * text);
   void combo_text_prepend (GtkWidget * combo, gchar * text);
   void setup_text_tags (GtkTextBuffer * buffer);
@@ -78,6 +81,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
   void adjust_label (GtkWidget * lab, int dimx, int dimy, float ax, float ay);
   void set_image_from_icon_name (GtkWidget * widg, gchar * icon);
+  void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend);
   void provide_gtk_css (gchar * css);
   void destroy_this_dialog (GtkDialog * dialog);
   void destroy_this_native_dialog (GtkNativeDialog * dialog);
@@ -157,11 +161,16 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   int get_widget_width (GtkWidget * widg);
   int get_widget_height (GtkWidget * widg);
+  int button_get_status (GtkWidget * button);
 
 */
 
 #include "global.h"
 #include "interface.h"
+#include "preferences.h"
+#include "glview.h"
+
+extern void adjust_preferences_window ();
 
 /*!
   \fn void show_the_widgets (GtkWidget * widg)
@@ -357,11 +366,11 @@ GtkWidget * new_gtk_window ()
 #ifdef GTK4
 /*!
   \fn void add_widget_gesture_and_key_action (GtkWidget * widget,
-*                                          gchar * cp_name, GCallback cp_handler, gpointer cp_data,
-*                                          gchar * cr_name, GCallback cr_handler, gpointer cr_data,
-*                                          gchar * kp_name, GCallback kp_handler, gpointer kp_data,
-*                                          gchar * mo_name, GCallback mo_handler, gpointer mo_data,
-*                                          gchar * sc_name, GCallback sc_handler, gpointer sc_data)
+                                              gchar * cp_name, GCallback cp_handler, gpointer cp_data,
+                                              gchar * cr_name, GCallback cr_handler, gpointer cr_data,
+                                              gchar * kp_name, GCallback kp_handler, gpointer kp_data,
+                                              gchar * mo_name, GCallback mo_handler, gpointer mo_data,
+                                              gchar * sc_name, GCallback sc_handler, gpointer sc_data)
 
   \brief Adding GTK4 mouse, and keyboard events to a GtkWidget
 
@@ -494,6 +503,7 @@ void run_this_gtk_dialog (GtkWidget * dial, GCallback handler, gpointer data)
   gtk_window_set_modal (GTK_WINDOW(dial), TRUE);
   if (handler) g_signal_connect (G_OBJECT(dial), "response", handler, data);
   show_the_widgets (dial);
+  if (preferences) adjust_preferences_window ();
   dialog_id ++;
   Event_loop[dialog_id] = g_main_loop_new (NULL, FALSE);
   g_main_loop_run (Event_loop[dialog_id]);
@@ -725,8 +735,8 @@ gboolean is_the_widget_visible (GtkWidget * widg)
 
 /*!
   \fn GtkWidget * create_hscale (float min, float max, float delta,
-                              float val, int pos, int round, int size,
-                              GCallback handler, GCallback scroll_handler, gpointer data)
+                                 float val, int pos, int round, int size,
+                                 GCallback handler, GCallback scroll_handler, gpointer data)
 
   \brief create an horizontal scale GtkWidget
 
@@ -890,6 +900,57 @@ GtkWidget * create_layout (int x, int y)
 }
 
 /*!
+  \fn int combo_get_active (GtkWidget * combo)
+
+  \brief retrieve the active item's position
+
+  \param combo the target GtkWidget
+*/
+int combo_get_active (GtkWidget * combo)
+{
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+}
+/* #ifdef GTK4
+#if GTK_MINOR_VERSION > 9
+  return gtk_drop_down_get_selected (GtkDropDown *)combo);
+#else
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+#endif
+#else
+  return gtk_combo_box_get_active ((GtkComboBox *)combo);
+#endif // GTK4
+} */
+
+/*!
+  \fn void combo_set_active (GtkWidget * combo, int pos)
+
+  \brief set the active item's position
+
+  \param combo the target GtkWidget
+  \param pos the position to set
+*/
+void combo_set_active (GtkWidget * combo, int pos)
+{
+  gtk_combo_box_set_active ((GtkComboBox *)combo, pos);
+}
+
+/*!
+  \fn void combo_set_markup (GtkWidget * combo)
+
+  \brief use pango markup in combo widget
+
+  \param combo to the target widget
+*/
+void combo_set_markup (GtkWidget * combo)
+{
+  GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(combo));
+  if (cell_list && cell_list -> data)
+  {
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), cell_list -> data, "markup", 0, NULL);
+  }
+}
+
+/*!
   \fn void combo_text_append (GtkWidget * combo, gchar * text)
 
   \brief append text in GtkComboBox widget
@@ -928,7 +989,7 @@ GtkWidget * create_combo ()
 /*!
   \fn void setup_text_tags (GtkTextBuffer * buffer)
 
-  \brief prepare the avialable text tags for the GtkTextBuffer
+  \brief prepare the available text tags for the GtkTextBuffer
 
   \param buffer the GtkTextBuffer
 */
@@ -1468,10 +1529,10 @@ GtkWidget * create_image_from_data (int format, gpointer item_image)
 #ifdef GTK3
 /*!
   \fn GtkWidget * gtk3_menu_item (GtkWidget * menu, gchar * name,
-*                              int icon_format, gpointer item_icon,
-*                              GCallback handler, gpointer data,
-*                              gboolean accel, guint key, GdkModifierType mod,
-*                              gboolean check, gboolean radio, gboolean status)
+                                  int icon_format, gpointer item_icon,
+                                  GCallback handler, gpointer data,
+                                  gboolean accel, guint key, GdkModifierType mod,
+                                  gboolean check, gboolean radio, gboolean status)
 
   \brief create a GT3 menu item, and insert it in a menu, if any
 
@@ -1571,8 +1632,8 @@ void add_menu_separator (GtkWidget * menu)
 }
 #endif
 
-/*
-* GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
+/*!
+  \fn GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
 
   \brief create a GtkLabel with pango markup
 
@@ -1785,6 +1846,39 @@ GtkWidget * spin_button (GCallback handler, double value, double start, double e
 }
 
 /*!
+  \fn int button_get_status (GtkWidget * button)
+
+  \brief get status of check / toggle button
+
+  \param button the button to check
+*/
+int button_get_status (GtkWidget * button)
+{
+#ifdef GTK4
+  return gtk_check_button_get_active (GTK_CHECK_BUTTON(button));
+#else
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(button));
+#endif
+}
+
+/*!
+  \fn void button_set_status (GtkWidget * button, int status)
+
+  \brief set status of check / toggle button
+
+  \param button the button to update
+  \param status the new status
+*/
+void button_set_status (GtkWidget * button, int status)
+{
+#ifdef GTK4
+  gtk_check_button_set_active (GTK_CHECK_BUTTON(button), status);
+#else
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(button), status);
+#endif
+}
+
+/*!
   \fn GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCallback handler, gpointer data)
 
   \brief create a check button
@@ -1801,20 +1895,18 @@ GtkWidget * check_button (gchar * text, int dimx, int dimy, gboolean state, GCal
   GtkWidget * but = gtk_check_button_new ();
   if (text != NULL)
   {
+    gchar * label = g_strdup_printf (" %s", text);
 #ifdef GTK4
-    gtk_check_button_set_label (GTK_CHECK_BUTTON(but), text);
+    gtk_check_button_set_label (GTK_CHECK_BUTTON(but), label);
     GtkWidget * lab = gtk_widget_get_last_child (but);
     adjust_label (lab, -1, -1, 0.0, 0.5);
 #else
-    add_container_child (CONTAINER_BUT, but, markup_label(text, -1, -1, 0.0, 0.5));
+    add_container_child (CONTAINER_BUT, but, markup_label(label, -1, -1, 0.0, 0.5));
 #endif
+    g_free (label);
   }
   gtk_widget_set_size_request (but, dimx, dimy);
-#ifdef GTK4
-  gtk_check_button_set_active (GTK_CHECK_BUTTON(but), state);
-#else
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(but), state);
-#endif
+  button_set_status (but, state);
   if (handler != NULL) g_signal_connect (G_OBJECT(but), "toggled", handler, data);
   return but;
 }
@@ -1901,23 +1993,50 @@ void set_image_from_icon_name (GtkWidget * widg, gchar * icon)
 }
 
 /*!
+  \fn void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend)
+
+  \brief append comments to a vertical box
+
+  \param vbox the target vertical box
+  \param symbol the symbol to legend
+  \param legend the associated legend
+*/
+void append_comments (GtkWidget * vbox, gchar * symbol, gchar * legend)
+{
+  GtkWidget * hbox = create_hbox (BSEP);
+  gchar * str = g_strdup_printf ("<i><sub>%s</sub></i>", legend);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(symbol, 15, -1, 1.0, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5) , FALSE, FALSE, 5);
+  g_free (str);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+}
+
+/*!
   \fn GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
-*  GtkWidget * bbox (GtkWidget * box, char * lab)
-*  GtkWidget * cbox (GtkWidget * box, char * lab)
-*  GtkWidget * fbox (GtkWidget * box, char * lab)
 
   \brief box creating routine, to help design faster elements for the GUI
 
+  \param box the box to insert the new box into
+  \param lab string to display
+  \param vspace vertical space
 */
 GtkWidget * abox (GtkWidget * box, char * lab, int vspace)
 {
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, vspace);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.25), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(lab, 150, 30, 0.0, 0.5), FALSE, FALSE, 0);
   return hbox;
 }
 
+/*!
+  \fn GtkWidget * bbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * bbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);
@@ -1928,6 +2047,14 @@ GtkWidget * bbox (GtkWidget * box, char * lab)
   return hhbox;
 }
 
+/*!
+  \fn GtkWidget * cbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * cbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);
@@ -1938,6 +2065,14 @@ GtkWidget * cbox (GtkWidget * box, char * lab)
   return hhbox;
 }
 
+/*!
+  \fn GtkWidget * fbox (GtkWidget * box, char * lab)
+
+  \brief box creating routine, to help design faster elements for the GUI
+
+  \param box the box to insert the new box into
+  \param lab string to display
+*/
 GtkWidget * fbox (GtkWidget * box, char * lab)
 {
   GtkWidget * hbox = create_hbox (0);

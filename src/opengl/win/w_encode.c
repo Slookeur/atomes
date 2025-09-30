@@ -134,7 +134,7 @@ G_MODULE_EXPORT void set_video_res (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void set_video_codec (GtkComboBox *ComboBoxGtk)
 {
-  codec = gtk_combo_box_get_active (ComboBoxGtk);
+  codec = combo_get_active ((GtkWidget *)ComboBoxGtk);
 }
 
 /*!
@@ -245,7 +245,7 @@ GtkWidget * form;
 */
 G_MODULE_EXPORT void set_image_format (GtkComboBox * box, gpointer data)
 {
-  codec = gtk_combo_box_get_active (box);
+  codec = combo_get_active ((GtkWidget *)box);
   switch (codec)
   {
     case 0:
@@ -407,7 +407,7 @@ void window_encode (glwin * view, gboolean video)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, form, TRUE, TRUE, 0);
   }
   codec = 0;
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cod), codec);
+  combo_set_active (cod, codec);
 
   if (! video) set_image_format (GTK_COMBO_BOX(cod), NULL);
 

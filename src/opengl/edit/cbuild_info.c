@@ -461,8 +461,8 @@ GtkWidget * create_wyck_pts_info (space_group * spg, int sid)
 G_MODULE_EXPORT void set_so_info (GtkComboBox * box, gpointer data)
 {
   builder_edition * cbuilder = (builder_edition *)data;
-  int i = gtk_combo_box_get_active (box);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(cbuilder -> so_combo), i);
+  int i = combo_get_active ((GtkWidget *)box);
+  combo_set_active (cbuilder -> so_combo, i);
   if (i > -1)
   {
     info_vs = destroy_this_widget (info_vs);
@@ -582,13 +582,9 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (sbox), renderer, "text", 0, NULL);
     gtk_widget_set_size_request (sbox, 150, 25);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, info_hsbox, sbox, FALSE, FALSE, 5);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(sbox), 0);
+    combo_set_active (sbox, 0);
     g_signal_connect (G_OBJECT(sbox), "changed", G_CALLBACK(set_so_info), get_project_by_id(id -> a) -> modelgl -> builder_win);
-    GList * cell_list = gtk_cell_layout_get_cells(GTK_CELL_LAYOUT(sbox));
-    if (cell_list && cell_list -> data)
-    {
-      gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(sbox), cell_list -> data, "markup", 0, NULL);
-    }
+    combo_set_markup (sbox);
   }
   else
   {

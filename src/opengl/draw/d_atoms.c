@@ -55,6 +55,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "ogl_shading.h"
 #include "dlp_field.h"
+#include "preferences.h"
 
 int atom_id;
 int gColorID[3];
@@ -106,19 +107,7 @@ ColRGBA get_atom_color (int i, int j, double al, int picked, gboolean to_pick)
     }
     else
     {
-      if (picked == 1)
-      {
-        colo.red = 0.0;
-        colo.green = 1.0;
-        colo.blue = 1.0;
-      }
-      else
-      {
-        colo.red = 1.0;
-        colo.green = 0.0;
-        colo.blue = 0.84;
-      }
-      colo.alpha = DEFAULT_OPACITY*0.75;
+      colo = plot -> sel_color[(picked == 1) ? 0 : 1];
     }
   }
   else
@@ -290,7 +279,7 @@ float get_sphere_radius (int style, int sp, int ac, int sel)
   }
   else if (style == CYLINDERS)
   {
-    return plot -> radall[ac] + sel*0.05;
+    return plot -> radall[ac] + sel*0.1;
   }
   else
   {
@@ -345,11 +334,11 @@ void setup_this_atom (int style, gboolean to_pick, gboolean picked, atom * at, i
   ColRGBA col = get_atom_color (at -> sp, at -> id, 1.0, picked, to_pick);
   if (at -> sp > proj_sp - 1) at -> sp -= proj_sp;
   float rad = get_sphere_radius ((style == NONE) ? plot -> style : style, at -> sp, ac, (picked) ? 1 : 0);
-  for (i=0; i<plot -> extra_cell[0]+1;i++)
+  for (i=0; i<plot -> abc -> extra_cell[0]+1;i++)
   {
-    for (j=0; j<plot -> extra_cell[1]+1; j++)
+    for (j=0; j<plot -> abc -> extra_cell[1]+1; j++)
     {
-      for (k=0; k<plot -> extra_cell[2]+1; k++)
+      for (k=0; k<plot -> abc -> extra_cell[2]+1; k++)
       {
         shift[0]=i*box_gl -> vect[0][0]+j*box_gl -> vect[1][0]+k*box_gl -> vect[2][0];
         shift[1]=i*box_gl -> vect[0][1]+j*box_gl -> vect[1][1]+k*box_gl -> vect[2][1];
@@ -628,7 +617,7 @@ void create_atom_lists (gboolean to_pick)
   if (j > 0)
   {
     // Render atom(s)
-    j = (plot -> extra_cell[0]+1)*(plot -> extra_cell[1]+1)*(plot -> extra_cell[2]+1);
+    j = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     if (! to_pick)
     {
       wingl -> n_shaders[ATOMS][step] = 0;

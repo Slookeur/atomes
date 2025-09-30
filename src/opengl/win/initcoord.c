@@ -264,7 +264,7 @@ GtkWidget * poly_show_setup (int * sp, int id, int jd)
   }
   else
   {
-    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, "_Show/Hide");
+    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, "Show/Hide");
   }
   gtk_menu_item_set_submenu ((GtkMenuItem *)active_glwin -> oglmpv[jd][id][* sp], menup);
   return menup;

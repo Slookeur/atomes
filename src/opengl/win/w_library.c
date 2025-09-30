@@ -376,8 +376,10 @@ gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif)
   str_b = g_strdup_printf ("%s", init);
   while (g_strcmp0 (str_a, str_b))
   {
+    g_free (str_b);
     str_b = g_strdup_printf ("%s", str_a);
-    str_a = g_strdup_printf ("%s", replace_markup (str_a, o_motif, n_motif));
+    g_free (str_a);
+    str_a = g_strdup_printf ("%s", replace_markup (str_b, o_motif, n_motif));
   }
   g_free (str_b);
   return str_a;
@@ -933,8 +935,8 @@ void prepare_preview (int active, int id, gboolean visible)
       on_calc_bonds_released (NULL, NULL);
       lib_proj -> modelgl -> anim -> last -> img -> quality = 30;
       lib_proj -> modelgl -> anim -> last -> img -> rep = ORTHOGRAPHIC;
-      lib_proj -> modelgl -> anim -> last -> img -> box_axis[AXIS] = NONE;
-      lib_proj -> modelgl -> anim -> last -> img -> box_axis[BOX] = NONE;
+      lib_proj -> modelgl -> anim -> last -> img -> xyz -> axis = NONE;
+      lib_proj -> modelgl -> anim -> last -> img -> abc -> box = NONE;
       if (visible)
       {
         gtk_widget_set_size_request (lib_proj -> modelgl -> plot, 150, 150);

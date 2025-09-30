@@ -110,11 +110,7 @@ G_MODULE_EXPORT void set_background (GtkCheckButton * backb, gpointer data)
 G_MODULE_EXPORT void set_background (GtkToggleButton * backb, gpointer data)
 #endif
 {
-#ifdef GTK4
-  if (gtk_check_button_get_active (backb))
-#else
-  if (gtk_toggle_button_get_active (backb))
-#endif
+  if (button_get_status ((GtkWidget *)backb))
   {
     back_alpha = 0.0;
   }
@@ -134,15 +130,11 @@ G_MODULE_EXPORT void set_background (GtkToggleButton * backb, gpointer data)
 */
 G_MODULE_EXPORT void choose_format (GtkComboBox * box, gpointer cid)
 {
-  forme = gtk_combo_box_get_active (box);
+  forme = combo_get_active ((GtkWidget *)box);
   if (forme != -1)
   {
     dwidget * imf  = (dwidget *) cid;
-#ifdef GTK4
-    gtk_check_button_set_active (GTK_CHECK_BUTTON(imf -> a), 0);
-#else
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(imf -> a), 0);
-#endif
+    button_set_status (imf -> a, 0);
     if (forme == 1 || forme == 3)
     {
       widget_set_sensitive(imf -> a, 0);

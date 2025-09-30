@@ -101,11 +101,7 @@ G_MODULE_EXPORT void set_rescaling (GtkToggleButton * but, gpointer data)
 #endif
 {
   glwin * view = (glwin *)data;
-#ifdef GTK4
-  view -> cell_win -> homo_density = gtk_check_button_get_active (but);
-#else
-  view -> cell_win -> homo_density = gtk_toggle_button_get_active (but);
-#endif
+  view -> cell_win -> homo_density = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (view -> cell_win -> shift_box[1], view -> cell_win -> homo_density);
 }
 

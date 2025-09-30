@@ -66,7 +66,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #define NINPUTS 6
 #define NSELECTION 7
 
-#define NGLOBAL_SHADERS 14
+#define NGLOBAL_SHADERS 15
 
 /*! \enum object_types */
 enum object_types
@@ -99,7 +99,8 @@ enum shaders {
   MEASU = 10, /*!< 10 */
   LIGHT = 11, /*!< 11 */
   SLABS = 12, /*!< 12 */
-  VOLMS = 13  /*!< 13 */
+  VOLMS = 13, /*!< 13 */
+  BACKG = 14  /*!< 14 */
 };
 
 #define FILLED_STYLES 4
@@ -185,8 +186,19 @@ struct Light
   vec3_t position;    /*!< Light position */
   vec3_t direction;   /*!< Light direction for directional and spot lights */
   vec3_t intensity;   /*!< Light colors */
-  vec3_t attenuation; /*!< Constant, linear and quadratic attenuations */
+  vec3_t attenuation; /*!< Constant, linear and quadratic attenuation */
   vec3_t spot_data;   /*!< Angle, inner and outer spot light cutoff */
+};
+
+/*! \typedef Lightning
+
+  \brief Lightning data for OpenGL rendering
+*/
+typedef struct Lightning Lightning;
+struct Lightning
+{
+  int lights;         /*!< The number of lights */
+  Light * spot;       /*!< The lights */
 };
 
 /*! \typedef Material
@@ -245,6 +257,19 @@ struct screen_string
   screen_string * last;
 };
 
+typedef struct screen_label screen_label;
+struct screen_label
+{
+  int position;
+  int render;
+  int scale;
+  gchar * font;
+  int n_colors;
+  ColRGBA * color;
+  double shift[3];
+  screen_string * list;
+};
+
 typedef struct atom_in_selection atom_in_selection;
 struct atom_in_selection
 {
@@ -268,14 +293,80 @@ struct atom_selection
   atom_in_selection * last;
 };
 
+/*! \typedef background
+
+  \brief a background data structure
+*/
+typedef struct background background;
+struct background
+{
+  int gradient;   /*!< 0 = none \n
+                       1 = linear \n
+                       2 = circular */
+  int direction;  /*!< If linear: \n
+                         0 = right to left \n
+                         1 = top to bottom \n
+                         2 = bottom right to top left \n
+                         3 = top right to bottom left \n
+                         4 = center \n
+                       If circular: \n
+                         0 = right to left \n
+                         1 = left to right \n
+                         2 = top to bottom \n
+                         3 = bottom to top \n
+                         4 = bottom right to top left \n
+                         5 = bottom left to top right \n
+                         6 = top right to bottom left \n
+                         7 = top left to bottom right \n
+                         8 = center  */
+  float position; /*!< Equal mixed position */
+  ColRGBA color;
+  ColRGBA gradient_color[2];
+};
+
+/*! \typedef axis
+
+  \brief axis layout data structure
+*/
+typedef struct axis axis;
+struct axis
+{
+  int axis;              /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double line;           /*!< Width for wireframe */
+  double rad;            /*!< Radius for cylinders */
+  double length;         /*!< Axis length */
+  int t_pos;             /*!< Axis template position */
+  GLfloat c_pos[3];      /*!< Axis custom positions */
+  int labels;            /*!< Show / hide axis labels */
+  gchar * title[3];      /*!< Axis titles */
+  ColRGBA * color;       /*!< Associated color */
+};
+
+/*! \typedef box
+
+  \brief box layout data structure
+*/
+typedef struct box box;
+struct box
+{
+  int box;             /*!< 0 = NONE (hide), 1 = wireframe, 4 = cylinders */
+  double line;         /*!< Width for wireframe */
+  double rad;          /*!< Radius for cylinders */
+  ColRGBA color;       /*!< Associated color */
+  int extra_cell[3];   /*!< Extra cells (if any) on x, y and z */
+};
+
 /*! \typedef image
 
-  \brief a structure to describe the content of the OpenGL rendering
+  \brief a structure to describe the visual content of the OpenGL rendering
 */
 typedef struct image image;
 struct image
 {
-  ColRGBA backcolor;                            /*!< Background color */
+  background * back;                            /*!< Background data structure */
+  axis * xyz;                                   /*!< Axis layout data structure */
+  box * abc;                                    /*!< Box layout data structure */
+
   // Color maps for atoms [0] and polyhedra [1]
   int color_map[2];                             /*!< Color maps, 0= atoms, 1 = polyhedra */
 
@@ -300,90 +391,37 @@ struct image
 
   // Labels
   // 0 = atoms, 1 = clones, 2 = axis, 3 = measures, 4 = measure edition
-  int labels_position[5];                       /*!< Labels position: \n
+  screen_label labels[5];                       /*!< Labels: \n
                                                     0 = atom(s), \n
                                                     1 = clone(s), \n
                                                     2 = axis, \n
                                                     3 = measure(s), \n
                                                     4 = measure(s) in edition mode */
-  int labels_render[5];                         /*!< Labels rendering mode: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  int labels_scale[5];                          /*!< Labels scaling mode: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  gchar * labels_font[5];                       /*!< Labels font: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  ColRGBA * labels_color[5];                    /*!< Labels color: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  double labels_shift[5][3];                    /*!< Labels axis shit, if any: \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  struct screen_string * labels_list[5];        /*!< Label screen strings (rendered and re-usable objects): \n
-                                                    0 = atom(s), \n
-                                                    1 = clone(s), \n
-                                                    2 = axis, \n
-                                                    3 = measure(s), \n
-                                                    4 = measure(s) in edition mode */
-  // 0 =Element name, 1 = Atomic symbol, 2 = Atomic symbol + ID number, 3 = ID number
-  int labels_format[3];                         /*!< Label format for the atom(s) and clone(s) \n
+  // 0 = Element name, 1 = Atomic symbol, 2 = Atomic symbol + ID number, 3 = ID number
+  int acl_format[2];                            /*!< Label format for the atom(s) and clone(s): \n
                                                     0 = element name, \n
                                                     1 = atomic symbol, \n
                                                     2 = atomic symbol + ID number (default), \n
                                                     3 = ID number */
-  gboolean mtilt;                               /*!< Measure tilt, if any */
-  int mpattern;                                 /*!< Measure line pattern */
-  int mfactor;                                  /*!< Measure  */
-  double mwidth;                                /*!< Measure line width */
+  // In the following: 0 = measure in analysis mode, 1 = measure in edition mode
+  gboolean mtilt[2];                             /*!< Measure tilt, if any */
+  int mpattern[2];                               /*!< Measure line pattern */
+  int mfactor[2];                                /*!< Measure  */
+  double mwidth[2];                              /*!< Measure line width */
 
   int m_is_pressed;                             /*!< is the key m pressed ? */
   // Atom selection: 0 = normal mode, 1 = edition mode
   atom_selection * selected[2];          /*!< atom(s) selection lists \n
                                                     0 = analysis mode, \n
                                                     1 = edition mode */
-  // Model box and partial axis data
-  // BOX = 0, AXIS = 1
-  int box_axis[2];                              /*!< Show (1) / hide (0): \n
-                                                   0 = model box, \n
-                                                   1 = axis */
-  double box_axis_rad[2];                       /*!< Cylinder radius (if used): \n
-                                                   0 = model box, \n
-                                                   1 = axis */
-  double box_axis_line[2];                      /*!< Wireframe line width (if used):
-                                                   0 = model box, \n
-                                                   1 = axis */
-  ColRGBA box_color;                            /*!< Model box color */
-  // Extra cell on a/b/c
-  int extra_cell[3];                            /*!< Extra cells (if any) on x, y and z */
-
-  double axis_length;                           /*!< Axis length */
-  int axispos;                                  /*!< Axis */
-  GLdouble axis_pos[3];                         /*!< Axis position */
-  int axis_labels;                              /*!<  */
-  gchar * axis_title[3];                        /*!< Axis titles */
-  ColRGBA * axis_color;                         /*!< Axis colors, if not default */
+  // Colors for atom selections
+  ColRGBA sel_color[2];
 
  // Coordination(s)
   ColRGBA ** spcolor[10];                       /*!<  Coordination sphere colors */
 
   GLdouble p_depth;                             /*!< Camera depth */
+  GLdouble m_depth;                             /*!< Maximum camera depth */
   GLdouble c_angle[2];                          /*!< Camera angle: pitch and heading */
   GLdouble c_shift[2];                          /*!< Camera position: x and y */
   GLdouble gnear;                               /*!< Near plane position */
@@ -441,11 +479,10 @@ struct image
                                                     0 = filled (default), \n
                                                     1 = lines, \n
                                                     2 = points */
-  int lights;                                   /*!< Number of light(s), default 3 */
   int * light_loc;                              /*!< Lights locations (only used when drawing light spots), in \n
                                                     0 = ambient light, not in the model, \n
                                                     1 = spot or directional light, in the model */
-  Light * l_ght;                                /*!< Light(s) description(s), if any */
+  Lightning l_ghtning;                          /*!< Lightning description */
   Material m_terial;                            /*!< Material description, if any */
   Fog f_g;                                      /*!< Fog description, if any*/
 
@@ -701,6 +738,7 @@ struct builder_edition
   GtkWidget * pbut;
   cell_info cell;
   int occupancy;
+  int rounding;
   gboolean overlapping;
   gboolean wrap;
   gboolean clones;
@@ -867,6 +905,58 @@ struct model_edition
   GtkWidget * notebook;
 };
 
+typedef struct box_edition box_edition;
+struct box_edition
+{
+  GtkWidget * win;
+  GtkWidget * show_hide;
+  GtkWidget * styles;
+  GtkWidget * width_box;
+  GtkWidget * width;
+  GtkWidget * radius_box;
+  GtkWidget * radius;
+  GtkWidget * box_data;
+};
+
+typedef struct axis_edition axis_edition;
+struct axis_edition
+{
+  GtkWidget * win;
+  GtkWidget * show_hide;
+  GtkWidget * styles;
+  GtkWidget * width_box;
+  GtkWidget * width;
+  GtkWidget * radius_box;
+  GtkWidget * radius;
+  GtkWidget * length;
+  GtkWidget * axis_data;
+  GtkWidget * templates;
+  GtkWidget * axis_position_box;
+  GtkWidget * axis_label_box[2];
+  GtkWidget * axis_color_title[3];
+};
+
+typedef struct rep_edition rep_edition;
+struct rep_edition
+{
+  GtkWidget * win;
+  GtkWidget * camera_widg[7];
+};
+
+typedef struct gradient_edition gradient_edition;
+struct gradient_edition
+{
+  GtkWidget * win;
+  GtkWidget * g_box;
+  GtkWidget * dir;
+  GtkWidget * d_box[2];
+  GtkWidget * color_box[2];
+  GtkWidget * p_box;
+  GtkWidget * p_scale;
+  GtkWidget * col_but;
+  GtkWidget * grad_but[2];
+};
+
 /*! \typedef glwin
 
   \brief OpenGL window widget structure */
@@ -908,7 +998,6 @@ struct glwin
   GtkWidget * ogl_smode[NSELECTION];
   GtkWidget * ogl_anim[2];
 #endif
-  GtkWidget * camera_widg[7];
   GtkWidget * rbuild[2];
   GtkWidget * cbuilder;
 
@@ -934,6 +1023,10 @@ struct glwin
   opengl_edition * opengl_win;
   model_edition * model_win[2];
   builder_edition * builder_win;
+  box_edition * box_win;
+  axis_edition * axis_win;
+  rep_edition * rep_win;
+  gradient_edition * gradient_win;
 
   // OpenGL plot
   GtkWidget * plot;

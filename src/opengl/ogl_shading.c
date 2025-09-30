@@ -47,6 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void glsl_bind_cylinders (glsl_program * glsl, object_3d * obj);
   void glsl_bind_caps (glsl_program * glsl, object_3d * obj);
   void glsl_bind_polyhedra (glsl_program * glsl, object_3d * obj);
+  void glsl_bind_background (glsl_program * glsl, object_3d * obj);
   void update_string_instances (glsl_program * glsl, object_3d * obj);
   void glsl_bind_string (glsl_program * glsl, object_3d * obj);
   void re_create_all_md_shaders (glwin * view);
@@ -159,7 +160,7 @@ void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char 
 */
 GLuint * glsl_add_lights (glsl_program * glsl)
 {
-  int tot = MATERIAL_DATA + plot -> lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
+  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
   lightning[1]  = glGetUniformLocation (glsl -> id, "lights_on");
@@ -176,7 +177,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   lightning[12] = glGetUniformLocation (glsl -> id, "fog.color");
   lightning[13] = glGetUniformLocation (glsl -> id, "numLights");
   int j;
-  for (j=0; j<plot -> lights; j++)
+  for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     set_light_uniform_location (lightning, glsl -> id, j, 0, "type");
     set_light_uniform_location (lightning, glsl -> id, j, 1, "position");
@@ -404,6 +405,28 @@ void glsl_bind_polyhedra (glsl_program * glsl, object_3d * obj)
 }
 
 /*!
+  \fn void glsl_bind_background (glsl_program * glsl, object_3d * obj)
+
+  \brief bind background data to an OpenGL shader program
+
+  \param glsl the target glsl
+  \param obj the 3D object to bind
+*/
+void glsl_bind_background (glsl_program * glsl, object_3d * obj)
+{
+
+  glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "first_color");
+  glsl -> uniform_loc[1] = glGetUniformLocation (glsl -> id, "second_color");
+  glsl -> uniform_loc[2] = glGetUniformLocation (glsl -> id, "gradient");
+  glsl -> uniform_loc[3] = glGetUniformLocation (glsl -> id, "position");
+
+  glBindBuffer(GL_ARRAY_BUFFER, glsl -> vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, obj -> vert_buffer_size * obj -> num_vertices*sizeof(GLfloat), obj -> vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(glsl -> array_pointer[0]);
+  glVertexAttribPointer(glsl -> array_pointer[0], 2, GL_FLOAT, GL_FALSE, obj -> vert_buffer_size*sizeof(GLfloat), (GLvoid*) 0);
+}
+
+/*!
   \fn void update_string_instances (glsl_program * glsl, object_3d * obj)
 
   \brief Update OpenGL string texture instances
@@ -514,13 +537,13 @@ object_3d * duplicate_object_3d (object_3d * old_obj)
 
 /*!
   \fn glsl_program * init_shader_program (int object, int object_id,
-*                                      const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
-*                                      GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
+                                          const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
+                                          GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
 
   \brief create an OpenGL shader program
 
   \param object shader id (in enum shaders)
-  \param object_id shader type in: GLSL_SPHERES, GLSL_POINTS, GLSL_LINES, GLSL_CYLINDERS, GLSL_CAPS, GLSL_POLYEDRA, GLSL_STRING
+  \param object_id shader type in: GLSL_SPHERES, GLSL_POINTS, GLSL_LINES, GLSL_CYLINDERS, GLSL_CAPS, GLSL_POLYEDRA, GLSL_STRING, GLSL_BACK
   \param vertex general shader: in the shaders defined in 'ogl_shaders.c'
   \param geometry geometry shader, if any: in the shaders defined in 'ogl_shaders.c'
   \param fragment color shader, if any: in the shaders defined in 'ogl_shaders.c'
@@ -562,8 +585,8 @@ glsl_program * init_shader_program (int object, int object_id,
   glsl -> array_pointer = alloc_shader_pointer (glsl -> array_pointer, narray);
   glsl -> uniform_loc = alloc_shader_pointer (glsl -> uniform_loc, nunif);
 
-  // Always the MVP matrix as uniform 0
-  glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "mvp");
+  // For other than background always the MVP matrix as uniform 0
+  if (object_id != GLSL_BACK) glsl -> uniform_loc[0] = glGetUniformLocation (glsl -> id, "mvp");
   // and always the vertices as array 0
   glsl -> array_pointer[0] = glGetAttribLocation (glsl -> id, "vert");
 
@@ -612,6 +635,9 @@ glsl_program * init_shader_program (int object, int object_id,
       break;
     case GLSL_STRING:
       glsl_bind_string (glsl, glsl -> obj);
+      break;
+    case GLSL_BACK:
+      glsl_bind_background (glsl, glsl -> obj);
       break;
   }
   glDetachShader (glsl -> id,glsl -> vertex_shader);
@@ -826,43 +852,46 @@ void set_lights_data (glsl_program * glsl)
   for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[3+j], plot -> m_terial.param[j+1]);
   glUniform1i (glsl -> light_uniform[8], plot -> f_g.mode);
   glUniform1i (glsl -> light_uniform[9], plot -> f_g.based);
-  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density);
+  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density/plot -> p_depth);
   glUniform2f (glsl -> light_uniform[11], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
   glUniform3f (glsl -> light_uniform[12], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
-  glUniform1i (glsl -> light_uniform[13], plot -> lights);
-  for (j=0; j<plot -> lights; j++)
+  glUniform1i (glsl -> light_uniform[13], plot -> l_ghtning.lights);
+  for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     k = j*LIGHT_DATA + LIGHT_INFO + MATERIAL_DATA + FOG_DATA;
-    glUniform1i (glsl -> light_uniform[k], plot -> l_ght[j].type);
-    if (plot -> l_ght[j].fix == 0)
+    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j].type);
+    if (plot -> l_ghtning.spot[j].fix == 0)
     {
-      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ght[j].position);
+      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].position);
     }
     else
     {
-      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ght[j].position);
+      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].position);
     }
     glUniform3f (glsl -> light_uniform[k+1], l_pos.x, l_pos.y, l_pos.z);
-    if (plot -> l_ght[j].fix == 0)
+    if (plot -> l_ghtning.spot[j].fix == 0)
     {
-      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ght[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].direction);
     }
     else
     {
-      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ght[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].direction);
     }
     glUniform3f (glsl -> light_uniform[k+2], l_dir.x, l_dir.y, l_dir.z);
-    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ght[j].intensity.x, plot -> l_ght[j].intensity.y, plot -> l_ght[j].intensity.z);
-    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ght[j].attenuation.x);
-    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ght[j].attenuation.y);
-    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ght[j].attenuation.z);
-    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ght[j].spot_data.x*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ght[j].spot_data.y*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ght[j].spot_data.z*pi/180.0));
+    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j].intensity.x, plot -> l_ghtning.spot[j].intensity.y, plot -> l_ghtning.spot[j].intensity.z);
+    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j].attenuation.x);
+    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j].attenuation.y);
+    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j].attenuation.z);
+    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j].spot_data.x*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
   }
 }
 
 uint16_t stipple_pattern[NDOTS]={ 0xAAAA, 0x1111, 0x0000, 0x55FF, 0x24FF, 0x3F3F, 0x33FF, 0x27FF};
+int this_tilt;
+int this_pattern;
+int this_factor;
 
 /*!
   \fn void shading_glsl_text (glsl_program * glsl)
@@ -881,7 +910,7 @@ void shading_glsl_text (glsl_program * glsl)
                                        glsl -> obj -> shift[2], glsl -> obj -> shift[3]);
   glUniform4f (glsl -> uniform_loc[6], glsl -> col -> red, glsl -> col -> green,
                                        glsl -> col -> blue, glsl -> col -> alpha);
-  if (glsl -> object == MEASU) glUniform1i (glsl -> uniform_loc[7], (plot -> mtilt) ? 1 : 0);
+  if (glsl -> object == MEASU) glUniform1i (glsl -> uniform_loc[7], this_tilt);
 }
 
 /*!
@@ -908,13 +937,25 @@ void render_this_shader (glsl_program * glsl, int ids)
     }
     wingl -> axis_proj_model_view_matrix = create_axis_matrices (j);
     glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
-    j = (plot -> box_axis[AXIS] == WIREFRAME) ? 1 : 3;
+    j = (plot -> xyz -> axis == WIREFRAME) ? 1 : 3;
     if (ids > j) shading_glsl_text (glsl);
   }
   else if (glsl -> object == LABEL)
   {
     glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> proj_model_view_matrix.m00);
     shading_glsl_text (glsl);
+  }
+  else if (glsl -> object == BACKG)
+  {
+    for (j=0; j<2; j++)
+    {
+      glUniform4f (glsl -> uniform_loc[j], plot -> back -> gradient_color[j].red,
+                                           plot -> back -> gradient_color[j].green,
+                                           plot -> back -> gradient_color[j].blue,
+                                           plot -> back -> gradient_color[j].alpha);
+    }
+    glUniform1i (glsl -> uniform_loc[2], plot -> back -> direction);
+    glUniform1f (glsl -> uniform_loc[3], plot -> back -> position);
   }
   else if (glsl -> object == MEASU)
   {
@@ -925,8 +966,8 @@ void render_this_shader (glsl_program * glsl, int ids)
     }
     else
     {
-      glUniform1i (glsl -> uniform_loc[1], plot -> mfactor);
-      glUniform1ui (glsl -> uniform_loc[2], stipple_pattern[plot -> mpattern]);
+      glUniform1i (glsl -> uniform_loc[1], this_factor);
+      glUniform1ui (glsl -> uniform_loc[2], stipple_pattern[this_pattern]);
       if (glsl -> vert_type == GL_TRIANGLES)
       {
         wingl -> label_projection_matrix = create_label_matrices ();
@@ -1012,7 +1053,9 @@ void render_this_shader (glsl_program * glsl, int ids)
   }
   else
   {
+    if (glsl -> draw_type == GLSL_BACK) glDisable (GL_DEPTH_TEST);
     glDrawArrays (glsl -> vert_type, 0, glsl -> obj -> num_vertices);
+    if (glsl -> draw_type == GLSL_BACK) glEnable (GL_DEPTH_TEST);
   }
   if (glsl_disable_cull_face (glsl)) glEnable (GL_CULL_FACE);
   glBindVertexArray (0);
@@ -1029,15 +1072,35 @@ void draw_vertices (int id)
 {
   int i, j;
   glsl_program * glsl;
-
-  i = (in_md_shaders(proj_gl, id)) ? step : 0;
-  for (j=0; j<wingl -> n_shaders[id][i]; j++)
+  if (id != MEASU)
   {
-    if (wingl -> ogl_glsl[id][i][j])
+    i = (in_md_shaders(proj_gl, id)) ? step : 0;
+    for (j=0; j<wingl -> n_shaders[id][i]; j++)
     {
-      glsl = wingl -> ogl_glsl[id][i][j];
-      glUseProgram (glsl -> id);
-      render_this_shader (glsl, j);
+      if (wingl -> ogl_glsl[id][i][j])
+      {
+        glsl = wingl -> ogl_glsl[id][i][j];
+        glUseProgram (glsl -> id);
+        render_this_shader (glsl, j);
+      }
+    }
+  }
+  else
+  {
+    for (i=0; i<2; i++)
+    {
+      this_pattern = plot -> mpattern[i];
+      this_tilt = plot -> mtilt[i];
+      this_factor = plot -> mfactor[i];
+      for (j=0; j<wingl -> n_shaders[id][i]; j++)
+      {
+        if (wingl -> ogl_glsl[id][i][j])
+        {
+          glsl = wingl -> ogl_glsl[id][i][j];
+          glUseProgram (glsl -> id);
+          render_this_shader (glsl, j);
+        }
+      }
     }
   }
 }

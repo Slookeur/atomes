@@ -40,7 +40,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #ifndef CELL_EDIT_H_
 #define CELL_EDIT_H_
 
-extern gchar * axis[3];
 extern char * box_prop[2][3];
 extern void allocatoms (project * this_proj);
 extern void center_molecule (project * this_proj);

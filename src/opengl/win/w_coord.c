@@ -137,14 +137,7 @@ G_MODULE_EXPORT void toggled_show_hide_coord (GtkToggleButton * widg, gpointer d
   }
   j += c;
 
-
-#ifdef GTK4
-  k = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-// GTK3 Menu Action To Check
-  k = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
-
+  k = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   if (k != this_proj -> modelgl -> anim -> last -> img -> show_coord[g][j])
   {
     if (is_coord_in_menu(g, this_proj))
@@ -222,11 +215,7 @@ G_MODULE_EXPORT void toggled_label_unlabel_coord (GtkToggleButton * widg, gpoint
   tint pointer;
   pointer.a = the_data -> d;
   pointer.b = the_data -> c;
-#ifdef GTK4
-  pointer.c = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-  pointer.c = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
+  pointer.c = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   selected_aspec = the_data -> b;
 #ifdef DEBUG
   g_debug ("Toggle label/unlabel coord:: s= %d, g= %d, c= %d, selec_sp= %d", pointer.a, pointer.b, pointer.c, selected_aspec);
@@ -265,11 +254,7 @@ G_MODULE_EXPORT void toggled_select_unselect_coord (GtkToggleButton * widg, gpoi
   tint pointer;
   pointer.a = the_data -> d;
   pointer.b = the_data -> c;
-#ifdef GTK4
-  pointer.c = (widg) ? gtk_check_button_get_active (widg) : frag_mol_status;
-#else
-  pointer.c = (widg) ? gtk_toggle_button_get_active (widg) : frag_mol_status;
-#endif
+  pointer.c = (widg) ? button_get_status ((GtkWidget *)widg) : frag_mol_status;
   selected_aspec = the_data -> b;
 #ifdef DEBUG
   g_debug ("Toggle select/unselect coord:: s= %d, g= %d, c= %d, selec_sp= %d", pointer.a, pointer.b, pointer.c, selected_aspec);
@@ -319,8 +304,8 @@ G_MODULE_EXPORT void toggled_show_hide_poly (GtkToggleButton * widg, gpointer da
       j += this_proj -> coord -> ntg[g][i];
     }
   }
+  k = button_get_status ((GtkWidget *)widg);
 #ifdef GTK4
-  k = gtk_check_button_get_active (widg);
   if (k != this_proj -> modelgl -> anim -> last -> img -> show_poly[g][j])
   {
     gchar * str;
@@ -347,7 +332,6 @@ G_MODULE_EXPORT void toggled_show_hide_poly (GtkToggleButton * widg, gpointer da
   }
 #else
   // GTK3 Menu Action To Check
-  k = gtk_toggle_button_get_active (widg);
   if (is_coord_in_menu(g, this_proj))
   {
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> ogl_poly[0][g][j], k);
@@ -1067,7 +1051,7 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
 G_MODULE_EXPORT void set_atom_color_map_box (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   int j = view -> cmap[i];
 #ifdef GTK4
   gchar * variant = g_strdup_printf ("set-amap.%d.0", j);
@@ -1090,7 +1074,7 @@ G_MODULE_EXPORT void set_atom_color_map_box (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_poly_color_map_box (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   int j = view -> cmap[i] + ATOM_MAPS;
 #ifdef GTK4
   gchar * variant = g_strdup_printf ("set-pmap.%d.0", j);
@@ -1126,7 +1110,7 @@ G_MODULE_EXPORT void on_cloned_poly_toggled (GtkToggleButton * Button, gpointer 
 {
   glwin * view = (glwin *)data;
 #ifdef GTK4
-   view -> anim -> last -> img -> cloned_poly = gtk_check_button_get_active (Button);
+   view -> anim -> last -> img -> cloned_poly = button_get_status ((GtkWidget *)Button);
    g_action_group_activate_action ((GActionGroup *)view -> action_group, "set-cloned-poly.0.0", NULL);
    /* int shaders[2] = {POLYS, RINGS};
    re_create_md_shaders (2, shaders, get_project_by_id(view -> proj));
@@ -1151,9 +1135,7 @@ GtkWidget * param_tab (glwin * view)
   /*gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(fragmol), vbox); */
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, TRUE, 25);
-  GtkWidget * lab = gtk_label_new ("<b>Atom(s) and bond(s) color map:</b>");
-  gtk_label_set_use_markup (GTK_LABEL(lab), 1);
-  gtk_label_align (lab, 0.0, 0.5);
+  GtkWidget * lab = markup_label ("<b>Atom(s) and bond(s) color map:</b>", -1, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 20);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
@@ -1195,15 +1177,13 @@ GtkWidget * param_tab (glwin * view)
       break;
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(color_box), l);
+  combo_set_active (color_box, l);
   g_signal_connect (G_OBJECT (color_box), "changed", G_CALLBACK(set_atom_color_map_box), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_box, FALSE, FALSE, 100);
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, TRUE, 25);
-  lab = gtk_label_new ("<b>Polyhedra color map:</b>");
-  gtk_label_set_use_markup (GTK_LABEL(lab), 1);
-  gtk_label_align (lab, 0.0, 0.5);
+  lab = markup_label ("<b>Polyhedra color map:</b>", -1, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 20);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
@@ -1236,7 +1216,7 @@ GtkWidget * param_tab (glwin * view)
       break;
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(color_box), l);
+  combo_set_active (color_box, l);
   g_signal_connect (G_OBJECT (color_box), "changed", G_CALLBACK(set_poly_color_map_box), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, color_box, FALSE, FALSE, 100);
   widget_set_sensitive (color_box, view -> bonding);

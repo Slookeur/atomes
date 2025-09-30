@@ -365,32 +365,47 @@ void update_all_menus (glwin * view, int nats)
   }
 
   update_menus (view);
-  for (i=0; i<2; i++)
+  widget_set_sensitive (view -> ogl_box[0], active_cell -> ltype);
+  if (view -> anim -> last -> img -> abc -> box == NONE)
   {
-    widget_set_sensitive (view -> ogl_box[i], active_cell -> ltype);
-    if (view -> anim -> last -> img -> box_axis[i] == NONE)
-    {
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[i][0], FALSE);
-      set_box_axis_style (view -> ogl_box_axis[i][0], & view -> colorp[0][i]);
-    }
-    else
-    {
-      j = (view -> anim -> last -> img -> box_axis[i] == WIREFRAME) ? 1 : 2;
-      k = j*j;
-      l = (view -> anim -> last -> img -> box_axis[i] == WIREFRAME) ? CYLINDERS : WIREFRAME;
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[i][0], TRUE);
-      set_box_axis_style (view -> ogl_box_axis[i][0], & view -> colorp[0][i]);
-      view -> anim -> last -> img -> box_axis[i] = l;
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[i][j], TRUE);
-      set_box_axis_style (view -> ogl_box_axis[i][j], & view -> colorp[k][i]);
-    }
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], FALSE);
+    set_box_axis_style (view -> ogl_box_axis[0][0], & view -> colorp[0][0]);
   }
+  else
+  {
+    j = (view -> anim -> last -> img -> abc -> box == WIREFRAME) ? 1 : 2;
+    k = j*j;
+    l = (view -> anim -> last -> img -> abc -> box == WIREFRAME) ? CYLINDERS : WIREFRAME;
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[0][0], TRUE);
+    set_box_axis_style (view -> ogl_box_axis[0][0], & view -> colorp[0][0]);
+    view -> anim -> last -> img -> abc -> box = l;
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[i][j], TRUE);
+    set_box_axis_style (view -> ogl_box_axis[0][j], & view -> colorp[k][0]);
+  }
+
+  if (view -> anim -> last -> img -> xyz -> axis == NONE)
+  {
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], FALSE);
+    set_box_axis_style (view -> ogl_box_axis[i][0], & view -> colorp[0][1]);
+  }
+  else
+  {
+    j = (view -> anim -> last -> img -> xyz -> axis == WIREFRAME) ? 1 : 2;
+    k = j*j;
+    l = (view -> anim -> last -> img -> xyz -> axis == WIREFRAME) ? CYLINDERS : WIREFRAME;
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], TRUE);
+    set_box_axis_style (view -> ogl_box_axis[i][0], & view -> colorp[0][1]);
+    view -> anim -> last -> img -> xyz -> axis = l;
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][j], TRUE);
+    set_box_axis_style (view -> ogl_box_axis[1][j], & view -> colorp[k][1]);
+  }
+
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_rep[view -> anim -> last -> img -> rep], TRUE);
   gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_rep[! view -> anim -> last -> img -> rep], FALSE);
   for (i=0; i<5; i++) gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][8+i], FALSE);
-  if (view -> anim -> last -> img -> axispos != CUSTOM)
+  if (view -> anim -> last -> img -> xyz -> t_pos != CUSTOM)
   {
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][8+view -> anim -> last -> img -> axispos], TRUE);
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][8+view -> anim -> last -> img -> xyz -> t_pos], TRUE);
   }
   set_advanced_bonding_menus (view);
   widget_set_sensitive (view -> ogl_clones[0], view -> allbonds[1]);
@@ -724,11 +739,11 @@ void set_motion (glwin * view, int axis, int da, int db, gboolean UpDown, GdkMod
     else
     {
       view -> anim -> last -> img -> c_shift[! axis] += (double) da / view -> pixels[axis];
-      if (view -> camera_widg[! axis + 5])
+      if (view -> rep_win)
       {
-        if (GTK_IS_WIDGET(view -> camera_widg[! axis + 5]))
+        if (view -> rep_win -> camera_widg[! axis + 5] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[! axis + 5]))
         {
-          gtk_spin_button_set_value ((GtkSpinButton *)view -> camera_widg[! axis + 5], - view -> anim -> last -> img -> c_shift[! axis]);
+          gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[! axis + 5], - view -> anim -> last -> img -> c_shift[! axis]);
         }
       }
       update (view);

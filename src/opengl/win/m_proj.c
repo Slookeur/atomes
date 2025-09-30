@@ -42,6 +42,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "glview.h"
 #include "glwindow.h"
+#include "preferences.h"
 
 /*! \enum position */
 enum position {
@@ -52,6 +53,8 @@ enum position {
   FRONT  = 4, /*!< 4 */
   BACK   = 5  /*!< 5 */
 };
+
+extern void camera_has_changed (gdouble value, gpointer data);
 
 /*!
   \fn G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
@@ -92,18 +95,40 @@ G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
       angle_y = 180.0;
       break;
   }
-  vec4_t q_a, q_b;
-  vec3_t axis;
-  axis.x = 0.0;
-  axis.y = 1.0;
-  axis.z = 0.0;
-  q_a = axis_to_quat (axis, -pi*angle_y/180.0);
-  axis.x = 1.0;
-  axis.y = 0.0;
-  axis.z = 0.0;
-  q_b = axis_to_quat (axis, -pi*angle_x/180.0);
-  get_project_by_id(id -> a) -> modelgl -> anim -> last -> img -> rotation_quaternion = q4_mul (q_a, q_b);
-  update (get_project_by_id(id -> a) -> modelgl);
+  if (preferences)
+  {
+    camera_has_changed (angle_x, & pref_pointer[3]);
+    camera_has_changed (angle_y, & pref_pointer[4]);
+  }
+  else
+  {
+    vec4_t q_a, q_b;
+    vec3_t axis;
+    axis.x = 0.0;
+    axis.y = 1.0;
+    axis.z = 0.0;
+    q_a = axis_to_quat (axis, -pi*angle_y/180.0);
+    axis.x = 1.0;
+    axis.y = 0.0;
+    axis.z = 0.0;
+    q_b = axis_to_quat (axis, -pi*angle_x/180.0);
+    glwin * view = get_project_by_id(id -> a) -> modelgl;
+    view -> anim -> last -> img -> rotation_quaternion = q4_mul (q_a, q_b);
+    update (view);
+    view -> anim -> last -> img -> c_angle[0] = - angle_x;
+    view -> anim -> last -> img -> c_angle[1] = - angle_y;
+    int i;
+    for (i=0; i<2; i++)
+    {
+      if (view -> rep_win)
+      {
+        if (view -> rep_win -> camera_widg[i+3] && GTK_IS_WIDGET(view -> rep_win -> camera_widg[i+3]))
+        {
+          gtk_spin_button_set_value ((GtkSpinButton *)view -> rep_win -> camera_widg[i+3], view -> anim -> last -> img -> c_angle[i]);
+        }
+      }
+    }
+  }
 }
 
 #ifdef GTK3

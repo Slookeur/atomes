@@ -43,6 +43,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include <ctype.h>
 #include "cbuild_edit.h"
+#include "readers.h"
 
 #ifdef G_OS_WIN32
   typedef intptr_t ssize_t;
@@ -83,8 +84,6 @@ int cell_get_lattice (int format)
 {
   size_t length = 0;
   gchar * line = NULL;
-  gchar * this_line;
-  char * this_word;
   int i, j, k;
   char c;
   i = 0;

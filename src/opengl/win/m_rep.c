@@ -62,9 +62,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 #include "submenus.h"
+#include "preferences.h"
 
 extern void save_rotation_quaternion (glwin * view);
 extern void rotate_x_y (glwin * view, double angle_x, double angle_y);
+extern G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data);
 #ifdef GTK4
 extern G_MODULE_EXPORT void set_full_screen (GSimpleAction * action, GVariant * parameter, gpointer data);
 #else
@@ -83,9 +85,9 @@ gchar * text_reps[OGL_REPS] = {"Orthographic", "Perspective"};
 void update_labels (glwin * view)
 {
   int i;
-  for (i=0; i<2; i++) if (view -> anim -> last -> img -> labels_scale[i]) view -> create_shaders[LABEL] = TRUE;
-  if (view -> anim -> last -> img -> labels_scale[2]) view -> create_shaders[MAXIS] = TRUE;
-  if (view -> anim -> last -> img -> labels_scale[3]) view -> create_shaders[MEASU] = TRUE;
+  for (i=0; i<2; i++) if (view -> anim -> last -> img -> labels[i].scale) view -> create_shaders[LABEL] = TRUE;
+  if (view -> anim -> last -> img -> labels[2].scale) view -> create_shaders[MAXIS] = TRUE;
+  if (view -> anim -> last -> img -> labels[3].scale) view -> create_shaders[MEASU] = TRUE;
 }
 
 /*!
@@ -99,63 +101,101 @@ void update_labels (glwin * view)
 void camera_has_changed (gdouble value, gpointer data)
 {
   tint * cid = (tint *)data;
-  project * this_proj = get_project_by_id(cid -> a);
+  glwin * view;
+  rep_edition * the_rep;
+  GLdouble * p_depth;
+  GLdouble * c_angle;
+  GLdouble * c_shift;
+  GLdouble * gnear;
+  GLdouble * zoom;
+  if (preferences)
+  {
+    the_rep = pref_rep_win;
+    GLdouble val = 10000.0;
+    p_depth = & val;
+    c_angle = tmp_rep -> c_angle;
+    c_shift = tmp_rep -> c_shift;
+    gnear = & tmp_rep -> gnear;
+    zoom = & tmp_rep -> zoom;
+  }
+  else
+  {
+    view = get_project_by_id(cid -> a) -> modelgl;
+    the_rep = view -> rep_win;
+    p_depth = & view -> anim -> last -> img -> p_depth;
+    c_angle = view -> anim -> last -> img -> c_angle;
+    c_shift = view -> anim -> last -> img -> c_shift;
+    gnear = & view -> anim -> last -> img -> gnear;
+    zoom = & view -> anim -> last -> img -> zoom;
+  }
   double v;
   switch (cid -> b)
   {
     case 0:
-      this_proj -> modelgl -> anim -> last -> img -> zoom = 2.0*(1.0-value);
-      // gtk_spin_button_set_increments ((GtkSpinButton *)this_proj -> modelgl -> camera_widg[0], this_proj -> modelgl -> zoom_factor, this_proj -> modelgl -> zoom_factor);
+      * zoom = 2.0*(1.0-value);
+      // gtk_spin_button_set_increments ((GtkSpinButton *)view -> rep_win -> camera_widg[0], view -> zoom_factor, view -> zoom_factor);
       break;
     case 1:
       // > camera depth
-      if (value > this_proj -> modelgl -> anim -> last -> img -> gnear)
+      if (value > * gnear)
       {
-        this_proj -> modelgl -> anim -> last -> img -> p_depth = value;
+        * p_depth = value;
       }
       else
       {
-        this_proj -> modelgl -> anim -> last -> img -> p_depth = this_proj -> modelgl -> anim -> last -> img -> gnear + 0.01;
-        gtk_spin_button_set_value ((GtkSpinButton *)this_proj -> modelgl -> camera_widg[1], this_proj -> modelgl -> anim -> last -> img -> p_depth);
+        * p_depth = * gnear + 0.01;
+        gtk_spin_button_set_value ((GtkSpinButton *)the_rep -> camera_widg[1], * p_depth);
       }
       break;
     case 2:
       // < perspective depth
-      if (value < this_proj -> modelgl -> anim -> last -> img -> p_depth)
+      if (value < * p_depth)
       {
-        this_proj -> modelgl -> anim -> last -> img -> gnear = value;
+        * gnear = value;
       }
       else
       {
-        this_proj -> modelgl -> anim -> last -> img -> gnear = this_proj -> modelgl -> anim -> last -> img -> p_depth - 0.01;
-        gtk_spin_button_set_value ((GtkSpinButton *)this_proj -> modelgl -> camera_widg[2], this_proj -> modelgl -> anim -> last -> img -> gnear);
+        * gnear = * p_depth - 0.01;
+        gtk_spin_button_set_value ((GtkSpinButton *)the_rep -> camera_widg[2], * gnear);
       }
       break;
     default:
       if (cid -> b < 5)
       {
-        if (value != this_proj -> modelgl -> anim -> last -> img -> c_angle[cid -> b - 3])
+        if (value != c_angle[cid -> b - 3])
         {
-          v = this_proj -> modelgl -> anim -> last -> img -> c_angle[cid -> b - 3] - value;
-          save_rotation_quaternion (this_proj -> modelgl);
-          if (cid -> b == 3)
+          if (preferences)
           {
-            rotate_x_y (this_proj -> modelgl, v, 0.0);
+            c_angle[cid -> b - 3] = value;
           }
           else
           {
-            rotate_x_y (this_proj -> modelgl, 0.0, v);
+            v = c_angle[cid -> b - 3] - value;
+            save_rotation_quaternion (view);
+            if (cid -> b == 3)
+            {
+              rotate_x_y (view, v, 0.0);
+            }
+            else
+            {
+              rotate_x_y (view, 0.0, v);
+            }
           }
+          gtk_spin_button_set_value ((GtkSpinButton *)the_rep -> camera_widg[cid -> b], value);
         }
       }
       else
       {
-        this_proj -> modelgl -> anim -> last -> img -> c_shift[cid -> b - 5] = (value == 0.0) ? value : - value;
+        c_shift[cid -> b - 5] = (value == 0.0) ? value : - value;
       }
       break;
   }
-  update_labels (this_proj -> modelgl);
-  update (this_proj -> modelgl);
+  if (! preferences)
+  {
+    update_labels (view);
+    if (view -> anim -> last -> img -> xyz -> axis != NONE) view -> create_shaders[MAXIS] = TRUE;
+    update (view);
+  }
 }
 
 /*!
@@ -168,13 +208,48 @@ void camera_has_changed (gdouble value, gpointer data)
 */
 G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data)
 {
-  glwin * view = (glwin *)data;
-  int i = view -> mode;
-  view -> mode = ANALYZE;
-  init_camera (get_project_by_id(view -> proj), FALSE);
-  view -> mode = i;
-  update_labels (view);
-  update (view);
+  int i;
+  if (preferences)
+  {
+    tmp_rep -> proj = -1;
+    tmp_rep -> zoom = ZOOM;
+    tmp_rep -> c_angle[0] = - CAMERA_ANGLE_X;
+    tmp_rep -> c_angle[1] = - CAMERA_ANGLE_Y;
+    for (i=0; i<2; i++) tmp_rep -> c_shift[i] = 0.0;
+    tmp_rep -> gnear = 6.0;
+    if (pref_rep_win)
+    {
+      if (pref_rep_win -> camera_widg[2] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[2]))
+      {
+        gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[2], tmp_rep -> gnear);
+      }
+      for (i=0; i<2; i++)
+      {
+        if (pref_rep_win -> camera_widg[i+3] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[i+3]))
+        {
+          gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[i+3], tmp_rep -> c_angle[i]);
+        }
+        if (pref_rep_win -> camera_widg[i+5] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[i+5]))
+        {
+          gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[i+5], tmp_rep -> c_shift[i]);
+        }
+      }
+      if (pref_rep_win -> camera_widg[0] && GTK_IS_WIDGET(pref_rep_win -> camera_widg[0]))
+      {
+        gtk_spin_button_set_value ((GtkSpinButton *)pref_rep_win -> camera_widg[0], 1.0 - 0.5*tmp_rep -> zoom);
+      }
+    }
+  }
+  else
+  {
+    glwin * view = (glwin *)data;
+    i = view -> mode;
+    view -> mode = ANALYZE;
+    init_camera (get_project_by_id(view -> proj), FALSE);
+    view -> mode = i;
+    update_labels (view);
+    update (view);
+  }
 }
 
 #ifdef GTK4
@@ -272,10 +347,70 @@ G_MODULE_EXPORT gboolean on_rep_delete (GtkWidget * widg, GdkEvent * event, gpoi
   int i;
   for (i=0; i<7; i++)
   {
-    if (view -> camera_widg[i]) view -> camera_widg[i] = destroy_this_widget(view -> camera_widg[i]);
+    if (view -> rep_win -> camera_widg[i]) view -> rep_win -> camera_widg[i] = destroy_this_widget(view -> rep_win -> camera_widg[i]);
   }
   destroy_this_widget ((GtkWidget *)widg);
   return TRUE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_rep_combo (GtkComboBox * box, gpointer data)
+
+  \brief change representation combo callback
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_rep_combo (GtkComboBox * box, gpointer data)
+{
+  int rep = combo_get_active ((GtkWidget *)box);
+  rep_edition * the_rep;
+  glwin * view;
+  if (preferences)
+  {
+    tmp_rep -> rep = rep;
+    the_rep = pref_rep_win;
+  }
+  else
+  {
+    view = (glwin *)data;
+    the_rep = view -> rep_win;
+    view -> anim -> last -> img -> rep = rep;
+  }
+  int i;
+  for (i=1; i<3; i++)
+  {
+    if (the_rep)
+    {
+      if (the_rep -> camera_widg[i] && GTK_IS_WIDGET(the_rep -> camera_widg[i]))
+      {
+        widget_set_sensitive (the_rep -> camera_widg[i], rep);
+      }
+    }
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_projection_combo (GtkComboBox * box, gpointer data)
+
+  \brief change projection combo callback
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_projection_combo (GtkComboBox * box, gpointer data)
+{
+  int proj = combo_get_active ((GtkWidget *)box);
+  if (preferences)
+  {
+    tmp_rep -> proj = proj;
+    set_camera_pos (NULL, & pref_pointer[proj]);
+  }
+  else
+  {
+    glwin * view = (glwin *)data;
+    set_camera_pos (NULL, & view -> colorp[proj][0]);
+  }
 }
 
 /*!
@@ -288,9 +423,8 @@ G_MODULE_EXPORT gboolean on_rep_delete (GtkWidget * widg, GdkEvent * event, gpoi
 */
 G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
 {
-  glwin * view = (glwin *)data;
-  gchar * cam_opts[7]={"Zoom:", "Perspective depth:", "Camera depth:",
-                       "Camera pitch:", "Camera heading:",
+  gchar * cam_opts[7]={"Zoom", "<b>P</b>erspective depth", "<b>C</b>amera depth",
+                       "Camera pitch", "Camera heading",
                        "Camera right/left", "Camera up/down"};
   gchar * str;
   double smax[7] = {1.0, 100.0, 100.0, 180.0, 180.0, 100.0, 100.0};
@@ -298,68 +432,166 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
   double sdel[7] = {0.001, 0.01, 0.01, 0.1, 0.1, 0.01, 0.01};
   int sdig[7] = {3, 2, 2, 1, 1, 2, 2};
   int i;
-  double v;
-  str = g_strdup_printf ("OpenGL camera set-up - %s", get_project_by_id(view -> proj)->name);
-  GtkWidget * arep =  create_win (str, view -> win, FALSE, FALSE);
-  g_free (str);
-  GtkWidget * vbox = create_vbox (5);
-  add_container_child (CONTAINER_WIN, arep, vbox);
-  GtkWidget * box;
-  for (i=0; i<7; i++)
+  double max_depth;
+  double v, v_max;
+  glwin * view;
+  rep_edition * the_rep;
+  GtkWidget * hbox;
+  GtkWidget * phbox, * pvbox;
+  GtkWidget * vbox = create_vbox (BSEP);
+  int rep;
+  gboolean build_win = TRUE;
+  if (preferences)
   {
-    box = abox (vbox, cam_opts[i], 0);
-    switch (i)
+    the_rep = pref_rep_win;
+    the_rep -> win = create_vbox (BSEP);
+    rep = tmp_rep -> rep;
+    max_depth = 100.0;
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_rep -> win, vbox, FALSE, FALSE, 10);
+  }
+  else
+  {
+    view = (glwin *)data;
+    max_depth = view -> anim -> last -> img -> m_depth;
+    if (view -> rep_win)
     {
-      case 0:
-        v = 1.0-0.5*view -> anim -> last -> img -> zoom;
-        break;
-      case 1:
-        v = view -> anim -> last -> img -> p_depth;
-        break;
-      case 2:
-        v = view -> anim -> last -> img -> gnear;
-        break;
-      default:
-        if (i < 5)
+      if (view -> rep_win -> win && GTK_IS_WIDGET(view -> rep_win -> win))
+      {
+        build_win = FALSE;
+        show_the_widgets (view -> rep_win -> win);
+      }
+    }
+    if (build_win)
+    {
+      view -> rep_win =  g_malloc0(sizeof*view -> rep_win);
+      the_rep = view -> rep_win;
+      str = g_strdup_printf ("%s - OpenGL camera set-up", get_project_by_id(view -> proj)->name);
+      the_rep -> win =  create_win (str, view -> win, FALSE, FALSE);
+      g_free (str);
+      add_container_child (CONTAINER_WIN, the_rep -> win, vbox);
+      rep = view -> anim -> last -> img -> rep;
+    }
+  }
+  if (build_win)
+  {
+    adv_box (vbox, "<b>Projection</b>", 10, 120, 0.0);
+    if (preferences)
+    {
+      phbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, phbox, FALSE, FALSE, 0);
+      pvbox = create_vbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
+    }
+    gchar * projection[6]={"Right [1, 0, 0]", "Left [-1, 0, 0]", "Top [0, 1, 0]", "Bottom [0, -1, 0]", "Front [0, 0, 1]", "Back [0, 0, -1]"};
+    hbox = abox ((preferences) ? pvbox : vbox, "Select", 0);
+    GtkWidget * combo = create_combo ();
+    combo = create_combo ();
+    for (i=0; i<6; i++) combo_text_append (combo, projection[i]);
+    combo_set_active (combo, (preferences) ? tmp_rep -> proj : -1);
+    gtk_widget_set_size_request (combo, 150, -1);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
+    g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_projection_combo), (preferences) ? NULL : view);
+
+    adv_box (vbox, "<b>Representation</b>", 10, 120, 0.0);
+    if (preferences)
+    {
+      phbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, phbox, FALSE, FALSE, 0);
+      pvbox = create_vbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
+    }
+    hbox = abox ((preferences) ? pvbox : vbox, "Mode", 0);
+
+    combo = create_combo ();
+    for (i=0; i<OGL_REPS; i++) combo_text_append (combo, text_reps[i]);
+    combo_set_active (combo, rep);
+    gtk_widget_set_size_request (combo, 150, -1);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
+    g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_rep_combo), (preferences) ? NULL : view);
+
+    adv_box (vbox, "<b>OpenGL camera set-up</b>", 10, 120, 0.0);
+    if (preferences)
+    {
+      phbox = create_hbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, phbox, FALSE, FALSE, 0);
+      pvbox = create_vbox (BSEP);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
+    }
+
+    for (i=0; i<7; i++)
+    {
+      if (! preferences || i != 1)
+      {
+        hbox = abox ((preferences) ? pvbox : vbox, cam_opts[i], 0);
+        switch (i)
         {
-          v = view -> anim -> last -> img -> c_angle[i-3];
+          case 0:
+            v = 1.0-0.5*((preferences) ? tmp_rep -> zoom : view -> anim -> last -> img -> zoom);
+            break;
+          case 1:
+            v = view -> anim -> last -> img -> p_depth;
+            break;
+          case 2:
+            v = (preferences) ? tmp_rep -> gnear : view -> anim -> last -> img -> gnear;
+            break;
+          default:
+            if (i < 5)
+            {
+              v = (preferences) ? tmp_rep -> c_angle[i-3] : view -> anim -> last -> img -> c_angle[i-3];
+            }
+            else
+            {
+              if (preferences)
+              {
+                v = (tmp_rep -> c_shift[i-5] == 0.0) ? 0.0 : - tmp_rep -> c_shift[i-5];
+              }
+              else
+              {
+                v = (view -> anim -> last -> img -> c_shift[i-5] == 0.0) ? 0.0 : - view -> anim -> last -> img -> c_shift[i-5];
+              }
+            }
+            break;
+        }
+        if (the_rep -> camera_widg[i]) the_rep -> camera_widg[i] = destroy_this_widget (the_rep -> camera_widg[i]);
+        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 10000.0 : smax[i];
+        the_rep -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], v_max, sdel[i], sdig[i], 150, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
+        if (i > 2 || i == 0)
+        {
+          str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
+        }
+        else if (i == 1)
+        {
+          str = g_strdup_printf ("in [<b>C</b>. depth, %.1f]", max_depth);
         }
         else
         {
-          v = (view -> anim -> last -> img -> c_shift[i-5] == 0.0) ? 0.0 : - view -> anim -> last -> img -> c_shift[i-5];
+          str = (preferences) ? g_strdup_printf ("in [%.1f, <b>P</b>. depth<sup>*</sup>]", smin[i]) : g_strdup_printf ("in [%.1f, <b>P</b>. depth]", smin[i]);
         }
-        break;
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
+        g_free (str);
+        if ((i == 1 || i == 2) && rep == ORTHOGRAPHIC) widget_set_sensitive (the_rep -> camera_widg[i], 0);
+      }
     }
-    if (view -> camera_widg[i]) view -> camera_widg[i] = destroy_this_widget(view -> camera_widg[i]);
-    view -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], smax[i], sdel[i], sdig[i], 150, & view -> colorp[i][0]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, view -> camera_widg[i], FALSE, FALSE, 10);
-    if (i > 2 || i == 0)
+    hbox = create_hbox(0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? "Reset" : "Reset view", IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
+    if (! preferences)
     {
-      str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
-    }
-    else if (i == 1)
-    {
-      str = g_strdup_printf ("in [C. depth, %.1f]", smax[i]);
+      add_gtk_close_event (the_rep -> win, G_CALLBACK(on_rep_delete), view);
+      show_the_widgets (the_rep -> win);
     }
     else
     {
-      str = g_strdup_printf ("in [%.1f, P. depth]", smin[i]);
+      append_comments (the_rep -> win, "<sup>*</sup>", "Perspective depth evaluated from the model");
     }
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
-    g_free (str);
-    if(i < 3 && view -> anim -> last -> img -> rep == ORTHOGRAPHIC) widget_set_sensitive (view -> camera_widg[i], 0);
   }
-  box = create_hbox(0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, box, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_button("Reset view", IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
-  add_gtk_close_event (arep, G_CALLBACK(on_rep_delete), view);
-  show_the_widgets (arep);
 }
 
 /*!
   \fn G_MODULE_EXPORT void set_rep (GtkWidget * widg, gpointer data)
 
-  \brief change representation callback - GTK3
+  \brief change representation callback
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
@@ -387,19 +619,16 @@ G_MODULE_EXPORT void set_rep (GtkWidget * widg, gpointer data)
     }
 #endif
     this_proj -> modelgl -> anim -> last -> img -> rep = j;
-#ifdef GTK3
-    // GTK3 Menu Action To Check
-    for (i=2; i<4; i++)
+    for (i=1; i<3; i++)
     {
-      if (this_proj -> modelgl -> camera_widg[i])
+      if (this_proj -> modelgl -> rep_win)
       {
-        if (GTK_IS_WIDGET(this_proj -> modelgl -> camera_widg[i]))
+        if (this_proj -> modelgl -> rep_win -> camera_widg[i] && GTK_IS_WIDGET(this_proj -> modelgl -> rep_win -> camera_widg[i]))
         {
-          widget_set_sensitive (this_proj -> modelgl -> camera_widg[i], j);
+          widget_set_sensitive (this_proj -> modelgl -> rep_win -> camera_widg[i], j);
         }
       }
     }
-#endif
     this_proj -> modelgl -> create_shaders[MAXIS] = TRUE;
     update (this_proj -> modelgl);
   }

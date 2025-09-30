@@ -603,11 +603,7 @@ G_MODULE_EXPORT void show_volumes (GtkToggleButton * but, gpointer data)
 {
   tint * dat = (tint *)data;
   project * this_proj = get_project_by_id (dat -> a);
-#ifdef GTK4
-  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = gtk_check_button_get_active (but);
-#else
-  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> modelgl -> anim -> last -> img -> show_vol[dat -> b] = button_get_status ((GtkWidget *)but);
   int shaders[1] = {VOLMS};
   re_create_md_shaders (1, shaders, this_proj);
   update (this_proj -> modelgl);
@@ -637,11 +633,7 @@ G_MODULE_EXPORT void fm_show_volumes (GtkToggleButton * but, gpointer data)
 {
   qint * dat = (qint *)data;
   project * this_proj = get_project_by_id (dat -> a);
-#ifdef GTK4
-  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = gtk_check_button_get_active (but);
-#else
-  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = gtk_toggle_button_get_active (but);
-#endif
+  this_proj -> modelgl -> anim -> last -> img -> fm_show_vol[dat -> b-2][dat -> d][dat -> c] = button_get_status ((GtkWidget *)but);
   int shaders[1] = {VOLMS};
   re_create_md_shaders (1, shaders, this_proj);
   update (this_proj -> modelgl);
@@ -999,7 +991,7 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
 G_MODULE_EXPORT void set_angular_precision (GtkComboBox * box, gpointer data)
 {
   glwin * view = (glwin *)data;
-  int i = gtk_combo_box_get_active (box);
+  int i = combo_get_active ((GtkWidget *)box);
   if (i != view -> volume_win -> angp)
   {
     project * this_proj = get_project_by_id (view -> proj);
@@ -1076,7 +1068,7 @@ GtkWidget * vol_model_tab (glwin * view)
   GtkWidget * ang_combo = create_combo ();
   gchar * angpr[4] = {"°", "°/10", "°/100", "°/1000"};
   for (i=0; i<4; i++) combo_text_append (ang_combo, angpr[i]);
-  gtk_combo_box_set_active (GTK_COMBO_BOX(ang_combo), view -> volume_win -> angp);
+  combo_set_active (ang_combo, view -> volume_win -> angp);
   g_signal_connect (G_OBJECT (ang_combo), "changed", G_CALLBACK(set_angular_precision), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ang_combo, FALSE, FALSE, 0);
 

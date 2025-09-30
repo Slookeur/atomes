@@ -182,7 +182,7 @@ void sens_superbut (project * this_proj)
   else
   {
     i = 0;
-    for (j=0; j<3; j++) i += this_proj -> modelgl -> anim -> last -> img -> extra_cell[j];
+    for (j=0; j<3; j++) i += this_proj -> modelgl -> anim -> last -> img -> abc -> extra_cell[j];
   }
   if (this_proj -> modelgl -> cell_win)
   {
@@ -222,7 +222,7 @@ void super_celling (glwin * view)
     image * last = view -> anim -> last -> img;
     if (k != view -> proj) active_project_changed (view -> proj);
     preserve_ogl_selection (view);
-    if (add_cells_ (& active_project -> natomes, & active_project -> steps, last -> extra_cell))
+    if (add_cells_ (& active_project -> natomes, & active_project -> steps, last -> abc -> extra_cell))
     {
       if (active_cell -> crystal)
       {
@@ -245,11 +245,11 @@ void super_celling (glwin * view)
       {
         for (j=0; j<3; j++)
         {
-          active_box -> vect[i][j] *= (last -> extra_cell[i] + 1);
+          active_box -> vect[i][j] *= (last -> abc -> extra_cell[i] + 1);
         }
-        l *= (last -> extra_cell[i] + 1);
-        active_box -> param[0][i] *= (last -> extra_cell[i] + 1);
-        last -> extra_cell[i] = 0;
+        l *= (last -> abc -> extra_cell[i] + 1);
+        active_box -> param[0][i] *= (last -> abc -> extra_cell[i] + 1);
+        last -> abc -> extra_cell[i] = 0;
         if (active_glwin -> cell_win)
         {
           if (active_glwin -> cell_win -> ax_cell[i])

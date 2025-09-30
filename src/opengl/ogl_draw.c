@@ -33,7 +33,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void print_matrices ();
   void setup_camera ();
   void unrotate_camera ();
+  void duplicate_fog (Fog * new_fog, Fog * old_fog);
+  void duplicate_material (Material * new_mat, Material * old_mat);
   void duplicate_material_and_lightning (image * new_img, image * old_img);
+  void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
   void add_image ();
   void at_shift (atom * at, float * shift);
   void at_unshift (atom * at, float * shift);
@@ -49,6 +52,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "glview.h"
 #include "dlp_field.h"
+#include "preferences.h"
 #include <time.h>
 
 extern ColRGBA init_color (int id, int numid);
@@ -83,6 +87,7 @@ extern void create_measures_lists ();
 extern void create_light_lists ();
 extern void create_slab_lists (project * this_proj);
 extern void create_volumes_lists ();
+extern void create_background_lists ();
 
 /*!
   \fn void print_matrices ()
@@ -170,6 +175,42 @@ screen_string * duplicate_screen_string (screen_string * old_s)
 }
 
 /*!
+  \fn void duplicate_material (Material * new_mat, Material * old_mat)
+
+  \brief duplicate material data
+
+  \param new_mat the new material data
+  \param old_mat the old material data to be copied
+
+*/
+void duplicate_material (Material * new_mat, Material * old_mat)
+{
+  new_mat -> predefine = old_mat -> predefine;
+  new_mat -> albedo = old_mat -> albedo;
+  int i;
+  for (i=0; i<6; i++) new_mat -> param[i] = old_mat -> param[i];
+}
+
+/*!
+  \fn void duplicate_fog (Fog * new_fog, Fog * old_fog);
+
+  \brief duplicate fog data
+
+  \param new_fog the new fog data
+  \param old_fog the old fog data to be copied
+
+*/
+void duplicate_fog (Fog * new_fog, Fog * old_fog)
+{
+  new_fog -> mode = old_fog -> mode;
+  new_fog -> based = old_fog -> based;
+  new_fog -> density = old_fog -> density;
+  int i;
+  for (i=0; i<2; i++) new_fog -> depth[i] = old_fog -> depth[i];
+  new_fog -> color = old_fog -> color;
+}
+
+/*!
   \fn void duplicate_material_and_lightning (image * new_img, image * old_img)
 
   \brief copy the material and lightning parameters of an image data structure
@@ -181,17 +222,51 @@ void duplicate_material_and_lightning (image * new_img, image * old_img)
 {
   new_img -> quality = old_img -> quality;
   new_img -> render = old_img -> render;
-  new_img -> lights = old_img -> lights;
-  new_img -> l_ght = copy_light_sources (old_img -> lights, old_img -> lights, old_img -> l_ght);
-  new_img -> m_terial.predefine = old_img -> m_terial.predefine;
-  new_img -> m_terial.albedo = old_img -> m_terial.albedo;
+  duplicate_material (& new_img -> m_terial, & old_img -> m_terial);
+  new_img -> l_ghtning.lights = old_img -> l_ghtning.lights;
+  new_img -> l_ghtning.spot = copy_light_sources (old_img -> l_ghtning.lights, old_img -> l_ghtning.lights, old_img -> l_ghtning.spot);
+  duplicate_fog (& new_img -> f_g, & old_img -> f_g);
+}
+
+/*!
+  \fn void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
+
+  \brief copy screen_label data structure
+
+  \param new_lab the new screen_label structure
+  \param old_lab the old screen_label structure to be copied
+*/
+void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
+{
+  screen_string * stmp_a, * stmp_b;
+
+  new_lab -> position = old_lab -> position;
+  new_lab -> render = old_lab -> render;
+  new_lab -> scale = old_lab -> scale;
+  new_lab -> font = g_strdup_printf ("%s", old_lab -> font);
+  new_lab -> color = NULL;
   int i;
-  for (i=0; i<6; i++) new_img -> m_terial.param[i] = old_img -> m_terial.param[i];
-  new_img -> f_g.mode = old_img -> f_g.mode;
-  new_img -> f_g.based = old_img -> f_g.based;
-  new_img -> f_g.density = old_img -> f_g.density;
-  for (i=0; i<2; i++) new_img -> f_g.depth[i] = old_img -> f_g.depth[i];
-  new_img -> f_g.color = old_img -> f_g.color;
+  for (i=0; i<3; i++) new_lab -> shift[i] = old_lab -> shift[i];
+  new_lab -> n_colors = old_lab -> n_colors;
+  if (old_lab -> color != NULL)
+  {
+    new_lab -> color = duplicate_color (new_lab -> n_colors, old_lab -> color);
+  }
+  new_lab -> list = NULL;
+  if (old_lab -> list != NULL)
+  {
+    new_lab -> list = duplicate_screen_string (old_lab -> list);
+    new_lab -> list -> last = duplicate_screen_string (old_lab -> list -> last);
+    stmp_a = old_lab -> list -> last;
+    stmp_b = new_lab -> list -> last;
+    while (stmp_a -> prev != NULL)
+    {
+      stmp_b -> prev = duplicate_screen_string (stmp_a -> prev);
+      stmp_b -> prev -> last = stmp_b -> last;
+      stmp_a = stmp_a -> prev;
+      stmp_b = stmp_b -> prev;
+    }
+  }
 }
 
 /*!
@@ -209,6 +284,8 @@ image * duplicate_image (image * old_img)
   // This line will copy all the stuff that is not dynamically allocated
   * new_img = * old_img;
 
+  new_img -> back = g_malloc0(sizeof*new_img -> back);
+  duplicate_background_data (new_img -> back, old_img -> back);
   j = proj_gl -> nspec;
   for (i=0; i<2; i++)
   {
@@ -254,44 +331,15 @@ image * duplicate_image (image * old_img)
 
   for (i=0; i<3; i++)
   {
-    new_img -> axis_title[i] = g_strdup_printf ("%s", old_img -> axis_title[i]);
+    new_img -> xyz -> title[i] = g_strdup_printf ("%s", old_img -> xyz -> title[i]);
   }
-  new_img -> axis_color = NULL;
-  if (old_img -> axis_color != NULL)
+  new_img -> xyz -> color = NULL;
+  if (old_img -> xyz -> color != NULL)
   {
-    new_img -> axis_color = duplicate_color (3, old_img -> axis_color);
+    new_img -> xyz -> color = duplicate_color (3, old_img -> xyz -> color);
   }
 
-  screen_string * stmp_a, * stmp_b;
-
-  for (i=0; i<5; i++)
-  {
-    if (i<2)new_img -> labels_format[i] = old_img -> labels_format[i];
-    new_img -> labels_font[i] = g_strdup_printf ("%s", old_img -> labels_font[i]);
-    new_img -> labels_color[i] = NULL;
-    for (j=0; j<3; j++)new_img -> labels_shift[i][j] = old_img -> labels_shift[i][j];
-    if (old_img -> labels_color[i] != NULL)
-    {
-      k = (i < 2) ? proj_gl -> nspec : 1;
-      new_img -> labels_color[i] = duplicate_color (k, old_img -> labels_color[i]);
-    }
-    new_img -> labels_list[i] = NULL;
-    if (old_img -> labels_list[i] != NULL)
-    {
-      new_img -> labels_list[i] = duplicate_screen_string (old_img -> labels_list[i]);
-      new_img -> labels_list[i] -> last = duplicate_screen_string (old_img -> labels_list[i] -> last);
-      stmp_a = old_img -> labels_list[i] -> last;
-      stmp_b =new_img -> labels_list[i] -> last;
-      while (stmp_a -> prev != NULL)
-      {
-        stmp_b -> prev = duplicate_screen_string (stmp_a -> prev);
-        stmp_b -> prev -> last = stmp_b -> last;
-        stmp_a = stmp_a -> prev;
-        stmp_b = stmp_b -> prev;
-      }
-    }
-  }
-
+  for (i=0; i<5; i++) duplicate_screen_label (& new_img -> labels[i], & old_img -> labels[i]);
   duplicate_material_and_lightning (new_img, old_img);
 
   // Atom selection
@@ -498,7 +546,9 @@ void draw (glwin * view)
   {
     int i;
     for (i=0; i<NGLOBAL_SHADERS; i++) cleaning_shaders (wingl, i);
+    if (plot -> back -> gradient) wingl -> create_shaders[BACKG] = TRUE;
   }
+  if (plot -> back -> gradient && wingl -> create_shaders[BACKG]) create_background_lists ();
   if (wingl -> create_shaders[MDBOX]) wingl -> n_shaders[MDBOX][box_step] = create_box_lists (box_step);
   if (wingl -> create_shaders[MAXIS]) wingl -> n_shaders[MAXIS][0] = create_axis_lists ();
   if (wingl -> create_shaders[LIGHT]) create_light_lists ();
@@ -510,9 +560,9 @@ void draw (glwin * view)
   {
     // Picking mode scene
     glDisable (GL_LIGHTING);
-    glClearColor (plot -> backcolor.red,
-                  plot -> backcolor.green,
-                  plot -> backcolor.blue,
+    glClearColor (plot -> back -> color.red,
+                  plot -> back -> color.green,
+                  plot -> back -> color.blue,
                   1.0);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -523,8 +573,14 @@ void draw (glwin * view)
   else
   {
     // Normal mode scene
-    glClearColor (plot -> backcolor.red, plot -> backcolor.green, plot -> backcolor.blue, plot -> backcolor.alpha);
+    glClearColor (plot -> back -> color.red,
+                  plot -> back -> color.green,
+                  plot -> back -> color.blue,
+                  plot -> back -> color.alpha);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    // Gradient background
+    draw_vertices (BACKG);
 
     // We want to draw the elements by reverse order
     // so that atoms will be last and and will appear on
@@ -549,7 +605,7 @@ void draw (glwin * view)
     draw_vertices (LABEL);
 
     // Axis if centered
-    if (view -> anim -> last -> img -> axispos == 4) draw_vertices (MAXIS);
+    if (view -> anim -> last -> img -> xyz -> t_pos == 4) draw_vertices (MAXIS);
 
     // Last the coordination polyhedra
     draw_vertices (POLYS);
@@ -565,7 +621,7 @@ void draw (glwin * view)
     draw_vertices (VOLMS);
 
     // Axis if not centered
-    if (view -> anim -> last -> img -> axispos != 4) draw_vertices (MAXIS);
+    if (view -> anim -> last -> img -> xyz -> t_pos != 4) draw_vertices (MAXIS);
 
     // Lights
     draw_vertices (LIGHT);
@@ -575,6 +631,7 @@ void draw (glwin * view)
     //draw_labels ();
     if (wingl -> record) add_image ();
   }
+
 /* #ifdef DEBUG
   glEndQuery (GL_TIME_ELAPSED);
   GLint done = 0;

@@ -97,12 +97,7 @@ G_MODULE_EXPORT void update_restart_check (GtkToggleButton * but, gpointer data)
 #endif
 {
   int i = GPOINTER_TO_INT(data);
-  gboolean j;
-#ifdef GTK4
-  j = gtk_check_button_get_active (but);
-#else
-  j = gtk_toggle_button_get_active (but);
-#endif
+  gboolean j = button_get_status ((GtkWidget *)but);
   tmp_cpmd -> restart[i] = (j) ? 1 : 0;
   if (i == 3 || i == 6)
   {
@@ -123,7 +118,7 @@ G_MODULE_EXPORT void update_restart_check (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void changed_restart_box (GtkComboBox * box, gpointer data)
 {
-  tmp_cpmd -> restart[0] = gtk_combo_box_get_active (box);
+  tmp_cpmd -> restart[0] = combo_get_active ((GtkWidget *)box);
   int i;
   for (i=1; i<4; i++) print_the_section (i, 0, qmbuffer[i]);
 }
@@ -149,7 +144,7 @@ GtkWidget * restart_box ()
   {
     combo_text_append (box, rest_opts[i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(box), tmp_cpmd -> restart[0]);
+  combo_set_active (box, tmp_cpmd -> restart[0]);
   g_signal_connect (G_OBJECT (box), "changed", G_CALLBACK(changed_restart_box), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, box, FALSE, FALSE, 5);
 

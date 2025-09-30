@@ -86,7 +86,6 @@ int vas_get_atom_coordinates (int sli)
       {
         if (res == 2) goto enda;
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         if (! this_word)
         {
@@ -128,7 +127,6 @@ int vas_get_atom_coordinates (int sli)
       for (j=0; j<active_project -> natomes; j++)
       {
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         if (! this_word)
         {

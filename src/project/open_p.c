@@ -51,6 +51,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "curve.h"
 #include "glview.h"
+#include "preferences.h"
 
 extern void alloc_curves (int c);
 extern void init_box_calc ();
@@ -63,6 +64,8 @@ extern void initrng ();
 extern void initchn ();
 extern void initmsd ();
 extern void initsh (int s);
+
+gboolean old_la_bo_ax_gr;
 
 /*!
   \fn char * read_string (int i, FILE * fp)
@@ -190,6 +193,7 @@ chemical_data * alloc_chem_data (int spec)
   chem -> element = g_malloc0 (spec*sizeof*chem -> element);
   chem -> nsps = allocint (spec);
   chem -> formula = allocint (spec);
+  chem -> grtotcutoff = default_totcut;
   chem -> cutoffs = allocddouble (spec, spec);
   chem -> chem_prop = allocddouble (CHEM_PARAMS, spec);
   return chem;
@@ -228,6 +232,7 @@ int open_project (FILE * fp, int npi)
 
   gboolean labels_in_file = FALSE;
   gboolean correct_x = TRUE;
+  old_la_bo_ax_gr = TRUE;
   // test on ver for version
   if (g_strcmp0(ver, "%\n% project file v-2.6\n%\n") == 0)
   {
@@ -235,6 +240,12 @@ int open_project (FILE * fp, int npi)
   }
   else if (g_strcmp0(ver, "%\n% project file v-2.7\n%\n") == 0)
   {
+    labels_in_file = TRUE;
+    correct_x = FALSE;
+  }
+  else if (g_strcmp0(ver, "%\n% project file v-2.8\n%\n") == 0)
+  {
+    old_la_bo_ax_gr = FALSE;
     labels_in_file = TRUE;
     correct_x = FALSE;
   }

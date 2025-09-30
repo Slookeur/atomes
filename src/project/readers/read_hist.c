@@ -134,7 +134,6 @@ int hist_get_content ()
       for (j=0; j<3; j++)
       {
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         for (l=0; l<3; l++)
         {
@@ -153,7 +152,6 @@ int hist_get_content ()
       {
         if (res == 2) goto enda;
         this_line = g_strdup_printf ("%s", coord_line[k+j*(2+this_reader -> traj)]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         for (l=0; l<3; l++)
         {
@@ -175,7 +173,6 @@ int hist_get_content ()
           }
           g_free (this_line);
           this_line = g_strdup_printf ("%s", coord_line[k+j*(2+this_reader -> traj)+1]);
-          saved_line = g_strdup_printf ("%s", this_line);
           this_word = strtok_r (this_line, " ", & saved_line);
           if (! this_word)
           {
@@ -224,7 +221,6 @@ int hist_get_content ()
       for (j=0; j<3; j++)
       {
         this_line = g_strdup_printf ("%s", coord_line[k+j]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         for (l=0; l<3; l++)
         {
@@ -242,7 +238,6 @@ int hist_get_content ()
       for (j=0; j<this_reader -> natomes; j++)
       {
         this_line = g_strdup_printf ("%s", coord_line[k+j*(2+this_reader -> traj)]);
-        saved_line = g_strdup_printf ("%s", this_line);
         this_word = strtok_r (this_line, " ", & saved_line);
         for (l=0; l<3; l++)
         {
@@ -260,7 +255,6 @@ int hist_get_content ()
           if (! i) check_for_species (v, j);
           g_free (this_line);
           this_line = g_strdup_printf ("%s", coord_line[k+j*(2+this_reader -> traj)+1]);
-          saved_line = g_strdup_printf ("%s", this_line);
           this_word = strtok_r (this_line, " ", & saved_line);
           if (! this_word)
           {

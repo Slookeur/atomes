@@ -68,6 +68,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 #include "glwindow.h"
+#include "preferences.h"
 
 char * box_p[2]={"<b>Edges [&#xC5;]</b>", "<b>Angles [&#xB0;]</b>"};
 char * box_prop[2][3]={{"<b><i>a</i></b>", "<b><i>b</i></b>", "<b><i>c</i></b>"},
@@ -87,7 +88,7 @@ GtkWidget * chem_spec[2];
 GtkWidget * chem_entry[CHEM_PARAMS-1];
 GtkWidget * vect_entry[9];
 double * tmp_chem[CHEM_PARAMS];
-double tmp_box[2][3];
+double tmp_lattice[2][3];
 double tmp_vect[3][3];
 int tmp_pbc, tmp_frac;
 int tmp_xcor, tmp_lat;
@@ -111,7 +112,7 @@ G_MODULE_EXPORT void update_box (GtkEntry * entry, gpointer data)
   double v = string_to_double ((gpointer)m);
   if (v >= 0.0)
   {
-    tmp_box[id -> a][id -> b] = v;
+    tmp_lattice[id -> a][id -> b] = v;
   }
   update_entry_double (entry, v);
 }
@@ -138,11 +139,7 @@ G_MODULE_EXPORT void toggle_pbc (GtkCheckButton * Button, gpointer data)
 G_MODULE_EXPORT void toggle_pbc (GtkToggleButton * Button, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_pbc = gtk_check_button_get_active (Button);
-#else
-  tmp_pbc = gtk_toggle_button_get_active (Button);
-#endif
+  tmp_pbc = button_get_status ((GtkWidget *)Button);
 }
 
 #ifdef GTK4
@@ -167,19 +164,15 @@ G_MODULE_EXPORT void toggle_frac (GtkCheckButton * Button, gpointer data)
 G_MODULE_EXPORT void toggle_frac (GtkToggleButton * Button, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_frac = gtk_check_button_get_active (Button);
-#else
-  tmp_frac = gtk_toggle_button_get_active (Button);
-#endif
+  tmp_frac = button_get_status ((GtkWidget *)Button);
   /*if (gtk_toggle_button_get_active (Button))
   {
     widget_set_sensitive (frac_box, 1);
-    gtk_combo_box_set_active (GTK_COMBO_BOX(frac_box), 0);
+    combo_set_active (frac_box, 0);
   }
   else
   {
-    gtk_combo_box_set_active (GTK_COMBO_BOX(frac_box), -1);
+    combo_set_active (frac_box, -1);
     widget_set_sensitive (frac_box, 0);
   }*/
 }
@@ -300,7 +293,7 @@ void edit_box (GtkWidget * vbox)
   {
     for (j=0; j<3; j++, k++)
     {
-      if (i < 2) tmp_box[i][j] = active_box -> param[i][j];
+      if (i < 2) tmp_lattice[i][j] = active_box -> param[i][j];
       tmp_vect[i][j] = active_box -> vect[i][j];
       t_box[k].a = i;
       t_box[k].b = j;
@@ -315,7 +308,7 @@ void edit_box (GtkWidget * vbox)
     {
       gtk_grid_attach (GTK_GRID (table), markup_label(box_prop[i][j], -1, -1, 0.5, 0.5), j, i+2*i+1, 1, 1);
       entry = create_entry (G_CALLBACK(update_box), 100, 15, FALSE, (gpointer)& t_box[k]);
-      update_entry_double (GTK_ENTRY(entry), tmp_box[i][j]);
+      update_entry_double (GTK_ENTRY(entry), tmp_lattice[i][j]);
       gtk_grid_attach (GTK_GRID (table), entry, j, i+2*i+2, 1, 1);
     }
   }
@@ -335,7 +328,7 @@ void edit_box (GtkWidget * vbox)
 */
 G_MODULE_EXPORT void update_chemistry (GtkEntry * entry, gpointer data)
 {
-  int i = gtk_combo_box_get_active (GTK_COMBO_BOX(spec_box));
+  int i = combo_get_active (spec_box);
   int j = GPOINTER_TO_INT(data);
   const gchar * m = entry_get_text (entry);
   double v = string_to_double ((gpointer)m);
@@ -354,14 +347,14 @@ G_MODULE_EXPORT void update_chemistry (GtkEntry * entry, gpointer data)
 G_MODULE_EXPORT void on_spec_changed (GtkComboBox * combo, gpointer data)
 {
   int i, j;
-  i = gtk_combo_box_get_active (combo);
+  i = combo_get_active ((GtkWidget *)combo);
   gtk_label_set_text (GTK_LABEL(chem_spec[0]), active_chem -> element[i]);
   gtk_label_set_text (GTK_LABEL(chem_spec[1]), g_strdup_printf("%d", (int)active_chem -> chem_prop[CHEM_Z][i]));
   for (j=0; j<CHEM_PARAMS-1; j++)
   {
     update_entry_double (GTK_ENTRY(chem_entry[j]), tmp_chem[j][i]);
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(rad_box), -1);
+  combo_set_active (rad_box, -1);
 }
 
 /*!
@@ -375,10 +368,10 @@ G_MODULE_EXPORT void on_spec_changed (GtkComboBox * combo, gpointer data)
 G_MODULE_EXPORT void on_rad_changed (GtkComboBox * combo, gpointer data)
 {
   int i, j, k;
-  i = gtk_combo_box_get_active (combo);
+  i = combo_get_active ((GtkWidget *)combo);
   if (i != -1)
   {
-    j = gtk_combo_box_get_active (GTK_COMBO_BOX(spec_box));
+    j = combo_get_active (spec_box);
     k = (int)active_chem -> chem_prop[CHEM_Z][j];
     tmp_chem[1][j] = set_radius_ (& k, & i);
     update_entry_double (GTK_ENTRY(chem_entry[1]), tmp_chem[1][j]);
@@ -407,11 +400,7 @@ G_MODULE_EXPORT void toggle_xcor (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void toggle_xcor (GtkToggleButton * but, gpointer data)
 #endif
 {
-#ifdef GTK4
-  tmp_xcor = gtk_check_button_get_active (but);
-#else
-  tmp_xcor = gtk_toggle_button_get_active (but);
-#endif
+  tmp_xcor = button_get_status ((GtkWidget *)but);
   widget_set_sensitive (chem_entry[CHEM_PARAMS-2], ! tmp_xcor);
 }
 
@@ -460,7 +449,7 @@ void edit_chem (GtkWidget * vbox)
           {
             combo_text_append (rad_box, chem_rad[j]);
           }
-          gtk_combo_box_set_active (GTK_COMBO_BOX(rad_box), -1);
+          combo_set_active (rad_box, -1);
           g_signal_connect(G_OBJECT(rad_box), "changed", G_CALLBACK(on_rad_changed), NULL);
           gtk_grid_attach (GTK_GRID (table), rad_box, 1, i+1, 1, 1);
         }
@@ -483,7 +472,7 @@ void edit_chem (GtkWidget * vbox)
       }
     }
   }
-  gtk_combo_box_set_active (GTK_COMBO_BOX(spec_box), 0);
+  combo_set_active (spec_box, 0);
   gtk_fixed_put (GTK_FIXED (chem_fixed), spec_box, -1, -1);
 }
 
@@ -575,9 +564,9 @@ gboolean has_box_changed ()
   {
     for (j=0; j<3; j++)
     {
-      if (tmp_box[i][j] != active_box -> param[i][j])
+      if (tmp_lattice[i][j] != active_box -> param[i][j])
       {
-        active_box -> param[i][j] = tmp_box[i][j];
+        active_box -> param[i][j] = tmp_lattice[i][j];
         changed = TRUE;
       }
     }
@@ -705,33 +694,50 @@ gboolean test_cutoffs ()
 
   \brief creation of the edit bond cutoff widgets
 
-  \param vbox GtkWidget that will receive the data
+  \param vbox the GtkWidget to store the data
 */
 void edit_bonds (GtkWidget * vbox)
 {
-  gchar * mess = "To define the existence of a bond between two atoms i (&#x3B1;) and j (&#x3B2;)."
-                 "\n\tA bond exits if the two following conditions are verified:\n"
-                 "\n\t\t1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)"
-                 "\n\t\t2) D<sub>ij</sub> &#x3c; first minimum of the partial gr<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)\n"
-                 "\n\t0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>";
-  gchar * fin = "\n\tD<sub>max</sub> is the maximum inter-atomic distance in the model\n";
+  gchar * mess[2] = {"To define the existence of a bond between two atoms i (&#x3B1;) and j (&#x3B2;), ",
+                     "a bond exits if the two following conditions are verified:"};
+  gchar * cond[2] = {"1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)",
+                     "2) D<sub>ij</sub> &#x3c; first minimum of the partial gr<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)"};
+  gchar * m_end= "0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>";
+  gchar * fin = "D<sub>max</sub> is the maximum inter-atomic distance in the model\n";
   gchar * str;
-  if (active_project -> max[0] != 0.0)
+  if (! preferences)
   {
-    str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;%s",
-                           mess, active_project -> max[0], fin);
+    if (active_project -> max[0] != 0.0)
+    {
+      str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
+                             m_end, active_project -> max[0]);
+    }
+    else
+    {
+      str = g_strdup_printf ("With %s", m_end);
+    }
   }
-  else
-  {
-    str = g_strdup_printf ("%s%s", mess, fin);
-  }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  g_free (str);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[0], -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[1], -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  GtkWidget * vvbox = create_vbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
   GtkWidget * hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  GtkWidget * boxv = create_vbox (BSEP);
-  cut_box (active_project, boxv);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, boxv, FALSE, FALSE, 50);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[0], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[1], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  if (! preferences)
+  {
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(fin, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+    g_free (str);
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+    GtkWidget * boxv = create_vbox (BSEP);
+    cut_box (active_project, boxv);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, boxv, FALSE, FALSE, 50);
+  }
 }
 
 /*!
@@ -761,7 +767,7 @@ G_MODULE_EXPORT void run_on_edit_activate (GtkDialog * win, gint response_id, gp
       }
       else if (i == 1)
       {
-        done = test_pbc (tmp_pbc, tmp_frac, tmp_box, tmp_vect);
+        done = test_pbc (tmp_pbc, tmp_frac, tmp_lattice, tmp_vect);
         if (done)
         {
           prep_box (i);
@@ -854,7 +860,7 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
     edit_box (box);
     if (id == 3)
     {
-      skip = test_pbc (tmp_pbc, tmp_frac, tmp_box, tmp_vect);
+      skip = test_pbc (tmp_pbc, tmp_frac, tmp_lattice, tmp_vect);
       if (skip)
       {
         active_cell -> ltype = tmp_lat;
@@ -901,4 +907,3 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
     tmpcut = NULL;
   }
 }
-
