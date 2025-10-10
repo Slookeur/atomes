@@ -141,9 +141,13 @@ void add_project (GtkTreeStore * store, int i)
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
   gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
-  for (j=0; j<NCALCS-2; j++)
+  for (j=0; j<NCALCS; j++)
   {
-    if (j < NCALCS-3 || get_project_by_id(i) -> steps > 1)
+#ifdef NEW_ANA
+    if (! get_project_by_id(i) -> analysis[j].requires_md || get_project_by_id(i) -> steps > 1)
+#else
+    if (j < NCALCS-1 || get_project_by_id(i) -> steps > 1)
+#endif
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
       gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, work_menu_items[4+j], 2, j, -1);
@@ -311,7 +315,6 @@ G_MODULE_EXPORT void workspace_ondc (GtkTreeView * treeview,
       g_debug ("WORKSPACE_ONDC: wchar = %s", wchar);
 #endif
       gtk_tree_model_get (model, & iter, 2, & i, -1);
-      i += 4;
 #ifdef DEBUG
       g_debug ("WORKSPACE_ONDC: creating view id= %d", i);
 #endif
@@ -320,7 +323,7 @@ G_MODULE_EXPORT void workspace_ondc (GtkTreeView * treeview,
       g_debug ("WORKSPACE_ONDC: for project= %d", j);
 #endif
       if (j < 0) j = activep;
-      if (i == 2) prep_model (j);
+      if (i == -2) prep_model (j);
       workinfo (get_project_by_id(j), i);
     }
   }

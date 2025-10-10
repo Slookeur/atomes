@@ -917,7 +917,12 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   {
     if (test_vol(active_box -> param, active_box -> vect))
     {
+#ifdef NEW_ANA
+      active_project -> analysis[GR].avail_ok = TRUE;
+      active_project -> analysis[GK].avail_ok = TRUE;
+#else
       for (j=0; j<3; j=j+2) active_project -> runok[j] = TRUE;
+#endif
     }
   }
   initcwidgets ();

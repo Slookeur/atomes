@@ -2151,10 +2151,17 @@ void create_new_project_using_data (atom_selection * selection)
       if (tmp -> next != NULL) tmp = tmp -> next;
     }
   }
+#ifdef NEW_ANA
+  active_project -> analysis[BD].avail_ok = TRUE;
+  active_project -> analysis[RI].avail_ok = TRUE;
+  active_project -> analysis[CH].avail_ok = TRUE;
+  active_project -> analysis[SP].avail_ok = TRUE;
+#else
   active_project -> runok[BD] = TRUE;
   active_project -> runok[RI] = TRUE;
   active_project -> runok[CH] = TRUE;
   active_project -> runok[SP] = TRUE;
+#endif
   active_project_changed (activep);
   add_project_to_workspace ();
   i = opengl_project -> modelgl -> anim -> last -> img -> style;

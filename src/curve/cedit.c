@@ -104,6 +104,24 @@ void prepbox (int k, int l, int m)
 
   project * extra_proj;
   project * this_proj = get_project_by_id(k);
+#ifdef NEW_ANA
+  str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[l].curves[m] -> name);
+  combo_text_append (setcolorbox, str);
+  g_free (str);
+  CurveExtra * ctmp = this_proj -> analysis[l].curves[m] -> extrac -> first;
+  for ( i=0 ; i < this_proj -> analysis[l].curves[m] -> extrac -> extras ; i++ )
+  {
+    n = ctmp -> id.a;
+    o = ctmp -> id.b;
+    p = ctmp -> id.c;
+    extra_proj = get_project_by_id(n);
+    str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> analysis[o].curves[p] -> name);
+    combo_text_append (setcolorbox, str);
+    g_free (str);
+    if (ctmp -> next != NULL) ctmp = ctmp -> next;
+  }
+  if (this_proj -> analysis[l].curves[m] -> extrac -> extras > 0)
+#else
   str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[l][m] -> name);
   combo_text_append (setcolorbox, str);
   g_free (str);
@@ -120,6 +138,7 @@ void prepbox (int k, int l, int m)
     if (ctmp -> next != NULL) ctmp = ctmp -> next;
   }
   if (this_proj -> curves[l][m] -> extrac -> extras > 0)
+#endif
   {
     widget_set_sensitive (setcolorbox, 1);
   }
@@ -147,14 +166,23 @@ void set_set (int a, int b, int c)
   setcolorbox = create_combo ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, thesetbox, setcolorbox, FALSE, FALSE, 0);
   show_the_widgets (setcolorbox);
+#ifdef NEW_ANA
+  action_to_plot (& get_project_by_id(a) -> analysis[b].idcc[c]);
+#else
   action_to_plot (& get_project_by_id(a) -> idcc[b][c]);
+#endif
   prepbox (activeg, activer, activec);
   choose_set (GTK_COMBO_BOX(setcolorbox), NULL);
   orgtree = destroy_this_widget (orgtree);
-
+#ifdef NEW_ANA
   add_container_child (CONTAINER_SCR, datascroll, create_org_list(& get_project_by_id(activeg) -> idcc[activer][activec]));
   show_the_widgets (orgtree);
   widget_set_sensitive (orgtree, get_project_by_id(activeg) -> curves[activer][activec] -> extrac -> extras);
+#else
+  add_container_child (CONTAINER_SCR, datascroll, create_org_list(& get_project_by_id(activeg) -> analysis[activer].idcc[activec]));
+  show_the_widgets (orgtree);
+  widget_set_sensitive (orgtree, get_project_by_id(activeg) -> analysis[activer].curves[activec] -> extrac -> extras);
+#endif
 }
 
 /*!
@@ -170,7 +198,7 @@ static void fill_proj_model (GtkTreeStore * store)
   GtkTreeIter calclevel;
   GtkTreeIter curvelevel;
   project * this_proj;
-  int i, j, k;
+  int i, j, k, l;
   int start, end, step;
   gboolean append;
 
@@ -185,6 +213,11 @@ static void fill_proj_model (GtkTreeStore * store)
     gtk_tree_store_append (store, & projlevel, NULL);
     gtk_tree_store_set (store, & projlevel, 0, 0, 1, prepare_for_title(this_proj -> name), 2, TRUE, 3, -1, -1);
     ppath[i] = gtk_tree_model_get_path ((GtkTreeModel *)store, & projlevel);
+#ifdef NEW_ANA
+    for (j=0; j<this_proj -> analysis[activer].c_sets; j++)
+    {
+      k = this_proj -> analysis[activer].compat_id[j];
+#else
     if (activer == 0 || activer == 3)
     {
       start = 0;
@@ -205,6 +238,41 @@ static void fill_proj_model (GtkTreeStore * store)
     }
     for (j=start; j<end; j=j+step)
     {
+#endif
+#ifdef NEW_ANA
+      if (this_proj -> analysis[k].init_ok)
+       {
+        gtk_tree_store_append (store, & calclevel, & projlevel);
+        gtk_tree_store_set (store, & calclevel, 0, 0, 1, graph_name[k], 2, TRUE, 3, -1, -1);
+        if (j == 0)
+        {
+          cpath[i] = gtk_tree_model_get_path ((GtkTreeModel *)store, & calclevel);
+        }
+        for (l = 0 ; l < this_proj -> analysis[k].numc ; l++)
+        {
+          append = FALSE;
+          if (i != activeg && this_proj -> analysis[k].curves[l] -> ndata != 0)
+          {
+            append = TRUE;
+          }
+          else if (((i != activeg) || (j != activer || k != activec)) && this_proj -> analysis[k].curves[l] -> ndata != 0)
+          {
+            append = TRUE;
+          }
+          if (append)
+          {
+            gtk_tree_store_append (store, & curvelevel, & calclevel);
+            gtk_tree_store_set (store, & curvelevel,
+                                0, 1,
+                                1, this_proj -> analysis[k].curves[l] -> name,
+                                2, ! was_not_added (active_project -> analysis[activer].curves[activec] -> extrac, i, k, l),
+                                3, i,
+                                4, k,
+                                5, l, -1);
+          }
+        }
+      }
+#else
       if (this_proj -> initok[j])
       {
         gtk_tree_store_append (store, & calclevel, & projlevel);
@@ -237,6 +305,7 @@ static void fill_proj_model (GtkTreeStore * store)
           }
         }
       }
+#endif
     }
   }
 }
@@ -367,7 +436,11 @@ void edit_curve (gpointer data)
 
   ctext[0] = "x ∈ [0.0, 1.0]";
   ctext[1] = "y ∈ [0.0, 1.0]";
+#ifdef NEW_ANA
+  edit_box = dialogmodal ("Edit curve", GTK_WINDOW(this_proj -> analysis[b].curves[c] -> window));
+#else
   edit_box = dialogmodal ("Edit curve", GTK_WINDOW(this_proj -> curves[b][c] -> window));
+#endif
   gtk_window_set_resizable (GTK_WINDOW (edit_box), FALSE);
 #ifndef GTK4
   gtk_window_set_icon (GTK_WINDOW (edit_box), THETD);

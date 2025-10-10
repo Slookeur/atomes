@@ -307,7 +307,7 @@ enum ImageFormats {
 /*!< \def NCALCS
   \brief number of analysis
 */
-#define NCALCS 12
+#define NCALCS 10
 
 /*!< \def NGRAPHS
   \brief number of analysis with results in curve window(s)
@@ -331,8 +331,7 @@ enum ImageFormats {
 #define CH 7
 #define SP 8
 #define MS 9
-#define BV 10
-#define FF 12
+// #define FF 12
 
 #define DEFAULT_FONT_SIZE 8
 #define DEFAULT_ALPHA 0.75
@@ -412,7 +411,7 @@ extern gchar * projfile;
 extern char * ifbug;
 extern char * coord_files[NCFORMATS+1];
 extern char * coord_files_ext[NCFORMATS+1];
-extern char * calc_name[NCALCS-2];
+extern char * calc_name[NCALCS];
 extern char * graph_name[NGRAPHS] ;
 extern char * rings_type[5];
 extern char * untime[5];
@@ -692,6 +691,35 @@ struct Curve
   GSimpleActionGroup * action_group;
 };
 
+/*! \typedef atomes_analysis
+
+  \brief analysis data structure
+*/
+typedef struct atomes_analysis atomes_analysis;
+struct atomes_analysis
+{
+  /*
+     Analysis related parameters
+  */
+  int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,ω) */
+  gboolean avail_ok;           /*!< Analysis calculation availability */
+  gboolean init_ok;            /*!< Curves initizalization */
+  gboolean calc_ok;            /*!< Analysis calculation confirmation */
+  int num_delta;               /*!< Discretization */
+  double calc_time;            /*!< Calculation time */
+  double delta;                /*!< Discretization */
+  double min;                  /*!< Minimum x value */
+  double max;                  /*!< Maximum x value */
+  double fact;                 /*!< Gaussian smoothing factor, if available */
+  GtkTextBuffer * calc_buffer; /*!< The text buffer for the calculation */
+  gboolean graph_res;          /*!< Results to be displayed using graphs ? */
+  int numc;                    /*!< Number of curves, if any */
+  int c_sets;                  /*!< Number of compatible sets */
+  int * compat_id;             /*!< List of compatible sets, in 0 - 10 */
+  Curve ** curves;             /*!< The curves, graph for the results of the calculations, if any */
+  tint * idcc;                 /*!< Pointers for the curves */
+};
+
 /*! \def MAXDATC
   \brief Number of tabs for the description of the classical calculation
 */
@@ -964,6 +992,7 @@ struct project
   /*
      Analysis related parameters
   */
+  atomes_analysis * analysis;
   gboolean runok[NGRAPHS];             /*!< Analysis calculation availability */
   gboolean initok[NGRAPHS];            /*!< Curves initizalization  */
   gboolean visok[NGRAPHS];             /*!< Analysis calculation confirmation */

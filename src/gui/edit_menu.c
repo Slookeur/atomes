@@ -543,15 +543,29 @@ void init_box_calc ()
   active_cell -> has_a_box = test_vol (active_box -> param, active_box -> vect);
   if (! active_cell -> has_a_box)
   {
+#ifdef NEW_ANA
+    active_project -> analysis[GR].run_ok = FALSE;
+    active_project -> analysis[SQ].run_ok = FALSE;
+    active_project -> analysis[SK].run_ok = FALSE;
+    active_project -> analysis[GK].run_ok = FALSE;
+#else
     for (i=0; i<4; i++) active_project -> runok[i] = FALSE;
+#endif
   }
   else
   {
+#ifdef NEW_ANA
+    active_project -> analysis[GR].run_ok = TRUE;
+    active_project -> analysis[SQ].run_ok = active_project -> analysis[GR].calc_ok;
+    active_project -> analysis[SK].run_ok = TRUE;
+    active_project -> analysis[GK].run_ok = active_project -> analysis[SK].calc_ok;
+#else
     for (i=0; i<3; i=i+2)
     {
       active_project -> runok[i] = TRUE;
       active_project -> runok[i+1] = active_project -> visok[i];
     }
+#endif
   }
   prep_calc_actions ();
 }
@@ -674,6 +688,20 @@ gboolean test_cutoffs ()
 {
   int i, j, k;
   k = 0;
+#ifdef NEW_ANA
+  for (i=0; i<active_project -> nspec; i++, k++)
+  {
+    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR].max)) return FALSE;
+  }
+  for (i=0; i<active_project -> nspec-1; i++)
+  {
+    for (j=i+1; j<active_project -> nspec; j++, k++)
+    {
+      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR].max)) return FALSE;
+    }
+  }
+  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR].max)) return FALSE;
+#else
   for (i=0; i<active_project -> nspec; i++, k++)
   {
     if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GR])) return FALSE;
@@ -686,6 +714,7 @@ gboolean test_cutoffs ()
     }
   }
   if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GR])) return FALSE;
+#endif
   return TRUE;
 }
 
@@ -707,10 +736,17 @@ void edit_bonds (GtkWidget * vbox)
   gchar * str;
   if (! preferences)
   {
+#ifdef NEW_ANA
+    if (active_project -> analysis[GR].max != 0.0)
+    {
+      str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
+                             m_end, active_project -> analysis[GR].max);
+#else
     if (active_project -> max[0] != 0.0)
     {
       str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
                              m_end, active_project -> max[0]);
+#endif
     }
     else
     {

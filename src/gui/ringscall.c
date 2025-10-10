@@ -82,8 +82,28 @@ void initrng ()
 {
   int i, j, k, l;
   char * cp[4] = {"Rc(n)[", "Pn(n)[", "Pmax(n)[", "Pmin(n)["};
-
   l = 0;
+#ifdef NEW_ANA
+  for ( i = 0 ; i < 5 ; i++ )
+  {
+    for ( j = 0 ; j < 4 ; j++ )
+    {
+
+      active_project -> analysis[RI].curves[l] -> name = g_strdup_printf ("%s - %sAll]", rings_type[i], cp[j]);
+      l=l+1;
+    }
+    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    {
+      for ( k = 0 ; k < 4 ; k++ )
+      {
+        active_project -> analysis[RI].curves[l] -> name = g_strdup_printf ("%s - %s%s]", rings_type[i], cp[k], active_chem -> label[j]);
+        l=l+1;
+      }
+    }
+  }
+  addcurwidgets (activep, RI, 0);
+  active_project -> analysis[RI].init_ok = TRUE;
+#else
   for ( i = 0 ; i < 5 ; i++ )
   {
     for ( j = 0 ; j < 4 ; j++ )
@@ -103,6 +123,7 @@ void initrng ()
   }
   addcurwidgets (activep, RI, 0);
   active_project -> initok[RI] = TRUE;
+#endif
 }
 
 #ifdef GTK3
@@ -154,7 +175,208 @@ void update_rings_view (project * this_proj, int c)
   gchar * tab;
   gchar * cid;
   gchar * str;
+#ifdef NEW_ANA
+  if (this_proj -> analysis[RI].calc_buffer == NULL) this_proj -> analysis[RI].calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[RI].calc_buffer);
+  j = this_proj -> rsparam[c][0];
+  if (j == 0)
+  {
+    nelt = g_strdup_printf ("All");
+    col = NULL;
+  }
+  else
+  {
+    nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
+    col = textcolor(j-1);
+  }
+  print_info ("\n\nRing statistics\n\n", "heading", this_proj -> analysis[RI].calc_buffer);
+  str = g_strdup_printf ("\n%s rings analysis details:\n", rings_type[c]);
+  print_info (str, "italic", this_proj -> analysis[RI].calc_buffer);
+  g_free (str);
 
+  if (this_proj -> rsparam[c][2])
+  {
+    print_info (" * only ABAB rings have been considered\n", "italic", this_proj -> analysis[RI].calc_buffer);
+  }
+  if (this_proj -> rsparam[c][3])
+  {
+    print_info (" * no homopolar bonds in the rings (A-A, B-B ...)\n", "italic", this_proj -> analysis[RI].calc_buffer);
+  }
+  if (this_proj -> rsparam[c][4])
+  {
+    print_info (" * no homopolar bonds in the connectivity matrix (A-A, B-B ...)\n", "italic", this_proj -> analysis[RI].calc_buffer);
+  }
+
+  print_info ("\n Atom(s) used to start the search: ", NULL, this_proj -> analysis[RI].calc_buffer);
+  print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+  if (j != 0) print_info (" atom(s) only", NULL, this_proj -> analysis[RI].calc_buffer);
+
+  if (this_proj -> steps > 1)
+  {
+    print_info ("\n Average number of rings per configuration: ", NULL, this_proj -> analysis[RI].calc_buffer);
+    str = g_strdup_printf ("%f", this_proj -> rsdata[c][0]);
+    print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+    g_free (str);
+    str = g_strdup_printf (" +/- %f\n", this_proj -> rsdata[c][1]);
+    print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+    g_free (str);
+  }
+  else
+  {
+    print_info ("\n Total number of rings: ", NULL, this_proj -> analysis[RI].calc_buffer);
+    str = g_strdup_printf ("%f\n", this_proj -> rsdata[c][0]);
+    print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+    g_free (str);
+  }
+  if (c  == 1 || c == 2)
+  {
+    if (this_proj -> steps > 1)
+    {
+      print_info (" Average number of ring(s) with n > ", NULL, this_proj -> analysis[RI].calc_buffer);
+    }
+    else
+    {
+      print_info (" Number of ring(s) with n > ", NULL, this_proj -> analysis[RI].calc_buffer);
+    }
+    str = g_strdup_printf ("%d", this_proj -> rsparam[c][1]);
+    print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+    g_free (str);
+    print_info ("  nodes that potentially exist: ", NULL, this_proj -> analysis[RI].calc_buffer);
+    str = g_strdup_printf ("%f", this_proj -> rsdata[c][2]);
+    print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+    g_free (str);
+    if (this_proj -> steps > 1)
+    {
+      str = g_strdup_printf (" +/- %f", this_proj -> rsdata[c][3]);
+      print_info (str, "bold", this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+    }
+    print_info ("\n", NULL, this_proj -> analysis[RI].calc_buffer);
+  }
+  print_info ("\n\t n\tRc(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+  print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+  if (this_proj -> steps > 1)
+  {
+    if (j == this_proj -> nspec)
+    {
+      print_info ("]\t  +/-   \tPn(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t  +/-   \tPmax(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t  +/-   \tPmin(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t  +/-\n", "bold", this_proj -> analysis[RI].calc_buffer);
+    }
+    else
+    {
+      print_info ("]\t   +/-  \tPn(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t   +/-  \tPmax(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t   +/-  \tPmin(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\t   +/-  \n", "bold", this_proj -> analysis[RI].calc_buffer);
+    }
+  }
+  else
+  {
+    if (j == this_proj -> nspec)
+    {
+      print_info ("]\tPn(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\tPmax(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\tPmin(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\n", "bold", this_proj -> analysis[RI].calc_buffer);
+    }
+    else
+    {
+      print_info ("]\tPn(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\tPmax(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\tPmin(n)[", "bold", this_proj -> analysis[RI].calc_buffer);
+      print_info (nelt, col, this_proj -> analysis[RI].calc_buffer);
+      print_info ("]\n", "bold", this_proj -> analysis[RI].calc_buffer);
+    }
+  }
+  tab = NULL;
+  cid = NULL;
+  k = 4*(c*(this_proj -> nspec+1) + this_proj -> rsparam[c][0]);
+  j = 1;
+  for ( i=2 ; i < this_proj -> rsparam[c][1] ; i++ )
+  {
+    if (this_proj -> curves[RI][k] -> data[1][i] != 0.0)
+    {
+      j ++;
+      if (j - 2*(j/2) == 0)
+      {
+        tab = g_strdup_printf ("grey_back");
+        cid = g_strdup_printf ("bold_grey_back");
+      }
+      else
+      {
+        tab = NULL;
+        cid = g_strdup_printf ("bold");
+      }
+      print_info ("\t", NULL, this_proj -> analysis[RI].calc_buffer);
+      if (i < 9)
+      {
+        print_info (" ",cid, this_proj -> analysis[RI].calc_buffer);
+      }
+      str = g_strdup_printf("%d", i+1);
+      print_info (str, cid, this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+      str = g_strdup_printf("\t%f\t", this_proj -> analysis[RI].curves[k] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+      if (this_proj -> steps > 1)
+      {
+        str = g_strdup_printf("%f\t", this_proj -> analysis[RI].curves[k] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+        g_free (str);
+      }
+      str = g_strdup_printf("%f\t", this_proj -> analysis[RI].curves[k+1] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+      if (this_proj -> steps > 1)
+      {
+        str = g_strdup_printf("%f\t", this_proj -> analysis[RI].curves[k+1] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+        g_free (str);
+      }
+      str = g_strdup_printf("%f\t", this_proj -> analysis[RI].curves[k+2] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+      if (this_proj -> steps > 1)
+      {
+        str = g_strdup_printf("%f\t", this_proj -> analysis[RI].curves[k+2] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+        g_free (str);
+      }
+      str = g_strdup_printf("%f", this_proj -> analysis[RI].curves[k+3] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+      g_free (str);
+      if (this_proj -> steps > 1)
+      {
+        str = g_strdup_printf("\t%f", this_proj -> analysis[RI].curves[k+3] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[RI].calc_buffer);
+        g_free (str);
+      }
+      print_info ("\n", NULL, this_proj -> analysis[RI].calc_buffer);
+      if (tab != NULL)
+      {
+        g_free (tab);
+      }
+      if (cid != NULL)
+      {
+        g_free (cid);
+      }
+    }
+  }
+  print_info (calculation_time(TRUE, this_proj -> rsdata[c][4]), NULL, this_proj -> analysis[RI].calc_buffer);
+#else
   if (this_proj -> text_buffer[RI+OT] == NULL) this_proj -> text_buffer[RI+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[RI+OT]);
   j = this_proj -> rsparam[c][0];
@@ -355,7 +577,7 @@ void update_rings_view (project * this_proj, int c)
     }
   }
   print_info (calculation_time(TRUE, this_proj -> rsdata[c][4]), NULL, this_proj -> text_buffer[RI+OT]);
-
+#endif
   g_free (nelt);
   if (col != NULL)
   {
@@ -454,10 +676,11 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
 
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
-  if (! active_project -> initok[RI])
-  {
-    initrng ();
-  }
+#ifdef NEW_ANA
+  if (! active_project -> analysis[RI].init_ok) initrng ();
+#else
+  if (! active_project -> initok[RI]) initrng ();
+#endif
   active_project -> rsparam[search][5] = 0;
   if (! active_project -> dmtx || active_project -> rsparam[search][4] || (search > 2 && active_cell -> pbc))
   {
@@ -588,8 +811,15 @@ void save_rings_data_ (int * taille,
   active_project -> rsdata[i][2] = * nampat;
   active_project -> rsdata[i][3] = * ectampat;
   j = 4*(i*(active_project -> nspec+1) + active_project -> rsparam[i][0]);
+#ifdef NEW_ANA
+  active_project -> analysis[RI].curves[j] -> err = duplicate_double (* taille, ectrc);
+  active_project -> analysis[RI].curves[j+1] -> err = duplicate_double (* taille, ectpna);
+  active_project -> analysis[RI].curves[j+2] -> err = duplicate_double (* taille, ectmax);
+  active_project -> analysis[RI].curves[j+3] -> err = duplicate_double (* taille, ectmin);
+#else
   active_project -> curves[RI][j] -> err = duplicate_double (* taille, ectrc);
   active_project -> curves[RI][j+1] -> err = duplicate_double (* taille, ectpna);
   active_project -> curves[RI][j+2] -> err = duplicate_double (* taille, ectmax);
   active_project -> curves[RI][j+3] -> err = duplicate_double (* taille, ectmin);
+#endif
 }

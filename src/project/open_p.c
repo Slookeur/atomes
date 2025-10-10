@@ -273,9 +273,13 @@ int open_project (FILE * fp, int npi)
     active_project -> bondfile = read_this_string (fp);
     if (active_project -> bondfile == NULL) return ERROR_PROJECT;
   }
+#ifdef NEW_ANA
+  // We need temporary buffers to read this data
+#else
   if (fread (active_project -> runok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> initok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> visok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif
   if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;

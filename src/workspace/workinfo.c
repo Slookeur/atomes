@@ -63,8 +63,8 @@ void workinfo (project * this_proj, int i)
   project * tmp_proj;
   switch (i)
   {
-    case 0:
-      this_proj -> text_buffer[i] = add_buffer (NULL, NULL, NULL);
+    case -4:
+      this_proj -> text_buffer[0] = add_buffer (NULL, NULL, NULL);
       print_info ("\n\nWorkspace information\n\n\n", "heading", this_proj -> text_buffer[0]);
       if (g_strcmp0(workspacefile, "(null)") == 0) workspacefile = NULL;
       if (workspacefile != NULL)
@@ -86,45 +86,72 @@ void workinfo (project * this_proj, int i)
       print_info ("\n\n\tActive project: ", NULL, this_proj -> text_buffer[0]);
       print_info (prepare_for_title(active_project -> name), "bold_green", this_proj -> text_buffer[0]);
       break;
-    case 1:
-      this_proj -> text_buffer[i] = add_buffer (NULL, NULL, NULL);
+    case -3:
+      this_proj -> text_buffer[1] = add_buffer (NULL, NULL, NULL);
       model_info (this_proj, this_proj -> text_buffer[1]);
       break;
-    case 2:
-      this_proj -> text_buffer[i] = add_buffer (NULL, NULL, NULL);
-      opengl_info (this_proj, this_proj -> text_buffer[i]);
+    case -2:
+      this_proj -> text_buffer[2] = add_buffer (NULL, NULL, NULL);
+      opengl_info (this_proj, this_proj -> text_buffer[2]);
       break;
-    case GR+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[GR]) update_rdf_view (this_proj, GR);
-      break;
-    case SQ+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[SQ]) update_sq_view (this_proj, SQ);
-      break;
-    case SK+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[SK]) update_sq_view (this_proj, SK);
-      break;
-    case GK+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[GK]) update_rdf_view (this_proj, GK);
-      break;
-    case AN+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[AN]) update_angle_view (this_proj);
-      break;
-    case RI+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[RI])
+    default:
+      if (i > -1)
       {
-        for (j=0; j<5; j++) if (this_proj -> rsparam[j][5]) update_rings_view (this_proj, j);
+#ifdef NEW_ANA
+        if (this_proj -> analysis[i].calc_bufffer == NULL && this_proj -> analysis[i].avail_ok)
+#else
+        if (this_proj -> text_buffer[i+4] == NULL && this_proj -> visok[i])
+#endif
+        {
+          switch (i)
+          {
+            case GR:
+              update_rdf_view (this_proj, GR);
+              break;
+            case SQ:
+              update_sq_view (this_proj, SQ);
+              break;
+            case SK:
+              update_sq_view (this_proj, SK);
+              break;
+            case GK:
+              update_rdf_view (this_proj, GK);
+              break;
+            case AN:
+              update_angle_view (this_proj);
+              break;
+            case RI:
+              for (j=0; j<5; j++) if (this_proj -> rsparam[j][5]) update_rings_view (this_proj, j);
+              break;
+            case CH:
+              update_chains_view (this_proj);
+              break;
+            case SP:
+              update_spherical_view (this_proj);
+              break;
+             case MS:
+               update_msd_view (this_proj);
+               break;
+          }
+        }
       }
       break;
-    case CH+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[CH]) update_chains_view (this_proj);
-      break;
-    case SP+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[SP]) update_spherical_view (this_proj);
-      break;
-    case MS+OT:
-      if (this_proj -> text_buffer[i] == NULL && this_proj -> visok[MS]) update_msd_view (this_proj);
-      break;
   }
+#ifdef NEW_ANA
+  if (i < 0)
+  {
+    j = i + 4;
+    if (this_proj -> text_buffer[j] == NULL) this_proj -> text_buffer[j] = add_buffer (NULL, NULL, NULL);
+    view_buffer (this_proj -> text_buffer[j]);
+  }
+  else
+  {
+    if (this_proj -> analysis[i].calc_buffer == NULL) this_proj -> analysis[i].calc_buffer = add_buffer (NULL, NULL, NULL);
+    view_buffer (this_proj -> analysis[i].calc_buffer);
+  }
+#else
+  i += 4;
   if (this_proj -> text_buffer[i] == NULL) this_proj -> text_buffer[i] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[i]);
+#endif
 }

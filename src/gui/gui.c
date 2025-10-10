@@ -103,33 +103,32 @@ GtkWidget * MainEvent;
 #endif
 
 gchar * dots[NDOTS];
-gchar * calc_img[NCALCS-2];
+gchar * calc_img[NCALCS];
 gchar * graph_img[NGRAPHS];
 
 atomes_action edition_acts[] = {{"edit.chemistry",   GINT_TO_POINTER(0)},
                                 {"edit.periodicity", GINT_TO_POINTER(1)},
                                 {"edit.cutoffs",     GINT_TO_POINTER(2)}};
 
-atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(0)},
-                                {"analyze.sq",     GINT_TO_POINTER(1)},
-                                {"analyze.sk",     GINT_TO_POINTER(2)},
-                                {"analyze.gk",     GINT_TO_POINTER(3)},
-                                {"analyze.bonds",  GINT_TO_POINTER(4)},
-                                {"analyze.rings",  GINT_TO_POINTER(5)},
-                                {"analyze.chains", GINT_TO_POINTER(6)},
-                                {"analyze.sp",     GINT_TO_POINTER(7)},
-                                {"analyze.msd",    GINT_TO_POINTER(8)}};
+atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GR)},
+                                {"analyze.sq",     GINT_TO_POINTER(SQ)},
+                                {"analyze.sk",     GINT_TO_POINTER(SK)},
+                                {"analyze.gk",     GINT_TO_POINTER(GK)},
+                                {"analyze.bonds",  GINT_TO_POINTER(BD)},
+                                {"analyze.rings",  GINT_TO_POINTER(RI-1)},
+                                {"analyze.chains", GINT_TO_POINTER(CH-1)},
+                                {"analyze.sp",     GINT_TO_POINTER(SP-1)},
+                                {"analyze.msd",    GINT_TO_POINTER(MS-1)}};
 
-char * calc_name[NCALCS-2] = {"g(r)/G(r)",
-                              "S(q) from FFT[g(r)]",
-                              "S(q) from Debye equation",
-                              "g(r)/G(r) from FFT[S(q)]",
-                              "Bonds and angles",
-                              "Ring statistics",
-                              "Chain statistics",
-                              "Spherical harmonics",
-                              "Mean Squared Displacement",
-                              "Bond valence"};
+char * calc_name[NGRAPHS] = {"g(r)/G(r)",
+                             "S(q) from FFT[g(r)]",
+                             "S(q) from Debye equation",
+                             "g(r)/G(r) from FFT[S(q)]",
+                             "Bonds and angles",
+                             "Ring statistics",
+                             "Chain statistics",
+                             "Spherical harmonics",
+                             "Mean Squared Displacement"};
 
 char * graph_name[NGRAPHS] = {"g(r)/G(r)",
                               "S(q) from FFT[g(r)]",
@@ -848,6 +847,9 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
       str = g_strdup_printf ("%s.project.compute", act);
       str_n = g_strdup_printf ("Analyze: %s", work_menu_items[calc+4]);
       append_menu_item (menu, str_n, (get_project_by_id(proj) -> runok[calc]) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
+#ifdef NEW_ANA
+
+#endif
       g_free (str);
       g_free (str_n);
     }
@@ -1008,6 +1010,7 @@ GMenu * create_analyze_menu ()
   append_menu_item (menu, "Chain statistics", "app.analyze.chains", NULL, NULL, IMG_FILE, PACKAGE_CH, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "Spherical Harmonics", "app.analyze.sp", NULL, NULL, IMG_FILE, PACKAGE_SP, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "Mean Squared Displacement", "app.analyze.msd", NULL, NULL, IMG_FILE, PACKAGE_MS, FALSE, FALSE, FALSE, NULL);
+  // Append new calculation menu element here
   g_menu_append_section (menu, NULL, (GMenuModel*)tool_box_section());
   return menu;
 }
@@ -1224,6 +1227,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   calc_img[7] = g_strdup_printf ("%s", PACKAGE_SP);
   calc_img[8] = g_strdup_printf ("%s", PACKAGE_MS);
   calc_img[9] = g_strdup_printf ("%s", PACKAGE_BD);
+  // New calculation icon to be added here
 
   dots[0] = g_strdup_printf ("%s", PACKAGE_DOTA);
   dots[1] = g_strdup_printf ("%s", PACKAGE_DOTB);

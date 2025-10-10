@@ -111,9 +111,28 @@ int save_project (FILE * fp, project * this_proj, int npi)
     i = -1;
     if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   }
+#ifdef NEW_ANA
+  // Create temporary buffers to write down the information
+  gboolean * avail_ok = allocbool (NCALCS);
+  gboolean * init_ok = allocbool (NCALCS);
+  gboolean * calc_ok = allocbool (NCALCS);
+  for (j=0; i<NCALCS; j++)
+  {
+    avail_ok[j] = this_proj -> analysis[j].avail_ok;
+    init_ok[j] = this_proj -> analysis[j].init_ok;
+    calc_ok[j] = this_proj -> analysis[j].calc_ok;
+  }
+  if (fwrite (avail_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  if (fwrite (init_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  if (fwrite (vis_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  g_free (avail_ok);
+  g_free (init_ok);
+  g_free (vis_ok);
+#else
   if (fwrite (this_proj -> runok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fwrite (this_proj -> initok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fwrite (this_proj -> visok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif
   if (fwrite (& this_proj -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (& this_proj -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (& this_proj -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
