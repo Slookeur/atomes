@@ -260,4 +260,3 @@ void draw_glyph (cairo_t * in, int theglyph, double x, double y, ColRGBA gcolor,
   cairo_set_source_rgba (in, gcolor.red, gcolor.green, gcolor.blue, 1.0);
   cairo_set_line_width (in, width);
 }
-

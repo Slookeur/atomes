@@ -341,6 +341,9 @@ void init_atomes_analyses ()
 
        - Modify the 'preferences.c' file to offer the options to save user preferences for this calculation
 
+       - Curves setup if any:
+         - adjust autoscale information, edit the file 'yaxis.c' line 105
+
        - Finally apf and awf files version should evolve to save and read the new calculation data
 
   */

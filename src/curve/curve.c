@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   double scale (double axe);
 
-  void prep_plot (project * this_proj, int rid, int cid);
+  void prep_plot (Curve * this_curve);
   void clean_this_curve_window (int cid, int rid);
   void set_curve_data_zero (int rid, int cid, int interv);
   void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid);
@@ -44,6 +44,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   curve_dash * selectdash (int iddash);
 
+  Curve * get_curve_from_pointer (gpointer data);
 */
 
 #include <gtk/gtk.h>
@@ -304,31 +305,36 @@ double scale (double axe)
 }
 
 /*!
-  \fn void prep_plot (project * this_proj, int rid, int cid)
+  \fn Curve * get_curve_from_pointer (gpointer data)
+
+  \brief get Curve pointer from pointer
+  \param data the target pointer
+*/
+Curve * get_curve_from_pointer (gpointer data)
+{
+  tint * ad = (tint *)data;
+#ifdef NEW_ANA
+  return get_project_by_id(ad -> a) -> analysis[ad -> b].curves[ad -> c];
+#else
+  return get_project_by_id(ad -> a) -> curves[ad -> b][ad -> c];
+#endif
+}
+
+/*!
+  \fn void prep_plot (Curve * this_curve)
 
   \brief prepare curve plot (setting up variables for the plot)
 
-  \param this_proj the target project
-  \param rid the calculation id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void prep_plot (project * this_proj, int rid, int cid)
+void prep_plot (Curve * this_curve)
 {
-#ifdef NEW_ANA
-  x_min = resol[0] * this_proj -> analysis[rid].curves[cid] -> frame_pos[0][0];
-  x_max = resol[0] * this_proj -> analysis[rid].curves[cid] -> frame_pos[0][1];
-  y_max = resol[1] * (1.0 - this_proj -> analysis[rid].curves[cid] -> frame_pos[1][1]);
+  x_min = resol[0] * this_curve -> frame_pos[0][0];
+  x_max = resol[0] * this_curve -> frame_pos[0][1];
+  y_max = resol[1] * (1.0 - this_curve -> frame_pos[1][1]);
   y_max = resol[1] - y_max;
-  y_min = resol[1] * (1.0 - this_proj -> analysis[rid].curves[cid] -> frame_pos[1][0]);
+  y_min = resol[1] * (1.0 - this_curve -> frame_pos[1][0]);
   y_min = resol[1] - y_min;
-#else
-  x_min = resol[0] * this_proj -> curves[rid][cid] -> frame_pos[0][0];
-  x_max = resol[0] * this_proj -> curves[rid][cid] -> frame_pos[0][1];
-  y_max = resol[1] * (1.0 - this_proj -> curves[rid][cid] -> frame_pos[1][1]);
-  y_max = resol[1] - y_max;
-  y_min = resol[1] * (1.0 - this_proj -> curves[rid][cid] -> frame_pos[1][0]);
-  y_min = resol[1] - y_min;
-#endif
   // The x size of the graph in pixels
   XDRAW = x_max - x_min;
 // The y size of the graph in pixels
@@ -430,56 +436,12 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
 {
   int i, j;
 #ifdef NEW_ANA
-#ifdef DEBUG
-  /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, active_project -> analysis[* rid].curves[* cid] -> name, * interv);
-  for ( i=0 ; i < *interv ; i++ )
-  {
-    g_debug ("SAVECURVE:: i= %d, data[i]= %f", i, datacurve[i]);
-  }*/
-#endif // DEBUG
-
-  clean_this_curve_window (* cid, * rid);
-  if (* interv != 0)
-  {
-    int inter = (* rid == SP) ? * interv/2 + 1: * interv;
-    if (* rid == SK)
-    {
-      active_project -> analysis[* rid].curves[* cid] -> ndata = inter;
-      active_project -> analysis[* rid].curves[* cid] -> data[0] = duplicate_double (inter, xsk);
-    }
-    else
-    {
-      set_curve_data_zero (* rid, * cid, inter);
-    }
-    if (* rid != SP)
-    {
-      active_project -> analysis[* rid].curves[* cid] -> data[1] = duplicate_double (inter, datacurve);
-    }
-    else
-    {
-      active_project -> analysis[* rid].curves[* cid] -> data[1] = allocdouble (inter);
-      for (i=0; i<inter; i++)
-      {
-        active_project -> analysis[* rid].curves[* cid] -> data[1][i] = datacurve[i*2];
-      }
-    }
-    for (i=0; i<2; i++)
-    {
-      j = active_project -> analysis[* rid].curves[* cid] -> extrac -> extras;
-      active_project -> analysis[* rid].curves[* cid] -> extrac -> extras = 0;
-      autoscale_axis (active_project, * rid, * cid, i);
-      active_project -> analysis[* rid].curves[* cid] -> extrac -> extras = j;
-      active_project -> analysis[* rid].curves[* cid] -> majt[i] = scale (active_project -> analysis[* rid].curves[* cid] -> axmax[i] - active_project -> analysis[* rid].curves[* cid] -> axmin[i]);
-      active_project -> analysis[* rid].curves[* cid] -> mint[i] = 2;
-    }
-  }
-  else
-  {
-    active_project -> analysis[* rid].curves[* cid] -> ndata = 0;
-  }
+  Curve * this_curve = active_project -> analysis[* rid].curves[* cid];
 #else
+  Curve * this_curve = active_project -> curves[* rid][* cid];
+#endif
 #ifdef DEBUG
-  /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, active_project -> curves[* rid][* cid] -> name, * interv);
+  /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
   for ( i=0 ; i < *interv ; i++ )
   {
     g_debug ("SAVECURVE:: i= %d, data[i]= %f", i, datacurve[i]);
@@ -492,8 +454,8 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
     int inter = (* rid == SP) ? * interv/2 + 1: * interv;
     if (* rid == SK)
     {
-      active_project -> curves[* rid][* cid] -> ndata = inter;
-      active_project -> curves[* rid][* cid] -> data[0] = duplicate_double (inter, xsk);
+      this_curve -> ndata = inter;
+      this_curve -> data[0] = duplicate_double (inter, xsk);
     }
     else
     {
@@ -501,31 +463,30 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
     }
     if (* rid != SP)
     {
-      active_project -> curves[* rid][* cid] -> data[1] = duplicate_double (inter, datacurve);
+      this_curve -> data[1] = duplicate_double (inter, datacurve);
     }
     else
     {
-      active_project -> curves[* rid][* cid] -> data[1] = allocdouble (inter);
+      this_curve -> data[1] = allocdouble (inter);
       for (i=0; i<inter; i++)
       {
-        active_project -> curves[* rid][* cid] -> data[1][i] = datacurve[i*2];
+        this_curve -> data[1][i] = datacurve[i*2];
       }
     }
     for (i=0; i<2; i++)
     {
-      j = active_project -> curves[* rid][* cid] -> extrac -> extras;
-      active_project -> curves[* rid][* cid] -> extrac -> extras = 0;
-      autoscale_axis (active_project, * rid, * cid, i);
-      active_project -> curves[* rid][* cid] -> extrac -> extras = j;
-      active_project -> curves[* rid][* cid] -> majt[i] = scale (active_project -> curves[* rid][* cid] -> axmax[i] - active_project -> curves[* rid][* cid] -> axmin[i]);
-      active_project -> curves[* rid][* cid] -> mint[i] = 2;
+      j = this_curve -> extrac -> extras;
+      this_curve -> extrac -> extras = 0;
+      autoscale_axis (active_project, this_curve, * rid, * cid, i);
+      this_curve -> extrac -> extras = j;
+      this_curve -> majt[i] = scale (this_curve -> axmax[i] - this_curve -> axmin[i]);
+      this_curve -> mint[i] = 2;
     }
   }
   else
   {
-    active_project -> curves[* rid][* cid] -> ndata = 0;
+    this_curve -> ndata = 0;
   }
-#endif
 }
 
 /*!
@@ -759,10 +720,5 @@ void update_curves ()
 */
 void update_curve (gpointer data)
 {
-  tint * cd = (tint *)data;
-#ifdef NEW_ANA
-  gtk_widget_queue_draw (get_project_by_id(cd -> a) -> analysis[cd -> b].curves[cd -> c] -> plot);
-#else
-  gtk_widget_queue_draw (get_project_by_id(cd -> a) -> curves[cd -> b][cd -> c] -> plot);
-#endif
+  gtk_widget_queue_draw (get_curve_from_pointer(data) -> plot);
 }

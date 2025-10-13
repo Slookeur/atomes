@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int get_curve_shift (project * this_proj, int b, int c);
+  int get_curve_shift (Curve * this_curve);
 
   G_MODULE_EXPORT gboolean view_curve_popup (GtkWidget * widget, gpointer data);
   G_MODULE_EXPORT gboolean on_motion_notify_event (GtkWidget * widget, GdkEventMotion * event, gpointer data);
@@ -111,8 +111,12 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
   a = cstate -> id -> a;
   b = cstate -> id -> b;
   c = cstate -> id -> c;
-  project * this_proj = get_project_by_id(a);
-  int curve_shift = get_curve_shift (this_proj,b,c);
+#ifdef NEW_ANA
+  Curve * this_curve = get_project_by_id(a) -> analysis[b].curves[c];
+#else
+  Curve * this_curve = get_project_by_id(a) -> curves[b][c];
+#endif
+  int curve_shift = get_curve_shift (this_curve);
 #ifdef GTK4
   event_y -= (double) curve_shift;
 #endif
@@ -121,7 +125,7 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
     cairo_t * rec;
     cairo_region_t * reg;
 #ifdef GTK3
-    GdkWindow * win = gtk_widget_get_window (this_proj -> curves[b][c] -> plot);
+    GdkWindow * win = gtk_widget_get_window (this_curve -> plot);
     reg = gdk_window_get_visible_region (win);
     GdkDrawingContext * curve_context = gdk_window_begin_draw_frame (win, reg);
     if (gdk_drawing_context_is_valid (curve_context))
@@ -129,11 +133,11 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
       rec = gdk_drawing_context_get_cairo_context (curve_context);
       if (event_x >= x_min && event_x <= x_max && event_y <= y_min && event_y >= y_max)
 #else
-    GtkNative * native = gtk_widget_get_native (this_proj -> curves[b][c] -> plot);
+    GtkNative * native = gtk_widget_get_native (this_curve -> plot);
     GdkSurface * surf = gtk_native_get_surface (native);
-    cairo_surface_t * csurf = cairo_surface_create_for_rectangle (this_proj -> curves[b][c] -> surface, 0.0, (double)curve_shift,
-                                                                  (double)gtk_widget_get_width(this_proj -> curves[b][c] -> plot),
-                                                                  (double)gtk_widget_get_height(this_proj -> curves[b][c] -> plot));
+    cairo_surface_t * csurf = cairo_surface_create_for_rectangle (this_curve -> surface, 0.0, (double)curve_shift,
+                                                                  (double)gtk_widget_get_width(this_curve -> plot),
+                                                                  (double)gtk_widget_get_height(this_curve -> plot));
     reg = gdk_cairo_region_create_from_surface (csurf);
     GdkDrawContext * curve_context = (GdkDrawContext *) gdk_surface_create_cairo_context (surf);
     gdk_draw_context_begin_frame (curve_context, reg);
@@ -146,10 +150,10 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
         width  = event_x - cstate -> mouseState.start_x;
         height = event_y - cstate -> mouseState.start_y;
 #ifdef GTK3
-        cairo_set_source_surface (rec, this_proj -> curves[b][c] -> surface, 0, -curve_shift);
+        cairo_set_source_surface (rec, this_curve -> surface, 0, -curve_shift);
 #else
         height += (double) curve_shift;
-        cairo_set_source_surface (rec, this_proj -> curves[b][c] -> surface, 0, +curve_shift);
+        cairo_set_source_surface (rec, this_curve -> surface, 0, +curve_shift);
 #endif
         cairo_paint (rec);
         if (event_x < cstate -> mouseState.start_x)
@@ -211,21 +215,21 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
         }
         g_free (str);
         width  = event_x - x_min;
-        tmp =  this_proj -> curves[b][c] -> axmax[0] - this_proj -> curves[b][c] -> axmin[0];
-        xp = this_proj -> curves[b][c] -> axmin[0] + width * tmp / XDRAW;
+        tmp =  this_curve -> axmax[0] - this_curve -> axmin[0];
+        xp = this_curve -> axmin[0] + width * tmp / XDRAW;
 #ifdef GTK4
         event_y -= (double) curve_shift;
 #endif
         height = event_y - y_max;
-        tmp =  this_proj -> curves[b][c] -> axmax[1] - this_proj -> curves[b][c] -> axmin[1];
-        yp = this_proj -> curves[b][c] -> axmax[1] + height * tmp / YDRAW;
+        tmp =  this_curve -> axmax[1] - this_curve -> axmin[1];
+        yp = this_curve -> axmax[1] + height * tmp / YDRAW;
         str = g_strdup_printf ("(x= %f, y= %f)", xp, yp);
       }
       else
       {
         str = g_strdup_printf ("(Not in plot)");
       }
-      gtk_label_set_text (GTK_LABEL(this_proj -> curves[b][c] -> pos), str);
+      gtk_label_set_text (GTK_LABEL(this_curve -> pos), str);
       g_free (str);
     }
 #ifdef GTK3
@@ -237,16 +241,14 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
   else if (! cstate -> mouseState.MouseIsDown)
   {
 #ifdef GTK3
-    // gtk_widget_get_size_request (this_proj -> curves[b][c] -> plot, & this_proj -> curves[b][c] -> wsize[0], & this_proj -> curves[b][c] -> wsize[1]);
-    gtk_window_get_size (GTK_WINDOW(this_proj -> curves[b][c] -> window),
-                           & this_proj -> curves[b][c] -> wsize[0],
-                           & y);
-    this_proj -> curves[b][c] -> wsize[1] = y - curve_shift;
+    // gtk_widget_get_size_request (this_curve -> plot, & this_curve -> wsize[0], & this_curve -> wsize[1]);
+    gtk_window_get_size (GTK_WINDOW(this_curve -> window), & this_curve -> wsize[0], & y);
+    this_curve -> wsize[1] = y - curve_shift;
 #else
-    this_proj -> curves[b][c] -> wsize[0] = gtk_widget_get_width (this_proj -> curves[b][c] -> plot);
-    this_proj -> curves[b][c] -> wsize[1] = gtk_widget_get_height (this_proj -> curves[b][c] -> plot);
+    this_curve -> wsize[0] = gtk_widget_get_width (this_curve -> plot);
+    this_curve -> wsize[1] = gtk_widget_get_height (this_curve -> plot);
 #endif
-    prep_plot (this_proj, b, c);
+    prep_plot (this_curve);
 #ifdef GTK4
     if (event_x >= x_min && event_x <= x_max && event_y <= y_min+(double)curve_shift && event_y >= y_max)
 #else
@@ -254,18 +256,18 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
 #endif
     {
       width  = event_x - x_min;
-      tmp =  this_proj -> curves[b][c] -> axmax[0] - this_proj -> curves[b][c] -> axmin[0];
-      xp = this_proj -> curves[b][c] -> axmin[0] + width * tmp / XDRAW;
+      tmp =  this_curve -> axmax[0] - this_curve -> axmin[0];
+      xp = this_curve -> axmin[0] + width * tmp / XDRAW;
       height = event_y - y_max;
-      tmp =  this_proj -> curves[b][c] -> axmax[1] - this_proj -> curves[b][c] -> axmin[1];
-      yp = this_proj -> curves[b][c] -> axmax[1] + height * tmp / YDRAW;
+      tmp =  this_curve -> axmax[1] - this_curve -> axmin[1];
+      yp = this_curve -> axmax[1] + height * tmp / YDRAW;
       str = g_strdup_printf ("(x= %f, y= %f)", xp, yp);
     }
     else
     {
       str = g_strdup_printf ("Not in plot");
     }
-    gtk_label_set_text (GTK_LABEL(this_proj -> curves[b][c] -> pos), str);
+    gtk_label_set_text (GTK_LABEL(this_curve -> pos), str);
     g_free (str);
   }
 }
@@ -341,8 +343,13 @@ void curve_button_event (GdkEvent * event, double event_x, double event_y, guint
   b = activer = cstate -> id -> b;
   c = activec = cstate -> id -> c;
   project * this_proj = get_project_by_id(a);
+#ifdef NEW_ANA
+  Curve * this_curve = this_proj -> analysis[b].curves[c];
+#else
+  Curve * this_curve = this_proj -> curves[b][c];
+#endif
 #ifdef GTK4
-  int curve_shift = get_curve_shift (this_proj, b, c);
+  int curve_shift = get_curve_shift (this_curve);
 #endif
   if (event_type == GDK_BUTTON_PRESS)
   {
@@ -351,17 +358,15 @@ void curve_button_event (GdkEvent * event, double event_x, double event_y, guint
 #ifdef GTK3
       /*
         The following is not working:
-          gtk_widget_get_size_request (this_proj -> curves[b][c] -> plot, & this_proj -> curves[b][c] -> wsize[0], & this_proj -> curves[b][c] -> wsize[1]);
+          gtk_widget_get_size_request (this_curve -> plot, & this_curve -> wsize[0], & this_curve -> wsize[1]);
       */
-      gtk_window_get_size (GTK_WINDOW(this_proj -> curves[b][c] -> window),
-                           & this_proj -> curves[b][c] -> wsize[0],
-                           & y1);
-      this_proj -> curves[b][c] -> wsize[1] = y1 - get_curve_shift (this_proj, b, c);
+      gtk_window_get_size (GTK_WINDOW(this_curve -> window), & this_curve -> wsize[0], & y1);
+      this_curve -> wsize[1] = y1 - get_curve_shift (this_curve);
 #else
-      this_proj -> curves[b][c] -> wsize[0] = gtk_widget_get_width (this_proj -> curves[b][c] -> plot);
-      this_proj -> curves[b][c] -> wsize[1] = gtk_widget_get_height (this_proj -> curves[b][c] -> plot);
+      this_curve -> wsize[0] = gtk_widget_get_width (this_curve -> plot);
+      this_curve -> wsize[1] = gtk_widget_get_height (this_curve -> plot);
 #endif
-      prep_plot (this_proj, b, c);
+      prep_plot (this_curve);
 #ifdef GTK4
       if (event_x >= x_min && event_x <= x_max && event_y <= y_min+(double)curve_shift && event_y >= y_max)
 #else
@@ -403,31 +408,31 @@ void curve_button_event (GdkEvent * event, double event_x, double event_y, guint
             y1 -= curve_shift;
             y2 -= curve_shift;
 #endif
-            tmp =  this_proj -> curves[b][c] -> axmax[0] - this_proj -> curves[b][c] -> axmin[0];
+            tmp =  this_curve -> axmax[0] - this_curve -> axmin[0];
             if (x2 > x1)
             {
             // zoom-in on X
-              this_proj -> curves[b][c] -> axmax[0] = this_proj -> curves[b][c] -> axmin[0] + x2 * tmp / XDRAW;
-              this_proj -> curves[b][c] -> axmin[0] = this_proj -> curves[b][c] -> axmin[0] + x1 * tmp / XDRAW;
+              this_curve -> axmax[0] = this_curve -> axmin[0] + x2 * tmp / XDRAW;
+              this_curve -> axmin[0] = this_curve -> axmin[0] + x1 * tmp / XDRAW;
             }
             else
             {
             // zoom-out on X
-              this_proj -> curves[b][c] -> axmin[0] = this_proj -> curves[b][c] -> axmin[0] - (x1 - x2) * tmp / XDRAW;
-              this_proj -> curves[b][c] -> axmax[0] = this_proj -> curves[b][c] -> axmax[0] + (x1 - x2) * tmp / XDRAW;
+              this_curve -> axmin[0] = this_curve -> axmin[0] - (x1 - x2) * tmp / XDRAW;
+              this_curve -> axmax[0] = this_curve -> axmax[0] + (x1 - x2) * tmp / XDRAW;
             }
-            tmp =  this_proj -> curves[b][c] -> axmax[1] - this_proj -> curves[b][c] -> axmin[1];
+            tmp =  this_curve -> axmax[1] - this_curve -> axmin[1];
             if (y1 > y2)
             {
             // zoom-in on Y
-              this_proj -> curves[b][c] -> axmin[1] = this_proj -> curves[b][c] -> axmax[1] + y1 * tmp / YDRAW;
-              this_proj -> curves[b][c] -> axmax[1] = this_proj -> curves[b][c] -> axmax[1] + y2 * tmp / YDRAW;
+              this_curve -> axmin[1] = this_curve -> axmax[1] + y1 * tmp / YDRAW;
+              this_curve -> axmax[1] = this_curve -> axmax[1] + y2 * tmp / YDRAW;
             }
             else
             {
               // zoom-out on Y
-              this_proj -> curves[b][c] -> axmin[1] = this_proj -> curves[b][c] -> axmin[1] + (y2 - y1) * tmp / YDRAW;
-              this_proj -> curves[b][c] -> axmax[1] = this_proj -> curves[b][c] -> axmax[1] - (y2 - y1) * tmp / YDRAW;
+              this_curve -> axmin[1] = this_curve -> axmin[1] + (y2 - y1) * tmp / YDRAW;
+              this_curve -> axmax[1] = this_curve -> axmax[1] - (y2 - y1) * tmp / YDRAW;
             }
           }
         }
@@ -565,17 +570,15 @@ G_MODULE_EXPORT gboolean on_curve_key_pressed (GtkEventControllerKey * self, gui
 #endif
 
 /*!
-  \fn int get_curve_shift (project * this_proj, int b, int c)
+  \fn int get_curve_shift (Curve * this_curve)
 
   \brief get cruve window size shift
 
-  \param this_proj the target project
-  \param b the calculation id
-  \param c the curve id
+  \param this_curve the target curve
 */
-int get_curve_shift (project * this_proj, int b, int c)
+int get_curve_shift (Curve * this_curve)
 {
-  return get_widget_height (this_proj -> curves[b][c] -> window) - get_widget_height (this_proj -> curves[b][c] -> plot);
+  return get_widget_height (this_curve -> window) - get_widget_height (this_curve -> plot);
 }
 
 /*!
@@ -588,11 +591,8 @@ int get_curve_shift (project * this_proj, int b, int c)
 */
 G_MODULE_EXPORT void on_curve_realize (GtkWidget * widg, gpointer data)
 {
-  tint * id = (tint *)data;
-  project * this_proj = get_project_by_id(id -> a);
-  resize_this_window (this_proj -> curves[id -> b][id -> c] -> window,
-                      this_proj -> curves[id -> b][id -> c] -> wsize[0],
-                      this_proj -> curves[id -> b][id -> c] -> wsize[1]+get_curve_shift (this_proj, id -> b, id -> c));
+  Curve * this_curve = get_curve_from_pointer (data);
+  resize_this_window (this_curve -> window, this_curve -> wsize[0], this_curve -> wsize[1] + get_curve_shift (this_curve));
 }
 
 /*!
@@ -604,22 +604,21 @@ G_MODULE_EXPORT void on_curve_realize (GtkWidget * widg, gpointer data)
 */
 GtkWidget * create_curve (tint * data)
 {
-  GtkWidget * Curve, * vbox;
-
+  GtkWidget * curve_win, * vbox;
   activec = data -> c;
-  project * this_proj = get_project_by_id(data -> a);
-  gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (this_proj -> name), this_proj -> curves[data -> b][data -> c] -> name);
-  Curve = create_win (str, MainWindow, FALSE, TRUE);
+  Curve * this_curve = get_curve_from_pointer ((gpointer)data);
+  gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (get_project_by_id(((tint *)data) -> a) -> name), this_curve -> name);
+  curve_win = create_win (str, MainWindow, FALSE, TRUE);
   activer = data -> b;
   g_free (str);
   vbox = create_vbox (BSEP);
-  add_container_child (CONTAINER_WIN, Curve, vbox);
-  this_proj -> curves[data -> b][data -> c] -> curve_vbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, this_proj -> curves[data -> b][data -> c] -> curve_vbox, FALSE, FALSE, 0);
+  add_container_child (CONTAINER_WIN, curve_win, vbox);
+  this_curve -> curve_vbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, this_curve -> curve_vbox, FALSE, FALSE, 0);
 
   curve_action_id ++;
-  this_proj -> curves[data -> b][data -> c] -> action_id = curve_action_id;
-  this_proj -> curves[data -> b][data -> c] -> action_group = g_simple_action_group_new ();
+  this_curve -> action_id = curve_action_id;
+  this_curve -> action_group = g_simple_action_group_new ();
   GSimpleAction * curve_action[5];
   curve_action[0] = g_simple_action_new ("save.data", NULL);
   curve_action[1] = g_simple_action_new ("close.curve", NULL);
@@ -629,46 +628,46 @@ GtkWidget * create_curve (tint * data)
   int i;
   for (i=0; i<5; i++)
   {
-    g_action_map_add_action (G_ACTION_MAP(this_proj -> curves[data -> b][data -> c] -> action_group), G_ACTION(curve_action[i]));
+    g_action_map_add_action (G_ACTION_MAP(this_curve -> action_group), G_ACTION(curve_action[i]));
     g_signal_connect (curve_action[i], "activate", G_CALLBACK(curve_menu_bar_action), data);
   }
-  str = g_strdup_printf ("c-%d", this_proj -> curves[data -> b][data -> c] -> action_id);
-  gtk_widget_insert_action_group (Curve, str, G_ACTION_GROUP(this_proj -> curves[data -> b][data -> c] -> action_group));
+  str = g_strdup_printf ("c-%d", this_curve -> action_id);
+  gtk_widget_insert_action_group (curve_win, str, G_ACTION_GROUP(this_curve -> action_group));
   g_free (str);
   curve_window_add_menu_bar (data);
 
-  this_proj -> curves[data -> b][data -> c] -> datatree = NULL;
-  this_proj -> curves[data -> b][data -> c] -> state.id = data;
-  this_proj -> curves[data -> b][data -> c] -> plot = gtk_drawing_area_new ();
-  gtk_widget_set_size_request (this_proj -> curves[data -> b][data -> c] -> plot, 100, 100);
-  gtk_widget_set_hexpand (this_proj -> curves[data -> b][data -> c] -> plot, TRUE);
-  gtk_widget_set_vexpand (this_proj -> curves[data -> b][data -> c] -> plot, TRUE);
+  this_curve -> datatree = NULL;
+  this_curve -> state.id = data;
+  this_curve -> plot = gtk_drawing_area_new ();
+  gtk_widget_set_size_request (this_curve -> plot, 100, 100);
+  gtk_widget_set_hexpand (this_curve -> plot, TRUE);
+  gtk_widget_set_vexpand (this_curve -> plot, TRUE);
 #ifdef GTK3
-  gtk_widget_add_events (GTK_WIDGET (this_proj -> curves[data -> b][data -> c] -> plot),
+  gtk_widget_add_events (GTK_WIDGET (this_curve -> plot),
                          GDK_EXPOSURE_MASK | GDK_SMOOTH_SCROLL_MASK |
                          GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
                          GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-  g_signal_connect (G_OBJECT(this_proj -> curves[data -> b][data -> c] -> plot), "motion_notify_event", G_CALLBACK(on_motion_notify_event), & this_proj -> curves[data -> b][data -> c] -> state);
-  g_signal_connect (G_OBJECT(this_proj -> curves[data -> b][data -> c] -> plot), "button_press_event", G_CALLBACK(on_curve_button_event), & this_proj -> curves[data -> b][data -> c] -> state);
-  g_signal_connect (G_OBJECT(this_proj -> curves[data -> b][data -> c] -> plot), "button_release_event", G_CALLBACK(on_curve_button_event),& this_proj -> curves[data -> b][data -> c] -> state);
-  g_signal_connect (G_OBJECT(this_proj -> curves[data -> b][data -> c] -> plot), "popup-menu", G_CALLBACK(view_curve_popup), & this_proj -> curves[data -> b][data -> c] -> state);
+  g_signal_connect (G_OBJECT(this_curve -> plot), "motion_notify_event", G_CALLBACK(on_motion_notify_event), & this_curve -> state);
+  g_signal_connect (G_OBJECT(this_curve -> plot), "button_press_event", G_CALLBACK(on_curve_button_event), & this_curve -> state);
+  g_signal_connect (G_OBJECT(this_curve -> plot), "button_release_event", G_CALLBACK(on_curve_button_event),& this_curve -> state);
+  g_signal_connect (G_OBJECT(this_curve -> plot), "popup-menu", G_CALLBACK(view_curve_popup), & this_curve -> state);
 #else
-  add_widget_gesture_and_key_action (Curve, "curve-button-pressed", G_CALLBACK(on_curve_button_pressed), & this_proj -> curves[data -> b][data -> c] -> state,
-                                            "curve-button-released", G_CALLBACK(on_curve_button_released), & this_proj -> curves[data -> b][data -> c] -> state,
+  add_widget_gesture_and_key_action (curve_win, "curve-button-pressed", G_CALLBACK(on_curve_button_pressed), & this_curve -> state,
+                                            "curve-button-released", G_CALLBACK(on_curve_button_released), & this_curve -> state,
                                             "curve-key-pressed", G_CALLBACK(on_curve_key_pressed), data,
-                                            "curve-pointer-motion", G_CALLBACK(on_curve_pointer_motion), & this_proj -> curves[data -> b][data -> c] -> state,
+                                            "curve-pointer-motion", G_CALLBACK(on_curve_pointer_motion), & this_curve -> state,
                                             NULL, NULL, NULL);
 #endif
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, this_proj -> curves[data -> b][data -> c] -> plot, FALSE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, this_curve -> plot, FALSE, TRUE, 0);
 
 #ifdef GTK3
-  g_signal_connect (G_OBJECT(this_proj -> curves[data -> b][data -> c] -> plot), "draw", G_CALLBACK(show_curve), data);
-  g_signal_connect (G_OBJECT(Curve), "key-press-event", G_CALLBACK(on_curve_key_pressed), data);
+  g_signal_connect (G_OBJECT(this_curve -> plot), "draw", G_CALLBACK(show_curve), data);
+  g_signal_connect (G_OBJECT(curve_win), "key-press-event", G_CALLBACK(on_curve_key_pressed), data);
 #else
-  gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA(this_proj -> curves[data -> b][data -> c] -> plot), (GtkDrawingAreaDrawFunc)show_curve, data, NULL);
+  gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA(this_curve -> plot), (GtkDrawingAreaDrawFunc)show_curve, data, NULL);
 #endif
-  g_signal_connect (G_OBJECT(Curve), "realize", G_CALLBACK(on_curve_realize), data);
-  add_gtk_close_event (Curve, G_CALLBACK(to_hide_curve), data);
-  return Curve;
+  g_signal_connect (G_OBJECT(curve_win), "realize", G_CALLBACK(on_curve_realize), data);
+  add_gtk_close_event (curve_win, G_CALLBACK(to_hide_curve), data);
+  return curve_win;
 }

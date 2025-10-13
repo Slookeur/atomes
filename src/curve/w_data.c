@@ -80,13 +80,19 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
 #endif
   int a, b, c, i, j, k, l, m, n, o, p, q;
   tint * cd = (tint *)data;
+  Curve * this_curve = get_curve_from_pointer (data);
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
+#ifdef NEW_ANA
+  double delta = get_project_by_id(a) -> analysis[b].delta;
+#else
+  double delta = get_project_by_id(a) -> delta[b];
+#endif
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     project * this_proj = get_project_by_id(a);
-    this_proj -> curves[b][c] -> cfile = file_chooser_get_file_name (chooser);
+    this_curve -> cfile = file_chooser_get_file_name (chooser);
     GtkFileFilter * tmp = gtk_file_chooser_get_filter (chooser);
     if (tmp == filter1)
     {
@@ -96,38 +102,38 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
     {
       l = 1;
     }
-    k = strlen(this_proj -> curves[b][c] -> cfile);
-    j = strlen (this_proj -> curves[b][c] -> title);
-    if (this_proj -> curves[b][c] -> extrac -> extras == 0)
+    k = strlen (this_curve -> cfile);
+    j = strlen (this_curve -> title);
+    if (this_curve -> extrac -> extras == 0)
     {
-      save_to_file_ (& k, this_proj -> curves[b][c] -> cfile,
-                     & this_proj -> curves[b][c] -> ndata,
-                     this_proj -> curves[b][c] -> data[0],
-                     this_proj -> curves[b][c] -> data[1],
-                     & this_proj -> curves[b][c] -> scale[0],
-                     & this_proj -> curves[b][c] -> scale[1],
-                     & this_proj -> curves[b][c] -> layout -> aspect,
-                     & this_proj -> delta[b], & b, & c, & l,
-                     & j, this_proj -> curves[b][c] -> title);
+      save_to_file_ (& k, this_curve -> cfile,
+                     & this_curve -> ndata,
+                     this_curve -> data[0],
+                     this_curve -> data[1],
+                     & this_curve -> scale[0],
+                     & this_curve -> scale[1],
+                     & this_curve -> layout -> aspect,
+                     & delta, & b, & c, & l,
+                     & j, this_curve -> title);
 
     }
     else
     {
-      p = this_proj -> curves[b][c] -> extrac -> extras + 1;
+      p = this_curve -> extrac -> extras + 1;
       m = 0;
-      prep_file_ (& k, this_proj -> curves[b][c] -> cfile, & l,
-                  & this_proj -> curves[b][c] -> scale[0],
-                  & this_proj -> curves[b][c] -> scale[1],
-                  & this_proj -> delta[b], & b, & c);
-      append_to_file_ (& this_proj -> curves[b][c] -> ndata,
-                       this_proj -> curves[b][c] -> data[0],
-                       this_proj -> curves[b][c] -> data[1],
-                       & this_proj -> delta[b],
-                       & this_proj -> curves[b][c] -> layout -> aspect,
+      prep_file_ (& k, this_curve -> cfile, & l,
+                  & this_curve -> scale[0],
+                  & this_curve -> scale[1],
+                  & delta, & b, & c);
+      append_to_file_ (& this_curve -> ndata,
+                       this_curve -> data[0],
+                       this_curve -> data[1],
+                       & delta,
+                       & this_curve -> layout -> aspect,
                        & b, & c, & l, & m, & p,
-                       & j, this_proj -> curves[b][c] -> title);
-      j = this_proj -> curves[b][c] -> extrac -> extras;
-      CurveExtra * ctmp = this_proj -> curves[b][c] -> extrac -> first;
+                       & j, this_curve -> title);
+      j = this_curve -> extrac -> extras;
+      CurveExtra * ctmp = this_curve -> extrac -> first;
       for (i=0 ; i < j ; i++ )
       {
         m = m + 1;
@@ -135,6 +141,16 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
         o = ctmp -> id.b;
         n = ctmp -> id.c;
         this_proj = get_project_by_id(q);
+#ifdef NEW_ANA
+        j = strlen (this_proj -> analysis[o].curves[n] -> title);
+        append_to_file_ (& this_proj -> analysis[o].curves[n] -> ndata,
+                         this_proj -> analysis[o].curves[n] -> data[0],
+                         this_proj -> analysis[o].curves[n] -> data[1],
+                         & this_proj -> analysis[o].delta,
+                         & ctmp -> layout -> aspect,
+                         & o, & n, & l, & m, & p,
+                         & j, this_proj -> analysis[o].curves[n] -> title);
+#else
         j = strlen (this_proj -> curves[o][n] -> title);
         append_to_file_ (& this_proj -> curves[o][n] -> ndata,
                          this_proj -> curves[o][n] -> data[0],
@@ -143,6 +159,7 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
                          & ctmp -> layout -> aspect,
                          & o, & n, & l, & m, & p,
                          & j, this_proj -> curves[o][n] -> title);
+#endif
         if (ctmp -> next) ctmp = ctmp -> next;
       }
     }
@@ -168,14 +185,9 @@ void write_curve (gpointer idata)
 #else
   GtkWidget * info;
 #endif
-  tint * cd = (tint *)idata;
-  int a, b, c;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (idata);
   info = create_file_chooser ("Save Data",
-                              GTK_WINDOW(this_proj -> curves[b][c] -> window),
+                              GTK_WINDOW(this_curve -> window),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
                               "Save");
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
@@ -190,14 +202,14 @@ void write_curve (gpointer idata)
   gtk_file_filter_set_name (GTK_FILE_FILTER(filter2), "x/y ASCII file (*.dat)");
   gtk_file_filter_add_pattern (GTK_FILE_FILTER(filter2), "*.dat");
   gtk_file_chooser_add_filter (chooser, filter2);
-  if (this_proj -> curves[b][c] -> cfile != NULL)
+  if (this_curve -> cfile != NULL)
   {
-    if (! file_chooser_set_file_name (chooser, this_proj -> curves[b][c] -> cfile)) goto end;
+    if (! file_chooser_set_file_name (chooser, this_curve -> cfile)) goto end;
   }
   else
   {
     file_chooser_set_current_folder (chooser);
-    gtk_file_chooser_set_current_name (chooser, this_proj -> curves[b][c] -> name);
+    gtk_file_chooser_set_current_name (chooser, this_curve -> name);
   }
 #ifdef GTK4
   run_this_gtk_native_dialog ((GtkNativeDialog *)info, G_CALLBACK(run_write_curve), idata);

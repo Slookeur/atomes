@@ -52,7 +52,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   GtkWidget * create_org_list (gpointer data);
   GtkWidget * create_tab_2 (gpointer data);
 
-  DataLayout * get_extra_layout (int i);
+  DataLayout * get_extra_layout (gpointer data, int i);
 
 */
 
@@ -186,16 +186,17 @@ cairo_surface_t * draw_surface (int aspect, double hwidth, double hopac, int da,
 }
 
 /*!
-  \fn DataLayout * get_extra_layout (int i)
+  \fn DataLayout * get_extra_layout (gpointer data, int i)
 
   \brief retrieve the i data layout
 
+  \param data the target data pointer
   \param i the id of data layout to retrieve
 */
-DataLayout * get_extra_layout (int i)
+DataLayout * get_extra_layout (gpointer data, int i)
 {
   int j;
-  CurveExtra * ctmp = get_project_by_id(a) -> curves[b][c] -> extrac -> first;
+  CurveExtra * ctmp = get_curve_from_pointer (data) -> extrac -> first;
   for (j=0; j<i; j++)
   {
     ctmp = ctmp -> next;
@@ -214,20 +215,16 @@ void set_data_style (gpointer data)
 {
   int i;
   cairo_surface_t * pix;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   i = combo_get_active (setcolorbox);
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (data);
   DataLayout * layout;
   if (i > 0)
   {
-    layout = get_extra_layout (i-1);
+    layout = get_extra_layout (data, i-1);
   }
   else
   {
-    layout = this_proj -> curves[b][c] -> layout;
+    layout = this_curve -> layout;
   }
   pix = draw_surface (layout -> aspect,
                       layout -> hwidth,
@@ -235,11 +232,11 @@ void set_data_style (gpointer data)
                       layout -> dash,
                       layout -> thickness,
                       layout -> datacolor,
-                      this_proj -> curves[b][c] -> backcolor,
+                      this_curve -> backcolor,
                       layout -> glyph,
                       layout -> gsize);
   stylearea = destroy_this_widget (stylearea);
-  stylearea =  create_image_from_data (IMG_SURFACE, pix);
+  stylearea = create_image_from_data (IMG_SURFACE, pix);
   cairo_surface_destroy (pix);
   show_the_widgets (stylearea);
 #ifdef GTK4
@@ -260,19 +257,15 @@ void set_data_style (gpointer data)
 G_MODULE_EXPORT void set_data_glyph (GtkComboBox * gbox, gpointer data)
 {
   int i, j;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   i = combo_get_active (setcolorbox);
   j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
-    get_extra_layout (i-1) -> glyph = j;
+    get_extra_layout (data, i-1) -> glyph = j;
   }
   else
   {
-    get_project_by_id(a) -> curves[b][c] -> layout -> glyph = j;
+    get_curve_from_pointer (data) -> layout -> glyph = j;
   }
   if (j == 0)
   {
@@ -298,19 +291,15 @@ G_MODULE_EXPORT void set_data_glyph (GtkComboBox * gbox, gpointer data)
 G_MODULE_EXPORT void set_data_dash (GtkComboBox * gbox, gpointer data)
 {
   int i, j;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   i = combo_get_active (setcolorbox);
   j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
-    get_extra_layout (i-1) -> dash = j;
+    get_extra_layout (data, i-1) -> dash = j;
   }
   else
   {
-    get_project_by_id(a) -> curves[b][c] -> layout -> dash = j;
+    get_curve_from_pointer (data) -> layout -> dash = j;
   }
   if (j == 0)
   {
@@ -334,19 +323,14 @@ G_MODULE_EXPORT void set_data_dash (GtkComboBox * gbox, gpointer data)
 G_MODULE_EXPORT void set_data_color (GtkColorChooser * colob, gpointer data)
 {
   int i;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
   i = combo_get_active (setcolorbox);
   if (i > 0)
   {
-    get_extra_layout (i-1) -> datacolor = get_button_color (colob);
+    get_extra_layout (data, i-1) -> datacolor = get_button_color (colob);
   }
   else
   {
-    this_proj -> curves[b][c] -> layout -> datacolor = get_button_color (colob);
+    get_curve_from_pointer (data) -> layout -> datacolor = get_button_color (colob);
   }
   set_data_style (data);
 }
@@ -364,37 +348,33 @@ G_MODULE_EXPORT void set_data_thickness (GtkEntry * thickd, gpointer data)
   int i;
   double k;
   const gchar * wid;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
+  Curve * this_curve = get_curve_from_pointer (data);
   wid = entry_get_text (thickd);
   k = string_to_double ((gpointer)wid);
-  project * this_proj = get_project_by_id(a);
   i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
     {
-      get_extra_layout (i-1) -> thickness = k;
+      get_extra_layout (data, i-1) -> thickness = k;
     }
     else
     {
-      this_proj -> curves[b][c] -> layout -> thickness = k;
+      this_curve -> layout -> thickness = k;
     }
     update_entry_double (thickd, k);
     set_data_style (data);
   }
   else
   {
-    show_warning ("Line width must be > 0.0", this_proj -> curves[b][c] -> window);
+    show_warning ("Line width must be > 0.0", this_curve -> window);
     if (i > 0)
     {
-      update_entry_double (thickd, get_extra_layout (i-1) -> thickness);
+      update_entry_double (thickd, get_extra_layout (data, i-1) -> thickness);
     }
     else
     {
-      update_entry_double (thickd, this_proj -> curves[b][c] -> layout -> thickness);
+      update_entry_double (thickd, this_curve -> layout -> thickness);
     }
   }
 }
@@ -412,37 +392,33 @@ G_MODULE_EXPORT void set_data_glyph_size (GtkEntry * glsize, gpointer data)
   int i;
   double k;
   const gchar * wid;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
+  Curve * this_curve = get_curve_from_pointer (data);
   wid = entry_get_text (glsize);
   k = string_to_double ((gpointer)wid);
-  project * this_proj = get_project_by_id(a);
   i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
     {
-      get_extra_layout (i-1) -> gsize = k;
+      get_extra_layout (data, i-1) -> gsize = k;
     }
     else
     {
-      this_proj -> curves[b][c] -> layout -> gsize = k;
+      this_curve -> layout -> gsize = k;
     }
     update_entry_double (glsize, k);
     set_data_style (data);
   }
   else
   {
-    show_warning ("Glyph size must be > 0.0", this_proj -> curves[b][c] -> window);
+    show_warning ("Glyph size must be > 0.0", this_curve -> window);
     if (i > 0)
     {
-      update_entry_double (glsize, get_extra_layout (i-1) -> gsize);
+      update_entry_double (glsize, get_extra_layout (data, i-1) -> gsize);
     }
     else
     {
-      update_entry_double (glsize, this_proj -> curves[b][c] -> layout -> gsize);
+      update_entry_double (glsize, this_curve -> layout -> gsize);
     }
   }
 }
@@ -460,37 +436,33 @@ G_MODULE_EXPORT void set_data_hist_width (GtkEntry * entry, gpointer data)
   int i;
   double k;
   const gchar * wid;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
+  Curve * this_curve = get_curve_from_pointer (data);
   wid = entry_get_text (entry);
   k = string_to_double ((gpointer)wid);
-  project * this_proj = get_project_by_id(a);
   i = combo_get_active (setcolorbox);
   if (k > 0.0)
   {
     if (i > 0)
     {
-      get_extra_layout (i-1) -> hwidth = k;
+      get_extra_layout (data, i-1) -> hwidth = k;
     }
     else
     {
-      this_proj -> curves[b][c] -> layout -> hwidth = k;
+      this_curve -> layout -> hwidth = k;
     }
     update_entry_double (entry, k);
     set_data_style (data);
   }
   else
   {
-    show_warning ("Bar width must be > 0.0", this_proj -> curves[b][c] -> window);
+    show_warning ("Bar width must be > 0.0", this_curve -> window);
     if (i > 0)
     {
-      update_entry_double (entry, get_extra_layout (i-1) -> hwidth);
+      update_entry_double (entry, get_extra_layout (data, i-1) -> hwidth);
     }
     else
     {
-      update_entry_double (entry, this_proj -> curves[b][c] -> layout -> hwidth);
+      update_entry_double (entry, this_curve -> layout -> hwidth);
     }
   }
 }
@@ -508,37 +480,33 @@ G_MODULE_EXPORT void set_data_hist_opac (GtkEntry * entry, gpointer data)
   int i;
   double k;
   const gchar * wid;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
+  Curve * this_curve = get_curve_from_pointer (data);
   wid = entry_get_text (entry);
   k = string_to_double ((gpointer)wid);
-  project * this_proj = get_project_by_id(a);
   i = combo_get_active (setcolorbox);
   if (k >= 0.0 && k <= 1.0)
   {
     if (i > 0)
     {
-      get_extra_layout (i-1) -> hopac = k;
+      get_extra_layout (data, i-1) -> hopac = k;
     }
     else
     {
-      this_proj -> curves[b][c] -> layout -> hopac = k;
+      this_curve -> layout -> hopac = k;
     }
     update_entry_double (entry, k);
     set_data_style (data);
   }
   else
   {
-    show_warning ("Bar opacity must be in [0.0 - 1.0]", this_proj -> curves[b][c] -> window);
+    show_warning ("Bar opacity must be in [0.0 - 1.0]", this_curve -> window);
     if (i > 0)
     {
-      update_entry_double (entry, get_extra_layout (i-1) -> hopac);
+      update_entry_double (entry, get_extra_layout (data, i-1) -> hopac);
     }
     else
     {
-      update_entry_double (entry, this_proj -> curves[b][c] -> layout -> hopac);
+      update_entry_double (entry, this_curve -> layout -> hopac);
     }
   }
 }
@@ -554,19 +522,15 @@ G_MODULE_EXPORT void set_data_hist_opac (GtkEntry * entry, gpointer data)
 G_MODULE_EXPORT void set_data_hist_pos (GtkComboBox * gbox, gpointer data)
 {
   int i, j;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   i = combo_get_active (setcolorbox);
   j = combo_get_active ((GtkWidget *)gbox);
   if (i > 0)
   {
-    get_extra_layout (i-1) -> hpos = j;
+    get_extra_layout (data, i-1) -> hpos = j;
   }
   else
   {
-    get_project_by_id(a) -> curves[b][c] -> layout -> hpos = j;
+    get_curve_from_pointer (data) -> layout -> hpos = j;
   }
   set_data_style (data);
 }
@@ -583,37 +547,33 @@ G_MODULE_EXPORT void set_data_glyph_freq (GtkEntry * glfreq, gpointer data)
 {
   int i, j;
   const gchar * wid;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   wid = entry_get_text (glfreq);
   j = string_to_double ((gpointer)wid);
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (data);
   i = combo_get_active (setcolorbox);
   if (j > 0)
   {
     if (i > 0)
     {
-      get_extra_layout (i-1) -> gfreq = j;
+      get_extra_layout (data, i-1) -> gfreq = j;
     }
     else
     {
-      this_proj -> curves[b][c] -> layout -> gfreq = j;
+      this_curve -> layout -> gfreq = j;
     }
     update_entry_int (glfreq, j);
     set_data_style (data);
   }
   else
   {
-    show_warning ("Glyph frequency must be > 0", this_proj -> curves[b][c] -> window);
+    show_warning ("Glyph frequency must be > 0", this_curve -> window);
     if (i > 0)
     {
-      update_entry_int (glfreq, get_extra_layout (i-1) -> thickness);
+      update_entry_int (glfreq, get_extra_layout (data, i-1) -> thickness);
     }
     else
     {
-      update_entry_int (glfreq, this_proj -> curves[b][c] -> layout -> gfreq);
+      update_entry_int (glfreq, this_curve -> layout -> gfreq);
     }
   }
 }
@@ -628,24 +588,16 @@ G_MODULE_EXPORT void set_data_glyph_freq (GtkEntry * glfreq, gpointer data)
 */
 G_MODULE_EXPORT void choose_set (GtkComboBox * box, gpointer data)
 {
-  int i, j, k, l;
-  tint ad;
-
+  int i;
   i = combo_get_active ((GtkWidget *)box);
-  j = dataxe[0].a;
-  k = dataxe[0].b;
-  l = dataxe[0].c;
-  ad.a = j;
-  ad.b = k;
-  ad.c = l;
   DataLayout * layout;
   if (i > 0)
   {
-    layout = get_extra_layout (i-1);
+    layout = get_extra_layout (data, i-1);
   }
   else
   {
-    layout = get_project_by_id(j) -> curves[k][l] -> layout;
+    layout = get_curve_from_pointer (data) -> layout;
   }
   GdkRGBA col = colrgba_togtkrgba (layout -> datacolor);
   gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(data_color), & col);
@@ -658,7 +610,7 @@ G_MODULE_EXPORT void choose_set (GtkComboBox * box, gpointer data)
   update_entry_double (GTK_ENTRY(data_hist_opac), layout -> hopac);
   combo_set_active (data_hist_pos, layout -> hpos);
   combo_set_active (data_aspect, layout -> aspect);
-  set_data_style (& ad);
+  set_data_style (data);
 }
 
 /*!
@@ -672,10 +624,6 @@ G_MODULE_EXPORT void choose_set (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_data_aspect (GtkComboBox * box, gpointer data)
 {
   int i, j;
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   i = combo_get_active (setcolorbox);
   j = combo_get_active ((GtkWidget *)box);
   if (j == 1)
@@ -693,11 +641,11 @@ G_MODULE_EXPORT void set_data_aspect (GtkComboBox * box, gpointer data)
   }
   if (i > 0)
   {
-    get_extra_layout (i-1) -> aspect = j;
+    get_extra_layout (data, i-1) -> aspect = j;
   }
   else
   {
-    get_project_by_id(a) -> curves[b][c] -> layout -> aspect = j;
+    get_curve_from_pointer (data) -> layout -> aspect = j;
   }
   set_data_style (data);
   update_curve (data);
@@ -715,37 +663,38 @@ static void fill_org_model (GtkListStore * store, gpointer data)
 {
   GtkTreeIter curvelevel;
   int i, j, k, l;
-  tint * cd = (tint *) data;
+  Curve * this_curve = get_curve_from_pointer (data);
   gchar * str;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id (a);
   CurveExtra * ctmp;
-  ctmp = this_proj -> curves[b][c] -> extrac -> first;
-  if (this_proj -> curves[b][c] -> draw_id == this_proj -> curves[b][c] -> extrac -> extras)
+  ctmp = this_curve -> extrac -> first;
+  if (this_curve -> draw_id == this_curve -> extrac -> extras)
   {
     gtk_list_store_append (store, & curvelevel);
-    str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[b][c] -> name);
+    str = g_strdup_printf ("%s - %s", get_project_by_id(((tint *)data) -> a) -> name, this_curve -> name);
     gtk_list_store_set (store, & curvelevel, 0, a, 1, b, 2, c, 3, str, -1);
     g_free (str);
   }
-  i = this_proj -> curves[b][c] -> extrac -> extras;
+  i = this_curve -> extrac -> extras;
   while (ctmp)
   {
     gtk_list_store_append (store, & curvelevel);
     j = ctmp -> id.a;
     k = ctmp -> id.b;
     l = ctmp -> id.c;
+#ifdef NEW_ANA
+    str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(j) -> name),
+                                      get_project_by_id(j) -> analysis[k].curves[l] -> name);
+#else
     str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(j) -> name),
                                       get_project_by_id(j) -> curves[k][l] -> name);
+#endif
     gtk_list_store_set (store, & curvelevel, 0, j, 1, k, 2, l, 3, str, -1);
     g_free (str);
     i --;
-    if (this_proj -> curves[b][c] -> draw_id == i)
+    if (this_curve -> draw_id == i)
     {
       gtk_list_store_append (store, & curvelevel);
-      str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[b][c] -> name);
+      str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(((tint *)data) -> a) -> name), this_curve -> name);
       gtk_list_store_set (store, & curvelevel, 0, a, 1, b, 2, c, 3, str, -1);
       g_free (str);
     }
@@ -771,23 +720,23 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   int i, j, k, l, m;
   tint cbid;
   CurveExtra * ctmpa, * ctmpb, * ctmpc, * ctmpd;
-  project * this_proj = get_project_by_id(cid -> a);
-  l = this_proj -> curves[cid -> b][cid -> c] -> extrac -> extras;
+  Curve * this_curve = get_curve_from_pointer (data);
+  l = this_curve -> extrac -> extras;
   m = combo_get_active (setcolorbox);
   if (m > 0)
   {
-    ctmpa = this_proj -> curves[cid -> b][cid -> c] -> extrac -> first;
+    ctmpa = this_curve -> extrac -> first;
     for (i=0; i<m-1; i++) ctmpa = ctmpa -> next;
     cbid = ctmpa -> id;
   }
-  ctmpa = this_proj -> curves[cid -> b][cid -> c] -> extrac -> first;
+  ctmpa = this_curve -> extrac -> first;
   valid = gtk_tree_model_get_iter_first (tree_model, & iter);
-  while (valid)
+  while (valid && ctmpa)
   {
     gtk_tree_model_get (tree_model, & iter, 0, & i, 1, & j, 2, & k, -1);
     if (i == cid -> a && j == cid -> b && k == cid -> c)
     {
-      this_proj -> curves[cid -> b][cid -> c] -> draw_id = l;
+      this_curve -> draw_id = l;
     }
     else if (ctmpa -> id.a != i || ctmpa -> id.b != j || ctmpa -> id.c != k)
     {
@@ -829,7 +778,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
         else
         {
           ctmpa -> next = NULL;
-          this_proj -> curves[cid -> b][cid -> c] -> extrac -> last = ctmpa;
+          this_curve -> extrac -> last = ctmpa;
         }
 
         if (ctmpc)
@@ -840,7 +789,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
         else
         {
           ctmpb -> prev = NULL;
-          this_proj -> curves[cid -> b][cid -> c] -> extrac -> first = ctmpb;
+          this_curve -> extrac -> first = ctmpb;
         }
         if (ctmpd)
         {
@@ -865,7 +814,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   }
   if (m > 0)
   {
-    ctmpa = this_proj -> curves[cid -> b][cid -> c] -> extrac -> first;
+    ctmpa = this_curve -> extrac -> first;
     m = 0;
     while (ctmpa)
     {
@@ -879,9 +828,9 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   setcolorbox = create_combo ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, thesetbox, setcolorbox, FALSE, FALSE, 0);
   show_the_widgets (setcolorbox);
-  prepbox (this_proj -> id, cid -> b, cid -> c);
+  prepbox (data);
   combo_set_active (setcolorbox, m);
-  choose_set (GTK_COMBO_BOX(setcolorbox), NULL);
+  choose_set (GTK_COMBO_BOX(setcolorbox), data);
   update_curve (data);
 }
 
@@ -948,12 +897,7 @@ G_MODULE_EXPORT void set_bshift (GtkCheckButton * shift, gpointer data)
 G_MODULE_EXPORT void set_bshift (GtkToggleButton * shift, gpointer data)
 #endif
 {
-  tint * cd = (tint *)data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> bshift = button_get_status ((GtkWidget *)shift);
+  get_curve_from_pointer (data) -> bshift = button_get_status ((GtkWidget *)shift);
   update_curve (data);
 }
 
@@ -968,26 +912,18 @@ GtkWidget * create_tab_2 (gpointer data)
 {
   GtkWidget * databox;
   GtkWidget * dhbox;
-
-  tint * cd = (tint *) data;
+  Curve * this_curve = get_curve_from_pointer (data);
   int i;
-
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
-
   const int naspects = 2;
   char * aspects[2];
   aspects[0]="x/y";
   aspects[1]="bar";
-
   databox = create_vbox (BSEP);
   thesetbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, thesetbox, FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, thesetbox, markup_label("<b>Select set: </b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
   setcolorbox = create_combo ();
-  prepbox (a, b, c);
+  prepbox (data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, thesetbox, setcolorbox, FALSE, FALSE, 10);
 
   pixarea = create_hbox (0);
@@ -1001,7 +937,7 @@ GtkWidget * create_tab_2 (gpointer data)
   {
     combo_text_append (data_aspect, aspects[i]);
   }
-  combo_set_active (data_aspect, this_proj -> curves[b][c] -> layout -> aspect);
+  combo_set_active (data_aspect, this_curve -> layout -> aspect);
   gtk_widget_set_size_request (data_aspect, 120, -1);
   g_signal_connect (G_OBJECT(data_aspect), "changed", G_CALLBACK(set_data_aspect), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Plot type:"), data_aspect, FALSE, FALSE, 0);
@@ -1011,7 +947,7 @@ GtkWidget * create_tab_2 (gpointer data)
   }
 
 // Data color
-  data_color = color_button (this_proj -> curves[b][c] -> layout -> datacolor, TRUE, 120, -1, G_CALLBACK(set_data_color), data);
+  data_color = color_button (this_curve -> layout -> datacolor, TRUE, 120, -1, G_CALLBACK(set_data_color), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Data color:"), data_color, FALSE, FALSE, 0);
 
 // Line style
@@ -1022,14 +958,14 @@ GtkWidget * create_tab_2 (gpointer data)
      combo_text_append (data_dash, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (data_dash, 120, -1);
-  combo_set_active (data_dash, this_proj -> curves[b][c] -> layout -> dash);
+  combo_set_active (data_dash, this_curve -> layout -> dash);
   g_signal_connect (G_OBJECT(data_dash), "changed", G_CALLBACK(set_data_dash), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Line style:"), data_dash, FALSE, FALSE, 0);
 
 // Line line width
   data_thickness = create_entry (G_CALLBACK(set_data_thickness), 120, 10, FALSE, data);
-  update_entry_double (GTK_ENTRY(data_thickness), this_proj -> curves[b][c] -> layout -> thickness);
-  if (this_proj -> curves[b][c] -> layout -> dash == 0)
+  update_entry_double (GTK_ENTRY(data_thickness), this_curve -> layout -> thickness);
+  if (this_curve -> layout -> dash == 0)
   {
     widget_set_sensitive (data_thickness, 0);
   }
@@ -1047,20 +983,20 @@ GtkWidget * create_tab_2 (gpointer data)
      combo_text_append (data_glyph, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (data_glyph, 120, -1);
-  combo_set_active (data_glyph, this_proj -> curves[b][c] -> layout -> glyph);
+  combo_set_active (data_glyph, this_curve -> layout -> glyph);
   g_signal_connect (G_OBJECT(data_glyph), "changed", G_CALLBACK(set_data_glyph), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Glyph_box, "Glyph type:"), data_glyph, FALSE, FALSE, 0);
 
 // Glyph size
   data_glyph_size = create_entry (G_CALLBACK(set_data_glyph_size), 120, 10, FALSE, data);
-  update_entry_double (GTK_ENTRY(data_glyph_size), this_proj -> curves[b][c] -> layout -> gsize);
+  update_entry_double (GTK_ENTRY(data_glyph_size), this_curve -> layout -> gsize);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Glyph_box, "Glyph size:"), data_glyph_size, FALSE, FALSE, 0);
 
 // Glyph frequency
   data_glyph_freq = create_entry (G_CALLBACK(set_data_glyph_freq), 120, 10, FALSE, data);
-  update_entry_int (GTK_ENTRY(data_glyph_freq), this_proj -> curves[b][c] -> layout -> gfreq);
+  update_entry_int (GTK_ENTRY(data_glyph_freq), this_curve -> layout -> gfreq);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Glyph_box, "Glyph freq.:"), data_glyph_freq, FALSE, FALSE, 0);
-  if (this_proj -> curves[b][c] -> layout -> glyph == 0)
+  if (this_curve -> layout -> glyph == 0)
   {
     widget_set_sensitive (data_glyph_size, 0);
     widget_set_sensitive (data_glyph_freq, 0);
@@ -1070,18 +1006,18 @@ GtkWidget * create_tab_2 (gpointer data)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, data_shape, Hist_box, FALSE, FALSE, 0);
   // Histogram width
   data_hist_width = create_entry (G_CALLBACK(set_data_hist_width), 120, 10, FALSE, data);
-  update_entry_double (GTK_ENTRY(data_hist_width), this_proj -> curves[b][c] -> layout -> hwidth);
+  update_entry_double (GTK_ENTRY(data_hist_width), this_curve -> layout -> hwidth);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Hist_box, "Bar width:"), data_hist_width, FALSE, FALSE, 0);
   // Histogram opacity
   data_hist_opac = create_entry (G_CALLBACK(set_data_hist_opac), 120, 10, FALSE, data);
-  update_entry_double (GTK_ENTRY(data_hist_opac), this_proj -> curves[b][c] -> layout -> hopac);
+  update_entry_double (GTK_ENTRY(data_hist_opac), this_curve -> layout -> hopac);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Hist_box, "Color opacity:"), data_hist_opac, FALSE, FALSE, 0);
 
   data_hist_pos = create_combo ();
   combo_text_append (data_hist_pos, "Transparent");
   combo_text_append (data_hist_pos, "Plain");
   gtk_widget_set_size_request (data_hist_pos, 120, -1);
-  combo_set_active (data_hist_pos, this_proj -> curves[b][c] -> layout -> hpos);
+  combo_set_active (data_hist_pos, this_curve -> layout -> hpos);
   g_signal_connect (G_OBJECT(data_hist_pos), "changed", G_CALLBACK(set_data_hist_pos), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (Hist_box, "Bar opacity:"), data_hist_pos, FALSE, FALSE, 0);
 
@@ -1093,7 +1029,7 @@ GtkWidget * create_tab_2 (gpointer data)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, hbox, FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                         check_button ("Automatic <i>x axis</i> shift for bar diagram  (to improve visibility)", -1, -1, this_proj -> curves[b][c] -> bshift, G_CALLBACK(set_bshift), data),
+                         check_button ("Automatic <i>x axis</i> shift for bar diagram  (to improve visibility)", -1, -1, this_curve -> bshift, G_CALLBACK(set_bshift), data),
                          FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   }
@@ -1107,7 +1043,7 @@ GtkWidget * create_tab_2 (gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, shbox, hbox, FALSE, FALSE, 75);
   datascroll = create_scroll (hbox, 350, 200, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, datascroll, create_org_list(data));
-  widget_set_sensitive (orgtree, this_proj -> curves[b][c] -> extrac -> extras);
+  widget_set_sensitive (orgtree, this_curve -> extrac -> extras);
 #ifndef GTK4
   gchar * str = "\tMove up/down to adjust layer position (up to front, down to back)";
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);

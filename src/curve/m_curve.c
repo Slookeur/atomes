@@ -99,9 +99,9 @@ shortcuts curve_shortcuts[] = {
 */
 void autoscale (gpointer data)
 {
-  tint * id = (tint *)data;
-  get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> autoscale[0] = TRUE;
-  get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> autoscale[1] = TRUE;
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> autoscale[0] = TRUE;
+  this_curve -> autoscale[1] = TRUE;
   update_curve (data);
 }
 
@@ -203,11 +203,11 @@ void prep_extra_rid (tint * data)
 {
   int i;
   extrarid = allocdint (nprojects, NGRAPHS);
-  project * this_proj = get_project_by_id (data -> a);
-  if (this_proj -> curves[data -> b][data -> c] -> extrac -> extras > 0)
+  Curve * this_curve = get_curve_from_pointer (data);
+  if (this_curve -> extrac -> extras > 0)
   {
-    CurveExtra * ctmp = this_proj -> curves[data -> b][data -> c] -> extrac -> first;
-    for (i=0; i<this_proj -> curves[data -> b][data -> c] -> extrac -> extras; i++)
+    CurveExtra * ctmp = this_curve -> extrac -> first;
+    for (i=0; i<this_curve -> extrac -> extras; i++)
     {
       extrarid[ctmp -> id.a][ctmp -> id.b] ++;
       if (ctmp -> next != NULL) ctmp = ctmp -> next;
@@ -228,10 +228,15 @@ void action_to_plot (gpointer data)
   tint * id = (tint *)data;
   gboolean remove = FALSE;
   project * this_proj = get_project_by_id (activeg);
-  if (this_proj -> curves[activer][activec] -> extrac > 0)
+#ifdef NEW_ANA
+  Curve * this_curve = this_proj -> analysis[activer].curves[activec];
+#else
+  Curve * this_curve = this_proj -> curves[activer][activec];
+#endif
+  if (this_curve -> extrac > 0)
   {
-    CurveExtra * ctmp = this_proj -> curves[activer][activec] -> extrac -> first;
-    for (i=0; i<this_proj -> curves[activer][activec] -> extrac -> extras; i++)
+    CurveExtra * ctmp = this_curve -> extrac -> first;
+    for (i=0; i<this_curve -> extrac -> extras; i++)
     {
       if (ctmp -> id.a == id -> a && ctmp -> id.b == id -> b && ctmp -> id.c == id -> c)
       {
@@ -242,19 +247,24 @@ void action_to_plot (gpointer data)
     }
     if (! remove)
     {
-      add_extra (this_proj -> curves[activer][activec] -> extrac, id);
+      add_extra (this_curve -> extrac, id);
     }
     else
     {
-      remove_extra (this_proj -> curves[activer][activec] -> extrac, ctmp);
+      remove_extra (this_curve -> extrac, ctmp);
     }
   }
   else
   {
-    add_extra (this_proj -> curves[activer][activec] -> extrac, id);
+    add_extra (this_curve -> extrac, id);
   }
+#ifdef NEW_ANA
+  curve_window_add_menu_bar (& this_proj -> analysis[activer].idcc[activec]);
+  update_curve ((gpointer)& this_proj -> analysis[activer].idcc[activec]);
+#else
   curve_window_add_menu_bar (& this_proj -> idcc[activer][activec]);
   update_curve ((gpointer)& this_proj -> idcc[activer][activec]);
+#endif
 }
 
 /*!
@@ -319,10 +329,10 @@ G_MODULE_EXPORT void curve_menu_bar_action (GSimpleAction * action, GVariant * p
   }
   else if (g_strcmp0 (name, "shortcuts.curve") == 0)
   {
-    tint * id = (tint *)data;
-    get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> shortcuts = destroy_this_widget (get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> shortcuts);
-    get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> shortcuts = shortcuts_window (G_N_ELEMENTS(curve_group_by_section), curve_group_by_section, G_N_ELEMENTS(curve_shortcut_by_group),
-                                                                                            curve_shortcut_by_group, curve_section_names, curve_group_names, curve_shortcuts);
+    Curve * this_curve = get_curve_from_pointer (data);
+    this_curve -> shortcuts = destroy_this_widget (this_curve -> shortcuts);
+    this_curve -> shortcuts = shortcuts_window (G_N_ELEMENTS(curve_group_by_section), curve_group_by_section, G_N_ELEMENTS(curve_shortcut_by_group),
+                                                                                      curve_shortcut_by_group, curve_section_names, curve_group_names, curve_shortcuts);
   }
 }
 
@@ -344,7 +354,11 @@ gboolean was_not_added (ExtraSets * sets, int a, int b, int c)
   {
     if (ctmp -> id.a == a && ctmp -> id.b == b)
     {
+#ifdef NEW_ANA
+      for (j=0; j<get_project_by_id(a) -> analysis[b].numc; j++)
+#else
       for (j=0; j<get_project_by_id(a) -> numc[b]; j++)
+#endif
       {
         if (ctmp -> id.c == c) return FALSE;
       }
@@ -375,6 +389,15 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
   gchar * text[2] = {"curve.action", "edit.data"};
   project * this_proj = get_project_by_id(a);
   int i;
+#ifdef NEW_ANA
+  for (i=0; i<this_proj -> analysis[b].numc; i++)
+  {
+    if (this_proj -> analysis[b].curves[i] -> ndata > 0)
+    {
+      if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
+      {
+        str_a = g_strdup_printf ("%s", this_proj -> analysis[b].curves[i] -> name);
+#else
   for (i=0; i<this_proj -> numc[b]; i++)
   {
     if (this_proj -> curves[b][i] -> ndata > 0)
@@ -382,6 +405,7 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
       if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
       {
         str_a = g_strdup_printf ("%s", this_proj -> curves[b][i] -> name);
+#endif
         str_b = g_strdup_printf ("%s.%d-%d-%d", text[edit], a, b, i);
         str_c = g_strdup_printf ("%s.%s", act, str_b);
         append_menu_item (menu, (const gchar *)str_a, (const gchar *)str_c, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
@@ -436,7 +460,28 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
       j = 1;
       k = (data -> b == SQ) ? SK : SQ;
     }
+#ifdef NEW_ANA
+    if (((add && extrarid[i][data -> b] < this_proj -> analysis[data -> b].numc)
+    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b].avail_ok)
+    {
+      create_menu[i][data -> b] = TRUE;
+      create_proj[i] = TRUE;
+    }
 
+    if (j && this_proj -> analysis[k].avail_ok)
+    {
+      create_menu[i][k] = FALSE;
+      if (this_proj -> analysis[k].curves[0] -> ndata > 0)
+      {
+        if ((add && extrarid[i][k] < this_proj -> analysis[k].numc)
+        || (! add && extrarid[i][k] > 0))
+        {
+          create_menu[i][k] = TRUE;
+          create_proj[i] = TRUE;
+        }
+      }
+    }
+#else
     if (((add && extrarid[i][data -> b] < this_proj -> numc[data -> b])
     || (! add && extrarid[i][data -> b] > 0)) && this_proj -> visok[data -> b])
     {
@@ -457,21 +502,22 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
         }
       }
     }
+#endif
   }
   if (edit)
   {
     create_menu[data -> a][data -> b] = TRUE;
     create_proj[data -> a] = TRUE;
   }
-  this_proj = get_project_by_id(data -> a);
+  Curve * this_curve = get_curve_from_pointer (data);
   GMenu * smenu;
   for (i=0; i<nprojects; i++)
   {
     if (create_proj[i])
     {
       smenu = g_menu_new ();
-      if (create_menu[i][data -> b]) append_submenu (smenu, graph_name[data -> b], curve_section(action_group, act, this_proj -> curves[data -> b][data -> c] -> extrac, add, edit, i, data -> b, data));
-      if (j && create_menu[i][k]) append_submenu (smenu, graph_name[k], curve_section(action_group, act, this_proj -> curves[data -> b][data -> c] -> extrac, add, edit, i, k, data));
+      if (create_menu[i][data -> b]) append_submenu (smenu, graph_name[data -> b], curve_section(action_group, act, this_curve -> extrac, add, edit, i, data -> b, data));
+      if (j && create_menu[i][k]) append_submenu (smenu, graph_name[k], curve_section(action_group, act, this_curve -> extrac, add, edit, i, k, data));
       // This way GTK3 will not be able to apply markup
       append_submenu (menu, get_project_by_id(i) -> name, smenu);
       g_object_unref (smenu);
@@ -584,16 +630,15 @@ GMenu * create_data_menu (GSimpleActionGroup * action_group, int pop, gchar * st
 }
 
 /*!
-  \fn GMenu * curve_menu_bar (project * this_proj, GSimpleActionGroup * action_group, gchar * str, tint * data)
+  \fn GMenu * curve_menu_bar (GSimpleActionGroup * action_group, gchar * str, tint * data)
 
   \brief create the curve window menu bar
 
-  \param this_proj the target project
   \param action_group the menu action group
   \param str the action string
   \param data the associated data pointer
 */
-GMenu * curve_menu_bar (project * this_proj, GSimpleActionGroup * action_group, gchar * str, tint * data)
+GMenu * curve_menu_bar (GSimpleActionGroup * action_group, gchar * str, tint * data)
 {
   GMenu * menu = g_menu_new ();
   prep_extra_rid (data);
@@ -613,23 +658,23 @@ GMenu * curve_menu_bar (project * this_proj, GSimpleActionGroup * action_group, 
 */
 void curve_window_add_menu_bar (tint * data)
 {
-  project * this_proj = get_project_by_id (data -> a);
-  this_proj -> curves[data -> b][data -> c] -> pos = destroy_this_widget (this_proj -> curves[data -> b][data -> c] -> pos);
-  this_proj -> curves[data -> b][data -> c] -> pos = gtk_label_new (" ");
-  this_proj -> curves[data -> b][data -> c] -> curve_hbox = destroy_this_widget (this_proj -> curves[data -> b][data -> c] -> curve_hbox);
-  this_proj -> curves[data -> b][data -> c] -> curve_hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, this_proj -> curves[data -> b][data -> c] -> curve_vbox, this_proj -> curves[data -> b][data -> c] -> curve_hbox, FALSE, FALSE, 0);
-  gchar * str = g_strdup_printf ("c-%d", this_proj -> curves[data -> b][data -> c] -> action_id);
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> pos = destroy_this_widget (this_curve -> pos);
+  this_curve -> pos = gtk_label_new (" ");
+  this_curve -> curve_hbox = destroy_this_widget (this_curve -> curve_hbox);
+  this_curve -> curve_hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, this_curve -> curve_vbox, this_curve -> curve_hbox, FALSE, FALSE, 0);
+  gchar * str = g_strdup_printf ("c-%d", this_curve -> action_id);
 #ifdef GTK3
-  GtkWidget * menu = gtk_menu_bar_new_from_model ((GMenuModel *)curve_menu_bar(this_proj, this_proj -> curves[data -> b][data -> c] -> action_group, str, data));
+  GtkWidget * menu = gtk_menu_bar_new_from_model ((GMenuModel *)curve_menu_bar(this_curve -> action_group, str, data));
 #else
-  GtkWidget * menu = gtk_popover_menu_bar_new_from_model ((GMenuModel *)curve_menu_bar(this_proj, this_proj -> curves[data -> b][data -> c] -> action_group, str, data));
+  GtkWidget * menu = gtk_popover_menu_bar_new_from_model ((GMenuModel *)curve_menu_bar(this_curve -> action_group, str, data));
 #endif
   g_free (str);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_proj -> curves[data -> b][data -> c] -> curve_hbox, menu, TRUE, TRUE, 0);
-  gtk_label_align (this_proj -> curves[data -> b][data -> c] -> pos, 1.0, 0.5);
-  add_box_child_end (this_proj -> curves[data -> b][data -> c] -> curve_hbox, this_proj -> curves[data -> b][data -> c] -> pos, FALSE, FALSE, 0);
-  show_the_widgets (this_proj -> curves[data -> b][data -> c] -> curve_hbox);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_curve -> curve_hbox, menu, TRUE, TRUE, 0);
+  gtk_label_align (this_curve -> pos, 1.0, 0.5);
+  add_box_child_end (this_curve -> curve_hbox, this_curve -> pos, FALSE, FALSE, 0);
+  show_the_widgets (this_curve -> curve_hbox);
 }
 
 /*!
@@ -651,8 +696,8 @@ GMenu * create_add_remove_section (GSimpleActionGroup * action_group, gchar * ac
   g_menu_item_set_icon (item, gicon);
   g_object_unref (gicon);
 #endif
-  project * this_proj = get_project_by_id (data -> a);
-  if (this_proj -> curves[data -> b][data -> c] -> extrac -> extras < num)
+  Curve * this_curve = get_curve_from_pointer (data);
+  if (this_curve -> extrac -> extras < num)
   {
     g_menu_item_set_submenu (item, (GMenuModel *)create_curve_submenu (action_group, act, data, TRUE, 0));
   }
@@ -669,7 +714,7 @@ GMenu * create_add_remove_section (GSimpleActionGroup * action_group, gchar * ac
   g_menu_item_set_icon (item, gicon);
   g_object_unref (gicon);
 #endif
-  if (this_proj -> curves[data -> b][data -> c] -> extrac -> extras > 0)
+  if (this_curve -> extrac -> extras > 0)
   {
     g_menu_item_set_submenu (item, (GMenuModel *)create_curve_submenu (action_group, act, data, FALSE, 0));
   }
@@ -724,21 +769,38 @@ GtkWidget * curve_popup_menu (gpointer data)
     g_signal_connect (curve_popup_action[i], "activate", G_CALLBACK(curve_menu_bar_action), cstate -> id);
   }
   prep_extra_rid (cstate -> id);
-  gchar * str = g_strdup_printf ("mc-%d", get_project_by_id(cstate -> id -> a) -> curves[cstate -> id -> b][cstate -> id -> c] -> action_id);
+#ifdef NEW_ANA
+  Curve * this_curve = get_project_by_id(cstate -> id -> a) -> analysis[cstate -> id -> b].curves[cstate -> id -> c];
+#else
+  Curve * this_curve = get_project_by_id(cstate -> id -> a) -> curves[cstate -> id -> b][cstate -> id -> c];
+#endif
+  gchar * str = g_strdup_printf ("mc-%d", this_curve -> action_id);
   GMenu * menu = g_menu_new ();
   g_menu_append_section (menu, NULL, (GMenuModel *)create_data_menu(curve_popup_actions, 1, str, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)create_curve_menu(str));
   i = -1;
   for ( j=0 ; j < nprojects; j++ )
   {
+#ifdef NEW_ANA
+    i += get_project_by_id(j) -> analysis[cstate -> id -> b].numc;
+#else
     i += get_project_by_id(j) -> numc[cstate -> id -> b];
+#endif
     if (cstate -> id -> b == GR || cstate -> id -> b == GK)
     {
+#ifdef NEW_ANA
+      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == GR) ? GK : GR].numc;
+#else
       i += get_project_by_id(j) -> numc[(cstate -> id -> b == GR) ? GK : GR];
+#endif
     }
     else if (cstate -> id -> b == SQ || cstate -> id -> b == SK)
     {
+#ifdef NEW_ANA
+      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == SQ) ? SK : SQ].numc;
+#else
       i += get_project_by_id(j) -> numc[(cstate -> id -> b == SQ) ? SK : SQ];
+#endif
     }
   }
   g_menu_append_section (menu, NULL, (GMenuModel *)create_add_remove_section(curve_popup_actions, str, i, cstate -> id));
@@ -748,7 +810,7 @@ GtkWidget * curve_popup_menu (gpointer data)
   g_free (extrarid);
 #ifdef GTK4
   curve_pop_menu = gtk_popover_menu_new_from_model_full ((GMenuModel *)menu, GTK_POPOVER_MENU_NESTED);
-  gtk_widget_set_parent (curve_pop_menu,  get_project_by_id(cstate -> id -> a) -> curves[cstate -> id -> b][cstate -> id -> c] -> window);
+  gtk_widget_set_parent (curve_pop_menu,  this_curve -> window);
   gtk_widget_set_size_request (curve_pop_menu, -1, 305);
 #else
   curve_pop_menu = gtk_menu_new_from_model ((GMenuModel *)menu);

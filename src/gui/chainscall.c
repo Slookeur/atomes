@@ -68,13 +68,13 @@ void initchn ()
 {
   int i;
 #ifdef NEW_ANA
-  active_project -> curves[CH][0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  active_project -> analysis[CH].curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
   for (i=0 ; i<active_project -> nspec ; i++)
   {
-    active_project -> curves[CH][i+1] -> name -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    active_project -> curves[CH][i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
   }
 #else
-  active_project -> analysis[CH].curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  active_project -> curves[CH][0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
   for (i=0 ; i<active_project -> nspec ; i++)
   {
     active_project -> curves[CH][i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);

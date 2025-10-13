@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void label (cairo_t * cr, double val, int axe, int p, project * this_proj);
+  void label_curve (cairo_t * cr, double val, int axe, int p, project * this_proj);
 
 */
 
@@ -43,7 +43,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn void label (cairo_t * cr, double val, int axe, int p, project * this_proj)
+  \fn void label_curve (cairo_t * cr, double val, int axe, int p, Curve * this_curve)
 
   \brief draw axis label
 
@@ -51,9 +51,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   \param val the value to display
   \param axe axis (0 = x, 1 = y)
   \param p label position (0 = bottom, 1 = top)
-  \param this_proj the target project
+  \param this_curve the target curve
 */
-void label (cairo_t * cr, double val, int axe, int p, project * this_proj)
+void label_curve (cairo_t * cr, double val, int axe, int p, Curve * this_curve)
 {
   gchar * label;
   gchar * lab;
@@ -68,7 +68,7 @@ void label (cairo_t * cr, double val, int axe, int p, project * this_proj)
     if (g_strcmp0 ((char *)tmp, ".") == 0) j = i;
     g_free (tmp);
   }
-  for (i=0; i < j + this_proj -> curves[activer][activec] -> labels_digit[axe] + 1; i++)
+  for (i=0; i < j + this_curve -> labels_digit[axe] + 1; i++)
   {
     if (i == 0)
     {
@@ -88,23 +88,23 @@ void label (cairo_t * cr, double val, int axe, int p, project * this_proj)
     pango_layout_get_size (layout, & i, & j);
     if (axe == 0)
     {
-      u = sin (this_proj -> curves[activer][activec] -> labels_angle[axe]) * (double)i;
-      v = sin (pi / 2.0 - this_proj -> curves[activer][activec] -> labels_angle[axe]) * (double)j;
+      u = sin (this_curve -> labels_angle[axe]) * (double)i;
+      v = sin (pi / 2.0 - this_curve -> labels_angle[axe]) * (double)j;
       ay = ay - (u + v)/PANGO_SCALE;
     }
     else
     {
       u = sqrt (1.0*i*i + 1.0*j*j);
       v = atan ((1.0*j) / (1.0*i));
-      u = u * cos (this_proj -> curves[activer][activec] -> labels_angle[axe] + v);
+      u = u * cos (this_curve -> labels_angle[axe] + v);
       ax = ax - u  / PANGO_SCALE;
     }
   }
   cairo_move_to (cr, ax, ay);
-  cairo_rotate (cr, this_proj -> curves[activer][activec] -> labels_angle[axe]);
+  cairo_rotate (cr, this_curve -> labels_angle[axe]);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);
   cairo_stroke (cr);
-  cairo_rotate (cr, -this_proj -> curves[activer][activec] -> labels_angle[axe]);
+  cairo_rotate (cr, -this_curve -> labels_angle[axe]);
   pango_cairo_update_layout (cr, layout);
 }

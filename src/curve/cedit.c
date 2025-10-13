@@ -30,8 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void prepbox (int k, int l, int m);
-  void set_set (int a, int b, int c);
+  void prepbox (gpointer data);
+  void set_set (int a, int b, int c, gpointer data);
   void set_visible_curve_data (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void edit_curve (gpointer data);
 
@@ -39,7 +39,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   G_MODULE_EXPORT void run_curve_edit (GtkDialog * dial, gint response_id, gpointer data);
 
-  GtkWidget * create_projects_tree ();
+  GtkWidget * create_projects_tree (gpointer data);
 
 */
 
@@ -89,56 +89,40 @@ GtkWidget * xyp[2];
 char * lapos[2]={"x: ", "y: "};
 
 /*!
-  \fn void prepbox (int k, int l, int m)
+  \fn void prepbox (gpointer data)
 
   \brief prepare the curve selection combo box
 
-  \param k project id
-  \param l calculation id
-  \param m curve id
+  \param data the associate data pointer
 */
-void prepbox (int k, int l, int m)
+void prepbox (gpointer data)
 {
   int i, n, o, p;
   gchar * str;
-
   project * extra_proj;
-  project * this_proj = get_project_by_id(k);
+  project * this_proj = get_project_by_id(((tint *)data) -> a);
+  Curve * this_curve = get_curve_from_pointer (data);
+  str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_curve -> name);
+  combo_text_append (setcolorbox, str);
+  g_free (str);
+  g_print ("cid= %d\n", this_curve -> cid);
+  CurveExtra * ctmp = this_curve -> extrac -> first;
+  for ( i=0 ; i < this_curve -> extrac -> extras ; i++ )
+  {
+    n = ctmp -> id.a;
+    o = ctmp -> id.b;
+    p = ctmp -> id.c;
+    extra_proj = get_project_by_id(n);
 #ifdef NEW_ANA
-  str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[l].curves[m] -> name);
-  combo_text_append (setcolorbox, str);
-  g_free (str);
-  CurveExtra * ctmp = this_proj -> analysis[l].curves[m] -> extrac -> first;
-  for ( i=0 ; i < this_proj -> analysis[l].curves[m] -> extrac -> extras ; i++ )
-  {
-    n = ctmp -> id.a;
-    o = ctmp -> id.b;
-    p = ctmp -> id.c;
-    extra_proj = get_project_by_id(n);
-    str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> analysis[o].curves[p] -> name);
-    combo_text_append (setcolorbox, str);
-    g_free (str);
-    if (ctmp -> next != NULL) ctmp = ctmp -> next;
-  }
-  if (this_proj -> analysis[l].curves[m] -> extrac -> extras > 0)
+    str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> analysis[o]curves[p] -> name);
 #else
-  str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[l][m] -> name);
-  combo_text_append (setcolorbox, str);
-  g_free (str);
-  CurveExtra * ctmp = this_proj -> curves[l][m] -> extrac -> first;
-  for ( i=0 ; i < this_proj -> curves[l][m] -> extrac -> extras ; i++ )
-  {
-    n = ctmp -> id.a;
-    o = ctmp -> id.b;
-    p = ctmp -> id.c;
-    extra_proj = get_project_by_id(n);
     str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> curves[o][p] -> name);
+#endif
     combo_text_append (setcolorbox, str);
     g_free (str);
     if (ctmp -> next != NULL) ctmp = ctmp -> next;
   }
-  if (this_proj -> curves[l][m] -> extrac -> extras > 0)
-#endif
+  if (this_curve -> extrac -> extras > 0)
   {
     widget_set_sensitive (setcolorbox, 1);
   }
@@ -148,19 +132,20 @@ void prepbox (int k, int l, int m)
   }
   gtk_widget_set_size_request (setcolorbox, -1, 30);
   combo_set_active (setcolorbox, 0);
-  g_signal_connect (G_OBJECT(setcolorbox), "changed", G_CALLBACK(choose_set), NULL);
+  g_signal_connect (G_OBJECT(setcolorbox), "changed", G_CALLBACK(choose_set), data);
 }
 
 /*!
-  \fn void set_set (int a, int b, int c)
+  \fn void set_set (int a, int b, int c, gpointer data)
 
   \brief addjust widgets to handle the new curve
 
   \param a project id
   \param b calculation id
   \param c curve id
+  \param data the associated data pointer
 */
-void set_set (int a, int b, int c)
+void set_set (int a, int b, int c, gpointer data)
 {
   setcolorbox = destroy_this_widget (setcolorbox);
   setcolorbox = create_combo ();
@@ -171,8 +156,12 @@ void set_set (int a, int b, int c)
 #else
   action_to_plot (& get_project_by_id(a) -> idcc[b][c]);
 #endif
-  prepbox (activeg, activer, activec);
-  choose_set (GTK_COMBO_BOX(setcolorbox), NULL);
+  prepbox (data);
+#ifdef NEW_ANA
+  choose_set (GTK_COMBO_BOX(setcolorbox), & get_project_by_id(a) -> analysis[b].idcc[c]);
+#else
+  choose_set (GTK_COMBO_BOX(setcolorbox), & get_project_by_id(a) -> idcc[b][c]);
+#endif
   orgtree = destroy_this_widget (orgtree);
 #ifdef NEW_ANA
   add_container_child (CONTAINER_SCR, datascroll, create_org_list(& get_project_by_id(activeg) -> idcc[activer][activec]));
@@ -198,7 +187,7 @@ static void fill_proj_model (GtkTreeStore * store)
   GtkTreeIter calclevel;
   GtkTreeIter curvelevel;
   project * this_proj;
-  int i, j, k, l;
+  int i, j, k;
   int start, end, step;
   gboolean append;
 
@@ -330,7 +319,7 @@ G_MODULE_EXPORT void toggle_curve (GtkCellRendererToggle * cell_renderer, gchar 
   gtk_tree_model_get_iter (GTK_TREE_MODEL(projmodel), & iter, path);
   gtk_tree_model_get (GTK_TREE_MODEL(projmodel), & iter, 2, & status, 3, & i, 4, & j, 5, & k, -1);
   gtk_tree_store_set (projmodel, & iter, 2, ! status, -1);
-  set_set (i, j, k);
+  set_set (i, j, k, data);
 }
 
 /*!
@@ -352,11 +341,13 @@ void set_visible_curve_data (GtkTreeViewColumn * col, GtkCellRenderer * renderer
 }
 
 /*!
-  \fn GtkWidget * create_projects_tree ()
+  \fn GtkWidget * create_projects_tree (gpointer data)
 
   \brief curve edition create the project(s) / curves tree model
+
+  \param data the associated data pointer
 */
-GtkWidget * create_projects_tree ()
+GtkWidget * create_projects_tree (gpointer data)
 {
   int i;
   GtkTreeViewColumn * projcol[6];
@@ -372,7 +363,7 @@ GtkWidget * create_projects_tree ()
     {
       projcell[i] = gtk_cell_renderer_toggle_new ();
       projcol[i] = gtk_tree_view_column_new_with_attributes(col_title[i],  projcell[i], ctype[i], i, NULL);
-      g_signal_connect (G_OBJECT(projcell[i]), "toggled", G_CALLBACK(toggle_curve), NULL);
+      g_signal_connect (G_OBJECT(projcell[i]), "toggled", G_CALLBACK(toggle_curve), data);
       gtk_tree_view_column_set_cell_data_func (projcol[i], projcell[i], set_visible_curve_data, NULL, NULL);
     }
     else
@@ -422,25 +413,11 @@ void edit_curve (gpointer data)
   GtkWidget * scrollsets;
 
 // Axis data
-
-  tint * cd = (tint *) data;
-  int a = activeg = cd -> a;
-  int b = activer = cd -> b;
-  int c = activec = cd -> c;
-
-#ifdef DEBUG
-  g_debug ("CEDIT: a= %d, b= %d, c= %d", a, b, c);
-#endif
-
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (data);
 
   ctext[0] = "x ∈ [0.0, 1.0]";
   ctext[1] = "y ∈ [0.0, 1.0]";
-#ifdef NEW_ANA
-  edit_box = dialogmodal ("Edit curve", GTK_WINDOW(this_proj -> analysis[b].curves[c] -> window));
-#else
-  edit_box = dialogmodal ("Edit curve", GTK_WINDOW(this_proj -> curves[b][c] -> window));
-#endif
+  edit_box = dialogmodal ("Edit curve", GTK_WINDOW(this_curve -> window));
   gtk_window_set_resizable (GTK_WINDOW (edit_box), FALSE);
 #ifndef GTK4
   gtk_window_set_icon (GTK_WINDOW (edit_box), THETD);
@@ -469,7 +446,7 @@ void edit_curve (gpointer data)
   dbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, dbox, markup_label("<b>Add data set(s) to the active window</b>", -1, 30, 0.5, 0.5), FALSE, FALSE, 0);
   scrollsets = create_scroll (dbox, 250, 525, GTK_SHADOW_ETCHED_IN);
-  add_container_child (CONTAINER_SCR, scrollsets, create_projects_tree ());
+  add_container_child (CONTAINER_SCR, scrollsets, create_projects_tree (data));
   gtk_notebook_append_page (GTK_NOTEBOOK(enoote), dbox, gtk_label_new ("Add data set"));
 //  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 4), gtk_label_new ("Add data set"));
 

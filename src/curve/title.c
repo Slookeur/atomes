@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   const gchar * default_title (int ax, int c);
 
-  void show_title (cairo_t * cr, project * this_proj, int rid, int cid);
+  void show_title (cairo_t * cr, Curve * this_curve);
 
 */
 
@@ -90,32 +90,34 @@ const gchar * default_title (int ax, int c)
   }
   else
   {
+#ifdef NEW_ANA
+    return active_project -> analysis[activer].curves[c] -> name;
+#else
     return active_project -> curves[activer][c] -> name;
+#endif
   }
 }
 
 /*!
-  \fn void show_title (cairo_t * cr, project * this_proj, int rid, int cid)
+  \fn void show_title (cairo_t * cr, Curve * this_curve)
 
   \brief draw title
 
   \param cr the cairo drawing context to use for the draw
-  \param this_proj the target project
-  \param rid the calculation id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void show_title (cairo_t * cr, project * this_proj, int rid, int cid)
+void show_title (cairo_t * cr, Curve * this_curve)
 {
   double x, y;
 
-  x = this_proj -> curves[rid][cid] -> title_pos[0] * resol[0];
-  y = this_proj -> curves[rid][cid] -> title_pos[1] * resol[1];
-  cairo_set_source_rgba (cr, this_proj -> curves[rid][cid] -> title_color.red,
-                             this_proj -> curves[rid][cid] -> title_color.green,
-                             this_proj -> curves[rid][cid] -> title_color.blue,
-                             this_proj -> curves[rid][cid] -> title_color.alpha);
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> title_font));
-  pango_layout_set_text (layout, this_proj -> curves[rid][cid] -> title, -1);
+  x = this_curve -> title_pos[0] * resol[0];
+  y = this_curve -> title_pos[1] * resol[1];
+  cairo_set_source_rgba (cr, this_curve -> title_color.red,
+                             this_curve -> title_color.green,
+                             this_curve -> title_color.blue,
+                             this_curve -> title_color.alpha);
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> title_font));
+  pango_layout_set_text (layout, this_curve -> title, -1);
   cairo_move_to (cr, x, y);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);

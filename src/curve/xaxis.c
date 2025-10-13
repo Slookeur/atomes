@@ -30,8 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid);
-  void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it);
+  void setup_xaxis_linear (cairo_t * cr, Curve * this_curve);
+  void setup_xaxis_log (cairo_t * cr, Curve * this_curve, gboolean draw_it);
 
 */
 
@@ -42,16 +42,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
+  \fn void setup_xaxis_linear (cairo_t * cr, Curve * this_curve)
 
   \brief setup x axis using a linear scale
 
   \param cr the cairo drawing context
-  \param this_proj the target project
-  \param rid the analysis id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
+void setup_xaxis_linear (cairo_t * cr, Curve * this_curve)
 {
   int k;
   double u, v;
@@ -69,20 +67,20 @@ void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
         case 0:
           ax = x_min - x_shift + (u + v) * XDRAW / xmax;
           ay = y_min + y_shift;
-          label (cr, cxy[0] + u + v, 0, 0, this_proj);
+          label_curve (cr, cxy[0] + u + v, 0, 0, this_curve);
           break;
         case 1:
           ax = x_min - x_shift + (u + v) * XDRAW / xmax;
           ay = y_max - y_shift;
-          label (cr, cxy[0] + u + v, 0, 1, this_proj);
+          label_curve (cr, cxy[0] + u + v, 0, 1, this_curve);
           break;
         case 2:
           ax = x_min - x_shift + (u + v) * XDRAW / xmax;
           ay = y_min + y_shift;
-          label (cr, cxy[0] + u + v, 0, 0, this_proj);
+          label_curve (cr, cxy[0] + u + v, 0, 0, this_curve);
           ax = x_min - x_shift + (u + v) * XDRAW / xmax;
           ay = y_max - y_shift;
-          label (cr, cxy[0] + u + v, 0, 1, this_proj);
+          label_curve (cr, cxy[0] + u + v, 0, 1, this_curve);
           break;
       }
       switch (tickpos)
@@ -120,9 +118,7 @@ void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
         cairo_move_to(cr, x_min + (u + v) * XDRAW / xmax, y_min);
         cairo_line_to(cr, x_min + (u + v)* XDRAW / xmax, y_max);
         cairo_stroke(cr);
-        prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                        this_proj -> curves[rid][cid] -> frame_thickness,
-                        this_proj -> curves[rid][cid] -> frame_color);
+        prep_frame (cr, this_curve -> frame_dash, this_curve -> frame_thickness, this_curve -> frame_color);
       }
       if (fmod(u+v, mticks) != 0.0)
       {
@@ -150,17 +146,17 @@ void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
 }
 
 /*!
-  \fn void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it)
+  \fn void setup_xaxis_log (cairo_t * cr, Curve * this_curve, int rid, int cid, gboolean draw_it)
 
   \brief setup x axis using a log scale
 
   \param cr the cairo drawing context
-  \param this_proj the target project
+  \param this_curve the target curve
   \param rid the analysis id
   \param cid the curve id
   \param draw_it 1/0 draw or not
 */
-void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it)
+void setup_xaxis_log (cairo_t * cr, Curve * this_curve, int rid, int cid, gboolean draw_it)
 {
   int i, k, l;
   gboolean istrue;
@@ -213,29 +209,29 @@ void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gbool
         cairo_move_to(cr, x_min + l * XDRAW / xlog, y_min);
         cairo_line_to(cr, x_min + l * XDRAW / xlog, y_max);
         cairo_stroke(cr);
-        prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                        this_proj -> curves[rid][cid] -> frame_thickness,
-                        this_proj -> curves[rid][cid] -> frame_color);
+        prep_frame (cr, this_curve -> frame_dash,
+                        this_curve -> frame_thickness,
+                        this_curve -> frame_color);
       }
       switch (labpos)
       {
         case 0:
           ax = x_min - x_shift + l * XDRAW / xlog;
           ay = y_min + y_shift;
-          label (cr, v, 0, 0, this_proj);
+          label_curve (cr, v, 0, 0, this_curve);
           break;
         case 1:
           ax = x_min - x_shift + l * XDRAW / xlog;
           ay = y_max - y_shift;
-          label (cr, v, 0, 1, this_proj);
+          label_curve (cr, v, 0, 1, this_curve);
           break;
         case 2:
           ax = x_min - x_shift + l * XDRAW / xlog;
           ay = y_min + y_shift;
-          label (cr, v, 0, 0, this_proj);
+          label_curve (cr, v, 0, 0, this_curve);
           ax = x_min - x_shift + l * XDRAW / xlog;
           ay = y_max - y_shift;
-          label (cr, v, 0, 1, this_proj);
+          label_curve (cr, v, 0, 1, this_curve);
           break;
       }
       switch (tickpos)
@@ -265,9 +261,9 @@ void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gbool
           cairo_move_to(cr, x_min + XDRAW * (l + log(k) / log(10.0)) / xlog, y_min);
           cairo_line_to(cr, x_min + XDRAW * (l + log(k) / log(10.0)) / xlog, y_max);
           cairo_stroke(cr);
-          prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                          this_proj -> curves[rid][cid] -> frame_thickness,
-                          this_proj -> curves[rid][cid] -> frame_color);
+          prep_frame (cr, this_curve -> frame_dash,
+                          this_curve -> frame_thickness,
+                          this_curve -> frame_color);
         }
         switch (tickpos)
         {

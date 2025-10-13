@@ -31,8 +31,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   void autoscale_axis (project * this_proj, int rid, int cid, int aid);
-  void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid);
-  void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it);
+  void setup_yaxis_linear (cairo_t * cr, Curve * this_curve);
+  void setup_yaxis_log (cairo_t * cr, Curve * this_curve, gboolean draw_it);
 
 */
 
@@ -43,82 +43,84 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn void autoscale_axis (project * this_proj, int rid, int cid, int aid)
+  \fn void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
 
   \brief autoscale axis
 
   \param this_proj the target project
+  \param this_curve the target curve
   \param rid the analysis id
   \param cid the curve id
   \param aid the axis id
 */
-void autoscale_axis (project * this_proj, int rid, int cid, int aid)
+void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
 {
   int i, j, k, l, m, n;
   if (! aid && (rid == RI ||rid == CH))
   {
      i = cid / ((this_proj -> nspec+1) * 4);
-     this_proj -> curves[rid][cid] -> axmax[aid] = (rid == RI) ? this_proj -> rsparam[i][1]: this_proj -> csparam[5];
-     this_proj -> curves[rid][cid] -> axmax[aid] += 1.0;
-     this_proj -> curves[rid][cid] -> axmin[aid] = (rid == RI) ? 2 : 1;
+     this_curve -> axmax[aid] = (rid == RI) ? this_proj -> rsparam[i][1]: this_proj -> csparam[5];
+     this_curve -> axmax[aid] += 1.0;
+     this_curve -> axmin[aid] = (rid == RI) ? 2 : 1;
   }
   else
   {
     n = (activer == SP && aid == 1) ? 1 : 0;
-    this_proj -> curves[rid][cid] -> axmax[aid] = this_proj -> curves[rid][cid] -> data[aid][n];
-    this_proj -> curves[rid][cid] -> axmin[aid] = this_proj -> curves[rid][cid] -> data[aid][n];
-    for ( i=n ; i < this_proj -> curves[rid][cid] -> ndata ; i++ )
+    this_curve -> axmax[aid] = this_curve -> data[aid][n];
+    this_curve -> axmin[aid] = this_curve -> data[aid][n];
+    for ( i=n ; i < this_curve -> ndata ; i++ )
     {
-      this_proj -> curves[rid][cid] -> axmax[aid] = max(this_proj -> curves[rid][cid] -> axmax[aid],
-                                                     this_proj -> curves[rid][cid] -> data[aid][i]);
-      this_proj -> curves[rid][cid] -> axmin[aid] = min(this_proj -> curves[rid][cid] -> axmin[aid],
-                                                     this_proj -> curves[rid][cid] -> data[aid][i]);
+      this_curve -> axmax[aid] = max(this_curve -> axmax[aid], this_curve -> data[aid][i]);
+      this_curve -> axmin[aid] = min(this_curve -> axmin[aid], this_curve -> data[aid][i]);
     }
-    CurveExtra * ctmp = this_proj -> curves[rid][cid] -> extrac -> first;
+    CurveExtra * ctmp = this_curve -> extrac -> first;
     project * that_proj;
-    for ( j=0 ; j < this_proj -> curves[rid][cid] -> extrac -> extras ; j++ )
+    for ( j=0 ; j < this_curve -> extrac -> extras ; j++ )
     {
       m = ctmp -> id.a;
       k = ctmp -> id.b;
       l = ctmp -> id.c;
       that_proj = get_project_by_id(m);
+#ifdef NEW_ANA
+      for ( i=n ; i < that_proj -> analysis[k].curves[l] -> ndata ; i++ )
+      {
+        this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> analysis[k].curves[l] -> data[aid][i]);
+        this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> analysis[k].curves[l] -> data[aid][i]);
+      }
+#else
       for ( i=n ; i < that_proj -> curves[k][l] -> ndata ; i++ )
       {
-        this_proj -> curves[rid][cid] -> axmax[aid] = max(this_proj -> curves[rid][cid] -> axmax[aid],
-                                                          that_proj -> curves[k][l] -> data[aid][i]);
-        this_proj -> curves[rid][cid] -> axmin[aid] = min(this_proj -> curves[rid][cid] -> axmin[aid],
-                                                          that_proj -> curves[k][l] -> data[aid][i]);
+        this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> curves[k][l] -> data[aid][i]);
+        this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> curves[k][l] -> data[aid][i]);
       }
+#endif
       if (ctmp -> next != NULL) ctmp = ctmp -> next;
     }
   }
 
   if (aid == 1)
   {
-    this_proj -> curves[rid][cid] -> cmin[aid] = this_proj -> curves[rid][cid] -> axmin[aid];
-    this_proj -> curves[rid][cid] -> cmax[aid] = this_proj -> curves[rid][cid] -> axmax[aid];
-    this_proj -> curves[rid][cid] -> axmin[aid] = this_proj -> curves[rid][cid] -> cmin[aid]
-                                                - fabs(this_proj -> curves[rid][cid] -> cmin[aid]) / 10.0;
-    this_proj -> curves[rid][cid] -> axmax[aid] = this_proj -> curves[rid][cid] -> cmax[aid]
-                                                + fabs(this_proj -> curves[rid][cid] -> cmax[aid]) / 10.0;
+    this_curve -> cmin[aid] = this_curve -> axmin[aid];
+    this_curve -> cmax[aid] = this_curve -> axmax[aid];
+    this_curve -> axmin[aid] = this_curve -> cmin[aid] - fabs(this_curve -> cmin[aid]) / 10.0;
+    this_curve -> axmax[aid] = this_curve -> cmax[aid] + fabs(this_curve -> cmax[aid]) / 10.0;
+//  Adjust autoscale information if required
     if (activer > GK && activer < MS)
     {
-      this_proj -> curves[rid][cid] -> axmin[aid] = 0.0;
+      this_curve -> axmin[aid] = 0.0;
     }
   }
 }
 
 /*!
-  \fn void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
+  \fn void setup_yaxis_linear (cairo_t * cr, Curve * this_curve)
 
   \brief setup y axis using a linear scale
 
   \param cr the cairo drawing context
-  \param this_proj the target project
-  \param rid the analysis id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
+void setup_yaxis_linear (cairo_t * cr, Curve * this_curve)
 {
   int k;
   double u, v;
@@ -137,20 +139,20 @@ void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
         case 0:
           ax = x_min - x_shift;
           ay = y_min - y_shift + (u + v) * YDRAW / ymax;
-          label (cr, cxy[1] + v + u, 1, 0, this_proj);
+          label_curve (cr, cxy[1] + v + u, 1, 0, this_curve);
           break;
         case 1:
           ax = x_max + x_shift;
           ay = y_min - y_shift + (u + v) * YDRAW / ymax;
-          label (cr, cxy[1] + v + u, 1, 1, this_proj);
+          label_curve (cr, cxy[1] + v + u, 1, 1, this_curve);
           break;
         case 2:
           ax = x_min - x_shift;
           ay = y_min - y_shift + (u + v) * YDRAW / ymax;
-          label (cr, cxy[1] + v + u, 1, 0, this_proj);
+          label_curve (cr, cxy[1] + v + u, 1, 0, this_curve);
           ax = x_max + x_shift;
           ay = y_min - y_shift + (u + v) * YDRAW / ymax;
-          label (cr, cxy[1] + v + u, 1, 1, this_proj);
+          label_curve (cr, cxy[1] + v + u, 1, 1, this_curve);
           break;
       }
       switch (tickpos)
@@ -188,9 +190,7 @@ void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
         cairo_move_to(cr, x_min, y_min + (u + v) * YDRAW / ymax);
         cairo_line_to(cr, x_max, y_min + (u + v) * YDRAW / ymax);
         cairo_stroke(cr);
-        prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                        this_proj -> curves[rid][cid] -> frame_thickness,
-                        this_proj -> curves[rid][cid] -> frame_color);
+        prep_frame (cr, this_curve -> frame_dash, this_curve -> frame_thickness, this_curve -> frame_color);
       }
       if (fmod(u+v, mticks) != 0.0)
       {
@@ -218,17 +218,15 @@ void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid)
 }
 
 /*!
-  \fn void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it)
+  \fn void setup_yaxis_log (cairo_t * cr, Curve * this_curve, gboolean draw_it)
 
   \brief setup y axis using a log scale
 
   \param cr the cairo drawing context
-  \param this_proj the target project
-  \param rid the analysis id
-  \param cid the curve id
+  \param this_curve the target curve
   \param draw_it 1/0 draw or not
 */
-void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it)
+void setup_yaxis_log (cairo_t * cr, Curve * this_curve, gboolean draw_it)
 {
   int i, k, l;
   gboolean istrue;
@@ -282,29 +280,27 @@ void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gbool
          cairo_move_to(cr, x_min, y_min + YDRAW * l / ylog);
          cairo_line_to(cr, x_max, y_min + YDRAW * l / ylog);
          cairo_stroke(cr);
-         prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                         this_proj -> curves[rid][cid] -> frame_thickness,
-                         this_proj -> curves[rid][cid] -> frame_color);
+         prep_frame (cr, this_curve -> frame_dash, this_curve -> frame_thickness, this_curve -> frame_color);
       }
       switch (labpos)
       {
         case 0:
           ax = x_min - x_shift;
           ay = y_min - y_shift + YDRAW *l / ylog;
-          label (cr, v, 1, 0, this_proj);
+          label_curve (cr, v, 1, 0, this_curve);
           break;
         case 1:
           ax = x_max + x_shift;
           ay = y_min - y_shift + YDRAW *l / ylog;
-          label (cr, v, 1, 1, this_proj);
+          label_curve (cr, v, 1, 1, this_curve);
           break;
         case 2:
           ax = x_min - x_shift;
           ay = y_min - y_shift + YDRAW *l / ylog;
-          label (cr, v, 1, 0, this_proj);
+          label_curve (cr, v, 1, 0, this_curve);
           ax = x_max + x_shift;
           ay = y_min - y_shift + YDRAW *l / ylog;
-          label (cr, v, 1, 1, this_proj);
+          label_curve (cr, v, 1, 1, this_curve);
           break;
       }
       switch (tickpos)
@@ -334,9 +330,7 @@ void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gbool
           cairo_move_to(cr, x_min, y_min + YDRAW * (l + log(k) / log(10.0)) / ylog);
           cairo_line_to(cr, x_max, y_min + YDRAW * (l + log(k) / log(10.0)) / ylog);
           cairo_stroke(cr);
-          prep_frame (cr, this_proj -> curves[rid][cid] -> frame_dash,
-                          this_proj -> curves[rid][cid] -> frame_thickness,
-                          this_proj -> curves[rid][cid] -> frame_color);
+          prep_frame (cr, this_curve -> frame_dash, this_curve -> frame_thickness, this_curve -> frame_color);
         }
         switch (tickpos)
         {

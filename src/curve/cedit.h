@@ -37,6 +37,6 @@ extern GtkWidget * thesetbox;
 extern GtkWidget * setcolorbox;
 extern char * lapos[2];
 
-void prepbox (int a, int b, int c);
+void prepbox (gpointer data);
 void edit_curve (gpointer cdata);
 #endif

@@ -197,16 +197,15 @@ G_MODULE_EXPORT void run_write_image (GtkDialog * info, gint response_id, gpoint
 {
   GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
 #endif
-  tint * cd = (tint *)data;
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     curve_image_file = file_chooser_get_file_name (chooser);
-    project * this_proj = get_project_by_id (cd -> a);
-    this_proj -> curves[cd -> b][cd -> c] -> format = forme + 1;
+    Curve * this_curve = get_curve_from_pointer (data);
+    this_curve -> format = forme + 1;
 #ifdef GTK3
     show_curve (NULL, NULL, data);
 #else
-    GdkSurface * surf = gtk_native_get_surface ((GtkNative *)this_proj -> curves[cd -> b][cd -> c] -> plot);
+    GdkSurface * surf = gtk_native_get_surface ((GtkNative *)this_curve -> plot);
     cairo_t * rec = (cairo_t *)gdk_cairo_context_cairo_create (gdk_surface_create_cairo_context (surf));
     show_curve (NULL, rec, resol[0], resol[1], data);
 #endif
@@ -227,24 +226,19 @@ G_MODULE_EXPORT void run_write_image (GtkDialog * info, gint response_id, gpoint
 */
 void write_image (gpointer curetow)
 {
-  int a, b, c;
-  tint * cd = (tint *)curetow;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
   gchar * i_filter[4]={"PNG file (*.png)",
                        "PDF file (*.pdf)",
                        "SVG file (*.svg)",
                        "EPS file (*.eps)"};
   GtkFileFilter * filter;
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (curetow);
   if (forme == -1)
   {
-    show_warning ("To save an image please enter a file format", this_proj -> curves[b][c] -> window);
+    show_warning ("To save an image please enter a file format", this_curve -> window);
   }
   else if (resol[0] == 0 || resol[1] == 0)
   {
-    show_warning ("You need to specify the size of the image", this_proj -> curves[b][c] -> window);
+    show_warning ("You need to specify the size of the image", this_curve -> window);
   }
   else
   {
@@ -254,7 +248,7 @@ void write_image (gpointer curetow)
     GtkWidget * info;
 #endif
     info = create_file_chooser (i_title[forme],
-                                GTK_WINDOW(this_proj -> curves[b][c] -> window),
+                                GTK_WINDOW(this_curve -> window),
      				            GTK_FILE_CHOOSER_ACTION_SAVE,
                                 "Save");
     GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
@@ -327,13 +321,8 @@ void save_image (gpointer cdata)
   int xlgt, ylgt;
   int i;
   gchar * str;
-  int a, b, c;
-  tint * cd = (tint *)cdata;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
-  save_img = dialog_cancel_apply ("Export image", this_proj -> curves[b][c] -> window, FALSE);
+  Curve * this_curve = get_curve_from_pointer (cdata);
+  save_img = dialog_cancel_apply ("Export image", this_curve -> window, FALSE);
   gtk_window_set_resizable (GTK_WINDOW (save_img), FALSE);
 #ifndef GTK4
   gtk_window_set_icon (GTK_WINDOW (save_img), THETD);
@@ -363,8 +352,8 @@ void save_image (gpointer cdata)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, TRUE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Size: ", 100, -1, 0.0, 0.5), FALSE, TRUE, 0);
 
-  xlgt = get_widget_width (this_proj -> curves[b][c] -> plot);
-  ylgt = get_widget_height (this_proj -> curves[b][c] -> plot);
+  xlgt = get_widget_width (this_curve -> plot);
+  ylgt = get_widget_height (this_curve -> plot);
   x = create_entry (G_CALLBACK(set_size), 50, 15, FALSE, GINT_TO_POINTER(0));
   update_entry_int (GTK_ENTRY(x), xlgt);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, x, TRUE, TRUE, 0);

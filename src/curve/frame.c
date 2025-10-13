@@ -122,77 +122,66 @@ void show_frame (cairo_t * cd, int tf, int da, int res[2], double ti, double x[2
 }
 
 /*!
-  \fn void prep_axis_data (project * this_proj, int rid, int cid, int ax)
+  \fn void prep_axis_data (Curve * this_curve, int ax)
 
   \brief prepare axis data
 
-  \param this_proj the target project
-  \param rid the calculation id
-  \param cid the curve id
+  \param this_curve the target Curve
   \param ax the axis
 */
-void prep_axis_data (project * this_proj, int rid, int cid, int ax)
+void prep_axis_data (Curve * this_curve, int ax)
 {
-  dogrid = this_proj -> curves[rid][cid] -> show_grid[ax];
-  x_shift = this_proj -> curves[rid][cid] -> labels_shift_x[ax];
-  y_shift = this_proj -> curves[rid][cid] -> labels_shift_y[ax];
-  mticks = this_proj -> curves[rid][cid] -> majt[ax];
-  nticks = this_proj -> curves[rid][cid] -> mint[ax];
-  if (this_proj -> curves[rid][cid] -> ticks_io[ax] == 1)
+  dogrid = this_curve -> show_grid[ax];
+  x_shift = this_curve -> labels_shift_x[ax];
+  y_shift = this_curve -> labels_shift_y[ax];
+  mticks = this_curve -> majt[ax];
+  nticks = this_curve -> mint[ax];
+  if (this_curve -> ticks_io[ax] == 1)
   {
-    amint = this_proj -> curves[rid][cid] -> mint_size[ax];
-    amajt = this_proj -> curves[rid][cid] -> majt_size[ax];
+    amint = this_curve -> mint_size[ax];
+    amajt = this_curve -> majt_size[ax];
   }
   else
   {
-    amint = - this_proj -> curves[rid][cid] -> mint_size[ax];
-    amajt = - this_proj -> curves[rid][cid] -> majt_size[ax];
+    amint = - this_curve -> mint_size[ax];
+    amajt = - this_curve -> majt_size[ax];
   }
-  tickpos = this_proj -> curves[rid][cid] -> ticks_pos[ax];
-  labpos = this_proj -> curves[rid][cid] -> labels_pos[ax];
+  tickpos = this_curve -> ticks_pos[ax];
+  labpos = this_curve -> labels_pos[ax];
 }
 
 /*!
-  \fn void draw_frame (cairo_t * cr, project * this_proj, int rid, int cid)
+  \fn void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid)
 
   \brief draw frame and axis data
 
   \param cr the cairo drawing context to use for the draw
-  \param this_proj the target project
+  \param this_curve the target curve
   \param rid the calculation id
   \param cid the curve id
 */
-void draw_frame (cairo_t * cr, project * this_proj, int rid, int cid)
+void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid)
 {
-  show_frame (cr,
-              this_proj -> curves[rid][cid] -> frame_type,
-              this_proj -> curves[rid][cid] -> frame_dash,
-              resol,
-              this_proj -> curves[rid][cid] -> frame_thickness,
-              this_proj -> curves[rid][cid] -> frame_pos[0],
-              this_proj -> curves[rid][cid] -> frame_pos[1],
-              this_proj -> curves[rid][cid] -> frame_color);
-
+  show_frame (cr, this_curve -> frame_type, this_curve -> frame_dash, resol,
+              this_curve -> frame_thickness, this_curve -> frame_pos[0], this_curve -> frame_pos[1], this_curve -> frame_color);
 // X axis
 
 // Draw X axis ticks and labels
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> labels_font[0]));
-  prep_axis_data (this_proj, rid, cid, 0);
-  if (this_proj -> curves[rid][cid] -> scale[0] == 0)
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> labels_font[0]));
+  prep_axis_data (this_curve, 0);
+  if (this_curve -> scale[0] == 0)
   {
-    setup_xaxis_linear (cr, this_proj, rid, cid);
+    setup_xaxis_linear (cr, this_curve);
   }
   else
   {
-    setup_xaxis_log (cr, this_proj, rid, cid, TRUE);
+    setup_xaxis_log (cr, this_curve, rid, cid, TRUE);
   }
 
 // Draw X axis title
-  cairo_move_to (cr,
-                 x_min  + XDRAW / 2.0 + this_proj -> curves[rid][cid] -> axis_title_x[0],
-                 y_min + this_proj -> curves[rid][cid] -> axis_title_y[0]);
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> axis_title_font[0]));
-  pango_layout_set_text (layout, this_proj -> curves[rid][cid] -> axis_title[0], -1);
+  cairo_move_to (cr, x_min  + XDRAW / 2.0 + this_curve -> axis_title_x[0], y_min + this_curve -> axis_title_y[0]);
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> axis_title_font[0]));
+  pango_layout_set_text (layout, this_curve -> axis_title[0], -1);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);
   cairo_stroke(cr);
@@ -200,21 +189,19 @@ void draw_frame (cairo_t * cr, project * this_proj, int rid, int cid)
 // Y axis
 
 // Draw Y axis ticks and labels
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> labels_font[1]));
-  prep_axis_data (this_proj, rid, cid, 1);
-  if (this_proj -> curves[rid][cid] -> scale[1] == 0)
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> labels_font[1]));
+  prep_axis_data (this_curve, 1);
+  if (this_curve -> scale[1] == 0)
   {
-    setup_yaxis_linear (cr, this_proj, rid, cid);
+    setup_yaxis_linear (cr, this_curve);
   }
   else
   {
-    setup_yaxis_log (cr, this_proj, rid, cid, TRUE);
+    setup_yaxis_log (cr, this_curve, TRUE);
   }
-  cairo_move_to (cr,
-                  x_min - this_proj -> curves[rid][cid] -> axis_title_x[1],
-                  y_min + YDRAW/2 - this_proj -> curves[rid][cid] -> axis_title_y[1]);
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> axis_title_font[1]));
-  pango_layout_set_text (layout, this_proj -> curves[rid][cid] -> axis_title[1], -1);
+  cairo_move_to (cr, x_min - this_curve -> axis_title_x[1], y_min + YDRAW/2 - this_curve -> axis_title_y[1]);
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> axis_title_font[1]));
+  pango_layout_set_text (layout, this_curve -> axis_title[1], -1);
   cairo_rotate (cr, -pi/2.0);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);

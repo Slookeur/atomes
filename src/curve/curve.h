@@ -100,7 +100,7 @@ extern int xmarge;
 extern int ymarge;
 extern char * curve_image_file;
 
-extern int get_curve_shift (project * this_proj, int b, int c);
+extern int get_curve_shift (Curve * this_curve);
 
 // Number of dash formats
 extern int ndash;
@@ -112,8 +112,8 @@ extern int lenp;
 
 extern curve_dash * selectdash (int iddash);
 extern double scale (double axe);
-extern void prep_plot (project * this_proj, int rid, int cid);
-extern void prep_axis_data (project * this_proj, int rid, int cid, int ax);
+extern Curve * get_curve_from_pointer (gpointer data);
+extern void prep_plot (Curve * this_curve);
 extern void hide_curves (project * this_proj, int c);
 extern void erase_curves (project * this_proj, int c);
 extern void update_curves ();
@@ -136,26 +136,25 @@ extern void initcurve (project * pid, int rid, int cid);
 extern void addcurwidgets (int pid, int rid, int st);
 extern void allocextra (int a, int b, int c);
 
-extern void label (cairo_t * cr, double val, int axe, int p, project * this_proj);
+extern void label_curve (cairo_t * cr, double val, int axe, int p, Curve * this_curve);
 
 extern void show_frame (cairo_t * cd,
                         int tf, int da, int res[2],
                         double ti, double x[2], double y[2],
                         ColRGBA dcol);
 extern void prep_frame (cairo_t * fr, int da, double ti, ColRGBA dcol);
-extern void draw_frame (cairo_t * cr, project * this_proj, int rid, int cid);
+extern void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid);
 
-extern void draw_glyph (cairo_t * in, int theglyph,
-                        double x, double y, ColRGBA gcolor, double size);
+extern void draw_glyph (cairo_t * in, int theglyph, double x, double y, ColRGBA gcolor, double size);
 
 extern const gchar * default_title (int ax, int c);
-extern void show_title (cairo_t * cr, project * this_proj, int rid, int cid);
+extern void show_title (cairo_t * cr, Curve * this_curve);
 
-extern void autoscale_axis (project * this_proj, int rid, int cid, int aid);
-extern void setup_xaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid);
-extern void setup_xaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it);
-extern void setup_yaxis_linear (cairo_t * cr, project * this_proj, int rid, int cid);
-extern void setup_yaxis_log (cairo_t * cr, project * this_proj, int rid, int cid, gboolean draw_it);
+extern void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid);
+extern void setup_xaxis_linear (cairo_t * cr, Curve * this_curve);
+extern void setup_xaxis_log (cairo_t * cr, Curve * this_curve, int rid, int cid, gboolean draw_it);
+extern void setup_yaxis_linear (cairo_t * cr, Curve * this_curve);
+extern void setup_yaxis_log (cairo_t * cr, Curve * this_curve, gboolean draw_it);
 
 extern void write_curve (gpointer idata);
 extern void save_image (gpointer cdata);
