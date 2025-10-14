@@ -93,7 +93,6 @@ void prepbox (gpointer data)
   str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_curve -> name);
   combo_text_append (cedit -> setcolorbox, str);
   g_free (str);
-  g_print ("cid= %d\n", this_curve -> cid);
   CurveExtra * ctmp = this_curve -> extrac -> first;
   for ( i=0 ; i < this_curve -> extrac -> extras ; i++ )
   {
@@ -135,7 +134,8 @@ void prepbox (gpointer data)
 */
 void set_set (int a, int b, int c, gpointer data)
 {
-  curve_edition * cedit = get_curve_from_pointer (data) -> curve_edit;
+  Curve * this_curve = get_curve_from_pointer (data);
+  curve_edition * cedit = this_curve -> curve_edit;
   cedit -> setcolorbox = destroy_this_widget (cedit -> setcolorbox);
   cedit -> setcolorbox = create_combo ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> thesetbox, cedit -> setcolorbox, FALSE, FALSE, 0);
@@ -146,21 +146,11 @@ void set_set (int a, int b, int c, gpointer data)
   action_to_plot (& get_project_by_id(a) -> idcc[b][c]);
 #endif
   prepbox (data);
-#ifdef NEW_ANA
-  choose_set (GTK_COMBO_BOX(cedit -> setcolorbox), & get_project_by_id(a) -> analysis[b].idcc[c]);
-#else
-  choose_set (GTK_COMBO_BOX(cedit -> setcolorbox), & get_project_by_id(a) -> idcc[b][c]);
-#endif
+  choose_set (GTK_COMBO_BOX(cedit -> setcolorbox), data);
   cedit -> orgtree = destroy_this_widget (cedit -> orgtree);
-#ifdef NEW_ANA
-  add_container_child (CONTAINER_SCR, cedit -> datascroll, create_org_list(& get_project_by_id(activeg) -> idcc[activer][activec]));
+  add_container_child (CONTAINER_SCR, cedit -> datascroll, create_org_list(data));
   show_the_widgets (cedit -> orgtree);
-  widget_set_sensitive (cedit -> orgtree, get_project_by_id(activeg) -> curves[activer][activec] -> extrac -> extras);
-#else
-  add_container_child (CONTAINER_SCR, cedit -> datascroll, create_org_list(& get_project_by_id(activeg) -> analysis[activer].idcc[activec]));
-  show_the_widgets (cedit -> orgtree);
-  widget_set_sensitive (cedit -> orgtree, get_project_by_id(activeg) -> analysis[activer].curves[activec] -> extrac -> extras);
-#endif
+  widget_set_sensitive (cedit -> orgtree, this_curve -> extrac -> extras);
 }
 
 /*!
