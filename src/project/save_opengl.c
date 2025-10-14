@@ -179,7 +179,7 @@ int write_this_axis (FILE * fp, axis * xyz)
   if (fwrite (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  // if (fwrite (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fwrite (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;

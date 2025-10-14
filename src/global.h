@@ -127,6 +127,8 @@ struct ColRGBA
   float alpha;
 };
 
+#include "cedit.h"
+
 /*! \typedef shortcuts
 
   \brief keyboard shortcuts information
@@ -688,6 +690,7 @@ struct Curve
   gchar * path;                  /*!< Path for the toolbox tree */
   int action_id;                 /*!< Unique Id to identify actions */
   CurveState state;              /*!< Curve state */
+  curve_edition * curve_edit;    /*!< curve edition data structure - cedit.h */
   GSimpleActionGroup * action_group;
 };
 

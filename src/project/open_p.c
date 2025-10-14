@@ -66,6 +66,7 @@ extern void initmsd ();
 extern void initsh (int s);
 
 gboolean old_la_bo_ax_gr;
+gboolean bad_ogl_axis;
 
 /*!
   \fn char * read_string (int i, FILE * fp)
@@ -233,6 +234,7 @@ int open_project (FILE * fp, int npi)
   gboolean labels_in_file = FALSE;
   gboolean correct_x = TRUE;
   old_la_bo_ax_gr = TRUE;
+  bad_ogl_axis = TRUE;
   // test on ver for version
   if (g_strcmp0(ver, "%\n% project file v-2.6\n%\n") == 0)
   {
@@ -249,7 +251,13 @@ int open_project (FILE * fp, int npi)
     labels_in_file = TRUE;
     correct_x = FALSE;
   }
-
+  else if (g_strcmp0(ver, "%\n% project file v-2.9\n%\n") == 0)
+  {
+    old_la_bo_ax_gr = FALSE;
+    labels_in_file = TRUE;
+    correct_x = FALSE;
+    bad_ogl_axis = FALSE;
+  }
  #ifdef DEBUG
   g_debug ("%s", ver);
  #endif // DEBUG

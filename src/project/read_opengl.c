@@ -47,6 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "preferences.h"
 
 extern gboolean old_la_bo_ax_gr;
+extern gboolean bad_ogl_axis;
 
 /*!
   \fn int read_atom_a (FILE * fp, project * this_proj, int s, int a)
@@ -336,7 +337,10 @@ int read_this_axis (FILE * fp, axis * xyz)
   if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  if (bad_ogl_axis)
+  {
+    if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+  }
   if (fread (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fread (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;

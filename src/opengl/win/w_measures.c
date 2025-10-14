@@ -349,7 +349,7 @@ void dihedral_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * r
 /*!
   \fn void measure_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 
-  \brief
+  \brief Measure window set color and Pango markup in tree view
 
   \param col the tree view column
   \param renderer the column renderer

@@ -31,11 +31,76 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #ifndef CEDIT_H_
 #define CEDIT_H_
 
-#include "global.h"
+typedef struct curve_edition curve_edition;
+struct curve_edition
+{
+  GtkWidget * win;
+  tint prc;
+  GtkTreePath ** ppath;
+  GtkTreePath ** cpath;
+  GtkWidget * projtree;
+  GtkWidget * xyp[2];
+  // tab 1
+  GtkWidget * title_box;
+  GtkWidget * frame[11];
+  GtkWidget * frame_box;
+  GtkWidget * frame_style_area;
+  GtkWidget * frame_pix_box;
+  qint dataxe[2];
+  qint framxe[4];
+  GtkWidget * custom_title;
+  // tab 2
+  GtkWidget * setcolorbox;
+  GtkWidget * thesetbox;
+  GtkWidget * data_shape;
+  GtkWidget * data_color;
+  GtkWidget * data_aspect;
+  GtkWidget * data_thickness;
+  GtkWidget * data_glyph;
+  GtkWidget * data_glyph_size;
+  GtkWidget * data_glyph_freq;
+  GtkWidget * data_hist_width;
+  GtkWidget * data_hist_opac;
+  GtkWidget * data_hist_pos;
+  GtkWidget * data_dash;
+  GtkWidget * stylearea;
+  GtkWidget * pixarea;
+  GtkWidget * Glyph_box;
+  GtkWidget * Hist_box;
+  GtkWidget * xyl[2];
+  GtkWidget * orgtree;
+  GtkWidget * datascroll;
+  // tab 3
+  GtkWidget * legend_box;
+  GtkWidget * legend_box_style;
+  GtkWidget * legend_style_area;
+  // tab 4
+  GtkWidget * axischoice;
+  GtkWidget * scale_box;
+  GtkWidget * ticks_inout_box;
+  GtkWidget * ticks_pos_box;
+  GtkWidget * labels_pos_box;
+  GtkWidget * ticks_labels_angle;
+  GtkWidget * ticks_labels_font;
+  GtkWidget * show_axis;
+  GtkWidget * show_grid;
+  GtkWidget * auto_scale;
+  GtkWidget * axis_default_title;
+  GtkWidget * axis_title;
+  GtkWidget * axis_title_font;
+  GtkWidget * majt;
+  GtkWidget * vmin;
+  GtkWidget * vmax;
+  GtkWidget * nmi[2], * ndi[2];
+  GtkWidget * mats[2];
+  GtkWidget * mits[2];
+  GtkWidget * nptx[2], * npty[2];
+  GtkWidget * tptx[2], * tpty[2];
+  int handler_id;
+};
 
-extern GtkWidget * thesetbox;
-extern GtkWidget * setcolorbox;
 extern char * lapos[2];
+extern char * ctext[2];
 
 void prepbox (gpointer data);
 void edit_curve (gpointer cdata);

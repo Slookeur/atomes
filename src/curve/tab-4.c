@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int get_active_axis ();
+  int get_active_axis (this_curve -> curve_edit);
 
   G_MODULE_EXPORT gboolean scroll_set_ticks_angle (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
 
@@ -85,42 +85,17 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "callbacks.h"
 #include "project.h"
 #include "curve.h"
-#include "cedit.h"
-
-GtkWidget * axischoice = NULL;
-GtkWidget * scale_box = NULL;
-GtkWidget * ticks_inout_box = NULL;
-GtkWidget * ticks_pos_box = NULL;
-GtkWidget * labels_pos_box = NULL;
-GtkWidget * ticks_labels_angle = NULL;
-GtkWidget * ticks_labels_font = NULL;
-GtkWidget * show_axis = NULL;
-GtkWidget * show_grid = NULL;
-GtkWidget * auto_scale = NULL;
-GtkWidget * axis_default_title = NULL;
-GtkWidget * axis_title = NULL;
-GtkWidget * axis_title_font = NULL;
-GtkWidget * majt = NULL;
-GtkWidget * vmin = NULL;
-GtkWidget * vmax = NULL;
-GtkWidget * nmi[2], * ndi[2];
-GtkWidget * mats[2];
-GtkWidget * mits[2];
-GtkWidget * nptx[2], * npty[2];
-GtkWidget * tptx[2], * tpty[2];
-
-extern qint dataxe[2];
-extern qint framxe[4];
-extern int a, b, c, d;
 
 /*!
-  \fn int get_active_axis ()
+  \fn int get_active_axis (curve_edition * cedit)
 
   \brief get active axis
+
+  \param cedit the target curve_edition pointer
 */
-int get_active_axis ()
+int get_active_axis (curve_edition * cedit)
 {
-  return combo_get_active (axischoice);
+  return combo_get_active (cedit -> axischoice);
 }
 
 /*!
@@ -134,7 +109,7 @@ int get_active_axis ()
 G_MODULE_EXPORT void set_axis_min (GtkEntry * res, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis();
+  int i = get_active_axis (this_curve -> curve_edit);
   if (i > -1)
   {
     const gchar * m;
@@ -163,7 +138,7 @@ G_MODULE_EXPORT void set_axis_min (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void set_axis_max (GtkEntry * res, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  int i = get_active_axis (this_curve -> curve_edit);
   const gchar * m;
   m = entry_get_text (res);
   if (string_to_double ((gpointer)m) > this_curve -> axmin[i])
@@ -189,8 +164,8 @@ G_MODULE_EXPORT void set_axis_max (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void set_max_div (GtkEntry * maj, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
+  int i = get_active_axis (this_curve -> curve_edit);
   double tmp;
-  int i = get_active_axis ();
   const gchar * m;
   m = entry_get_text (maj);
   tmp = string_to_double ((gpointer)m);
@@ -376,8 +351,9 @@ G_MODULE_EXPORT void set_axis_title_y_spin (GtkSpinButton * res, gpointer data)
 */
 G_MODULE_EXPORT void set_io_ticks (GtkComboBox * box, gpointer data)
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> ticks_io[i] = combo_get_active ((GtkWidget *)box);
+  Curve * this_curve = get_curve_from_pointer(data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> ticks_io[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -391,8 +367,9 @@ G_MODULE_EXPORT void set_io_ticks (GtkComboBox * box, gpointer data)
 */
 G_MODULE_EXPORT void set_pos_ticks (GtkComboBox * box, gpointer data)
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> ticks_pos[i] = combo_get_active ((GtkWidget *)box);
+  Curve * this_curve = get_curve_from_pointer(data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> ticks_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -406,8 +383,9 @@ G_MODULE_EXPORT void set_pos_ticks (GtkComboBox * box, gpointer data)
 */
 G_MODULE_EXPORT void set_pos_labels (GtkComboBox * box, gpointer data)
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> labels_pos[i] = combo_get_active ((GtkWidget *)box);
+  Curve * this_curve = get_curve_from_pointer(data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> labels_pos[i] = combo_get_active ((GtkWidget *)box);
   update_curve (data);
 }
 
@@ -422,7 +400,7 @@ G_MODULE_EXPORT void set_pos_labels (GtkComboBox * box, gpointer data)
 G_MODULE_EXPORT void set_ticks_labels_font (GtkFontButton * fontb, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  int i = get_active_axis (this_curve -> curve_edit);
   g_free (this_curve -> labels_font[i]);
   this_curve -> labels_font[i] = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
   update_curve (data);
@@ -438,8 +416,9 @@ G_MODULE_EXPORT void set_ticks_labels_font (GtkFontButton * fontb, gpointer data
 */
 void ticks_angle_has_changed (gpointer data, double value)
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> labels_angle[i] = value * (pi/180.0);
+  Curve * this_curve = get_curve_from_pointer (data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> labels_angle[i] = value * (pi/180.0);
   update_curve (data);
 }
 
@@ -495,17 +474,18 @@ G_MODULE_EXPORT void to_axis_title (GtkToggleButton * but, gpointer data)
 #endif
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  curve_edition * cedit = this_curve -> curve_edit;
+  int i = get_active_axis (cedit);
   if (button_get_status ((GtkWidget *)but))
   {
-    widget_set_sensitive (axis_title, 0);
+    widget_set_sensitive (cedit -> axis_title, 0);
     g_free (this_curve -> axis_title[i]);
-    this_curve -> axis_title[i] = g_strdup_printf ("%s", default_title (i, c));
-    update_entry_text (GTK_ENTRY(axis_title), this_curve -> axis_title[i]);
+    this_curve -> axis_title[i] = g_strdup_printf ("%s", default_title (i, ((tint *)data) -> c));
+    update_entry_text (GTK_ENTRY(cedit -> axis_title), this_curve -> axis_title[i]);
   }
   else
   {
-    widget_set_sensitive (axis_title, 1);
+    widget_set_sensitive (cedit -> axis_title, 1);
   }
   update_curve (data);
 }
@@ -532,8 +512,9 @@ G_MODULE_EXPORT void set_grid (GtkCheckButton * grid, gpointer data)
 G_MODULE_EXPORT void set_grid (GtkToggleButton * grid, gpointer data)
 #endif
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> show_grid[i] = button_get_status ((GtkWidget *)grid);
+  Curve * this_curve = get_curve_from_pointer (data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> show_grid[i] = button_get_status ((GtkWidget *)grid);
   update_curve (data);
 }
 
@@ -547,8 +528,9 @@ G_MODULE_EXPORT void set_grid (GtkToggleButton * grid, gpointer data)
 */
 G_MODULE_EXPORT void set_autoscale (GtkButton * autosc, gpointer data)
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> autoscale[i] = TRUE;
+  Curve * this_curve = get_curve_from_pointer (data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> autoscale[i] = TRUE;
   update_curve (data);
 }
 
@@ -574,8 +556,9 @@ G_MODULE_EXPORT void set_axis (GtkCheckButton * axis, gpointer data)
 G_MODULE_EXPORT void set_axis (GtkToggleButton * axis, gpointer data)
 #endif
 {
-  int i = get_active_axis ();
-  get_curve_from_pointer (data) -> show_axis[i] = button_get_status ((GtkWidget *)axis);
+  Curve * this_curve = get_curve_from_pointer (data);
+  int i = get_active_axis (this_curve -> curve_edit);
+  this_curve -> show_axis[i] = button_get_status ((GtkWidget *)axis);
   update_curve (data);
 }
 
@@ -590,7 +573,7 @@ G_MODULE_EXPORT void set_axis (GtkToggleButton * axis, gpointer data)
 G_MODULE_EXPORT void set_axis_legend (GtkEntry * xtit, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  int i = get_active_axis (this_curve -> curve_edit);
   g_free (this_curve -> axis_title[i]);
   this_curve -> axis_title[i] = g_strdup_printf ("%s", entry_get_text (xtit));
   update_curve (data);
@@ -607,7 +590,7 @@ G_MODULE_EXPORT void set_axis_legend (GtkEntry * xtit, gpointer data)
 G_MODULE_EXPORT void set_axis_title_font (GtkFontButton * fontb, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  int i = get_active_axis (this_curve -> curve_edit);
   g_free (this_curve -> axis_title_font[i]);
   this_curve -> axis_title_font[i] = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
   update_curve (data);
@@ -624,16 +607,14 @@ G_MODULE_EXPORT void set_axis_title_font (GtkFontButton * fontb, gpointer data)
 G_MODULE_EXPORT void set_scale (GtkComboBox * sbox, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
-  int i = get_active_axis ();
+  int i = get_active_axis (this_curve -> curve_edit);
   int j = combo_get_active((GtkWidget *)sbox);
   this_curve -> scale[i] = j;
-  widget_set_sensitive (majt, ! j);
-  widget_set_sensitive (nmi[i], ! j);
+  widget_set_sensitive (this_curve -> curve_edit -> majt, ! j);
+  widget_set_sensitive (this_curve -> curve_edit -> nmi[i], ! j);
   this_curve -> autoscale[i] = TRUE;
   update_curve (data);
 }
-
-int handler_id;
 
 /*!
   \fn G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
@@ -647,65 +628,67 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
 {
   int i;
   Curve * this_curve = get_curve_from_pointer (data);
+  curve_edition * cedit = this_curve -> curve_edit;
   i = combo_get_active ((GtkWidget *)box);
-  update_entry_double (GTK_ENTRY(vmin), this_curve -> axmin[i]);
-  update_entry_double (GTK_ENTRY(vmax), this_curve -> axmax[i]);
-  update_entry_double (GTK_ENTRY(majt), this_curve -> majt[i]);
-  combo_set_active (ticks_inout_box, this_curve -> ticks_io[i]);
-  combo_set_active (ticks_pos_box, this_curve -> ticks_pos[i]);
-  combo_set_active (labels_pos_box, this_curve -> labels_pos[i]);
-  gtk_font_chooser_set_font (GTK_FONT_CHOOSER(ticks_labels_font), this_curve -> labels_font[i]);
-  gtk_range_set_value (GTK_RANGE(ticks_labels_angle), this_curve -> labels_angle[i] * (180.0/pi));
-  if (b < MS)
+  update_entry_double (GTK_ENTRY(cedit -> vmin), this_curve -> axmin[i]);
+  update_entry_double (GTK_ENTRY(cedit -> vmax), this_curve -> axmax[i]);
+  update_entry_double (GTK_ENTRY(cedit -> majt), this_curve -> majt[i]);
+  combo_set_active (cedit -> ticks_inout_box, this_curve -> ticks_io[i]);
+  combo_set_active (cedit -> ticks_pos_box, this_curve -> ticks_pos[i]);
+  combo_set_active (cedit -> labels_pos_box, this_curve -> labels_pos[i]);
+  gtk_font_chooser_set_font (GTK_FONT_CHOOSER(cedit -> ticks_labels_font), this_curve -> labels_font[i]);
+  gtk_range_set_value (GTK_RANGE(cedit -> ticks_labels_angle), this_curve -> labels_angle[i] * (180.0/pi));
+  if (((tint *)data) -> b < MS)
   {
-    widget_set_sensitive (scale_box, 0);
+    widget_set_sensitive (cedit -> scale_box, 0);
   }
   else
   {
-    g_signal_handler_disconnect (G_OBJECT(scale_box), handler_id);
-    combo_set_active (scale_box, this_curve -> scale[i]);
-    handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
-    widget_set_sensitive (scale_box, 1);
-    /* widget_set_sensitive (vmax, ! this_curve -> scale[i]);
-    widget_set_sensitive (vmin, ! this_curve -> scale[i]); */
-    widget_set_sensitive (majt, ! this_curve -> scale[i]);
-    widget_set_sensitive (nmi[i], ! this_curve -> scale[i]);
+    g_signal_handler_disconnect (G_OBJECT(cedit -> scale_box), cedit -> handler_id);
+    combo_set_active (cedit -> scale_box, this_curve -> scale[i]);
+    cedit -> handler_id = g_signal_connect (G_OBJECT(cedit -> scale_box), "changed", G_CALLBACK(set_scale), data);
+    widget_set_sensitive (cedit -> scale_box, 1);
+    /* widget_set_sensitive (cedit -> vmax, ! this_curve -> scale[i]);
+    widget_set_sensitive (cedit -> vmin, ! this_curve -> scale[i]); */
+    widget_set_sensitive (cedit -> majt, ! this_curve -> scale[i]);
+    widget_set_sensitive (cedit -> nmi[i], ! this_curve -> scale[i]);
   }
-  hide_the_widgets (nmi[! i]);
-  hide_the_widgets (ndi[! i]);
-  hide_the_widgets (mats[! i]);
-  hide_the_widgets (mits[! i]);
-  hide_the_widgets (nptx[! i]);
-  hide_the_widgets (npty[! i]);
-  hide_the_widgets (tptx[! i]);
-  hide_the_widgets (tpty[! i]);
+  hide_the_widgets (cedit -> nmi[! i]);
+  hide_the_widgets (cedit -> ndi[! i]);
+  hide_the_widgets (cedit -> mats[! i]);
+  hide_the_widgets (cedit -> mits[! i]);
+  hide_the_widgets (cedit -> nptx[! i]);
+  hide_the_widgets (cedit -> npty[! i]);
+  hide_the_widgets (cedit -> tptx[! i]);
+  hide_the_widgets (cedit -> tpty[! i]);
 
-  show_the_widgets (nmi[i]);
-  show_the_widgets (ndi[i]);
-  show_the_widgets (mats[i]);
-  show_the_widgets (mits[i]);
-  show_the_widgets (nptx[i]);
-  show_the_widgets (npty[i]);
-  show_the_widgets (tptx[i]);
-  show_the_widgets (tpty[i]);
+  show_the_widgets (cedit -> nmi[i]);
+  show_the_widgets (cedit -> ndi[i]);
+  show_the_widgets (cedit -> mats[i]);
+  show_the_widgets (cedit -> mits[i]);
+  show_the_widgets (cedit -> nptx[i]);
+  show_the_widgets (cedit -> npty[i]);
+  show_the_widgets (cedit -> tptx[i]);
+  show_the_widgets (cedit -> tpty[i]);
 
-  button_set_status (show_axis, this_curve -> show_axis[i]);
-  button_set_status (show_grid, this_curve -> show_grid[i]);
-  button_set_status (axis_default_title, this_curve -> axis_defaut_title[i]);
+  button_set_status (cedit -> show_axis, this_curve -> show_axis[i]);
+  button_set_status (cedit -> show_grid, this_curve -> show_grid[i]);
+  button_set_status (cedit -> axis_default_title, this_curve -> axis_defaut_title[i]);
 
-  widget_set_sensitive (axis_title, ! this_curve -> axis_defaut_title[i]);
-  update_entry_text (GTK_ENTRY(axis_title), this_curve -> axis_title[i]);
-  gtk_font_chooser_set_font (GTK_FONT_CHOOSER(axis_title_font), this_curve -> axis_title_font[i]);
+  widget_set_sensitive (cedit -> axis_title, ! this_curve -> axis_defaut_title[i]);
+  update_entry_text (GTK_ENTRY(cedit -> axis_title), this_curve -> axis_title[i]);
+  gtk_font_chooser_set_font (GTK_FONT_CHOOSER(cedit -> axis_title_font), this_curve -> axis_title_font[i]);
 }
 
 /*!
-  \fn GtkWidget * create_tab_4 (gpointer data)
+  \fn GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 
   \brief handle the creation of the 4th tab of the curve edition dialog
 
+  \param cedit the target curve_edition pointer
   \param data the associated data pointer
 */
-GtkWidget * create_tab_4 (gpointer data)
+GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 {
   Curve * this_curve = get_curve_from_pointer (data);
   int i;
@@ -718,45 +701,45 @@ GtkWidget * create_tab_4 (gpointer data)
   GtkWidget * ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("<b>Select axis:</b>", 175, -1, 1.0, 0.5), FALSE, FALSE, 0);
-  axischoice = create_combo ();
-  combo_text_append (axischoice, "X axis");
-  combo_text_append (axischoice, "Y axis");
-  combo_set_active (axischoice, 0);
-  gtk_widget_set_size_request (axischoice, 80, 35);
-  g_signal_connect (G_OBJECT(axischoice), "changed", G_CALLBACK(update_axis), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, axischoice, FALSE, FALSE, 25);
+  cedit -> axischoice = create_combo ();
+  combo_text_append (cedit -> axischoice, "X axis");
+  combo_text_append (cedit -> axischoice, "Y axis");
+  combo_set_active (cedit -> axischoice, 0);
+  gtk_widget_set_size_request (cedit -> axischoice, 80, 35);
+  g_signal_connect (G_OBJECT(cedit -> axischoice), "changed", G_CALLBACK(update_axis), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> axischoice, FALSE, FALSE, 25);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
 
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox,  markup_label("Scale type:", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  scale_box = create_combo ();
-  combo_text_append (scale_box, "Linear");
-  combo_text_append (scale_box, "Log");
-  combo_set_active (scale_box, this_curve -> scale[0]);
-  gtk_widget_set_size_request (scale_box, 80, -1);
-  handler_id = g_signal_connect (G_OBJECT(scale_box), "changed", G_CALLBACK(set_scale), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, scale_box, FALSE, FALSE, 0);
-  auto_scale = create_button ("Autoscale axis", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_autoscale), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, auto_scale, FALSE, FALSE, 30);
+  cedit -> scale_box = create_combo ();
+  combo_text_append (cedit -> scale_box, "Linear");
+  combo_text_append (cedit -> scale_box, "Log");
+  combo_set_active (cedit -> scale_box, this_curve -> scale[0]);
+  gtk_widget_set_size_request (cedit -> scale_box, 80, -1);
+  cedit -> handler_id = g_signal_connect (G_OBJECT(cedit -> scale_box), "changed", G_CALLBACK(set_scale), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> scale_box, FALSE, FALSE, 0);
+  cedit -> auto_scale = create_button ("Autoscale axis", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_autoscale), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> auto_scale, FALSE, FALSE, 30);
 
 // Axis min and max
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Min:", 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
-  vmin = create_entry (G_CALLBACK(set_axis_min), 100, 15, FALSE, data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, vmin, FALSE, FALSE, 0);
+  cedit -> vmin = create_entry (G_CALLBACK(set_axis_min), 100, 15, FALSE, data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> vmin, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Max:", 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
-  vmax = create_entry (G_CALLBACK(set_axis_max), 100, 15, FALSE, data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, vmax, FALSE, FALSE, 0);
+  cedit -> vmax = create_entry (G_CALLBACK(set_axis_max), 100, 15, FALSE, data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> vmax, FALSE, FALSE, 0);
 
 // Major ticks spacing
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Major ticks spacing:", 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  majt = create_entry (G_CALLBACK(set_max_div), 100, 15, FALSE, data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, majt, FALSE, FALSE, 0);
+  cedit -> majt = create_entry (G_CALLBACK(set_max_div), 100, 15, FALSE, data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> majt, FALSE, FALSE, 0);
 
 // Number of minors ticks
   ahbox = create_hbox (0);
@@ -764,8 +747,8 @@ GtkWidget * create_tab_4 (gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Number of minor ticks:", 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
-    nmi[i] = spin_button (G_CALLBACK(set_min_div_spin), (double)this_curve -> mint[i]-1.0, 0.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, nmi[i], FALSE, FALSE, 0);
+    cedit -> nmi[i] = spin_button (G_CALLBACK(set_min_div_spin), (double)this_curve -> mint[i]-1.0, 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> nmi[i], FALSE, FALSE, 0);
   }
 
 // Ticks ...
@@ -775,35 +758,35 @@ GtkWidget * create_tab_4 (gpointer data)
 
 // ... position ...
   ahbox = abox (axisbox, "Location:", 1);
-  ticks_inout_box = create_combo ();
-  combo_text_append (ticks_inout_box, "In");
-  combo_text_append (ticks_inout_box, "Out");
-  gtk_widget_set_size_request (ticks_inout_box, 60, -1);
-  g_signal_connect (G_OBJECT(ticks_inout_box), "changed", G_CALLBACK(set_io_ticks), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, ticks_inout_box, FALSE, FALSE, 3);
+  cedit -> ticks_inout_box = create_combo ();
+  combo_text_append (cedit -> ticks_inout_box, "In");
+  combo_text_append (cedit -> ticks_inout_box, "Out");
+  gtk_widget_set_size_request (cedit -> ticks_inout_box, 60, -1);
+  g_signal_connect (G_OBJECT(cedit -> ticks_inout_box), "changed", G_CALLBACK(set_io_ticks), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> ticks_inout_box, FALSE, FALSE, 3);
 
-  ticks_pos_box = create_combo ();
-  combo_text_append (ticks_pos_box, "Normal");
-  combo_text_append (ticks_pos_box, "Opposite");
-  combo_text_append (ticks_pos_box, "Both");
-  combo_text_append (ticks_pos_box, "None");
-  gtk_widget_set_size_request (ticks_pos_box, 100, -1);
-  g_signal_connect (G_OBJECT(ticks_pos_box), "changed", G_CALLBACK(set_pos_ticks), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, ticks_pos_box, FALSE, FALSE, 3);
+  cedit -> ticks_pos_box = create_combo ();
+  combo_text_append (cedit -> ticks_pos_box, "Normal");
+  combo_text_append (cedit -> ticks_pos_box, "Opposite");
+  combo_text_append (cedit -> ticks_pos_box, "Both");
+  combo_text_append (cedit -> ticks_pos_box, "None");
+  gtk_widget_set_size_request (cedit -> ticks_pos_box, 100, -1);
+  g_signal_connect (G_OBJECT(cedit -> ticks_pos_box), "changed", G_CALLBACK(set_pos_ticks), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> ticks_pos_box, FALSE, FALSE, 3);
 
 //  ... sizes ...
 
   ahbox = abox (axisbox, "Major ticks size:", 1);
   for (i=0; i<2; i++)
   {
-    mats[i] = spin_button (G_CALLBACK(set_ticks_size_major_spin), (double)this_curve -> majt_size[i], 0.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, mats[i], FALSE, FALSE, 0);
+    cedit -> mats[i] = spin_button (G_CALLBACK(set_ticks_size_major_spin), (double)this_curve -> majt_size[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> mats[i], FALSE, FALSE, 0);
   }
   ahbox = abox (axisbox, "Minor ticks size:", 1);
   for (i=0; i<2; i++)
   {
-    mits[i] = spin_button (G_CALLBACK(set_ticks_size_minor_spin), (double)this_curve -> mint_size[i], 0.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, mits[i], FALSE, FALSE, 0);
+    cedit -> mits[i] = spin_button (G_CALLBACK(set_ticks_size_minor_spin), (double)this_curve -> mint_size[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> mits[i], FALSE, FALSE, 0);
   }
 
 // Ticks labels ...
@@ -813,75 +796,75 @@ GtkWidget * create_tab_4 (gpointer data)
 
 // ... position ...
   ahbox = abox (axisbox, "Location:", 1);
-  labels_pos_box = create_combo ();
-  combo_text_append (labels_pos_box, "Normal");
-  combo_text_append (labels_pos_box, "Opposite");
-  combo_text_append (labels_pos_box, "Both");
-  combo_text_append (labels_pos_box, "None");
-  gtk_widget_set_size_request (labels_pos_box, 150, -1);
-  g_signal_connect (G_OBJECT(labels_pos_box), "changed", G_CALLBACK(set_pos_labels), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, labels_pos_box, FALSE, FALSE, 0);
+  cedit -> labels_pos_box = create_combo ();
+  combo_text_append (cedit -> labels_pos_box, "Normal");
+  combo_text_append (cedit -> labels_pos_box, "Opposite");
+  combo_text_append (cedit -> labels_pos_box, "Both");
+  combo_text_append (cedit -> labels_pos_box, "None");
+  gtk_widget_set_size_request (cedit -> labels_pos_box, 150, -1);
+  g_signal_connect (G_OBJECT(cedit -> labels_pos_box), "changed", G_CALLBACK(set_pos_labels), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> labels_pos_box, FALSE, FALSE, 0);
 
 // ... significant digits ...
   ahbox = abox (axisbox, "Significant digits:", 1);
   for (i=0; i<2; i++)
   {
-    ndi[i] = spin_button (G_CALLBACK(set_lab_digit_spin), (double)this_curve -> labels_digit[i], 0.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, ndi[i], FALSE, FALSE, 0);
+    cedit -> ndi[i] = spin_button (G_CALLBACK(set_lab_digit_spin), (double)this_curve -> labels_digit[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> ndi[i], FALSE, FALSE, 0);
   }
 
 // ... font ...
-  ticks_labels_font = font_button (this_curve -> labels_font[0], 150, 35, G_CALLBACK(set_ticks_labels_font), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 1), ticks_labels_font, FALSE, FALSE, 5);
+  cedit -> ticks_labels_font = font_button (this_curve -> labels_font[0], 150, 35, G_CALLBACK(set_ticks_labels_font), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 1), cedit -> ticks_labels_font, FALSE, FALSE, 5);
 
 // ... angle ..
-  ticks_labels_angle = create_hscale (-180.0, 180.0, 1.0, 0.0, GTK_POS_LEFT, 0, 150, G_CALLBACK(set_ticks_angle), G_CALLBACK(scroll_set_ticks_angle), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Angle:", 1), ticks_labels_angle, FALSE, FALSE, 5);
+  cedit -> ticks_labels_angle = create_hscale (-180.0, 180.0, 1.0, 0.0, GTK_POS_LEFT, 0, 150, G_CALLBACK(set_ticks_angle), G_CALLBACK(scroll_set_ticks_angle), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Angle:", 1), cedit -> ticks_labels_angle, FALSE, FALSE, 5);
 
 // ...distance to axis
   ahbox = abox (axisbox, "Position: ", 1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("x:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
-    nptx[i] = spin_button (G_CALLBACK(set_lab_shift_x_spin), (double)this_curve -> labels_shift_x[i], -100.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, nptx[i], FALSE, FALSE, 0);
+    cedit -> nptx[i] = spin_button (G_CALLBACK(set_lab_shift_x_spin), (double)this_curve -> labels_shift_x[i], -100.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> nptx[i], FALSE, FALSE, 0);
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("y:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
-    npty[i] = spin_button (G_CALLBACK(set_lab_shift_y_spin), (double) this_curve -> labels_shift_y[i], -100.0, 100.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, npty[i], FALSE, FALSE, 0);
+    cedit -> npty[i] = spin_button (G_CALLBACK(set_lab_shift_y_spin), (double) this_curve -> labels_shift_y[i], -100.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> npty[i], FALSE, FALSE, 0);
   }
 
-  show_axis = check_button ("Show/hide axis (if min[axis] &lt; 0.0 &lt; max[axis])", 100, 30, FALSE, G_CALLBACK(set_axis), data);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, show_axis, FALSE, FALSE, 3);
-  show_grid = check_button ("Show/hide axis grid", 100, 30, FALSE, G_CALLBACK(set_grid), data);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, show_grid, FALSE, FALSE, 1);
+  cedit -> show_axis = check_button ("Show/hide axis (if min[axis] &lt; 0.0 &lt; max[axis])", 100, 30, FALSE, G_CALLBACK(set_axis), data);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_axis, FALSE, FALSE, 3);
+  cedit -> show_grid = check_button ("Show/hide axis grid", 100, 30, FALSE, G_CALLBACK(set_grid), data);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_grid, FALSE, FALSE, 1);
 
 // Axis title
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE,3);
-  axis_default_title = check_button ("Use default axis title", 175, -1, FALSE, G_CALLBACK(to_axis_title), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, axis_default_title, FALSE, FALSE, 0);
-  axis_title = create_entry (G_CALLBACK(set_axis_legend), 150, 15, FALSE, data);
-  gtk_entry_set_alignment (GTK_ENTRY(axis_title), 0.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, axis_title, FALSE, FALSE, 0);
+  cedit -> axis_default_title = check_button ("Use default axis title", 175, -1, FALSE, G_CALLBACK(to_axis_title), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> axis_default_title, FALSE, FALSE, 0);
+  cedit -> axis_title = create_entry (G_CALLBACK(set_axis_legend), 150, 15, FALSE, data);
+  gtk_entry_set_alignment (GTK_ENTRY(cedit -> axis_title), 0.0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> axis_title, FALSE, FALSE, 0);
 
-  axis_title_font = font_button (this_curve -> axis_title_font[0], 150, 35, G_CALLBACK(set_axis_title_font), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 3), axis_title_font, FALSE, FALSE, 0);
+  cedit -> axis_title_font = font_button (this_curve -> axis_title_font[0], 150, 35, G_CALLBACK(set_axis_title_font), data);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 3), cedit -> axis_title_font, FALSE, FALSE, 0);
 
   ahbox = abox (axisbox, "Position: ", 3);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("x:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
-    tptx[i] = spin_button (G_CALLBACK(set_axis_title_x_spin), (double)this_curve -> axis_title_x[i], -500.0, 500.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, tptx[i], FALSE, FALSE, 0);
+    cedit -> tptx[i] = spin_button (G_CALLBACK(set_axis_title_x_spin), (double)this_curve -> axis_title_x[i], -500.0, 500.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> tptx[i], FALSE, FALSE, 0);
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("y:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
-    tpty[i] = spin_button (G_CALLBACK(set_axis_title_y_spin), (double)this_curve -> axis_title_y[i], -500.0, 500.0, 1.0, 0, 50, & dataxe[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, tpty[i], FALSE, FALSE, 0);
+    cedit -> tpty[i] = spin_button (G_CALLBACK(set_axis_title_y_spin), (double)this_curve -> axis_title_y[i], -500.0, 500.0, 1.0, 0, 50, & cedit -> dataxe[i]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> tpty[i], FALSE, FALSE, 0);
   }
   return axisbox;
 }

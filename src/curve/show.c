@@ -109,7 +109,10 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
     for (j=0; j<2; j++)
     {
       resol[j] = this_curve -> wsize[j];
-      if (xyp[j] != NULL) update_entry_int (GTK_ENTRY(xyp[j]), this_curve -> wsize[j]);
+      if (this_curve -> curve_edit)
+      {
+        if (this_curve -> curve_edit -> xyp[j] != NULL) update_entry_int (GTK_ENTRY(this_curve -> curve_edit -> xyp[j]), this_curve -> wsize[j]);
+      }
     }
   }
   else
@@ -172,13 +175,16 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
 
   if (upm)
   {
-    if (axischoice != NULL)
+    if (this_curve -> curve_edit)
     {
-      j = combo_get_active (axischoice);
-      update_entry_double (GTK_ENTRY(vmin), this_curve -> axmin[j]);
-      update_entry_double (GTK_ENTRY(vmax), this_curve -> axmax[j]);
-      update_entry_double (GTK_ENTRY(majt), this_curve -> majt[j]);
-      update_entry_int (GTK_ENTRY(nmi[j]), this_curve -> mint[j] - 1);
+      if (this_curve -> curve_edit -> axischoice != NULL)
+      {
+        j = combo_get_active (this_curve -> curve_edit -> axischoice);
+        update_entry_double (GTK_ENTRY(this_curve -> curve_edit -> vmin), this_curve -> axmin[j]);
+        update_entry_double (GTK_ENTRY(this_curve -> curve_edit -> vmax), this_curve -> axmax[j]);
+        update_entry_double (GTK_ENTRY(this_curve -> curve_edit -> majt), this_curve -> majt[j]);
+        update_entry_int (GTK_ENTRY(this_curve -> curve_edit -> nmi[j]), this_curve -> mint[j] - 1);
+      }
     }
   }
 
