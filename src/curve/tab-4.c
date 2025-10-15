@@ -480,7 +480,7 @@ G_MODULE_EXPORT void to_axis_title (GtkToggleButton * but, gpointer data)
   {
     widget_set_sensitive (cedit -> axis_title, 0);
     g_free (this_curve -> axis_title[i]);
-    this_curve -> axis_title[i] = g_strdup_printf ("%s", default_title (i, ((tint *)data) -> c));
+    this_curve -> axis_title[i] = g_strdup_printf ("%s", default_title (i, data));
     update_entry_text (GTK_ENTRY(cedit -> axis_title), this_curve -> axis_title[i]);
   }
   else

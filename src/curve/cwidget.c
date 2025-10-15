@@ -257,9 +257,7 @@ void initcurve (project * pid, int rid, int cid)
   {
     g_free (this_curve -> cfile);
   }
-  activer = -1;
   curve_default_scale (pid, rid, cid, this_curve);
-  activer = rid;
 }
 
 /*!
@@ -274,7 +272,6 @@ void initcurve (project * pid, int rid, int cid)
 void addcurwidgets (int pid, int rid, int str)
 {
   int j, k;
-  activer = rid;
   project * this_proj = get_project_by_id(pid);
 #ifdef NEW_ANA
   for (j=0; j<this_proj -> analysis[rid].numc; j++)
@@ -295,7 +292,7 @@ void addcurwidgets (int pid, int rid, int str)
     {
       if (this_proj -> analysis[rid].curves[j] -> axis_defaut_title[k])
       {
-        this_proj -> analysis[rid].curves[j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, j));
+        this_proj -> analysis[rid].curves[j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> analysis[rid].idcc[j]));
       }
     }
   }
@@ -323,7 +320,7 @@ void addcurwidgets (int pid, int rid, int str)
     {
       if (this_proj -> curves[rid][j] -> axis_defaut_title[k])
       {
-        this_proj -> curves[rid][j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, j));
+        this_proj -> curves[rid][j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> idcc[rid][j]));
       }
     }
   }

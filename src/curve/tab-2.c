@@ -1004,7 +1004,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   }
 
   cedit -> Hist_box = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> data_shape, cedit -> Hist_box, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, data_shape, cedit -> Hist_box, FALSE, FALSE, 0);
   // Histogram width
   cedit -> data_hist_width = create_entry (G_CALLBACK(set_data_hist_width), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(cedit -> data_hist_width), this_curve -> layout -> hwidth);
@@ -1021,7 +1021,6 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   combo_set_active (cedit -> data_hist_pos, this_curve -> layout -> hpos);
   g_signal_connect (G_OBJECT(cedit -> data_hist_pos), "changed", G_CALLBACK(set_data_hist_pos), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, "Bar opacity:"), cedit -> data_hist_pos, FALSE, FALSE, 0);
-
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   GtkWidget * hbox;

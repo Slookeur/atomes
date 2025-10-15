@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  const gchar * default_title (int ax, int c);
+  const gchar * default_title (int ax, gpointer data);
 
   void show_title (cairo_t * cr, Curve * this_curve);
 
@@ -44,42 +44,43 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn const gchar * default_title (int ax, int c)
+  \fn const gchar * default_title (int ax, gpointer data)
 
   \brief default title string
 
   \param ax axis
-  \param c curve id
+  \param data the associated data pointer
 */
-const gchar * default_title (int ax, int c)
+const gchar * default_title (int ax, gpointer data)
 {
+  int rid = ((tint *)data) -> b;
   if (ax == 0)
   {
-    if (activer == GR || activer == GK)
+    if (rid == GR || rid == GK)
     {
       return ("r [Å]");
     }
-    else if (activer == SQ || activer == SK)
+    else if (rid == SQ || rid == SK)
     {
       return ("q [Å-1]");
     }
-    else if (activer == BD)
+    else if (rid == BD)
     {
       return ("Dij [Å]");
     }
-    else if (activer == AN)
+    else if (rid == AN)
     {
       return ("θ [°]");
     }
-    else if (activer == RI)
+    else if (rid == RI)
     {
       return ("Size n of the ring [total number of nodes]");
     }
-    else if (activer == CH)
+    else if (rid == CH)
     {
       return ("Size n of the chain [total number of nodes]");
     }
-    else if (activer == SP)
+    else if (rid == SP)
     {
       return ("Ql");
     }
@@ -90,11 +91,7 @@ const gchar * default_title (int ax, int c)
   }
   else
   {
-#ifdef NEW_ANA
-    return active_project -> analysis[activer].curves[c] -> name;
-#else
-    return active_project -> curves[activer][c] -> name;
-#endif
+    return get_curve_from_pointer (data) -> name;
   }
 }
 

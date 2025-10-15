@@ -337,17 +337,8 @@ void curve_button_event (GdkEvent * event, double event_x, double event_y, guint
 {
   int x1, x2, y1, y2;
   double tmp;
-  int a, b, c;
   CurveState * cstate = (CurveState *)data;
-  a = activeg = cstate -> id -> a;
-  b = activer = cstate -> id -> b;
-  c = activec = cstate -> id -> c;
-  project * this_proj = get_project_by_id(a);
-#ifdef NEW_ANA
-  Curve * this_curve = this_proj -> analysis[b].curves[c];
-#else
-  Curve * this_curve = this_proj -> curves[b][c];
-#endif
+  Curve * this_curve = get_curve_from_pointer ((gpointer)cstate -> id);
 #ifdef GTK4
   int curve_shift = get_curve_shift (this_curve);
 #endif
@@ -437,11 +428,7 @@ void curve_button_event (GdkEvent * event, double event_x, double event_y, guint
           }
         }
       }
-      tint id;
-      id.a = a;
-      id.b = b;
-      id.c = c;
-      update_curve ((gpointer)& id);
+      update_curve ((gpointer)cstate -> id);
     }
   }
 }
@@ -605,11 +592,14 @@ G_MODULE_EXPORT void on_curve_realize (GtkWidget * widg, gpointer data)
 GtkWidget * create_curve (tint * data)
 {
   GtkWidget * curve_win, * vbox;
-  activec = data -> c;
-  Curve * this_curve = get_curve_from_pointer ((gpointer)data);
-  gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (get_project_by_id(((tint *)data) -> a) -> name), this_curve -> name);
-  curve_win = create_win (str, MainWindow, FALSE, TRUE);
+
+  activeg = data -> a;
   activer = data -> b;
+  activec = data -> c;
+
+  Curve * this_curve = get_curve_from_pointer ((gpointer)data);
+  gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (get_project_by_id(data -> a) -> name), this_curve -> name);
+  curve_win = create_win (str, MainWindow, FALSE, TRUE);
   g_free (str);
   vbox = create_vbox (BSEP);
   add_container_child (CONTAINER_WIN, curve_win, vbox);

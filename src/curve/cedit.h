@@ -52,7 +52,6 @@ struct curve_edition
   // tab 2
   GtkWidget * setcolorbox;
   GtkWidget * thesetbox;
-  GtkWidget * data_shape;
   GtkWidget * data_color;
   GtkWidget * data_aspect;
   GtkWidget * data_thickness;

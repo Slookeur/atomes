@@ -83,13 +83,10 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
   double alp;
   gboolean upm;
   Curve * this_curve = get_curve_from_pointer (curve);
-  tint * cd = (tint *)curve;
+  pid = ((tint *)curve) -> a;
+  rid = ((tint *)curve) -> b;
+  cid = ((tint *)curve) -> c;
 
-  pid = cd -> a;
-  rid = cd -> b;
-  cid = cd -> c;
-  activec = cid;
-  activer = rid;
   cairo_surface_t * surface = NULL;
   project * this_proj = get_project_by_id(pid);
 

@@ -147,7 +147,7 @@ extern void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid);
 
 extern void draw_glyph (cairo_t * in, int theglyph, double x, double y, ColRGBA gcolor, double size);
 
-extern const gchar * default_title (int ax, int c);
+extern const gchar * default_title (int ax, gpointer data);
 extern void show_title (cairo_t * cr, Curve * this_curve);
 
 extern void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid);

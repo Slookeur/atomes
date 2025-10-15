@@ -755,6 +755,9 @@ GtkWidget * curve_popup_menu (gpointer data)
   GtkWidget * curve_pop_menu;
   int i, j;
   CurveState * cstate = (CurveState *)data;
+  activeg = cstate -> id -> a;
+  activer = cstate -> id -> b;
+  activec = cstate -> id -> c;
   GSimpleActionGroup * curve_popup_actions = g_simple_action_group_new ();
   GSimpleAction * curve_popup_action[6];
   curve_popup_action[0] = g_simple_action_new ("save.data", NULL);

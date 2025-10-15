@@ -65,7 +65,7 @@ void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, 
   }
   else
   {
-    n = (activer == SP && aid == 1) ? 1 : 0;
+    n = (rid == SP && aid == 1) ? 1 : 0;
     this_curve -> axmax[aid] = this_curve -> data[aid][n];
     this_curve -> axmin[aid] = this_curve -> data[aid][n];
     for ( i=n ; i < this_curve -> ndata ; i++ )
@@ -105,7 +105,7 @@ void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, 
     this_curve -> axmin[aid] = this_curve -> cmin[aid] - fabs(this_curve -> cmin[aid]) / 10.0;
     this_curve -> axmax[aid] = this_curve -> cmax[aid] + fabs(this_curve -> cmax[aid]) / 10.0;
 //  Adjust autoscale information if required
-    if (activer > GK && activer < MS)
+    if (rid > GK && rid < MS)
     {
       this_curve -> axmin[aid] = 0.0;
     }
