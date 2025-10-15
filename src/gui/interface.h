@@ -61,5 +61,9 @@ void update_after_calc (int calc);
 
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
 void prep_calc_actions ();
+#ifdef NEW_ANA
+void init_atomes_analyses ();
+#else
 void initcwidgets ();
+#endif // NEW_ANA
 #endif

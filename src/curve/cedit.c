@@ -103,7 +103,7 @@ void prepbox (gpointer data)
     p = ctmp -> id.c;
     extra_proj = get_project_by_id(n);
 #ifdef NEW_ANA
-    str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> analysis[o]curves[p] -> name);
+    str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> analysis[o] -> curves[p] -> name);
 #else
     str = g_strdup_printf ("%s - %s", prepare_for_title(extra_proj -> name), extra_proj -> curves[o][p] -> name);
 #endif
@@ -144,7 +144,7 @@ void set_set (int a, int b, int c, gpointer data)
   show_the_widgets (cedit -> setcolorbox);
   activeg = ((tint *)data) -> a;
 #ifdef NEW_ANA
-  action_to_plot (& get_project_by_id(a) -> analysis[b].idcc[c]);
+  action_to_plot (& get_project_by_id(a) -> analysis[b] -> idcc[c]);
 #else
   action_to_plot (& get_project_by_id(a) -> idcc[b][c]);
 #endif
@@ -171,7 +171,7 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
   GtkTreeIter calclevel;
   GtkTreeIter curvelevel;
   project * this_proj;
-  int i, j, k;
+  int i, j, k, l;
   int start, end, step;
   gboolean append;
   int pid = ((tint *)data) -> a;
@@ -191,9 +191,9 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
     gtk_tree_store_set (store, & projlevel, 0, 0, 1, prepare_for_title(this_proj -> name), 2, TRUE, 3, -1, -1);
     cedit -> ppath[i] = gtk_tree_model_get_path ((GtkTreeModel *)store, & projlevel);
 #ifdef NEW_ANA
-    for (j=0; j<this_proj -> analysis[rid].c_sets; j++)
+    for (j=0; j<this_proj -> analysis[rid] -> c_sets; j++)
     {
-      k = this_proj -> analysis[rid].compat_id[j];
+      k = this_proj -> analysis[rid] -> compat_id[j];
 #else
     if (rid == 0 || rid == 3)
     {
@@ -217,7 +217,7 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
     {
 #endif
 #ifdef NEW_ANA
-      if (this_proj -> analysis[k].init_ok)
+      if (this_proj -> analysis[k] -> init_ok)
        {
         gtk_tree_store_append (store, & calclevel, & projlevel);
         gtk_tree_store_set (store, & calclevel, 0, 0, 1, graph_name[k], 2, TRUE, 3, -1, -1);
@@ -225,14 +225,14 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
         {
           cedit -> cpath[i] = gtk_tree_model_get_path ((GtkTreeModel *)store, & calclevel);
         }
-        for (l = 0 ; l < this_proj -> analysis[k].numc ; l++)
+        for (l = 0 ; l < this_proj -> analysis[k] -> numc ; l++)
         {
           append = FALSE;
-          if (i != pid && this_proj -> analysis[k].curves[l] -> ndata != 0)
+          if (i != pid && this_proj -> analysis[k] -> curves[l] -> ndata != 0)
           {
             append = TRUE;
           }
-          else if (((i != pid) || (j != rid || k != cid)) && this_proj -> analysis[k].curves[l] -> ndata != 0)
+          else if (((i != pid) || (j != rid || k != cid)) && this_proj -> analysis[k] -> curves[l] -> ndata != 0)
           {
             append = TRUE;
           }
@@ -241,7 +241,7 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
             gtk_tree_store_append (store, & curvelevel, & calclevel);
             gtk_tree_store_set (store, & curvelevel,
                                 0, 1,
-                                1, this_proj -> analysis[k].curves[l] -> name,
+                                1, this_proj -> analysis[k] -> curves[l] -> name,
                                 2, ! was_not_added (get_curve_from_pointer(data) -> extrac, i, k, l),
                                 3, i,
                                 4, k,

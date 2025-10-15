@@ -102,7 +102,6 @@ char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar
                                     "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
 
 char ** las;
-void initcwidgets ();
 extern G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern const gchar * dfi[2];
@@ -646,7 +645,14 @@ void run_project ()
     }
     to_read_pos ();
     prep_pos_ (& active_cell -> pbc, & active_cell -> frac);
-    if (active_project -> numwid < 0) initcwidgets ();
+    if (active_project -> numwid < 0)
+    {
+#ifdef NEW_ANA
+     init_atomes_analyses ();
+#else
+      initcwidgets ();
+#endif // NEW_ANA
+    }
     active_project -> dmtx = FALSE;
     active_project -> run = 1;
   }

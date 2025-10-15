@@ -56,13 +56,13 @@ const gchar * default_title (int ax, gpointer data)
   project * this_proj = get_project_by_id (((tint *)data) -> a);
   if (ax == 0)
   {
+    int rid = ((tint *)data) -> b;
 #ifdef NEW_ANA
     if (rid != MS)
     {
-      return this_proj -> analysis[rid].x_title;
+      return this_proj -> analysis[rid] -> x_title;
     }
 #else
-    int rid = ((tint *)data) -> b;
     if (rid == GR || rid == GK)
     {
       return ("r [Å]");

@@ -108,13 +108,14 @@ void add_project (GtkTreeStore * store, int i)
   GtkTreeIter steplevel;
   GtkTreeIter optslevel;
   gtk_tree_store_append (store, & piter[i], & worklevel);
+  project * this_proj = get_project_by_id(i);
   if (i == activep)
   {
-    tmp = g_strdup_printf ("<b>%s</b>", active_project -> name);
+    tmp = g_strdup_printf ("<b>%s</b>", this_proj -> name);
   }
   else
   {
-    tmp = g_strdup_printf ("%s", get_project_by_id(i) -> name);
+    tmp = g_strdup_printf ("%s", this_proj -> name);
   }
   gtk_tree_store_set (store, & piter[i], 0, THETD, 1, tmp, 2, -1, -1);
   prpath[i] = gtk_tree_model_get_path (GTK_TREE_MODEL(store), & piter[i]);
@@ -127,13 +128,23 @@ void add_project (GtkTreeStore * store, int i)
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
   gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
+  gboolean append;
+
   for (j=0; j<NCALCS; j++)
   {
+    append = FALSE;
 #ifdef NEW_ANA
-    if (! get_project_by_id(i) -> analysis[j].requires_md || get_project_by_id(i) -> steps > 1)
+    if (this_proj -> analysis)
+    {
+      if (this_proj -> analysis[j])
+      {
+        if (! this_proj -> analysis[j] -> requires_md || this_proj -> steps > 1) append = TRUE;
+      }
+    }
 #else
-    if (j < NCALCS-1 || get_project_by_id(i) -> steps > 1)
+    if (j < NCALCS-1 || this_proj -> steps > 1) append = TRUE;
 #endif
+    if (append)
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
       gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, graph_name[j], 2, j, -1);
@@ -427,13 +438,13 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     for (j=0; j<NGRAPHS; j++)
     {
 #ifdef NEW_ANA
-      if (this_proj -> analysis[j].init_ok)
+      if (this_proj -> analysis[j] -> init_ok)
       {
-        for (k=0; k<this_proj -> analysis[j].numc; k++)
+        for (k=0; k<this_proj -> analysis[j] -> numc; k++)
         {
-          if (this_proj -> analysis[j].curves[k] -> window != NULL)
+          if (this_proj -> analysis[j] -> curves[k] -> window != NULL)
           {
-            correct_this_window_title (this_proj -> analysis[j].curves[k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[j].curves[k] -> name));
+            correct_this_window_title (this_proj -> analysis[j] -> curves[k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[j] -> curves[k] -> name));
           }
         }
       }

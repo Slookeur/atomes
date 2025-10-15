@@ -62,22 +62,22 @@ void initsq (int r)
   int i, j, k;
 
 #ifdef NEW_ANA
-  active_project -> analysis[r].curves[0] -> name = g_strdup_printf ("S(q) Neutrons");
-  active_project -> analysis[r].curves[1] -> name = g_strdup_printf ("S(q) Neutrons - smoothed");
-  active_project -> analysis[r].curves[2] -> name = g_strdup_printf ("Q(q) Neutrons");
-  active_project -> analysis[r].curves[3] -> name = g_strdup_printf ("Q(q) Neutrons - smoothed");
-  active_project -> analysis[r].curves[4] -> name = g_strdup_printf ("S(q) X-rays");
-  active_project -> analysis[r].curves[5] -> name = g_strdup_printf ("S(q) X-rays - smoothed");
-  active_project -> analysis[r].curves[6] -> name = g_strdup_printf ("Q(q) X-rays");
-  active_project -> analysis[r].curves[7] -> name = g_strdup_printf ("Q(q) X-rays - smoothed");
+  active_project -> analysis[r] -> curves[0] -> name = g_strdup_printf ("S(q) Neutrons");
+  active_project -> analysis[r] -> curves[1] -> name = g_strdup_printf ("S(q) Neutrons - smoothed");
+  active_project -> analysis[r] -> curves[2] -> name = g_strdup_printf ("Q(q) Neutrons");
+  active_project -> analysis[r] -> curves[3] -> name = g_strdup_printf ("Q(q) Neutrons - smoothed");
+  active_project -> analysis[r] -> curves[4] -> name = g_strdup_printf ("S(q) X-rays");
+  active_project -> analysis[r] -> curves[5] -> name = g_strdup_printf ("S(q) X-rays - smoothed");
+  active_project -> analysis[r] -> curves[6] -> name = g_strdup_printf ("Q(q) X-rays");
+  active_project -> analysis[r] -> curves[7] -> name = g_strdup_printf ("Q(q) X-rays - smoothed");
   k = 8;
   for ( i = 0 ; i < active_project -> nspec ; i++ )
   {
     for ( j = 0 ; j < active_project -> nspec ; j++ )
     {
-      active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
+      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
+      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
     }
   }
@@ -85,32 +85,32 @@ void initsq (int r)
   {
     for ( j = 0 ; j < active_project -> nspec ; j++ )
     {
-      active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
+      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
+      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
     }
   }
   if ( active_project -> nspec == 2 )
   {
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[NN]");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[NN]");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[NN] - smoothed");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[NN] - smoothed");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[NC]");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[NC]");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[NC] - smoothed");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[NC] - smoothed");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[CC]");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[CC]");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[CC] - smoothed");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[CC] - smoothed");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[ZZ]");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ]");
     k=k+1;
-    active_project -> analysis[r].curves[k] -> name = g_strdup_printf ("BT(q)[ZZ] - smoothed");
+    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ] - smoothed");
   }
   addcurwidgets (activep, r, 0);
-  active_project -> analysis[r].init_ok = TRUE;
+  active_project -> analysis[r] -> init_ok = TRUE;
 #else
   active_project -> curves[r][0] -> name = g_strdup_printf ("S(q) Neutrons");
   active_project -> curves[r][1] -> name = g_strdup_printf ("S(q) Neutrons - smoothed");
@@ -176,62 +176,62 @@ void update_sq_view (project * this_proj, int sqk)
 {
   gchar * str;
 #ifdef NEW_ANA
-  if (this_proj -> analysis[sqk].calc_buffer == NULL) this_proj -> analysis[sqk].calc_buffer = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk].calc_buffer);
+  if (this_proj -> analysis[sqk] -> calc_buffer == NULL) this_proj -> analysis[sqk] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   if (sqk == SK)
   {
-    print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk].calc_buffer);
+    print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
   else
   {
-    print_info (" - FFT[g(r)]\n\n", "heading", this_proj -> analysis[sqk].calc_buffer);
+    print_info (" - FFT[g(r)]\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
-  print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\tReciprocal space discretization:\n\n", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\t - Number of δq steps: ", "bold", this_proj -> analysis[sqk].calc_buffer);
-  str = g_strdup_printf ("%d", this_proj -> analysis[sqk].num_delta);
-  print_info (str, "bold_blue", this_proj -> analysis[sqk].calc_buffer);
+  print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\tReciprocal space discretization:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\t - Number of δq steps: ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> analysis[sqk] -> num_delta);
+  print_info (str, "bold_blue", this_proj -> analysis[sqk] -> calc_buffer);
   g_free (str);
-  print_info ("\n\n\t between ", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("Q", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("min", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (" and ", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("Q", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("max", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\n\t where ", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("Q", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("min", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (" is the minimum wave vector, and ", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("Q", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("max", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (" is the maximum wave vector:\n\n", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\t\tQ", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("min", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (" = ", "bold", this_proj -> analysis[sqk].calc_buffer);
-  str = g_strdup_printf ("%f", this_proj -> analysis[sqk].min);
-  print_info (str, "bold_blue", this_proj -> analysis[sqk].calc_buffer);
+  print_info ("\n\n\t between ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" and ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\n\t where ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" is the minimum wave vector, and ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" is the maximum wave vector:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\t\tQ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" = ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  str = g_strdup_printf ("%f", this_proj -> analysis[sqk] -> min);
+  print_info (str, "bold_blue", this_proj -> analysis[sqk] -> calc_buffer);
   g_free (str);
-  print_info (" Å", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("-1", "sup_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\tand\t", NULL, this_proj -> analysis[sqk].calc_buffer);
-  print_info ("Q", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("max", "sub_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (" = ", "bold", this_proj -> analysis[sqk].calc_buffer);
-  str = g_strdup_printf ("%f", this_proj -> analysis[sqk].max);
-  print_info (str, "bold_blue", this_proj -> analysis[sqk].calc_buffer);
+  print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\tand\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" = ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  str = g_strdup_printf ("%f", this_proj -> analysis[sqk] -> max);
+  print_info (str, "bold_blue", this_proj -> analysis[sqk] -> calc_buffer);
   g_free (str);
-  print_info (" Å", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("-1", "sup_bold", this_proj -> analysis[sqk].calc_buffer);
+  print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
 
-  print_info ("\n\n\t - δq = ", "bold", this_proj -> analysis[sqk].calc_buffer);
-  str = g_strdup_printf ("%f", this_proj -> analysis[sqk].delta);
-  print_info (str, "bold_blue", this_proj -> analysis[sqk].calc_buffer);
+  print_info ("\n\n\t - δq = ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  str = g_strdup_printf ("%f", this_proj -> analysis[sqk] -> delta);
+  print_info (str, "bold_blue", this_proj -> analysis[sqk] -> calc_buffer);
   g_free (str);
-  print_info (" Å", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("-1", "sup_bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info ("\n", "bold", this_proj -> analysis[sqk].calc_buffer);
-  print_info (calculation_time(TRUE, this_proj -> calc_time[sqk]), NULL, this_proj -> analysis[sqk].calc_buffer);
+  print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\n", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (calculation_time(TRUE, this_proj -> analysis[sqk] -> calc_time), NULL, this_proj -> analysis[sqk] -> calc_buffer);
 #else
   if (this_proj -> text_buffer[sqk+OT] == NULL) this_proj -> text_buffer[sqk+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[sqk+OT]);
@@ -304,16 +304,16 @@ G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data)
 {
   int i;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SQ].init_ok) initsq (SQ);
-  clean_curves_data (SQ, 0, active_project -> analysis[SQ].numc);
-  active_project -> analysis[SQ].delta = (active_project -> analysis[SQ].max - active_project -> analysis[SQ].min) / active_project -> analysis[SQ].num_delta;
+  if (! active_project -> analysis[SQ] -> init_ok) initsq (SQ);
+  clean_curves_data (SQ, 0, active_project -> analysis[SQ] -> numc);
+  active_project -> analysis[SQ] -> delta = (active_project -> analysis[SQ] -> max - active_project -> analysis[SQ] -> min) / active_project -> analysis[SQ] -> num_delta;
   prepostcalc (widg, FALSE, SQ, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = s_of_q_ (& active_project -> analysis[SQ].max,
-               & active_project -> analysis[SQ].min,
-               & active_project -> analysis[SQ].num_delta);
+  i = s_of_q_ (& active_project -> analysis[SQ] -> max,
+               & active_project -> analysis[SQ] -> min,
+               & active_project -> analysis[SQ] -> num_delta);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[SQ].calc_time = get_calc_time (start_time, stop_time);
+  active_project -> analysis[SQ] -> calc_time = get_calc_time (start_time, stop_time);
 #else
   if (! active_project -> initok[SQ]) initsq (SQ);
   clean_curves_data (SQ, 0, active_project -> numc[SQ]);
@@ -369,30 +369,30 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   int i, j;
 
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SK].init_ok) initsq (SK);
-  clean_curves_data (SK, 0, active_project -> analysis[SK].numc);
-  active_project -> delta[SK] = (active_project -> analysis[SK].max - active_project -> analysis[SK].min) / active_project -> analysis[SK].num_delta;
+  if (! active_project -> analysis[SK] -> init_ok) initsq (SK);
+  clean_curves_data (SK, 0, active_project -> analysis[SK] -> numc);
+  active_project -> analysis[SK] -> delta = (active_project -> analysis[SK] -> max - active_project -> analysis[SK] -> min) / active_project -> analysis[SK] -> num_delta;
   prepostcalc (widg, FALSE, SK, 0, opac);
-  i = cqvf_ (& active_project -> analysis[SK].max,
-             & active_project -> analysis[SK].min,
-             & active_project -> analysis[SK].num_delta,
+  i = cqvf_ (& active_project -> analysis[SK] -> max,
+             & active_project -> analysis[SK] -> min,
+             & active_project -> analysis[SK] -> num_delta,
              & active_project -> sk_advanced[0],
              & active_project -> sk_advanced[1]);
   prepostcalc (widg, TRUE, SK, i, 1.0);
   if (i == 1)
   {
     prepostcalc (widg, FALSE, SK, 0, opac);
-    for (i=0; i<active_project -> analysis[SK].numc; i++)
+    for (i=0; i<active_project -> analysis[SK] -> numc; i++)
     {
-      active_project -> analysis[SK].curves[i] -> ndata = 0;
+      active_project -> analysis[SK] -> curves[i] -> ndata = 0;
     }
     clock_gettime (CLOCK_MONOTONIC, & start_time);
-    j = s_of_k_ (& active_project -> analysis[SK].num_delta, & active_project -> xcor);
+    j = s_of_k_ (& active_project -> analysis[SK] -> num_delta, & active_project -> xcor);
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SK].calc_time = get_calc_time (start_time, stop_time);
+    active_project -> analysis[SK] -> calc_time = get_calc_time (start_time, stop_time);
     g_free (xsk);
     xsk = NULL;
-    active_project -> analysis[GK].avail_ok = j;
+    active_project -> analysis[GK] -> avail_ok = j;
 #else
   if (! active_project -> initok[SK]) initsq (SK);
   clean_curves_data (SK, 0, active_project -> numc[SK]);

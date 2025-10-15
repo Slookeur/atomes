@@ -85,7 +85,7 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
   b = cd -> b;
   c = cd -> c;
 #ifdef NEW_ANA
-  double delta = get_project_by_id(a) -> analysis[b].delta;
+  double delta = get_project_by_id(a) -> analysis[b] -> delta;
 #else
   double delta = get_project_by_id(a) -> delta[b];
 #endif
@@ -142,14 +142,14 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
         n = ctmp -> id.c;
         this_proj = get_project_by_id(q);
 #ifdef NEW_ANA
-        j = strlen (this_proj -> analysis[o].curves[n] -> title);
-        append_to_file_ (& this_proj -> analysis[o].curves[n] -> ndata,
-                         this_proj -> analysis[o].curves[n] -> data[0],
-                         this_proj -> analysis[o].curves[n] -> data[1],
-                         & this_proj -> analysis[o].delta,
+        j = strlen (this_proj -> analysis[o] -> curves[n] -> title);
+        append_to_file_ (& this_proj -> analysis[o] -> curves[n] -> ndata,
+                         this_proj -> analysis[o] -> curves[n] -> data[0],
+                         this_proj -> analysis[o] -> curves[n] -> data[1],
+                         & this_proj -> analysis[o] -> delta,
                          & ctmp -> layout -> aspect,
                          & o, & n, & l, & m, & p,
-                         & j, this_proj -> analysis[o].curves[n] -> title);
+                         & j, this_proj -> analysis[o] -> curves[n] -> title);
 #else
         j = strlen (this_proj -> curves[o][n] -> title);
         append_to_file_ (& this_proj -> curves[o][n] -> ndata,

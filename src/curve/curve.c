@@ -314,7 +314,7 @@ Curve * get_curve_from_pointer (gpointer data)
 {
   tint * ad = (tint *)data;
 #ifdef NEW_ANA
-  return get_project_by_id(ad -> a) -> analysis[ad -> b].curves[ad -> c];
+  return get_project_by_id(ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
 #else
   return get_project_by_id(ad -> a) -> curves[ad -> b][ad -> c];
 #endif
@@ -352,24 +352,24 @@ void prep_plot (Curve * this_curve)
 void clean_this_curve_window (int cid, int rid)
 {
 #ifdef NEW_ANA
-  /*if (active_project -> analysis[rid].curves[cid] -> window != NULL)
+  /*if (active_project -> analysis[rid] -> curves[cid] -> window != NULL)
   {
-    active_project -> analysis[rid].curves[cid] -> window = destroy_this_widget (active_project -> analysis[rid].curves[cid] -> window);
-    active_project -> analysis[rid].curves[cid] -> plot = destroy_this_widget (active_project -> analysis[rid].curves[cid] -> plot);
+    active_project -> analysis[rid] -> curves[cid] -> window = destroy_this_widget (active_project -> analysis[rid] -> curves[cid] -> window);
+    active_project -> analysis[rid] -> curves[cid] -> plot = destroy_this_widget (active_project -> analysis[rid] -> curves[cid] -> plot);
   }*/
-  if (active_project -> analysis[rid].curves[cid] -> ndata > 0)
+  if (active_project -> analysis[rid] -> curves[cid] -> ndata > 0)
   {
     int i;
     for (i=0; i<2; i++)
     {
-      if (active_project -> analysis[rid].curves[cid] -> data[i] != NULL)
+      if (active_project -> analysis[rid] -> curves[cid] -> data[i] != NULL)
       {
-        g_free (active_project -> analysis[rid].curves[cid] -> data[i]);
-        active_project -> analysis[rid].curves[cid] -> data[i] = NULL;
+        g_free (active_project -> analysis[rid] -> curves[cid] -> data[i]);
+        active_project -> analysis[rid] -> curves[cid] -> data[i] = NULL;
       }
     }
   }
-  active_project -> analysis[rid].curves[cid] -> ndata = 0;
+  active_project -> analysis[rid] -> curves[cid] -> ndata = 0;
 #else
   /*if (active_project -> curves[rid][cid] -> window != NULL)
   {
@@ -404,12 +404,12 @@ void clean_this_curve_window (int cid, int rid)
 void set_curve_data_zero (int rid, int cid, int interv)
 {
 #ifdef NEW_ANA
-  active_project -> analysis[rid].curves[cid] -> ndata = interv;
-  active_project -> analysis[rid].curves[cid] -> data[0] = allocdouble (interv);
+  active_project -> analysis[rid] -> curves[cid] -> ndata = interv;
+  active_project -> analysis[rid] -> curves[cid] -> data[0] = allocdouble (interv);
   int i;
   for (i=0; i<interv; i++)
   {
-    active_project -> analysis[rid].curves[cid] -> data[0][i] = active_project -> analysis[rid].min + i*active_project -> analysis[rid].delta;
+    active_project -> analysis[rid] -> curves[cid] -> data[0][i] = active_project -> analysis[rid] -> min + i*active_project -> analysis[rid] -> delta;
   }
 #else
   active_project -> curves[rid][cid] -> ndata = interv;
@@ -436,7 +436,7 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
 {
   int i, j;
 #ifdef NEW_ANA
-  Curve * this_curve = active_project -> analysis[* rid].curves[* cid];
+  Curve * this_curve = active_project -> analysis[* rid] -> curves[* cid];
 #else
   Curve * this_curve = active_project -> curves[* rid][* cid];
 #endif
@@ -501,18 +501,18 @@ void hide_curves (project * this_proj, int c)
 {
   int i;
 #ifdef NEW_ANA
-  for ( i = 0 ; i < this_proj -> analysis[c].numc ; i ++ )
+  for ( i = 0 ; i < this_proj -> analysis[c] -> numc ; i ++ )
   {
-    if (this_proj -> analysis[c].curves[i])
+    if (this_proj -> analysis[c] -> curves[i])
     {
-      if (this_proj -> analysis[c].curves[i] -> window)
+      if (this_proj -> analysis[c] -> curves[i] -> window)
       {
-        if (is_the_widget_visible(this_proj -> analysis[c].curves[i] -> window))
+        if (is_the_widget_visible(this_proj -> analysis[c] -> curves[i] -> window))
         {
-          hide_the_widgets (this_proj -> analysis[c].curves[i] -> window);
-          adjust_tool_model (c, i, this_proj -> analysis[c].curves[i] -> path);
-          g_free (this_proj -> analysis[c].curves[i] -> path);
-          this_proj -> analysis[c].curves[i] -> path = NULL;
+          hide_the_widgets (this_proj -> analysis[c] -> curves[i] -> window);
+          adjust_tool_model (c, i, this_proj -> analysis[c] -> curves[i] -> path);
+          g_free (this_proj -> analysis[c] -> curves[i] -> path);
+          this_proj -> analysis[c] -> curves[i] -> path = NULL;
         }
       }
     }
@@ -559,18 +559,18 @@ void remove_this_curve_from_extras (int a, int b, int c)
 #ifdef NEW_ANA
       for (j=0; j<NCALCS; j++)
       {
-        if (this_proj -> analysis[j].idcc != NULL)
+        if (this_proj -> analysis[j] -> idcc != NULL)
         {
-          for (k=0; k<this_proj -> analysis[j].numc; k++)
+          for (k=0; k<this_proj -> analysis[j] -> numc; k++)
           {
-            if (this_proj -> analysis[j].curves[k] -> extrac > 0)
+            if (this_proj -> analysis[j] -> curves[k] -> extrac > 0)
             {
-              ctmp = this_proj -> analysis[j].curves[k] -> extrac -> first;
-              for (l=0; l<this_proj -> analysis[j].curves[k] -> extrac -> extras; l++)
+              ctmp = this_proj -> analysis[j] -> curves[k] -> extrac -> first;
+              for (l=0; l<this_proj -> analysis[j] -> curves[k] -> extrac -> extras; l++)
               {
                 if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
                 {
-                  remove_extra (this_proj -> analysis[j].curves[k] -> extrac, ctmp);
+                  remove_extra (this_proj -> analysis[j] -> curves[k] -> extrac, ctmp);
                   break;
                 }
                 if (ctmp -> next != NULL) ctmp = ctmp -> next;
@@ -619,26 +619,26 @@ void erase_curves (project * this_proj, int c)
 {
   int i, j;
 #ifdef NEW_ANA
-  for (i=0 ; i<this_proj -> analysis[c].numc; i ++)
+  for (i=0 ; i<this_proj -> analysis[c] -> numc; i ++)
   {
-    if (this_proj -> analysis[c].curves[i])
+    if (this_proj -> analysis[c] -> curves[i])
     {
       remove_this_curve_from_extras (this_proj -> id, c, i);
       for (j=0; j<2; j++)
       {
-        if (this_proj -> analysis[c].curves[i] -> data[j])
+        if (this_proj -> analysis[c] -> curves[i] -> data[j])
         {
-          free (this_proj -> analysis[c].curves[i] -> data[j]);
-          this_proj -> analysis[c].curves[i] -> data[j] = NULL;
+          free (this_proj -> analysis[c] -> curves[i] -> data[j]);
+          this_proj -> analysis[c] -> curves[i] -> data[j] = NULL;
         }
       }
-      if (this_proj -> analysis[c].curves[i] -> name)
+      if (this_proj -> analysis[c] -> curves[i] -> name)
       {
-        g_free (this_proj -> analysis[c].curves[i] -> name);
-        this_proj -> analysis[c].curves[i] -> name = NULL;
+        g_free (this_proj -> analysis[c] -> curves[i] -> name);
+        this_proj -> analysis[c] -> curves[i] -> name = NULL;
       }
-      g_free (this_proj -> analysis[c].curves[i]);
-      this_proj -> analysis[c].curves[i] = NULL;
+      g_free (this_proj -> analysis[c] -> curves[i]);
+      this_proj -> analysis[c] -> curves[i] = NULL;
     }
   }
 #else
@@ -682,13 +682,13 @@ void update_curves ()
 #ifdef NEW_ANA
     for (j=0; j<NCALCS; j++)
     {
-      for (k=0; k<this_proj -> analysis[j].numc; k++)
+      for (k=0; k<this_proj -> analysis[j] -> numc; k++)
       {
-        if (this_proj -> analysis[j].curves[k] -> plot != NULL)
+        if (this_proj -> analysis[j] -> curves[k] -> plot != NULL)
         {
-          if (is_the_widget_visible(this_proj -> analysis[j].curves[k] -> plot))
+          if (is_the_widget_visible(this_proj -> analysis[j] -> curves[k] -> plot))
           {
-            gtk_widget_queue_draw (this_proj -> analysis[j].curves[k] -> plot);
+            gtk_widget_queue_draw (this_proj -> analysis[j] -> curves[k] -> plot);
           }
         }
       }

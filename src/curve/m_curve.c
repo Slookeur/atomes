@@ -229,7 +229,7 @@ void action_to_plot (gpointer data)
   gboolean remove = FALSE;
   project * this_proj = get_project_by_id (activeg);
 #ifdef NEW_ANA
-  Curve * this_curve = this_proj -> analysis[activer].curves[activec];
+  Curve * this_curve = this_proj -> analysis[activer] -> curves[activec];
 #else
   Curve * this_curve = this_proj -> curves[activer][activec];
 #endif
@@ -259,8 +259,8 @@ void action_to_plot (gpointer data)
     add_extra (this_curve -> extrac, id);
   }
 #ifdef NEW_ANA
-  curve_window_add_menu_bar (& this_proj -> analysis[activer].idcc[activec]);
-  update_curve ((gpointer)& this_proj -> analysis[activer].idcc[activec]);
+  curve_window_add_menu_bar (& this_proj -> analysis[activer] -> idcc[activec]);
+  update_curve ((gpointer)& this_proj -> analysis[activer] -> idcc[activec]);
 #else
   curve_window_add_menu_bar (& this_proj -> idcc[activer][activec]);
   update_curve ((gpointer)& this_proj -> idcc[activer][activec]);
@@ -355,7 +355,7 @@ gboolean was_not_added (ExtraSets * sets, int a, int b, int c)
     if (ctmp -> id.a == a && ctmp -> id.b == b)
     {
 #ifdef NEW_ANA
-      for (j=0; j<get_project_by_id(a) -> analysis[b].numc; j++)
+      for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
 #else
       for (j=0; j<get_project_by_id(a) -> numc[b]; j++)
 #endif
@@ -390,13 +390,13 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
   project * this_proj = get_project_by_id(a);
   int i;
 #ifdef NEW_ANA
-  for (i=0; i<this_proj -> analysis[b].numc; i++)
+  for (i=0; i<this_proj -> analysis[b] -> numc; i++)
   {
-    if (this_proj -> analysis[b].curves[i] -> ndata > 0)
+    if (this_proj -> analysis[b] -> curves[i] -> ndata > 0)
     {
       if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
       {
-        str_a = g_strdup_printf ("%s", this_proj -> analysis[b].curves[i] -> name);
+        str_a = g_strdup_printf ("%s", this_proj -> analysis[b] -> curves[i] -> name);
 #else
   for (i=0; i<this_proj -> numc[b]; i++)
   {
@@ -414,11 +414,11 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
 #ifdef NEW_ANA
         if (edit)
         {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b].idcc[i], FALSE, FALSE, FALSE, NULL);
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
         }
         else
         {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b].idcc[i], FALSE, FALSE, FALSE, NULL);
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
         }
 #else
         if (edit)
@@ -472,19 +472,19 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
       k = (data -> b == SQ) ? SK : SQ;
     }
 #ifdef NEW_ANA
-    if (((add && extrarid[i][data -> b] < this_proj -> analysis[data -> b].numc)
-    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b].calc_ok)
+    if (((add && extrarid[i][data -> b] < this_proj -> analysis[data -> b] -> numc)
+    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b] -> calc_ok)
     {
       create_menu[i][data -> b] = TRUE;
       create_proj[i] = TRUE;
     }
 
-    if (j && this_proj -> analysis[k].calc_ok)
+    if (j && this_proj -> analysis[k] -> calc_ok)
     {
       create_menu[i][k] = FALSE;
-      if (this_proj -> analysis[k].curves[0] -> ndata > 0)
+      if (this_proj -> analysis[k] -> curves[0] -> ndata > 0)
       {
-        if ((add && extrarid[i][k] < this_proj -> analysis[k].numc)
+        if ((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
         || (! add && extrarid[i][k] > 0))
         {
           create_menu[i][k] = TRUE;
@@ -784,7 +784,7 @@ GtkWidget * curve_popup_menu (gpointer data)
   }
   prep_extra_rid (cstate -> id);
 #ifdef NEW_ANA
-  Curve * this_curve = get_project_by_id(cstate -> id -> a) -> analysis[cstate -> id -> b].curves[cstate -> id -> c];
+  Curve * this_curve = get_project_by_id(cstate -> id -> a) -> analysis[cstate -> id -> b] -> curves[cstate -> id -> c];
 #else
   Curve * this_curve = get_project_by_id(cstate -> id -> a) -> curves[cstate -> id -> b][cstate -> id -> c];
 #endif
@@ -796,14 +796,14 @@ GtkWidget * curve_popup_menu (gpointer data)
   for ( j=0 ; j < nprojects; j++ )
   {
 #ifdef NEW_ANA
-    i += get_project_by_id(j) -> analysis[cstate -> id -> b].numc;
+    i += get_project_by_id(j) -> analysis[cstate -> id -> b] -> numc;
 #else
     i += get_project_by_id(j) -> numc[cstate -> id -> b];
 #endif
     if (cstate -> id -> b == GR || cstate -> id -> b == GK)
     {
 #ifdef NEW_ANA
-      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == GR) ? GK : GR].numc;
+      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == GR) ? GK : GR] -> numc;
 #else
       i += get_project_by_id(j) -> numc[(cstate -> id -> b == GR) ? GK : GR];
 #endif
@@ -811,7 +811,7 @@ GtkWidget * curve_popup_menu (gpointer data)
     else if (cstate -> id -> b == SQ || cstate -> id -> b == SK)
     {
 #ifdef NEW_ANA
-      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == SQ) ? SK : SQ].numc;
+      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == SQ) ? SK : SQ] -> numc;
 #else
       i += get_project_by_id(j) -> numc[(cstate -> id -> b == SQ) ? SK : SQ];
 #endif

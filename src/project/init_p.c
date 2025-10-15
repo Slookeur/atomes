@@ -71,9 +71,9 @@ void init_curves_and_calc (project * this_proj)
   for (i=0; i<NGRAPHS; i++)
   {
 #ifdef NEW_ANA
-    this_proj -> analysis[i].avail_ok = FALSE;
-    this_proj -> analysis[i].init_ok = FALSE;
-    this_proj -> analysis[i].calc_ok = FALSE;
+    this_proj -> analysis[i] -> avail_ok = FALSE;
+    this_proj -> analysis[i] -> init_ok = FALSE;
+    this_proj -> analysis[i] -> calc_ok = FALSE;
 #else
     this_proj -> runok[i] = FALSE;
     this_proj -> initok[i] = FALSE;
@@ -97,10 +97,18 @@ void apply_default_parameters_to_project (project * this_proj)
   {
     this_proj -> chemistry -> grtotcutoff = default_totcut;
   }
+#ifdef NEW_ANA
+  /* for (i=0; i<6; i++) this_proj -> analysis[i] -> num_delta = default_num_delta[i];
+  this_proj -> analysis[SP] -> num_delta = default_num_delta[6];
+  this_proj -> analysis[MS] -> num_delta = default_num_delta[7];
+  this_proj -> analysis[MS] -> delta = default_delta_t[0]; */
+#else
   for (i=0; i<6; i++) this_proj -> num_delta[i] = default_num_delta[i];
   this_proj -> num_delta[SP] = default_num_delta[6];
   this_proj -> num_delta[MS] = default_num_delta[7];
   this_proj -> delta[MS] = default_delta_t[0];
+#endif // NEW_ANA
+
   for (i=0; i<5; i++)
   {
     this_proj -> rsparam[i][0] = default_rsparam[1];
@@ -168,7 +176,7 @@ void apply_default_parameters_to_project (project * this_proj)
 */
 void init_project (gboolean alloc_box)
 {
-  project * new_proj = g_malloc0 (sizeof*proj);
+  project * new_proj = g_malloc0 (sizeof*new_proj);
   nprojects ++;
   activep = nprojects - 1;
   new_proj -> id = activep;

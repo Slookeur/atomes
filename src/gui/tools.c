@@ -138,22 +138,22 @@ void fill_tool_model ()
 #ifdef NEW_ANA
         if (active_project -> analysis)
         {
-          // if (active_project -> analysis[i] != NULL)
+          if (active_project -> analysis[i])
           {
-            if (active_project -> analysis[i].numc > 0 && active_project -> analysis[i].calc_ok)
+            if (active_project -> analysis[i] -> numc > 0 && active_project -> analysis[i] -> calc_ok)
             {
-              for (j=0; j<active_project -> analysis[i].numc; j++)
+              for (j=0; j<active_project -> analysis[i] -> numc; j++)
               {
-                if (active_project -> analysis[i].curves[j] -> name && active_project -> analysis[i].curves[j] -> ndata)
+                if (active_project -> analysis[i] -> curves[j] -> name && active_project -> analysis[i] -> curves[j] -> ndata)
                 {
                   gtk_tree_store_append (tool_model, & curve_level, & calc_level);
                   status = FALSE;
-                  str = g_strdup_printf ("%s", active_project -> analysis[i].curves[j] -> name);
-                  if (active_project -> analysis[i].curves[j] -> window != NULL)
+                  str = g_strdup_printf ("%s", active_project -> analysis[i] -> curves[j] -> name);
+                  if (active_project -> analysis[i] -> curves[j] -> window != NULL)
                   {
-                    if (GTK_IS_WIDGET(active_project -> analysis[i].curves[j] -> window))
+                    if (GTK_IS_WIDGET(active_project -> analysis[i] -> curves[j] -> window))
                     {
-                      if (gtk_widget_get_visible(active_project -> analysis[i].curves[j] -> window)) status = TRUE;
+                      if (gtk_widget_get_visible(active_project -> analysis[i] -> curves[j] -> window)) status = TRUE;
                     }
                   }
                   gtk_tree_store_set (tool_model, & curve_level, 0, i, 1, j, 3, str, 4, status, -1);
@@ -223,10 +223,10 @@ void tool_set_visible (GtkTreeViewColumn * col,
   else if (j > -1 && active_project -> numwid > 0)
   {
 #ifdef NEW_ANA
-    if (active_project -> analysis[j].numc)
+    if (active_project -> analysis[j] -> numc)
     {
       gtk_tree_model_get (mod, iter, 1, & k, -1);
-      if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j].curves[k] -> ndata);
+      if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j] -> curves[k] -> ndata);
     }
 #else
     if (active_project -> numc[j])
@@ -295,18 +295,18 @@ G_MODULE_EXPORT void toggle_show_hide_curve (GtkCellRendererToggle * cell_render
 #ifdef NEW_ANA
   if (! k)
   {
-    if (active_project -> analysis[i].curves[j] -> window == NULL)
+    if (active_project -> analysis[i] -> curves[j] -> window == NULL)
     {
-      active_project -> analysis[i].curves[j] -> window = create_curve (& active_project -> analysis[i].idcc[j]);
-      active_project -> analysis[i].curves[j] -> path = g_strdup_printf ("%s", string_path);
+      active_project -> analysis[i] -> curves[j] -> window = create_curve (& active_project -> analysis[i] -> idcc[j]);
+      active_project -> analysis[i] -> curves[j] -> path = g_strdup_printf ("%s", string_path);
     }
-    show_the_widgets (active_project -> analysis[i].curves[j] -> window);
+    show_the_widgets (active_project -> analysis[i] -> curves[j] -> window);
   }
   else
   {
-    if (active_project -> analysis[i].curves[j] -> window != NULL)
+    if (active_project -> analysis[i] -> curves[j] -> window != NULL)
     {
-      hide_the_widgets (active_project -> analysis[i].curves[j] -> window);
+      hide_the_widgets (active_project -> analysis[i] -> curves[j] -> window);
     }
   }
 #else

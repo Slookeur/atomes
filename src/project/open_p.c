@@ -36,7 +36,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   gchar * read_this_string (FILE * fp);
 
-  void initcnames (int w, int s);
+  void initcnames (int w);
   void allocatoms (project * this_proj);
   void alloc_proj_data (project * this_proj, int cid);
 
@@ -64,6 +64,9 @@ extern void initrng ();
 extern void initchn ();
 extern void initmsd ();
 extern void initsh (int s);
+#ifdef NEW_ANA
+extern void init_atomes_analyses ();
+#endif
 
 gboolean old_la_bo_ax_gr;
 gboolean bad_ogl_axis;
@@ -110,28 +113,27 @@ gchar * read_this_string (FILE * fp)
 
 
 /*!
-  \fn void initcnames (int w, int s)
+  \fn void initcnames (int w)
 
-  \brief initialize curve namees
+  \brief initialize curve names
 
-  \param w calculation id
-  \param s initialize spherical harmonics or not
+  \param cid calculation id
 */
-void initcnames (int w, int s)
+void initcnames (int cid)
 {
-  switch (w)
+  switch (cid)
   {
     case GR:
-      initgr (w);
+      initgr (cid);
       break;
     case SQ:
-      initsq (w);
+      initsq (cid);
       break;
     case SK:
-      initsq (w);
+      initsq (cid);
       break;
     case GK:
-      initgr (w);
+      initgr (cid);
       break;
     case BD:
       initbd ();
@@ -332,10 +334,10 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
 #ifdef NEW_ANA
-  int * tmp_num_delta = allocdouble (NGRAPHS);
+  int * tmp_num_delta = allocint (NGRAPHS);
   double * tmp_delta = allocdouble (NGRAPHS);
-  if (fread (active_project -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (active_project -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (tmp_num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (tmp_delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
 #else
   if (fread (active_project -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
@@ -420,16 +422,19 @@ int open_project (FILE * fp, int npi)
         // Read curves
 #ifdef NEW_ANA
         init_atomes_analyses ();
-        for (i=0; <NGRAPHS; i++)
+        for (i=0; i<NGRAPHS; i++)
         {
-          active_project -> analysis[i].avail_ok = tmp_avail[i];
-          active_project -> analysis[i].init_ok = tmp_init[i];
-          active_project -> analysis[i].calc_ok = tmp_calc[i];
-          active_project -> analysis[i].delta = tmp_delta[i];
-          active_project -> analysis[i].num_delta = tmp_num_delta[i];
-          active_project -> analysis[i].min = tmp_min[i];
-          active_project -> analysis[i].max = tmp_max[i];
-          if (active_project -> analysis[i].avail_ok) initcnames (i, 0);
+          if (active_project -> analysis[i])
+          {
+            active_project -> analysis[i] -> avail_ok = tmp_avail[i];
+            active_project -> analysis[i] -> init_ok = tmp_init[i];
+            active_project -> analysis[i] -> calc_ok = tmp_calc[i];
+            active_project -> analysis[i] -> delta = tmp_delta[i];
+            active_project -> analysis[i] -> num_delta = tmp_num_delta[i];
+            active_project -> analysis[i] -> min = tmp_min[i];
+            active_project -> analysis[i] -> max = tmp_max[i];
+            if (active_project -> analysis[i] -> avail_ok) initcnames (i);
+          }
         }
         g_free (tmp_avail);
         g_free (tmp_init);
@@ -440,7 +445,7 @@ int open_project (FILE * fp, int npi)
         g_free (tmp_max);
 #else
         initcwidgets ();
-        for (i=0; i<NGRAPHS; i++) if (active_project -> initok[i]) initcnames (i, 0);
+        for (i=0; i<NGRAPHS; i++) if (active_project -> initok[i]) initcnames (i);
 #endif
         if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
 #ifdef DEBUG
@@ -453,15 +458,15 @@ int open_project (FILE * fp, int npi)
           if (j)
           {
 #ifdef NEW_ANA
-            active_project -> analysis[SP].numc = j;
+            active_project -> analysis[SP] -> numc = j;
             active_project -> numwid += j;
             alloc_analysis_curves (active_project -> analysis[SP]);
             addcurwidgets (activep, SP, 0);
-            active_project -> analysis[SP].avail_ok = TRUE;
+            active_project -> analysis[SP] -> avail_ok = TRUE;
             for (k=0; k<j; k++)
             {
-              active_project -> analysis[SP].curves[k] -> name = read_this_string (fp);
-              if (active_project -> analysis[SP].curves[k] -> name == NULL) return ERROR_PROJECT;
+              active_project -> analysis[SP] -> curves[k] -> name = read_this_string (fp);
+              if (active_project -> analysis[SP] -> curves[k] -> name == NULL) return ERROR_PROJECT;
             }
 #else
             active_project -> numc[SP] = j;

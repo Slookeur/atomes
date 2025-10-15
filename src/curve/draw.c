@@ -113,7 +113,7 @@ void draw_curve (cairo_t * cr,
   curve_dash * dasht;
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = this_proj -> analysis[rid].curves[cid];
+  this_curve = this_proj -> analysis[rid] -> curves[cid];
 #else
   this_curve = this_proj -> curves[rid][cid];
 #endif
@@ -128,7 +128,7 @@ void draw_curve (cairo_t * cr,
     else
     {
 #ifdef NEW_ANA
-      x = (i+1) * this_proj -> analysis[rid].num_delta * this_proj -> analysis[rid].delta * pow(10, dxlog);
+      x = (i+1) * this_proj -> analysis[rid] -> num_delta * this_proj -> analysis[rid] -> delta * pow(10, dxlog);
 #else
       x = (i+1) * this_proj -> num_delta[rid] * this_proj -> delta[rid] * pow(10, dxlog);
 #endif

@@ -99,7 +99,7 @@ G_MODULE_EXPORT void set_window_size (GtkEntry * maj, gpointer data)
   int i;
   qint * ad = (qint *)data;
 #ifdef NEW_ANA
-  Curve * this_curve = get_project_by_id (ad -> a) -> analysis[ad -> b].curves[ad -> c];
+  Curve * this_curve = get_project_by_id (ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
 #else
   Curve * this_curve = get_project_by_id (ad -> a) -> curves[ad -> b][ad -> c];
 #endif

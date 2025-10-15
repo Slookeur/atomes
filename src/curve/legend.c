@@ -64,7 +64,7 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
   curve_dash * dasht;
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve =  this_proj -> analysis[rid].curves[cid];
+  this_curve =  this_proj -> analysis[rid] -> curves[cid];
 #else
   this_curve = this_proj -> curves[rid][cid];
 #endif
@@ -135,7 +135,7 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
       m = ctmp -> id.c;
 #ifdef NEW_ANA
       str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
-                                        get_project_by_id(k) -> analysis[l].curves[m] -> name);
+                                        get_project_by_id(k) -> analysis[l] -> curves[m] -> name);
 #else
       str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
                                         get_project_by_id(k) -> curves[l][m] -> name);

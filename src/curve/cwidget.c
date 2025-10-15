@@ -63,7 +63,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
   layout -> datacolor.alpha = 1.0;
   layout -> thickness = DTHICK;
 #ifdef NEW_ANA
-  layout -> hwidth = (rid == SP) ? 1.0 : pid -> analysis[rid].delta;
+  layout -> hwidth = (rid == SP) ? 1.0 : pid -> analysis[rid] -> delta;
 #else
   layout -> hwidth = (rid == SP) ? 1.0 : pid -> delta[rid];
 #endif
@@ -122,8 +122,8 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
   if (rid < RI || rid == MS)
   {
 #ifdef NEW_ANA
-    this_curve -> cmin[0] = this_proj -> analysis[rid].min;
-    this_curve -> cmax[0] = active_project -> max[rid];
+    this_curve -> cmin[0] = this_proj -> analysis[rid] -> min;
+    this_curve -> cmax[0] = this_proj ->  analysis[rid] -> max;
 #else
     this_curve -> cmin[0] = this_proj -> min[rid];
     this_curve -> cmax[0] = this_proj -> max[rid];
@@ -142,7 +142,11 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
   }
   else
   {
+#ifdef NEW_ANA
+    if (cid < active_project -> analysis[MS] -> numc - 6)
+#else
     if (cid < active_project -> numc[MS] - 6)
+#endif // NEW_ANA
     {
       this_curve -> scale[0] = 1;
       this_curve -> scale[1] = 1;
@@ -168,7 +172,7 @@ void initcurve (project * pid, int rid, int cid)
 {
   int k;
 #ifdef NEW_ANA
-  Curve * this_curve = pid -> analysis[rid].curve[cid];
+  Curve * this_curve = pid -> analysis[rid] -> curves[cid];
 #else
   Curve * this_curve = pid -> curves[rid][cid];
 #endif
@@ -274,25 +278,25 @@ void addcurwidgets (int pid, int rid, int str)
   int j, k;
   project * this_proj = get_project_by_id(pid);
 #ifdef NEW_ANA
-  for (j=0; j<this_proj -> analysis[rid].numc; j++)
+  for (j=0; j<this_proj -> analysis[rid] -> numc; j++)
   {
-    this_proj -> analysis[rid].curves[j] -> cid = j;
-    this_proj -> analysis[rid].idcc[j].a = pid;
-    this_proj -> analysis[rid].idcc[j].b = rid;
-    this_proj -> analysis[rid].idcc[j].c = j;
-    if (str == 0 || this_proj -> analysis[rid].curves[j] -> ndata == 0)
+    this_proj -> analysis[rid] -> curves[j] -> cid = j;
+    this_proj -> analysis[rid] -> idcc[j].a = pid;
+    this_proj -> analysis[rid] -> idcc[j].b = rid;
+    this_proj -> analysis[rid] -> idcc[j].c = j;
+    if (str == 0 || this_proj -> analysis[rid] -> curves[j] -> ndata == 0)
     {
       initcurve (this_proj, rid, j);
     }
-    if (this_proj -> analysis[rid].curves[j] -> default_title)
+    if (this_proj -> analysis[rid] -> curves[j] -> default_title)
     {
-      this_proj -> analysis[rid].curves[j] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[rid].curves[j] -> name);
+      this_proj -> analysis[rid] -> curves[j] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[rid] -> curves[j] -> name);
     }
     for (k=0; k<2; k++)
     {
-      if (this_proj -> analysis[rid].curves[j] -> axis_defaut_title[k])
+      if (this_proj -> analysis[rid] -> curves[j] -> axis_defaut_title[k])
       {
-        this_proj -> analysis[rid].curves[j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> analysis[rid].idcc[j]));
+        this_proj -> analysis[rid] -> curves[j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> analysis[rid] -> idcc[j]));
       }
     }
   }

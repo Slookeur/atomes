@@ -1679,13 +1679,13 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   {
 
 #ifdef NEW_ANA
-    active_project -> analysis[GR].avail_ok = TRUE;
-    active_project -> analysis[GK].avail_ok = TRUE;
-    active_project -> analysis[BD].avail_ok = TRUE;
-    active_project -> analysis[AN].avail_ok = TRUE;
-    active_project -> analysis[RI].avail_ok = TRUE;
-    active_project -> analysis[CH].avail_ok = TRUE;
-    active_project -> analysis[SP].avail_ok = TRUE;
+    active_project -> analysis[GR] -> avail_ok = TRUE;
+    active_project -> analysis[GK] -> avail_ok = TRUE;
+    active_project -> analysis[BD] -> avail_ok = TRUE;
+    active_project -> analysis[AN] -> avail_ok = TRUE;
+    active_project -> analysis[RI] -> avail_ok = TRUE;
+    active_project -> analysis[CH] -> avail_ok = TRUE;
+    active_project -> analysis[SP] -> avail_ok = TRUE;
 #else
     for (i=0; i<3; i=i+2) active_project -> runok[i] = TRUE;
     active_project -> runok[BD] = TRUE;
@@ -1706,7 +1706,11 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       active_image -> style = (active_project -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
       initcutoffs (active_chem, active_project -> nspec);
       init_curves_and_calc (active_project);
+#ifdef NEW_ANA
+     init_atomes_analyses ();
+#else
       initcwidgets ();
+#endif // NEW_ANA
       active_project_changed (activep);
       init_camera (active_project, TRUE);
       setup_default_lights (active_project, active_image);

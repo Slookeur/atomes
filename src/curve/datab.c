@@ -134,8 +134,8 @@ void save_row (gpointer data, gpointer user_data)
   if (gtk_tree_model_get_iter (curve_model, & row, path))
   {
 #ifdef NEW_ANA
-    gtk_tree_model_get (curve_model, & row, 1, & get_project_by_id(id -> a) -> analysis[id -> b].curves[id -> c] -> data[0][nrows],
-                                            2, & get_project_by_id(id -> a) -> analysis[id -> b].curves[id -> c] -> data[1][nrows], -1);
+    gtk_tree_model_get (curve_model, & row, 1, & get_project_by_id(id -> a) -> analysis[id -> b] -> curves[id -> c] -> data[0][nrows],
+                                            2, & get_project_by_id(id -> a) -> analysis[id -> b] -> curves[id -> c] -> data[1][nrows], -1);
 #else
     gtk_tree_model_get (curve_model, & row, 1, & get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> data[0][nrows],
                                             2, & get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> data[1][nrows], -1);
@@ -210,7 +210,7 @@ void add_to_last_col (double cte, gpointer data)
   qint * dat = (qint *)data;
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = get_project_by_id (((tint *)data) -> a) -> analysis[dat -> b].curves[dat -> c];
+  this_curve = get_project_by_id (((tint *)data) -> a) -> analysis[dat -> b] -> curves[dat -> c];
 #else
   this_curve = get_project_by_id (((tint *)data) -> a) -> curves[dat -> b][dat -> c];
 #endif
@@ -255,7 +255,7 @@ void multiply_last_col (double cte, gpointer data)
   qint * dat = (qint *)data;
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = get_project_by_id (dat -> a) -> analysis[dat -> b].curves[dat -> c];
+  this_curve = get_project_by_id (dat -> a) -> analysis[dat -> b] -> curves[dat -> c];
 #else
   this_curve = get_project_by_id (dat -> a) -> curves[dat -> b][dat -> c];
 #endif
@@ -425,7 +425,7 @@ G_MODULE_EXPORT void edit_cell (GtkCellRendererText * cell, gchar * path_string,
   qint * id = (qint *)user_data;
   project * this_proj = get_project_by_id (id -> a);
 #ifdef NEW_ANA
-  curve_model = gtk_tree_view_get_model(GTK_TREE_VIEW(this_proj -> analysis[id -> b].curves[id -> c] -> datatree));
+  curve_model = gtk_tree_view_get_model(GTK_TREE_VIEW(this_proj -> analysis[id -> b] -> curves[id -> c] -> datatree));
 #else
   curve_model = gtk_tree_view_get_model(GTK_TREE_VIEW(this_proj -> curves[id -> b][id -> c] -> datatree));
 #endif
@@ -488,7 +488,7 @@ void add_to_column (gpointer data)
   gchar * str;
   qint * dat = (qint *)data;
 #ifdef NEW_ANA
-  wind = dialogmodal ("Add constant to column", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b].curves[dat -> c] -> window));
+  wind = dialogmodal ("Add constant to column", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
 #else
   wind = dialogmodal ("Add constant to column", GTK_WINDOW(get_project_by_id(dat -> a) -> curves[dat -> b][dat -> c] -> window));
 #endif
@@ -545,7 +545,7 @@ void multiply_column (gpointer data)
   gchar * str;
   qint * dat = (qint *)data;
 #ifdef NEW_ANA
-  wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b].curves[dat -> c] -> window));
+  wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
 #else
   wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> curves[dat -> b][dat -> c] -> window));
 #endif // NEW_ANA
@@ -882,13 +882,13 @@ static void fill_data_model (GtkListStore * store, project * this_proj, int b, i
   GtkTreeIter datalevel;
   int i;
 #ifdef NEW_ANA
-  for (i=0; i<this_proj -> analysis[b].curves[c] -> ndata; i++)
+  for (i=0; i<this_proj -> analysis[b] -> curves[c] -> ndata; i++)
   {
     gtk_list_store_append (store, & datalevel);
     gtk_list_store_set (store, & datalevel,
                         0, i+1,
-                        1, this_proj -> analysis[b].curves[c] -> data[0][i],
-                        2, this_proj -> analysis[b].curves[c] -> data[1][i], -1);
+                        1, this_proj -> analysis[b] -> curves[c] -> data[0][i],
+                        2, this_proj -> analysis[b] -> curves[c] -> data[1][i], -1);
   }
 #else
   for (i=0; i<this_proj -> curves[b][c] -> ndata; i++)
@@ -924,7 +924,7 @@ GtkWidget * setview (project * this_proj, int b, int c)
   int i;
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = this_proj -> analysis[b].curves[c];
+  this_curve = this_proj -> analysis[b] -> curves[c];
 #else
   this_curve = this_proj -> curves[b][c];
 #endif
@@ -997,7 +997,7 @@ void cancel_changes (GtkWidget * widg, gpointer data)
   tint * id = (tint *)data;
   destroy_this_widget (widg);
 #ifdef NEW_ANA
-  get_project_by_id(id -> a) -> analysis[id -> b].curves[id -> c] -> datatree = NULL;
+  get_project_by_id(id -> a) -> analysis[id -> b] -> curves[id -> c] -> datatree = NULL;
 #else
   get_project_by_id(id -> a) -> curves[id -> b][id -> c] -> datatree = NULL;
 #endif
@@ -1057,7 +1057,7 @@ G_MODULE_EXPORT void validate_changes (GtkButton * but, gpointer data)
   project * this_proj = get_project_by_id(id -> a);
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = this_proj -> analysis[id -> b].curves[id -> c];
+  this_curve = this_proj -> analysis[id -> b] -> curves[id -> c];
 #else
   this_curve = this_proj -> curves[id -> b][id -> c];
 #endif
@@ -1093,7 +1093,7 @@ void edit_data (gpointer data)
   project * this_proj = get_project_by_id(id -> a);
   Curve * this_curve;
 #ifdef NEW_ANA
-  this_curve = this_proj -> analysis[id -> b].curves[id -> c];
+  this_curve = this_proj -> analysis[id -> b] -> curves[id -> c];
 #else
   this_curve = this_proj -> curves[id -> b][id -> c];
 #endif

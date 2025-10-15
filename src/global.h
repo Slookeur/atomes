@@ -37,6 +37,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #endif
 
 #define GDK_SYNCHRONIZE
+#define NEW_ANA
 
 #ifndef GLOBAL_H_
 
@@ -695,6 +696,7 @@ struct Curve
   GSimpleActionGroup * action_group;
 };
 
+#ifdef NEW_ANA
 /*! \typedef atomes_analysis
 
   \brief analysis data structure
@@ -706,10 +708,12 @@ struct atomes_analysis
      Analysis related parameters
   */
   int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,ω) */
+  gchar * name;                /*!< Analysis name for menu item */
   gboolean avail_ok;           /*!< Analysis calculation availability */
   gboolean init_ok;            /*!< Curves initialization */
   gboolean calc_ok;            /*!< Analysis calculation confirmation */
   gboolean requires_md;        /*!< Analysis requires multiple configurations */
+  gchar * x_title;             /*!< x axis default title, ex: "r [Å] */
   int num_delta;               /*!< Discretization */
   double calc_time;            /*!< Calculation time */
   double delta;                /*!< Discretization */
@@ -724,6 +728,7 @@ struct atomes_analysis
   Curve ** curves;             /*!< The curves, graph for the results of the calculations, if any */
   tint * idcc;                 /*!< Pointers for the curves */
 };
+#endif
 
 /*! \def MAXDATC
   \brief Number of tabs for the description of the classical calculation
@@ -998,7 +1003,7 @@ struct project
      Analysis related parameters
   */
 #ifdef NEW_ANA
-  atomes_analysis * analysis;
+  atomes_analysis ** analysis;         /*!< The analysis data and results */
   GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
 #else
   gboolean runok[NGRAPHS];             /*!< Analysis calculation availability */

@@ -461,7 +461,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   for (i=0 ; i<NGRAPHS ; i++)
   {
 #ifdef NEW_ANA
-    this_proj -> analysis[i].calc_ok = FALSE;
+    this_proj -> analysis[i] -> calc_ok = FALSE;
 #else
     this_proj -> visok[i]=FALSE;
 #endif // NEW_ANA
@@ -922,14 +922,18 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
     if (test_vol(active_box -> param, active_box -> vect))
     {
 #ifdef NEW_ANA
-      active_project -> analysis[GR].avail_ok = TRUE;
-      active_project -> analysis[GK].avail_ok = TRUE;
+      active_project -> analysis[GR] -> avail_ok = TRUE;
+      active_project -> analysis[GK] -> avail_ok = TRUE;
 #else
       for (j=0; j<3; j=j+2) active_project -> runok[j] = TRUE;
 #endif
     }
   }
+#ifdef NEW_ANA
+  init_atomes_analyses ();
+#else
   initcwidgets ();
+#endif // NEW_ANA
   active_project -> dmtx = FALSE;
   active_project -> run = (active_project -> natomes) ? TRUE : FALSE;
   chemistry_ () ;

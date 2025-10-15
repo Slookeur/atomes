@@ -87,7 +87,7 @@ int read_project_curve (FILE * fp, int wid, int pid)
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
 #ifdef NEW_ANA
-  Curve * this_curve = this_proj -> analysis[rid].curves[cid];
+  Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
 #else
   Curve * this_curve = this_proj -> curves[rid][cid];
 #endif // NEW_ANA

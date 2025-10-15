@@ -61,21 +61,22 @@ void prep_calc_actions ()
   // Depends on the number of calculations available
   for (i=0; i<G_N_ELEMENTS(analyze_actions); i++)
   {
+#ifdef NEW_ANA
+    if (! active_project -> analysis)
+    {
+      remove_action (analyze_acts[i].action_name);
+    }
+    else
+    {
+#endif
     if (i < AN)
     {
 #ifdef NEW_ANA
-      if (active_project -> analysis)
+      if (active_project -> analysis[i])
       {
-        if (active_project -> analysis[i])
+        if (active_project -> analysis[i] -> avail_ok)
         {
-          if (active_project -> analysis[i].avail_ok)
-          {
-            add_action (analyze_actions[i]);
-          }
-          else
-          {
-            remove_action (analyze_acts[i].action_name);
-          }
+          add_action (analyze_actions[i]);
         }
         else
         {
@@ -95,22 +96,16 @@ void prep_calc_actions ()
       {
         remove_action (analyze_acts[i].action_name);
       }
+#endif
     }
     else
     {
 #ifdef NEW_ANA
-      if (active_project -> analysis)
+      if (active_project -> analysis[i+1])
       {
-        if (active_project -> analysis[i+1])
+        if (active_project -> analysis[i+1] -> avail_ok)
         {
-          if (active_project -> analysis[i+1].avail_ok)
-          {
-            add_action (analyze_actions[i]);
-          }
-          else
-          {
-            remove_action (analyze_acts[i].action_name);
-          }
+          add_action (analyze_actions[i]);
         }
         else
         {
@@ -130,7 +125,11 @@ void prep_calc_actions ()
       {
         remove_action (analyze_acts[i].action_name);
       }
+#endif
     }
+#ifdef NEW_ANA
+  }
+#endif // NEW_ANA
   }
 }
 
@@ -189,8 +188,8 @@ int update_project ()
     if (active_cell -> has_a_box)
     {
 #ifdef NEW_ANA
-      active_project -> analysis[GR].avail_ok = TRUE;
-      active_project -> analysis[SK].avail_ok = TRUE;
+      active_project -> analysis[GR] -> avail_ok = TRUE;
+      active_project -> analysis[SK] -> avail_ok = TRUE;
 #else
       active_project -> runok[GR] = TRUE;
       active_project -> runok[SK] = TRUE;
@@ -199,10 +198,10 @@ int update_project ()
     else
     {
 #ifdef NEW_ANA
-      active_project -> analysis[GR].avail_ok = FALSE;
-      active_project -> analysis[SQ].avail_ok = FALSE;
-      active_project -> analysis[SK].avail_ok = FALSE;
-      active_project -> analysis[SK].avail_ok = FALSE;
+      active_project -> analysis[GR] -> avail_ok = FALSE;
+      active_project -> analysis[SQ] -> avail_ok = FALSE;
+      active_project -> analysis[SK] -> avail_ok = FALSE;
+      active_project -> analysis[SK] -> avail_ok = FALSE;
 #else
       active_project -> runok[GR] = FALSE;
       active_project -> runok[SQ] = FALSE;
@@ -213,12 +212,12 @@ int update_project ()
     if (active_project -> natomes)
     {
 #ifdef NEW_ANA
-      active_project -> analysis[BD].avail_ok = TRUE;
-      active_project -> analysis[AN].avail_ok = TRUE;
-      active_project -> analysis[RI].avail_ok = TRUE;
-      active_project -> analysis[CH].avail_ok = TRUE;
-      active_project -> analysis[SP].avail_ok = TRUE;
-      if (active_project -> steps > 1) active_project -> analysis[MS].avail_ok = TRUE;
+      active_project -> analysis[BD] -> avail_ok = TRUE;
+      active_project -> analysis[AN] -> avail_ok = TRUE;
+      active_project -> analysis[RI] -> avail_ok = TRUE;
+      active_project -> analysis[CH] -> avail_ok = TRUE;
+      active_project -> analysis[SP] -> avail_ok = TRUE;
+      if (active_project -> steps > 1) active_project -> analysis[MS] -> avail_ok = TRUE;
 #else
       active_project -> runok[BD] = TRUE;
       active_project -> runok[AN] = TRUE;

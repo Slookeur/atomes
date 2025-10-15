@@ -55,6 +55,15 @@ extern void clean_this_curve_window (int cid, int rid);
 void clean_curves_data (int calc, int start, int end)
 {
   int i;
+#ifdef NEW_ANA
+  for (i=start; i<end; i++)
+  {
+    if (active_project -> analysis[calc] -> curves)
+    {
+      clean_this_curve_window (i, calc);
+    }
+  }
+#else
   for (i=start; i<end; i++)
   {
     if (active_project -> curves[calc])
@@ -62,6 +71,7 @@ void clean_curves_data (int calc, int start, int end)
       clean_this_curve_window (i, calc);
     }
   }
+#endif // NEW_ANA
 }
 
 #ifndef NEW_ANA
@@ -159,7 +169,7 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
 //  char * bar[2] = {"bond properties", "nearest neigbhors table"};
 //  char * mess;
 #ifdef NEW_ANA
-  if (run < NGRAPHS && run > -1) active_project -> analysis[run].calc_ok = adv;
+  if (run < NGRAPHS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
 #else
   if (run < NGRAPHS && run > -1) active_project -> visok[run] = adv;
 #endif // NEW_ANA
@@ -209,7 +219,7 @@ void alloc_analysis_curves (atomes_analysis * this_analysis)
     g_free (this_analysis -> idcc);
     this_analysis -> idcc = NULL;
   }
-  this_analysis -> idcc = g_malloc0 (this_analysis -> *sizeof*this_analysis -> idcc);
+  this_analysis -> idcc = g_malloc0 (this_analysis -> numc*sizeof*this_analysis -> idcc);
   if (this_analysis -> curves != NULL)
   {
     g_free (this_analysis -> curves);
@@ -238,7 +248,7 @@ void alloc_analysis_curves (atomes_analysis * this_analysis)
 */
 atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
 {
-  atomes_analysis * new_analysis = g_malloc0(sizeof*atomes_analysis);
+  atomes_analysis * new_analysis = g_malloc0(sizeof*new_analysis);
   new_analysis -> name = g_strdup_printf ("%s", name);
   new_analysis -> aid = analysis;
   new_analysis -> requires_md = req_md;
@@ -251,8 +261,9 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
       new_analysis -> numc = num_curves;
       alloc_analysis_curves (new_analysis);
     }
-    if (default_title) analysis -> x_title = g_strdup_printf ("%s", x_title);
+    if (x_title) new_analysis -> x_title = g_strdup_printf ("%s", x_title);
   }
+  return new_analysis;
 }
 
 /*
@@ -281,29 +292,28 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
 void init_atomes_analyses ()
 {
   int i, j;
-  active_project -> total_analysis = NCALCS;
-  active_project -> analysis = g_malloc0(NCALCS*sizeof*active_project -> analysis);
+
   j = active_project -> nspec;
   /* Compatible analysis:
     - always include self, and others if required
     - x axis must be similar or allow comparison (ex: distance)
   */
   int * comp_list;
-
+  active_project -> analysis = g_malloc0(NCALCS*sizeof*active_project -> analysis);
   // g(r)
   comp_list = allocint (2);
   comp_list[0] = GR;
   comp_list[1] = GK;
-  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, FALSE, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, FALSE, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQ;
   comp_list[1] = SK;
-  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, FALSE, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, FALSE, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
@@ -330,7 +340,7 @@ void init_atomes_analyses ()
 
   // Mean square displacement
   comp_list[0] = MS;
-  if (active_project -> steps > 1) active_project -> analisys[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
+  if (active_project -> steps > 1) active_project -> analysis[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
 
   g_free (comp_list);
   /*
@@ -375,7 +385,7 @@ void init_atomes_analyses ()
            active_project -> analysis[ID] = setup_analysis (ID, TRUE, num_graphs, num_compat, {compat_1, compat_2, ...});
 
        - if periodicity is required for this calculation, edit 'edit_menuc.c' edit the 'init_box_calc()' function
-         to add the proper flags for :  'active_project -> analysis[ID].avail_ok'
+         to add the proper flags for :  'active_project -> analysis[ID] -> avail_ok'
 
        - edit the file 'cbuild_action.c' line 1680 to add the default availability for this calculation
        - edit the file 'popup.c' line 2155 to add the default availability for this calculation
@@ -388,6 +398,11 @@ void init_atomes_analyses ()
        - Ultimately: modify the 'preferences.c' file to offer the options to save user preferences for this calculation
 
   */
-  for (i=0; i<NCALCS; i++) active_project -> numwid = active_project -> numwid + active_project -> analysis[i].numc;
+  active_project -> numwid = 0;
+
+  for (i=0; i<NCALCS; i++)
+  {
+    if (active_project -> analysis[i]) active_project -> numwid += active_project -> analysis[i] -> numc;
+  }
 }
 #endif

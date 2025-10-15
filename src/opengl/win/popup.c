@@ -2152,11 +2152,11 @@ void create_new_project_using_data (atom_selection * selection)
     }
   }
 #ifdef NEW_ANA
-  active_project -> analysis[BD].avail_ok = TRUE;
-  active_project -> analysis[AN].avail_ok = TRUE;
-  active_project -> analysis[RI].avail_ok = TRUE;
-  active_project -> analysis[CH].avail_ok = TRUE;
-  active_project -> analysis[SP].avail_ok = TRUE;
+  active_project -> analysis[BD] -> avail_ok = TRUE;
+  active_project -> analysis[AN] -> avail_ok = TRUE;
+  active_project -> analysis[RI] -> avail_ok = TRUE;
+  active_project -> analysis[CH] -> avail_ok = TRUE;
+  active_project -> analysis[SP] -> avail_ok = TRUE;
 #else
   active_project -> runok[BD] = TRUE;
   active_project -> runok[AN] = TRUE;

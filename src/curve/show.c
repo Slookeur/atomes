@@ -227,7 +227,7 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
                   ctmp -> id.b,
                   get_project_by_id(ctmp -> id.a),
 #ifdef NEW_ANA
-                  get_project_by_id(ctmp -> id.a) -> analysis[ctmp -> id.b].scurves[ctmp -> id.c] -> ndata,
+                  get_project_by_id(ctmp -> id.a) -> analysis[ctmp -> id.b] -> curves[ctmp -> id.c] -> ndata,
 #else
                   get_project_by_id(ctmp -> id.a) -> curves[ctmp -> id.b][ctmp -> id.c] -> ndata,
 #endif

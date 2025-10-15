@@ -661,7 +661,7 @@ static void fill_org_model (GtkListStore * store, gpointer data)
     k = ctmp -> id.b;
     l = ctmp -> id.c;
 #ifdef NEW_ANA
-    str = g_strdup_printf ("%s - %s", get_project_by_id(j) -> name, get_project_by_id(j) -> analysis[k].curves[l] -> name);
+    str = g_strdup_printf ("%s - %s", get_project_by_id(j) -> name, get_project_by_id(j) -> analysis[k] -> curves[l] -> name);
 #else
     str = g_strdup_printf ("%s - %s", get_project_by_id(j) -> name, get_project_by_id(j) -> curves[k][l] -> name);
 #endif

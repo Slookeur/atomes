@@ -109,7 +109,7 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
   b = cstate -> id -> b;
   c = cstate -> id -> c;
 #ifdef NEW_ANA
-  Curve * this_curve = get_project_by_id(a) -> analysis[b].curves[c];
+  Curve * this_curve = get_project_by_id(a) -> analysis[b] -> curves[c];
 #else
   Curve * this_curve = get_project_by_id(a) -> curves[b][c];
 #endif

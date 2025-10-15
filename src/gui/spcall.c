@@ -44,7 +44,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "curve.h"
 
+#ifdef NEW_ANA
+extern void alloc_analysis_curves (atomes_analysis * this_analysis);
+#else
 extern void alloc_curves (int c);
+#endif // NEW_ANA
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 
 /*!
@@ -60,20 +64,20 @@ void initsh (int str)
   if (str)
   {
 #ifdef NEW_ANA
-    active_project -> numwid -= active_project -> analysis[SP].numc;
-    active_project -> analysis[SP].numc = active_project -> nspec;
+    active_project -> numwid -= active_project -> analysis[SP] -> numc;
+    active_project -> analysis[SP] -> numc = active_project -> nspec;
     for (i=0; i<active_project -> nspec; i++)
     {
-      active_project -> analysis[SP].numc += active_coord -> ntg[1][i];
+      active_project -> analysis[SP] -> numc += active_coord -> ntg[1][i];
     }
-    alloc_curves (SP);
-    active_project -> numwid += active_project -> analysis[SP].numc;
+    alloc_analysis_curves (active_project -> analysis[SP]);
+    active_project -> numwid += active_project -> analysis[SP] -> numc;
     j = 0;
     for (i = 0 ; i < active_project -> nspec ; i++)
     {
-      active_project -> analysis[SP].curves[i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
+      active_project -> analysis[SP] -> curves[i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
                                                                   active_chem -> label[i],
-                                                                  active_project -> analysis[SP].num_delta);
+                                                                  active_project -> analysis[SP] -> num_delta);
       j += active_coord -> ntg[1][i];
     }
     k = 1;
@@ -81,14 +85,14 @@ void initsh (int str)
     {
       for (j=0 ; j < active_coord -> ntg[1][i]; j++)
       {
-        active_project -> analysis[SP].curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
+        active_project -> analysis[SP] -> curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
                                                                     exact_name(env_name (active_project, j, i, 0, NULL)),
-                                                                               active_project -> analysis[SP].num_delta);
+                                                                               active_project -> analysis[SP] -> num_delta);
       }
       k += active_coord -> ntg[1][i]+1;
     }
     addcurwidgets (activep, SP, 0);
-    active_project -> analysis[SP].init_ok = TRUE;
+    active_project -> analysis[SP] -> init_ok = TRUE;
 #else
     active_project -> numwid -= active_project -> numc[SP];
     active_project -> numc[SP] = active_project -> nspec;
@@ -137,36 +141,36 @@ void update_spherical_view (project * this_proj)
   gchar * tab;
   gchar * cid;
 #ifdef NEW_ANA
-  if (this_proj -> analysis[SP].calc_buffer == NULL) this_proj -> analysis[SP].calc_buffer = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> analysis[SP].calc_buffer);
+  if (this_proj -> analysis[SP] -> calc_buffer == NULL) this_proj -> analysis[SP] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[SP] -> calc_buffer);
 
-  print_info ("\n\nSpherical harmonics\n\n", "heading", this_proj -> analysis[SP].calc_buffer);
+  print_info ("\n\nSpherical harmonics\n\n", "heading", this_proj -> analysis[SP] -> calc_buffer);
   m = 0;
   for (i=0; i<this_proj -> nspec; i++)
   {
-    print_info ("\nResults for the ", NULL, this_proj -> analysis[SP].calc_buffer);
-    print_info (exact_name(active_chem -> label[i]), textcolor(i), this_proj -> analysis[SP].calc_buffer);
-    print_info (" atoms: \n\n", NULL, this_proj -> analysis[SP].calc_buffer);
+    print_info ("\nResults for the ", NULL, this_proj -> analysis[SP] -> calc_buffer);
+    print_info (exact_name(active_chem -> label[i]), textcolor(i), this_proj -> analysis[SP] -> calc_buffer);
+    print_info (" atoms: \n\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
     // Here print average spec info
 
-    print_info ("\tl\t", "bold_italic", this_proj -> analysis[SP].calc_buffer);
-    print_info ("Q(","bold", this_proj -> analysis[SP].calc_buffer);
-    print_info ("l", "bold_italic", this_proj -> analysis[SP].calc_buffer);
-    print_info (")","bold", this_proj -> analysis[SP].calc_buffer);
-    print_info (active_chem -> label[i], textcolor(i), this_proj -> analysis[SP].calc_buffer);
-    print_info ("[All]", "bold", this_proj -> analysis[SP].calc_buffer);
+    print_info ("\tl\t", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("Q(","bold", this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("l", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
+    print_info (")","bold", this_proj -> analysis[SP] -> calc_buffer);
+    print_info (active_chem -> label[i], textcolor(i), this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("[All]", "bold", this_proj -> analysis[SP] -> calc_buffer);
     for (j=0 ; j < active_coord -> ntg[1][i]; j++)
     {
-      print_info ("\tQ(","bold", this_proj -> analysis[SP].calc_buffer);
-      print_info ("l", "bold_italic", this_proj -> analysis[SP].calc_buffer);
-      print_info (")","bold", this_proj -> analysis[SP].calc_buffer);
-      env_name (this_proj, j, i, 1, this_proj -> analysis[SP].calc_buffer);
+      print_info ("\tQ(","bold", this_proj -> analysis[SP] -> calc_buffer);
+      print_info ("l", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
+      print_info (")","bold", this_proj -> analysis[SP] -> calc_buffer);
+      env_name (this_proj, j, i, 1, this_proj -> analysis[SP] -> calc_buffer);
     }
-    print_info ("\n", NULL, this_proj -> analysis[SP].calc_buffer);
+    print_info ("\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
     k = 1;
     tab = NULL;
     cid = NULL;
-    for (j=0; j<this_proj -> num_delta[SP]/2+1 ; j++)
+    for (j=0; j<this_proj -> analysis[SP] -> num_delta/2+1 ; j++)
     {
       k ++;
       if (k - 2*(k/2) == 0)
@@ -179,21 +183,21 @@ void update_spherical_view (project * this_proj)
         tab = NULL;
         cid = g_strdup_printf ("bold");
       }
-      print_info ("\t", NULL, this_proj -> analysis[SP].calc_buffer);
+      print_info ("\t", NULL, this_proj -> analysis[SP] -> calc_buffer);
       if (j < 5)
       {
-        print_info (" ",cid, this_proj -> analysis[SP].calc_buffer);
+        print_info (" ",cid, this_proj -> analysis[SP] -> calc_buffer);
       }
       str = g_strdup_printf("%d", 2*j);
-      print_info (str, cid, this_proj -> analysis[SP].calc_buffer);
+      print_info (str, cid, this_proj -> analysis[SP] -> calc_buffer);
       g_free (str);
       for (l=0; l<active_coord -> ntg[1][i]+1; l++)
       {
-        str = g_strdup_printf("\t%f", this_proj -> analysis[SP].curves[l+m] -> data[1][j]);
-        print_info (str, tab, this_proj -> analysis[SP].calc_buffer);
+        str = g_strdup_printf("\t%f", this_proj -> analysis[SP] -> curves[l+m] -> data[1][j]);
+        print_info (str, tab, this_proj -> analysis[SP] -> calc_buffer);
         g_free (str);
       }
-      print_info ("\n", NULL, this_proj -> analysis[SP].calc_buffer);
+      print_info ("\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
       if (tab != NULL)
       {
         g_free (tab);
@@ -206,7 +210,7 @@ void update_spherical_view (project * this_proj)
     m += active_coord -> ntg[1][i]+1;
   }
 
-  print_info (calculation_time(TRUE, this_proj -> calc_time[SP]), NULL, this_proj -> analysis[SP].calc_buffer);
+  print_info (calculation_time(TRUE, this_proj -> analysis[SP] -> calc_time), NULL, this_proj -> analysis[SP] -> calc_buffer);
 #else
   if (this_proj -> text_buffer[SP+OT] == NULL) this_proj -> text_buffer[SP+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[SP+OT]);
@@ -293,16 +297,16 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SP].init_ok) initsh(1);
+  if (! active_project -> analysis[SP] -> init_ok) initsh(1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)
   {
-    clean_curves_data (SP, 0, active_project -> analysis[SP].numc);
+    clean_curves_data (SP, 0, active_project -> analysis[SP] -> numc);
     prepostcalc (widg, FALSE, SP, 0, opac);
     k = 0;
     l = active_project -> nspec;
-    m = active_project -> analysis[SP].num_delta;
+    m = active_project -> analysis[SP] -> num_delta;
     clock_gettime (CLOCK_MONOTONIC, & start_time);
     for (i=0; i<active_project -> nspec; i++)
     {
@@ -314,8 +318,8 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
       }
     }
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SP].calc_time = get_calc_time (start_time, stop_time);
-    if (l != active_project -> analysis[SP].numc)
+    active_project -> analysis[SP] -> calc_time = get_calc_time (start_time, stop_time);
+    if (l != active_project -> analysis[SP] -> numc)
 #else
   if (! active_project -> initok[SP]) initsh(1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
