@@ -64,10 +64,30 @@ void prep_calc_actions ()
     if (i < AN)
     {
 #ifdef NEW_ANA
-      if (active_project -> analysis[i] -> avail_ok)
+      if (active_project -> analysis)
+      {
+        if (active_project -> analysis[i])
+        {
+          if (active_project -> analysis[i].avail_ok)
+          {
+            add_action (analyze_actions[i]);
+          }
+          else
+          {
+            remove_action (analyze_acts[i].action_name);
+          }
+        }
+        else
+        {
+          remove_action (analyze_acts[i].action_name);
+        }
+      }
+      else
+      {
+        remove_action (analyze_acts[i].action_name);
+      }
 #else
       if (active_project -> runok[i])
-#endif
       {
         add_action (analyze_actions[i]);
       }
@@ -79,10 +99,30 @@ void prep_calc_actions ()
     else
     {
 #ifdef NEW_ANA
-      if (active_project -> analysis[i+1] -> avail_ok)
+      if (active_project -> analysis)
+      {
+        if (active_project -> analysis[i+1])
+        {
+          if (active_project -> analysis[i+1].avail_ok)
+          {
+            add_action (analyze_actions[i]);
+          }
+          else
+          {
+            remove_action (analyze_acts[i].action_name);
+          }
+        }
+        else
+        {
+          remove_action (analyze_acts[i].action_name);
+        }
+      }
+      else
+      {
+        remove_action (analyze_acts[i].action_name);
+      }
 #else
       if (active_project -> runok[i+1])
-#endif
       {
         add_action (analyze_actions[i]);
       }
@@ -149,8 +189,8 @@ int update_project ()
     if (active_cell -> has_a_box)
     {
 #ifdef NEW_ANA
-      active_prokject -> analysis[GR].avail_ok = TRUE;
-      active_prokject -> analysis[SK].avail_ok = TRUE;
+      active_project -> analysis[GR].avail_ok = TRUE;
+      active_project -> analysis[SK].avail_ok = TRUE;
 #else
       active_project -> runok[GR] = TRUE;
       active_project -> runok[SK] = TRUE;
@@ -159,10 +199,10 @@ int update_project ()
     else
     {
 #ifdef NEW_ANA
-      active_prokject -> analysis[GR].avail_ok = FALSE;
-      active_prokject -> analysis[SQ].avail_ok = FALSE;
-      active_prokject -> analysis[SK].avail_ok = FALSE;
-      active_prokject -> analysis[SK].avail_ok = FALSE;
+      active_project -> analysis[GR].avail_ok = FALSE;
+      active_project -> analysis[SQ].avail_ok = FALSE;
+      active_project -> analysis[SK].avail_ok = FALSE;
+      active_project -> analysis[SK].avail_ok = FALSE;
 #else
       active_project -> runok[GR] = FALSE;
       active_project -> runok[SQ] = FALSE;

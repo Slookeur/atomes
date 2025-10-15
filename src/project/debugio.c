@@ -53,117 +53,122 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 void debugiocurve (project * this_proj, gboolean win, int rid, int cid, gchar * iost)
 {
+#ifdef NEW_ANA
+  Curve * this_curve = this_proj -> analysis[rid].curves[cid];
+#else
+  Curve * this_curve = this_proj -> curves[rid][cid];
+#endif // NEW_ANA
   g_debug (" ");
   g_debug ("IODEBUG: %s: pid= %d, rid= %d, cid= %d", iost, this_proj -> id, rid, cid);
-  g_debug ("IODEBUG: %s: ndata= %d", iost, this_proj -> curves[rid][cid] -> ndata);
-  if (this_proj -> curves[rid][cid] -> data[0] == NULL)
+  g_debug ("IODEBUG: %s: ndata= %d", iost, this_curve -> ndata);
+  if (this_curve -> data[0] == NULL)
   {
     g_debug ("IODEBUG: %s: data[0] == NULL", iost);
   }
-  g_debug ("IODEBUG: %s: x[0]= %f", iost, this_proj -> curves[rid][cid] -> data[0][0]);
-  g_debug ("IODEBUG: %s: y[0]= %f", iost, this_proj -> curves[rid][cid] -> data[1][0]);
-  g_debug ("IODEBUG: %s: x[ndata-1]= %f", iost, this_proj -> curves[rid][cid] -> data[0][this_proj -> curves[rid][cid] -> ndata - 1]);
-  g_debug ("IODEBUG: %s: y[ndata-1]= %f", iost, this_proj -> curves[rid][cid] -> data[1][this_proj -> curves[rid][cid] -> ndata - 1]);
+  g_debug ("IODEBUG: %s: x[0]= %f", iost, this_curve -> data[0][0]);
+  g_debug ("IODEBUG: %s: y[0]= %f", iost, this_curve -> data[1][0]);
+  g_debug ("IODEBUG: %s: x[ndata-1]= %f", iost, this_curve -> data[0][this_curve -> ndata - 1]);
+  g_debug ("IODEBUG: %s: y[ndata-1]= %f", iost, this_curve -> data[1][this_curve -> ndata - 1]);
   if (win)
   {
     g_debug ("IODEBUG: %s: cmax[0]= %f, cmax[1]= %f", iost,
-                          this_proj -> curves[rid][cid] -> cmax[0], this_proj -> curves[rid][cid] -> cmax[1]);
-    g_debug ("IODEBUG: %s: name= %s", iost, this_proj -> curves[rid][cid] -> name);
-    g_debug ("IODEBUG: %s: show_title= %d", iost, this_proj -> curves[rid][cid] -> show_title);
-    g_debug ("IODEBUG: %s: default_title= %d", iost, this_proj -> curves[rid][cid] -> default_title);
-    g_debug ("IODEBUG: %s: title= %s", iost, this_proj -> curves[rid][cid] -> title);
-    g_debug ("IODEBUG: %s: title_font= %s", iost, this_proj -> curves[rid][cid] -> title_font);
+                          this_curve -> cmax[0], this_curve -> cmax[1]);
+    g_debug ("IODEBUG: %s: name= %s", iost, this_curve -> name);
+    g_debug ("IODEBUG: %s: show_title= %d", iost, this_curve -> show_title);
+    g_debug ("IODEBUG: %s: default_title= %d", iost, this_curve -> default_title);
+    g_debug ("IODEBUG: %s: title= %s", iost, this_curve -> title);
+    g_debug ("IODEBUG: %s: title_font= %s", iost, this_curve -> title_font);
     g_debug ("IODEBUG: %s: title_pos[0]= %f, title_pos[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> title_pos[0], this_proj -> curves[rid][cid] -> title_pos[1]);
+             this_curve -> title_pos[0], this_curve -> title_pos[1]);
     g_debug ("IODEBUG: %s: title.red= %f, title.green= %f, title.blue= %f", iost,
-             this_proj -> curves[rid][cid] -> title_color.red,
-             this_proj -> curves[rid][cid] -> title_color.green,
-             this_proj -> curves[rid][cid] -> title_color.blue);
+             this_curve -> title_color.red,
+             this_curve -> title_color.green,
+             this_curve -> title_color.blue);
     // Axis
     g_debug ("IODEBUG: %s: axmin[0]= %f, axmin[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> axmin[0], this_proj -> curves[rid][cid] -> axmin[1]);
+             this_curve -> axmin[0], this_curve -> axmin[1]);
     g_debug ("IODEBUG: %s: axmax[0]= %f, axmax[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> axmax[0], this_proj -> curves[rid][cid] -> axmax[1]);
-    g_debug ("IODEBUG: %s: x_axis_title= %s", iost, this_proj -> curves[rid][cid] -> axis_title[0]);
-    g_debug ("IODEBUG: %s: x_axis_title_font= %s", iost, this_proj -> curves[rid][cid] -> axis_title_font[0]);
+             this_curve -> axmax[0], this_curve -> axmax[1]);
+    g_debug ("IODEBUG: %s: x_axis_title= %s", iost, this_curve -> axis_title[0]);
+    g_debug ("IODEBUG: %s: x_axis_title_font= %s", iost, this_curve -> axis_title_font[0]);
     g_debug ("IODEBUG: %s: x_axis_title_pos[0]= %d, x_axis_title_pos[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> axis_title_x[0], this_proj -> curves[rid][cid] -> axis_title_y[0]);
-    g_debug ("IODEBUG: %s: y_axis_title= %s", iost, this_proj -> curves[rid][cid] -> axis_title[1]);
-    g_debug ("IODEBUG: %s: y_axis_title_font= %s", iost, this_proj -> curves[rid][cid] -> axis_title_font[1]);
+             this_curve -> axis_title_x[0], this_curve -> axis_title_y[0]);
+    g_debug ("IODEBUG: %s: y_axis_title= %s", iost, this_curve -> axis_title[1]);
+    g_debug ("IODEBUG: %s: y_axis_title_font= %s", iost, this_curve -> axis_title_font[1]);
     g_debug ("IODEBUG: %s: y_axis_title_pos[0]= %d, y_axis_title_pos[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> axis_title_x[1], this_proj -> curves[rid][cid] -> axis_title_y[1]);
+             this_curve -> axis_title_x[1], this_curve -> axis_title_y[1]);
     g_debug ("IODEBUG: %s: scale[0]= %d, scale[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> scale[0], this_proj -> curves[rid][cid] -> scale[1]);
-    g_debug ("IODEBUG: %s: x_axis_defaut_title= %d", iost, this_proj -> curves[rid][cid] -> axis_defaut_title[0]);
-    g_debug ("IODEBUG: %s: y_axis_defaut_title= %d", iost, this_proj -> curves[rid][cid] -> axis_defaut_title[1]);
+             this_curve -> scale[0], this_curve -> scale[1]);
+    g_debug ("IODEBUG: %s: x_axis_defaut_title= %d", iost, this_curve -> axis_defaut_title[0]);
+    g_debug ("IODEBUG: %s: y_axis_defaut_title= %d", iost, this_curve -> axis_defaut_title[1]);
     g_debug ("IODEBUG: %s: grid[0]= %d, grid[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> show_grid[0], this_proj -> curves[rid][cid] -> show_grid[1]);
+             this_curve -> show_grid[0], this_curve -> show_grid[1]);
     g_debug ("IODEBUG: %s: show_axis[0]= %d, show_axis[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> show_axis[0], this_proj -> curves[rid][cid] -> show_axis[1]);
+             this_curve -> show_axis[0], this_curve -> show_axis[1]);
     g_debug ("IODEBUG: %s: autoscale[0]= %d, autoscale[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> autoscale[0], this_proj -> curves[rid][cid] -> autoscale[1]);
+             this_curve -> autoscale[0], this_curve -> autoscale[1]);
     g_debug ("IODEBUG: %s: majt[0]= %f, majt[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> majt[0], this_proj -> curves[rid][cid] -> majt[1]);
+             this_curve -> majt[0], this_curve -> majt[1]);
     g_debug ("IODEBUG: %s: mint[0]= %d, mint[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> mint[0], this_proj -> curves[rid][cid] -> mint[1]);
+             this_curve -> mint[0], this_curve -> mint[1]);
     g_debug ("IODEBUG: %s: ticks_io[0]= %d, ticks_io[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> ticks_io[0], this_proj -> curves[rid][cid] -> ticks_io[1]);
+             this_curve -> ticks_io[0], this_curve -> ticks_io[1]);
     g_debug ("IODEBUG: %s: ticks_pos[0]= %d, ticks_pos[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> ticks_pos[0], this_proj -> curves[rid][cid] -> ticks_pos[1]);
+             this_curve -> ticks_pos[0], this_curve -> ticks_pos[1]);
     g_debug ("IODEBUG: %s: majt_size[0]= %d, majt_size[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> majt_size[0], this_proj -> curves[rid][cid] -> majt_size[1]);
+             this_curve -> majt_size[0], this_curve -> majt_size[1]);
     g_debug ("IODEBUG: %s: mint_size[0]= %d, mint_size[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> mint_size[0], this_proj -> curves[rid][cid] -> mint_size[1]);
+             this_curve -> mint_size[0], this_curve -> mint_size[1]);
     g_debug ("IODEBUG: %s: labels_pos[0]= %d, labels_pos[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> labels_pos[0], this_proj -> curves[rid][cid] -> labels_pos[1]);
+             this_curve -> labels_pos[0], this_curve -> labels_pos[1]);
     g_debug ("IODEBUG: %s: labels_digit[0]= %d, labels_digit[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> labels_digit[0], this_proj -> curves[rid][cid] -> labels_digit[1]);
+             this_curve -> labels_digit[0], this_curve -> labels_digit[1]);
     g_debug ("IODEBUG: %s: labels_font[0]= %s, labels_font[1]= %s", iost,
-             this_proj -> curves[rid][cid] -> labels_font[0], this_proj -> curves[rid][cid] -> labels_font[1]);
+             this_curve -> labels_font[0], this_curve -> labels_font[1]);
     g_debug ("IODEBUG: %s: labels_angle[0]= %f, labels_angle[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> labels_angle[0], this_proj -> curves[rid][cid] -> labels_angle[1]);
+             this_curve -> labels_angle[0], this_curve -> labels_angle[1]);
     g_debug ("IODEBUG: %s: labels_shift_x[0]= %d, labels_shift_y[0]= %d", iost,
-             this_proj -> curves[rid][cid] -> labels_shift_x[0], this_proj -> curves[rid][cid] -> labels_shift_y[0]);
+             this_curve -> labels_shift_x[0], this_curve -> labels_shift_y[0]);
     g_debug ("IODEBUG: %s: labels_shift_x[1]= %d, labels_shift_y[1]= %d", iost,
-             this_proj -> curves[rid][cid] -> labels_shift_x[1], this_proj -> curves[rid][cid] -> labels_shift_y[1]);
+             this_curve -> labels_shift_x[1], this_curve -> labels_shift_y[1]);
     // Legend
-    g_debug ("IODEBUG: %s: show_legend= %d", iost, this_proj -> curves[rid][cid] -> show_legend);
+    g_debug ("IODEBUG: %s: show_legend= %d", iost, this_curve -> show_legend);
     g_debug ("IODEBUG: %s: legend_pos[0]= %f, legend_pos[1]= %f", iost,
-             this_proj -> curves[rid][cid] -> legend_pos[0], this_proj -> curves[rid][cid] -> legend_pos[1]);
-    g_debug ("IODEBUG: %s: legend_font= %s", iost, this_proj -> curves[rid][cid] -> legend_font);
+             this_curve -> legend_pos[0], this_curve -> legend_pos[1]);
+    g_debug ("IODEBUG: %s: legend_font= %s", iost, this_curve -> legend_font);
     g_debug ("IODEBUG: %s: legend.red= %f, legend.green= %f, legend.blue= %f", iost,
-             this_proj -> curves[rid][cid] -> legend_color.red,
-             this_proj -> curves[rid][cid] -> legend_color.green,
-             this_proj -> curves[rid][cid] -> legend_color.blue);
-    g_debug ("IODEBUG: %s: show_legend_box= %d", iost, this_proj -> curves[rid][cid] -> show_legend_box);
-    g_debug ("IODEBUG: %s: legend_box_dash= %d", iost, this_proj -> curves[rid][cid] -> legend_box_dash);
-    g_debug ("IODEBUG: %s: legend_box_thickness= %f", iost, this_proj -> curves[rid][cid] -> legend_box_thickness);
+             this_curve -> legend_color.red,
+             this_curve -> legend_color.green,
+             this_curve -> legend_color.blue);
+    g_debug ("IODEBUG: %s: show_legend_box= %d", iost, this_curve -> show_legend_box);
+    g_debug ("IODEBUG: %s: legend_box_dash= %d", iost, this_curve -> legend_box_dash);
+    g_debug ("IODEBUG: %s: legend_box_thickness= %f", iost, this_curve -> legend_box_thickness);
     g_debug ("IODEBUG: %s: legend_box.red= %f, legend_box.green= %f, legend_box.blue= %f", iost,
-             this_proj -> curves[rid][cid] -> legend_box_color.red,
-             this_proj -> curves[rid][cid] -> legend_box_color.green,
-             this_proj -> curves[rid][cid] -> legend_box_color.blue);
+             this_curve -> legend_box_color.red,
+             this_curve -> legend_box_color.green,
+             this_curve -> legend_box_color.blue);
     // Frame
-    g_debug ("IODEBUG: %s: show_frame= %d", iost, this_proj -> curves[rid][cid] -> show_frame);
-    g_debug ("IODEBUG: %s: frame_type= %d", iost, this_proj -> curves[rid][cid] -> frame_type);
-    g_debug ("IODEBUG: %s: frame_dash= %d", iost, this_proj -> curves[rid][cid] -> frame_dash);
-    g_debug ("IODEBUG: %s: frame_thickness= %f", iost, this_proj -> curves[rid][cid] -> frame_thickness);
+    g_debug ("IODEBUG: %s: show_frame= %d", iost, this_curve -> show_frame);
+    g_debug ("IODEBUG: %s: frame_type= %d", iost, this_curve -> frame_type);
+    g_debug ("IODEBUG: %s: frame_dash= %d", iost, this_curve -> frame_dash);
+    g_debug ("IODEBUG: %s: frame_thickness= %f", iost, this_curve -> frame_thickness);
     g_debug ("IODEBUG: %s: frame.red= %f, frame.green= %f, frame.blue= %f", iost,
-             this_proj -> curves[rid][cid] -> frame_color.red,
-             this_proj -> curves[rid][cid] -> frame_color.green,
-             this_proj -> curves[rid][cid] -> frame_color.blue);
+             this_curve -> frame_color.red,
+             this_curve -> frame_color.green,
+             this_curve -> frame_color.blue);
     g_debug ("IODEBUG: %s: frame.xmin= %f, frame.xmax= %f", iost,
-             this_proj -> curves[rid][cid] -> frame_pos[0][0], this_proj -> curves[rid][cid] -> frame_pos[0][1]);
+             this_curve -> frame_pos[0][0], this_curve -> frame_pos[0][1]);
     g_debug ("IODEBUG: %s: frame.ymin= %f, frame.ymax= %f", iost,
-             this_proj -> curves[rid][cid] -> frame_pos[1][0], this_proj -> curves[rid][cid] -> frame_pos[1][1]);
+             this_curve -> frame_pos[1][0], this_curve -> frame_pos[1][1]);
     // Data
     g_debug ("IODEBUG: %s: backc.red= %f, backc.green= %f, backc.blue= %f", iost,
-             this_proj -> curves[rid][cid] -> backcolor.red,
-             this_proj -> curves[rid][cid] -> backcolor.green,
-             this_proj -> curves[rid][cid] -> backcolor.blue);
-    g_debug ("IODEBUG: %s: legend_font= %s", iost, this_proj -> curves[rid][cid] -> legend_font);
-    if (this_proj -> curves[rid][cid] -> cfile != NULL)
+             this_curve -> backcolor.red,
+             this_curve -> backcolor.green,
+             this_curve -> backcolor.blue);
+    g_debug ("IODEBUG: %s: legend_font= %s", iost, this_curve -> legend_font);
+    if (this_curve -> cfile != NULL)
     {
-      g_debug ("IODEBUG: %s: cfile= %s", iost, this_proj -> curves[rid][cid] -> cfile);
+      g_debug ("IODEBUG: %s: cfile= %s", iost, this_curve -> cfile);
     }
   }
   else

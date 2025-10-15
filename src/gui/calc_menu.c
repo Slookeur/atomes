@@ -278,7 +278,11 @@ void calc_sph (GtkWidget * vbox)
   gchar * str = "Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> in [2-40]";
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,  markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(SP));
+#ifdef NEW_ANA
+  update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SP].num_delta);
+#else
   update_entry_int (GTK_ENTRY(entry), active_project -> num_delta[SP]);
+#endif // NEW_ANA
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
 }
 
@@ -309,12 +313,20 @@ void calc_msd (GtkWidget * vbox)
     if (i == 1)
     {
       entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(-MS));
+#ifdef NEW_ANA
+      update_entry_double (GTK_ENTRY(entry), active_project -> analysis[MS].delta);
+#else
       update_entry_double (GTK_ENTRY(entry), active_project -> delta[MS]);
+#endif // NEW_ANA
     }
     else
     {
       entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(MS));
+#ifdef NEW_ANA
+      update_entry_int (GTK_ENTRY(entry), active_project -> analysis[MS].num_delta);
+#else
       update_entry_int (GTK_ENTRY(entry), active_project -> num_delta[MS]);
+#endif // NEW_ANA
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
     if (i == 1)
@@ -1018,7 +1030,11 @@ void calc_bonds (GtkWidget * vbox)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a[i], 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
       ba_entry[i] = create_entry (G_CALLBACK(set_delta), 150, 15, FALSE, (gpointer)GINT_TO_POINTER(BD+i));
-      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> num_delta[BD+i]);
+#ifdef NEW_ANA
+      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BD+i].num_delta);
+#else
+      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BD+i].num_delta);
+#endif // NEW_ANA
       widget_set_sensitive (ba_entry[i], active_project -> runc[i]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ba_entry[i], FALSE, FALSE, 0);
     }

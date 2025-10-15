@@ -411,6 +411,16 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
         append_menu_item (menu, (const gchar *)str_a, (const gchar *)str_c, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
         g_free (str_a);
         g_free (str_c);
+#ifdef NEW_ANA
+        if (edit)
+        {
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b].idcc[i], FALSE, FALSE, FALSE, NULL);
+        }
+        else
+        {
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b].idcc[i], FALSE, FALSE, FALSE, NULL);
+        }
+#else
         if (edit)
         {
           widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> idcc[b][i], FALSE, FALSE, FALSE, NULL);
@@ -419,6 +429,7 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
         {
           widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> idcc[b][i], FALSE, FALSE, FALSE, NULL);
         }
+#endif // NEW_ANA
         g_free (str_b);
       }
     }

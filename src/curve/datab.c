@@ -544,7 +544,11 @@ void multiply_column (gpointer data)
   GtkWidget * lab;
   gchar * str;
   qint * dat = (qint *)data;
+#ifdef NEW_ANA
+  wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b].curves[dat -> c] -> window));
+#else
   wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> curves[dat -> b][dat -> c] -> window));
+#endif // NEW_ANA
   gtk_dialog_add_button (GTK_DIALOG (wind), "Apply", GTK_RESPONSE_APPLY);
   box = dialog_get_content_area (wind);
   hbox = create_hbox (0);

@@ -426,6 +426,18 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     g_free (tmp_title);
     for (j=0; j<NGRAPHS; j++)
     {
+#ifdef NEW_ANA
+      if (this_proj -> analysis[j].init_ok)
+      {
+        for (k=0; k<this_proj -> analysis[j].numc; k++)
+        {
+          if (this_proj -> analysis[j].curves[k] -> window != NULL)
+          {
+            correct_this_window_title (this_proj -> analysis[j].curves[k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[j].curves[k] -> name));
+          }
+        }
+      }
+#else
       if (this_proj -> initok[j])
       {
         for (k=0; k<this_proj -> numc[j]; k++)
@@ -436,6 +448,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
           }
         }
       }
+#endif // NEW_ANA
     }
     if (activep == i)
     {

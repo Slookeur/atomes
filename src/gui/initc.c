@@ -223,23 +223,25 @@ void alloc_analysis_curves (atomes_analysis * this_analysis)
 }
 
 /*!
-  \fn atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
+  \fn atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
 
   \brief allocate atomes_analysis data structure
 
   \param name analysis name
   \param analysis analysis ID
+  \param req_md requires MD trajectory (1/0)
   \param graph curves as output or not (1/0)
   \param num_curves number of curves to be produced for this analysis
   \param n_compat number of compatible analysis
   \param compat list of compatible analysis
   \param x_title default title for x axis for graphs
 */
-atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
+atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
 {
   atomes_analysis * new_analysis = g_malloc0(sizeof*atomes_analysis);
   new_analysis -> name = g_strdup_printf ("%s", name);
   new_analysis -> aid = analysis;
+  new_analysis -> requires_md = req_md;
   new_analysis -> graph_res = graph;
   if (graph)
   {
@@ -292,43 +294,43 @@ void init_atomes_analyses ()
   comp_list = allocint (2);
   comp_list[0] = GR;
   comp_list[1] = GK;
-  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, FALSE, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, FALSE, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQ;
   comp_list[1] = SK;
-  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, FALSE, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, FALSE, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
   comp_list[0] = BD;
-  active_project -> analysis[BD] = setup_analysis ("Bonds properties", BD, TRUE, j*j, 1, comp_list, "Dij [Å]");
+  active_project -> analysis[BD] = setup_analysis ("Bonds properties", BD, FALSE, TRUE, j*j, 1, comp_list, "Dij [Å]");
 
   // Angle distribution(s)
   comp_list[0] = AN;
-  active_project -> analysis[AN] = setup_analysis ("Angle distributions", AN, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
+  active_project -> analysis[AN] = setup_analysis ("Angle distributions", AN, FALSE, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
   comp_list[0] = RI;
-  active_project -> analysis[RI] = setup_analysis ("Ring statistics", RI, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+  active_project -> analysis[RI] = setup_analysis ("Ring statistics", RI, FALSE, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
 
   // Chain statistic(s)
   comp_list[0] = CH;
-  active_project -> analysis[CH] = setup_analysis ("Chain statistics", CH, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+  active_project -> analysis[CH] = setup_analysis ("Chain statistics", CH, FALSE, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
 
   // Spherical harmonic(s)
   comp_list[0] = SP;
-  active_project -> analysis[SP] = setup_analysis ("Spherical harmonics", SP, TRUE, 0, 1, comp_list, "Ql");
+  active_project -> analysis[SP] = setup_analysis ("Spherical harmonics", SP, FALSE, TRUE, 0, 1, comp_list, "Ql");
 
   // Mean square displacement
   comp_list[0] = MS;
-  if (active_project -> steps > 1) active_project -> analisys[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, 14*j+6, 1, comp_list, NULL);
+  if (active_project -> steps > 1) active_project -> analisys[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
 
   g_free (comp_list);
   /*

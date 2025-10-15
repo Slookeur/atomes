@@ -539,15 +539,14 @@ gboolean test_pbc (int pbc, int frac, double box[2][3], double vect[3][3])
 */
 void init_box_calc ()
 {
-  int i;
   active_cell -> has_a_box = test_vol (active_box -> param, active_box -> vect);
   if (! active_cell -> has_a_box)
   {
 #ifdef NEW_ANA
-    active_project -> analysis[GR].run_ok = FALSE;
-    active_project -> analysis[SQ].run_ok = FALSE;
-    active_project -> analysis[SK].run_ok = FALSE;
-    active_project -> analysis[GK].run_ok = FALSE;
+    active_project -> analysis[GR].avail_ok = FALSE;
+    active_project -> analysis[SQ].avail_ok = FALSE;
+    active_project -> analysis[SK].avail_ok = FALSE;
+    active_project -> analysis[GK].avail_ok = FALSE;
 #else
     for (i=0; i<4; i++) active_project -> runok[i] = FALSE;
 #endif
@@ -555,11 +554,12 @@ void init_box_calc ()
   else
   {
 #ifdef NEW_ANA
-    active_project -> analysis[GR].run_ok = TRUE;
-    active_project -> analysis[SQ].run_ok = active_project -> analysis[GR].calc_ok;
-    active_project -> analysis[SK].run_ok = TRUE;
-    active_project -> analysis[GK].run_ok = active_project -> analysis[SK].calc_ok;
+    active_project -> analysis[GR].avail_ok = TRUE;
+    active_project -> analysis[SQ].avail_ok = active_project -> analysis[GR].calc_ok;
+    active_project -> analysis[SK].avail_ok = TRUE;
+    active_project -> analysis[GK].avail_ok = active_project -> analysis[SK].calc_ok;
 #else
+    int i;
     for (i=0; i<3; i=i+2)
     {
       active_project -> runok[i] = TRUE;

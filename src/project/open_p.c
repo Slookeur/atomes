@@ -331,8 +331,15 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+#ifdef NEW_ANA
+  int * tmp_num_delta = allocdouble (NGRAPHS);
+  double * tmp_delta = allocdouble (NGRAPHS);
   if (fread (active_project -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#else
+  if (fread (active_project -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (active_project -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif
   if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
   {
@@ -342,8 +349,15 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+#ifdef NEW_ANA
+  double * tmp_min = allocdouble (NGRAPHS);
+  double * tmp_max = allocdouble (NGRAPHS);
+  if (fread (tmp_min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (tmp_max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#else
   if (fread (active_project -> min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif
   if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
   {
@@ -406,8 +420,24 @@ int open_project (FILE * fp, int npi)
         // Read curves
 #ifdef NEW_ANA
         init_atomes_analyses ();
-        for (i=0; <NCA)
-        for (i=0; i<NGRAPHS; i++) if (active_project -> analysis[i].avail_ok) initcnames (i, 0);
+        for (i=0; <NGRAPHS; i++)
+        {
+          active_project -> analysis[i].avail_ok = tmp_avail[i];
+          active_project -> analysis[i].init_ok = tmp_init[i];
+          active_project -> analysis[i].calc_ok = tmp_calc[i];
+          active_project -> analysis[i].delta = tmp_delta[i];
+          active_project -> analysis[i].num_delta = tmp_num_delta[i];
+          active_project -> analysis[i].min = tmp_min[i];
+          active_project -> analysis[i].max = tmp_max[i];
+          if (active_project -> analysis[i].avail_ok) initcnames (i, 0);
+        }
+        g_free (tmp_avail);
+        g_free (tmp_init);
+        g_free (tmp_calc);
+        g_free (tmp_delta);
+        g_free (tmp_num_delta);
+        g_free (tmp_min);
+        g_free (tmp_max);
 #else
         initcwidgets ();
         for (i=0; i<NGRAPHS; i++) if (active_project -> initok[i]) initcnames (i, 0);
@@ -422,6 +452,18 @@ int open_project (FILE * fp, int npi)
           if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
           if (j)
           {
+#ifdef NEW_ANA
+            active_project -> analysis[SP].numc = j;
+            active_project -> numwid += j;
+            alloc_analysis_curves (active_project -> analysis[SP]);
+            addcurwidgets (activep, SP, 0);
+            active_project -> analysis[SP].avail_ok = TRUE;
+            for (k=0; k<j; k++)
+            {
+              active_project -> analysis[SP].curves[k] -> name = read_this_string (fp);
+              if (active_project -> analysis[SP].curves[k] -> name == NULL) return ERROR_PROJECT;
+            }
+#else
             active_project -> numc[SP] = j;
             active_project -> numwid += j;
             alloc_curves (SP);
@@ -432,6 +474,7 @@ int open_project (FILE * fp, int npi)
               active_project -> curves[SP][k] -> name = read_this_string (fp);
               if (active_project -> curves[SP][k] -> name == NULL) return ERROR_PROJECT;
             }
+#endif
           }
           for (j=0; j<i; j++)
           {

@@ -709,6 +709,7 @@ struct atomes_analysis
   gboolean avail_ok;           /*!< Analysis calculation availability */
   gboolean init_ok;            /*!< Curves initialization */
   gboolean calc_ok;            /*!< Analysis calculation confirmation */
+  gboolean requires_md;        /*!< Analysis requires multiple configurations */
   int num_delta;               /*!< Discretization */
   double calc_time;            /*!< Calculation time */
   double delta;                /*!< Discretization */

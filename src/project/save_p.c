@@ -167,8 +167,22 @@ int save_project (FILE * fp, project * this_proj, int npi)
   if (fwrite (& this_proj -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (& this_proj -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (this_proj -> modelgl -> pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+#ifdef NEW_ANA
+  int * tmp_num_delta = allocinit (NGRAPHS);
+  double * tmp_delta = allocdouble (NGRAPHS);
+  for (j=0; i<NGRAPHS; j++)
+  {
+    tmp_num_delta[j] = this_proj -> analysis[j].num_delta;
+    tmp_delta[j] = this_proj -> analysis[j].delta;
+  }
+  if (fwrite (tmp_num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fwrite (tmp_delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  g_free (tmp_num_delta);
+  g_free (tmp_delta);
+#else
   if (fwrite (this_proj -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fwrite (this_proj -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif // NEW_ANA
   if (fwrite (this_proj -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
   {
@@ -178,8 +192,22 @@ int save_project (FILE * fp, project * this_proj, int npi)
   if (fwrite (& this_proj -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (this_proj -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fwrite (this_proj -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+#ifdef NEW_ANA
+  double * tmp_min = allocdouble (NGRAPHS);
+  double * tmp_max = allocdouble (NGRAPHS);
+  for (j=0; i<NGRAPHS; j++)
+  {
+    tmp_min[j] = this_proj -> analysis[j].min;
+    tmp_max[j] = this_proj -> analysis[j].max;
+  }
+  if (fwrite (tmp_min, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fwrite (tmp_max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  g_free (tmp_min);
+  g_free (tmp_max);
+#else
   if (fwrite (this_proj -> min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fwrite (this_proj -> max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+#endif
   if (fwrite (& this_proj -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (this_proj -> natomes != 0 && this_proj -> nspec != 0)
   {
@@ -209,6 +237,18 @@ int save_project (FILE * fp, project * this_proj, int npi)
     if (this_proj -> run)
     {
       k = 0;
+#ifdef NEW_ANA
+      for (i=0; i<NGRAPHS; i++)
+      {
+        for (j=0; j<this_proj -> analysis[i].numc; j++)
+        {
+          if (this_proj -> analysis[i].curves[j] -> ndata != 0)
+          {
+            k ++;
+          }
+        }
+      }
+#else
       for (i=0; i<NGRAPHS; i++)
       {
         for (j=0; j<this_proj -> numc[i]; j++)
@@ -219,9 +259,30 @@ int save_project (FILE * fp, project * this_proj, int npi)
           }
         }
       }
+#endif // NEW_ANA
       if (fwrite (& k, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
       if (k)
       {
+#ifdef NEW_ANA
+        if (fwrite (& this_proj -> analysis[SP].numc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+        if (this_proj -> analysis[SP].numc)
+        {
+          for (i=0; i<this_proj -> analysis[SP].numc; i++)
+          {
+            if (save_this_string (fp, this_proj -> analysis[SP].curves[i] -> name) != OK) return ERROR_PROJECT;
+          }
+        }
+        for (i=0; i<NGRAPHS; i++)
+        {
+          for (j=0; j<this_proj -> analysis[i].numc; j++)
+          {
+            if (this_proj -> analysis[i].curves[j] -> ndata != 0)
+            {
+              if (save_project_curve (fp, npi, this_proj, i, j) != OK) return ERROR_CURVE;
+            }
+          }
+        }
+#else
         if (fwrite (& this_proj -> numc[SP], sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
         if (this_proj -> numc[SP])
         {
@@ -230,7 +291,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
             if (save_this_string (fp, this_proj -> curves[SP][i] -> name) != OK) return ERROR_PROJECT;
           }
         }
-        for (i=0; i< NGRAPHS; i++)
+        for (i=0; i<NGRAPHS; i++)
         {
           for (j=0; j<this_proj -> numc[i]; j++)
           {
@@ -240,6 +301,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
             }
           }
         }
+#endif // NEW_ANA
       }
       if (this_proj -> initgl)
       {
