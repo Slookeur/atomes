@@ -460,7 +460,11 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   // Clean curves data
   for (i=0 ; i<NGRAPHS ; i++)
   {
+#ifdef NEW_ANA
+    this_proj -> analysis[i].calc_ok = FALSE;
+#else
     this_proj -> visok[i]=FALSE;
+#endif // NEW_ANA
     hide_curves (this_proj, i);
     erase_curves (this_proj, i);
   }

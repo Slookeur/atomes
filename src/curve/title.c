@@ -53,7 +53,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 const gchar * default_title (int ax, gpointer data)
 {
-  int rid = ((tint *)data) -> b;
   project * this_proj = get_project_by_id (((tint *)data) -> a);
   if (ax == 0)
   {
@@ -63,6 +62,7 @@ const gchar * default_title (int ax, gpointer data)
       return this_proj -> analysis[rid].x_title;
     }
 #else
+    int rid = ((tint *)data) -> b;
     if (rid == GR || rid == GK)
     {
       return ("r [Å]");

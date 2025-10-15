@@ -1197,7 +1197,7 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
 
   l = GPOINTER_TO_INT(data);
 #ifdef NEW_ANA
-  if (active_project -> analysis[l].vis_ok)
+  if (active_project -> analysis[l].calc_ok)
   {
     if (l == 2)
     {

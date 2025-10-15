@@ -98,7 +98,7 @@ void workinfo (project * this_proj, int i)
       if (i > -1)
       {
 #ifdef NEW_ANA
-        if (this_proj -> analysis[i].calc_bufffer == NULL && this_proj -> analysis[i].avail_ok)
+        if (this_proj -> analysis[i].calc_bufffer == NULL && this_proj -> analysis[i].calc_ok)
 #else
         if (this_proj -> text_buffer[i+4] == NULL && this_proj -> visok[i])
 #endif

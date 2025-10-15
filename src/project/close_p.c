@@ -201,12 +201,24 @@ void close_project (project * to_close)
   {
     for (i=0 ; i<NGRAPHS ; i++)
     {
+#ifdef NEW_ANA
+      if (to_close -> analysis[i])
+      {
+        to_close -> analysis[i].calc_ok = FALSE;
+        if (to_close -> analysis[i].curves)
+        {
+          hide_curves (to_close, i);
+          erase_curves (to_close, i);
+        }
+      }
+#else
       to_close -> visok[i]=FALSE;
       if (to_close -> curves[i])
       {
         hide_curves (to_close, i);
         erase_curves (to_close, i);
       }
+#endif // NEW_ANA
     }
   }
   clean_view ();

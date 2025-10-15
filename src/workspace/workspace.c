@@ -86,22 +86,12 @@ GdkPixbuf * wpix = NULL;
 gchar * wchar = NULL;
 int projects_in_workspace = 0;
 
-char * work_menu_items[NITEMS-2] = {"Workspace                ",
-                                    "Settings                 ",
-                                   //"OpenGL - 3D              ",
-                                    "Visualization            ",
-                                   //"Calc. visualization      ",
-                                    "Analysis                 ",
-                                    "g(r)/G(r)                ",
-                                    "S(q) from g(r)           ",
-                                    "S(q) from Debye equation ",
-                                    "g(r) from FFT[S(q) Debye]",
-                                    "Bonding information      ",
-                                    "Angle distribution       ",
-                                    "Ring statistics          ",
-                                    "Chain statistics         ",
-                                    "Spherical harmonics      ",
-                                    "Mean Square Displacement "};
+char * work_menu_items[NITEMS] = {"Workspace                ",
+                                  "Settings                 ",
+                                  //"OpenGL - 3D            ",
+                                  "Visualization            ",
+                                  //"Calc. visualization    ",
+                                  "Analysis                 "};
 
 /*!
   \fn void add_project (GtkTreeStore * store, int i)
@@ -134,10 +124,6 @@ void add_project (GtkTreeStore * store, int i)
   // OpenGL
   gtk_tree_store_append (store, & steplevel, & piter[i]);
   gtk_tree_store_set (store, & steplevel, 0, OGLM, 1, work_menu_items[2], 2, -2, -1);
-  //gtk_tree_store_append (store, & optslevel, & steplevel);
-  //gtk_tree_store_set (store, & optslevel, 0, OGLM, 1, work_menu_items[3], 2, -1, -1);
-  //gtk_tree_store_append (store, & optslevel, & steplevel);
-  //gtk_tree_store_set (store, & optslevel, 0, OGLC, 1, work_menu_items[4], 2, -1, -1);
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
   gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
@@ -150,7 +136,7 @@ void add_project (GtkTreeStore * store, int i)
 #endif
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
-      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, work_menu_items[4+j], 2, j, -1);
+      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, graph_name[j], 2, j, -1);
     }
   }
   gtk_tree_view_expand_to_path (GTK_TREE_VIEW(worktree), gtk_tree_model_get_path(GTK_TREE_MODEL(store), & worklevel));

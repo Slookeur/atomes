@@ -70,9 +70,15 @@ void init_curves_and_calc (project * this_proj)
   int i;
   for (i=0; i<NGRAPHS; i++)
   {
+#ifdef NEW_ANA
+    this_proj -> analysis[i].avail_ok = FALSE;
+    this_proj -> analysis[i].init_ok = FALSE;
+    this_proj -> analysis[i].calc_ok = FALSE;
+#else
     this_proj -> runok[i] = FALSE;
     this_proj -> initok[i] = FALSE;
     this_proj -> visok[i] = FALSE;
+#endif
   }
 }
 
@@ -167,16 +173,17 @@ void init_project (gboolean alloc_box)
   activep = nprojects - 1;
   new_proj -> id = activep;
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
+#ifndef NEW_ANA
   new_proj -> delta[RI] = new_proj -> delta[CH] = 1.0;
   new_proj -> min[RI] = new_proj -> min[CH] = 1;
   new_proj -> delta[SP] = 2.0;
+#endif
   apply_default_parameters_to_project (new_proj);
   new_proj -> tfile = -1;
   new_proj -> newproj = TRUE;
   new_proj -> steps = 1;
   new_proj -> xcor = 1;
   new_proj -> tunit = (int)default_delta_t[1];
-
   new_proj -> sk_advanced[0] = 1.0;
   new_proj -> sk_advanced[1] = 15.0;
 
@@ -184,7 +191,9 @@ void init_project (gboolean alloc_box)
   if (alloc_box) new_proj -> cell.box = g_malloc0(sizeof*new_proj -> cell.box);
 
   remove_edition_actions ();
+#ifndef NEW_ANA
   init_curves_and_calc (new_proj);
+#endif
   new_proj -> numwid = -1;
   if (nprojects == 1)
   {

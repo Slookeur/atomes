@@ -239,18 +239,27 @@ void debugioproj (project * this_proj, gchar * iost)
                         this_proj -> cell.box[0].param[1][0], this_proj -> cell.box[0].param[1][1], this_proj -> cell.box[0].param[1][2]);
   g_debug ("IODEBUG::%s: vmod[0]= %f, vmod[1]= %f, vmod[2]= %f", iost,
                         this_proj -> cell.box[0].param[0][0], this_proj -> cell.box[0].param[0][1], this_proj -> cell.box[0].param[0][2]);
+#ifdef NEW_ANA
   for (i=0; i<NGRAPHS; i++)
   {
+    g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> analysis[i].calc_ok);
+    g_debug ("IODEBUG::%s: i= %d, initok[i]= %d", iost, i, this_proj -> analysis[i].init_ok);
+    g_debug ("IODEBUG::%s: i= %d, num_delta[i]= %d", iost, i, this_proj -> analysis[i].num_delta);
+    g_debug ("IODEBUG::%s: i= %d, delta[i]= %f", iost, i, this_proj -> analysis[i].delta);
+    g_debug ("IODEBUG::%s: i= %d, min[i]= %f", iost, i, this_proj -> analysis[i].min);
+    g_debug ("IODEBUG::%s: i= %d, max[i]= %f", iost, i, this_proj -> analysis[i].max);
+  }
+#else
+  for (i=0; i<NGRAPHS; i++)
+  {
+    g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> visok[i]);
+    g_debug ("IODEBUG::%s: i= %d, initok[i]= %d", iost, i, this_proj -> initok[i]);
     g_debug ("IODEBUG::%s: i= %d, num_delta[i]= %d", iost, i, this_proj -> num_delta[i]);
     g_debug ("IODEBUG::%s: i= %d, delta[i]= %f", iost, i, this_proj -> delta[i]);
     g_debug ("IODEBUG::%s: i= %d, min[i]= %f", iost, i, this_proj -> min[i]);
     g_debug ("IODEBUG::%s: i= %d, max[i]= %f", iost, i, this_proj -> max[i]);
   }
-  for (i=0; i<NGRAPHS; i++)
-  {
-    g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> visok[i]);
-    g_debug ("IODEBUG::%s: i= %d, initok[i]= %d", iost, i, this_proj -> initok[i]);
-  }
+#endif
   if (this_proj -> natomes != 0 && this_proj -> nspec != 0)
   {
     for (i=0; i<this_proj -> steps; i++)

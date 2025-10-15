@@ -135,6 +135,32 @@ void fill_tool_model ()
       gtk_image_clear (img);
       if (active_project)
       {
+#ifdef NEW_ANA
+        if (active_project -> analysis[i])
+        {
+          if (active_project -> analysis[i].numc > 0 && active_project -> analysis[i].calc_ok)
+          {
+            for (j=0; j<active_project -> analysis[i].numc; j++)
+            {
+              if (active_project -> analysis[i].curves[j] -> name && active_project -> analysis[i].curves[j] -> ndata)
+              {
+                gtk_tree_store_append (tool_model, & curve_level, & calc_level);
+                status = FALSE;
+                str = g_strdup_printf ("%s", active_project -> analysis[i].curves[j] -> name);
+                if (active_project -> analysis[i].curves[j] -> window != NULL)
+                {
+                  if (GTK_IS_WIDGET(active_project -> analysis[i].curves[j] -> window))
+                  {
+                    if (gtk_widget_get_visible(active_project -> analysis[i].curves[j] -> window)) status = TRUE;
+                  }
+                }
+                gtk_tree_store_set (tool_model, & curve_level, 0, i, 1, j, 3, str, 4, status, -1);
+                g_free (str);
+              }
+            }
+          }
+        }
+#else
         if (active_project -> numc[i] > 0 && active_project -> visok[i])
         {
           for (j=0; j<active_project -> numc[i]; j++)
@@ -156,6 +182,7 @@ void fill_tool_model ()
             }
           }
         }
+#endif // NEW_ANA
       }
     }
   }

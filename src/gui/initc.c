@@ -64,6 +64,7 @@ void clean_curves_data (int calc, int start, int end)
   }
 }
 
+#ifndef NEW_ANA
 /*!
   \fn void alloc_curves (int rid)
 
@@ -139,6 +140,7 @@ void initcwidgets ()
     if (i != SP) alloc_curves (i);
   }
 }
+#endif
 
 /*!
   \fn void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc)
@@ -156,7 +158,11 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
   //int i;
 //  char * bar[2] = {"bond properties", "nearest neigbhors table"};
 //  char * mess;
+#ifdef NEW_ANA
+  if (run < NGRAPHS && run > -1) active_project -> analysis[run].calc_ok = adv;
+#else
   if (run < NGRAPHS && run > -1) active_project -> visok[run] = adv;
+#endif // NEW_ANA
   if (! status)
   {
 #ifdef GTK3

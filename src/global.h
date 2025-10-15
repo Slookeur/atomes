@@ -321,7 +321,8 @@ enum ImageFormats {
 */
 #define NCFORMATS 13
 
-#define NITEMS 16
+#define NITEMS 4
+
 #define OT 4
 #define GR 0
 #define SQ 1
@@ -706,7 +707,7 @@ struct atomes_analysis
   */
   int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,ω) */
   gboolean avail_ok;           /*!< Analysis calculation availability */
-  gboolean init_ok;            /*!< Curves initizalization */
+  gboolean init_ok;            /*!< Curves initialization */
   gboolean calc_ok;            /*!< Analysis calculation confirmation */
   int num_delta;               /*!< Discretization */
   double calc_time;            /*!< Calculation time */
@@ -991,16 +992,17 @@ struct project
   chemical_data * chemistry;           /*!< Chemical data */
   coord_info * coord;                  /*!< Coordination(s) data */
   cell_info cell;                      /*!< Periodicity data */
-  atom ** atoms;                /*!< Atom list: atoms[steps][natomes] */
+  atom ** atoms;                       /*!< Atom list: atoms[steps][natomes] */
   /*
      Analysis related parameters
   */
+#ifdef NEW_ANA
   atomes_analysis * analysis;
+  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
+#else
   gboolean runok[NGRAPHS];             /*!< Analysis calculation availability */
   gboolean initok[NGRAPHS];            /*!< Curves initizalization  */
   gboolean visok[NGRAPHS];             /*!< Analysis calculation confirmation */
-  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
-  gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
   // gr, sq, sk, gftt, bd, an, frag-mol, ch, sp, msd
   int numc[NGRAPHS];                   /*!< Number of curves: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   int num_delta[NGRAPHS];              /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
@@ -1008,6 +1010,12 @@ struct project
   double delta[NGRAPHS];               /*!< Discretization: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   double min[NGRAPHS];                 /*!< Minimum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   double max[NGRAPHS];                 /*!< Maximum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
+  tint * idcc[NGRAPHS];                        /*!< Pointers for the curves */
+  Curve ** curves[NGRAPHS];                    /*!< The curves, graph for the results of the calculations */
+  GtkTextBuffer * text_buffer[NITEMS+NGRAPHS]; /*!< The text buffer for the results of the calculations */
+#endif
+  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
+  gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
   // 0 = Search type, 1 = NUMA
   int rsearch[2];                      /*!< Ring statistics parameters: 0 = Search type, 1 = Ring's allocation parameter NUMA */
   // First col : search type (up to chains stat). Second col: search info
@@ -1040,10 +1048,8 @@ struct project
                                             1 = Standard deviation for CpS */
   double fact[4];                      /*!< Gaussian smoothing factors: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt */
   double sk_advanced[2];               /*!< */
-  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
-  tint * idcc[NGRAPHS];                /*!< Pointers for the curves */
+
   int numwid;                          /*!< total number of curves for this project */
-  Curve ** curves[NGRAPHS];            /*!< The curves, graph for the results of the calculations */
   /*
      OpenGL related parameters
   */

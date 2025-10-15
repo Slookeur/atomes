@@ -124,10 +124,10 @@ int save_project (FILE * fp, project * this_proj, int npi)
   }
   if (fwrite (avail_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
   if (fwrite (init_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
-  if (fwrite (vis_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  if (fwrite (calc_ok, sizeof(gboolean), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
   g_free (avail_ok);
   g_free (init_ok);
-  g_free (vis_ok);
+  g_free (calc_ok);
 #else
   if (fwrite (this_proj -> runok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fwrite (this_proj -> initok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;

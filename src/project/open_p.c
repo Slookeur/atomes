@@ -283,6 +283,13 @@ int open_project (FILE * fp, int npi)
   }
 #ifdef NEW_ANA
   // We need temporary buffers to read this data
+  gboolean * tmp_avail, * tmp_init, * tmp_calc;
+  tmp_avail = allocbool (NGRAPHS);
+  tmp_init = allocbool (NGRAPHS);
+  tmp_calc = allocbool (NGRAPHS);
+  if (fread (tmp_avail, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (tmp_init, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fread (tmp_calc, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
 #else
   if (fread (active_project -> runok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (active_project -> initok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
@@ -395,9 +402,16 @@ int open_project (FILE * fp, int npi)
           j = 1;
           prep_spec_ (active_chem -> chem_prop[CHEM_Z], active_chem -> nsps, & j);
         }
-        initcwidgets ();
+
         // Read curves
+#ifdef NEW_ANA
+        init_atomes_analyses ();
+        for (i=0; <NCA)
+        for (i=0; i<NGRAPHS; i++) if (active_project -> analysis[i].avail_ok) initcnames (i, 0);
+#else
+        initcwidgets ();
         for (i=0; i<NGRAPHS; i++) if (active_project -> initok[i]) initcnames (i, 0);
+#endif
         if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
 #ifdef DEBUG
         g_debug ("\n**********************************************\n curves to read= %d\n**********************************************\n", i);

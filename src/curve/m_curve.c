@@ -462,13 +462,13 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
     }
 #ifdef NEW_ANA
     if (((add && extrarid[i][data -> b] < this_proj -> analysis[data -> b].numc)
-    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b].avail_ok)
+    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b].calc_ok)
     {
       create_menu[i][data -> b] = TRUE;
       create_proj[i] = TRUE;
     }
 
-    if (j && this_proj -> analysis[k].avail_ok)
+    if (j && this_proj -> analysis[k].calc_ok)
     {
       create_menu[i][k] = FALSE;
       if (this_proj -> analysis[k].curves[0] -> ndata > 0)
