@@ -337,6 +337,7 @@ GtkWidget * curvetbox ()
   graph_img[7] = g_strdup_printf ("%s", PACKAGE_CH);
   graph_img[8] = g_strdup_printf ("%s", PACKAGE_SP);
   graph_img[9] = g_strdup_printf ("%s", PACKAGE_MS);
+  // New calculation icon to be added here
 
   toolscroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);
   add_container_child (CONTAINER_SCR, toolscroll, tooltree ());

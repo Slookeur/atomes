@@ -69,9 +69,6 @@ extern void autoscale (gpointer data);
 extern void curve_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data);
 
 int curve_action_id = -1;
-int activeg = 0;
-int activec = 0;
-int activer = 0;
 
 #ifdef GTK3
 /*!

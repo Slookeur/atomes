@@ -85,7 +85,6 @@ extern G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer d
 extern G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data);
-extern gchar * calc_img[NCALCS];
 
 GtkWidget * calc_win = NULL;
 GtkWidget * ba_entry[2];
@@ -101,11 +100,6 @@ int search_type;
 GtkWidget * calc_window (int i)
 {
   calc_dialog = dialog_cancel_apply (calc_name[i], MainWindow, FALSE);
-#ifndef GTK4
-  /* GtkWidget * apply_button =
-  button_set_image (GTK_BUTTON(apply_button), calc_name[i], IMG_FILE, (gpointer)calc_img[i]);
-  show_the_widgets (apply_button); */
-#endif
   return calc_dialog;
 }
 
@@ -1733,14 +1727,10 @@ G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
   }
 
 #ifndef GTK4
-  gtk_window_set_icon (GTK_WINDOW (calc_win), gdk_pixbuf_new_from_file(calc_img[id], NULL));
+  gtk_window_set_icon (GTK_WINDOW (calc_win), gdk_pixbuf_new_from_file(graph_img[(id < AN) ? id : id+1], NULL));
 #endif
   GtkWidget * vbox = create_vbox (BSEP);
   gtk_widget_set_size_request (vbox, -1, 30);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
-  /*GtkWidget * spinner = gtk_spinner_new ();
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, spinner, FALSE, FALSE, 0);
-  gtk_widget_set_size_request (spinner, -1, 30);
-  hide_the_widgets (spinner);*/
   run_this_gtk_dialog (calc_win, G_CALLBACK(run_on_calc_activate), data);
 }

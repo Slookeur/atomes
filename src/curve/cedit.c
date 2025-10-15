@@ -60,7 +60,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "callbacks.h"
 #include "project.h"
 #include "curve.h"
-// #include "cedit.h"
 
 extern G_MODULE_EXPORT void set_data_aspect (GtkComboBox * box, gpointer data);
 extern G_MODULE_EXPORT void update_axis (GtkComboBox * widg, gpointer data);
@@ -73,6 +72,9 @@ extern GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data);
 extern GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data);
 extern GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data);
 
+int activeg = 0;
+int activec = 0;
+int activer = 0;
 char * lapos[2]={"x: ", "y: "};
 
 /*!

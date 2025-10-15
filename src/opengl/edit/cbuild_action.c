@@ -1682,12 +1682,14 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
     active_project -> analysis[GR].avail_ok = TRUE;
     active_project -> analysis[GK].avail_ok = TRUE;
     active_project -> analysis[BD].avail_ok = TRUE;
+    active_project -> analysis[AN].avail_ok = TRUE;
     active_project -> analysis[RI].avail_ok = TRUE;
     active_project -> analysis[CH].avail_ok = TRUE;
     active_project -> analysis[SP].avail_ok = TRUE;
 #else
     for (i=0; i<3; i=i+2) active_project -> runok[i] = TRUE;
     active_project -> runok[BD] = TRUE;
+    active_project -> runok[AN] = TRUE;
     active_project -> runok[RI] = TRUE;
     active_project -> runok[CH] = TRUE;
     active_project -> runok[SP] = TRUE;

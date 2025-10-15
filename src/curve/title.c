@@ -54,8 +54,15 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 const gchar * default_title (int ax, gpointer data)
 {
   int rid = ((tint *)data) -> b;
+  project * this_proj = get_project_by_id (((tint *)data) -> a);
   if (ax == 0)
   {
+#ifdef NEW_ANA
+    if (rid != MS)
+    {
+      return this_proj -> analysis[rid].x_title;
+    }
+#else
     if (rid == GR || rid == GK)
     {
       return ("r [Å]");
@@ -84,9 +91,10 @@ const gchar * default_title (int ax, gpointer data)
     {
       return ("Ql");
     }
+#endif // NEW_ANA
     else
     {
-      return g_strdup_printf ("t [%s]", untime[active_project -> tunit]);
+      return g_strdup_printf ("t [%s]", untime[this_proj -> tunit]);
     }
   }
   else

@@ -213,34 +213,37 @@ void alloc_analysis_curves (atomes_analysis * this_analysis)
   for (i = 0; i < this_analysis -> numc; i++)
   {
     this_analysis -> curves[i] = g_malloc0 (sizeof*this_analysis -> curves[i]);
-    this_analysis -> curves[i] -> cfile = NULL;
-    this_analysis -> curves[i] -> name = NULL;
-    this_analysis -> curves[i] -> axis_title[0] = NULL;
-    this_analysis -> curves[i] -> axis_title[1] = NULL;
   }
 }
 
 /*!
-  \fn atomes_analysis * setup_analysis (int analysis, gboolean graph, int num_curves, int n_compat, int * compat)
+  \fn atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
 
   \brief allocate atomes_analysis data structure
 
-  \param analysis
-  \param graph
-  \param num_curves
-  \param n_compat
-  \param compat
+  \param name analysis name
+  \param analysis analysis ID
+  \param graph curves as output or not (1/0)
+  \param num_curves number of curves to be produced for this analysis
+  \param n_compat number of compatible analysis
+  \param compat list of compatible analysis
+  \param x_title default title for x axis for graphs
 */
-atomes_analysis * setup_analysis (int analysis, gboolean graph, int num_curves, int n_compat, int * compat)
+atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
 {
   atomes_analysis * new_analysis = g_malloc0(sizeof*atomes_analysis);
+  new_analysis -> name = g_strdup_printf ("%s", name);
   new_analysis -> aid = analysis;
   new_analysis -> graph_res = graph;
   if (graph)
   {
     new_analysis -> compat_id = duplicate_int (n_compat, compat);
-    new_analysis -> numc = num_curves;
-    alloc_analysis_curves (new_analysis);
+    if (num_curves)
+    {
+      new_analysis -> numc = num_curves;
+      alloc_analysis_curves (new_analysis);
+    }
+    if (default_title) analysis -> x_title = g_strdup_printf ("%s", x_title);
   }
 }
 
@@ -273,47 +276,78 @@ void init_atomes_analyses ()
   active_project -> total_analysis = NCALCS;
   active_project -> analysis = g_malloc0(NCALCS*sizeof*active_project -> analysis);
   j = active_project -> nspec;
-  // g(r)
-  active_project -> analysis[GR] = setup_analysis (GR, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, {GR, GK});
-  // s(q)
-  active_project -> analysis[SQ] = setup_analysis (SQ, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, {SQ, SK});
-  // s(k)
-  active_project -> analysis[SK] = setup_analysis (SK, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, {SQ, SK});
-  // g(r) FFT
-  active_project -> analysis[GK] = setup_analysis (GK, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, {GR, GK});
-  // Bond length  distribution(s)
-  active_project -> analysis[BD] = setup_analysis (BD, TRUE, j*j, 1, BD);
-  // Angle distribution(s)
-  active_project -> analysis[AN] = setup_analysis (AN, TRUE, j*j*j + j*j*j*j, 1, AN);
-  // Ring statistic(s)
-  active_project -> analysis[RI] = setup_analysis (RI, TRUE, 20*(j+1), 1, RI);
-  // Chain statistic(s)
-  active_project -> analysis[CH] = setup_analysis (CH, TRUE, j+1, 1, CH);
-  // Mean square displacement
-  if (active_project -> steps > 1) active_project -> analisys[MS] = setup_analysis (MS, TRUE, 14*j+6, 1, MS);
+  /* Compatible analysis:
+    - always include self, and others if required
+    - x axis must be similar or allow comparison (ex: distance)
+  */
+  int * comp_list;
 
+  // g(r)
+  comp_list = allocint (2);
+  comp_list[0] = GR;
+  comp_list[1] = GK;
+  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+  // g(r) FFT  - same compatibility list
+  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, TRUE, 16+5*j*j + (j ==2) ? 6 : 0, 2, comp_list, "r [Å]");
+
+  // s(q)
+  comp_list[0] = SQ;
+  comp_list[1] = SK;
+  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+  // s(k) - same compatibility list
+  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, TRUE, 8+4*j*j + (j ==2) ? 8 : 0, 2, comp_list, "q [Å-1]");
+
+  g_free (comp_list);
+
+  comp_list = allocint (1);
+  // Bond length  distribution(s)
+  comp_list[0] = BD;
+  active_project -> analysis[BD] = setup_analysis ("Bonds properties", BD, TRUE, j*j, 1, comp_list, "Dij [Å]");
+
+  // Angle distribution(s)
+  comp_list[0] = AN;
+  active_project -> analysis[AN] = setup_analysis ("Angle distributions", AN, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
+
+  // Ring statistic(s)
+  comp_list[0] = RI;
+  active_project -> analysis[RI] = setup_analysis ("Ring statistics", RI, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+
+  // Chain statistic(s)
+  comp_list[0] = CH;
+  active_project -> analysis[CH] = setup_analysis ("Chain statistics", CH, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+
+  // Spherical harmonic(s)
+  comp_list[0] = SP;
+  active_project -> analysis[SP] = setup_analysis ("Spherical harmonics", SP, TRUE, 0, 1, comp_list, "Ql");
+
+  // Mean square displacement
+  comp_list[0] = MS;
+  if (active_project -> steps > 1) active_project -> analisys[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, 14*j+6, 1, comp_list, NULL);
+
+  g_free (comp_list);
   /*
     How to add a new analysis:
 
        - edit the file 'global.c'
+
+         - define ID a new, and unique, 2 characters variable, ex: GR
          - create a PACKAGE_ID variable: gchar * PACKAGE_ID = NULL;
-         - increment NCALCS
-         - increment NGRAPHS if needed
-         - define ID a new, and unique, 2 character variable, ex: GR
+         - increment the total number of calculations available : NCALCS
+         - increment increment the total number calculation using graphs : NGRAPHS (if needed)
 
        - edit the file 'global.h' to make the information available in other parts of the code: extern gchar * PACKAGE_ID;
 
-       - edit the file 'main.c'
+       - to use new icon for this calculation edit the file 'main.c'
          - to read the icon file: PACKAGE_ID = g_build_filename (PACKAGE_PREFIX, "pixmaps/id.png", NULL);
 
        - edit the file 'gui.c'
-         - modifiy the following variables to describe the new calculation, and create the corresponding menu elements:
-           - atomes_action analyze_acts[]
-           - char * calc_name[]
-           - char * graph_name[]
+         - modify the following variables to describe the new calculation, and create the corresponding menu elements:
+           - atomes_action analyze_acts[] : {"analyze.id",    GINT_TO_POINTER(ID-1)}
+           - char * calc_name[] : calculation name for the menu items
+           - char * graph_name[] : name for the graph windows
            - in the function 'G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)' add the calculation menu callback:
 
-             else if (g_strcmp0 (name, "analyze.id") == 0)
+             else if (g_strcmp0 (name, "analyze.id") == 0)  // Update this line using the value in analyze_acts[]
              {
                on_calc_activate (NULL, data); // This does not change
              }
@@ -324,27 +358,26 @@ void init_atomes_analyses ()
 
            - in the function 'GtkWidget * create_main_window (GApplication * atomes).' declare the icon for the new calculation:
 
-             calc_img[ID] = g_strdup_printf ("%s", PACKAGE_ID);
+             graph_img[ID] = g_strdup_printf ("%s", PACKAGE_ID);
 
        - edit the file 'initc.c'
 
-         - define the maximum number of graph that the analysis is producing
-         - define the list of compatible analysis, and list the analyis ID.
+         - declare the new analysis:
 
            active_project -> analysis[ID] = setup_analysis (ID, TRUE, num_graphs, num_compat, {compat_1, compat_2, ...});
 
        - if periodicity is required for this calculation, edit 'edit_menuc.c' edit the 'init_box_calc()' function
-         to add the proper flags for :  'active_project -> analysis[ID].run_ok'
+         to add the proper flags for :  'active_project -> analysis[ID].avail_ok'
 
        - edit the file 'cbuild_action.c' line 1680 to add the default availability for this calculation
        - edit the file 'popup.c' line 2155 to add the default availability for this calculation
 
-       - Modify the 'preferences.c' file to offer the options to save user preferences for this calculation
-
        - Curves setup if any:
-         - adjust autoscale information, edit the file 'yaxis.c' line 105
+         - adjust autoscale information, edit the file 'yaxis.c' line 107
 
-       - Finally apf and awf files version should evolve to save and read the new calculation data
+       - Finally '*.apf' and '*.awf' files version should evolve to save and read the new calculation data
+
+       - Ultimately: modify the 'preferences.c' file to offer the options to save user preferences for this calculation
 
   */
   for (i=0; i<NCALCS; i++) active_project -> numwid = active_project -> numwid + active_project -> analysis[i].numc;

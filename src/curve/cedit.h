@@ -98,6 +98,10 @@ struct curve_edition
   int handler_id;
 };
 
+extern int activeg;
+extern int activec;
+extern int activer;
+
 extern char * lapos[2];
 extern char * ctext[2];
 

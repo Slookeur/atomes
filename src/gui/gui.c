@@ -103,7 +103,6 @@ GtkWidget * MainEvent;
 #endif
 
 gchar * dots[NDOTS];
-gchar * calc_img[NCALCS];
 gchar * graph_img[NGRAPHS];
 
 atomes_action edition_acts[] = {{"edit.chemistry",   GINT_TO_POINTER(0)},
@@ -120,26 +119,26 @@ atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GR)},
                                 {"analyze.sp",     GINT_TO_POINTER(SP-1)},
                                 {"analyze.msd",    GINT_TO_POINTER(MS-1)}};
 
-char * calc_name[NGRAPHS] = {"g(r)/G(r)",
-                             "S(q) from FFT[g(r)]",
-                             "S(q) from Debye equation",
-                             "g(r)/G(r) from FFT[S(q)]",
-                             "Bonds and angles",
-                             "Ring statistics",
-                             "Chain statistics",
-                             "Spherical harmonics",
-                             "Mean Squared Displacement"};
+char * calc_name[] = {"g(r)/G(r)",
+                      "S(q) from FFT[g(r)]",
+                      "S(q) from Debye equation",
+                      "g(r)/G(r) from FFT[S(q)]",
+                      "Bonds and angles",
+                      "Ring statistics",
+                      "Chain statistics",
+                      "Spherical harmonics",
+                      "Mean Squared Displacement"};
 
-char * graph_name[NGRAPHS] = {"g(r)/G(r)",
-                              "S(q) from FFT[g(r)]",
-                              "S(q) from Debye equation",
-                              "g(r)/G(r) from FFT[S(q)]",
-                              "Bonds properties",
-                              "Angle distributions",
-                              "Ring statistics",
-                              "Chain statistics",
-                              "Spherical harmonics",
-                              "Mean Squared Displacement"};
+char * graph_name[] = {"g(r)/G(r)",
+                       "S(q) from FFT[g(r)]",
+                       "S(q) from Debye equation",
+                       "g(r)/G(r) from FFT[S(q)]",
+                       "Bonds properties",
+                       "Angle distributions",
+                       "Ring statistics",
+                       "Chain statistics",
+                       "Spherical harmonics",
+                       "Mean Squared Displacement"};
 
 tint cut_sel;
 dint davect[9];
@@ -846,9 +845,10 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
     {
       str = g_strdup_printf ("%s.project.compute", act);
       str_n = g_strdup_printf ("Analyze: %s", work_menu_items[calc+4]);
-      append_menu_item (menu, str_n, (get_project_by_id(proj) -> runok[calc]) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
 #ifdef NEW_ANA
-
+      append_menu_item (menu, str_n, (get_project_by_id(proj) -> analysis[calc].avail_ok) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
+#else
+      append_menu_item (menu, str_n, (get_project_by_id(proj) -> runok[calc]) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
 #endif
       g_free (str);
       g_free (str_n);
@@ -1216,18 +1216,6 @@ GtkWidget * create_main_window (GApplication * atomes)
     davect[i].a = i/3;
     davect[i].b = i-3*davect[i].a;
   }
-
-  calc_img[0] = g_strdup_printf ("%s", PACKAGE_GR);
-  calc_img[1] = g_strdup_printf ("%s", PACKAGE_SQ);
-  calc_img[2] = g_strdup_printf ("%s", PACKAGE_SQ);
-  calc_img[3] = g_strdup_printf ("%s", PACKAGE_GR);
-  calc_img[4] = g_strdup_printf ("%s", PACKAGE_AN);
-  calc_img[5] = g_strdup_printf ("%s", PACKAGE_RI);
-  calc_img[6] = g_strdup_printf ("%s", PACKAGE_CH);
-  calc_img[7] = g_strdup_printf ("%s", PACKAGE_SP);
-  calc_img[8] = g_strdup_printf ("%s", PACKAGE_MS);
-  calc_img[9] = g_strdup_printf ("%s", PACKAGE_BD);
-  // New calculation icon to be added here
 
   dots[0] = g_strdup_printf ("%s", PACKAGE_DOTA);
   dots[1] = g_strdup_printf ("%s", PACKAGE_DOTB);

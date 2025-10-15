@@ -64,9 +64,6 @@ extern int originp;
 extern int ndash;
 extern int nglyph;
 extern double back_alpha;
-extern int activeg;
-extern int activec;
-extern int activer;
 
 typedef struct curve_dash curve_dash;
 struct curve_dash
