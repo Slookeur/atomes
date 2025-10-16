@@ -50,7 +50,7 @@ Here is the step by step procedure:
 
   2. Edit the file `src.global.h` to make the information available in other parts of the code:
 
-   - Define 'IDC' a new, and unique, 3 characters variable, associated to the new calculation ID number: 
+   - Define `IDC` a new, and unique, 3 characters variable, associated to the new calculation ID number: 
 
   ```
   #define IDC 10
@@ -65,9 +65,7 @@ Here is the step by step procedure:
    - Increment the total number of calculations available : `NCALCS`
    - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
-  3. Edit the file `src/gui/main.c`:
- 
-    - to read the icon file for the new analysis (after line ): 
+  3. Edit the file `src/gui/main.c` to read the icon file for the new analysis (after line ): 
 
     ```
     PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
@@ -75,32 +73,39 @@ Here is the step by step procedure:
 
   4. Edit the file `gui.c` :
 
-    a. At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
-      - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
-      - `char * calc_name[]` : add the new calculation name for the menu items
-      - `char * graph_name[]` : add the new calculation name for the graph windows
+   1. At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
+   
+    - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
+    - `char * calc_name[]` : add the new calculation name for the menu items
+    - `char * graph_name[]` : add the new calculation name for the graph windows
 
-    b. In the function 'G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)' add the calculation menu callback:
+  2. In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
 
-             else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
-             {
-               on_calc_activate (NULL, data); // This does not change
-             }
+```
+    else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
+    {
+      on_calc_activate (NULL, data); // This does not change
+    }
+```
 
-           - in the function 'GtkWidget * create_main_window (GApplication * atomes).' declare the icon for the new calculation:
+  3. In the function `GtkWidget * create_main_window (GApplication * atomes)` declare the icon for the new calculation:
 
-             graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+```
+   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+```
 
-       - edit the file 'calc_menu.c'
+ 5. Edit the file `calc_menu.c`
 
-         - in the function 'G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)' add a case for the new analysis
+  1. In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
 
-           case IDC:
-             calc_idc (box);
-             break;
+```
+   case IDC:
+     calc_idc (box);
+     break;
+```
+  2. Write the `calc_idc` function that describes the calculation dialog for the new analysis:
 
-         - write the 'calc_idc' function that describes the calculation dialog for the new analysis:
-
+```
          /*!
              \fn void calc_idc (GtkWidget * vbox)
 
@@ -112,42 +117,46 @@ Here is the step by step procedure:
           {
             GtkWidget * idc_box;
 
+          // This part requires to be a litte bit familiar with GTK+
+
             add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
           }
-
+```
           Contact me for help !
 
-         - In the function 'G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)' 
+   3. In the function `G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)`
+ 
+    - Add a case for the new analysis:
 
-           - Add a case for the new analysis:
+```
+         case IDC:
+           if (test_idc()) on_calc_idc_released (calc_win, NULL);
+           break;
+```
+    Note that `test_idc()` might be a testing routine you want to write to ensure that conditions are met to perform the analysis
 
-             case IDC:
-               if (test_idc()) on_calc_idc_released (calc_win, NULL);
-               break;
-
-            - Note that 'test_idc()' might be a testing routine you want to write to ensure that conditions are met to perform the analysis
-
-            - You now need to write the 'on_calc_idc_released' function to perform the calculation
+    - You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
  
 
-       - edit the file 'initc.c'
+   4. Edit the file `initc.c`
 
-         - declare the new analysis:
+    - declare the new analysis, after line :
 
-           active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
+```
+     active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
+```
 
-       - if periodicity is required for this calculation, edit 'edit_menuc.c' edit the 'init_box_calc()' function
-         to add the proper flags for :  'active_project -> analysis[IDC] -> avail_ok'
+   5. If periodicity is required for this calculation:
 
-       - edit the file 'cbuild_action.c' line 1680 to add the default availability for this calculation
-       - edit the file 'popup.c' line 2155 to add the default availability for this calculation
+    - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for : `active_project -> analysis[IDC] -> avail_ok`
+    - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
+    - Edit the file `popup.c` line 2155 to add the default availability for this calculation
 
-       - Curves setup if any:
-         - adjust autoscale information, edit the file 'yaxis.c' line 107
+   6. Optional graph setup, if any:
 
-       - Finally '*.apf' and '*.awf' files version should evolve to save and read the new calculation data
+    - Edit the file `yaxis.c` to adjust the Y axis autoscale information, after line 107
 
-       - Ultimately: modify the 'preferences.c' file to offer the options to save user preferences for this calculation
 
-  */
+   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
+   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
   
