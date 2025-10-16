@@ -98,21 +98,13 @@ G_MODULE_EXPORT gboolean view_curve_popup (GtkWidget * widget, gpointer data)
 */
 void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpointer data)
 {
-  int a, b, c;
   int x, y;
   double r, g, d;
   double tmp, xp, yp;
   gchar * str;
   gint width, height;
   CurveState * cstate = (CurveState *)data;
-  a = cstate -> id -> a;
-  b = cstate -> id -> b;
-  c = cstate -> id -> c;
-#ifdef NEW_ANA
-  Curve * this_curve = get_project_by_id(a) -> analysis[b] -> curves[c];
-#else
-  Curve * this_curve = get_project_by_id(a) -> curves[b][c];
-#endif
+  Curve * this_curve = get_curve_from_pointer ((gpointer)(cstate -> id));
   int curve_shift = get_curve_shift (this_curve);
 #ifdef GTK4
   event_y -= (double) curve_shift;

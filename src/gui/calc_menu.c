@@ -1033,7 +1033,7 @@ void calc_bonds (GtkWidget * vbox)
 #ifdef NEW_ANA
       update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BD+i] -> num_delta);
 #else
-      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BD+i] -> num_delta);
+      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> num_delta[BD+i]);
 #endif // NEW_ANA
       widget_set_sensitive (ba_entry[i], active_project -> runc[i]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ba_entry[i], FALSE, FALSE, 0);

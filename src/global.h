@@ -37,7 +37,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #endif
 
 #define GDK_SYNCHRONIZE
-#define NEW_ANA
 
 #ifndef GLOBAL_H_
 

@@ -255,6 +255,7 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
   new_analysis -> graph_res = graph;
   if (graph)
   {
+    new_analysis -> c_sets = n_compat;
     new_analysis -> compat_id = duplicate_int (n_compat, compat);
     if (num_curves)
     {

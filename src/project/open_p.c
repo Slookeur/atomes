@@ -65,6 +65,7 @@ extern void initchn ();
 extern void initmsd ();
 extern void initsh (int s);
 #ifdef NEW_ANA
+extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 extern void init_atomes_analyses ();
 #endif
 

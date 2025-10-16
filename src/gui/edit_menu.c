@@ -540,10 +540,9 @@ gboolean test_pbc (int pbc, int frac, double box[2][3], double vect[3][3])
 void init_box_calc ()
 {
   active_cell -> has_a_box = test_vol (active_box -> param, active_box -> vect);
-  if (active_project -> analysis)
-  {
-    active_project -> analysis[GR] -> avail_ok = TRUE;
-  }
+#ifndef NEW_ANA
+  int i;
+#endif
   if (! active_cell -> has_a_box)
   {
 #ifdef NEW_ANA
@@ -569,7 +568,6 @@ void init_box_calc ()
       active_project -> analysis[GK] -> avail_ok = active_project -> analysis[SK] -> calc_ok;
     }
 #else
-    int i;
     for (i=0; i<3; i=i+2)
     {
       active_project -> runok[i] = TRUE;
