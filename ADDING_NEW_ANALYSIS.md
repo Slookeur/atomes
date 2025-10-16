@@ -140,7 +140,7 @@ This is to be done close to line **97**
 
   - In the function `on_calc_activate` add a case for the new analysis
   ```C
-   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
+  G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
  {
     ...
 
