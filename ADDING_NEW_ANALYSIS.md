@@ -50,13 +50,15 @@ Here is the step by step procedure:
 
 ### 0. Pick a 3 letter keyword to describe your new calculation, ex: **IDC**
 
-### 1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable:
+### 1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable
   ```C
   gchar * PACKAGE_IDC = NULL;
   ```
-### 2. Edit the file `src.global.h` to make the information available in other parts of the code:
+This is to be done close to line **97**
 
-  - Define `IDC` a new, and unique, 3 characters variable, associated to the new calculation ID number: 
+### 2. Edit the file `src/global.h` to make the information available in other parts of the code:
+
+  - Define ```C IDC ``` a new, and unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
   #define IDC 10
   ```
@@ -72,7 +74,7 @@ Here is the step by step procedure:
   ```C
   PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
   ```
-### 4. Edit the file `gui.c`
+### 4. Edit the file `/src/gui/gui.c`
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
     - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
@@ -90,7 +92,7 @@ Here is the step by step procedure:
   ```C
   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
   ```
-### 5. Edit the file `initc.c`
+### 5. Edit the file `src/gui/initc.c`
 
   - declare the new analysis, after line :
   ```C
@@ -99,21 +101,21 @@ Here is the step by step procedure:
 
 ### 6. If periodicity is required for this calculation:
 
-  - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for
+  - Edit `src/gui/edit_menuc.c` search for the `init_box_calc()` function to add the proper flags for
 ```
   active_project -> analysis[IDC] -> avail_ok
 ```
-  - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
-  - Edit the file `popup.c` line 2155 to add the default availability for this calculation
+  - Edit the file `src/opengl/edit/cbuild_action.c` close to line **1680** to add the default availability for this calculation
+  - Edit the file `src/opengl/win/popup.c` close line **2155** to add the default availability for this calculation
 
 ### 7. Optional graph setup, if any:
 
-  - Edit the file `yaxis.c` to adjust the Y axis autoscale information, after line 107
+  - Edit the file `src/curve/yaxis.c` to adjust the Y axis autoscale information, after line 107
 
 ## Coding the new analysis user dialog and its callbacks
 
 
-### 1. Edit the file `calc_menu.c`
+### 1. Edit the file `src/gui/calc_menu.c`
 
   - In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
   ```C
