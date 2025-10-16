@@ -92,7 +92,7 @@ Here is the step by step procedure:
      break;
   ```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
-  ```
+  ```[C]
   /*!
     \fn void calc_idc (GtkWidget * vbox)
 
@@ -133,7 +133,10 @@ Contact me for help !
 
 ### 7. If periodicity is required for this calculation:
 
-  - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for : `active_project -> analysis[IDC] -> avail_ok`
+  - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for
+```
+  active_project -> analysis[IDC] -> avail_ok
+```
   - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
   - Edit the file `popup.c` line 2155 to add the default availability for this calculation
 
