@@ -22,24 +22,24 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
 ## Overview of the TODO list
 
-  1. Adding the new analysis description in the code
-  2. Coding the new analysis user dialog and its callbacks
-  3. Coding the new calculation and its connections to the **atomes** software internal data structures
+  - Adding the new analysis description in the code
+  - Coding the new analysis user dialog and its callbacks
+  - Coding the new calculation and its connections to the **atomes** software internal data structures
 
-    1. Create a new source file to implement the calculation
-    2. Add this new file to the `Makefile`
+    - Create a new source file to implement the calculation
+    - Add this new file to the `Makefile`
 
-  4. **atomes** release candidate requirements:
+  - **atomes** release candidate requirements:
 
-    1. Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
+    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
 
-      1. To save / read the new analysis parameters and results
-      2. To ensure the reading of older `.apf` and `.awf` file format(s)
+      - To save / read the new analysis parameters and results
+      - To ensure the reading of older `.apf` and `.awf` file format(s)
 
-    2. Modifying the user preferences dialog to consider the new analysis default parameter(s)
+    - Modifying the user preferences dialog to consider the new analysis default parameter(s)
 
-      1. To save / read the new analysis parameter(s)
-      2. To ensure the reading of older user preferences XML file (should be automatic)
+      - To save / read the new analysis parameter(s)
+      - To ensure the reading of older user preferences XML file (should be automatic)
 
 Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help, and step **.4** is the most complicated part. 
 
