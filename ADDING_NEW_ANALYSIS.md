@@ -73,13 +73,13 @@ Here is the step by step procedure:
 
   4. Edit the file `gui.c` :
 
-    1. At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
+    a. At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
       - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
       - `char * calc_name[]` : add the new calculation name for the menu items
       - `char * graph_name[]` : add the new calculation name for the graph windows
 
-    2. In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
+    b. In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
 
   ```
   else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
