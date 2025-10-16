@@ -18,7 +18,10 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
     meaning that it is required to code the dialog handling the calculation, I tried to simplify this as much as I could, 
     but in the end it is impossible to simplify everything.  
   
-  - Prepare a 16x16 pixels PNG image to be used as an icon to illustrate the calculation for the GUI and place it in the `data\pixmaps` folder.
+  - Prepare an image to illustrate the calculation for the GUI
+    - PNG format 
+    - 16x16 pixels 
+    - Place it in the `data\pixmaps` folder.
 
 ## Overview of the TODO list
 
@@ -48,7 +51,7 @@ Step **.4** is the most complicated part.
 
 Here is the step by step procedure: 
 
-### 0. Pick a 3 letter keyword to describe your new calculation, ex: **IDC**
+### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
 ### 1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable
   ```C
@@ -58,7 +61,7 @@ This is to be done close to line **97**
 
 ### 2. Edit the file `src/global.h` to make the information available in other parts of the code:
 
-  - Define ```C IDC ``` a new, and unique, 3 characters variable, associated to the new calculation ID number: 
+  - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
   #define IDC 10
   ```
