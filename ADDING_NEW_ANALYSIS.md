@@ -48,7 +48,8 @@ Here is the step by step procedure:
   gchar * PACKAGE_IDC = NULL;
   ```
 
-  2. Edit the file `src.global.h' to make the information available in other parts of the code:
+  2. Edit the file `src.global.h` to make the information available in other parts of the code:
+
     - Define 'IDC' a new, and unique, 3 characters variable, associated to the new calculation ID number: 
   ```
   #define IDC 10
@@ -59,8 +60,8 @@ Here is the step by step procedure:
   ```
   extern gchar * PACKAGE_IDC;
   ```
-    - Increment the total number of calculations available : `NCALCS`
-    - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
+     - Increment the total number of calculations available : `NCALCS`
+     - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
   3. Edit the file `src/gui/main.c`:
  
