@@ -95,9 +95,16 @@ This is to be done close to line **97**
     on_calc_activate (NULL, data); // This does not change
   }
   ```
-  - In the function `GtkWidget * create_main_window (GApplication * atomes)` declare the icon for the new calculation:
+  - In the function `create_main_window` declare the icon for the new calculation:
   ```C
+   GtkWidget * create_main_window (GApplication * atomes)
+ {
+     ...
+
   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+
+   ...
+ }
   ```
 ### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html)
 
@@ -127,9 +134,10 @@ This is to be done close to line **97**
   - In the function `on_calc_activate` add a case for the new analysis
   ```C
    G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
-   {
-     ...
-
+ {
+```
+ ...
+```C
      case IDC:
        calc_idc (box);
        break;
