@@ -21,7 +21,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
   - Prepare an image to illustrate the calculation for the GUI
     - PNG format 
     - 16x16 pixels 
-    - Place it in the `data\pixmaps` folder.
+    - Place it in the `data/pixmaps` folder.
 
 ## Overview of the TODO list
 
@@ -44,7 +44,8 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
       - To save / read the new analysis parameter(s)
       - To ensure the reading of older user preferences XML file (should be automatic)
 
-Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help. 
+Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help.
+ 
 Step **.4** is the most complicated part. 
 
 ## Adding the new analysis description in the code
@@ -53,23 +54,26 @@ Here is the step by step procedure:
 
 ### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
-### 1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable
+### 1. Edit the file [`src/global.c`](https://slookeur.github.io/atomes-doxygen/dc/d57/global_8c.html) to create a `PACKAGE_IDC` variable
   ```C
   gchar * PACKAGE_IDC = NULL;
   ```
 This is to be done close to line **97**
 
-### 2. Edit the file `src/global.h` to make the information available in other parts of the code:
+### 2. Edit the file [`src/global.h`](https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html) to make the information available in other parts of the code:
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
   #define IDC 10
   ```
   The associated number should be the latest calculation ID number + 1
+  This is to be done close to line **336**
+
   - Insert the following: 
   ```C
   extern gchar * PACKAGE_IDC;
   ```
+  This is to be done close to line **366**
   - Increment the total number of calculations available : `NCALCS`
   - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
