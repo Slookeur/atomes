@@ -7,9 +7,11 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
   - List all information required by this new analysis: 
     - Required parameter(s) for the user to input
-    - Any requirement(s) for the calculation to be performed, for example: 
+    - Any requirement(s) for the calculation to be performed, for example:
+      - Is a box description required ? 
       - Should periodic boundary condition be applied ?
       - Should a prior calculation be performed ?
+      - Is a trajectory (multiple configurations) required ?
 
   - **atomes** Graphical User Interface uses the GTK+ library, in a coded version and not a XML file version, 
     meaning that it is required to code the dialog handling the calculation, I tried to simplify this as much as I could, 
@@ -17,22 +19,26 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
   
   - Prepare a 16x16 pixels PNG image to be used as an icon to illustrate the calculation for the GUI and place it in the `data\pixmaps` folder.
 
-## The general TODO list
+## Overview of the TODO list
 
   1. Adding the new analysis description in the code
-  2. Coding the new analysis calculation dialog
+  2. Coding the new analysis user dialog and its callbacks
   3. Coding the new calculation and its connections to the **atomes** software internal data structures
+
+    - Create a new source file to implement the calculation
+    - Add this new file to the `Makefile`
+
   4. **atomes** release candidate requirements:
 
-   - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
+    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
 
-     - to save / read the new analysis parameters and results
-     - to ensure the reading of older `.apf` and `.awf` file format(s)
+      - to save / read the new analysis parameters and results
+      - to ensure the reading of older `.apf` and `.awf` file format(s)
 
-   - Modifying the user preferences dialog to consider the new analysis default parameter(s)
+    - Modifying the user preferences dialog to consider the new analysis default parameter(s)
 
-     - to save / read the new analysis parameter(s)
-     - to ensure the reading of older user preferences XML file (should be automatic)
+      - to save / read the new analysis parameter(s)
+      - to ensure the reading of older user preferences XML file (should be automatic)
 
 Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help, and step **.4** is the most complicated part. 
 
@@ -82,8 +88,30 @@ Here is the step by step procedure:
   ```
   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
   ```
+### 5. Edit the file `initc.c`
 
-### 5. Edit the file `calc_menu.c`
+  - declare the new analysis, after line :
+  ```
+  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
+  ```
+
+### 6. If periodicity is required for this calculation:
+
+  - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for
+```
+  active_project -> analysis[IDC] -> avail_ok
+```
+  - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
+  - Edit the file `popup.c` line 2155 to add the default availability for this calculation
+
+### 7. Optional graph setup, if any:
+
+  - Edit the file `yaxis.c` to adjust the Y axis autoscale information, after line 107
+
+## Coding the new analysis user dialog and its callbacks
+
+
+### 1. Edit the file `calc_menu.c`
 
   - In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
   ```
@@ -124,27 +152,11 @@ Contact me for help !
     - You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
  
 
-### 6. Edit the file `initc.c`
+## Coding the new calculation and its connections to the **atomes** software internal data structures
 
-  - declare the new analysis, after line :
-  ```
-  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
-  ```
+Create a new file
 
-### 7. If periodicity is required for this calculation:
-
-  - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for
-```
-  active_project -> analysis[IDC] -> avail_ok
-```
-  - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
-  - Edit the file `popup.c` line 2155 to add the default availability for this calculation
-
-### 8. Optional graph setup, if any:
-
-  - Edit the file `yaxis.c` to adjust the Y axis autoscale information, after line 107
-
-### 9. Release version
+## **atomes** release candidate requirements
 
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
