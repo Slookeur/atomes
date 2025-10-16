@@ -40,13 +40,13 @@ Overall step **1.** is easy, step **2.** and **3.** are slightly more complicate
 
 Here is the step by step procedure: 
 
-### Pick a 3 letter keyword to describe your new calculation, ex: **IDC**
+### 0. Pick a 3 letter keyword to describe your new calculation, ex: **IDC**
 
-### Edit the file `src/global.c` to create a `PACKAGE_IDC` variable:
+### 1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable:
   ```
   gchar * PACKAGE_IDC = NULL;
   ```
-### Edit the file `src.global.h` to make the information available in other parts of the code:
+### 2. Edit the file `src.global.h` to make the information available in other parts of the code:
 
   - Define `IDC` a new, and unique, 3 characters variable, associated to the new calculation ID number: 
   ```
@@ -60,11 +60,11 @@ Here is the step by step procedure:
   - Increment the total number of calculations available : `NCALCS`
   - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
-### Edit the file `src/gui/main.c` to read the icon file for the new analysis (after line ): 
+### 3. Edit the file `src/gui/main.c` to read the icon file for the new analysis (after line ): 
   ```
   PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
   ```
-### Edit the file `gui.c`
+### 4. Edit the file `gui.c`
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
     - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
@@ -83,7 +83,7 @@ Here is the step by step procedure:
   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
   ```
 
-### Edit the file `calc_menu.c`
+### 5. Edit the file `calc_menu.c`
 
   - In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
   ```
@@ -124,24 +124,24 @@ Contact me for help !
     - You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
  
 
-### Edit the file `initc.c`
+### 6. Edit the file `initc.c`
 
   - declare the new analysis, after line :
   ```
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
   ```
 
-### If periodicity is required for this calculation:
+### 7. If periodicity is required for this calculation:
 
   - Edit `edit_menuc.c` edit the `init_box_calc()` function to add the proper flags for : `active_project -> analysis[IDC] -> avail_ok`
   - Edit the file `cbuild_action.c` line 1680 to add the default availability for this calculation
   - Edit the file `popup.c` line 2155 to add the default availability for this calculation
 
-### Optional graph setup, if any:
+### 8. Optional graph setup, if any:
 
   - Edit the file `yaxis.c` to adjust the Y axis autoscale information, after line 107
 
-### Release version
+### 9. Release version
 
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
