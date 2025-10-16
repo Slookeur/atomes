@@ -92,7 +92,7 @@ Here is the step by step procedure:
      break;
   ```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
-  ```[C]
+  ```[c]
   /*!
     \fn void calc_idc (GtkWidget * vbox)
 
