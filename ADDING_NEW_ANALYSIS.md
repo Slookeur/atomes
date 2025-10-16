@@ -105,27 +105,26 @@ Here is the step by step procedure:
   2. Write the `calc_idc` function that describes the calculation dialog for the new analysis:
 
   ```
-         /*!
-             \fn void calc_idc (GtkWidget * vbox)
+  /*!
+    \fn void calc_idc (GtkWidget * vbox)
 
-             \brief creation of the idc calculation widgets
+    \brief creation of the idc calculation widgets
 
-             \param vbox GtkWidget that will receive the data
-          */
-          void calc_bonds (GtkWidget * vbox)
-          {
-            GtkWidget * idc_box;
+    \param vbox GtkWidget that will receive the data
+  */
+  void calc_bonds (GtkWidget * vbox)
+  {
+    GtkWidget * idc_box;
 
-          // This part requires to be a litte bit familiar with GTK+
+   // This part requires to be a litte bit familiar with GTK+
 
-            add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
-          }
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
+  }
   ```
   
 Contact me for help !
 
-   3. In the function `G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)`
- 
+   3. In the function `G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)` 
     - Add a case for the new analysis:
 
     ```
@@ -139,9 +138,7 @@ Contact me for help !
  
 
    4. Edit the file `initc.c`
-
     - declare the new analysis, after line :
-
     ```
     active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
     ```
