@@ -124,12 +124,19 @@ This is to be done close to line **97**
 
 ### 1. Edit the file [`src/gui/calc_menu.c`](https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html)
 
-  - In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
+  - In the function `on_calc_activate` add a case for the new analysis
   ```C
-   case IDC:
-     calc_idc (box);
-     break;
-  ```
+   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
+   {
+     ...
+
+     case IDC:
+       calc_idc (box);
+       break;
+      
+     ...
+   }
+   ```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
   ```C
   /*!
