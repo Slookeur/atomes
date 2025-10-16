@@ -88,23 +88,30 @@ This is to be done close to line **97**
     - `char * calc_name[]` : add the new calculation name for the menu items
     - `char * graph_name[]` : add the new calculation name for the graph windows
 
-  - In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
+  - In the function `atomes_menu_bar_action` add the calculation menu callback:
   ```C
+  G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
+  {
+    ...
+
   else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
   {
     on_calc_activate (NULL, data); // This does not change
   }
+
+    ...
+  }
   ```
   - In the function `create_main_window` declare the icon for the new calculation:
   ```C
-   GtkWidget * create_main_window (GApplication * atomes)
+  GtkWidget * create_main_window (GApplication * atomes)
  {
-     ...
+    ...
 
-  graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
 
-   ...
- }
+    ...
+  }
   ```
 ### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html)
 
@@ -116,7 +123,7 @@ This is to be done close to line **97**
 ### 6. If periodicity is required for this calculation:
 
   - Edit [`src/gui/edit_menuc.c`](https://slookeur.github.io/atomes-doxygen/d8/da6/edit__menu_8c.html) search for the `init_box_calc()` function to add the proper flags for
-```
+```C
   active_project -> analysis[IDC] -> avail_ok
 ```
   - Edit the file [`src/opengl/edit/cbuild_action.c`](https://slookeur.github.io/atomes-doxygen/d0/dd3/cbuild__action_8c.html) close to line **1680** to add the default availability for this calculation
@@ -135,15 +142,14 @@ This is to be done close to line **97**
   ```C
    G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
  {
-```
- ...
-```C
-     case IDC:
-       calc_idc (box);
-       break;
+    ...
+
+    case IDC:
+      calc_idc (box);
+      break;
       
-     ...
-   }
+    ...
+  }
    ```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
   ```C
