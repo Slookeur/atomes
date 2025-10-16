@@ -105,31 +105,31 @@ void workinfo (project * this_proj, int i)
         {
           switch (i)
           {
-            case GR:
-              update_rdf_view (this_proj, GR);
+            case GDR:
+              update_rdf_view (this_proj, GDR);
               break;
-            case SQ:
-              update_sq_view (this_proj, SQ);
+            case SQD:
+              update_sq_view (this_proj, SQD);
               break;
-            case SK:
-              update_sq_view (this_proj, SK);
+            case SKD:
+              update_sq_view (this_proj, SKD);
               break;
-            case GK:
-              update_rdf_view (this_proj, GK);
+            case GDK:
+              update_rdf_view (this_proj, GDK);
               break;
-            case AN:
+            case ANG:
               update_angle_view (this_proj);
               break;
-            case RI:
+            case RIN:
               for (j=0; j<5; j++) if (this_proj -> rsparam[j][5]) update_rings_view (this_proj, j);
               break;
-            case CH:
+            case CHA:
               update_chains_view (this_proj);
               break;
-            case SP:
+            case SPH:
               update_spherical_view (this_proj);
               break;
-             case MS:
+             case MSD:
                update_msd_view (this_proj);
                break;
           }

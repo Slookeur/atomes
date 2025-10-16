@@ -117,34 +117,34 @@ void initcwidgets ()
   int i, j;
 
   j=active_project -> nspec;
-  active_project -> numc[GR] = 16+5*j*j;
-  active_project -> numc[SQ] = 8+4*j*j;
-  active_project -> numc[SK] = 8+4*j*j;
-  active_project -> numc[GK] = active_project -> numc[GR];
-  active_project -> numc[BD] = j*j;
-  active_project -> numc[AN] = j*j*j + j*j*j*j;
-  active_project -> numc[RI] = 20*(j+1);
-  active_project -> numc[CH] = j+1;
-  active_project -> numc[SP] = 0;
-  active_project -> numc[MS] = 0;
-  if (active_project -> steps > 1) active_project -> numc[MS] = 14*j+6;
+  active_project -> numc[GDR] = 16+5*j*j;
+  active_project -> numc[SQD] = 8+4*j*j;
+  active_project -> numc[SKD] = 8+4*j*j;
+  active_project -> numc[GDK] = active_project -> numc[GDR];
+  active_project -> numc[BND] = j*j;
+  active_project -> numc[ANG] = j*j*j + j*j*j*j;
+  active_project -> numc[RIN] = 20*(j+1);
+  active_project -> numc[CHA] = j+1;
+  active_project -> numc[SPH] = 0;
+  active_project -> numc[MSD] = 0;
+  if (active_project -> steps > 1) active_project -> numc[MSD] = 14*j+6;
 
   if (j == 2)
   {
-    active_project -> numc[GR] = active_project -> numc[GR] + 6;
-    active_project -> numc[SQ] = active_project -> numc[SQ] + 8;
-    active_project -> numc[SK] = active_project -> numc[SK] + 8;
-    active_project -> numc[GK] = active_project -> numc[GK] + 6;
+    active_project -> numc[GDR] = active_project -> numc[GDR] + 6;
+    active_project -> numc[SQD] = active_project -> numc[SQD] + 8;
+    active_project -> numc[SKD] = active_project -> numc[SKD] + 8;
+    active_project -> numc[GDK] = active_project -> numc[GDK] + 6;
   }
-  active_project -> numwid = active_project -> numc[GR]
-                       + active_project -> numc[SQ]
-                       + active_project -> numc[SK]
-                       + active_project -> numc[GK]
-                       + active_project -> numc[BD]
-                       + active_project -> numc[AN]
-                       + active_project -> numc[RI]
-                       + active_project -> numc[CH]
-                       + active_project -> numc[MS];
+  active_project -> numwid = active_project -> numc[GDR]
+                       + active_project -> numc[SQD]
+                       + active_project -> numc[SKD]
+                       + active_project -> numc[GDK]
+                       + active_project -> numc[BND]
+                       + active_project -> numc[ANG]
+                       + active_project -> numc[RIN]
+                       + active_project -> numc[CHA]
+                       + active_project -> numc[MSD];
   for (i=0; i<NGRAPHS; i++)
   {
     if (i != SP) alloc_curves (i);
@@ -273,16 +273,16 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
   #define NCALCS 10
   #define NGRAPHS 10
 
-  #define GR 0
-  #define SQ 1
-  #define SK 2
-  #define GK 3
-  #define BD 4
-  #define AN 5
-  #define RI 6
-  #define CH 7
-  #define SP 8
-  #define MS 9
+  #define GDR 0
+  #define SQD 1
+  #define SKD 2
+  #define GDK 3
+  #define BND 4
+  #define ANG 5
+  #define RIN 6
+  #define CHA 7
+  #define SPH 8
+  #define MSD 9
 */
 
 /*!
@@ -303,45 +303,45 @@ void init_atomes_analyses ()
   active_project -> analysis = g_malloc0(NCALCS*sizeof*active_project -> analysis);
   // g(r)
   comp_list = allocint (2);
-  comp_list[0] = GR;
-  comp_list[1] = GK;
-  active_project -> analysis[GR] = setup_analysis ("g(r)/G(r)", GR, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  comp_list[0] = GDR;
+  comp_list[1] = GDK;
+  active_project -> analysis[GDR] = setup_analysis ("g(r)/G(r)", GDR, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GK, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  active_project -> analysis[GDK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
-  comp_list[0] = SQ;
-  comp_list[1] = SK;
-  active_project -> analysis[SQ] = setup_analysis ("S(q) from FFT[g(r)]", SQ, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  comp_list[0] = SQD;
+  comp_list[1] = SKD;
+  active_project -> analysis[SQD] = setup_analysis ("S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SK] = setup_analysis ("S(q) from Debye equation", SK, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SKD] = setup_analysis ("S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
-  comp_list[0] = BD;
-  active_project -> analysis[BD] = setup_analysis ("Bonds properties", BD, FALSE, TRUE, j*j, 1, comp_list, "Dij [Å]");
+  comp_list[0] = BND;
+  active_project -> analysis[BND] = setup_analysis ("Bonds properties", BND, FALSE, TRUE, j*j, 1, comp_list, "Dij [Å]");
 
   // Angle distribution(s)
-  comp_list[0] = AN;
-  active_project -> analysis[AN] = setup_analysis ("Angle distributions", AN, FALSE, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
+  comp_list[0] = ANG;
+  active_project -> analysis[ANG] = setup_analysis ("Angle distributions", ANG, FALSE, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
-  comp_list[0] = RI;
-  active_project -> analysis[RI] = setup_analysis ("Ring statistics", RI, FALSE, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+  comp_list[0] = RIN;
+  active_project -> analysis[RIN] = setup_analysis ("Ring statistics", RIN, FALSE, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
 
   // Chain statistic(s)
-  comp_list[0] = CH;
-  active_project -> analysis[CH] = setup_analysis ("Chain statistics", CH, FALSE, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+  comp_list[0] = CHA;
+  active_project -> analysis[CHA] = setup_analysis ("Chain statistics", CHA, FALSE, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
 
   // Spherical harmonic(s)
-  comp_list[0] = SP;
-  active_project -> analysis[SP] = setup_analysis ("Spherical harmonics", SP, FALSE, TRUE, 0, 1, comp_list, "Ql");
+  comp_list[0] = SPH;
+  active_project -> analysis[SPH] = setup_analysis ("Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
 
   // Mean square displacement
-  comp_list[0] = MS;
-  if (active_project -> steps > 1) active_project -> analysis[MS] = setup_analysis ("Mean Squared Displacement", MS, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
+  comp_list[0] = MSD;
+  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis ("Mean Squared Displacement", MSD, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
 
   g_free (comp_list);
   /*
@@ -349,44 +349,42 @@ void init_atomes_analyses ()
 
        - edit the file 'global.c'
 
-         - define ID a new, and unique, 2 characters variable, ex: GR
-         - create a PACKAGE_ID variable: gchar * PACKAGE_ID = NULL;
+         - create a 'PACKAGE_IDC variable': gchar * PACKAGE_IDC = NULL;
+
+       - edit the file 'global.h' to make the information available in other parts of the code:
+         - define 'IDC' a new, and unique, 3 characters variable, ex: #define IDC 10
+         - extern gchar * PACKAGE_IDC;
          - increment the total number of calculations available : NCALCS
          - increment increment the total number calculation using graphs : NGRAPHS (if needed)
 
-       - edit the file 'global.h' to make the information available in other parts of the code: extern gchar * PACKAGE_ID;
-
        - to use new icon for this calculation edit the file 'main.c'
-         - to read the icon file: PACKAGE_ID = g_build_filename (PACKAGE_PREFIX, "pixmaps/id.png", NULL);
+         - to read the icon file: PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
 
        - edit the file 'gui.c'
-         - modify the following variables to describe the new calculation, and create the corresponding menu elements:
-           - atomes_action analyze_acts[] : {"analyze.id",    GINT_TO_POINTER(ID-1)}
-           - char * calc_name[] : calculation name for the menu items
-           - char * graph_name[] : name for the graph windows
+         - At the top of the file modify the following variables to describe the new calculation, and create the corresponding menu elements:
+           - atomes_action analyze_acts[] : {"analyze.idc",    GINT_TO_POINTER(IDC-1)}
+           - char * calc_name[] : add the new calculation name for the menu items
+           - char * graph_name[] : add the new calculation name for the graph windows
+
            - in the function 'G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)' add the calculation menu callback:
 
-             else if (g_strcmp0 (name, "analyze.id") == 0)  // Update this line using the value in analyze_acts[]
+             else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
              {
                on_calc_activate (NULL, data); // This does not change
              }
 
-           - in the function 'GMenu * create_analyze_menu ()' create the new menu element :
-
-             append_menu_item (menu, "MNew calculation", "app.analyze.id", NULL, NULL, IMG_FILE, PACKAGE_ID, FALSE, FALSE, FALSE, NULL);
-
            - in the function 'GtkWidget * create_main_window (GApplication * atomes).' declare the icon for the new calculation:
 
-             graph_img[ID] = g_strdup_printf ("%s", PACKAGE_ID);
+             graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
 
        - edit the file 'initc.c'
 
          - declare the new analysis:
 
-           active_project -> analysis[ID] = setup_analysis (ID, TRUE, num_graphs, num_compat, {compat_1, compat_2, ...});
+           active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
 
        - if periodicity is required for this calculation, edit 'edit_menuc.c' edit the 'init_box_calc()' function
-         to add the proper flags for :  'active_project -> analysis[ID] -> avail_ok'
+         to add the proper flags for :  'active_project -> analysis[IDC] -> avail_ok'
 
        - edit the file 'cbuild_action.c' line 1680 to add the default availability for this calculation
        - edit the file 'popup.c' line 2155 to add the default availability for this calculation

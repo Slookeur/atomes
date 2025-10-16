@@ -2055,14 +2055,14 @@ void set_atomes_defaults ()
   default_totcut = 0.0;
   if (default_bond_cutoff) g_free (default_bond_cutoff);
   default_bond_cutoff = NULL;
-  default_num_delta[GR] = 1000;
-  default_num_delta[SQ] = 1000;
-  default_num_delta[SK] = 1000;
-  default_num_delta[GK] = 1000;
-  default_num_delta[BD] = 100;
-  default_num_delta[AN] = 90;
-  default_num_delta[CH-1] = 20;
-  default_num_delta[MS-2] = 0;
+  default_num_delta[GDR] = 1000;
+  default_num_delta[SQD] = 1000;
+  default_num_delta[SKD] = 1000;
+  default_num_delta[GDK] = 1000;
+  default_num_delta[BND] = 100;
+  default_num_delta[ANG] = 90;
+  default_num_delta[CHA-1] = 20;
+  default_num_delta[MSD-2] = 0;
   default_delta_t[0] = 0.0;
   default_delta_t[1] = -1.0;
 

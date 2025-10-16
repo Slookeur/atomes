@@ -168,7 +168,7 @@ void draw_curve (cairo_t * cr,
   {
     j = 0;
     k = 1;
-    if (rid == RI) j = 2;
+    if (rid == RIN) j = 2;
     for ( i = j ; i < points - k ; i ++)
     {
       plot = TRUE;
@@ -257,7 +257,7 @@ void draw_curve (cairo_t * cr,
   {
     j = 0;
     k = 1;
-    if (rid == RI) j = 2;
+    if (rid == RIN) j = 2;
     // g_debug ("x_min= %f, x_max= %f, y_min= %f, y_max= %f", x_min, x_max, y_min, y_max);
     for ( i = j ; i < points ; i ++)
     {

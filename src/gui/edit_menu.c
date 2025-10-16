@@ -548,10 +548,10 @@ void init_box_calc ()
 #ifdef NEW_ANA
     if (active_project -> analysis)
     {
-      active_project -> analysis[GR] -> avail_ok = FALSE;
-      active_project -> analysis[SQ] -> avail_ok = FALSE;
-      active_project -> analysis[SK] -> avail_ok = FALSE;
-      active_project -> analysis[GK] -> avail_ok = FALSE;
+      active_project -> analysis[GDR] -> avail_ok = FALSE;
+      active_project -> analysis[SQD] -> avail_ok = FALSE;
+      active_project -> analysis[SKD] -> avail_ok = FALSE;
+      active_project -> analysis[GDK] -> avail_ok = FALSE;
     }
 #else
     for (i=0; i<4; i++) active_project -> runok[i] = FALSE;
@@ -562,10 +562,10 @@ void init_box_calc ()
 #ifdef NEW_ANA
     if (active_project -> analysis)
     {
-      active_project -> analysis[GR] -> avail_ok = TRUE;
-      active_project -> analysis[SQ] -> avail_ok = active_project -> analysis[GR] -> calc_ok;
-      active_project -> analysis[SK] -> avail_ok = TRUE;
-      active_project -> analysis[GK] -> avail_ok = active_project -> analysis[SK] -> calc_ok;
+      active_project -> analysis[GDR] -> avail_ok = TRUE;
+      active_project -> analysis[SQD] -> avail_ok = active_project -> analysis[GDR] -> calc_ok;
+      active_project -> analysis[SKD] -> avail_ok = TRUE;
+      active_project -> analysis[GDK] -> avail_ok = active_project -> analysis[SKD] -> calc_ok;
     }
 #else
     for (i=0; i<3; i=i+2)
@@ -699,29 +699,29 @@ gboolean test_cutoffs ()
 #ifdef NEW_ANA
   for (i=0; i<active_project -> nspec; i++, k++)
   {
-    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR] -> max)) return FALSE;
+    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GDR] -> max)) return FALSE;
   }
   for (i=0; i<active_project -> nspec-1; i++)
   {
     for (j=i+1; j<active_project -> nspec; j++, k++)
     {
-      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR] -> max)) return FALSE;
+      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GDR] -> max)) return FALSE;
     }
   }
-  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GR] -> max)) return FALSE;
+  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GDR] -> max)) return FALSE;
 #else
   for (i=0; i<active_project -> nspec; i++, k++)
   {
-    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GR])) return FALSE;
+    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
   }
   for (i=0; i<active_project -> nspec-1; i++)
   {
     for (j=i+1; j<active_project -> nspec; j++, k++)
     {
-      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GR])) return FALSE;
+      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
     }
   }
-  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GR])) return FALSE;
+  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
 #endif
   return TRUE;
 }
@@ -745,10 +745,10 @@ void edit_bonds (GtkWidget * vbox)
   if (! preferences)
   {
 #ifdef NEW_ANA
-    if (active_project -> analysis[GR] -> max != 0.0)
+    if (active_project -> analysis[GDR] -> max != 0.0)
     {
       str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
-                             m_end, active_project -> analysis[GR] -> max);
+                             m_end, active_project -> analysis[GDR] -> max);
 #else
     if (active_project -> max[0] != 0.0)
     {

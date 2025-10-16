@@ -99,14 +99,14 @@ void apply_default_parameters_to_project (project * this_proj)
   }
 #ifdef NEW_ANA
   /* for (i=0; i<6; i++) this_proj -> analysis[i] -> num_delta = default_num_delta[i];
-  this_proj -> analysis[SP] -> num_delta = default_num_delta[6];
-  this_proj -> analysis[MS] -> num_delta = default_num_delta[7];
-  this_proj -> analysis[MS] -> delta = default_delta_t[0]; */
+  this_proj -> analysis[SPH] -> num_delta = default_num_delta[6];
+  this_proj -> analysis[MSD] -> num_delta = default_num_delta[7];
+  this_proj -> analysis[MSD] -> delta = default_delta_t[0]; */
 #else
   for (i=0; i<6; i++) this_proj -> num_delta[i] = default_num_delta[i];
-  this_proj -> num_delta[SP] = default_num_delta[6];
-  this_proj -> num_delta[MS] = default_num_delta[7];
-  this_proj -> delta[MS] = default_delta_t[0];
+  this_proj -> num_delta[SPH] = default_num_delta[6];
+  this_proj -> num_delta[MSD] = default_num_delta[7];
+  this_proj -> delta[MSD] = default_delta_t[0];
 #endif // NEW_ANA
 
   for (i=0; i<5; i++)
@@ -182,9 +182,9 @@ void init_project (gboolean alloc_box)
   new_proj -> id = activep;
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
 #ifndef NEW_ANA
-  new_proj -> delta[RI] = new_proj -> delta[CH] = 1.0;
-  new_proj -> min[RI] = new_proj -> min[CH] = 1;
-  new_proj -> delta[SP] = 2.0;
+  new_proj -> delta[RIN] = new_proj -> delta[CHA] = 1.0;
+  new_proj -> min[RIN] = new_proj -> min[CHA] = 1;
+  new_proj -> delta[SPH] = 2.0;
 #endif
   apply_default_parameters_to_project (new_proj);
   new_proj -> tfile = -1;

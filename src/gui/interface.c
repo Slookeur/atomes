@@ -906,11 +906,11 @@ void lattice_info_ (int * bid, double * volume, double * density,
   if ((active_cell -> npt && * bid == active_project -> steps-1) || ! active_cell -> npt)
   {
 #ifdef NEW_ANA
-    active_project -> analysis[GR] -> max = fdmax_ (& active_cell -> pbc);
-    active_project -> analysis[SQ] -> min = active_project -> analysis[SK] -> min = fkmin_ (& active_cell -> pbc);
+    active_project -> analysis[GDR] -> max = fdmax_ (& active_cell -> pbc);
+    active_project -> analysis[SQD] -> min = active_project -> analysis[SKD] -> min = fkmin_ (& active_cell -> pbc);
 #else
-    active_project -> max[GR] = fdmax_ (& active_cell -> pbc);
-    active_project -> min[SQ] = active_project -> min[SK] = fkmin_ (& active_cell -> pbc);
+    active_project -> max[GDR] = fdmax_ (& active_cell -> pbc);
+    active_project -> min[SQD] = active_project -> min[SKD] = fkmin_ (& active_cell -> pbc);
 #endif // NEW_ANA
     int i, j;
     active_cell -> volume = active_cell -> density = 0.0;

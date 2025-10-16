@@ -179,7 +179,7 @@ void update_sq_view (project * this_proj, int sqk)
   if (this_proj -> analysis[sqk] -> calc_buffer == NULL) this_proj -> analysis[sqk] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
-  if (sqk == SK)
+  if (sqk == SKD)
   {
     print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
@@ -236,7 +236,7 @@ void update_sq_view (project * this_proj, int sqk)
   if (this_proj -> text_buffer[sqk+OT] == NULL) this_proj -> text_buffer[sqk+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[sqk+OT]);
   print_info ("\n\nStructure factor(s)", "heading", this_proj -> text_buffer[sqk+OT]);
-  if (sqk == SK)
+  if (sqk == SKD)
   {
     print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> text_buffer[sqk+OT]);
   }
@@ -304,36 +304,36 @@ G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data)
 {
   int i;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SQ] -> init_ok) initsq (SQ);
-  clean_curves_data (SQ, 0, active_project -> analysis[SQ] -> numc);
-  active_project -> analysis[SQ] -> delta = (active_project -> analysis[SQ] -> max - active_project -> analysis[SQ] -> min) / active_project -> analysis[SQ] -> num_delta;
-  prepostcalc (widg, FALSE, SQ, 0, opac);
+  if (! active_project -> analysis[SQD] -> init_ok) initsq (SQD);
+  clean_curves_data (SQD, 0, active_project -> analysis[SQD] -> numc);
+  active_project -> analysis[SQD] -> delta = (active_project -> analysis[SQD] -> max - active_project -> analysis[SQD] -> min) / active_project -> analysis[SQD] -> num_delta;
+  prepostcalc (widg, FALSE, SQD, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = s_of_q_ (& active_project -> analysis[SQ] -> max,
-               & active_project -> analysis[SQ] -> min,
-               & active_project -> analysis[SQ] -> num_delta);
+  i = s_of_q_ (& active_project -> analysis[SQD] -> max,
+               & active_project -> analysis[SQD] -> min,
+               & active_project -> analysis[SQD] -> num_delta);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[SQ] -> calc_time = get_calc_time (start_time, stop_time);
+  active_project -> analysis[SQD] -> calc_time = get_calc_time (start_time, stop_time);
 #else
-  if (! active_project -> initok[SQ]) initsq (SQ);
-  clean_curves_data (SQ, 0, active_project -> numc[SQ]);
-  active_project -> delta[SQ] = (active_project -> max[SQ] - active_project -> min[SQ]) / active_project -> num_delta[SQ];
-  prepostcalc (widg, FALSE, SQ, 0, opac);
+  if (! active_project -> initok[SQD]) initsq (SQD);
+  clean_curves_data (SQD, 0, active_project -> numc[SQD]);
+  active_project -> delta[SQD] = (active_project -> max[SQD] - active_project -> min[SQD]) / active_project -> num_delta[SQD];
+  prepostcalc (widg, FALSE, SQD, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = s_of_q_ (& active_project -> max[SQ],
-               & active_project -> min[SQ],
-               & active_project -> num_delta[SQ]);
+  i = s_of_q_ (& active_project -> max[SQD],
+               & active_project -> min[SQD],
+               & active_project -> num_delta[SQD]);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[SQ] = get_calc_time (start_time, stop_time);
+  active_project -> calc_time[SQD] = get_calc_time (start_time, stop_time);
 #endif
-  prepostcalc (widg, TRUE, SQ, i, 1.0);
+  prepostcalc (widg, TRUE, SQD, i, 1.0);
   if (! i)
   {
     show_error ("The S(q) calculation has failed", 0, widg);
   }
   else
   {
-    update_sq_view (active_project, SQ);
+    update_sq_view (active_project, SQD);
     show_the_widgets (curvetoolbox);
   }
   fill_tool_model ();
@@ -369,66 +369,66 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   int i, j;
 
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SK] -> init_ok) initsq (SK);
-  clean_curves_data (SK, 0, active_project -> analysis[SK] -> numc);
-  active_project -> analysis[SK] -> delta = (active_project -> analysis[SK] -> max - active_project -> analysis[SK] -> min) / active_project -> analysis[SK] -> num_delta;
-  prepostcalc (widg, FALSE, SK, 0, opac);
-  i = cqvf_ (& active_project -> analysis[SK] -> max,
-             & active_project -> analysis[SK] -> min,
-             & active_project -> analysis[SK] -> num_delta,
+  if (! active_project -> analysis[SKD] -> init_ok) initsq (SKD);
+  clean_curves_data (SKD, 0, active_project -> analysis[SKD] -> numc);
+  active_project -> analysis[SKD] -> delta = (active_project -> analysis[SKD] -> max - active_project -> analysis[SKD] -> min) / active_project -> analysis[SKD] -> num_delta;
+  prepostcalc (widg, FALSE, SKD, 0, opac);
+  i = cqvf_ (& active_project -> analysis[SKD] -> max,
+             & active_project -> analysis[SKD] -> min,
+             & active_project -> analysis[SKD] -> num_delta,
              & active_project -> sk_advanced[0],
              & active_project -> sk_advanced[1]);
-  prepostcalc (widg, TRUE, SK, i, 1.0);
+  prepostcalc (widg, TRUE, SKD, i, 1.0);
   if (i == 1)
   {
-    prepostcalc (widg, FALSE, SK, 0, opac);
-    for (i=0; i<active_project -> analysis[SK] -> numc; i++)
+    prepostcalc (widg, FALSE, SKD, 0, opac);
+    for (i=0; i<active_project -> analysis[SKD] -> numc; i++)
     {
-      active_project -> analysis[SK] -> curves[i] -> ndata = 0;
+      active_project -> analysis[SKD] -> curves[i] -> ndata = 0;
     }
     clock_gettime (CLOCK_MONOTONIC, & start_time);
-    j = s_of_k_ (& active_project -> analysis[SK] -> num_delta, & active_project -> xcor);
+    j = s_of_k_ (& active_project -> analysis[SKD] -> num_delta, & active_project -> xcor);
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SK] -> calc_time = get_calc_time (start_time, stop_time);
+    active_project -> analysis[SKD] -> calc_time = get_calc_time (start_time, stop_time);
     g_free (xsk);
     xsk = NULL;
-    active_project -> analysis[GK] -> avail_ok = j;
+    active_project -> analysis[GDK] -> avail_ok = j;
 #else
-  if (! active_project -> initok[SK]) initsq (SK);
-  clean_curves_data (SK, 0, active_project -> numc[SK]);
-  active_project -> delta[SK] = (active_project -> max[SK] - active_project -> min[SK]) / active_project -> num_delta[SK];
-  prepostcalc (widg, FALSE, SK, 0, opac);
-  i = cqvf_ (& active_project -> max[SK],
-             & active_project -> min[SK],
-             & active_project -> num_delta[SK],
+  if (! active_project -> initok[SKD]) initsq (SK);
+  clean_curves_data (SKD, 0, active_project -> numc[SKD]);
+  active_project -> delta[SKD] = (active_project -> max[SKD] - active_project -> min[SKD]) / active_project -> num_delta[SKD];
+  prepostcalc (widg, FALSE, SKD, 0, opac);
+  i = cqvf_ (& active_project -> max[SKD],
+             & active_project -> min[SKD],
+             & active_project -> num_delta[SKD],
              & active_project -> sk_advanced[0],
              & active_project -> sk_advanced[1]);
-  prepostcalc (widg, TRUE, SK, i, 1.0);
+  prepostcalc (widg, TRUE, SKD, i, 1.0);
   if (i == 1)
   {
-    prepostcalc (widg, FALSE, SK, 0, opac);
-    for (i=0; i<active_project -> numc[SK]; i++)
+    prepostcalc (widg, FALSE, SKD, 0, opac);
+    for (i=0; i<active_project -> numc[SKD]; i++)
     {
-      active_project -> curves[SK][i] -> ndata = 0;
+      active_project -> curves[SKD][i] -> ndata = 0;
     }
     clock_gettime (CLOCK_MONOTONIC, & start_time);
-    j = s_of_k_ (& active_project -> num_delta[SK], & active_project -> xcor);
+    j = s_of_k_ (& active_project -> num_delta[SKD], & active_project -> xcor);
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> calc_time[SK] = get_calc_time (start_time, stop_time);
+    active_project -> calc_time[SKD] = get_calc_time (start_time, stop_time);
     g_free (xsk);
     xsk = NULL;
-    active_project -> runok[GK] = j;
+    active_project -> runok[GDK] = j;
 #endif
-    prepostcalc (widg, TRUE, SK, j, 1.0);
+    prepostcalc (widg, TRUE, SKD, j, 1.0);
     if (! j)
     {
-      remove_action (analyze_acts[GK].action_name);
+      remove_action (analyze_acts[GDK].action_name);
       show_error ("The S(q) calculation has failed", 0, widg);
     }
     else
     {
-      add_action (analyze_actions[GK]);
-      update_sq_view (active_project, SK);
+      add_action (analyze_actions[GDK]);
+      update_sq_view (active_project, SKD);
       show_the_widgets (curvetoolbox);
     }
   }

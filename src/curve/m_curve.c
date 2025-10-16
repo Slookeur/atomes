@@ -458,41 +458,32 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
   for (i=0; i<nprojects; i++)
   {
     this_proj = get_project_by_id(i);
-    create_menu[i][data -> b] = FALSE;
     create_proj[i] = FALSE;
-    j = 0;
-    if (data -> b == GR || data -> b == GK)
-    {
-      j = 1;
-      k = (data -> b == GR) ? GK : GR;
-    }
-    else if (data -> b == SQ || data -> b == SK)
-    {
-      j = 1;
-      k = (data -> b == SQ) ? SK : SQ;
-    }
 #ifdef NEW_ANA
-    if (((add && extrarid[i][data -> b] < this_proj -> analysis[data -> b] -> numc)
-    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> analysis[data -> b] -> calc_ok)
+    for (j=0; j<this_proj -> analysis[data -> b] -> c_sets; j++)
     {
-      create_menu[i][data -> b] = TRUE;
-      create_proj[i] = TRUE;
-    }
-
-    if (j && this_proj -> analysis[k] -> calc_ok)
-    {
+      k = this_proj -> analysis[data -> b] -> compat_id[j];
       create_menu[i][k] = FALSE;
-      if (this_proj -> analysis[k] -> curves[0] -> ndata > 0)
+      if (((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
+      || (! add && extrarid[i][k] > 0)) && this_proj -> analysis[k] -> calc_ok)
       {
-        if ((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
-        || (! add && extrarid[i][k] > 0))
-        {
-          create_menu[i][k] = TRUE;
-          create_proj[i] = TRUE;
-        }
+        create_menu[i][k] = TRUE;
+        create_proj[i] = TRUE;
       }
     }
 #else
+    create_menu[i][data -> b] = FALSE;
+    j = 0;
+    if (data -> b == GDR || data -> b == GDK)
+    {
+      j = 1;
+      k = (data -> b == GDR) ? GDK : GDR;
+    }
+    else if (data -> b == SQD || data -> b == SKD)
+    {
+      j = 1;
+      k = (data -> b == SQD) ? SKD : SQD;
+    }
     if (((add && extrarid[i][data -> b] < this_proj -> numc[data -> b])
     || (! add && extrarid[i][data -> b] > 0)) && this_proj -> visok[data -> b])
     {
@@ -764,7 +755,7 @@ GMenu * autoscale_section (gchar * str)
 GtkWidget * curve_popup_menu (gpointer data)
 {
   GtkWidget * curve_pop_menu;
-  int i, j;
+  int i, j, k, l;
   CurveState * cstate = (CurveState *)data;
   activeg = cstate -> id -> a;
   activer = cstate -> id -> b;
@@ -793,30 +784,30 @@ GtkWidget * curve_popup_menu (gpointer data)
   g_menu_append_section (menu, NULL, (GMenuModel *)create_data_menu(curve_popup_actions, 1, str, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)create_curve_menu(str));
   i = -1;
-  for ( j=0 ; j < nprojects; j++ )
+#ifdef NEW_ANA
+  project * this_proj = get_project_by_id (activeg);
+  for ( j=0 ; j < this_proj -> analysis[activer] -> c_sets; j++)
   {
-#ifdef NEW_ANA
-    i += get_project_by_id(j) -> analysis[cstate -> id -> b] -> numc;
-#else
-    i += get_project_by_id(j) -> numc[cstate -> id -> b];
-#endif
-    if (cstate -> id -> b == GR || cstate -> id -> b == GK)
+    k = this_proj -> analysis[activer] -> compat_id[j];
+    for ( l=0 ; l < nprojects; l++ )
     {
-#ifdef NEW_ANA
-      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == GR) ? GK : GR] -> numc;
-#else
-      i += get_project_by_id(j) -> numc[(cstate -> id -> b == GR) ? GK : GR];
-#endif
-    }
-    else if (cstate -> id -> b == SQ || cstate -> id -> b == SK)
-    {
-#ifdef NEW_ANA
-      i += get_project_by_id(j) -> analysis[(cstate -> id -> b == SQ) ? SK : SQ] -> numc;
-#else
-      i += get_project_by_id(j) -> numc[(cstate -> id -> b == SQ) ? SK : SQ];
-#endif
+      i += get_project_by_id(l) -> analysis[k] -> numc;
     }
   }
+#else
+  for ( j=0 ; j < nprojects; j++ )
+  {
+    i += get_project_by_id(j) -> numc[cstate -> id -> b];
+    if (cstate -> id -> b == GDR || cstate -> id -> b == GDK)
+    {
+      i += get_project_by_id(j) -> numc[(cstate -> id -> b == GDR) ? GDK : GDR];
+    }
+    else if (cstate -> id -> b == SQD || cstate -> id -> b == SKD)
+    {
+      i += get_project_by_id(j) -> numc[(cstate -> id -> b == SQD) ? SKD : SQD];
+    }
+  }
+#endif
   g_menu_append_section (menu, NULL, (GMenuModel *)create_add_remove_section(curve_popup_actions, str, i, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)autoscale_section(str));
   g_menu_append_section (menu, NULL, (GMenuModel *)curve_close_section(str));

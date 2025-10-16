@@ -2152,17 +2152,17 @@ void create_new_project_using_data (atom_selection * selection)
     }
   }
 #ifdef NEW_ANA
-  active_project -> analysis[BD] -> avail_ok = TRUE;
-  active_project -> analysis[AN] -> avail_ok = TRUE;
-  active_project -> analysis[RI] -> avail_ok = TRUE;
-  active_project -> analysis[CH] -> avail_ok = TRUE;
-  active_project -> analysis[SP] -> avail_ok = TRUE;
+  active_project -> analysis[BND] -> avail_ok = TRUE;
+  active_project -> analysis[ANG] -> avail_ok = TRUE;
+  active_project -> analysis[RIN] -> avail_ok = TRUE;
+  active_project -> analysis[CHA] -> avail_ok = TRUE;
+  active_project -> analysis[SPH] -> avail_ok = TRUE;
 #else
-  active_project -> runok[BD] = TRUE;
-  active_project -> runok[AN] = TRUE;
-  active_project -> runok[RI] = TRUE;
-  active_project -> runok[CH] = TRUE;
-  active_project -> runok[SP] = TRUE;
+  active_project -> runok[BND] = TRUE;
+  active_project -> runok[ANG] = TRUE;
+  active_project -> runok[RIN] = TRUE;
+  active_project -> runok[CHA] = TRUE;
+  active_project -> runok[SPH] = TRUE;
 #endif
   active_project_changed (activep);
   add_project_to_workspace ();

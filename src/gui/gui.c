@@ -109,15 +109,15 @@ atomes_action edition_acts[] = {{"edit.chemistry",   GINT_TO_POINTER(0)},
                                 {"edit.periodicity", GINT_TO_POINTER(1)},
                                 {"edit.cutoffs",     GINT_TO_POINTER(2)}};
 
-atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GR)},
-                                {"analyze.sq",     GINT_TO_POINTER(SQ)},
-                                {"analyze.sk",     GINT_TO_POINTER(SK)},
-                                {"analyze.gk",     GINT_TO_POINTER(GK)},
-                                {"analyze.bonds",  GINT_TO_POINTER(BD)},
-                                {"analyze.rings",  GINT_TO_POINTER(RI-1)},
-                                {"analyze.chains", GINT_TO_POINTER(CH-1)},
-                                {"analyze.sp",     GINT_TO_POINTER(SP-1)},
-                                {"analyze.msd",    GINT_TO_POINTER(MS-1)}};
+atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
+                                {"analyze.sq",     GINT_TO_POINTER(SQD)},
+                                {"analyze.sk",     GINT_TO_POINTER(SKD)},
+                                {"analyze.gk",     GINT_TO_POINTER(GDK)},
+                                {"analyze.bonds",  GINT_TO_POINTER(BND)},
+                                {"analyze.rings",  GINT_TO_POINTER(RIN-1)},
+                                {"analyze.chains", GINT_TO_POINTER(CHA-1)},
+                                {"analyze.sp",     GINT_TO_POINTER(SPH-1)},
+                                {"analyze.msd",    GINT_TO_POINTER(MSD-1)}};
 
 char * calc_name[] = {"g(r)/G(r)",
                       "S(q) from FFT[g(r)]",
@@ -1001,15 +1001,14 @@ GMenu * tool_box_section ()
 GMenu * create_analyze_menu ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "g(r) / G(r)", "app.analyze.gr", NULL, NULL, IMG_FILE, PACKAGE_GR, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "S(q) from FFT[g(r)]", "app.analyze.sq", NULL, NULL, IMG_FILE, PACKAGE_SQ, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "S(q) from Debye Eq.", "app.analyze.sk", NULL, NULL, IMG_FILE, PACKAGE_SQ, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "g(r) / G(r) from FFT[S(q)]", "app.analyze.gk", NULL, NULL, IMG_FILE, PACKAGE_GR, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Bonds and Angles", "app.analyze.bonds", NULL, NULL, IMG_FILE, PACKAGE_BD, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Ring statistics", "app.analyze.rings", NULL, NULL, IMG_FILE, PACKAGE_RI, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Chain statistics", "app.analyze.chains", NULL, NULL, IMG_FILE, PACKAGE_CH, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Spherical Harmonics", "app.analyze.sp", NULL, NULL, IMG_FILE, PACKAGE_SP, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Mean Squared Displacement", "app.analyze.msd", NULL, NULL, IMG_FILE, PACKAGE_MS, FALSE, FALSE, FALSE, NULL);
+  gchar * str;
+  int i;
+  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
+  {
+    str = g_strdup_printf ("app.%s", analyze_acts[i].action_name);
+    append_menu_item (menu, calc_name[i], str, NULL, NULL, IMG_FILE, graph_img[(i < ANG) ? i : i+1], FALSE, FALSE, FALSE, NULL);
+    g_free (str);
+  }
   // Append new calculation menu element here
   g_menu_append_section (menu, NULL, (GMenuModel*)tool_box_section());
   return menu;
@@ -1100,7 +1099,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_window_set_default_icon (THETD);
 #endif
   THEMO = gdk_pixbuf_new_from_file (PACKAGE_MOL, NULL);
-  THEBD = gdk_pixbuf_new_from_file (PACKAGE_BD, NULL);
+  THEBD = gdk_pixbuf_new_from_file (PACKAGE_BND, NULL);
   SETTING = gdk_pixbuf_new_from_file (PACKAGE_PRO, NULL);
   SETTINGS = gdk_pixbuf_new_from_file (PACKAGE_SET, NULL);
   OGL = gdk_pixbuf_new_from_file (PACKAGE_OGL, NULL);
@@ -1111,6 +1110,17 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_window_set_title (GTK_WINDOW(window), PACKAGE);
   gtk_window_set_resizable (GTK_WINDOW(window), TRUE);
   gtk_widget_set_size_request (window, 900, 450);
+
+  graph_img[0] = g_strdup_printf ("%s", PACKAGE_GDR);
+  graph_img[1] = g_strdup_printf ("%s", PACKAGE_SQD);
+  graph_img[2] = g_strdup_printf ("%s", PACKAGE_SQD);
+  graph_img[3] = g_strdup_printf ("%s", PACKAGE_GDR);
+  graph_img[4] = g_strdup_printf ("%s", PACKAGE_BND);
+  graph_img[5] = g_strdup_printf ("%s", PACKAGE_ANG);
+  graph_img[6] = g_strdup_printf ("%s", PACKAGE_RIN);
+  graph_img[7] = g_strdup_printf ("%s", PACKAGE_CHA);
+  graph_img[8] = g_strdup_printf ("%s", PACKAGE_SPH);
+  graph_img[9] = g_strdup_printf ("%s", PACKAGE_MSD);
 
   atomes_action main_actions[] = {{ "workspace.open", GINT_TO_POINTER(2)},
                                   { "workspace.save",  GINT_TO_POINTER(3)},

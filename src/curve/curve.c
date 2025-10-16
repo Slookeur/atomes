@@ -451,8 +451,8 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   clean_this_curve_window (* cid, * rid);
   if (* interv != 0)
   {
-    int inter = (* rid == SP) ? * interv/2 + 1: * interv;
-    if (* rid == SK)
+    int inter = (* rid == SPH) ? * interv/2 + 1: * interv;
+    if (* rid == SKD)
     {
       this_curve -> ndata = inter;
       this_curve -> data[0] = duplicate_double (inter, xsk);
@@ -461,7 +461,7 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
     {
       set_curve_data_zero (* rid, * cid, inter);
     }
-    if (* rid != SP)
+    if (* rid != SPH)
     {
       this_curve -> data[1] = duplicate_double (inter, datacurve);
     }

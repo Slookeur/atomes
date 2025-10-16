@@ -68,23 +68,23 @@ void initchn ()
 {
   int i;
 #ifdef NEW_ANA
-  active_project -> analysis[CH] -> curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  active_project -> analysis[CHA] -> curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
   for (i=0 ; i<active_project -> nspec ; i++)
   {
-    active_project -> analysis[CH] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    active_project -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
   }
 #else
-  active_project -> curves[CH][0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  active_project -> curves[CHA][0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
   for (i=0 ; i<active_project -> nspec ; i++)
   {
-    active_project -> curves[CH][i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    active_project -> curves[CHA][i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
   }
 #endif
-  addcurwidgets (activep, CH, 0);
+  addcurwidgets (activep, CHA, 0);
 #ifdef NEW_ANA
-  active_project -> analysis[CH] -> init_ok = TRUE;
+  active_project -> analysis[CHA] -> init_ok = TRUE;
 #else
-  active_project -> initok[CH] = TRUE;
+  active_project -> initok[CHA] = TRUE;
 #endif
 }
 
@@ -127,8 +127,8 @@ void update_chains_view (project * this_proj)
   gchar * str;
 
 #ifdef NEW_ANA
-  if (this_proj -> analysis[CH] -> calc_buffer == NULL) this_proj -> analysis[CH] -> calc_buffer = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> analysis[CH] -> calc_buffer);
+  if (this_proj -> analysis[CHA] -> calc_buffer == NULL) this_proj -> analysis[CHA] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[CHA] -> calc_buffer);
   j = this_proj -> csparam[0];
   if (! j)
   {
@@ -140,66 +140,66 @@ void update_chains_view (project * this_proj)
     nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
     col = textcolor(j-1);
   }
-  print_info ("\n\nChain statistics\n\n", "heading", this_proj -> analysis[CH] -> calc_buffer);
+  print_info ("\n\nChain statistics\n\n", "heading", this_proj -> analysis[CHA] -> calc_buffer);
 
   if (this_proj -> csparam[1])
   {
-    print_info (" * only AAAA chains have been considered\n", "italic", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (" * only AAAA chains have been considered\n", "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[2])
   {
-    print_info (" * only ABAB chains have been considered\n", "italic", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (" * only ABAB chains have been considered\n", "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[3])
   {
-    print_info (" * homopolar bonds can not shorten the chains\n", "italic", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (" * homopolar bonds can not shorten the chains\n", "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[4])
   {
-    print_info (" * only 1-(2)", "italic", this_proj -> analysis[CH] -> calc_buffer);
-    print_info ("n", "sub_italic", this_proj -> analysis[CH] -> calc_buffer);
-    print_info ("-1 chains have been considered, ie. isolated chains\n", "italic", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (" * only 1-(2)", "italic", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("n", "sub_italic", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("-1 chains have been considered, ie. isolated chains\n", "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
-  print_info ("\n Atom(s) used to start the search: ", NULL, this_proj -> analysis[CH] -> calc_buffer);
-  print_info (nelt, col, this_proj -> analysis[CH] -> calc_buffer);
-  if (j != 0) print_info (" atom(s) only", NULL, this_proj -> analysis[CH] -> calc_buffer);
+  print_info ("\n Atom(s) used to start the search: ", NULL, this_proj -> analysis[CHA] -> calc_buffer);
+  print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
+  if (j != 0) print_info (" atom(s) only", NULL, this_proj -> analysis[CHA] -> calc_buffer);
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n Average number of chains per configuration: ", NULL, this_proj -> analysis[CH] -> calc_buffer);
+    print_info ("\n Average number of chains per configuration: ", NULL, this_proj -> analysis[CHA] -> calc_buffer);
     str = g_strdup_printf ("%f", this_proj -> csdata[0]);
-    print_info (str, "bold", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
     str = g_strdup_printf (" +/- %f\n", this_proj -> csdata[1]);
-    print_info (str, "bold", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
   }
   else
   {
-    print_info ("\n Total number of chains: ", NULL, this_proj -> analysis[CH] -> calc_buffer);
+    print_info ("\n Total number of chains: ", NULL, this_proj -> analysis[CHA] -> calc_buffer);
     str = g_strdup_printf ("%f\n", this_proj -> csdata[0]);
-    print_info (str, "bold", this_proj -> analysis[CH] -> calc_buffer);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
   }
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n\t n     Av. by step \tCc(n)[", "bold", this_proj -> analysis[CH] -> calc_buffer);
-    print_info (nelt, col, this_proj -> analysis[CH] -> calc_buffer);
+    print_info ("\n\t n     Av. by step \tCc(n)[", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
     if (j == this_proj -> nspec)
     {
-      print_info ("]\t  +/-\n", "bold", this_proj -> analysis[CH] -> calc_buffer);
+      print_info ("]\t  +/-\n", "bold", this_proj -> analysis[CHA] -> calc_buffer);
     }
     else
     {
-      print_info ("]\t   +/-\n", "bold", this_proj -> analysis[CH] -> calc_buffer);
+      print_info ("]\t   +/-\n", "bold", this_proj -> analysis[CHA] -> calc_buffer);
     }
   }
   else
   {
-    print_info ("\n\t n\tNumber\t\tCc(n)[", "bold", this_proj -> analysis[CH] -> calc_buffer);
-    print_info (nelt, col, this_proj -> analysis[CH] -> calc_buffer);
-    print_info ("]\n", NULL, this_proj -> analysis[CH] -> calc_buffer);
+    print_info ("\n\t n\tNumber\t\tCc(n)[", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("]\n", NULL, this_proj -> analysis[CHA] -> calc_buffer);
   }
   tab = NULL;
   cid = NULL;
@@ -208,7 +208,7 @@ void update_chains_view (project * this_proj)
   j = 1;
   for ( i=1 ; i < this_proj -> csparam[5] ; i++ )
   {
-    if (this_proj -> analysis[CH] -> curves[k] -> data[1][i] != 0.0)
+    if (this_proj -> analysis[CHA] -> curves[k] -> data[1][i] != 0.0)
     {
       j ++;
       if (j - 2*(j/2) == 0)
@@ -221,27 +221,27 @@ void update_chains_view (project * this_proj)
         tab = NULL;
         cid = g_strdup_printf ("bold");
       }
-      print_info ("\t", NULL, this_proj -> analysis[CH] -> calc_buffer);
+      print_info ("\t", NULL, this_proj -> analysis[CHA] -> calc_buffer);
       if (i < 9)
       {
-        print_info (" ",cid, this_proj -> analysis[CH] -> calc_buffer);
+        print_info (" ",cid, this_proj -> analysis[CHA] -> calc_buffer);
       }
       str = g_strdup_printf("%d", i+1);
-      print_info (str, cid, this_proj -> analysis[CH] -> calc_buffer);
+      print_info (str, cid, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
-      str = g_strdup_printf("\t%f\t", l*this_proj -> analysis[CH] -> curves[k] -> data[1][i]);
-      print_info (str, tab, this_proj -> analysis[CH] -> calc_buffer);
+      str = g_strdup_printf("\t%f\t", l*this_proj -> analysis[CHA] -> curves[k] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
-      str = g_strdup_printf("%f\t", this_proj -> analysis[CH] -> curves[k] -> data[1][i]);
-      print_info (str, tab, this_proj -> analysis[CH] -> calc_buffer);
+      str = g_strdup_printf("%f\t", this_proj -> analysis[CHA] -> curves[k] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
       if (this_proj -> steps > 1)
       {
-        str = g_strdup_printf("%f\t", this_proj -> analysis[CH] -> curves[k] -> err[i]);
-        print_info (str, tab, this_proj -> analysis[CH] -> calc_buffer);
+        str = g_strdup_printf("%f\t", this_proj -> analysis[CHA] -> curves[k] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
         g_free (str);
       }
-       print_info ("\n", NULL, this_proj -> analysis[CH] -> calc_buffer);
+       print_info ("\n", NULL, this_proj -> analysis[CHA] -> calc_buffer);
       if (tab != NULL)
       {
         g_free (tab);
@@ -252,7 +252,7 @@ void update_chains_view (project * this_proj)
       }
     }
   }
-  print_info (calculation_time(TRUE, this_proj -> analysis[CH] -> calc_time), NULL, this_proj -> analysis[CH] -> calc_buffer);
+  print_info (calculation_time(TRUE, this_proj -> analysis[CHA] -> calc_time), NULL, this_proj -> analysis[CHA] -> calc_buffer);
 #else
   if (this_proj -> text_buffer[CH+OT] == NULL) this_proj -> text_buffer[CH+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[CH+OT]);
@@ -336,7 +336,7 @@ void update_chains_view (project * this_proj)
   j = 1;
   for ( i=1 ; i < this_proj -> csparam[5] ; i++ )
   {
-    if (this_proj -> curves[CH][k] -> data[1][i] != 0.0)
+    if (this_proj -> curves[CHA][k] -> data[1][i] != 0.0)
     {
       j ++;
       if (j - 2*(j/2) == 0)
@@ -357,15 +357,15 @@ void update_chains_view (project * this_proj)
       str = g_strdup_printf("%d", i+1);
       print_info (str, cid, this_proj -> text_buffer[CH+OT]);
       g_free (str);
-      str = g_strdup_printf("\t%f\t", l*this_proj -> curves[CH][k] -> data[1][i]);
+      str = g_strdup_printf("\t%f\t", l*this_proj -> curves[CHA][k] -> data[1][i]);
       print_info (str, tab, this_proj -> text_buffer[CH+OT]);
       g_free (str);
-      str = g_strdup_printf("%f\t", this_proj -> curves[CH][k] -> data[1][i]);
+      str = g_strdup_printf("%f\t", this_proj -> curves[CHA][k] -> data[1][i]);
       print_info (str, tab, this_proj -> text_buffer[CH+OT]);
       g_free (str);
       if (this_proj -> steps > 1)
       {
-        str = g_strdup_printf("%f\t", this_proj -> curves[CH][k] -> err[i]);
+        str = g_strdup_printf("%f\t", this_proj -> curves[CHA][k] -> err[i]);
         print_info (str, tab, this_proj -> text_buffer[CH+OT]);
         g_free (str);
       }
@@ -380,7 +380,7 @@ void update_chains_view (project * this_proj)
       }
     }
   }
-  print_info (calculation_time(TRUE, this_proj -> calc_time[CH]), NULL, this_proj -> text_buffer[CH+OT]);
+  print_info (calculation_time(TRUE, this_proj -> calc_time[CHA]), NULL, this_proj -> text_buffer[CH+OT]);
 #endif
   g_free (nelt);
   if (col != NULL)
@@ -444,9 +444,9 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[CH] -> init_ok) initchn ();
+  if (! active_project -> analysis[CHA] -> init_ok) initchn ();
 #else
-  if (! active_project -> initok[CH]) initchn ();
+  if (! active_project -> initok[CHA]) initchn ();
 #endif
   active_project -> csparam[6] = 0;
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 6, 0);
@@ -454,9 +454,9 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   if (active_project -> dmtx)
   {
 #ifdef NEW_ANA
-    clean_curves_data (CH, 0, active_project -> analysis[CH] -> numc);
+    clean_curves_data (CHA, 0, active_project -> analysis[CHA] -> numc);
 #else
-    clean_curves_data (CH, 0, active_project -> numc[CH]);
+    clean_curves_data (CHA, 0, active_project -> numc[CHA]);
 #endif
     clean_chains_data (active_glwin);
     active_glwin -> all_chains = g_malloc0 (active_project -> steps*sizeof*active_glwin -> all_chains);
@@ -473,7 +473,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
       }
     }
     k = 1;
-    prepostcalc (widg, FALSE, CH, 0, opac);
+    prepostcalc (widg, FALSE, CHA, 0, opac);
     clock_gettime (CLOCK_MONOTONIC, & start_time);
     j = initchains_ (& active_project -> csparam[0],
                      & active_project -> csparam[1],
@@ -484,9 +484,9 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
                      & active_project -> csearch);
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
 #ifdef NEW_ANA
-    active_project -> analysis[CH] -> calc_time = get_calc_time (start_time, stop_time);
+    active_project -> analysis[CHA] -> calc_time = get_calc_time (start_time, stop_time);
 #else
-    active_project -> calc_time[CH] = get_calc_time (start_time, stop_time);
+    active_project -> calc_time[CHA] = get_calc_time (start_time, stop_time);
 #endif
     if (j == 0)
     {
@@ -504,7 +504,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
       g_free (str);
       j = 0;
     }
-    prepostcalc (widg, TRUE, CH, j, 1.0);
+    prepostcalc (widg, TRUE, CHA, j, 1.0);
   }
   else
   {
@@ -542,8 +542,8 @@ void save_chains_data_ (int * taille, double ectrc[* taille], double * rpstep, d
   active_project -> csdata[1] = * ectrpst;
   i = active_project -> csparam[0];
 #ifdef NEW_ANA
-  active_project -> analysis[CH] -> curves[i] -> err = duplicate_double (* taille, ectrc);
+  active_project -> analysis[CHA] -> curves[i] -> err = duplicate_double (* taille, ectrc);
 #else
-  active_project -> curves[CH][i] -> err = duplicate_double (* taille, ectrc);
+  active_project -> curves[CHA][i] -> err = duplicate_double (* taille, ectrc);
 #endif
 }

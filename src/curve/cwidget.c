@@ -63,21 +63,21 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
   layout -> datacolor.alpha = 1.0;
   layout -> thickness = DTHICK;
 #ifdef NEW_ANA
-  layout -> hwidth = (rid == SP) ? 1.0 : pid -> analysis[rid] -> delta;
+  layout -> hwidth = (rid == SPH) ? 1.0 : pid -> analysis[rid] -> delta;
 #else
-  layout -> hwidth = (rid == SP) ? 1.0 : pid -> delta[rid];
+  layout -> hwidth = (rid == SPH) ? 1.0 : pid -> delta[rid];
 #endif
   layout -> hopac = 0.25;
   layout -> hpos = 1;
   layout -> dash = 1;
   layout -> gfreq = 1;
-  if (rid < RI)
+  if (rid < RIN)
   {
     layout -> aspect = 0;
     layout -> glyph = 0;
     layout -> gsize = 10;
   }
-  else if (rid == RI)
+  else if (rid == RIN)
   {
     if ( cid%4 == 0 || cid%4 == 1 )
     {
@@ -92,7 +92,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
       layout -> gsize = 5.0;
     }
   }
-  else if (rid < MS)
+  else if (rid < MSD)
   {
     layout -> aspect = 1;
     layout -> glyph = 0;
@@ -119,7 +119,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
 */
 void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
 {
-  if (rid < RI || rid == MS)
+  if (rid < RIN || rid == MSD)
   {
 #ifdef NEW_ANA
     this_curve -> cmin[0] = this_proj -> analysis[rid] -> min;
@@ -135,7 +135,7 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
     this_curve -> cmax[0] = this_curve -> ndata;
   }
 
-  if (rid < MS)
+  if (rid < MSD)
   {
     this_curve -> scale[0] = 0;
     this_curve -> scale[1] = 0;
@@ -143,9 +143,9 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
   else
   {
 #ifdef NEW_ANA
-    if (cid < active_project -> analysis[MS] -> numc - 6)
+    if (cid < active_project -> analysis[MSD] -> numc - 6)
 #else
-    if (cid < active_project -> numc[MS] - 6)
+    if (cid < active_project -> numc[MSD] - 6)
 #endif // NEW_ANA
     {
       this_curve -> scale[0] = 1;

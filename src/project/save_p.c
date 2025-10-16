@@ -264,12 +264,12 @@ int save_project (FILE * fp, project * this_proj, int npi)
       if (k)
       {
 #ifdef NEW_ANA
-        if (fwrite (& this_proj -> analysis[SP] -> numc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-        if (this_proj -> analysis[SP] -> numc)
+        if (fwrite (& this_proj -> analysis[SPH] -> numc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+        if (this_proj -> analysis[SPH] -> numc)
         {
-          for (i=0; i<this_proj -> analysis[SP] -> numc; i++)
+          for (i=0; i<this_proj -> analysis[SPH] -> numc; i++)
           {
-            if (save_this_string (fp, this_proj -> analysis[SP] -> curves[i] -> name) != OK) return ERROR_PROJECT;
+            if (save_this_string (fp, this_proj -> analysis[SPH] -> curves[i] -> name) != OK) return ERROR_PROJECT;
           }
         }
         for (i=0; i<NGRAPHS; i++)
@@ -283,12 +283,12 @@ int save_project (FILE * fp, project * this_proj, int npi)
           }
         }
 #else
-        if (fwrite (& this_proj -> numc[SP], sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-        if (this_proj -> numc[SP])
+        if (fwrite (& this_proj -> numc[SPH], sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+        if (this_proj -> numc[SPH])
         {
-          for (i=0; i<this_proj -> numc[SP]; i++)
+          for (i=0; i<this_proj -> numc[SPH]; i++)
           {
-            if (save_this_string (fp, this_proj -> curves[SP][i] -> name) != OK) return ERROR_PROJECT;
+            if (save_this_string (fp, this_proj -> curves[SPH][i] -> name) != OK) return ERROR_PROJECT;
           }
         }
         for (i=0; i<NGRAPHS; i++)

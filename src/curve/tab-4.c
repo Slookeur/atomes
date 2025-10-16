@@ -638,7 +638,7 @@ G_MODULE_EXPORT void update_axis (GtkComboBox * box, gpointer data)
   combo_set_active (cedit -> labels_pos_box, this_curve -> labels_pos[i]);
   gtk_font_chooser_set_font (GTK_FONT_CHOOSER(cedit -> ticks_labels_font), this_curve -> labels_font[i]);
   gtk_range_set_value (GTK_RANGE(cedit -> ticks_labels_angle), this_curve -> labels_angle[i] * (180.0/pi));
-  if (((tint *)data) -> b < MS)
+  if (((tint *)data) -> b < MSD)
   {
     widget_set_sensitive (cedit -> scale_box, 0);
   }

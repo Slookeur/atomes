@@ -124,34 +124,34 @@ void initcnames (int cid)
 {
   switch (cid)
   {
-    case GR:
+    case GDR:
       initgr (cid);
       break;
-    case SQ:
+    case SQD:
       initsq (cid);
       break;
-    case SK:
+    case SKD:
       initsq (cid);
       break;
-    case GK:
+    case GDK:
       initgr (cid);
       break;
-    case BD:
+    case BND:
       initbd ();
       break;
-    case AN:
+    case ANG:
       initang ();
       break;
-    case RI:
+    case RIN:
       initrng ();
       break;
-    case CH:
+    case CHA:
       initchn ();
       break;
-    case SP:
+    case SPH:
       initsh (0);
       break;
-    default:
+    case MSD:
       initmsd ();
       break;
   }
@@ -459,26 +459,26 @@ int open_project (FILE * fp, int npi)
           if (j)
           {
 #ifdef NEW_ANA
-            active_project -> analysis[SP] -> numc = j;
+            active_project -> analysis[SPH] -> numc = j;
             active_project -> numwid += j;
-            alloc_analysis_curves (active_project -> analysis[SP]);
-            addcurwidgets (activep, SP, 0);
-            active_project -> analysis[SP] -> avail_ok = TRUE;
+            alloc_analysis_curves (active_project -> analysis[SPH]);
+            addcurwidgets (activep, SPH, 0);
+            active_project -> analysis[SPH] -> avail_ok = TRUE;
             for (k=0; k<j; k++)
             {
-              active_project -> analysis[SP] -> curves[k] -> name = read_this_string (fp);
-              if (active_project -> analysis[SP] -> curves[k] -> name == NULL) return ERROR_PROJECT;
+              active_project -> analysis[SPH] -> curves[k] -> name = read_this_string (fp);
+              if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return ERROR_PROJECT;
             }
 #else
-            active_project -> numc[SP] = j;
+            active_project -> numc[SPH] = j;
             active_project -> numwid += j;
-            alloc_curves (SP);
-            addcurwidgets (activep, SP, 0);
-            active_project -> initok[SP] = TRUE;
+            alloc_curves (SPH);
+            addcurwidgets (activep, SPH, 0);
+            active_project -> initok[SPH] = TRUE;
             for (k=0; k<j; k++)
             {
-              active_project -> curves[SP][k] -> name = read_this_string (fp);
-              if (active_project -> curves[SP][k] -> name == NULL) return ERROR_PROJECT;
+              active_project -> curves[SPH][k] -> name = read_this_string (fp);
+              if (active_project -> curves[SPH][k] -> name == NULL) return ERROR_PROJECT;
             }
 #endif
           }

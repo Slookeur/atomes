@@ -106,7 +106,7 @@ void fill_tool_model ()
   gtk_tree_store_clear (tool_model);
   for (i=0; i<NGRAPHS; i++)
   {
-    if (i != MS)
+    if (i != MSD)
     {
       append = TRUE;
     }
@@ -256,7 +256,7 @@ void adjust_tool_model (int calc, int curve, gchar * string_path)
   GtkTreeIter iter;
   GtkTreePath * path = gtk_tree_path_new_from_string (string_path);
   gtk_tree_model_get_iter (GTK_TREE_MODEL(tool_model), & iter, path);
-  if (calc == SP || calc == MS)
+  if (calc == SPH || calc == MSD)
   {
     int i, j;
     gtk_tree_model_get (GTK_TREE_MODEL(tool_model), & iter, 0, & i, -1);
@@ -384,16 +384,6 @@ GtkWidget * curvetbox ()
 #else
   gtk_widget_set_size_request (ctbox, 300, 240);
 #endif
-  graph_img[0] = g_strdup_printf ("%s", PACKAGE_GR);
-  graph_img[1] = g_strdup_printf ("%s", PACKAGE_SQ);
-  graph_img[2] = g_strdup_printf ("%s", PACKAGE_SQ);
-  graph_img[3] = g_strdup_printf ("%s", PACKAGE_GR);
-  graph_img[4] = g_strdup_printf ("%s", PACKAGE_BD);
-  graph_img[5] = g_strdup_printf ("%s", PACKAGE_AN);
-  graph_img[6] = g_strdup_printf ("%s", PACKAGE_RI);
-  graph_img[7] = g_strdup_printf ("%s", PACKAGE_CH);
-  graph_img[8] = g_strdup_printf ("%s", PACKAGE_SP);
-  graph_img[9] = g_strdup_printf ("%s", PACKAGE_MS);
   // New calculation icon to be added here
 
   toolscroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);

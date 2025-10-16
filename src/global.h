@@ -324,16 +324,16 @@ enum ImageFormats {
 #define NITEMS 4
 
 #define OT 4
-#define GR 0
-#define SQ 1
-#define SK 2
-#define GK 3
-#define BD 4
-#define AN 5
-#define RI 6
-#define CH 7
-#define SP 8
-#define MS 9
+#define GDR 0
+#define SQD 1
+#define SKD 2
+#define GDK 3
+#define BND 4
+#define ANG 5
+#define RIN 6
+#define CHA 7
+#define SPH 8
+#define MSD 9
 // #define FF 12
 
 #define DEFAULT_FONT_SIZE 8
@@ -356,14 +356,14 @@ extern gchar * PACKAGE_JPG;
 extern gchar * PACKAGE_BMP;
 extern gchar * PACKAGE_TIFF;
 extern gchar * PACKAGE_VOID;
-extern gchar * PACKAGE_GR;
-extern gchar * PACKAGE_SQ;
-extern gchar * PACKAGE_BD;
-extern gchar * PACKAGE_AN;
-extern gchar * PACKAGE_RI;
-extern gchar * PACKAGE_CH;
-extern gchar * PACKAGE_SP;
-extern gchar * PACKAGE_MS;
+extern gchar * PACKAGE_GDR;
+extern gchar * PACKAGE_SQD;
+extern gchar * PACKAGE_BND;
+extern gchar * PACKAGE_ANG;
+extern gchar * PACKAGE_RIN;
+extern gchar * PACKAGE_CHA;
+extern gchar * PACKAGE_SPH;
+extern gchar * PACKAGE_MSD;
 extern gchar * PACKAGE_TD;
 extern gchar * PACKAGE_MOL;
 extern gchar * PACKAGE_OGL;

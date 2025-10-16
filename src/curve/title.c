@@ -58,36 +58,36 @@ const gchar * default_title (int ax, gpointer data)
   {
     int rid = ((tint *)data) -> b;
 #ifdef NEW_ANA
-    if (rid != MS)
+    if (rid != MSD)
     {
       return this_proj -> analysis[rid] -> x_title;
     }
 #else
-    if (rid == GR || rid == GK)
+    if (rid == GDR || rid == GDK)
     {
       return ("r [Å]");
     }
-    else if (rid == SQ || rid == SK)
+    else if (rid == SQD || rid == SKD)
     {
       return ("q [Å-1]");
     }
-    else if (rid == BD)
+    else if (rid == BND)
     {
       return ("Dij [Å]");
     }
-    else if (rid == AN)
+    else if (rid == ANG)
     {
       return ("θ [°]");
     }
-    else if (rid == RI)
+    else if (rid == RIN)
     {
       return ("Size n of the ring [total number of nodes]");
     }
-    else if (rid == CH)
+    else if (rid == CHA)
     {
       return ("Size n of the chain [total number of nodes]");
     }
-    else if (rid == SP)
+    else if (rid == SPH)
     {
       return ("Ql");
     }

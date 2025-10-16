@@ -183,7 +183,7 @@ void update_rdf_view (project * this_proj, int rdf)
   if (this_proj -> analysis[rdf] -> calc_buffer == NULL) this_proj -> analysis[rdf] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[rdf] -> calc_buffer);
   print_info ("\n\nRadial distribution function(s)", "heading", this_proj -> analysis[rdf] -> calc_buffer);
-  if (rdf == GR)
+  if (rdf == GDR)
   {
     print_info (" - real space calculation\n\n", "heading", this_proj -> analysis[rdf] -> calc_buffer);
   }
@@ -193,13 +193,13 @@ void update_rdf_view (project * this_proj, int rdf)
   }
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[rdf] -> calc_buffer);
 
-  if (rdf == GK)
+  if (rdf == GDK)
   {
     print_info ("\tReciprocal space data:\n\n", NULL, this_proj -> analysis[rdf] -> calc_buffer);
     print_info ("\t - Minimum vector Q", "bold", this_proj -> analysis[rdf] -> calc_buffer);
     print_info ("min", "sub_bold", this_proj -> analysis[rdf] -> calc_buffer);
     print_info (": ", "bold", this_proj -> analysis[rdf] -> calc_buffer);
-    str = g_strdup_printf ("%f", this_proj -> analysis[SK] -> min);
+    str = g_strdup_printf ("%f", this_proj -> analysis[SKD] -> min);
     print_info (str, "bold_red", this_proj -> analysis[rdf] -> calc_buffer);
     g_free (str);
     print_info (" Å", "bold", this_proj -> analysis[rdf] -> calc_buffer);
@@ -258,7 +258,7 @@ void update_rdf_view (project * this_proj, int rdf)
     print_info ("\t - Minimum vector Q", "bold", this_proj -> text_buffer[rdf+OT]);
     print_info ("min", "sub_bold", this_proj -> text_buffer[rdf+OT]);
     print_info (": ", "bold", this_proj -> text_buffer[rdf+OT]);
-    str = g_strdup_printf ("%f", this_proj -> min[SK]);
+    str = g_strdup_printf ("%f", this_proj -> min[SKD]);
     print_info (str, "bold_red", this_proj -> text_buffer[rdf+OT]);
     g_free (str);
     print_info (" Å", "bold", this_proj -> text_buffer[rdf+OT]);
@@ -266,7 +266,7 @@ void update_rdf_view (project * this_proj, int rdf)
     print_info ("\n\t - Maximum vector Q", "bold", this_proj -> text_buffer[rdf+OT]);
     print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
     print_info (" for the FFT: ", "bold", this_proj -> text_buffer[rdf+OT]);
-    str = g_strdup_printf ("%f", this_proj -> max[GK]);
+    str = g_strdup_printf ("%f", this_proj -> max[GDK]);
     print_info (str, "bold_red", this_proj -> text_buffer[rdf+OT]);
     g_free (str);
     print_info (" Å", "bold", this_proj -> text_buffer[rdf+OT]);
@@ -288,7 +288,7 @@ void update_rdf_view (project * this_proj, int rdf)
   print_info ("D", "bold", this_proj -> text_buffer[rdf+OT]);
   print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
   print_info (" = ", NULL, this_proj -> text_buffer[rdf+OT]);
-  str = g_strdup_printf ("%f", this_proj -> max[GR]);
+  str = g_strdup_printf ("%f", this_proj -> max[GDR]);
   print_info (str, "bold_blue", this_proj -> text_buffer[rdf+OT]);
   g_free (str);
   print_info (" Å\n\n\t - δr = ", "bold", this_proj -> text_buffer[rdf+OT]);
@@ -312,34 +312,34 @@ G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
 {
   int i;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[GR] -> init_ok) initgr (GR);
-  clean_curves_data (GR, 0, active_project -> analysis[GR] -> numc);
-  active_project -> analysis[GR] -> delta = active_project -> analysis[GR] -> max / active_project -> analysis[GR] -> num_delta;
-  prepostcalc (widg, FALSE, GR, 0, opac);
+  if (! active_project -> analysis[GDR] -> init_ok) initgr (GDR);
+  clean_curves_data (GDR, 0, active_project -> analysis[GDR] -> numc);
+  active_project -> analysis[GDR] -> delta = active_project -> analysis[GDR] -> max / active_project -> analysis[GDR] -> num_delta;
+  prepostcalc (widg, FALSE, GDR, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_ (& active_project -> analysis[GR] -> num_delta, & active_project -> analysis[GR] -> delta, & fitc);
+  i = g_of_r_ (& active_project -> analysis[GDR] -> num_delta, & active_project -> analysis[GDR] -> delta, & fitc);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[GR] -> calc_time = get_calc_time (start_time, stop_time);
+  active_project -> analysis[GDR] -> calc_time = get_calc_time (start_time, stop_time);
 #else
-  if (! active_project -> initok[GR]) initgr (GR);
-  clean_curves_data (GR, 0, active_project -> numc[GR]);
-  active_project -> delta[GR] = active_project -> max[GR] / active_project -> num_delta[GR];
-  prepostcalc (widg, FALSE, GR, 0, opac);
+  if (! active_project -> initok[GDR]) initgr (GDR);
+  clean_curves_data (GDR, 0, active_project -> numc[GDR]);
+  active_project -> delta[GDR] = active_project -> max[GDR] / active_project -> num_delta[GDR];
+  prepostcalc (widg, FALSE, GDR, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_ (& active_project -> num_delta[GR], & active_project -> delta[GR], & fitc);
+  i = g_of_r_ (& active_project -> num_delta[GDR], & active_project -> delta[GDR], & fitc);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[GR] = get_calc_time (start_time, stop_time);
+  active_project -> calc_time[GDR] = get_calc_time (start_time, stop_time);
 #endif
-  prepostcalc (widg, TRUE, GR, i, 1.0);
+  prepostcalc (widg, TRUE, GDR, i, 1.0);
   if (! i)
   {
-    remove_action (analyze_acts[SQ].action_name);
+    remove_action (analyze_acts[SQD].action_name);
     show_error ("The RDF's calculation has failed", 0, widg);
   }
   else
   {
-    add_action (analyze_actions[SQ]);
-    update_rdf_view (active_project, GR);
+    add_action (analyze_actions[SQD]);
+    update_rdf_view (active_project, GDR);
     show_the_widgets (curvetoolbox);
   }
   fill_tool_model ();
@@ -418,35 +418,35 @@ int recup_data_ (int * cd, int * rd)
   if (* rd == 0)
   {
     return send_gr_ (cd,
-                     & active_project -> analysis[GR] -> curves[* cd] -> ndata,
-                     & active_project -> analysis[GR] -> delta,
-                     active_project -> analysis[GR] -> curves[* cd] -> data[0],
-                     active_project -> analysis[GR] -> curves[* cd] -> data[1]);
+                     & active_project -> analysis[GDR] -> curves[* cd] -> ndata,
+                     & active_project -> analysis[GDR] -> delta,
+                     active_project -> analysis[GDR] -> curves[* cd] -> data[0],
+                     active_project -> analysis[GDR] -> curves[* cd] -> data[1]);
   }
   else
   {
     return send_sq_ (cd,
-                     & active_project -> analysis[SK] -> curves[* cd] -> ndata,
-                     & active_project -> analysis[GK] -> delta,
-                     active_project -> analysis[SK] -> curves[* cd] -> data[0],
-                     active_project -> analysis[SK] -> curves[* cd] -> data[1]);
+                     & active_project -> analysis[SKD] -> curves[* cd] -> ndata,
+                     & active_project -> analysis[GDK] -> delta,
+                     active_project -> analysis[SKD] -> curves[* cd] -> data[0],
+                     active_project -> analysis[SKD] -> curves[* cd] -> data[1]);
   }
 #else
   if (* rd == 0)
   {
     return send_gr_ (cd,
-                     & active_project -> curves[GR][* cd] -> ndata,
-                     & active_project -> delta[GR],
-                     active_project -> curves[GR][* cd] -> data[0],
-                     active_project -> curves[GR][* cd] -> data[1]);
+                     & active_project -> curves[GDR][* cd] -> ndata,
+                     & active_project -> delta[GDR],
+                     active_project -> curves[GDR][* cd] -> data[0],
+                     active_project -> curves[GDR][* cd] -> data[1]);
   }
   else
   {
     return send_sq_ (cd,
-                     & active_project -> curves[SK][* cd] -> ndata,
-                     & active_project -> delta[GK],
-                     active_project -> curves[SK][* cd] -> data[0],
-                     active_project -> curves[SK][* cd] -> data[1]);
+                     & active_project -> curves[SKD][* cd] -> ndata,
+                     & active_project -> delta[GDK],
+                     active_project -> curves[SKD][* cd] -> data[0],
+                     active_project -> curves[SKD][* cd] -> data[1]);
   }
 #endif
 }
@@ -464,36 +464,36 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
   int i;
 
 #ifdef NEW_ANA
-  if (! active_project -> analysis[GK] -> init_ok) initgr (GK);
-  clean_curves_data (GK, 0, active_project -> analysis[GK] -> numc);
-  active_project -> analysis[GK] -> delta = active_project -> analysis[GK] -> max / active_project -> analysis[GK] -> num_delta;
-  prepostcalc (widg, FALSE, GK, 0, opac);
+  if (! active_project -> analysis[GDK] -> init_ok) initgr (GDK);
+  clean_curves_data (GDK, 0, active_project -> analysis[GDK] -> numc);
+  active_project -> analysis[GDK] -> delta = active_project -> analysis[GDK] -> max / active_project -> analysis[GDK] -> num_delta;
+  prepostcalc (widg, FALSE, GDK, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_fft_ (& active_project -> analysis[GK] -> num_delta,
-                   & active_project -> analysis[GK] -> delta,
-                   & active_project -> analysis[GK] -> max);
+  i = g_of_r_fft_ (& active_project -> analysis[GDK] -> num_delta,
+                   & active_project -> analysis[GDK] -> delta,
+                   & active_project -> analysis[GDK] -> max);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[GK] -> calc_time = get_calc_time (start_time, stop_time);
+  active_project -> analysis[GDK] -> calc_time = get_calc_time (start_time, stop_time);
 #else
-  if (! active_project -> initok[GK]) initgr (GK);
-  clean_curves_data (GK, 0, active_project -> numc[GK]);
-  active_project -> delta[GK] = active_project -> max[GR] / active_project -> num_delta[GK];
-  prepostcalc (widg, FALSE, GK, 0, opac);
+  if (! active_project -> initok[GDK]) initgr (GDK);
+  clean_curves_data (GDK, 0, active_project -> numc[GDK]);
+  active_project -> delta[GDK] = active_project -> max[GDR] / active_project -> num_delta[GDK];
+  prepostcalc (widg, FALSE, GDK, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_fft_ (& active_project -> num_delta[GK],
-                   & active_project -> delta[GK],
-                   & active_project -> max[GK]);
+  i = g_of_r_fft_ (& active_project -> num_delta[GDK],
+                   & active_project -> delta[GDK],
+                   & active_project -> max[GDK]);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[GK] = get_calc_time (start_time, stop_time);
+  active_project -> calc_time[GDK] = get_calc_time (start_time, stop_time);
 #endif
-  prepostcalc (widg, TRUE, GK, i, 1.0);
+  prepostcalc (widg, TRUE, GDK, i, 1.0);
   if (! i)
   {
     show_error ("The RDF's from FFT[S(k)] calculation has failed", 0, widg);
   }
   else
   {
-    update_rdf_view (active_project, GK);
+    update_rdf_view (active_project, GDK);
     show_the_widgets (curvetoolbox);
   }
   fill_tool_model ();

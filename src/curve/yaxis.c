@@ -56,16 +56,16 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
 {
   int i, j, k, l, m, n;
-  if (! aid && (rid == RI ||rid == CH))
+  if (! aid && (rid == RIN ||rid == CHA))
   {
      i = cid / ((this_proj -> nspec+1) * 4);
-     this_curve -> axmax[aid] = (rid == RI) ? this_proj -> rsparam[i][1]: this_proj -> csparam[5];
+     this_curve -> axmax[aid] = (rid == RIN) ? this_proj -> rsparam[i][1]: this_proj -> csparam[5];
      this_curve -> axmax[aid] += 1.0;
-     this_curve -> axmin[aid] = (rid == RI) ? 2 : 1;
+     this_curve -> axmin[aid] = (rid == RIN) ? 2 : 1;
   }
   else
   {
-    n = (rid == SP && aid == 1) ? 1 : 0;
+    n = (rid == SPH && aid == 1) ? 1 : 0;
     this_curve -> axmax[aid] = this_curve -> data[aid][n];
     this_curve -> axmin[aid] = this_curve -> data[aid][n];
     for ( i=n ; i < this_curve -> ndata ; i++ )
@@ -105,7 +105,7 @@ void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, 
     this_curve -> axmin[aid] = this_curve -> cmin[aid] - fabs(this_curve -> cmin[aid]) / 10.0;
     this_curve -> axmax[aid] = this_curve -> cmax[aid] + fabs(this_curve -> cmax[aid]) / 10.0;
 //  Adjust autoscale information if required
-    if (rid > GK && rid < MS)
+    if (rid > GDK && rid < MSD)
     {
       this_curve -> axmin[aid] = 0.0;
     }

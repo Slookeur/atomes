@@ -942,7 +942,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   gtk_widget_set_size_request (cedit -> data_aspect, 120, -1);
   g_signal_connect (G_OBJECT(cedit -> data_aspect), "changed", G_CALLBACK(set_data_aspect), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Plot type:"), cedit -> data_aspect, FALSE, FALSE, 0);
-  if (((tint *)data) -> b == MS)
+  if (((tint *)data) -> b == MSD)
   {
     widget_set_sensitive (cedit -> data_aspect, 0);
   }
@@ -1024,7 +1024,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   GtkWidget * hbox;
-  if (((tint *)data) -> b != MS)
+  if (((tint *)data) -> b != MSD)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, hbox, FALSE, FALSE, 5);

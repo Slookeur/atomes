@@ -64,20 +64,20 @@ void initsh (int str)
   if (str)
   {
 #ifdef NEW_ANA
-    active_project -> numwid -= active_project -> analysis[SP] -> numc;
-    active_project -> analysis[SP] -> numc = active_project -> nspec;
+    active_project -> numwid -= active_project -> analysis[SPH] -> numc;
+    active_project -> analysis[SPH] -> numc = active_project -> nspec;
     for (i=0; i<active_project -> nspec; i++)
     {
-      active_project -> analysis[SP] -> numc += active_coord -> ntg[1][i];
+      active_project -> analysis[SPH] -> numc += active_coord -> ntg[1][i];
     }
-    alloc_analysis_curves (active_project -> analysis[SP]);
-    active_project -> numwid += active_project -> analysis[SP] -> numc;
+    alloc_analysis_curves (active_project -> analysis[SPH]);
+    active_project -> numwid += active_project -> analysis[SPH] -> numc;
     j = 0;
     for (i = 0 ; i < active_project -> nspec ; i++)
     {
-      active_project -> analysis[SP] -> curves[i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
+      active_project -> analysis[SPH] -> curves[i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
                                                                   active_chem -> label[i],
-                                                                  active_project -> analysis[SP] -> num_delta);
+                                                                  active_project -> analysis[SPH] -> num_delta);
       j += active_coord -> ntg[1][i];
     }
     k = 1;
@@ -85,29 +85,29 @@ void initsh (int str)
     {
       for (j=0 ; j < active_coord -> ntg[1][i]; j++)
       {
-        active_project -> analysis[SP] -> curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
+        active_project -> analysis[SPH] -> curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
                                                                     exact_name(env_name (active_project, j, i, 0, NULL)),
-                                                                               active_project -> analysis[SP] -> num_delta);
+                                                                               active_project -> analysis[SPH] -> num_delta);
       }
       k += active_coord -> ntg[1][i]+1;
     }
-    addcurwidgets (activep, SP, 0);
-    active_project -> analysis[SP] -> init_ok = TRUE;
+    addcurwidgets (activep, SPH, 0);
+    active_project -> analysis[SPH] -> init_ok = TRUE;
 #else
-    active_project -> numwid -= active_project -> numc[SP];
-    active_project -> numc[SP] = active_project -> nspec;
+    active_project -> numwid -= active_project -> numc[SPH];
+    active_project -> numc[SPH] = active_project -> nspec;
     for (i=0; i<active_project -> nspec; i++)
     {
-      active_project -> numc[SP] += active_coord -> ntg[1][i];
+      active_project -> numc[SPH] += active_coord -> ntg[1][i];
     }
-    alloc_curves (SP);
-    active_project -> numwid += active_project -> numc[SP];
+    alloc_curves (SPH);
+    active_project -> numwid += active_project -> numc[SPH];
     j = 0;
     for (i = 0 ; i < active_project -> nspec ; i++)
     {
-      active_project -> curves[SP][i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
+      active_project -> curves[SPH][i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
                                                                   active_chem -> label[i],
-                                                                  active_project -> num_delta[SP]);
+                                                                  active_project -> num_delta[SPH]);
       j += active_coord -> ntg[1][i];
     }
     k = 1;
@@ -115,14 +115,14 @@ void initsh (int str)
     {
       for (j=0 ; j < active_coord -> ntg[1][i]; j++)
       {
-        active_project -> curves[SP][j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
+        active_project -> curves[SPH][j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
                                                                     exact_name(env_name (active_project, j, i, 0, NULL)),
-                                                                               active_project -> num_delta[SP]);
+                                                                               active_project -> num_delta[SPH]);
       }
       k += active_coord -> ntg[1][i]+1;
     }
-    addcurwidgets (activep, SP, 0);
-    active_project -> initok[SP] = TRUE;
+    addcurwidgets (activep, SPH, 0);
+    active_project -> initok[SPH] = TRUE;
 #endif
   }
 }
@@ -141,36 +141,36 @@ void update_spherical_view (project * this_proj)
   gchar * tab;
   gchar * cid;
 #ifdef NEW_ANA
-  if (this_proj -> analysis[SP] -> calc_buffer == NULL) this_proj -> analysis[SP] -> calc_buffer = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> analysis[SP] -> calc_buffer);
+  if (this_proj -> analysis[SPH] -> calc_buffer == NULL) this_proj -> analysis[SPH] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[SPH] -> calc_buffer);
 
-  print_info ("\n\nSpherical harmonics\n\n", "heading", this_proj -> analysis[SP] -> calc_buffer);
+  print_info ("\n\nSpherical harmonics\n\n", "heading", this_proj -> analysis[SPH] -> calc_buffer);
   m = 0;
   for (i=0; i<this_proj -> nspec; i++)
   {
-    print_info ("\nResults for the ", NULL, this_proj -> analysis[SP] -> calc_buffer);
-    print_info (exact_name(active_chem -> label[i]), textcolor(i), this_proj -> analysis[SP] -> calc_buffer);
-    print_info (" atoms: \n\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("\nResults for the ", NULL, this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (exact_name(active_chem -> label[i]), textcolor(i), this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (" atoms: \n\n", NULL, this_proj -> analysis[SPH] -> calc_buffer);
     // Here print average spec info
 
-    print_info ("\tl\t", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
-    print_info ("Q(","bold", this_proj -> analysis[SP] -> calc_buffer);
-    print_info ("l", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
-    print_info (")","bold", this_proj -> analysis[SP] -> calc_buffer);
-    print_info (active_chem -> label[i], textcolor(i), this_proj -> analysis[SP] -> calc_buffer);
-    print_info ("[All]", "bold", this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("\tl\t", "bold_italic", this_proj -> analysis[SPH] -> calc_buffer);
+    print_info ("Q(","bold", this_proj -> analysis[SPH] -> calc_buffer);
+    print_info ("l", "bold_italic", this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (")","bold", this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (active_chem -> label[i], textcolor(i), this_proj -> analysis[SPH] -> calc_buffer);
+    print_info ("[All]", "bold", this_proj -> analysis[SPH] -> calc_buffer);
     for (j=0 ; j < active_coord -> ntg[1][i]; j++)
     {
-      print_info ("\tQ(","bold", this_proj -> analysis[SP] -> calc_buffer);
-      print_info ("l", "bold_italic", this_proj -> analysis[SP] -> calc_buffer);
-      print_info (")","bold", this_proj -> analysis[SP] -> calc_buffer);
-      env_name (this_proj, j, i, 1, this_proj -> analysis[SP] -> calc_buffer);
+      print_info ("\tQ(","bold", this_proj -> analysis[SPH] -> calc_buffer);
+      print_info ("l", "bold_italic", this_proj -> analysis[SPH] -> calc_buffer);
+      print_info (")","bold", this_proj -> analysis[SPH] -> calc_buffer);
+      env_name (this_proj, j, i, 1, this_proj -> analysis[SPH] -> calc_buffer);
     }
-    print_info ("\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
+    print_info ("\n", NULL, this_proj -> analysis[SPH] -> calc_buffer);
     k = 1;
     tab = NULL;
     cid = NULL;
-    for (j=0; j<this_proj -> analysis[SP] -> num_delta/2+1 ; j++)
+    for (j=0; j<this_proj -> analysis[SPH] -> num_delta/2+1 ; j++)
     {
       k ++;
       if (k - 2*(k/2) == 0)
@@ -183,21 +183,21 @@ void update_spherical_view (project * this_proj)
         tab = NULL;
         cid = g_strdup_printf ("bold");
       }
-      print_info ("\t", NULL, this_proj -> analysis[SP] -> calc_buffer);
+      print_info ("\t", NULL, this_proj -> analysis[SPH] -> calc_buffer);
       if (j < 5)
       {
-        print_info (" ",cid, this_proj -> analysis[SP] -> calc_buffer);
+        print_info (" ",cid, this_proj -> analysis[SPH] -> calc_buffer);
       }
       str = g_strdup_printf("%d", 2*j);
-      print_info (str, cid, this_proj -> analysis[SP] -> calc_buffer);
+      print_info (str, cid, this_proj -> analysis[SPH] -> calc_buffer);
       g_free (str);
       for (l=0; l<active_coord -> ntg[1][i]+1; l++)
       {
-        str = g_strdup_printf("\t%f", this_proj -> analysis[SP] -> curves[l+m] -> data[1][j]);
-        print_info (str, tab, this_proj -> analysis[SP] -> calc_buffer);
+        str = g_strdup_printf("\t%f", this_proj -> analysis[SPH] -> curves[l+m] -> data[1][j]);
+        print_info (str, tab, this_proj -> analysis[SPH] -> calc_buffer);
         g_free (str);
       }
-      print_info ("\n", NULL, this_proj -> analysis[SP] -> calc_buffer);
+      print_info ("\n", NULL, this_proj -> analysis[SPH] -> calc_buffer);
       if (tab != NULL)
       {
         g_free (tab);
@@ -210,7 +210,7 @@ void update_spherical_view (project * this_proj)
     m += active_coord -> ntg[1][i]+1;
   }
 
-  print_info (calculation_time(TRUE, this_proj -> analysis[SP] -> calc_time), NULL, this_proj -> analysis[SP] -> calc_buffer);
+  print_info (calculation_time(TRUE, this_proj -> analysis[SPH] -> calc_time), NULL, this_proj -> analysis[SPH] -> calc_buffer);
 #else
   if (this_proj -> text_buffer[SP+OT] == NULL) this_proj -> text_buffer[SP+OT] = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> text_buffer[SP+OT]);
@@ -241,7 +241,7 @@ void update_spherical_view (project * this_proj)
     k = 1;
     tab = NULL;
     cid = NULL;
-    for (j=0; j<this_proj -> num_delta[SP]/2+1 ; j++)
+    for (j=0; j<this_proj -> num_delta[SPH]/2+1 ; j++)
     {
       k ++;
       if (k - 2*(k/2) == 0)
@@ -264,7 +264,7 @@ void update_spherical_view (project * this_proj)
       g_free (str);
       for (l=0; l<active_coord -> ntg[1][i]+1; l++)
       {
-        str = g_strdup_printf("\t%f", this_proj -> curves[SP][l+m] -> data[1][j]);
+        str = g_strdup_printf("\t%f", this_proj -> curves[SPH][l+m] -> data[1][j]);
         print_info (str, tab, this_proj -> text_buffer[SP+OT]);
         g_free (str);
       }
@@ -281,7 +281,7 @@ void update_spherical_view (project * this_proj)
     m += active_coord -> ntg[1][i]+1;
   }
 
-  print_info (calculation_time(TRUE, this_proj -> calc_time[SP]), NULL, this_proj -> text_buffer[SP+OT]);
+  print_info (calculation_time(TRUE, this_proj -> calc_time[SPH]), NULL, this_proj -> text_buffer[SP+OT]);
 #endif
 }
 
@@ -297,16 +297,16 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
 #ifdef NEW_ANA
-  if (! active_project -> analysis[SP] -> init_ok) initsh(1);
+  if (! active_project -> analysis[SPH] -> init_ok) initsh(1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)
   {
-    clean_curves_data (SP, 0, active_project -> analysis[SP] -> numc);
-    prepostcalc (widg, FALSE, SP, 0, opac);
+    clean_curves_data (SPH, 0, active_project -> analysis[SPH] -> numc);
+    prepostcalc (widg, FALSE, SPH, 0, opac);
     k = 0;
     l = active_project -> nspec;
-    m = active_project -> analysis[SP] -> num_delta;
+    m = active_project -> analysis[SPH] -> num_delta;
     clock_gettime (CLOCK_MONOTONIC, & start_time);
     for (i=0; i<active_project -> nspec; i++)
     {
@@ -318,19 +318,19 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
       }
     }
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SP] -> calc_time = get_calc_time (start_time, stop_time);
-    if (l != active_project -> analysis[SP] -> numc)
+    active_project -> analysis[SPH] -> calc_time = get_calc_time (start_time, stop_time);
+    if (l != active_project -> analysis[SPH] -> numc)
 #else
-  if (! active_project -> initok[SP]) initsh(1);
+  if (! active_project -> initok[SPH]) initsh(1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)
   {
-    clean_curves_data (SP, 0, active_project -> numc[SP]);
-    prepostcalc (widg, FALSE, SP, 0, opac);
+    clean_curves_data (SPH, 0, active_project -> numc[SPH]);
+    prepostcalc (widg, FALSE, SPH, 0, opac);
     k = 0;
     l = active_project -> nspec;
-    m = active_project -> num_delta[SP];
+    m = active_project -> num_delta[SPH];
     clock_gettime (CLOCK_MONOTONIC, & start_time);
     for (i=0; i<active_project -> nspec; i++)
     {
@@ -342,8 +342,8 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
       }
     }
     clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> calc_time[SP] = get_calc_time (start_time, stop_time);
-    if (l != active_project -> numc[SP])
+    active_project -> calc_time[SPH] = get_calc_time (start_time, stop_time);
+    if (l != active_project -> numc[SPH])
 #endif
     {
       i = 0;
@@ -352,7 +352,7 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
     {
       i = 1;
     }
-    prepostcalc (widg, TRUE, SP, i, 1.0);
+    prepostcalc (widg, TRUE, SPH, i, 1.0);
     if (! i)
     {
       show_error ("Unexpected error when analyzing the spherical harmonics", 0, widg);

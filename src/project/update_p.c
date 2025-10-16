@@ -69,7 +69,7 @@ void prep_calc_actions ()
     else
     {
 #endif
-    if (i < AN)
+    if (i < ANG)
     {
 #ifdef NEW_ANA
       if (active_project -> analysis[i])
@@ -188,43 +188,43 @@ int update_project ()
     if (active_cell -> has_a_box)
     {
 #ifdef NEW_ANA
-      active_project -> analysis[GR] -> avail_ok = TRUE;
-      active_project -> analysis[SK] -> avail_ok = TRUE;
+      active_project -> analysis[GDR] -> avail_ok = TRUE;
+      active_project -> analysis[SKD] -> avail_ok = TRUE;
 #else
-      active_project -> runok[GR] = TRUE;
-      active_project -> runok[SK] = TRUE;
+      active_project -> runok[GDR] = TRUE;
+      active_project -> runok[SKD] = TRUE;
 #endif
     }
     else
     {
 #ifdef NEW_ANA
-      active_project -> analysis[GR] -> avail_ok = FALSE;
-      active_project -> analysis[SQ] -> avail_ok = FALSE;
-      active_project -> analysis[SK] -> avail_ok = FALSE;
-      active_project -> analysis[SK] -> avail_ok = FALSE;
+      active_project -> analysis[GDR] -> avail_ok = FALSE;
+      active_project -> analysis[SQD] -> avail_ok = FALSE;
+      active_project -> analysis[SKD] -> avail_ok = FALSE;
+      active_project -> analysis[SKD] -> avail_ok = FALSE;
 #else
-      active_project -> runok[GR] = FALSE;
-      active_project -> runok[SQ] = FALSE;
-      active_project -> runok[SK] = FALSE;
-      active_project -> runok[GK] = FALSE;
+      active_project -> runok[GDR] = FALSE;
+      active_project -> runok[SQD] = FALSE;
+      active_project -> runok[SKD] = FALSE;
+      active_project -> runok[GDK] = FALSE;
 #endif
     }
     if (active_project -> natomes)
     {
 #ifdef NEW_ANA
-      active_project -> analysis[BD] -> avail_ok = TRUE;
-      active_project -> analysis[AN] -> avail_ok = TRUE;
-      active_project -> analysis[RI] -> avail_ok = TRUE;
-      active_project -> analysis[CH] -> avail_ok = TRUE;
-      active_project -> analysis[SP] -> avail_ok = TRUE;
-      if (active_project -> steps > 1) active_project -> analysis[MS] -> avail_ok = TRUE;
+      active_project -> analysis[BND] -> avail_ok = TRUE;
+      active_project -> analysis[ANG] -> avail_ok = TRUE;
+      active_project -> analysis[RIN] -> avail_ok = TRUE;
+      active_project -> analysis[CHA] -> avail_ok = TRUE;
+      active_project -> analysis[SPH] -> avail_ok = TRUE;
+      if (active_project -> steps > 1) active_project -> analysis[MSD] -> avail_ok = TRUE;
 #else
-      active_project -> runok[BD] = TRUE;
-      active_project -> runok[AN] = TRUE;
-      active_project -> runok[RI] = TRUE;
-      active_project -> runok[CH] = TRUE;
-      active_project -> runok[SP] = TRUE;
-      if (active_project -> steps > 1) active_project -> runok[MS] = TRUE;
+      active_project -> runok[BND] = TRUE;
+      active_project -> runok[ANG] = TRUE;
+      active_project -> runok[RIN] = TRUE;
+      active_project -> runok[CHA] = TRUE;
+      active_project -> runok[SPH] = TRUE;
+      if (active_project -> steps > 1) active_project -> runok[MSD] = TRUE;
 #endif
     }
   }

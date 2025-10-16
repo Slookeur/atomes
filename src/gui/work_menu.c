@@ -247,7 +247,7 @@ GtkWidget * work_menu (int p, int c)
   g_signal_connect (pop_act[15], "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(0));
   g_signal_connect (pop_act[16], "activate", G_CALLBACK(atomes_menu_bar_action), NULL);
 
-  calc_to_compute = (c < AN) ? c : c - 1;
+  calc_to_compute = (c < ANG) ? c : c - 1;
 #ifdef GTK3
   menu = this_work_menu (p, c);
   // GMenu * popup = create_workspace_menu ("pop", 1, p, c);
