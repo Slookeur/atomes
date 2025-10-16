@@ -51,17 +51,19 @@ Here is the step by step procedure:
   2. Edit the file `src.global.h` to make the information available in other parts of the code:
 
     - Define 'IDC' a new, and unique, 3 characters variable, associated to the new calculation ID number: 
+
   ```
   #define IDC 10
   ```
   The associated number should be the latest calculation ID number + 1
 
-   - Insert the following: 
+    - Insert the following: 
+
   ```
   extern gchar * PACKAGE_IDC;
   ```
-     - Increment the total number of calculations available : `NCALCS`
-     - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
+    - Increment the total number of calculations available : `NCALCS`
+    - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
   3. Edit the file `src/gui/main.c`:
  
