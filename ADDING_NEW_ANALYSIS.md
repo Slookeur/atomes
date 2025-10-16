@@ -77,11 +77,11 @@ This is to be done close to line **97**
   - Increment the total number of calculations available : `NCALCS`
   - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
-### 3. Edit the file `src/gui/main.c` to read the icon file for the new analysis (after line ): 
+### 3. Edit the file [`src/gui/main.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html) to read the icon file for the new analysis (after line ): 
   ```C
   PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
   ```
-### 4. Edit the file `/src/gui/gui.c`
+### 4. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
     - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
@@ -99,7 +99,7 @@ This is to be done close to line **97**
   ```C
   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
   ```
-### 5. Edit the file `src/gui/initc.c`
+### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html)
 
   - declare the new analysis, after line :
   ```C
@@ -108,21 +108,21 @@ This is to be done close to line **97**
 
 ### 6. If periodicity is required for this calculation:
 
-  - Edit `src/gui/edit_menuc.c` search for the `init_box_calc()` function to add the proper flags for
+  - Edit [`src/gui/edit_menuc.c`](https://slookeur.github.io/atomes-doxygen/d8/da6/edit__menu_8c.html) search for the `init_box_calc()` function to add the proper flags for
 ```
   active_project -> analysis[IDC] -> avail_ok
 ```
-  - Edit the file `src/opengl/edit/cbuild_action.c` close to line **1680** to add the default availability for this calculation
-  - Edit the file `src/opengl/win/popup.c` close line **2155** to add the default availability for this calculation
+  - Edit the file [`src/opengl/edit/cbuild_action.c`](https://slookeur.github.io/atomes-doxygen/d0/dd3/cbuild__action_8c.html) close to line **1680** to add the default availability for this calculation
+  - Edit the file [`src/opengl/win/popup.c`](https://slookeur.github.io/atomes-doxygen/d5/da4/popup_8c.html) close line **2155** to add the default availability for this calculation
 
 ### 7. Optional graph setup, if any:
 
-  - Edit the file `src/curve/yaxis.c` to adjust the Y axis autoscale information, after line 107
+  - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust the Y axis autoscale information, after line 107
 
 ## Coding the new analysis user dialog and its callbacks
 
 
-### 1. Edit the file `src/gui/calc_menu.c`
+### 1. Edit the file [`src/gui/calc_menu.c`](https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html)
 
   - In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
   ```C
