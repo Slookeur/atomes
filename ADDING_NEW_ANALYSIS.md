@@ -24,13 +24,13 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
   3. Coding the new calculation and its connections to the **atomes** software internal data structures
   4. **atomes** release candidate requirements:
 
-    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
-      - to save / read the new analysis parameters and results
-      - to ensure the reading of older `.apf` and `.awf` file format(s)
+   - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
+    - to save / read the new analysis parameters and results
+    - to ensure the reading of older `.apf` and `.awf` file format(s)
 
-    - Modifying the user preferences dialog to consider the new analysis default parameter(s)
-      - to save / read the new analysis parameter(s)
-      - to ensure the reading of older user preferences XML file (should be automatic)
+   - Modifying the user preferences dialog to consider the new analysis default parameter(s)
+    - to save / read the new analysis parameter(s)
+    - to ensure the reading of older user preferences XML file (should be automatic)
 
 Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help, and step **.4** is the most complicated part. 
 
