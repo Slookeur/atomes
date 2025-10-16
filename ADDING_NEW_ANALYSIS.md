@@ -67,45 +67,44 @@ Here is the step by step procedure:
 
   3. Edit the file `src/gui/main.c` to read the icon file for the new analysis (after line ): 
 
-    ```
-    PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
-    ```
+  ```
+  PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
+  ```
 
   4. Edit the file `gui.c` :
 
    1. At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
-   
     - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
     - `char * calc_name[]` : add the new calculation name for the menu items
     - `char * graph_name[]` : add the new calculation name for the graph windows
 
-  2. In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
+   2. In the function `G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)` add the calculation menu callback:
 
-```
-    else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
-    {
-      on_calc_activate (NULL, data); // This does not change
-    }
-```
+  ```
+  else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
+  {
+    on_calc_activate (NULL, data); // This does not change
+  }
+  ```
 
   3. In the function `GtkWidget * create_main_window (GApplication * atomes)` declare the icon for the new calculation:
 
-```
-   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
-```
+  ```
+  graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+  ```
 
  5. Edit the file `calc_menu.c`
 
   1. In the function `G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)` add a case for the new analysis
 
-```
+  ```
    case IDC:
      calc_idc (box);
      break;
-```
+  ```
   2. Write the `calc_idc` function that describes the calculation dialog for the new analysis:
 
-```
+  ```
          /*!
              \fn void calc_idc (GtkWidget * vbox)
 
@@ -121,18 +120,19 @@ Here is the step by step procedure:
 
             add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
           }
-```
-          Contact me for help !
+  ```
+  
+Contact me for help !
 
    3. In the function `G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)`
  
     - Add a case for the new analysis:
 
-```
-         case IDC:
-           if (test_idc()) on_calc_idc_released (calc_win, NULL);
-           break;
-```
+    ```
+     case IDC:
+       if (test_idc()) on_calc_idc_released (calc_win, NULL);
+       break;
+    ```
     Note that `test_idc()` might be a testing routine you want to write to ensure that conditions are met to perform the analysis
 
     - You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
@@ -142,9 +142,9 @@ Here is the step by step procedure:
 
     - declare the new analysis, after line :
 
-```
-     active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
-```
+    ```
+    active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
+    ```
 
    5. If periodicity is required for this calculation:
 
