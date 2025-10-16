@@ -7,7 +7,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
   - List all information required by this new analysis: 
     - Required parameter(s) for the user to input
-    - Any requirement(s) for the calculation to be performed, ex: 
+    - Any requirement(s) for the calculation to be performed, for example: 
       - Should periodic boundary condition be applied ?
       - Should a prior calculation be performed ?
 
@@ -23,9 +23,11 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
   2. Coding the new analysis calculation dialog
   3. Coding the new calculation and its connections to the **atomes** software internal data structures
   4. **atomes** release candidate requirements:
+
     - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
       - to save / read the new analysis parameters and results
       - to ensure the reading of older `.apf` and `.awf` file format(s)
+
     - Modifying the user preferences dialog to consider the new analysis default parameter(s)
       - to save / read the new analysis parameter(s)
       - to ensure the reading of older user preferences XML file (should be automatic)
@@ -36,22 +38,22 @@ Overall step **1.** is easy, step **2.** and **3.** are slightly more complicate
 
 Here is the step by step procedure: 
 
-  0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
+  0. Pick a 3 letter keyword to describe your new calculation, ex: **IDC**
 
-  1. Edit the file `src/global.c` to create a 'PACKAGE_IDC variable':
+  1. Edit the file `src/global.c` to create a `PACKAGE_IDC` variable:
 
   ```
   gchar * PACKAGE_IDC = NULL;
   ```
 
   2. Edit the file `src.global.h' to make the information available in other parts of the code:
-    - Define 'IDC' a new, and unique, 3 characters variable, ex: 
+    - Define 'IDC' a new, and unique, 3 characters variable, associated to the new calculation ID number: 
   ```
   #define IDC 10
   ```
   The associated number should be the latest calculation ID number + 1
 
-    - Insert the following: 
+   - Insert the following: 
   ```
   extern gchar * PACKAGE_IDC;
   ```
