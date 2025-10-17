@@ -58,7 +58,7 @@ Here is the step by step procedure:
 > [!CAUTION]
 > In the following I will use the `IDC`, sometimes `idc` keywords as examples, remember to adjust it ! 
 
-### 1. Edit the file [`src/global.h`](https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html) to make the information available in other parts of the code:
+### 1. Edit the file [`src/global.h`][global.h] to make the information available in other parts of the code:
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
@@ -82,10 +82,10 @@ At the time I wrote this tutorial MSD was the last one set to 9.
   - Increment the total number of calculations available : `NCALCS`
   - Increment the total number of calculations using graphs : `NGRAPHS`
 
-### 2. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
+### 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
-    - [`atomes_action analyze_acts[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee) append a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
+    - [`atomes_action analyze_acts[]`][analyze_acts] append a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
 
     ```C
     atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
@@ -100,7 +100,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                                     {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};  // This is an example
     ```
 
-    - [`char * calc_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735) : add the new calculation name for the menu items
+    - [`char * calc_name[]`][calc_name]: add the new calculation name for the menu items
  
     ```C
     char * calc_name[] = {"g(r)/G(r)",
@@ -115,7 +115,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                           "The new analysis"};  // This is an example
     ```
 
-    - [`char * graph_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3) : add the new calculation name for the graph windows
+    - [`char * graph_name[]`][graph_name] : add the new calculation name for the graph windows
 
     ```C
     char * graph_name[] = {"g(r)/G(r)",
@@ -131,7 +131,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                            "The new analysis"};  // This is an example
     ```
 
-  - In the function `atomes_menu_bar_action` add the calculation menu callback:
+  - In the function [`atomes_menu_bar_action`][atomes_menu_bar_action] add the calculation menu callback:
 
   ```C
   G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
@@ -147,7 +147,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
   }
   ```
 
-  - In the function `create_main_window` declare the icon for the new calculation:
+  - In the function [`create_main_window`][create_main_window] declare the icon for the new calculation:
 
   ```C
   GtkWidget * create_main_window (GApplication * atomes)
@@ -160,9 +160,9 @@ At the time I wrote this tutorial MSD was the last one set to 9.
   }
   ```
 
-### 3. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
+### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
-Search for the `atomes_analysis` function to declare the new analysis
+Search for the [`atomes_analysis`][atomes_analysis] function to declare the new analysis
 
 ```C
 void init_atomes_analysis ()
@@ -177,7 +177,7 @@ void init_atomes_analysis ()
 
 ### 4. Update the default availability for the new calculation:
 
-  - Edit [`src/project/update_p.c`](https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html) search for the `update_analysis_availability` function to add the proper flags
+  - Edit [`src/project/update_p.c`][update_p.c] search for the [`update_analysis_availability`][update_analysis_availability] function to add the proper flags
 
   ```C
   void update_analysis_availability (project * this_proj)
@@ -210,7 +210,7 @@ void init_atomes_analysis ()
 
 ### 5. Optional graph setup, if any:
 
-  - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust specific axis autoscale information
+  - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
 
   ```C
   void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
@@ -238,9 +238,9 @@ The autoscale is performed immediately after in this function.
 ## Coding the new analysis user dialog and its callbacks
 
 
-### 1. Edit the file [`src/gui/calc_menu.c`](https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html)
+### 1. Edit the file [`src/gui/calc_menu.c`][calc_menu.c]
 
-  - In the function `on_calc_activate` add a case for the new analysis
+  - In the function [`on_calc_activate`][on_calc_activate] add a case for the new analysis
 
   ```C
   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
@@ -274,10 +274,13 @@ The autoscale is performed immediately after in this function.
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
   }
   ```
+> [!TIP]
+> Many example are available in **atomes** source code, in particular in the file [`src/gui/calc_menu.c`][calc_menu.c]
+
 
 Contact me for help !
 
-  - In the function `run_on_calc_activate` add a test case for the new analysis:
+  - In the function [`run_on_calc_activate`][run_on_calc_activate] add a test case for the new analysis:
 
   ```C
   G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
@@ -292,9 +295,11 @@ Contact me for help !
   }
   ```
 
-Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
+> [!TIP]
+> Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
 
-You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
+> [!IMPORTANT]
+> Note that `on_calc_idc_released` is a function you must write to perform the calculation (see bellow).
  
 
 ## Adding the new analysis using the **atomes** software internal data structures
@@ -306,4 +311,21 @@ Create a new file
 
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
-  
+
+
+[global.h]:https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html
+[gui.c]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html
+[analyze_acts]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee
+[calc_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735
+[graph_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
+[atomes_menu_bar_action]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#acd3996df411bbbd56fd07fdb40953f75
+[create_main_window]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a92f4ba1abecbb26e2b9e934397930f37
+[init.c]:https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html
+[atomes_analysis]:to_be_addedd
+[update_p.c]:https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html
+[update_analysis_availability]:to_be_added
+[yaxis.c]:https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html
+[calc_menu.c]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html
+[on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a981fd6ae8aa02f6ba86bbfdfbeace7ed
+[run_on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a7605cb93faba5139a75d08568f1fb0a0
+
