@@ -1,7 +1,9 @@
 # Adding a new analysis to the **atomes** software
 
-this document describes the steps required to add a new analysis in **atomes** 
+This document describes the steps required to add a new analysis in **atomes** 
 and to make use of the [graph visualization system](https://atomes.ipcms.fr/analyze/) of the **atomes** program. 
+
+To get familiar with the source code of the **atomes** program please refer to the extensive [Doxygen documentation][atomes_doxygen]
 
 ## Before starting 
 
@@ -228,7 +230,7 @@ void init_atomes_analysis ()
     if (rid == IDC)
     {
        // Specific layout option(s) here
-       // Among the options available in the [DataLayout][DataLayout] data structure
+       // Among the options available in the DataLayout data structure - see bellow
     }
 
     ...
@@ -245,13 +247,15 @@ void init_atomes_analysis ()
     {
        this_curve -> cmin[0] = user_define_min;  // To set the default min value
        this_curve -> cmax[0] = user_define_max;  // To set the default max value
-       // Or any other option in the [Curve][Curve] data structure
+       // Or any other option in the Curve data structure - see bellow
     }
 
     ...
 
   }
   ```
+>[!TIP] More information about the [DataLayout][DataLayout] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
+>[!TIP] More information about the [Curve][Curve] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
 
   - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
 
@@ -355,7 +359,7 @@ Create a new file
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
 
-
+[atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
 [global.h]:https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html
 [gui.c]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html
 [analyze_acts]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee
