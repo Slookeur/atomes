@@ -179,7 +179,10 @@ void init_atomes_analysis ()
 {
   ...
 
-  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, comp_list);  // This is an example
+  int num_g = ;        // Total number of graph windows as result(s) of the analysis
+  int num_c = ;        // Number of analysis compatible, to allow overlap of the data on the graph window
+  int * c_list = ;     // List of compatible analysis, including self
+  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_g, num_c, c_list);  // This is an example
 
   ...
 }
@@ -193,6 +196,7 @@ void init_atomes_analysis ()
   void update_analysis_availability (project * this_proj)
   {
     ...
+
     if (this_proj -> cell.has_a_box) // Or any other prerequisite
     {
       ...
@@ -209,6 +213,7 @@ void init_atomes_analysis ()
 
       ...
     }
+
     ...
 
     // Otherwise default value to TRUE (or FALSE)
@@ -240,7 +245,6 @@ void init_atomes_analysis ()
 
   void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
   {
-
     ...
 
     else if (rid == IDC)
@@ -251,11 +255,10 @@ void init_atomes_analysis ()
     }
 
     ...
-
   }
   ```
->[!TIP] More information about the [DataLayout][DataLayout] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
->[!TIP] More information about the [Curve][Curve] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
+> [!TIP] More information about the [DataLayout][DataLayout] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
+> [!TIP] More information about the [Curve][Curve] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
 
   - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
 
