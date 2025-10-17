@@ -132,6 +132,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
     ```
 
   - In the function `atomes_menu_bar_action` add the calculation menu callback:
+
   ```C
   G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
   {
@@ -145,13 +146,15 @@ At the time I wrote this tutorial MSD was the last one set to 9.
     ...
   }
   ```
+
   - In the function `create_main_window` declare the icon for the new calculation:
+
   ```C
   GtkWidget * create_main_window (GApplication * atomes)
   {
     ...
 
-    graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
+    graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);  // This is an example
 
     ...
   }
@@ -166,7 +169,7 @@ void init_atomes_analysis ()
 {
   ...
 
-  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, comp_list);
+  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, comp_list);  // This is an example
 
   ...
 }
@@ -298,7 +301,8 @@ You now need to write the `on_calc_idc_released` function to perform the calcula
 
 Create a new file
 
-## **atomes** release candidate requirements
+
+## **atomes** release candidate requirements
 
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
