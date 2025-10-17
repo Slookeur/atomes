@@ -62,10 +62,19 @@ Here is the step by step procedure:
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
 ```C
-  #define IDC 10
+#define GDR 0
+#define SQD 1
+#define SKD 2
+#define GDK 3
+#define BND 4
+#define ANG 5
+#define RIN 6
+#define CHA 7
+#define SPH 8
+#define MSD 9
+#define IDC 10
 ```
-  The associated number should be the latest calculation ID number + 1
-  This is to be done close to line **336**
+  The associated number should be the latest calculation ID number + 1, in this example MSD is the last one set to 9. 
 
   - Increment the total number of calculations available : `NCALCS`
   - Increment increment the total number calculation using graphs : `NGRAPHS`
