@@ -181,7 +181,7 @@ void init_atomes_analysis ()
 
   int num_g = ;        // Total number of graph windows as result(s) of the analysis
   int num_c = ;        // Number of analysis compatible, to allow overlap of the data on the graph window
-  int * c_list = ;     // List of compatible analysis, including self
+  int * c_list = {};   // List of compatible analysis, including self
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_g, num_c, c_list);  // This is an example
 
   ...
