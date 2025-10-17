@@ -259,9 +259,11 @@ void init_atomes_analysis ()
   ```
 > [!TIP]
 > More information about the [DataLayout][DataLayout] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
-
-> [!TIP]
+>
+> 
 > More information about the [Curve][Curve] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
+>
+> You can also consider to modify the corresponding data structures for your need !
 
   - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
 
