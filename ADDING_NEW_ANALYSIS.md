@@ -73,19 +73,10 @@ This is to be done close to line **97**
   The associated number should be the latest calculation ID number + 1
   This is to be done close to line **336**
 
-  - Insert the following: 
-```C
-  extern gchar * PACKAGE_IDC;
-```
-  This is to be done close to line **366**
   - Increment the total number of calculations available : `NCALCS`
-  - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
+  - Increment increment the total number calculation using graphs : `NGRAPHS`
 
-### 3. Edit the file [`src/gui/main.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html) to read the icon file for the new analysis (after line ): 
-```C
-  PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
-```
-### 4. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
+### 3. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
     - `atomes_action analyze_acts[]` : add a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
@@ -112,12 +103,12 @@ GtkWidget * create_main_window (GApplication * atomes)
 {
   ...
 
-  graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+  graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
 
   ...
 }
 ```
-### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
+### 4. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
 
 Search for the `atomes_analysis` function to declare the new analysis
 ```C
@@ -131,7 +122,7 @@ void init_atomes_analysis ()
 }
 ```
 
-### 6. Update the default availability for the new calculation:
+### 5. Update the default availability for the new calculation:
 
   - Edit [`src/project/update_p.c`](https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html) search for the `update_analysis_availability` function to add the proper flags
 ```C
@@ -163,7 +154,7 @@ void update_analysis_availability (project * this_proj)
 }
 ```
 
-### 7. Optional graph setup, if any:
+### 6. Optional graph setup, if any:
 
   - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust specific axis autoscale information
 
