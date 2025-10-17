@@ -66,7 +66,7 @@ extern void initmsd ();
 extern void initsh (int s);
 #ifdef NEW_ANA
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
-extern void init_atomes_analyses ();
+extern void init_atomes_analysis ();
 #endif
 
 gboolean old_la_bo_ax_gr;
@@ -422,7 +422,7 @@ int open_project (FILE * fp, int npi)
 
         // Read curves
 #ifdef NEW_ANA
-        init_atomes_analyses ();
+        init_atomes_analysis ();
         for (i=0; i<NGRAPHS; i++)
         {
           if (active_project -> analysis[i])

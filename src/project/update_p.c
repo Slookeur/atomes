@@ -37,6 +37,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void prep_calc_actions ();
   void active_project_changed (int id);
   void opengl_project_changed (int id);
+  void update_analysis_availability (project * this_proj);
 
 */
 
@@ -134,6 +135,67 @@ void prep_calc_actions ()
 }
 
 /*!
+  \fn void update_analysis_availability (project * this_proj)
+
+  \brief update analysis availability for a target projet
+
+  \param this_proj the target project
+*/
+void update_analysis_availability (project * this_proj)
+{
+  if (this_proj -> natomes && this_proj -> numwid)
+  {
+    if (this_proj -> cell.has_a_box)
+    {
+#ifdef NEW_ANA
+      this_proj -> analysis[GDR] -> avail_ok = TRUE;
+      this_proj -> analysis[SKD] -> avail_ok = TRUE;
+#else
+      this_proj -> runok[GDR] = TRUE;
+      this_proj -> runok[SKD] = TRUE;
+#endif
+    }
+    else
+    {
+#ifdef NEW_ANA
+      this_proj -> analysis[GDR] -> avail_ok = FALSE;
+      this_proj -> analysis[SQD] -> avail_ok = FALSE;
+      this_proj -> analysis[SKD] -> avail_ok = FALSE;
+      this_proj -> analysis[SKD] -> avail_ok = FALSE;
+#else
+      this_proj -> runok[GDR] = FALSE;
+      this_proj -> runok[SQD] = FALSE;
+      this_proj -> runok[SKD] = FALSE;
+      this_proj -> runok[GDK] = FALSE;
+#endif
+    }
+#ifdef NEW_ANA
+    this_proj -> analysis[BND] -> avail_ok = TRUE;
+    this_proj -> analysis[ANG] -> avail_ok = TRUE;
+    this_proj -> analysis[RIN] -> avail_ok = TRUE;
+    this_proj -> analysis[CHA] -> avail_ok = TRUE;
+    this_proj -> analysis[SPH] -> avail_ok = TRUE;
+    if (this_proj -> steps > 1) this_proj -> analysis[MSD] -> avail_ok = TRUE;
+#else
+    this_proj -> runok[BND] = TRUE;
+    this_proj -> runok[ANG] = TRUE;
+    this_proj -> runok[RIN] = TRUE;
+    this_proj -> runok[CHA] = TRUE;
+    this_proj -> runok[SPH] = TRUE;
+    if (this_proj -> steps > 1) this_proj -> runok[MSD] = TRUE;
+#endif
+  }
+  else
+  {
+    int i;
+    for (i=0; i<NGRAPHS; i++)
+    {
+      this_proj -> analysis[i] -> avail_ok = FALSE;
+    }
+  }
+}
+
+/*!
   \fn int update_project ()
 
   \brief update project: send data to Fortran90, and update calculation interactors
@@ -183,51 +245,7 @@ int update_project ()
       cutoffsend ();
     }
   }
-  if (active_project -> numwid > 0)
-  {
-    if (active_cell -> has_a_box)
-    {
-#ifdef NEW_ANA
-      active_project -> analysis[GDR] -> avail_ok = TRUE;
-      active_project -> analysis[SKD] -> avail_ok = TRUE;
-#else
-      active_project -> runok[GDR] = TRUE;
-      active_project -> runok[SKD] = TRUE;
-#endif
-    }
-    else
-    {
-#ifdef NEW_ANA
-      active_project -> analysis[GDR] -> avail_ok = FALSE;
-      active_project -> analysis[SQD] -> avail_ok = FALSE;
-      active_project -> analysis[SKD] -> avail_ok = FALSE;
-      active_project -> analysis[SKD] -> avail_ok = FALSE;
-#else
-      active_project -> runok[GDR] = FALSE;
-      active_project -> runok[SQD] = FALSE;
-      active_project -> runok[SKD] = FALSE;
-      active_project -> runok[GDK] = FALSE;
-#endif
-    }
-    if (active_project -> natomes)
-    {
-#ifdef NEW_ANA
-      active_project -> analysis[BND] -> avail_ok = TRUE;
-      active_project -> analysis[ANG] -> avail_ok = TRUE;
-      active_project -> analysis[RIN] -> avail_ok = TRUE;
-      active_project -> analysis[CHA] -> avail_ok = TRUE;
-      active_project -> analysis[SPH] -> avail_ok = TRUE;
-      if (active_project -> steps > 1) active_project -> analysis[MSD] -> avail_ok = TRUE;
-#else
-      active_project -> runok[BND] = TRUE;
-      active_project -> runok[ANG] = TRUE;
-      active_project -> runok[RIN] = TRUE;
-      active_project -> runok[CHA] = TRUE;
-      active_project -> runok[SPH] = TRUE;
-      if (active_project -> steps > 1) active_project -> runok[MSD] = TRUE;
-#endif
-    }
-  }
+  update_analysis_availability (active_project);
 #ifdef DEBUG
   g_debug ("UPDATE_PROJECT: updated");
 #endif

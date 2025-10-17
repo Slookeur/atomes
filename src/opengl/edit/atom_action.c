@@ -930,7 +930,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
     }
   }
 #ifdef NEW_ANA
-  init_atomes_analyses ();
+  init_atomes_analysis ();
 #else
   initcwidgets ();
 #endif // NEW_ANA

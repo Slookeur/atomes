@@ -56,7 +56,7 @@ Here is the step by step procedure:
 ### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
 > [!CAUTION]
-> In the following I will use the `IDC` keyword as an example, remember to adjust it ! 
+> In the following I will use the `IDC`, sometimes `idc` keywords as examples, remember to adjust it ! 
 
 ### 1. Edit the file [`src/global.c`](https://slookeur.github.io/atomes-doxygen/dc/d57/global_8c.html) to create a `PACKAGE_IDC` variable
 ```C
@@ -138,7 +138,7 @@ void init_atomes_analysis ()
 void update_analysis_availability (project * this_proj)
 {
   ...
-  if (this_proj -> cell -> has_a_box) // Or any other prerequisite
+  if (this_proj -> cell.has_a_box) // Or any other prerequisite
   {
     ...
        

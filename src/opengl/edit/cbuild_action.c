@@ -1677,23 +1677,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
 
   if (visible)
   {
-
-#ifdef NEW_ANA
-    active_project -> analysis[GDR] -> avail_ok = TRUE;
-    active_project -> analysis[GDK] -> avail_ok = TRUE;
-    active_project -> analysis[BND] -> avail_ok = TRUE;
-    active_project -> analysis[ANG] -> avail_ok = TRUE;
-    active_project -> analysis[RIN] -> avail_ok = TRUE;
-    active_project -> analysis[CHA] -> avail_ok = TRUE;
-    active_project -> analysis[SPH] -> avail_ok = TRUE;
-#else
-    for (i=0; i<3; i=i+2) active_project -> runok[i] = TRUE;
-    active_project -> runok[BND] = TRUE;
-    active_project -> runok[ANG] = TRUE;
-    active_project -> runok[RIN] = TRUE;
-    active_project -> runok[CHA] = TRUE;
-    active_project -> runok[SPH] = TRUE;
-#endif
+    update_analysis_availability (active_project);
     active_project_changed (activep);
     if (new_proj)
     {
@@ -1707,7 +1691,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       initcutoffs (active_chem, active_project -> nspec);
       init_curves_and_calc (active_project);
 #ifdef NEW_ANA
-     init_atomes_analyses ();
+     init_atomes_analysis ();
 #else
       initcwidgets ();
 #endif // NEW_ANA

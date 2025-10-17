@@ -648,7 +648,7 @@ void run_project ()
     if (active_project -> numwid < 0)
     {
 #ifdef NEW_ANA
-     init_atomes_analyses ();
+     init_atomes_analysis ();
 #else
       initcwidgets ();
 #endif // NEW_ANA

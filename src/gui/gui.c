@@ -1099,7 +1099,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_window_set_default_icon (THETD);
 #endif
   THEMO = gdk_pixbuf_new_from_file (PACKAGE_MOL, NULL);
-  THEBD = gdk_pixbuf_new_from_file (PACKAGE_BND, NULL);
+  THEBD = gdk_pixbuf_new_from_file (g_build_filename (PACKAGE_PREFIX, "pixmaps/bd.png", NULL), NULL);
   SETTING = gdk_pixbuf_new_from_file (PACKAGE_PRO, NULL);
   SETTINGS = gdk_pixbuf_new_from_file (PACKAGE_SET, NULL);
   OGL = gdk_pixbuf_new_from_file (PACKAGE_OGL, NULL);
@@ -1111,16 +1111,16 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_window_set_resizable (GTK_WINDOW(window), TRUE);
   gtk_widget_set_size_request (window, 900, 450);
 
-  graph_img[0] = g_strdup_printf ("%s", PACKAGE_GDR);
-  graph_img[1] = g_strdup_printf ("%s", PACKAGE_SQD);
-  graph_img[2] = g_strdup_printf ("%s", PACKAGE_SQD);
-  graph_img[3] = g_strdup_printf ("%s", PACKAGE_GDR);
-  graph_img[4] = g_strdup_printf ("%s", PACKAGE_BND);
-  graph_img[5] = g_strdup_printf ("%s", PACKAGE_ANG);
-  graph_img[6] = g_strdup_printf ("%s", PACKAGE_RIN);
-  graph_img[7] = g_strdup_printf ("%s", PACKAGE_CHA);
-  graph_img[8] = g_strdup_printf ("%s", PACKAGE_SPH);
-  graph_img[9] = g_strdup_printf ("%s", PACKAGE_MSD);
+  graph_img[0] = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
+  graph_img[1] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
+  graph_img[2] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
+  graph_img[3] = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
+  graph_img[4] = g_build_filename (PACKAGE_PREFIX, "pixmaps/bd.png", NULL);
+  graph_img[5] = g_build_filename (PACKAGE_PREFIX, "pixmaps/an.png", NULL);
+  graph_img[6] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ri.png", NULL);
+  graph_img[7] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ch.png", NULL);
+  graph_img[8] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sp.png", NULL);
+  graph_img[9] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ms.png", NULL);
 
   atomes_action main_actions[] = {{ "workspace.open", GINT_TO_POINTER(2)},
                                   { "workspace.save",  GINT_TO_POINTER(3)},

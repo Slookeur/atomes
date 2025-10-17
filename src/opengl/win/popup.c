@@ -2096,6 +2096,7 @@ void create_new_project_using_data (atom_selection * selection)
   {
     active_cell -> ltype = opengl_project -> cell.ltype;
     active_cell -> pbc = opengl_project -> cell.pbc;
+    active_cell -> has_a_box = opengl_project -> cell.has_a_box;
     k = (active_cell -> npt) ? opengl_project -> modelgl -> anim -> last -> img -> step : 0;
     for (i=0; i<3; i++)
     {
@@ -2151,19 +2152,7 @@ void create_new_project_using_data (atom_selection * selection)
       if (tmp -> next != NULL) tmp = tmp -> next;
     }
   }
-#ifdef NEW_ANA
-  active_project -> analysis[BND] -> avail_ok = TRUE;
-  active_project -> analysis[ANG] -> avail_ok = TRUE;
-  active_project -> analysis[RIN] -> avail_ok = TRUE;
-  active_project -> analysis[CHA] -> avail_ok = TRUE;
-  active_project -> analysis[SPH] -> avail_ok = TRUE;
-#else
-  active_project -> runok[BND] = TRUE;
-  active_project -> runok[ANG] = TRUE;
-  active_project -> runok[RIN] = TRUE;
-  active_project -> runok[CHA] = TRUE;
-  active_project -> runok[SPH] = TRUE;
-#endif
+  update_analysis_availability (active_project);
   active_project_changed (activep);
   add_project_to_workspace ();
   i = opengl_project -> modelgl -> anim -> last -> img -> style;

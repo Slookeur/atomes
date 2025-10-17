@@ -34,6 +34,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void alloc_curves (int rid);
   void initcwidgets ();
   void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
+  void alloc_analysis_curves (atomes_analysis * this_analysis);
+  void init_atomes_analysis ();
+
+  atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title);
 
 */
 
@@ -286,11 +290,11 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
 */
 
 /*!
-  \fn void init_atomes_analyses ()
+  \fn void init_atomes_analysis ()
 
   \brief initialize analysis data structures for atomes
 */
-void init_atomes_analyses ()
+void init_atomes_analysis ()
 {
   int i, j;
 

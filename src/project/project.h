@@ -79,6 +79,7 @@ extern G_MODULE_EXPORT gboolean edit_tab (GtkWidget * widget, GdkEventButton * e
 #endif
 extern void init_curves_and_calc (project * this_proj);
 extern void init_project (gboolean alloc_box);
+extern void update_analysis_availability (project * this_proj);
 extern int update_project ();
 extern void clean_view ();
 extern void view_buffer (GtkTextBuffer * buffer);

@@ -672,14 +672,6 @@ int main (int argc, char *argv[])
   PACKAGE_BMP = g_build_filename (PACKAGE_PREFIX, "pixmaps/bmp.png", NULL);
   PACKAGE_TIFF = g_build_filename (PACKAGE_PREFIX, "pixmaps/tiff.png", NULL);
   PACKAGE_VOID = g_build_filename (PACKAGE_PREFIX, "pixmaps/void.png", NULL);
-  PACKAGE_GDR = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
-  PACKAGE_SQD = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
-  PACKAGE_BND = g_build_filename (PACKAGE_PREFIX, "pixmaps/bd.png", NULL);
-  PACKAGE_ANG = g_build_filename (PACKAGE_PREFIX, "pixmaps/an.png", NULL);
-  PACKAGE_RIN = g_build_filename (PACKAGE_PREFIX, "pixmaps/ri.png", NULL);
-  PACKAGE_CHA = g_build_filename (PACKAGE_PREFIX, "pixmaps/ch.png", NULL);
-  PACKAGE_SPH = g_build_filename (PACKAGE_PREFIX, "pixmaps/sp.png", NULL);
-  PACKAGE_MSD = g_build_filename (PACKAGE_PREFIX, "pixmaps/ms.png", NULL);
   PACKAGE_TD = g_build_filename (PACKAGE_PREFIX, "pixmaps/td.png", NULL);
   PACKAGE_MOL = g_build_filename (PACKAGE_PREFIX, "pixmaps/molecule.png", NULL);
   PACKAGE_OGL = g_build_filename (PACKAGE_PREFIX, "pixmaps/opengl.png", NULL);
