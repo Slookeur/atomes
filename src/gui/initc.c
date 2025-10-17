@@ -206,9 +206,7 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
 */
 void init_atomes_analysis (gboolean apply_defaults)
 {
-  int i, j;
-
-  j = active_project -> nspec;
+  int i = active_project -> nspec;
   /* Compatible analysis:
     - always include self, and others if required
     - x axis must be similar or allow comparison (ex: distance)
@@ -219,35 +217,35 @@ void init_atomes_analysis (gboolean apply_defaults)
   comp_list = allocint (2);
   comp_list[0] = GDR;
   comp_list[1] = GDK;
-  active_project -> analysis[GDR] = setup_analysis ("g(r)/G(r)", GDR, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  active_project -> analysis[GDR] = setup_analysis ("g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GDK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*j*j + ((j ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  active_project -> analysis[GDK] = setup_analysis ("g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQD;
   comp_list[1] = SKD;
-  active_project -> analysis[SQD] = setup_analysis ("S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SQD] = setup_analysis ("S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SKD] = setup_analysis ("S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*j*j + ((j ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SKD] = setup_analysis ("S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
   comp_list[0] = BND;
-  active_project -> analysis[BND] = setup_analysis ("Bonds properties", BND, FALSE, TRUE, j*j, 1, comp_list, "Dij [Å]");
+  active_project -> analysis[BND] = setup_analysis ("Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "Dij [Å]");
 
   // Angle distribution(s)
   comp_list[0] = ANG;
-  active_project -> analysis[ANG] = setup_analysis ("Angle distributions", ANG, FALSE, TRUE, j*j*j + j*j*j*j, 1, comp_list, "θ [°]");
+  active_project -> analysis[ANG] = setup_analysis ("Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
   comp_list[0] = RIN;
-  active_project -> analysis[RIN] = setup_analysis ("Ring statistics", RIN, FALSE, TRUE, 20*(j+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+  active_project -> analysis[RIN] = setup_analysis ("Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size n of the ring [total number of nodes]");
 
   // Chain statistic(s)
   comp_list[0] = CHA;
-  active_project -> analysis[CHA] = setup_analysis ("Chain statistics", CHA, FALSE, TRUE, j+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+  active_project -> analysis[CHA] = setup_analysis ("Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size n of the chain [total number of nodes]");
 
   // Spherical harmonic(s)
   comp_list[0] = SPH;
@@ -255,15 +253,9 @@ void init_atomes_analysis (gboolean apply_defaults)
 
   // Mean square displacement
   comp_list[0] = MSD;
-  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis ("Mean Squared Displacement", MSD, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
+  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis ("Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
 
   g_free (comp_list);
-
-  active_project -> numwid = 0;
-  for (i=0; i<NCALCS; i++)
-  {
-    if (active_project -> analysis[i]) active_project -> numwid += active_project -> analysis[i] -> numc;
-  }
 
   if (apply_defaults) apply_analysis_default_parameters_to_project (active_project);
 }

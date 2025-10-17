@@ -196,12 +196,15 @@ void tool_set_visible (GtkTreeViewColumn * col,
   {
     gtk_cell_renderer_set_sensitive (renderer, FALSE);
   }
-  else if (j > -1 && active_project -> numwid > 0)
+  else if (j > -1 && active_project -> analysis)
   {
-    if (active_project -> analysis[j] -> numc)
+    if (active_project -> analysis[j])
     {
-      gtk_tree_model_get (mod, iter, 1, & k, -1);
-      if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j] -> curves[k] -> ndata);
+      if (active_project -> analysis[j] -> numc)
+      {
+        gtk_tree_model_get (mod, iter, 1, & k, -1);
+        if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j] -> curves[k] -> ndata);
+      }
     }
   }
   else

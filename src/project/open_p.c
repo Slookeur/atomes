@@ -441,7 +441,6 @@ int open_project (FILE * fp, int npi)
           if (j)
           {
             active_project -> analysis[SPH] -> numc = j;
-            active_project -> numwid += j;
             alloc_analysis_curves (active_project -> analysis[SPH]);
             addcurwidgets (activep, SPH, 0);
             active_project -> analysis[SPH] -> avail_ok = TRUE;

@@ -233,7 +233,6 @@ void init_project (gboolean alloc_box)
   if (alloc_box) new_proj -> cell.box = g_malloc0(sizeof*new_proj -> cell.box);
 
   remove_edition_actions ();
-  new_proj -> numwid = -1;
   if (nprojects == 1)
   {
     workzone.first = g_malloc0 (sizeof*workzone.first);

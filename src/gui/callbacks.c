@@ -645,7 +645,7 @@ void run_project ()
     }
     to_read_pos ();
     prep_pos_ (& active_cell -> pbc, & active_cell -> frac);
-    if (active_project -> numwid < 0)
+    if (! active_project -> analysis)
     {
       init_atomes_analysis (TRUE);
     }

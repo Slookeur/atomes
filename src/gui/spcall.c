@@ -59,14 +59,12 @@ void initsh (int str)
   int i, j, k;
   if (str)
   {
-    active_project -> numwid -= active_project -> analysis[SPH] -> numc;
     active_project -> analysis[SPH] -> numc = active_project -> nspec;
     for (i=0; i<active_project -> nspec; i++)
     {
       active_project -> analysis[SPH] -> numc += active_coord -> ntg[1][i];
     }
     alloc_analysis_curves (active_project -> analysis[SPH]);
-    active_project -> numwid += active_project -> analysis[SPH] -> numc;
     j = 0;
     for (i = 0 ; i < active_project -> nspec ; i++)
     {

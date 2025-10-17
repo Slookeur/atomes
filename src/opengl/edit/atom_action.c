@@ -151,7 +151,6 @@ void clean_this_project (project * this_proj)
   g_free (opengl_project -> chemistry);
   opengl_project -> chemistry = NULL;
   init_curves_and_calc (opengl_project);
-  opengl_project -> numwid = -1;
   frag_update = mol_update = 0;
   prep_calc_actions ();
   free_glwin_spec_data (opengl_project, opengl_project -> nspec);

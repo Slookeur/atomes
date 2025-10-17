@@ -1029,8 +1029,6 @@ struct project
                                             1 = Standard deviation for CpS */
   double fact[4];                      /*!< Gaussian smoothing factors: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt */
   double sk_advanced[2];               /*!< */
-
-  int numwid;                          /*!< total number of curves for this project */
   /*
      OpenGL related parameters
   */

@@ -117,26 +117,26 @@ void prep_calc_actions ()
 */
 void update_analysis_availability (project * this_proj)
 {
-  if (this_proj -> natomes && this_proj -> numwid)
+  if (this_proj -> natomes && this_proj -> analysis)
   {
     if (this_proj -> cell.has_a_box)
     {
-      this_proj -> analysis[GDR] -> avail_ok = TRUE;
-      this_proj -> analysis[SKD] -> avail_ok = TRUE;
+      if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = TRUE;
+      if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = TRUE;
     }
     else
     {
-      this_proj -> analysis[GDR] -> avail_ok = FALSE;
-      this_proj -> analysis[SQD] -> avail_ok = FALSE;
-      this_proj -> analysis[SKD] -> avail_ok = FALSE;
-      this_proj -> analysis[SKD] -> avail_ok = FALSE;
+      if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = FALSE;
+      if (this_proj -> analysis[SQD]) this_proj -> analysis[SQD] -> avail_ok = FALSE;
+      if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = FALSE;
+      if (this_proj -> analysis[GDK]) this_proj -> analysis[GDK] -> avail_ok = FALSE;
     }
-    this_proj -> analysis[BND] -> avail_ok = TRUE;
-    this_proj -> analysis[ANG] -> avail_ok = TRUE;
-    this_proj -> analysis[RIN] -> avail_ok = TRUE;
-    this_proj -> analysis[CHA] -> avail_ok = TRUE;
-    this_proj -> analysis[SPH] -> avail_ok = TRUE;
-    if (this_proj -> steps > 1) this_proj -> analysis[MSD] -> avail_ok = TRUE;
+    if (this_proj -> analysis[BND]) this_proj -> analysis[BND] -> avail_ok = TRUE;
+    if (this_proj -> analysis[ANG]) this_proj -> analysis[ANG] -> avail_ok = TRUE;
+    if (this_proj -> analysis[RIN]) this_proj -> analysis[RIN] -> avail_ok = TRUE;
+    if (this_proj -> analysis[CHA]) this_proj -> analysis[CHA] -> avail_ok = TRUE;
+    if (this_proj -> analysis[SPH]) this_proj -> analysis[SPH] -> avail_ok = TRUE;
+    if (this_proj -> steps > 1 && this_proj -> analysis[MSD]) this_proj -> analysis[MSD] -> avail_ok = TRUE;
   }
   else if (this_proj -> analysis)
   {
@@ -253,7 +253,7 @@ void active_project_changed (int id)
   }
   else
   {
-    if (active_project -> numwid > 0)
+    if (active_project -> analysis)
     {
       prep_calc_actions ();
       add_action (edition_actions[0]);
