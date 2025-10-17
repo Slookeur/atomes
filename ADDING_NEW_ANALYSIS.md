@@ -38,10 +38,10 @@ To get familiar with the code of the **atomes** program please refer to the exte
 
   - **4** : **atomes** release candidate requirements:
 
-    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
+    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) file formats
 
-      - To save / read the new analysis parameters and results
-      - To ensure the reading compatibility of older `.apf` and `.awf` file format(s)
+      - To save / read the new analysis parameter(s) and result(s)
+      - To ensure the reading compatibility of older `.apf` and `.awf` file formats
 
     - Modifying the user preferences dialog to consider the new analysis default parameter(s)
 
