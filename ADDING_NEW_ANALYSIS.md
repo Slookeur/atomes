@@ -5,6 +5,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
 ## Before starting 
 
+  - If not done yet please give a look to the [`CONTRIBUTING.md`](https://github.com/Slookeur/atomes/blob/devel/CONTRIBUTING.md) document
   - List all information required by this new analysis: 
     - Required parameter(s) for the user to input
     - Any requirement(s) for the calculation to be performed, for example:
@@ -27,7 +28,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
   - **1** : Adding the new analysis description in the code
   - **2** : Coding the new analysis user dialog and its callbacks
-  - **3** : Coding the new calculation and its connections to the **atomes** software internal data structures
+  - **3** : Adding the new analysis using the **atomes** software internal data structures
 
     - Create a new source file to implement the calculation
     - Add this new file to the `Makefile`
@@ -55,32 +56,32 @@ Here is the step by step procedure:
 ### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
 ### 1. Edit the file [`src/global.c`](https://slookeur.github.io/atomes-doxygen/dc/d57/global_8c.html) to create a `PACKAGE_IDC` variable
-  ```C
+```C
   gchar * PACKAGE_IDC = NULL;
-  ```
+```
 This is to be done close to line **97**
 
 ### 2. Edit the file [`src/global.h`](https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html) to make the information available in other parts of the code:
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
-  ```C
+```C
   #define IDC 10
-  ```
+```
   The associated number should be the latest calculation ID number + 1
   This is to be done close to line **336**
 
   - Insert the following: 
-  ```C
+```C
   extern gchar * PACKAGE_IDC;
-  ```
+```
   This is to be done close to line **366**
   - Increment the total number of calculations available : `NCALCS`
   - Increment increment the total number calculation using graphs : `NGRAPHS` (if needed)
 
 ### 3. Edit the file [`src/gui/main.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html) to read the icon file for the new analysis (after line ): 
-  ```C
+```C
   PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
-  ```
+```
 ### 4. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
@@ -89,7 +90,7 @@ This is to be done close to line **97**
     - `char * graph_name[]` : add the new calculation name for the graph windows
 
   - In the function `atomes_menu_bar_action` add the calculation menu callback:
-  ```C
+```C
   G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
   {
     ...
@@ -101,9 +102,9 @@ This is to be done close to line **97**
 
     ...
   }
-  ```
+```
   - In the function `create_main_window` declare the icon for the new calculation:
-  ```C
+```C
   GtkWidget * create_main_window (GApplication * atomes)
  {
     ...
@@ -112,42 +113,43 @@ This is to be done close to line **97**
 
     ...
   }
-  ```
+```
 ### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html)
 
   - declare the new analysis, after line :
-  ```C
+```C
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
-  ```
+```
 
 ### 6. Update the default availability for the new calculation:
 
   - Edit [`src/project/update_p.c`](https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html) search for the `update_analysis_availability` function to add the proper flags
-  ```C
-  void update_analysis_availability (project * this_proj)
+```C
+void update_analysis_availability (project * this_proj)
+{
+  ...
+  if (this_proj -> cell -> has_a_box) // Or any other prerequisite
   {
-     ...
-     if (this_proj -> cell -> has_a_box) // Or any other prerequisite
-     {
-       ...
+    ...
        
-       active_project -> analysis[IDC] -> avail_ok = TRUE;
+    active_project -> analysis[IDC] -> avail_ok = TRUE;
 
-       ...
-      }
-      else
-      {
-       ...
-       
-       active_project -> analysis[IDC] -> avail_ok = FALSE;
+    ...
+  }
+  else
+  {
+    ...
+      
+    active_project -> analysis[IDC] -> avail_ok = FALSE;
 
-       ...
-      }
-     ...
+    ...
+  }
+  ...
 
-     active_project -> analysis[IDC] -> avail_ok = TRUE;
+  active_project -> analysis[IDC] -> avail_ok = TRUE;
 
-     ...
+  ...
+}
 ```
 
 ### 7. Optional graph setup, if any:
@@ -183,9 +185,9 @@ The autoscale is performed immediately after in this function.
 ### 1. Edit the file [`src/gui/calc_menu.c`](https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html)
 
   - In the function `on_calc_activate` add a case for the new analysis
-  ```C
+```C
   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
- {
+  {
     ...
 
     case IDC:
@@ -194,9 +196,9 @@ The autoscale is performed immediately after in this function.
       
     ...
   }
-   ```
+```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
-  ```C
+```C
   /*!
     \fn void calc_idc (GtkWidget * vbox)
 
@@ -212,20 +214,25 @@ The autoscale is performed immediately after in this function.
 
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
   }
-  ```
+```
 
 Contact me for help !
 
-  - In the function `G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)` 
-    - Add a test case for the new analysis:
-    ```C
-      case IDC:
+  - In the function `run_on_calc_activate` add a test case for the new analysis:
+```C
+G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
+{
+  ...
+
+  case IDC:
         if (test_idc()) on_calc_idc_released (calc_win, NULL);
         break;
-     ```
-    Note that `test_idc()` might be a testing routine you want to write to ensure that conditions are met to perform the analysis
+  ...
+}
+```
+Note that `test_idc()` might be a testing routine you want to write to ensure that conditions are met to perform the analysis.
 
-    - You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
+You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
  
 
 ## Coding the new calculation and its connections to the **atomes** software internal data structures
