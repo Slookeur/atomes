@@ -91,34 +91,41 @@ This is to be done close to line **97**
 
   - In the function `atomes_menu_bar_action` add the calculation menu callback:
 ```C
-  G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
-  {
-    ...
+G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
+{
+  ...
 
   else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
   {
     on_calc_activate (NULL, data); // This does not change
   }
 
-    ...
-  }
+  ...
+}
 ```
   - In the function `create_main_window` declare the icon for the new calculation:
 ```C
-  GtkWidget * create_main_window (GApplication * atomes)
- {
-    ...
+GtkWidget * create_main_window (GApplication * atomes)
+{
+  ...
 
-   graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
+  graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
 
-    ...
-  }
+  ...
+}
 ```
-### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html)
+### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
 
-  - declare the new analysis, after line :
+Search for the `atomes_analyses` function to declare the new analysis
 ```C
-  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
+void init_atomes_analyses ()
+{
+  ...
+
+  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, comp_list);
+
+  ...
+}
 ```
 
 ### 6. Update the default availability for the new calculation:
@@ -186,34 +193,34 @@ The autoscale is performed immediately after in this function.
 
   - In the function `on_calc_activate` add a case for the new analysis
 ```C
-  G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
-  {
-    ...
+G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
+{
+  ...
 
-    case IDC:
-      calc_idc (box);
-      break;
+  case IDC:
+    calc_idc (box);
+    break;
       
-    ...
-  }
+  ...
+}
 ```
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
 ```C
-  /*!
-    \fn void calc_idc (GtkWidget * vbox)
+/*!
+  \fn void calc_idc (GtkWidget * vbox)
 
-    \brief creation of the idc calculation widgets
+  \brief creation of the idc calculation widgets
 
-    \param vbox GtkWidget that will receive the data
-  */
-  void calc_bonds (GtkWidget * vbox)
-  {
-    GtkWidget * idc_box;
+  \param vbox GtkWidget that will receive the data
+*/
+void calc_bonds (GtkWidget * vbox)
+{
+  GtkWidget * idc_box;
 
-   // This part requires to be a litte bit familiar with GTK+
+ // This part requires to be a litte bit familiar with GTK+
 
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
-  }
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
+}
 ```
 
 Contact me for help !
