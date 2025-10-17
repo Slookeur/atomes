@@ -95,7 +95,7 @@ Here is the step by step procedure:
 ### 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
-    - [`atomes_action analyze_acts[]`][analyze_acts] append a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
+    - [`atomes_action analyze_acts[]`][analyze_acts] : append a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
 
     ```C
     atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
@@ -110,7 +110,7 @@ Here is the step by step procedure:
                                     {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};  // This is an example
     ```
 
-    - [`char * calc_name[]`][calc_name]: add the new calculation name for the menu items
+    - [`char * calc_name[]`][calc_name] : append a line to add the new calculation name for the menu items
  
     ```C
     char * calc_name[] = {"g(r)/G(r)",
@@ -125,7 +125,7 @@ Here is the step by step procedure:
                           "The new analysis"};  // This is an example
     ```
 
-    - [`char * graph_name[]`][graph_name] : add the new calculation name for the tool box window
+    - [`char * graph_name[]`][graph_name] : append a line to add the new calculation name for the tool box window
 
     ```C
     char * graph_name[] = {"g(r)/G(r)",
