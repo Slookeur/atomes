@@ -153,6 +153,7 @@ void update_analysis_availability (project * this_proj)
   }
   ...
 
+  // Otherwise default value to TRUE (or FALSE)
   active_project -> analysis[IDC] -> avail_ok = TRUE;
 
   ...
@@ -232,17 +233,17 @@ G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, g
   ...
 
   case IDC:
-        if (test_idc()) on_calc_idc_released (calc_win, NULL);
-        break;
+    if (test_idc()) on_calc_idc_released (calc_win, NULL);
+    break;
   ...
 }
 ```
-Note that `test_idc()` might be a testing routine you want to write to ensure that conditions are met to perform the analysis.
+Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
 
 You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
  
 
-## Coding the new calculation and its connections to the **atomes** software internal data structures
+## Adding the new analysis using the **atomes** software internal data structures
 
 Create a new file
 
