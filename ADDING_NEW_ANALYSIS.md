@@ -3,7 +3,7 @@
 This document describes the steps required to add a new analysis in **atomes** 
 and to make use of the [graph visualization system](https://atomes.ipcms.fr/analyze/) of the **atomes** program. 
 
-To get familiar with the source code of the **atomes** program please refer to the extensive [Doxygen documentation][atomes_doxygen]
+To get familiar with the code of the **atomes** program please refer to the extensive [Doxygen][Doxygen] code source [documentation][atomes_doxygen]
 
 ## Before starting 
 
@@ -359,6 +359,7 @@ Create a new file
   - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
   - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
 
+[Doxygen]:https://www.doxygen.nl/
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
 [global.h]:https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html
 [gui.c]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html
