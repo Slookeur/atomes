@@ -87,8 +87,8 @@ Here is the step by step procedure:
   ```
 
 >[!IMPORTANT]
->The associated number should be the latest calculation ID number + 1 
->At the time I wrote this tutorial MSD was the last one set to 9. 
+>The associated number should be the latest calculation ID number + 1,  
+>when I wrote this tutorial `MSD` was the last one set to 9. 
 
 ### 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
@@ -283,7 +283,7 @@ The autoscale is performed immediately after in this function.
 
 ### 1. Edit the file [`src/gui/calc_menu.c`][calc_menu.c]
 
-  - In the function [`on_calc_activate`][on_calc_activate] add a case for the new analysis
+  - In the function [`on_calc_activate`][on_calc_activate] add a test case for the new analysis
 
   ```C
   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
@@ -367,6 +367,7 @@ Create a new file
 [atomes_analysis]:to_be_addedd
 [update_p.c]:https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html
 [update_analysis_availability]:to_be_added
+[cwidget.c]:https://slookeur.github.io/atomes-doxygen/d4/d80/cwidget_8c.html
 [yaxis.c]:https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html
 [calc_menu.c]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html
 [on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a981fd6ae8aa02f6ba86bbfdfbeace7ed
