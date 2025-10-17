@@ -299,7 +299,7 @@ Contact me for help !
 > Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
 
 > [!IMPORTANT]
-> Note that `on_calc_idc_released` is a function you must write to perform the calculation (see bellow).
+> Note that `on_calc_idc_released` is a function you **MUST** write to perform the calculation (see bellow).
  
 
 ## Adding the new analysis using the **atomes** software internal data structures
