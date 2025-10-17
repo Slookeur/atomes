@@ -55,6 +55,9 @@ Here is the step by step procedure:
 
 ### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
+> [!CAUTION]
+> In the following I will use the `IDC` keyword as an example, remember to adjust it ! 
+
 ### 1. Edit the file [`src/global.c`](https://slookeur.github.io/atomes-doxygen/dc/d57/global_8c.html) to create a `PACKAGE_IDC` variable
 ```C
   gchar * PACKAGE_IDC = NULL;
@@ -116,9 +119,9 @@ GtkWidget * create_main_window (GApplication * atomes)
 ```
 ### 5. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
 
-Search for the `atomes_analyses` function to declare the new analysis
+Search for the `atomes_analysis` function to declare the new analysis
 ```C
-void init_atomes_analyses ()
+void init_atomes_analysis ()
 {
   ...
 
