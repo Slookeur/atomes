@@ -125,9 +125,9 @@ void workinfo (project * this_proj, int i)
             case SPH:
               update_spherical_view (this_proj);
               break;
-             case MSD:
-               update_msd_view (this_proj);
-               break;
+            case MSD:
+              update_msd_view (this_proj);
+              break;
           }
         }
       }
