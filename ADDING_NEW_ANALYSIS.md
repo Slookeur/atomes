@@ -259,6 +259,7 @@ void init_atomes_analysis ()
   ```
 > [!TIP]
 > More information about the [DataLayout][DataLayout] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
+
 > [!TIP]
 > More information about the [Curve][Curve] data structure is available in the [Doxygen documentation of the **atomes** program][atomes_doxygen]
 
