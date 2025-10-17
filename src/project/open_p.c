@@ -36,7 +36,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   gchar * read_this_string (FILE * fp);
 
-  void initcnames (int w);
+  void initcnames (int rid);
   void allocatoms (project * this_proj);
   void alloc_proj_data (project * this_proj, int cid);
 
@@ -110,27 +110,27 @@ gchar * read_this_string (FILE * fp)
 
 
 /*!
-  \fn void initcnames (int w)
+  \fn void initcnames (int rid)
 
   \brief initialize curve names
 
-  \param cid calculation id
+  \param rid calculation id
 */
-void initcnames (int cid)
+void initcnames (int rid)
 {
-  switch (cid)
+  switch (rid)
   {
     case GDR:
-      initgr (cid);
+      initgr (rid);
       break;
     case SQD:
-      initsq (cid);
+      initsq (rid);
       break;
     case SKD:
-      initsq (cid);
+      initsq (rid);
       break;
     case GDK:
-      initgr (cid);
+      initgr (rid);
       break;
     case BND:
       initbd ();
