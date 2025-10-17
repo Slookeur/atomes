@@ -125,7 +125,7 @@ Here is the step by step procedure:
                           "The new analysis"};  // This is an example
     ```
 
-    - [`char * graph_name[]`][graph_name] : add the new calculation name for the graph windows
+    - [`char * graph_name[]`][graph_name] : add the new calculation name for the tool box window
 
     ```C
     char * graph_name[] = {"g(r)/G(r)",
