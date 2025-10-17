@@ -120,18 +120,62 @@ This is to be done close to line **97**
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
   ```
 
-### 6. If periodicity is required for this calculation:
+### 6. Update the default availability for the new calculation:
 
-  - Edit [`src/gui/edit_menuc.c`](https://slookeur.github.io/atomes-doxygen/d8/da6/edit__menu_8c.html) search for the `init_box_calc()` function to add the proper flags for
-```C
-  active_project -> analysis[IDC] -> avail_ok
+  - Edit [`src/project/update_p.c`](https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html) search for the `update_analysis_availability` function to add the proper flags
+  ```C
+  void update_analysis_availability (project * this_proj)
+  {
+     ...
+     if (this_proj -> cell -> has_a_box) // Or any other prerequisite
+     {
+       ...
+       
+       active_project -> analysis[IDC] -> avail_ok = TRUE;
+
+       ...
+      }
+      else
+      {
+       ...
+       
+       active_project -> analysis[IDC] -> avail_ok = FALSE;
+
+       ...
+      }
+     ...
+
+     active_project -> analysis[IDC] -> avail_ok = TRUE;
+
+     ...
 ```
-  - Edit the file [`src/opengl/edit/cbuild_action.c`](https://slookeur.github.io/atomes-doxygen/d0/dd3/cbuild__action_8c.html) close to line **1680** to add the default availability for this calculation
-  - Edit the file [`src/opengl/win/popup.c`](https://slookeur.github.io/atomes-doxygen/d5/da4/popup_8c.html) close line **2155** to add the default availability for this calculation
 
 ### 7. Optional graph setup, if any:
 
-  - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust the Y axis autoscale information, after line 107
+  - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust specific axis autoscale information
+
+```C
+void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
+{
+  ...
+
+  // Not that aid is the axis: 0 = x, 1 = y
+  if (rid = IDC)
+  {
+    // Min value for the new calculation to be specified here
+    this_curve -> axmin[aid] = min_value[aid];
+
+    // Max value for the new calculation to be specified here
+    this_curve -> axmax[aid] = max_value[aid];    
+  }
+
+  ...
+}
+```
+
+Note that by default **atomes** will just take the min and max values of the available calculation results but you might want to adjust this.
+
+The autoscale is performed immediately after in this function. 
 
 ## Coding the new analysis user dialog and its callbacks
 
