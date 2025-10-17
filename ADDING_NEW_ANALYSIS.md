@@ -6,6 +6,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 ## Before starting 
 
   - If not done yet please give a look to the [`CONTRIBUTING.md`](https://github.com/Slookeur/atomes/blob/devel/CONTRIBUTING.md) document
+
   - List all information required by this new analysis: 
     - Required parameter(s) for the user to input
     - Any requirement(s) for the calculation to be performed, for example:
@@ -38,7 +39,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
     - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) files format
 
       - To save / read the new analysis parameters and results
-      - To ensure the reading of older `.apf` and `.awf` file format(s)
+      - To ensure the reading compatibility of older `.apf` and `.awf` file format(s)
 
     - Modifying the user preferences dialog to consider the new analysis default parameter(s)
 
@@ -47,7 +48,7 @@ and to make use of the [graph visualization system](https://atomes.ipcms.fr/anal
 
 Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help.
  
-Step **.4** is the most complicated part. 
+Step **.4** is the most complicated part that will most likely require my help.
 
 ## Adding the new analysis description in the code
 
@@ -59,6 +60,16 @@ Here is the step by step procedure:
 > In the following I will use the `IDC`, sometimes `idc` keywords as examples, remember to adjust it ! 
 
 ### 1. Edit the file [`src/global.h`][global.h] to make the information available in other parts of the code:
+
+  - Increment the total number of calculations available : `NCALCS`
+  ```C
+  #define NCALCS 10
+  ```
+
+  - Increment the total number of calculations using graphs : `NGRAPHS`
+  ```C
+  #define NGRAPHS 10
+  ```
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
@@ -75,12 +86,9 @@ Here is the step by step procedure:
   #define IDC 10  // This is an example
   ```
 
-The associated number should be the latest calculation ID number + 1 
-
-At the time I wrote this tutorial MSD was the last one set to 9. 
-
-  - Increment the total number of calculations available : `NCALCS`
-  - Increment the total number of calculations using graphs : `NGRAPHS`
+>[!IMPORTANT]
+>The associated number should be the latest calculation ID number + 1 
+>At the time I wrote this tutorial MSD was the last one set to 9. 
 
 ### 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
@@ -210,6 +218,41 @@ void init_atomes_analysis ()
 
 ### 5. Optional graph setup, if any:
 
+  - Edit the file [`src/curve/cwidget.c`][cwidget.c] that contains few functions to tweak few graph related options
+
+  ```C
+  DataLayout * curve_default_layout (project * pid, int rid, int cid)
+  {
+    ...
+
+    if (rid == IDC)
+    {
+       // Specific layout option(s) here
+       // Among the options available in the [DataLayout][DataLayout] data structure
+    }
+
+    ...
+  }
+
+  ...
+
+  void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
+  {
+
+    ...
+
+    else if (rid == IDC)
+    {
+       this_curve -> cmin[0] = user_define_min;  // To set the default min value
+       this_curve -> cmax[0] = user_define_max;  // To set the default max value
+       // Or any other option in the [Curve][Curve] data structure
+    }
+
+    ...
+
+  }
+  ```
+
   - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
 
   ```C
@@ -328,4 +371,5 @@ Create a new file
 [calc_menu.c]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html
 [on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a981fd6ae8aa02f6ba86bbfdfbeace7ed
 [run_on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a7605cb93faba5139a75d08568f1fb0a0
-
+[DataLayout]:https://slookeur.github.io/atomes-doxygen/d0/d5d/struct_data_layout.html
+[Curve]:https://slookeur.github.io/atomes-doxygen/da/d6e/struct_curve.html
