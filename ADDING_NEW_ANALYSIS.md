@@ -97,10 +97,33 @@ atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
                                 {"analyze.msd",    GINT_TO_POINTER(MSD-1)},
                                 {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};
 ```
-
     - [`char * calc_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735) : add the new calculation name for the menu items
+```C
+char * calc_name[] = {"g(r)/G(r)",
+                      "S(q) from FFT[g(r)]",
+                      "S(q) from Debye equation",
+                      "g(r)/G(r) from FFT[S(q)]",
+                      "Bonds and angles",
+                      "Ring statistics",
+                      "Chain statistics",
+                      "Spherical harmonics",
+                      "Mean Squared Displacement",
+                      "The new analysis"};
+```
     - [`char * graph_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3) : add the new calculation name for the graph windows
-
+```C
+char * graph_name[] = {"g(r)/G(r)",
+                       "S(q) from FFT[g(r)]",
+                       "S(q) from Debye equation",
+                       "g(r)/G(r) from FFT[S(q)]",
+                       "Bonds properties",
+                       "Angle distributions",
+                       "Ring statistics",
+                       "Chain statistics",
+                       "Spherical harmonics",
+                       "Mean Squared Displacement",
+                       "The new analysis"};
+```
   - In the function `atomes_menu_bar_action` add the calculation menu callback:
 ```C
 G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
