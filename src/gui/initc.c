@@ -35,7 +35,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void initcwidgets ();
   void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
   void alloc_analysis_curves (atomes_analysis * this_analysis);
-  void init_atomes_analysis ();
+  void init_atomes_analysis (gboolean apply_defaults);
 
   atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title);
 
@@ -46,6 +46,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 
 extern void clean_this_curve_window (int cid, int rid);
+extern void apply_analysis_default_parameters_to_project (project * this_proj);
 
 /*!
   \fn void clean_curves_data (int calc, int start, int end)
@@ -59,7 +60,6 @@ extern void clean_this_curve_window (int cid, int rid);
 void clean_curves_data (int calc, int start, int end)
 {
   int i;
-#ifdef NEW_ANA
   for (i=start; i<end; i++)
   {
     if (active_project -> analysis[calc] -> curves)
@@ -67,94 +67,7 @@ void clean_curves_data (int calc, int start, int end)
       clean_this_curve_window (i, calc);
     }
   }
-#else
-  for (i=start; i<end; i++)
-  {
-    if (active_project -> curves[calc])
-    {
-      clean_this_curve_window (i, calc);
-    }
-  }
-#endif // NEW_ANA
 }
-
-#ifndef NEW_ANA
-/*!
-  \fn void alloc_curves (int rid)
-
-  \brief allocating curve data
-
-  \param rid analysis id
-*/
-void alloc_curves (int rid)
-{
-  int i;
-  if (active_project -> idcc[rid] != NULL)
-  {
-    g_free (active_project -> idcc[rid]);
-    active_project -> idcc[rid] = NULL;
-  }
-  active_project -> idcc[rid] = g_malloc0 (active_project -> numc[rid]*sizeof*active_project -> idcc[rid]);
-  if (active_project -> curves[rid] != NULL)
-  {
-    g_free (active_project -> curves[rid]);
-    active_project -> curves[rid] = NULL;
-  }
-  active_project -> curves[rid] = g_malloc (active_project -> numc[rid]*sizeof*active_project -> curves);
-  for (i = 0; i < active_project -> numc[rid]; i++)
-  {
-    active_project -> curves[rid][i] = g_malloc0 (sizeof*active_project -> curves[rid][i]);
-    active_project -> curves[rid][i] -> cfile = NULL;
-    active_project -> curves[rid][i] -> name = NULL;
-    active_project -> curves[rid][i] -> axis_title[0] = NULL;
-    active_project -> curves[rid][i] -> axis_title[1] = NULL;
-  }
-}
-
-/*!
-  \fn void initcwidgets ()
-
-  \brief initializing curve values
-*/
-void initcwidgets ()
-{
-  int i, j;
-
-  j=active_project -> nspec;
-  active_project -> numc[GDR] = 16+5*j*j;
-  active_project -> numc[SQD] = 8+4*j*j;
-  active_project -> numc[SKD] = 8+4*j*j;
-  active_project -> numc[GDK] = active_project -> numc[GDR];
-  active_project -> numc[BND] = j*j;
-  active_project -> numc[ANG] = j*j*j + j*j*j*j;
-  active_project -> numc[RIN] = 20*(j+1);
-  active_project -> numc[CHA] = j+1;
-  active_project -> numc[SPH] = 0;
-  active_project -> numc[MSD] = 0;
-  if (active_project -> steps > 1) active_project -> numc[MSD] = 14*j+6;
-
-  if (j == 2)
-  {
-    active_project -> numc[GDR] = active_project -> numc[GDR] + 6;
-    active_project -> numc[SQD] = active_project -> numc[SQD] + 8;
-    active_project -> numc[SKD] = active_project -> numc[SKD] + 8;
-    active_project -> numc[GDK] = active_project -> numc[GDK] + 6;
-  }
-  active_project -> numwid = active_project -> numc[GDR]
-                       + active_project -> numc[SQD]
-                       + active_project -> numc[SKD]
-                       + active_project -> numc[GDK]
-                       + active_project -> numc[BND]
-                       + active_project -> numc[ANG]
-                       + active_project -> numc[RIN]
-                       + active_project -> numc[CHA]
-                       + active_project -> numc[MSD];
-  for (i=0; i<NGRAPHS; i++)
-  {
-    if (i != SP) alloc_curves (i);
-  }
-}
-#endif
 
 /*!
   \fn void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc)
@@ -172,11 +85,7 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
   //int i;
 //  char * bar[2] = {"bond properties", "nearest neigbhors table"};
 //  char * mess;
-#ifdef NEW_ANA
   if (run < NGRAPHS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
-#else
-  if (run < NGRAPHS && run > -1) active_project -> visok[run] = adv;
-#endif // NEW_ANA
   if (! status)
   {
 #ifdef GTK3
@@ -207,7 +116,6 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
   }
 }
 
-#ifdef NEW_ANA
 /*!
   \fn void alloc_analysis_curves (atomes_analysis * this_analysis)
 
@@ -290,11 +198,13 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
 */
 
 /*!
-  \fn void init_atomes_analysis ()
+  \fn void init_atomes_analysis (gboolean apply_defaults)
 
   \brief initialize analysis data structures for atomes
+
+  \param apply_defaults apply default parameters (1/0)
 */
-void init_atomes_analysis ()
+void init_atomes_analysis (gboolean apply_defaults)
 {
   int i, j;
 
@@ -348,64 +258,12 @@ void init_atomes_analysis ()
   if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis ("Mean Squared Displacement", MSD, TRUE, TRUE, 14*j+6, 1, comp_list, NULL);
 
   g_free (comp_list);
-  /*
-    How to add a new analysis:
 
-       - edit the file 'global.c'
-
-         - create a 'PACKAGE_IDC variable': gchar * PACKAGE_IDC = NULL;
-
-       - edit the file 'global.h' to make the information available in other parts of the code:
-         - define 'IDC' a new, and unique, 3 characters variable, ex: #define IDC 10
-         - extern gchar * PACKAGE_IDC;
-         - increment the total number of calculations available : NCALCS
-         - increment increment the total number calculation using graphs : NGRAPHS (if needed)
-
-       - to use new icon for this calculation edit the file 'main.c'
-         - to read the icon file: PACKAGE_IDC = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
-
-       - edit the file 'gui.c'
-         - At the top of the file modify the following variables to describe the new calculation, and create the corresponding menu elements:
-           - atomes_action analyze_acts[] : {"analyze.idc",    GINT_TO_POINTER(IDC-1)}
-           - char * calc_name[] : add the new calculation name for the menu items
-           - char * graph_name[] : add the new calculation name for the graph windows
-
-           - in the function 'G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)' add the calculation menu callback:
-
-             else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
-             {
-               on_calc_activate (NULL, data); // This does not change
-             }
-
-           - in the function 'GtkWidget * create_main_window (GApplication * atomes).' declare the icon for the new calculation:
-
-             graph_img[IDC] = g_strdup_printf ("%s", PACKAGE_IDC);
-
-       - edit the file 'initc.c'
-
-         - declare the new analysis:
-
-           active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_graphs, num_compat, list_of_compat_calc);
-
-       - if periodicity is required for this calculation, edit 'edit_menuc.c' edit the 'init_box_calc()' function
-         to add the proper flags for :  'active_project -> analysis[IDC] -> avail_ok'
-
-       - edit the file 'cbuild_action.c' line 1680 to add the default availability for this calculation
-       - edit the file 'popup.c' line 2155 to add the default availability for this calculation
-
-       - Curves setup if any:
-         - adjust autoscale information, edit the file 'yaxis.c' line 107
-
-       - Finally '*.apf' and '*.awf' files version should evolve to save and read the new calculation data
-
-       - Ultimately: modify the 'preferences.c' file to offer the options to save user preferences for this calculation
-
-  */
   active_project -> numwid = 0;
-
   for (i=0; i<NCALCS; i++)
   {
     if (active_project -> analysis[i]) active_project -> numwid += active_project -> analysis[i] -> numc;
   }
+
+  if (apply_defaults) apply_analysis_default_parameters_to_project (active_project);
 }
-#endif

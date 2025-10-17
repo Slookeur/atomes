@@ -118,7 +118,6 @@ G_MODULE_EXPORT void set_max (GtkEntry * entry, gpointer data)
   double v = string_to_double ((gpointer)m);
   if (v > 0)
   {
-#ifdef NEW_ANA
     if (active_project -> analysis[c] -> max != v)
     {
       active_project -> analysis[c] -> max = v;
@@ -126,15 +125,6 @@ G_MODULE_EXPORT void set_max (GtkEntry * entry, gpointer data)
     }
   }
   update_entry_double (entry, active_project -> analysis[c] -> max);
-#else
-    if (active_project -> max[c] != v)
-    {
-      active_project -> max[c] = v;
-      // Max has changed do something !?
-    }
-  }
-  update_entry_double (entry, active_project -> max[c]);
-#endif
 }
 
 GtkWidget * rings_box[2];
@@ -172,7 +162,6 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
   }
   else if (c > -1 && ! preferences)
   {
-#ifdef NEW_ANA
     k = active_project -> analysis[c] -> num_delta;
   }
   if (c < 0 && ! preferences)
@@ -183,18 +172,6 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
       {
         active_project -> analysis[-c] -> delta = v;
       }
-#else
-    k = active_project -> num_delta[c];
-  }
-  if (c < 0 && ! preferences)
-  {
-    if (v > 0.0)
-    {
-      if (active_project -> delta[-c] != v)
-      {
-        active_project -> delta[-c] = v;
-      }
-#endif
     }
   }
   else if (i > 0 && ! preferences)
@@ -216,7 +193,6 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
       k = active_project -> csparam[5] = i;
     }
     else
-#ifdef NEW_ANA
     {
       if (active_project -> analysis[c] -> num_delta != i)
       {
@@ -229,20 +205,6 @@ G_MODULE_EXPORT void set_delta (GtkEntry * entry, gpointer data)
   {
     update_entry_double (entry, active_project -> analysis[-c] -> delta);
   }
-#else
-    {
-      if (active_project -> num_delta[c] != i)
-      {
-        active_project -> num_delta[c] = i;
-      }
-      k = active_project -> num_delta[c];
-    }
-  }
-  if (c < 0)
-  {
-    update_entry_double (entry, active_project -> delta[-c]);
-  }
-#endif
   else
   {
     update_entry_int (entry, k);
@@ -278,11 +240,7 @@ void calc_sph (GtkWidget * vbox)
   gchar * str = "Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> in [2-40]";
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,  markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(SPH));
-#ifdef NEW_ANA
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SPH] -> num_delta);
-#else
-  update_entry_int (GTK_ENTRY(entry), active_project -> num_delta[SPH]);
-#endif // NEW_ANA
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
 }
 
@@ -313,20 +271,12 @@ void calc_msd (GtkWidget * vbox)
     if (i == 1)
     {
       entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(-MSD));
-#ifdef NEW_ANA
       update_entry_double (GTK_ENTRY(entry), active_project -> analysis[MSD] -> delta);
-#else
-      update_entry_double (GTK_ENTRY(entry), active_project -> delta[MSD]);
-#endif // NEW_ANA
     }
     else
     {
       entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(MSD));
-#ifdef NEW_ANA
       update_entry_int (GTK_ENTRY(entry), active_project -> analysis[MSD] -> num_delta);
-#else
-      update_entry_int (GTK_ENTRY(entry), active_project -> num_delta[MSD]);
-#endif // NEW_ANA
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
     if (i == 1)
@@ -794,21 +744,13 @@ G_MODULE_EXPORT void toggle_bond (GtkToggleButton * Button, gpointer data)
 */
 gboolean test_gr (int rdf)
 {
-#ifdef NEW_ANA
   if (active_project -> analysis[rdf] -> num_delta < 2)
-#else
-  if (active_project -> num_delta[rdf] < 2)
-#endif
   {
     show_warning ("You must specify a number of &#x3b4;r >= 2\n"
                   "to discretize the real space between 0.0 and D<sub>max</sub>\n", calc_win);
     return FALSE;
   }
-#ifdef NEW_ANA
   else if (rdf == GDK && (active_project -> analysis[rdf] -> max > active_project -> analysis[SKD] -> max || active_project -> analysis[rdf] -> max <= active_project -> analysis[SKD] -> min))
-#else
-  else if (rdf == GDK && (active_project -> max[rdf] > active_project -> max[SKD] || active_project -> max[rdf] <= active_project -> min[SKD]))
-#endif
   {
     show_warning ("You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
                   "for the FFT, with Q<sub>min</sub> < Q<sub>max</sub>[FFT] <= Q<sub>max</sub>", calc_win);
@@ -829,21 +771,13 @@ gboolean test_gr (int rdf)
 */
 gboolean test_sq (int fdq)
 {
-#ifdef NEW_ANA
   if (active_project -> analysis[fdq] -> max <= active_project -> analysis[fdq] -> min)
-#else
-  if (active_project -> max[fdq] <= active_project -> min[fdq])
-#endif
   {
     show_warning ("You must specify a maximum wave vector Q<sub>max</sub>\n"
                   "note that Q<sub>max</sub> must be > Q<sub>min</sub>", calc_win);
     return FALSE;
   }
-#ifdef NEW_ANA
   else if (active_project -> analysis[fdq] -> num_delta < 2)
-#else
-  else if (active_project -> num_delta[fdq] < 2)
-#endif
   {
     show_warning ("You must specify a number of &#x3b4;q >= 2\n"
                   "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n", calc_win);
@@ -862,22 +796,15 @@ gboolean test_sq (int fdq)
 */
 gboolean test_bonds ()
 {
-#ifdef NEW_ANA
   if (active_project -> runc[0] && active_project -> analysis[BND] -> num_delta < 2)
-#else
-  if (active_project -> runc[0] && active_project -> num_delta[BND] < 2)
-#endif
   {
     show_warning ("You must specify a number of &#x3b4;r >= 2\n"
                   "to discretize the real space between\n"
                   "the shortest and the highest inter-atomic distances", calc_win);
     return FALSE;
   }
-#ifdef NEW_ANA
+
   if (active_project -> runc[1] && active_project -> analysis[ANG] -> num_delta < 2)
-#else
-  if (active_project -> runc[1] && active_project -> num_delta[ANG] < 2)
-#endif
   {
     show_warning ("You must specify a number of &#x3b4;&#x3b8; >= 2\n"
                   "to discretize the angular space between 0 and 180°", calc_win);
@@ -936,11 +863,7 @@ gboolean test_msd ()
 {
   if(active_project -> steps > 1)
   {
-#ifdef NEW_ANA
     if (active_project -> analysis[MSD] -> delta < 1)
-#else
-    if (active_project -> delta[MSD] == 0.0)
-#endif
     {
       show_warning ("You must specify the time step &#x3b4;t\n"
                     "used to integrate the Newton's equations\n"
@@ -961,11 +884,7 @@ gboolean test_msd ()
   }
   else
   {
-#ifdef NEW_ANA
     if (active_project -> analysis[MSD] -> num_delta < 1)
-#else
-    if (active_project -> num_delta[MSD] < 1)
-#endif
     {
       show_warning ("You must specify the number of steps\n"
                     "between each of the %d configurations\n"
@@ -986,11 +905,7 @@ gboolean test_msd ()
 */
 gboolean test_sph ()
 {
-#ifdef NEW_ANA
   if (active_project -> analysis[SPH] -> num_delta < 2 || active_project -> analysis[SPH] -> num_delta > 40)
-#else
-  if (active_project -> num_delta[SPH] < 2 || active_project -> num_delta[SPH] > 40)
-#endif
   {
     show_warning ("You must specify a number <i>l<sub>max</sub></i> in [2-40]", calc_win);
     return FALSE;
@@ -1030,11 +945,7 @@ void calc_bonds (GtkWidget * vbox)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a[i], 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
       ba_entry[i] = create_entry (G_CALLBACK(set_delta), 150, 15, FALSE, (gpointer)GINT_TO_POINTER(BND+i));
-#ifdef NEW_ANA
       update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BND+i] -> num_delta);
-#else
-      update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> num_delta[BND+i]);
-#endif // NEW_ANA
       widget_set_sensitive (ba_entry[i], active_project -> runc[i]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ba_entry[i], FALSE, FALSE, 0);
     }
@@ -1131,11 +1042,7 @@ G_MODULE_EXPORT void set_advanced_sq (GtkEntry * entry, gpointer data)
     {
       show_warning ("You must specify a probability between 0.0 and 1.0", calc_win);
     }
-#ifdef NEW_ANA
     else if (c == 1 && (v < active_project -> analysis[SKD] -> min || v > active_project -> analysis[SKD] -> max))
-#else
-    else if (c == 1 && (v < active_project -> min[SKD] || v > active_project -> max[SKD]))
-#endif
     {
       show_warning ("Q<sub>lim</sub> must be &#8805; Q<sub>min</sub> and &#8804; Q<sub>max</sub>", calc_win);
     }
@@ -1167,16 +1074,9 @@ G_MODULE_EXPORT void set_sfact (GtkEntry * entry, gpointer data)
   }
   else
   {
-#ifdef NEW_ANA
     active_project -> analysis[i] -> fact = v;
   }
   update_entry_double (entry, active_project -> analysis[i] -> fact);
-#else
-
-    active_project -> fact[i] = v;
-  }
-  update_entry_double (entry, active_project -> fact[i]);
-#endif
 }
 
 /*!
@@ -1212,7 +1112,6 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
   int i, k, l, m;
 
   l = GPOINTER_TO_INT(data);
-#ifdef NEW_ANA
   if (active_project -> analysis[l] -> calc_ok)
   {
     if (l == 2)
@@ -1333,128 +1232,6 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
                           & l);
       }
     }
-#else
-  if (active_project -> visok[l])
-  {
-    if (l == 2)
-    {
-      xsk = duplicate_double(active_project -> curves[l][0] -> ndata, active_project -> curves[l][0] -> data[0]);
-    }
-    i = 1;
-    smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                      active_project -> curves[l][i-1] -> data[1],
-                      & active_project -> fact[l],
-                      & i,
-                      & active_project -> curves[l][i-1] -> ndata,
-                      & l);
-    i = i+2;
-    smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                      active_project -> curves[l][i-1] -> data[1],
-                      & active_project -> fact[l],
-                      & i,
-                      & active_project -> curves[l][i-1] -> ndata,
-                      & l);
-    i = i+2;
-    smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                      active_project -> curves[l][i-1] -> data[1],
-                      & active_project -> fact[l],
-                      & i,
-                      & active_project -> curves[l][i-1] -> ndata,
-                      & l);
-    i = i+2;
-    smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                      active_project -> curves[l][i-1] -> data[1],
-                      & active_project -> fact[l],
-                      & i,
-                      & active_project -> curves[l][i-1] -> ndata,
-                      & l);
-    if (l == 0 || l == 3)
-    {
-      i = i+2;
-      smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                        active_project -> curves[l][i-1] -> data[1],
-                        & active_project -> fact[l],
-                        & i,
-                        & active_project -> curves[l][i-1] -> ndata,
-                        & l);
-      i = i+2;
-      smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                        active_project -> curves[l][i-1] -> data[1],
-                        & active_project -> fact[l],
-                        & i,
-                        & active_project -> curves[l][i-1] -> ndata,
-                        & l);
-      i = i+2;
-      smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                        active_project -> curves[l][i-1] -> data[1],
-                        & active_project -> fact[l],
-                        & i,
-                        & active_project -> curves[l][i-1] -> ndata,
-                        & l);
-      i = i+2;
-      smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                        active_project -> curves[l][i-1] -> data[1],
-                        & active_project -> fact[l],
-                        & i,
-                        & active_project -> curves[l][i-1] -> ndata,
-                        & l);
-    }
-    for (k=0 ; k<active_project -> nspec ; k++)
-    {
-      for (m=0 ; m<active_project -> nspec ; m++)
-      {
-        i = i+2;
-        smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                          active_project -> curves[l][i-1] -> data[1],
-                          & active_project -> fact[l],
-                          & i,
-                          & active_project -> curves[l][i-1] -> ndata,
-                          & l);
-        if (l == 0 || l == 3)
-        {
-          i = i+2;
-          smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                            active_project -> curves[l][i-1] -> data[1],
-                            & active_project -> fact[l],
-                            & i,
-                            & active_project -> curves[l][i-1] -> ndata,
-                            & l);
-          i = i+1;
-        }
-      }
-    }
-    if (l == 1 || l == 2)
-    {
-      for (k=0 ; k<active_project -> nspec ; k++)
-      {
-        for (m=0 ; m<active_project -> nspec ; m++)
-        {
-          i = i+2;
-          smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                            active_project -> curves[l][i-1] -> data[1],
-                            & active_project -> fact[l],
-                            & i,
-                            & active_project -> curves[l][i-1] -> ndata,
-                            & l);
-        }
-      }
-    }
-    if (active_project -> nspec == 2)
-    {
-      m = 3;
-      if (l == 1 || l == 2) m = m+1;
-      for (k=0 ; k<m; k++)
-      {
-        i = i+2;
-        smooth_and_save_ (active_project -> curves[l][i-1] -> data[0],
-                          active_project -> curves[l][i-1] -> data[1],
-                          & active_project -> fact[l],
-                          & i,
-                          & active_project -> curves[l][i-1] -> ndata,
-                          & l);
-      }
-    }
-#endif
     if (l == 2)
     {
       g_free (xsk);
@@ -1501,7 +1278,6 @@ void calc_gr_sq (GtkWidget * box, int id)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a[id], 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
   GtkWidget * entry= create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(id));
-#ifdef NEW_ANA
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[id] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
   if (id > GDR)
@@ -1530,36 +1306,6 @@ void calc_gr_sq (GtkWidget * box, int id)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (2, active_project -> analysis[SKD] -> max), FALSE, FALSE, 0);
   }
-#else
-  update_entry_int (GTK_ENTRY(entry), active_project -> num_delta[id]);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-  if (id > GDR)
-  {
-    hbox = create_hbox (0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b[id-1], 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-    GtkWidget * entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(id));
-    update_entry_double (GTK_ENTRY(entry), active_project -> max[id]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-  }
-
-  if (id == GDR || id == GDK)
-  {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (0, active_project -> max[GDR]), FALSE, FALSE, 0);
-  }
-  if (id == SQD)
-  {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> min[SQD]), FALSE, FALSE, 0);
-  }
-  if (id == SKD|| id == GDK)
-  {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> min[SKD]), FALSE, FALSE, 0);
-  }
-  if (id == GDK)
-  {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (2, active_project -> max[SKD]), FALSE, FALSE, 0);
-  }
-#endif
   if (id == GDR || id == GDK)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
@@ -1733,9 +1479,6 @@ G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
       break;
     case MSD-1:
       calc_msd (box);
-      break;
-    case 9:
-      // calc_valence (box);
       break;
     default:
       calc_gr_sq (box, id);

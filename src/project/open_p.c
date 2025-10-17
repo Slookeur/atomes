@@ -53,7 +53,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "preferences.h"
 
-extern void alloc_curves (int c);
 extern void init_box_calc ();
 extern void set_color_map_sensitive (glwin * view);
 extern void initgr (int r);
@@ -64,10 +63,7 @@ extern void initrng ();
 extern void initchn ();
 extern void initmsd ();
 extern void initsh (int s);
-#ifdef NEW_ANA
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
-extern void init_atomes_analysis ();
-#endif
 
 gboolean old_la_bo_ax_gr;
 gboolean bad_ogl_axis;
@@ -284,7 +280,7 @@ int open_project (FILE * fp, int npi)
     active_project -> bondfile = read_this_string (fp);
     if (active_project -> bondfile == NULL) return ERROR_PROJECT;
   }
-#ifdef NEW_ANA
+
   // We need temporary buffers to read this data
   gboolean * tmp_avail, * tmp_init, * tmp_calc;
   tmp_avail = allocbool (NGRAPHS);
@@ -293,11 +289,7 @@ int open_project (FILE * fp, int npi)
   if (fread (tmp_avail, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (tmp_init, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (tmp_calc, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#else
-  if (fread (active_project -> runok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (active_project -> initok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (active_project -> visok, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#endif
+  //
   if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
@@ -334,15 +326,12 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
-#ifdef NEW_ANA
+  // Temporary buffers again
   int * tmp_num_delta = allocint (NGRAPHS);
   double * tmp_delta = allocdouble (NGRAPHS);
   if (fread (tmp_num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (tmp_delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#else
-  if (fread (active_project -> num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (active_project -> delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#endif
+  //
   if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
   {
@@ -352,15 +341,12 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
-#ifdef NEW_ANA
+  // Temporary buffers again
   double * tmp_min = allocdouble (NGRAPHS);
   double * tmp_max = allocdouble (NGRAPHS);
   if (fread (tmp_min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
   if (fread (tmp_max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#else
-  if (fread (active_project -> min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (active_project -> max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-#endif
+  //
   if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
   {
@@ -419,10 +405,9 @@ int open_project (FILE * fp, int npi)
           j = 1;
           prep_spec_ (active_chem -> chem_prop[CHEM_Z], active_chem -> nsps, & j);
         }
-
         // Read curves
-#ifdef NEW_ANA
-        init_atomes_analysis ();
+        init_atomes_analysis (FALSE);
+        // Using temporary buffers
         for (i=0; i<NGRAPHS; i++)
         {
           if (active_project -> analysis[i])
@@ -444,10 +429,7 @@ int open_project (FILE * fp, int npi)
         g_free (tmp_num_delta);
         g_free (tmp_min);
         g_free (tmp_max);
-#else
-        initcwidgets ();
-        for (i=0; i<NGRAPHS; i++) if (active_project -> initok[i]) initcnames (i);
-#endif
+        // Temporary buffers end
         if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
 #ifdef DEBUG
         g_debug ("\n**********************************************\n curves to read= %d\n**********************************************\n", i);
@@ -458,7 +440,6 @@ int open_project (FILE * fp, int npi)
           if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
           if (j)
           {
-#ifdef NEW_ANA
             active_project -> analysis[SPH] -> numc = j;
             active_project -> numwid += j;
             alloc_analysis_curves (active_project -> analysis[SPH]);
@@ -469,18 +450,6 @@ int open_project (FILE * fp, int npi)
               active_project -> analysis[SPH] -> curves[k] -> name = read_this_string (fp);
               if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return ERROR_PROJECT;
             }
-#else
-            active_project -> numc[SPH] = j;
-            active_project -> numwid += j;
-            alloc_curves (SPH);
-            addcurwidgets (activep, SPH, 0);
-            active_project -> initok[SPH] = TRUE;
-            for (k=0; k<j; k++)
-            {
-              active_project -> curves[SPH][k] -> name = read_this_string (fp);
-              if (active_project -> curves[SPH][k] -> name == NULL) return ERROR_PROJECT;
-            }
-#endif
           }
           for (j=0; j<i; j++)
           {

@@ -647,11 +647,7 @@ void run_project ()
     prep_pos_ (& active_cell -> pbc, & active_cell -> frac);
     if (active_project -> numwid < 0)
     {
-#ifdef NEW_ANA
-     init_atomes_analysis ();
-#else
-      initcwidgets ();
-#endif // NEW_ANA
+      init_atomes_analysis (TRUE);
     }
     active_project -> dmtx = FALSE;
     active_project -> run = 1;

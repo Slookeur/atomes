@@ -81,19 +81,11 @@ void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, 
       k = ctmp -> id.b;
       l = ctmp -> id.c;
       that_proj = get_project_by_id(m);
-#ifdef NEW_ANA
       for ( i=n ; i < that_proj -> analysis[k] -> curves[l] -> ndata ; i++ )
       {
         this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
         this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
       }
-#else
-      for ( i=n ; i < that_proj -> curves[k][l] -> ndata ; i++ )
-      {
-        this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> curves[k][l] -> data[aid][i]);
-        this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> curves[k][l] -> data[aid][i]);
-      }
-#endif
       if (ctmp -> next != NULL) ctmp = ctmp -> next;
     }
   }

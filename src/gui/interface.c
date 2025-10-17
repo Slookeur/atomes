@@ -905,13 +905,8 @@ void lattice_info_ (int * bid, double * volume, double * density,
   active_cell -> box[* bid].dens = * density;
   if ((active_cell -> npt && * bid == active_project -> steps-1) || ! active_cell -> npt)
   {
-#ifdef NEW_ANA
     active_project -> analysis[GDR] -> max = fdmax_ (& active_cell -> pbc);
     active_project -> analysis[SQD] -> min = active_project -> analysis[SKD] -> min = fkmin_ (& active_cell -> pbc);
-#else
-    active_project -> max[GDR] = fdmax_ (& active_cell -> pbc);
-    active_project -> min[SQD] = active_project -> min[SKD] = fkmin_ (& active_cell -> pbc);
-#endif // NEW_ANA
     int i, j;
     active_cell -> volume = active_cell -> density = 0.0;
     i = (active_cell -> npt) ? active_project -> steps : 1;
@@ -1048,7 +1043,6 @@ void update_after_calc (int calc)
   for (i=0; i<nprojects; i++)
   {
     this_proj = get_project_by_id(i);
-#ifdef NEW_ANA
     if (this_proj -> analysis[calc] -> init_ok)
     {
       for (j= 0; j < this_proj -> analysis[calc] -> numc; j++)
@@ -1062,20 +1056,5 @@ void update_after_calc (int calc)
         }
       }
     }
-#else
-    if (this_proj -> initok[calc])
-    {
-      for (j= 0; j < this_proj -> numc[calc]; j++)
-      {
-        if (this_proj -> curves[calc][j] -> plot != NULL)
-        {
-          cd.a = i;
-          cd.b = calc;
-          cd.c = j;
-          update_curve ((gpointer)& cd);
-        }
-      }
-    }
-#endif // NEW_ANA
   }
 }

@@ -228,11 +228,7 @@ void action_to_plot (gpointer data)
   tint * id = (tint *)data;
   gboolean remove = FALSE;
   project * this_proj = get_project_by_id (activeg);
-#ifdef NEW_ANA
   Curve * this_curve = this_proj -> analysis[activer] -> curves[activec];
-#else
-  Curve * this_curve = this_proj -> curves[activer][activec];
-#endif
   if (this_curve -> extrac > 0)
   {
     CurveExtra * ctmp = this_curve -> extrac -> first;
@@ -258,13 +254,8 @@ void action_to_plot (gpointer data)
   {
     add_extra (this_curve -> extrac, id);
   }
-#ifdef NEW_ANA
   curve_window_add_menu_bar (& this_proj -> analysis[activer] -> idcc[activec]);
   update_curve ((gpointer)& this_proj -> analysis[activer] -> idcc[activec]);
-#else
-  curve_window_add_menu_bar (& this_proj -> idcc[activer][activec]);
-  update_curve ((gpointer)& this_proj -> idcc[activer][activec]);
-#endif
 }
 
 /*!
@@ -354,11 +345,7 @@ gboolean was_not_added (ExtraSets * sets, int a, int b, int c)
   {
     if (ctmp -> id.a == a && ctmp -> id.b == b)
     {
-#ifdef NEW_ANA
       for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
-#else
-      for (j=0; j<get_project_by_id(a) -> numc[b]; j++)
-#endif
       {
         if (ctmp -> id.c == c) return FALSE;
       }
@@ -389,7 +376,6 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
   gchar * text[2] = {"curve.action", "edit.data"};
   project * this_proj = get_project_by_id(a);
   int i;
-#ifdef NEW_ANA
   for (i=0; i<this_proj -> analysis[b] -> numc; i++)
   {
     if (this_proj -> analysis[b] -> curves[i] -> ndata > 0)
@@ -397,21 +383,11 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
       if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
       {
         str_a = g_strdup_printf ("%s", this_proj -> analysis[b] -> curves[i] -> name);
-#else
-  for (i=0; i<this_proj -> numc[b]; i++)
-  {
-    if (this_proj -> curves[b][i] -> ndata > 0)
-    {
-      if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
-      {
-        str_a = g_strdup_printf ("%s", this_proj -> curves[b][i] -> name);
-#endif
         str_b = g_strdup_printf ("%s.%d-%d-%d", text[edit], a, b, i);
         str_c = g_strdup_printf ("%s.%s", act, str_b);
         append_menu_item (menu, (const gchar *)str_a, (const gchar *)str_c, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
         g_free (str_a);
         g_free (str_c);
-#ifdef NEW_ANA
         if (edit)
         {
           widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
@@ -420,16 +396,6 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
         {
           widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
         }
-#else
-        if (edit)
-        {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> idcc[b][i], FALSE, FALSE, FALSE, NULL);
-        }
-        else
-        {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> idcc[b][i], FALSE, FALSE, FALSE, NULL);
-        }
-#endif // NEW_ANA
         g_free (str_b);
       }
     }
@@ -459,7 +425,6 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
   {
     this_proj = get_project_by_id(i);
     create_proj[i] = FALSE;
-#ifdef NEW_ANA
     for (j=0; j<this_proj -> analysis[data -> b] -> c_sets; j++)
     {
       k = this_proj -> analysis[data -> b] -> compat_id[j];
@@ -471,40 +436,6 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
         create_proj[i] = TRUE;
       }
     }
-#else
-    create_menu[i][data -> b] = FALSE;
-    j = 0;
-    if (data -> b == GDR || data -> b == GDK)
-    {
-      j = 1;
-      k = (data -> b == GDR) ? GDK : GDR;
-    }
-    else if (data -> b == SQD || data -> b == SKD)
-    {
-      j = 1;
-      k = (data -> b == SQD) ? SKD : SQD;
-    }
-    if (((add && extrarid[i][data -> b] < this_proj -> numc[data -> b])
-    || (! add && extrarid[i][data -> b] > 0)) && this_proj -> visok[data -> b])
-    {
-      create_menu[i][data -> b] = TRUE;
-      create_proj[i] = TRUE;
-    }
-
-    if (j && this_proj -> visok[k])
-    {
-      create_menu[i][k] = FALSE;
-      if (this_proj -> curves[k][0] -> ndata > 0)
-      {
-        if ((add && extrarid[i][k] < this_proj -> numc[k])
-        || (! add && extrarid[i][k] > 0))
-        {
-          create_menu[i][k] = TRUE;
-          create_proj[i] = TRUE;
-        }
-      }
-    }
-#endif
   }
   if (edit)
   {
@@ -774,17 +705,12 @@ GtkWidget * curve_popup_menu (gpointer data)
     g_signal_connect (curve_popup_action[i], "activate", G_CALLBACK(curve_menu_bar_action), cstate -> id);
   }
   prep_extra_rid (cstate -> id);
-#ifdef NEW_ANA
   Curve * this_curve = get_project_by_id(cstate -> id -> a) -> analysis[cstate -> id -> b] -> curves[cstate -> id -> c];
-#else
-  Curve * this_curve = get_project_by_id(cstate -> id -> a) -> curves[cstate -> id -> b][cstate -> id -> c];
-#endif
   gchar * str = g_strdup_printf ("mc-%d", this_curve -> action_id);
   GMenu * menu = g_menu_new ();
   g_menu_append_section (menu, NULL, (GMenuModel *)create_data_menu(curve_popup_actions, 1, str, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)create_curve_menu(str));
   i = -1;
-#ifdef NEW_ANA
   project * this_proj = get_project_by_id (activeg);
   for ( j=0 ; j < this_proj -> analysis[activer] -> c_sets; j++)
   {
@@ -794,20 +720,6 @@ GtkWidget * curve_popup_menu (gpointer data)
       i += get_project_by_id(l) -> analysis[k] -> numc;
     }
   }
-#else
-  for ( j=0 ; j < nprojects; j++ )
-  {
-    i += get_project_by_id(j) -> numc[cstate -> id -> b];
-    if (cstate -> id -> b == GDR || cstate -> id -> b == GDK)
-    {
-      i += get_project_by_id(j) -> numc[(cstate -> id -> b == GDR) ? GDK : GDR];
-    }
-    else if (cstate -> id -> b == SQD || cstate -> id -> b == SKD)
-    {
-      i += get_project_by_id(j) -> numc[(cstate -> id -> b == SQD) ? SKD : SQD];
-    }
-  }
-#endif
   g_menu_append_section (menu, NULL, (GMenuModel *)create_add_remove_section(curve_popup_actions, str, i, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)autoscale_section(str));
   g_menu_append_section (menu, NULL, (GMenuModel *)curve_close_section(str));

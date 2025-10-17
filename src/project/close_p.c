@@ -201,7 +201,6 @@ void close_project (project * to_close)
   {
     for (i=0 ; i<NGRAPHS ; i++)
     {
-#ifdef NEW_ANA
       if (to_close -> analysis)
       {
         to_close -> analysis[i] -> calc_ok = FALSE;
@@ -211,14 +210,6 @@ void close_project (project * to_close)
           erase_curves (to_close, i);
         }
       }
-#else
-      to_close -> visok[i]=FALSE;
-      if (to_close -> curves[i])
-      {
-        hide_curves (to_close, i);
-        erase_curves (to_close, i);
-      }
-#endif // NEW_ANA
     }
   }
   clean_view ();
@@ -297,7 +288,6 @@ void close_project (project * to_close)
           }
         }
       }
-#ifdef NEW_ANA
       for (j=0; j<NGRAPHS; j++)
       {
         if (this_proj -> analysis[j] -> idcc != NULL)
@@ -308,22 +298,9 @@ void close_project (project * to_close)
           }
         }
       }
-#else
-      for (j=0; j<NGRAPHS; j++)
-      {
-        if (this_proj -> idcc[j] != NULL)
-        {
-          for (k=0; k<this_proj -> numc[j]; k++)
-          {
-            this_proj -> idcc[j][k].a = i;
-          }
-        }
-      }
-#endif // NEW_ANA
       if (this_proj -> next != NULL) this_proj = this_proj -> next;
     }
     this_proj = workzone.first;
-#ifdef NEW_ANA
     for (i=0 ; i<nprojects ; i++)
     {
       this_proj -> id = i;
@@ -343,27 +320,6 @@ void close_project (project * to_close)
       }
       if (this_proj -> next != NULL) this_proj = this_proj -> next;
     }
-#else
-    for (i=0 ; i<nprojects ; i++)
-    {
-      this_proj -> id = i;
-      for (j=0; j<NGRAPHS; j++)
-      {
-        for (k=0; k<this_proj -> numc[j]; k++)
-        {
-          if (this_proj -> curves[j][k] -> window)
-          {
-            curve_window_add_menu_bar (&  this_proj -> idcc[j][k]);
-            if (is_the_widget_visible(this_proj -> curves[j][k] -> plot))
-            {
-              gtk_widget_queue_draw (this_proj -> curves[j][k] -> plot);
-            }
-          }
-        }
-      }
-      if (this_proj -> next != NULL) this_proj = this_proj -> next;
-    }
-#endif // NEW_ANA
   }
   update_insert_combos ();
 }

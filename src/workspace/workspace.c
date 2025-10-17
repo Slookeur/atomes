@@ -133,7 +133,6 @@ void add_project (GtkTreeStore * store, int i)
   for (j=0; j<NCALCS; j++)
   {
     append = FALSE;
-#ifdef NEW_ANA
     if (this_proj -> analysis)
     {
       if (this_proj -> analysis[j])
@@ -141,9 +140,6 @@ void add_project (GtkTreeStore * store, int i)
         if (! this_proj -> analysis[j] -> requires_md || this_proj -> steps > 1) append = TRUE;
       }
     }
-#else
-    if (j < NCALCS-1 || this_proj -> steps > 1) append = TRUE;
-#endif
     if (append)
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
@@ -437,7 +433,6 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     g_free (tmp_title);
     for (j=0; j<NGRAPHS; j++)
     {
-#ifdef NEW_ANA
       if (this_proj -> analysis[j] -> init_ok)
       {
         for (k=0; k<this_proj -> analysis[j] -> numc; k++)
@@ -448,18 +443,6 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
           }
         }
       }
-#else
-      if (this_proj -> initok[j])
-      {
-        for (k=0; k<this_proj -> numc[j]; k++)
-        {
-          if (this_proj -> curves[j][k] -> window != NULL)
-          {
-            correct_this_window_title (this_proj -> curves[j][k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[j][k] -> name));
-          }
-        }
-      }
-#endif // NEW_ANA
     }
     if (activep == i)
     {

@@ -98,11 +98,7 @@ G_MODULE_EXPORT void set_window_size (GtkEntry * maj, gpointer data)
   char * text[2];
   int i;
   qint * ad = (qint *)data;
-#ifdef NEW_ANA
   Curve * this_curve = get_project_by_id (ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
-#else
-  Curve * this_curve = get_project_by_id (ad -> a) -> curves[ad -> b][ad -> c];
-#endif
   int shift = get_curve_shift (this_curve);
   text[0] = "X size must be > 0";
   text[1] = "Y size must be > 0";

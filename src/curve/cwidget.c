@@ -62,11 +62,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
   layout -> datacolor.blue = BLUE;
   layout -> datacolor.alpha = 1.0;
   layout -> thickness = DTHICK;
-#ifdef NEW_ANA
   layout -> hwidth = (rid == SPH) ? 1.0 : pid -> analysis[rid] -> delta;
-#else
-  layout -> hwidth = (rid == SPH) ? 1.0 : pid -> delta[rid];
-#endif
   layout -> hopac = 0.25;
   layout -> hpos = 1;
   layout -> dash = 1;
@@ -121,13 +117,8 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
 {
   if (rid < RIN || rid == MSD)
   {
-#ifdef NEW_ANA
     this_curve -> cmin[0] = this_proj -> analysis[rid] -> min;
     this_curve -> cmax[0] = this_proj ->  analysis[rid] -> max;
-#else
-    this_curve -> cmin[0] = this_proj -> min[rid];
-    this_curve -> cmax[0] = this_proj -> max[rid];
-#endif
   }
   else
   {
@@ -142,11 +133,7 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
   }
   else
   {
-#ifdef NEW_ANA
     if (cid < active_project -> analysis[MSD] -> numc - 6)
-#else
-    if (cid < active_project -> numc[MSD] - 6)
-#endif // NEW_ANA
     {
       this_curve -> scale[0] = 1;
       this_curve -> scale[1] = 1;
@@ -171,11 +158,7 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
 void initcurve (project * pid, int rid, int cid)
 {
   int k;
-#ifdef NEW_ANA
   Curve * this_curve = pid -> analysis[rid] -> curves[cid];
-#else
-  Curve * this_curve = pid -> curves[rid][cid];
-#endif
   this_curve -> window = NULL;
   this_curve -> plot = NULL;
   this_curve -> wsize[0] = 800;
@@ -277,7 +260,6 @@ void addcurwidgets (int pid, int rid, int str)
 {
   int j, k;
   project * this_proj = get_project_by_id(pid);
-#ifdef NEW_ANA
   for (j=0; j<this_proj -> analysis[rid] -> numc; j++)
   {
     this_proj -> analysis[rid] -> curves[j] -> cid = j;
@@ -300,33 +282,4 @@ void addcurwidgets (int pid, int rid, int str)
       }
     }
   }
-#else
-  int l = 0;
-  for (j=0; j<rid; j++)
-  {
-    l += this_proj -> numc[j];
-  }
-  for (j=0; j<this_proj -> numc[rid]; j++)
-  {
-    this_proj -> curves[rid][j] -> cid = l + j;
-    this_proj -> idcc[rid][j].a = pid;
-    this_proj -> idcc[rid][j].b = rid;
-    this_proj -> idcc[rid][j].c = j;
-    if (str == 0 || this_proj -> curves[rid][j] -> ndata == 0)
-    {
-      initcurve (this_proj, rid, j);
-    }
-    if (this_proj -> curves[rid][j] -> default_title)
-    {
-      this_proj -> curves[rid][j] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[rid][j] -> name);
-    }
-    for (k=0; k<2; k++)
-    {
-      if (this_proj -> curves[rid][j] -> axis_defaut_title[k])
-      {
-        this_proj -> curves[rid][j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> idcc[rid][j]));
-      }
-    }
-  }
-#endif
 }

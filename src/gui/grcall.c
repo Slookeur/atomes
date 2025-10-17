@@ -65,7 +65,6 @@ int fitc = 0;
 void initgr (int r)
 {
   int i, j, k;
-#ifdef NEW_ANA
   active_project -> analysis[r] -> curves[0] -> name = g_strdup_printf ("g(r) neutrons");
   active_project -> analysis[r] -> curves[1] -> name = g_strdup_printf ("g(r) neutrons - smoothed");
   active_project -> analysis[r] -> curves[2] -> name = g_strdup_printf ("G(r) neutrons");
@@ -115,57 +114,6 @@ void initgr (int r)
   }
   addcurwidgets (activep, r, 0);
   active_project -> analysis[r] -> init_ok = TRUE;
-#else
-  active_project -> curves[r][0] -> name = g_strdup_printf ("g(r) neutrons");
-  active_project -> curves[r][1] -> name = g_strdup_printf ("g(r) neutrons - smoothed");
-  active_project -> curves[r][2] -> name = g_strdup_printf ("G(r) neutrons");
-  active_project -> curves[r][3] -> name = g_strdup_printf ("G(r) neutrons - smoothed");
-  active_project -> curves[r][4] -> name = g_strdup_printf ("D(r) neutrons");
-  active_project -> curves[r][5] -> name = g_strdup_printf ("D(r) neutrons - smoothed");
-  active_project -> curves[r][6] -> name = g_strdup_printf ("T(r) neutrons");
-  active_project -> curves[r][7] -> name = g_strdup_printf ("T(r) neutrons - smoothed");
-  active_project -> curves[r][8] -> name = g_strdup_printf ("g(r) X-rays");
-  active_project -> curves[r][9] -> name = g_strdup_printf ("g(r) X-rays - smoothed");
-  active_project -> curves[r][10] -> name = g_strdup_printf ("G(r) X-rays");
-  active_project -> curves[r][11] -> name = g_strdup_printf ("G(r) X-rays - smoothed");
-  active_project -> curves[r][12] -> name = g_strdup_printf ("D(r) X-rays");
-  active_project -> curves[r][13] -> name = g_strdup_printf ("D(r) X-rays - smoothed");
-  active_project -> curves[r][14] -> name = g_strdup_printf ("T(r) X-rays");
-  active_project -> curves[r][15] -> name = g_strdup_printf ("T(r) X-rays - smoothed");
-  k = 16;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
-  {
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
-    {
-      active_project -> curves[r][k] -> name = g_strdup_printf ("g(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
-      k=k+1;
-      active_project -> curves[r][k] -> name = g_strdup_printf ("g(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
-      k=k+1;
-      active_project -> curves[r][k] -> name = g_strdup_printf ("G(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
-      k=k+1;
-      active_project -> curves[r][k] -> name = g_strdup_printf ("G(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
-      k=k+1;
-      active_project -> curves[r][k] -> name = g_strdup_printf ("dn(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
-      k=k+1;
-    }
-  }
-  if ( active_project -> nspec == 2 )
-  {
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[NN]");
-    k=k+1;
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[NN] - smoothed");
-    k=k+1;
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[NC]");
-    k=k+1;
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[NC] - smoothed");
-    k=k+1;
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[CC]");
-    k=k+1;
-    active_project -> curves[r][k] -> name = g_strdup_printf("BT(r)[CC] - smoothed");
-  }
-  addcurwidgets (activep, r, 0);
-  active_project -> initok[r] = TRUE;
-#endif
 }
 
 /*!
@@ -179,7 +127,6 @@ void initgr (int r)
 void update_rdf_view (project * this_proj, int rdf)
 {
   gchar * str;
-#ifdef NEW_ANA
   if (this_proj -> analysis[rdf] -> calc_buffer == NULL) this_proj -> analysis[rdf] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[rdf] -> calc_buffer);
   print_info ("\n\nRadial distribution function(s)", "heading", this_proj -> analysis[rdf] -> calc_buffer);
@@ -238,66 +185,6 @@ void update_rdf_view (project * this_proj, int rdf)
   g_free (str);
   print_info (" Å\n", "bold", this_proj -> analysis[rdf] -> calc_buffer);
   print_info (calculation_time(TRUE, this_proj -> analysis[rdf] -> calc_time), NULL, this_proj -> analysis[rdf] -> calc_buffer);
-#else
-  if (this_proj -> text_buffer[rdf+OT] == NULL) this_proj -> text_buffer[rdf+OT] = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> text_buffer[rdf+OT]);
-  print_info ("\n\nRadial distribution function(s)", "heading", this_proj -> text_buffer[rdf+OT]);
-  if (rdf == GR)
-  {
-    print_info (" - real space calculation\n\n", "heading", this_proj -> text_buffer[rdf+OT]);
-  }
-  else
-  {
-    print_info (" - FFT[S(q)]\n\n", "heading", this_proj -> text_buffer[rdf+OT]);
-  }
-  print_info ("Calculation details:\n\n", NULL, this_proj -> text_buffer[rdf+OT]);
-
-  if (rdf == GK)
-  {
-    print_info ("\tReciprocal space data:\n\n", NULL, this_proj -> text_buffer[rdf+OT]);
-    print_info ("\t - Minimum vector Q", "bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("min", "sub_bold", this_proj -> text_buffer[rdf+OT]);
-    print_info (": ", "bold", this_proj -> text_buffer[rdf+OT]);
-    str = g_strdup_printf ("%f", this_proj -> min[SKD]);
-    print_info (str, "bold_red", this_proj -> text_buffer[rdf+OT]);
-    g_free (str);
-    print_info (" Å", "bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("-1", "sup_bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("\n\t - Maximum vector Q", "bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
-    print_info (" for the FFT: ", "bold", this_proj -> text_buffer[rdf+OT]);
-    str = g_strdup_printf ("%f", this_proj -> max[GDK]);
-    print_info (str, "bold_red", this_proj -> text_buffer[rdf+OT]);
-    g_free (str);
-    print_info (" Å", "bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("-1", "sup_bold", this_proj -> text_buffer[rdf+OT]);
-    print_info ("\n\n", NULL, this_proj -> text_buffer[rdf+OT]);
-  }
-  print_info ("\tReal space discretization:\n\n", NULL, this_proj -> text_buffer[rdf+OT]);
-  print_info ("\t - Number of δr steps: ", "bold", this_proj -> text_buffer[rdf+OT]);
-  str = g_strdup_printf ("%d", this_proj -> num_delta[rdf]);
-  print_info (str, "bold_blue", this_proj -> text_buffer[rdf+OT]);
-  g_free (str);
-  print_info ("\n\n\t between 0.0 and ", NULL, this_proj -> text_buffer[rdf+OT]);
-  print_info ("D", "bold", this_proj -> text_buffer[rdf+OT]);
-  print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
-  print_info ("\n\t where ", NULL, this_proj -> text_buffer[rdf+OT]);
-  print_info ("D", "bold", this_proj -> text_buffer[rdf+OT]);
-  print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
-  print_info (" is the maximum distance in real space, ", NULL, this_proj -> text_buffer[rdf+OT]);
-  print_info ("D", "bold", this_proj -> text_buffer[rdf+OT]);
-  print_info ("max", "sub_bold", this_proj -> text_buffer[rdf+OT]);
-  print_info (" = ", NULL, this_proj -> text_buffer[rdf+OT]);
-  str = g_strdup_printf ("%f", this_proj -> max[GDR]);
-  print_info (str, "bold_blue", this_proj -> text_buffer[rdf+OT]);
-  g_free (str);
-  print_info (" Å\n\n\t - δr = ", "bold", this_proj -> text_buffer[rdf+OT]);
-  str = g_strdup_printf ("%f", this_proj -> delta[rdf]);
-  print_info (str, "bold_blue", this_proj -> text_buffer[rdf+OT]);
-  g_free (str);
-  print_info (" Å\n", "bold", this_proj -> text_buffer[rdf+OT]);
-  print_info (calculation_time(TRUE, this_proj -> calc_time[rdf]), NULL, this_proj -> text_buffer[rdf+OT]);
-#endif
 }
 
 /*!
@@ -311,7 +198,6 @@ void update_rdf_view (project * this_proj, int rdf)
 G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
 {
   int i;
-#ifdef NEW_ANA
   if (! active_project -> analysis[GDR] -> init_ok) initgr (GDR);
   clean_curves_data (GDR, 0, active_project -> analysis[GDR] -> numc);
   active_project -> analysis[GDR] -> delta = active_project -> analysis[GDR] -> max / active_project -> analysis[GDR] -> num_delta;
@@ -320,16 +206,6 @@ G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
   i = g_of_r_ (& active_project -> analysis[GDR] -> num_delta, & active_project -> analysis[GDR] -> delta, & fitc);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
   active_project -> analysis[GDR] -> calc_time = get_calc_time (start_time, stop_time);
-#else
-  if (! active_project -> initok[GDR]) initgr (GDR);
-  clean_curves_data (GDR, 0, active_project -> numc[GDR]);
-  active_project -> delta[GDR] = active_project -> max[GDR] / active_project -> num_delta[GDR];
-  prepostcalc (widg, FALSE, GDR, 0, opac);
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_ (& active_project -> num_delta[GDR], & active_project -> delta[GDR], & fitc);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[GDR] = get_calc_time (start_time, stop_time);
-#endif
   prepostcalc (widg, TRUE, GDR, i, 1.0);
   if (! i)
   {
@@ -413,8 +289,6 @@ G_MODULE_EXPORT void on_cutcheck_toggled (GtkToggleButton * but, gpointer data)
 */
 int recup_data_ (int * cd, int * rd)
 {
-#ifdef NEW_ANA
-
   if (* rd == 0)
   {
     return send_gr_ (cd,
@@ -431,24 +305,6 @@ int recup_data_ (int * cd, int * rd)
                      active_project -> analysis[SKD] -> curves[* cd] -> data[0],
                      active_project -> analysis[SKD] -> curves[* cd] -> data[1]);
   }
-#else
-  if (* rd == 0)
-  {
-    return send_gr_ (cd,
-                     & active_project -> curves[GDR][* cd] -> ndata,
-                     & active_project -> delta[GDR],
-                     active_project -> curves[GDR][* cd] -> data[0],
-                     active_project -> curves[GDR][* cd] -> data[1]);
-  }
-  else
-  {
-    return send_sq_ (cd,
-                     & active_project -> curves[SKD][* cd] -> ndata,
-                     & active_project -> delta[GDK],
-                     active_project -> curves[SKD][* cd] -> data[0],
-                     active_project -> curves[SKD][* cd] -> data[1]);
-  }
-#endif
 }
 
 /*!
@@ -463,7 +319,6 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
 {
   int i;
 
-#ifdef NEW_ANA
   if (! active_project -> analysis[GDK] -> init_ok) initgr (GDK);
   clean_curves_data (GDK, 0, active_project -> analysis[GDK] -> numc);
   active_project -> analysis[GDK] -> delta = active_project -> analysis[GDK] -> max / active_project -> analysis[GDK] -> num_delta;
@@ -474,18 +329,6 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
                    & active_project -> analysis[GDK] -> max);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
   active_project -> analysis[GDK] -> calc_time = get_calc_time (start_time, stop_time);
-#else
-  if (! active_project -> initok[GDK]) initgr (GDK);
-  clean_curves_data (GDK, 0, active_project -> numc[GDK]);
-  active_project -> delta[GDK] = active_project -> max[GDR] / active_project -> num_delta[GDK];
-  prepostcalc (widg, FALSE, GDK, 0, opac);
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = g_of_r_fft_ (& active_project -> num_delta[GDK],
-                   & active_project -> delta[GDK],
-                   & active_project -> max[GDK]);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[GDK] = get_calc_time (start_time, stop_time);
-#endif
   prepostcalc (widg, TRUE, GDK, i, 1.0);
   if (! i)
   {

@@ -845,11 +845,7 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
     {
       str = g_strdup_printf ("%s.project.compute", act);
       str_n = g_strdup_printf ("Analyze: %s", graph_name[calc]);
-#ifdef NEW_ANA
       append_menu_item (menu, str_n, (get_project_by_id(proj) -> analysis[calc] -> avail_ok) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
-#else
-      append_menu_item (menu, str_n, (get_project_by_id(proj) -> runok[calc]) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
-#endif
       g_free (str);
       g_free (str_n);
     }

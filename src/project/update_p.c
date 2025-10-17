@@ -62,22 +62,24 @@ void prep_calc_actions ()
   // Depends on the number of calculations available
   for (i=0; i<G_N_ELEMENTS(analyze_actions); i++)
   {
-#ifdef NEW_ANA
     if (! active_project -> analysis)
     {
       remove_action (analyze_acts[i].action_name);
     }
     else
     {
-#endif
-    if (i < ANG)
-    {
-#ifdef NEW_ANA
-      if (active_project -> analysis[i])
+      if (i < ANG)
       {
-        if (active_project -> analysis[i] -> avail_ok)
+        if (active_project -> analysis[i])
         {
-          add_action (analyze_actions[i]);
+          if (active_project -> analysis[i] -> avail_ok)
+          {
+            add_action (analyze_actions[i]);
+          }
+          else
+          {
+            remove_action (analyze_acts[i].action_name);
+          }
         }
         else
         {
@@ -86,51 +88,23 @@ void prep_calc_actions ()
       }
       else
       {
-        remove_action (analyze_acts[i].action_name);
-      }
-#else
-      if (active_project -> runok[i])
-      {
-        add_action (analyze_actions[i]);
-      }
-      else
-      {
-        remove_action (analyze_acts[i].action_name);
-      }
-#endif
-    }
-    else
-    {
-#ifdef NEW_ANA
-      if (active_project -> analysis[i+1])
-      {
-        if (active_project -> analysis[i+1] -> avail_ok)
+        if (active_project -> analysis[i+1])
         {
-          add_action (analyze_actions[i]);
+          if (active_project -> analysis[i+1] -> avail_ok)
+          {
+            add_action (analyze_actions[i]);
+          }
+          else
+          {
+            remove_action (analyze_acts[i].action_name);
+          }
         }
         else
         {
           remove_action (analyze_acts[i].action_name);
         }
       }
-      else
-      {
-        remove_action (analyze_acts[i].action_name);
-      }
-#else
-      if (active_project -> runok[i+1])
-      {
-        add_action (analyze_actions[i]);
-      }
-      else
-      {
-        remove_action (analyze_acts[i].action_name);
-      }
-#endif
     }
-#ifdef NEW_ANA
-  }
-#endif // NEW_ANA
   }
 }
 
@@ -147,50 +121,29 @@ void update_analysis_availability (project * this_proj)
   {
     if (this_proj -> cell.has_a_box)
     {
-#ifdef NEW_ANA
       this_proj -> analysis[GDR] -> avail_ok = TRUE;
       this_proj -> analysis[SKD] -> avail_ok = TRUE;
-#else
-      this_proj -> runok[GDR] = TRUE;
-      this_proj -> runok[SKD] = TRUE;
-#endif
     }
     else
     {
-#ifdef NEW_ANA
       this_proj -> analysis[GDR] -> avail_ok = FALSE;
       this_proj -> analysis[SQD] -> avail_ok = FALSE;
       this_proj -> analysis[SKD] -> avail_ok = FALSE;
       this_proj -> analysis[SKD] -> avail_ok = FALSE;
-#else
-      this_proj -> runok[GDR] = FALSE;
-      this_proj -> runok[SQD] = FALSE;
-      this_proj -> runok[SKD] = FALSE;
-      this_proj -> runok[GDK] = FALSE;
-#endif
     }
-#ifdef NEW_ANA
     this_proj -> analysis[BND] -> avail_ok = TRUE;
     this_proj -> analysis[ANG] -> avail_ok = TRUE;
     this_proj -> analysis[RIN] -> avail_ok = TRUE;
     this_proj -> analysis[CHA] -> avail_ok = TRUE;
     this_proj -> analysis[SPH] -> avail_ok = TRUE;
     if (this_proj -> steps > 1) this_proj -> analysis[MSD] -> avail_ok = TRUE;
-#else
-    this_proj -> runok[BND] = TRUE;
-    this_proj -> runok[ANG] = TRUE;
-    this_proj -> runok[RIN] = TRUE;
-    this_proj -> runok[CHA] = TRUE;
-    this_proj -> runok[SPH] = TRUE;
-    if (this_proj -> steps > 1) this_proj -> runok[MSD] = TRUE;
-#endif
   }
-  else
+  else if (this_proj -> analysis)
   {
     int i;
     for (i=0; i<NGRAPHS; i++)
     {
-      this_proj -> analysis[i] -> avail_ok = FALSE;
+      if (this_proj -> analysis[i]) this_proj -> analysis[i] -> avail_ok = FALSE;
     }
   }
 }

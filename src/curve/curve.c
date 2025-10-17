@@ -313,11 +313,7 @@ double scale (double axe)
 Curve * get_curve_from_pointer (gpointer data)
 {
   tint * ad = (tint *)data;
-#ifdef NEW_ANA
   return get_project_by_id(ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
-#else
-  return get_project_by_id(ad -> a) -> curves[ad -> b][ad -> c];
-#endif
 }
 
 /*!
@@ -351,7 +347,6 @@ void prep_plot (Curve * this_curve)
 */
 void clean_this_curve_window (int cid, int rid)
 {
-#ifdef NEW_ANA
   /*if (active_project -> analysis[rid] -> curves[cid] -> window != NULL)
   {
     active_project -> analysis[rid] -> curves[cid] -> window = destroy_this_widget (active_project -> analysis[rid] -> curves[cid] -> window);
@@ -370,26 +365,6 @@ void clean_this_curve_window (int cid, int rid)
     }
   }
   active_project -> analysis[rid] -> curves[cid] -> ndata = 0;
-#else
-  /*if (active_project -> curves[rid][cid] -> window != NULL)
-  {
-    active_project -> curves[rid][cid] -> window = destroy_this_widget (active_project -> curves[rid][cid] -> window);
-    active_project -> curves[rid][cid] -> plot = destroy_this_widget (active_project -> curves[rid][cid] -> plot);
-  }*/
-  if (active_project -> curves[rid][cid] -> ndata > 0)
-  {
-    int i;
-    for (i=0; i<2; i++)
-    {
-      if (active_project -> curves[rid][cid] -> data[i] != NULL)
-      {
-        g_free (active_project -> curves[rid][cid] -> data[i]);
-        active_project -> curves[rid][cid] -> data[i] = NULL;
-      }
-    }
-  }
-  active_project -> curves[rid][cid] -> ndata = 0;
-#endif
 }
 
 /*!
@@ -403,7 +378,6 @@ void clean_this_curve_window (int cid, int rid)
 */
 void set_curve_data_zero (int rid, int cid, int interv)
 {
-#ifdef NEW_ANA
   active_project -> analysis[rid] -> curves[cid] -> ndata = interv;
   active_project -> analysis[rid] -> curves[cid] -> data[0] = allocdouble (interv);
   int i;
@@ -411,15 +385,6 @@ void set_curve_data_zero (int rid, int cid, int interv)
   {
     active_project -> analysis[rid] -> curves[cid] -> data[0][i] = active_project -> analysis[rid] -> min + i*active_project -> analysis[rid] -> delta;
   }
-#else
-  active_project -> curves[rid][cid] -> ndata = interv;
-  active_project -> curves[rid][cid] -> data[0] = allocdouble (interv);
-  int i;
-  for (i=0; i<interv; i++)
-  {
-    active_project -> curves[rid][cid] -> data[0][i] = active_project -> min[rid] + i*active_project -> delta[rid];
-  }
-#endif
 }
 
 /*!
@@ -435,11 +400,7 @@ void set_curve_data_zero (int rid, int cid, int interv)
 void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid)
 {
   int i, j;
-#ifdef NEW_ANA
   Curve * this_curve = active_project -> analysis[* rid] -> curves[* cid];
-#else
-  Curve * this_curve = active_project -> curves[* rid][* cid];
-#endif
 #ifdef DEBUG
   /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
   for ( i=0 ; i < *interv ; i++ )
@@ -500,7 +461,6 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
 void hide_curves (project * this_proj, int c)
 {
   int i;
-#ifdef NEW_ANA
   for ( i = 0 ; i < this_proj -> analysis[c] -> numc ; i ++ )
   {
     if (this_proj -> analysis[c] -> curves[i])
@@ -517,24 +477,6 @@ void hide_curves (project * this_proj, int c)
       }
     }
   }
-#else
-  for ( i = 0 ; i < this_proj -> numc[c] ; i ++ )
-  {
-    if (this_proj -> curves[c][i])
-    {
-      if (this_proj -> curves[c][i] -> window)
-      {
-        if (is_the_widget_visible(this_proj -> curves[c][i] -> window))
-        {
-          hide_the_widgets (this_proj -> curves[c][i] -> window);
-          adjust_tool_model (c, i, this_proj -> curves[c][i] -> path);
-          g_free (this_proj -> curves[c][i] -> path);
-          this_proj -> curves[c][i] -> path = NULL;
-        }
-      }
-    }
-  }
-#endif
 }
 
 /*!
@@ -556,7 +498,6 @@ void remove_this_curve_from_extras (int a, int b, int c)
     if (i != a)
     {
       this_proj = get_project_by_id (i);
-#ifdef NEW_ANA
       for (j=0; j<NCALCS; j++)
       {
         if (this_proj -> analysis[j] -> idcc != NULL)
@@ -579,30 +520,6 @@ void remove_this_curve_from_extras (int a, int b, int c)
           }
         }
       }
-#else
-      for (j=0; j<NGRAPHS; j++)
-      {
-        if (this_proj -> idcc[j] != NULL)
-        {
-          for (k=0; k<this_proj -> numc[j]; k++)
-          {
-            if (this_proj -> curves[j][k] -> extrac > 0)
-            {
-              ctmp = this_proj -> curves[j][k] -> extrac -> first;
-              for (l=0; l<this_proj -> curves[j][k] -> extrac -> extras; l++)
-              {
-                if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
-                {
-                  remove_extra (this_proj -> curves[j][k] -> extrac, ctmp);
-                  break;
-                }
-                if (ctmp -> next != NULL) ctmp = ctmp -> next;
-              }
-            }
-          }
-        }
-      }
-#endif
     }
   }
 }
@@ -618,7 +535,6 @@ void remove_this_curve_from_extras (int a, int b, int c)
 void erase_curves (project * this_proj, int c)
 {
   int i, j;
-#ifdef NEW_ANA
   for (i=0 ; i<this_proj -> analysis[c] -> numc; i ++)
   {
     if (this_proj -> analysis[c] -> curves[i])
@@ -641,30 +557,6 @@ void erase_curves (project * this_proj, int c)
       this_proj -> analysis[c] -> curves[i] = NULL;
     }
   }
-#else
-  for (i=0 ; i<this_proj -> numc[c]; i ++)
-  {
-    if (this_proj -> curves[c][i])
-    {
-      remove_this_curve_from_extras (this_proj -> id, c, i);
-      for (j=0; j<2; j++)
-      {
-        if (this_proj -> curves[c][i] -> data[j])
-        {
-          free (this_proj -> curves[c][i] -> data[j]);
-          this_proj -> curves[c][i] -> data[j] = NULL;
-        }
-      }
-      if (this_proj -> curves[c][i] -> name)
-      {
-        g_free (this_proj -> curves[c][i] -> name);
-        this_proj -> curves[c][i] -> name = NULL;
-      }
-      g_free (this_proj -> curves[c][i]);
-      this_proj -> curves[c][i] = NULL;
-    }
-  }
-#endif
 }
 
 /*!
@@ -679,7 +571,6 @@ void update_curves ()
   for (i=0; i<nprojects; i++)
   {
     this_proj = get_project_by_id(i);
-#ifdef NEW_ANA
     for (j=0; j<NCALCS; j++)
     {
       for (k=0; k<this_proj -> analysis[j] -> numc; k++)
@@ -693,21 +584,6 @@ void update_curves ()
         }
       }
     }
-#else
-    for (j=0; j<NGRAPHS; j++)
-    {
-      for (k=0; k<this_proj -> numc[j]; k++)
-      {
-        if (this_proj -> curves[j][k] -> plot != NULL)
-        {
-          if (is_the_widget_visible(this_proj -> curves[j][k] -> plot))
-          {
-            gtk_widget_queue_draw (this_proj -> curves[j][k] -> plot);
-          }
-        }
-      }
-    }
-#endif
   }
 }
 

@@ -58,12 +58,8 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid);
 void update_after_calc (int calc);
 
 // In init.c:
-
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
 void prep_calc_actions ();
-#ifdef NEW_ANA
-void init_atomes_analysis ();
-#else
-void initcwidgets ();
-#endif // NEW_ANA
+
+void init_atomes_analysis (gboolean apply_defaults);
 #endif

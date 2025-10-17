@@ -31,6 +31,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   void init_curves_and_calc (project * this_proj);
+  void apply_analysis_default_parameters_to_project (project * this_proj);
   void apply_default_parameters_to_project (project * this_proj);
   void init_project (gboolean alloc_box);
 
@@ -70,45 +71,46 @@ void init_curves_and_calc (project * this_proj)
   int i;
   for (i=0; i<NGRAPHS; i++)
   {
-#ifdef NEW_ANA
     this_proj -> analysis[i] -> avail_ok = FALSE;
     this_proj -> analysis[i] -> init_ok = FALSE;
     this_proj -> analysis[i] -> calc_ok = FALSE;
-#else
-    this_proj -> runok[i] = FALSE;
-    this_proj -> initok[i] = FALSE;
-    this_proj -> visok[i] = FALSE;
-#endif
   }
 }
 
 /*!
-  \fn void apply_default_parameters_to_project (project * this_proj)
+  \fn void apply_analysis_default_parameters_to_project (project * this_proj)
 
-  \brief apply new default parameters to project
+  \brief apply default analysis parameters to project
 
   \param this_proj the target project
+
 */
-void apply_default_parameters_to_project (project * this_proj)
+void apply_analysis_default_parameters_to_project (project * this_proj)
 {
   int i, j;
-  // Calc parameters
-  if (this_proj -> chemistry)
+  for (i=0; i<6; i++)
   {
-    this_proj -> chemistry -> grtotcutoff = default_totcut;
+    if (this_proj -> analysis[i]) this_proj -> analysis[i] -> num_delta = default_num_delta[i];
   }
-#ifdef NEW_ANA
-  /* for (i=0; i<6; i++) this_proj -> analysis[i] -> num_delta = default_num_delta[i];
-  this_proj -> analysis[SPH] -> num_delta = default_num_delta[6];
-  this_proj -> analysis[MSD] -> num_delta = default_num_delta[7];
-  this_proj -> analysis[MSD] -> delta = default_delta_t[0]; */
-#else
-  for (i=0; i<6; i++) this_proj -> num_delta[i] = default_num_delta[i];
-  this_proj -> num_delta[SPH] = default_num_delta[6];
-  this_proj -> num_delta[MSD] = default_num_delta[7];
-  this_proj -> delta[MSD] = default_delta_t[0];
-#endif // NEW_ANA
+  if (this_proj -> analysis[RIN])
+  {
+    active_project -> analysis[RIN] -> delta = 1.0;
+    active_project -> analysis[RIN] -> min = 1.0;
+  }
+  if (this_proj -> analysis[CHA])
+  {
+    active_project -> analysis[CHA] -> delta = 1.0;
+    active_project -> analysis[CHA] -> min = 1.0;
+  }
+  if (this_proj -> analysis[SPH])
+  {
+    active_project -> analysis[SPH] -> delta = 2.0;
+    this_proj -> analysis[SPH] -> num_delta = default_num_delta[6];
+  }
+  if (this_proj -> analysis[MSD]) this_proj -> analysis[MSD] -> num_delta = default_num_delta[7];
+  if (this_proj -> analysis[MSD]) this_proj -> analysis[MSD] -> delta = default_delta_t[0];
 
+  // Other analysis parameters
   for (i=0; i<5; i++)
   {
     this_proj -> rsparam[i][0] = default_rsparam[1];
@@ -121,6 +123,41 @@ void apply_default_parameters_to_project (project * this_proj)
   for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
   this_proj -> csparam[5] = default_csparam[1];
   this_proj -> csearch = default_csparam[2];
+}
+
+/*!
+  \fn void apply_default_parameters_to_project (project * this_proj)
+
+  \brief apply default parameters to project
+
+  \param this_proj the target project
+*/
+void apply_default_parameters_to_project (project * this_proj)
+{
+  // Calc parameters
+  if (this_proj -> chemistry)
+  {
+    this_proj -> chemistry -> grtotcutoff = default_totcut;
+  }
+  if (this_proj -> analysis)
+  {
+    apply_analysis_default_parameters_to_project (this_proj);
+  }
+  // Other analysis parameters
+  int i, j;
+  for (i=0; i<5; i++)
+  {
+    this_proj -> rsparam[i][0] = default_rsparam[1];
+    this_proj -> rsparam[i][1] = default_rsparam[2];
+    for (j=2; j<5; j++) this_proj -> rsparam[i][j] = default_rsparam[j+2];
+  }
+  this_proj -> rsearch[0] = default_rsparam[0];
+  this_proj -> rsearch[1] = default_rsparam[3];
+  this_proj -> csparam[0] = default_csparam[0];
+  for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
+  this_proj -> csparam[5] = default_csparam[1];
+  this_proj -> csearch = default_csparam[2];
+  //
   if (this_proj -> modelgl)
   {
     image * img = this_proj -> modelgl -> anim -> last -> img;
@@ -181,27 +218,21 @@ void init_project (gboolean alloc_box)
   activep = nprojects - 1;
   new_proj -> id = activep;
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
-#ifndef NEW_ANA
-  new_proj -> delta[RIN] = new_proj -> delta[CHA] = 1.0;
-  new_proj -> min[RIN] = new_proj -> min[CHA] = 1;
-  new_proj -> delta[SPH] = 2.0;
-#endif
   apply_default_parameters_to_project (new_proj);
   new_proj -> tfile = -1;
   new_proj -> newproj = TRUE;
   new_proj -> steps = 1;
-  new_proj -> xcor = 1;
   new_proj -> tunit = (int)default_delta_t[1];
+
+  // Other calculation related parameters
+  new_proj -> xcor = 1;
   new_proj -> sk_advanced[0] = 1.0;
   new_proj -> sk_advanced[1] = 15.0;
-
+  //
   new_proj -> coord = g_malloc0 (sizeof*new_proj -> coord);
   if (alloc_box) new_proj -> cell.box = g_malloc0(sizeof*new_proj -> cell.box);
 
   remove_edition_actions ();
-#ifndef NEW_ANA
-  init_curves_and_calc (new_proj);
-#endif
   new_proj -> numwid = -1;
   if (nprojects == 1)
   {

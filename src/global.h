@@ -687,7 +687,6 @@ struct Curve
   GSimpleActionGroup * action_group;
 };
 
-#ifdef NEW_ANA
 /*! \typedef atomes_analysis
 
   \brief analysis data structure
@@ -719,7 +718,6 @@ struct atomes_analysis
   Curve ** curves;             /*!< The curves, graph for the results of the calculations, if any */
   tint * idcc;                 /*!< Pointers for the curves */
 };
-#endif
 
 /*! \def MAXDATC
   \brief Number of tabs for the description of the classical calculation
@@ -993,24 +991,10 @@ struct project
   /*
      Analysis related parameters
   */
-#ifdef NEW_ANA
+  /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   atomes_analysis ** analysis;         /*!< The analysis data and results */
   GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
-#else
-  gboolean runok[NGRAPHS];             /*!< Analysis calculation availability */
-  gboolean initok[NGRAPHS];            /*!< Curves initizalization  */
-  gboolean visok[NGRAPHS];             /*!< Analysis calculation confirmation */
-  // gr, sq, sk, gftt, bd, an, frag-mol, ch, sp, msd
-  int numc[NGRAPHS];                   /*!< Number of curves: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  int num_delta[NGRAPHS];              /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double calc_time[NGRAPHS];           /*!< Calculation time: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double delta[NGRAPHS];               /*!< Discretization: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double min[NGRAPHS];                 /*!< Minimum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double max[NGRAPHS];                 /*!< Maximum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  tint * idcc[NGRAPHS];                        /*!< Pointers for the curves */
-  Curve ** curves[NGRAPHS];                    /*!< The curves, graph for the results of the calculations */
-  GtkTextBuffer * text_buffer[NITEMS+NGRAPHS]; /*!< The text buffer for the results of the calculations */
-#endif
+
   int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
   gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
   // 0 = Search type, 1 = NUMA

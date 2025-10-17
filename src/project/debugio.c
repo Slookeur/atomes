@@ -53,11 +53,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 void debugiocurve (project * this_proj, gboolean win, int rid, int cid, gchar * iost)
 {
-#ifdef NEW_ANA
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
-#else
-  Curve * this_curve = this_proj -> curves[rid][cid];
-#endif // NEW_ANA
   g_debug (" ");
   g_debug ("IODEBUG: %s: pid= %d, rid= %d, cid= %d", iost, this_proj -> id, rid, cid);
   g_debug ("IODEBUG: %s: ndata= %d", iost, this_curve -> ndata);
@@ -244,7 +240,6 @@ void debugioproj (project * this_proj, gchar * iost)
                         this_proj -> cell.box[0].param[1][0], this_proj -> cell.box[0].param[1][1], this_proj -> cell.box[0].param[1][2]);
   g_debug ("IODEBUG::%s: vmod[0]= %f, vmod[1]= %f, vmod[2]= %f", iost,
                         this_proj -> cell.box[0].param[0][0], this_proj -> cell.box[0].param[0][1], this_proj -> cell.box[0].param[0][2]);
-#ifdef NEW_ANA
   for (i=0; i<NGRAPHS; i++)
   {
     g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> analysis[i] -> calc_ok);
@@ -254,17 +249,6 @@ void debugioproj (project * this_proj, gchar * iost)
     g_debug ("IODEBUG::%s: i= %d, min[i]= %f", iost, i, this_proj -> analysis[i] -> min);
     g_debug ("IODEBUG::%s: i= %d, max[i]= %f", iost, i, this_proj -> analysis[i] -> max);
   }
-#else
-  for (i=0; i<NGRAPHS; i++)
-  {
-    g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> visok[i]);
-    g_debug ("IODEBUG::%s: i= %d, initok[i]= %d", iost, i, this_proj -> initok[i]);
-    g_debug ("IODEBUG::%s: i= %d, num_delta[i]= %d", iost, i, this_proj -> num_delta[i]);
-    g_debug ("IODEBUG::%s: i= %d, delta[i]= %f", iost, i, this_proj -> delta[i]);
-    g_debug ("IODEBUG::%s: i= %d, min[i]= %f", iost, i, this_proj -> min[i]);
-    g_debug ("IODEBUG::%s: i= %d, max[i]= %f", iost, i, this_proj -> max[i]);
-  }
-#endif
   if (this_proj -> natomes != 0 && this_proj -> nspec != 0)
   {
     for (i=0; i<this_proj -> steps; i++)

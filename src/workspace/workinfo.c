@@ -97,11 +97,7 @@ void workinfo (project * this_proj, int i)
     default:
       if (i > -1)
       {
-#ifdef NEW_ANA
         if (this_proj -> analysis[i] -> calc_buffer == NULL && this_proj -> analysis[i] -> calc_ok)
-#else
-        if (this_proj -> text_buffer[i+4] == NULL && this_proj -> visok[i])
-#endif
         {
           switch (i)
           {
@@ -137,7 +133,6 @@ void workinfo (project * this_proj, int i)
       }
       break;
   }
-#ifdef NEW_ANA
   if (i < 0)
   {
     j = i + 4;
@@ -149,9 +144,4 @@ void workinfo (project * this_proj, int i)
     if (this_proj -> analysis[i] -> calc_buffer == NULL) this_proj -> analysis[i] -> calc_buffer = add_buffer (NULL, NULL, NULL);
     view_buffer (this_proj -> analysis[i] -> calc_buffer);
   }
-#else
-  i += 4;
-  if (this_proj -> text_buffer[i] == NULL) this_proj -> text_buffer[i] = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> text_buffer[i]);
-#endif
 }

@@ -62,12 +62,7 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
   int j, k, l, m;
   gchar * str;
   curve_dash * dasht;
-  Curve * this_curve;
-#ifdef NEW_ANA
-  this_curve =  this_proj -> analysis[rid] -> curves[cid];
-#else
-  this_curve = this_proj -> curves[rid][cid];
-#endif
+  Curve * this_curve =  this_proj -> analysis[rid] -> curves[cid];
 
   x = this_curve -> legend_pos[0] * resol[0];
   y = this_curve -> legend_pos[1] * resol[1];
@@ -133,13 +128,8 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
       k = ctmp -> id.a;
       l = ctmp -> id.b;
       m = ctmp -> id.c;
-#ifdef NEW_ANA
       str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
                                         get_project_by_id(k) -> analysis[l] -> curves[m] -> name);
-#else
-      str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
-                                        get_project_by_id(k) -> curves[l][m] -> name);
-#endif
       if (ctmp -> next !=  NULL) ctmp = ctmp -> next;
     }
     pango_layout_set_text (layout, str, -1);

@@ -540,12 +540,9 @@ gboolean test_pbc (int pbc, int frac, double box[2][3], double vect[3][3])
 void init_box_calc ()
 {
   active_cell -> has_a_box = test_vol (active_box -> param, active_box -> vect);
-#ifndef NEW_ANA
-  int i;
-#endif
   if (! active_cell -> has_a_box)
   {
-#ifdef NEW_ANA
+
     if (active_project -> analysis)
     {
       active_project -> analysis[GDR] -> avail_ok = FALSE;
@@ -553,13 +550,9 @@ void init_box_calc ()
       active_project -> analysis[SKD] -> avail_ok = FALSE;
       active_project -> analysis[GDK] -> avail_ok = FALSE;
     }
-#else
-    for (i=0; i<4; i++) active_project -> runok[i] = FALSE;
-#endif
   }
   else
   {
-#ifdef NEW_ANA
     if (active_project -> analysis)
     {
       active_project -> analysis[GDR] -> avail_ok = TRUE;
@@ -567,13 +560,6 @@ void init_box_calc ()
       active_project -> analysis[SKD] -> avail_ok = TRUE;
       active_project -> analysis[GDK] -> avail_ok = active_project -> analysis[SKD] -> calc_ok;
     }
-#else
-    for (i=0; i<3; i=i+2)
-    {
-      active_project -> runok[i] = TRUE;
-      active_project -> runok[i+1] = active_project -> visok[i];
-    }
-#endif
   }
   prep_calc_actions ();
 }
@@ -696,7 +682,6 @@ gboolean test_cutoffs ()
 {
   int i, j, k;
   k = 0;
-#ifdef NEW_ANA
   for (i=0; i<active_project -> nspec; i++, k++)
   {
     if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GDR] -> max)) return FALSE;
@@ -709,20 +694,6 @@ gboolean test_cutoffs ()
     }
   }
   if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> analysis[GDR] -> max)) return FALSE;
-#else
-  for (i=0; i<active_project -> nspec; i++, k++)
-  {
-    if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
-  }
-  for (i=0; i<active_project -> nspec-1; i++)
-  {
-    for (j=i+1; j<active_project -> nspec; j++, k++)
-    {
-      if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
-    }
-  }
-  if (tmpcut[k] == 0.0 || (active_project -> run && tmpcut[k] > active_project -> max[GDR])) return FALSE;
-#endif
   return TRUE;
 }
 
@@ -744,17 +715,10 @@ void edit_bonds (GtkWidget * vbox)
   gchar * str;
   if (! preferences)
   {
-#ifdef NEW_ANA
     if (active_project -> analysis[GDR] -> max != 0.0)
     {
       str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
                              m_end, active_project -> analysis[GDR] -> max);
-#else
-    if (active_project -> max[0] != 0.0)
-    {
-      str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
-                             m_end, active_project -> max[0]);
-#endif
     }
     else
     {

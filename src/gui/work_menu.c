@@ -161,11 +161,7 @@ GtkWidget * this_work_menu (int p, int c)
     if (c > -1)
     {
       gchar * str = g_strdup_printf ("Analyze: %s", graph_name[c]);
-#ifdef NEW_ANA
       widget_set_sensitive (gtk3_menu_item (menu, str, IMG_FILE, (gpointer)graph_img[c], G_CALLBACK(compute_this_prop), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE), get_project_by_id(p) -> analysis[c] -> avail_ok);
-#else
-      widget_set_sensitive (gtk3_menu_item (menu, str, IMG_FILE, (gpointer)graph_img[c], G_CALLBACK(compute_this_prop), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE), get_project_by_id(p) -> runok[c]);
-#endif
       g_free (str);
     }
     gtk3_menu_item (menu, "Edit Name", IMG_STOCK, (gpointer)EDITA, G_CALLBACK(change_project_name), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
