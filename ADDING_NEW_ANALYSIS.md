@@ -61,25 +61,26 @@ Here is the step by step procedure:
 ### 1. Edit the file [`src/global.h`](https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html) to make the information available in other parts of the code:
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
-```C
-#define GDR 0
-#define SQD 1
-#define SKD 2
-#define GDK 3
-#define BND 4
-#define ANG 5
-#define RIN 6
-#define CHA 7
-#define SPH 8
-#define MSD 9
-#define IDC 10
-```
+  ```C
+  #define GDR 0
+  #define SQD 1
+  #define SKD 2
+  #define GDK 3
+  #define BND 4
+  #define ANG 5
+  #define RIN 6
+  #define CHA 7
+  #define SPH 8
+  #define MSD 9
+  #define IDC 10  // This is an example
+  ```
+
 The associated number should be the latest calculation ID number + 1 
 
 At the time I wrote this tutorial MSD was the last one set to 9. 
 
   - Increment the total number of calculations available : `NCALCS`
-  - Increment the total number calculation using graphs : `NGRAPHS`
+  - Increment the total number of calculations using graphs : `NGRAPHS`
 
 ### 2. Edit the file [`/src/gui/gui.c`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html)
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
@@ -96,7 +97,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                                     {"analyze.chains", GINT_TO_POINTER(CHA-1)},
                                     {"analyze.sp",     GINT_TO_POINTER(SPH-1)},
                                     {"analyze.msd",    GINT_TO_POINTER(MSD-1)},
-                                    {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};
+                                    {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};  // This is an example
     ```
 
     - [`char * calc_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735) : add the new calculation name for the menu items
@@ -111,7 +112,7 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                           "Chain statistics",
                           "Spherical harmonics",
                           "Mean Squared Displacement",
-                          "The new analysis"};
+                          "The new analysis"};  // This is an example
     ```
 
     - [`char * graph_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3) : add the new calculation name for the graph windows
@@ -127,37 +128,39 @@ At the time I wrote this tutorial MSD was the last one set to 9.
                            "Chain statistics",
                            "Spherical harmonics",
                            "Mean Squared Displacement",
-                           "The new analysis"};
+                           "The new analysis"};  // This is an example
     ```
 
   - In the function `atomes_menu_bar_action` add the calculation menu callback:
-```C
-G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
-{
-  ...
-
-  else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
+  ```C
+  G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
   {
-    on_calc_activate (NULL, data); // This does not change
+    ...
+
+    else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
+    {
+      on_calc_activate (NULL, data); // This does not change
+    }
+
+    ...
   }
-
-  ...
-}
-```
+  ```
   - In the function `create_main_window` declare the icon for the new calculation:
-```C
-GtkWidget * create_main_window (GApplication * atomes)
-{
-  ...
+  ```C
+  GtkWidget * create_main_window (GApplication * atomes)
+  {
+    ...
 
-  graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
+    graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);
 
-  ...
-}
-```
+    ...
+  }
+  ```
+
 ### 3. Edit the file [`src/gui/initc.c`](https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html) to declare the new analysis
 
 Search for the `atomes_analysis` function to declare the new analysis
+
 ```C
 void init_atomes_analysis ()
 {
@@ -172,57 +175,58 @@ void init_atomes_analysis ()
 ### 4. Update the default availability for the new calculation:
 
   - Edit [`src/project/update_p.c`](https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html) search for the `update_analysis_availability` function to add the proper flags
-```C
-void update_analysis_availability (project * this_proj)
-{
-  ...
-  if (this_proj -> cell.has_a_box) // Or any other prerequisite
+
+  ```C
+  void update_analysis_availability (project * this_proj)
   {
     ...
+    if (this_proj -> cell.has_a_box) // Or any other prerequisite
+    {
+      ...
        
+      active_project -> analysis[IDC] -> avail_ok = TRUE;
+
+      ...
+    }
+    else
+    {
+      ...
+      
+      active_project -> analysis[IDC] -> avail_ok = FALSE;
+
+      ...
+    }
+    ...
+
+    // Otherwise default value to TRUE (or FALSE)
     active_project -> analysis[IDC] -> avail_ok = TRUE;
 
     ...
   }
-  else
-  {
-    ...
-      
-    active_project -> analysis[IDC] -> avail_ok = FALSE;
-
-    ...
-  }
-  ...
-
-  // Otherwise default value to TRUE (or FALSE)
-  active_project -> analysis[IDC] -> avail_ok = TRUE;
-
-  ...
-}
-```
+  ```
 
 ### 5. Optional graph setup, if any:
 
   - Edit the file [`src/curve/yaxis.c`](https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html) to adjust specific axis autoscale information
 
-```C
-void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
-{
-  ...
+  ```C
+  void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)
+  {
+    ...
 
-  // Not that aid is the axis: 0 = x, 1 = y
-  if (rid = IDC)
-  {
-    // Min value for the new calculation to be specified here
-    this_curve -> axmin[aid] = min_value[aid];
+    // Not that aid is the axis: 0 = x, 1 = y
+    if (rid = IDC)
+    {
+      // Min value for the new calculation to be specified here
+      this_curve -> axmin[aid] = min_value[aid];
 
-    // Max value for the new calculation to be specified here
-    this_curve -> axmax[aid] = max_value[aid];    
+      // Max value for the new calculation to be specified here
+      this_curve -> axmax[aid] = max_value[aid];    
+    }
+
+    ...
   }
-
-  ...
-}
-```
+  ```
 
 Note that by default **atomes** will just take the min and max values of the available calculation results but you might want to adjust this.
 
@@ -234,51 +238,57 @@ The autoscale is performed immediately after in this function.
 ### 1. Edit the file [`src/gui/calc_menu.c`](https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html)
 
   - In the function `on_calc_activate` add a case for the new analysis
-```C
-G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
-{
-  ...
 
-  case IDC:
-    calc_idc (box);
-    break;
+  ```C
+  G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
+  {
+    ...
+
+    case IDC:
+      calc_idc (box);
+      break;
       
-  ...
-}
-```
+    ...
+  }
+  ```
+
   - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
-```C
-/*!
-  \fn void calc_idc (GtkWidget * vbox)
 
-  \brief creation of the idc calculation widgets
+  ```C
+  /*!
+    \fn void calc_idc (GtkWidget * vbox)
 
-  \param vbox GtkWidget that will receive the data
-*/
-void calc_bonds (GtkWidget * vbox)
-{
-  GtkWidget * idc_box;
+    \brief creation of the idc calculation widgets
 
- // This part requires to be a litte bit familiar with GTK+
+    \param vbox GtkWidget that will receive the data
+  */
+  void calc_bonds (GtkWidget * vbox)
+  {
+    GtkWidget * idc_box;
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
-}
-```
+   // This part requires to be a litte bit familiar with GTK+
+
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
+  }
+  ```
 
 Contact me for help !
 
   - In the function `run_on_calc_activate` add a test case for the new analysis:
-```C
-G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
-{
-  ...
 
-  case IDC:
-    if (test_idc()) on_calc_idc_released (calc_win, NULL);
-    break;
-  ...
-}
-```
+  ```C
+  G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
+  {
+    ...
+
+    case IDC:
+      if (test_idc()) on_calc_idc_released (calc_win, NULL);
+      break;
+
+    ...
+  }
+  ```
+
 Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
 
 You now need to write the `on_calc_idc_released` function to perform the calculation (see bellow).
