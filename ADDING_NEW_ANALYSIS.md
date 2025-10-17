@@ -99,7 +99,7 @@ atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
                                 {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};
 ```
 
-    - [`char * calc_name[]`](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735) : add the new calculation name for the menu items
+    - `[char * calc_name](https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735)` : add the new calculation name for the menu items
 
 ```C
 char * calc_name[] = {"g(r)/G(r)",
