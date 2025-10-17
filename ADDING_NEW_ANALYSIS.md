@@ -286,7 +286,10 @@ void init_atomes_analysis ()
   }
   ```
 
-Note that by default **atomes** will just take the min and max values of the available calculation results but you might want to adjust this.
+> [!TIP]
+> By default **atomes** will just take the minimum and maximum values for calculation based on the result(s)
+>
+> This is to enforce to use other set of parameters as min and max values for x and / or y axis.
 
 The autoscale is performed immediately after in this function. 
 
@@ -331,9 +334,6 @@ The autoscale is performed immediately after in this function.
   ```
 > [!TIP]
 > Many example are available in **atomes** source code, in particular in the file [`src/gui/calc_menu.c`][calc_menu.c]
-
-
-Contact me for help !
 
   - In the function [`run_on_calc_activate`][run_on_calc_activate] add a test case for the new analysis:
 
