@@ -96,7 +96,6 @@ Here is the step by step procedure:
   - At the top modify the following variables to describe the new analysis, and to create the corresponding menu elements:
 
     - [`gchar * calc_name`][calc_name] : append a line to add the new analysis name for the menu items
- 
     ```C
     gchar * calc_name[] = {"g(r)/G(r)",
                            "S(q) from FFT[g(r)]",
@@ -109,9 +108,7 @@ Here is the step by step procedure:
                            "Mean Squared Displacement",
                            "The new analysis"};  // This is an example
     ```
-
     - [`gchar * graph_name`][graph_name] : append a line to add the new analysis name for the tool box window
-
     ```C
     gchar * graph_name[] = {"g(r)/G(r)",
                             "S(q) from FFT[g(r)]",
@@ -125,9 +122,7 @@ Here is the step by step procedure:
                             "Mean Squared Displacement",
                             "The new analysis"};  // This is an example
     ```
-
     - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
-
     ```C
     gchar * graph_icon[] = {"pixmaps/gr.png",
                             "pixmaps/sq.png",
@@ -349,7 +344,7 @@ Create a new file
 [analyze_acts]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee
 [calc_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735
 [graph_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
-[graph_icon]:
+[graph_icon]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
 [atomes_menu_bar_action]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#acd3996df411bbbd56fd07fdb40953f75
 [create_main_window]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a92f4ba1abecbb26e2b9e934397930f37
 [init.c]:https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html
