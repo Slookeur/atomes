@@ -8,10 +8,21 @@
   G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
   {
     ...
+    switch (response_id)
+    {
+      case GTK_RESPONSE_APPLY:
+        switch (id)
+        {
 
-    case IDC:
-      if (test_idc()) on_calc_idc_released (calc_win, NULL);
-      break;
+          ...
+
+          case IDC:
+            if (test_idc()) on_calc_idc_released (calc_win, NULL);
+            break;
+
+          ...
+
+        }
 
     ...
   }
