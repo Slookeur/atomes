@@ -152,6 +152,11 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading. 
 But that is ultimately up to you to decide. 
 
-My only concern at this point is to  
- 
+Please give a look to the **atomes** [project data structure][atomes_project] to know how to retrieve the elements you might need for your calculation, 
+at this point you only need to call the element of the active project `active_project`. 
+
+My only concern at this point is to ensure for the implementation in **atomes** to be as fast as possible. 
+That is why I am asking, if not done yet, you to parallelize the analysis in OpenMP. 
+
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
+[atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
