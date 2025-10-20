@@ -4,7 +4,7 @@
 
   - The new file must be located in the [`src/gui`][gui] directory
   - The new file must be named **analysis**call.c, in the following `idccall.c`
-  - The new file must contain the callback for the analysis, that is what happen when the user click on `Apply` in the calculation dialog. 
+  - The new file must contain the callback for the analysis, what happens when the user click on `Apply` in the calculation dialog. 
   - The new file can contain the analysis it-self
 
 ## 2. Writting the calculation callbacks in the file `analysiscall.c`
@@ -72,7 +72,9 @@ void init_idc ()
   for ( i = 0 ; i < active_project -> nspec ; i++ )
   {
     active_project -> analysis[IDC] -> curves[i] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[i]);
-  } 
+  }
+  // The total number of curves declare in this function
+  // should be equal to active_project -> analysis[IDC] -> numc
   addcurwidgets (activep, IDC, 0);
   active_project -> analysis[IDC] -> init_ok = TRUE;
 }
@@ -87,7 +89,12 @@ void init_idc ()
 void update_idc_view (project * this_proj)
 {
   gchar * str;
-  if (this_proj -> analysis[IDC] -> calc_buffer == NULL) this_proj -> analysis[IDC] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  if (this_proj -> analysis[IDC] -> calc_buffer == NULL)
+  {
+    // If this text buffer does not exist, then initialize it
+    this_proj -> analysis[IDC] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  } 
+  // Display the text buffer for the IDC calculation
   view_buffer (this_proj -> analysis[IDC] -> calc_buffer);
   print_info ("\n\nThis is the new IDC analysis\n\n", "heading", this_proj -> analysis[IDC] -> calc_buffer);
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[IDC] -> calc_buffer);
@@ -101,7 +108,9 @@ void update_idc_view (project * this_proj)
   print_info (str, "bold_blue", this_proj -> analysis[IDC] -> calc_buffer);
   g_free (str);
 
-  print_info (calculation_time(TRUE, this_proj -> analysis[IDC] -> calc_time), NULL, this_proj -> analysis[IDC] -> calc_buffer);
+  str = calculation_time (TRUE, this_proj -> analysis[IDC] -> calc_time);
+  print_info (str, NULL, this_proj -> analysis[IDC] -> calc_buffer);
+  g_free (str);
 }
 
 /*!
@@ -114,8 +123,9 @@ void update_idc_view (project * this_proj)
 */
 G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 {
-  // Initializing the graph for this calculation, if any
+  // Initializing the graph for this calculation, if this was done already
   if (! active_project -> analysis[IDC] -> init_ok)  init_idc ();
+  // Cleaning previous results, if any
   clean_curves_data (IDC, 0, active_project -> analysis[IDC] -> numc);
   prepostcalc (widg, FALSE, IDC, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
@@ -139,5 +149,9 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
 ## 3. Implementing the new analysis
 
+I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading. 
+But that is ultimately up to you to decide. 
+
+My only concern at this point is to  
  
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
