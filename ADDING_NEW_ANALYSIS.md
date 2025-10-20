@@ -135,7 +135,7 @@ Here is the step by step procedure:
                             "pixmaps/sp.png",
                             "pixmaps/ms.png",
                             "pixmaps/idc.png"};  // this is an example
-   ``
+    ```
 
 ### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
@@ -155,7 +155,7 @@ void init_atomes_analysis ()
 }
 ```
 > [!WARNING]
-> Analyis compatibility list MUST include its own unique ID, in the example IDC, and all other compatible analysis if any. 
+> Analyis compatibility list **MUST** include its own unique ID, in the example IDC, and all other compatible analysis if any. 
 > This information is used to handle superposition of data sets on graph windows 
 
 ### 4. Update the default availability for the new calculation:
