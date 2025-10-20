@@ -25,7 +25,7 @@ To get familiar with the code of the **atomes** program please refer to the exte
   - Prepare an image to illustrate the calculation for the GUI
     - PNG format 
     - 16x16 pixels 
-    - Place it in the `data/pixmaps` folder
+    - Place it in the `bin/pixmaps` folder
 
 ## Overview of the TODO list
 
