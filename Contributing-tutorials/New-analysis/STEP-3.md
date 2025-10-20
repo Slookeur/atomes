@@ -148,7 +148,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
 ```
  >[!IMPORTANT]
- > At this point **atomes** only cares for the elements of the active project.
+ > At this point **atomes** only cares for the elements of the active project and 
  > `active_project` is a pointer that was set on that particular project. 
 
 
