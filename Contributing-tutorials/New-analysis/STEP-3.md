@@ -8,7 +8,7 @@
   - The new file can contain the analysis it-self
 
  >[!WARNING]
- > The new file name must be unique, ensure that no other file in the project has the same name that the name you want to pick
+ > The new file name must be unique, ensure that no other file in the project has the same name !
 
 ## 2. Writting the calculation callbacks in the file `analysiscall.c`
 
@@ -150,7 +150,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 }
 
 ```
- >[!IMPORTANT]
+ >[!TIP]
  > At this point **atomes** only cares for the elements of the active project and 
  > `active_project` is a pointer that was set on that particular project. 
 
