@@ -125,7 +125,8 @@ Here is the step by step procedure:
                             "Mean Squared Displacement",
                             "The new analysis"};  // This is an example
     ```
-  - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
+
+    - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
 
     ```C
     gchar * graph_icon[] = {"pixmaps/gr.png",
