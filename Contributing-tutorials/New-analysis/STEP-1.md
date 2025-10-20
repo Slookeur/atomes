@@ -1,67 +1,11 @@
-# Adding a new analysis to the **atomes** software
+# Adding the new analysis description in the code
 
-This document describes the steps required to add a new analysis in **atomes** 
-and to make use of the [graph visualization system](https://atomes.ipcms.fr/analyze/) of the **atomes** program. 
-
-To get familiar with the code of the **atomes** program please refer to the extensive [Doxygen][Doxygen] code source [documentation][atomes_doxygen]
-
-## Before starting 
-
-  - If not done yet please give a look to the [`CONTRIBUTING.md`](https://github.com/Slookeur/atomes/blob/devel/CONTRIBUTING.md) document
-
-  - List all information required by this new analysis: 
-    - Required parameter(s) for the user to input
-    - Any requirement(s) for the calculation to be performed, for example:
-
-      - Is a box description required ? 
-      - Should periodic boundary condition be applied ?
-      - Should a prior calculation be performed ?
-      - Is a trajectory (multiple configurations) required ?
-
-  - **atomes** Graphical User Interface uses the GTK+ library, in a coded version and not a XML file version, 
-    meaning that it is required to code the dialog handling the calculation, I tried to simplify this as much as I could, 
-    but in the end it is impossible to simplify everything.  
-  
-  - Prepare an image to illustrate the calculation for the GUI
-    - PNG format 
-    - 16x16 pixels 
-    - Place it in the `data/pixmaps` folder
-
-## Overview of the TODO list
-
-  - **1** : Adding the new analysis description in the code
-  - **2** : Coding the new analysis user dialog and its callbacks
-  - **3** : Adding the new analysis using the **atomes** software internal data structures
-
-    - Create a new source file to implement the calculation
-    - Add this new file to the `Makefile`
-
-  - **4** : **atomes** release candidate requirements:
-
-    - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) file formats
-
-      - To save / read the new analysis parameter(s) and result(s)
-      - To ensure the reading compatibility of older `.apf` and `.awf` file formats
-
-    - Modifying the user preferences dialog to consider the new analysis default parameter(s)
-
-      - To save / read the new analysis parameter(s)
-      - To ensure the reading of older user preferences XML file (should be automatic)
-
-Overall step **1.** is easy, step **2.** and **3.** are slightly more complicated and might require my help.
- 
-Step **.4** is the most complicated part that will most likely require my help.
-
-## Adding the new analysis description in the code
-
-Here is the step by step procedure: 
-
-### 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
+## 0. Pick a 3 letter keyword to describe your new calculation, ex: ***IDC***
 
 > [!CAUTION]
 > In the following I will use the `IDC`, sometimes `idc` keywords as examples, remember to adjust it ! 
 
-### 1. Edit the file [`src/global.h`][global.h] to make the information available in other parts of the code:
+## 1. Edit the file [`src/global.h`][global.h] to make the information available in other parts of the code:
 
   - Increment the total number of calculations available : `NCALCS`
   ```C
@@ -92,7 +36,7 @@ Here is the step by step procedure:
 >The associated number should be the latest calculation ID number + 1,  
 >when I wrote this tutorial `MSD` was the last one set to 9. 
 
-### 2. Edit the file [`/src/gui/gui.c`][gui.c]
+## 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new analysis, and to create the corresponding menu elements:
 
     - [`gchar * calc_name`][calc_name] : append a line to add the new analysis name for the menu items
@@ -137,7 +81,7 @@ Here is the step by step procedure:
                             "pixmaps/idc.png"};  // this is an example
     ```
 
-### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
+## 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
 Search for the [`init_atomes_analysis`][init_atomes_analysis] function to declare the new analysis
 
@@ -158,7 +102,7 @@ void init_atomes_analysis ()
 > Analyis compatibility list **MUST** include its own unique ID, in the example IDC, and all other compatible analysis if any. 
 > This information is used to handle superposition of data sets on graph windows 
 
-### 4. Update the default availability for the new calculation:
+## 4. Update the default availability for the new calculation:
 
   - Edit [`src/project/update_p.c`][update_p.c] search for the [`update_analysis_availability`][update_analysis_availability] function to add the proper flags
 
@@ -193,7 +137,7 @@ void init_atomes_analysis ()
   }
   ```
 
-### 5. Optional graph setup, if any:
+## 5. Optional graph setup, if any:
 
   - Edit the file [`src/curve/cwidget.c`][cwidget.c] that contains few functions to tweak few graph related options
 
@@ -263,80 +207,6 @@ void init_atomes_analysis ()
 
 The autoscale is performed immediately after in this function. 
 
-## Coding the new analysis user dialog and its callbacks
-
-
-### 1. Edit the file [`src/gui/calc_menu.c`][calc_menu.c]
-
-  - In the function [`on_calc_activate`][on_calc_activate] add a test case for the new analysis
-
-  ```C
-  G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
-  {
-    ...
-
-    case IDC:
-      calc_idc (box);
-      break;
-      
-    ...
-  }
-  ```
-
-  - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
-
-  ```C
-  /*!
-    \fn void calc_idc (GtkWidget * vbox)
-
-    \brief creation of the idc calculation widgets
-
-    \param vbox GtkWidget that will receive the data
-  */
-  void calc_bonds (GtkWidget * vbox)
-  {
-    GtkWidget * idc_box;
-
-   // This part requires to be a litte bit familiar with GTK+
-
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
-  }
-  ```
-> [!TIP]
-> Many example are available in **atomes** source code, in particular in the file [`src/gui/calc_menu.c`][calc_menu.c]
-
-  - In the function [`run_on_calc_activate`][run_on_calc_activate] add a test case for the new analysis:
-
-  ```C
-  G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
-  {
-    ...
-
-    case IDC:
-      if (test_idc()) on_calc_idc_released (calc_win, NULL);
-      break;
-
-    ...
-  }
-  ```
-
-> [!TIP]
-> Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
-
-> [!IMPORTANT]
-> Note that `on_calc_idc_released` is a function you **MUST** write to perform the calculation (see bellow).
- 
-
-## Adding the new analysis using the **atomes** software internal data structures
-
-Create a new file
-
-
-## **atomes** release candidate requirements
-
-  - Finally `*.apf` and `*.awf` files version should evolve to save and read the new calculation data
-  - Ultimately: modify the `preferences.c` file to offer the options to save user preferences for this calculation
-
 [Doxygen]:https://www.doxygen.nl/
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
 [global.h]:https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html
@@ -353,8 +223,5 @@ Create a new file
 [update_analysis_availability]:to_be_added
 [cwidget.c]:https://slookeur.github.io/atomes-doxygen/d4/d80/cwidget_8c.html
 [yaxis.c]:https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html
-[calc_menu.c]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html
-[on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a981fd6ae8aa02f6ba86bbfdfbeace7ed
-[run_on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a7605cb93faba5139a75d08568f1fb0a0
 [DataLayout]:https://slookeur.github.io/atomes-doxygen/d0/d5d/struct_data_layout.html
 [Curve]:https://slookeur.github.io/atomes-doxygen/da/d6e/struct_curve.html
