@@ -138,7 +138,7 @@ Here is the step by step procedure:
                             "pixmaps/ch.png",
                             "pixmaps/sp.png",
                             "pixmaps/ms.png",
-                            "pixmaps/idc.png};  // this is an example
+                            "pixmaps/idc.png"};  // this is an example
   ```
 
 ### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
@@ -348,6 +348,7 @@ Create a new file
 [analyze_acts]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee
 [calc_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735
 [graph_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
+[graph_icon]:
 [atomes_menu_bar_action]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#acd3996df411bbbd56fd07fdb40953f75
 [create_main_window]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a92f4ba1abecbb26e2b9e934397930f37
 [init.c]:https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html
