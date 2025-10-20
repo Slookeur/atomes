@@ -123,6 +123,7 @@ void update_idc_view (project * this_proj)
 */
 G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 {
+  // active_project is a pointer on the active atomes project
   // Initializing the graph for this calculation, if this was done already
   if (! active_project -> analysis[IDC] -> init_ok)  init_idc ();
   // Cleaning previous results, if any
@@ -146,6 +147,10 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 }
 
 ```
+ >[!IMPORTANT]
+ > At this point **atomes** only cares for the elements of the active project.
+ > `active_project` is a pointer that was set on that particular project. 
+
 
 ## 3. Implementing the new analysis
 
