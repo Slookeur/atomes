@@ -7,6 +7,9 @@
   - The new file must contain the callback for the analysis, what happens when the user click on `Apply` in the calculation dialog. 
   - The new file can contain the analysis it-self
 
+ >[!WARNING]
+ > The new file name must be unique, ensure that no other file in the project has the same name that the name you want to pick
+
 ## 2. Writting the calculation callbacks in the file `analysiscall.c`
 
 ```C
@@ -158,12 +161,50 @@ I would recommend to put the analysis, and therefore the implementation of the `
 But that is ultimately up to you to decide. 
 
 Please give a look to the **atomes** [project data structure][atomes_project] to know how to retrieve the elements you might need for your calculation, 
-at this point you only need to call the element of the active project `active_project`. 
+and remember that at this point you only need to call the element of the active project `active_project`. 
 
  >[!IMPORTANT]
  > To ensure for the implementation in **atomes** to be as fast as possible,  
  > I am asking you, if not done yet, to parallelize the analysis in OpenMP. 
  > Do not hesitate to ask for my help in the process.
 
+## 4. Modifying the [Makefile][makefile]
+
+  - Add the `analysiscall.c` file to the `OBJ_GUI` variable: 
+  
+  ```Makefile
+
+  ...
+
+  OBJ_GUI = \
+ 
+   ...
+
+    $(OBJ)msdcall.o \
+    $(OBJ)idccall.o \
+    $(OBJ)main.o
+
+  ```
+
+  - Add the building instructions for the `analysiscall.c` file
+
+  ```Makefile
+
+  ...
+
+  # GUI
+
+  ...
+
+  $(OBJ)msdcall.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)msdcall.o $(GUI)msdcall.c $(INCLUDES)
+  $(OBJ)idccall.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)idccall.o $(GUI)idccall.c $(INCLUDES)
+ 
+  ... 
+
+   ```
+
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
 [atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
+[makefile]:https://github.com/Slookeur/atomes/blob/devel/Makefile
