@@ -139,7 +139,7 @@ Here is the step by step procedure:
 
 ### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
-Search for the [`atomes_analysis`][atomes_analysis] function to declare the new analysis
+Search for the [`init_atomes_analysis`][init_atomes_analysis] function to declare the new analysis
 
 ```C
 void init_atomes_analysis ()
@@ -257,7 +257,7 @@ void init_atomes_analysis ()
   ```
 
 > [!TIP]
-> By default **atomes** will just take the minimum and maximum values for calculation based on the result(s)
+> By default **atomes** will just take the minimum and maximum values for an analysis based on the calculation result(s)
 >
 > This is to enforce to use other set of parameters as min and max values for x and / or y axis.
 
@@ -344,11 +344,11 @@ Create a new file
 [analyze_acts]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a63faa9f0b3e4a03314fadd5c0e0072ee
 [calc_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#af7398ae8daba1bd18190e2cea0ff7735
 [graph_name]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
-[graph_icon]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#ac889711808825fe192212c8a19e2d2b3
+[graph_icon]:to_be_added
 [atomes_menu_bar_action]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#acd3996df411bbbd56fd07fdb40953f75
 [create_main_window]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html#a92f4ba1abecbb26e2b9e934397930f37
 [init.c]:https://slookeur.github.io/atomes-doxygen/d9/d35/initc_8c.html
-[atomes_analysis]:to_be_addedd
+[init_atomes_analysis]:to_be_added
 [update_p.c]:https://slookeur.github.io/atomes-doxygen/db/d3e/update__p_8c.html
 [update_analysis_availability]:to_be_added
 [cwidget.c]:https://slookeur.github.io/atomes-doxygen/d4/d80/cwidget_8c.html
