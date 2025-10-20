@@ -65,7 +65,7 @@ Here is the step by step procedure:
 
   - Increment the total number of calculations available : `NCALCS`
   ```C
-  #define NCALCS 10
+  #define NCALCS 1**1**
   ```
 
   - Increment the total number of calculations using graphs : `NGRAPHS`
