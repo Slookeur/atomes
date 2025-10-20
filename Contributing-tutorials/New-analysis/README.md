@@ -31,11 +31,7 @@ To get familiar with the code of the **atomes** program please refer to the exte
 
   - **1** : Adding the new analysis description in the code
   - **2** : Coding the new analysis user dialog and its callbacks
-  - **3** : Adding the new analysis using the **atomes** software internal data structures
-
-    - Create a new source file to implement the calculation
-    - Add this new file to the `Makefile`
-
+  - **3** : Adding the new analysis to the **atomes** software
   - **4** : **atomes** release candidate requirements:
 
     - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) file formats
@@ -56,7 +52,7 @@ Step **.4** is the most complicated part that will most likely require my help.
 
 ## [Coding the new analysis user dialog and its callbacks][codding]
 
-## [Adding the new analysis using the **atomes** software internal data structures][analysing]
+## [Adding the new analysis to the **atomes** software][analysing]
 
 ## [**atomes** release candidate requirements][releasing]
 
