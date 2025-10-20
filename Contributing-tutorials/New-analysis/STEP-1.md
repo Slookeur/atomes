@@ -106,6 +106,8 @@ void init_atomes_analysis ()
 
   - Edit [`src/project/update_p.c`][update_p.c] search for the [`update_analysis_availability`][update_analysis_availability] function to add the proper flags
 
+Specify if the analysis is always available, or if conditions have to be met:
+
   ```C
   void update_analysis_availability (project * this_proj)
   {
