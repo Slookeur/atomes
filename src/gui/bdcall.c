@@ -127,10 +127,12 @@ void restore_color_map (glwin * view, int * colm)
 */
 void recup_dmin_dmax_ (double * min, double * max)
 {
-  active_project -> analysis[BND] -> min = * min;
-  active_project -> analysis[BND] -> max = * max;
+  if (active_project -> analysis)
+  {
+    active_project -> analysis[BND] -> min = * min;
+    active_project -> analysis[BND] -> max = * max;
+  }
 }
-
 /*!
   \fn void initbd ()
 
@@ -519,6 +521,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
   int bonding = 0;
   int * colm = NULL;
 
+  // intitialize_this_analysis (active_project, BND);
   gboolean vis_bd = active_project -> analysis[BND] -> calc_ok;
   if (widg) bonds_update = 1;
   bonding = (active_project -> runc[0]) ? 1 : 0;

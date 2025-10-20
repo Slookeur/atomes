@@ -932,6 +932,7 @@ void prepare_preview (int active, int id, gboolean visible)
       active_glwin -> init = FALSE;
       active_image = active_glwin -> anim -> last -> img;
       lib_proj  -> runc[0] = TRUE;
+      init_atomes_analysis (TRUE);
       on_calc_bonds_released (NULL, NULL);
       lib_proj -> modelgl -> anim -> last -> img -> quality = 30;
       lib_proj -> modelgl -> anim -> last -> img -> rep = ORTHOGRAPHIC;

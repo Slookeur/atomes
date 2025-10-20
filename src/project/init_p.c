@@ -69,11 +69,14 @@ extern G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data);
 void init_curves_and_calc (project * this_proj)
 {
   int i;
-  for (i=0; i<NGRAPHS; i++)
+  if (this_proj -> analysis)
   {
-    this_proj -> analysis[i] -> avail_ok = FALSE;
-    this_proj -> analysis[i] -> init_ok = FALSE;
-    this_proj -> analysis[i] -> calc_ok = FALSE;
+    for (i=0; i<NGRAPHS; i++)
+    {
+      this_proj -> analysis[i] -> avail_ok = FALSE;
+      this_proj -> analysis[i] -> init_ok = FALSE;
+      this_proj -> analysis[i] -> calc_ok = FALSE;
+    }
   }
 }
 

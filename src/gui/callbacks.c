@@ -631,6 +631,10 @@ void run_project ()
 {
   if (! active_project -> run)
   {
+    if (! active_project -> analysis)
+    {
+      init_atomes_analysis (TRUE);
+    }
     int i, j;
     j = (active_cell -> npt) ? active_project -> steps : 1;
     for (i=0; i<j; i++)
@@ -645,10 +649,6 @@ void run_project ()
     }
     to_read_pos ();
     prep_pos_ (& active_cell -> pbc, & active_cell -> frac);
-    if (! active_project -> analysis)
-    {
-      init_atomes_analysis (TRUE);
-    }
     active_project -> dmtx = FALSE;
     active_project -> run = 1;
   }
