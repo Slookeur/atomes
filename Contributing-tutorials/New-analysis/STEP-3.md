@@ -67,13 +67,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 void init_idc ()
 {
-  int i, j;
+  int i;
   // In this example a result is described for each chemical species.
-  i = 0;
-  for ( j = 0 ; j < active_project -> nspec ; j++ )
+  for ( i = 0 ; i < active_project -> nspec ; i++ )
   {
-    active_project -> analysis[IDC] -> curves[j] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[j]);
-    i=i+1;
+    active_project -> analysis[IDC] -> curves[i] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[i]);
   } 
   addcurwidgets (activep, IDC, 0);
   active_project -> analysis[IDC] -> init_ok = TRUE;
