@@ -1,8 +1,8 @@
 # Coding the new analysis user dialog and its callbacks
 
-## 1. Edit the file [`src/gui/calc_menu.c`][calc_menu.c]
+## Edit the file [`src/gui/calc_menu.c`][calc_menu.c]
 
-  - In the function [`run_on_calc_activate`][run_on_calc_activate] add a test case for the new analysis:
+  1. In the function [`run_on_calc_activate`][run_on_calc_activate] add a test case for the new analysis:
 
   ```C
   G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
@@ -23,7 +23,7 @@
 > [!IMPORTANT]
 > Note that `on_calc_idc_released` is a function you **MUST** write to perform the calculation ([see next step][step-3]).
  
-  - In the function [`on_calc_activate`][on_calc_activate] add a test case for the new analysis
+  2. In the function [`on_calc_activate`][on_calc_activate] add a test case for the new analysis
 
   ```C
   G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
@@ -40,7 +40,7 @@
 > [!IMPORTANT]
 > Note that `calc_idc` is a function you **MUST** write to describe the user dialog for the analysis (see below).
 
-  - Write the `calc_idc` function that describes the calculation dialog for the new analysis:
+  3. Write the `calc_idc` function that describes the calculation dialog for the new analysis:
 
   ```C
   /*!
