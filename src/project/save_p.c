@@ -73,6 +73,39 @@ int save_this_string (FILE * fp, gchar * string)
 }
 
 /*!
+  \fn int save_analysis (FILE * fp, atomes_analysis * this_analysis)
+
+  \brief
+
+  \param fp the file pointer
+  \param this_analysis the target analysis
+*/
+int save_analysis (FILE * fp, atomes_analysis * this_analysis)
+{
+  if (fwrite (& this_analysis -> aid, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (save_this_string (fp, this_analysis -> name) != OK) return ERROR_PROJECT;
+
+  if (fwrite (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (this_analysis -> x_title)
+  {
+
+  }
+  if (fwrite (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> min, sizeof(double), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> max, sizeof(double), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (this_analysis -> graph_res)
+  {
+    if (fwrite (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& this_analysis -> c_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  }
+}
+
+/*!
   \fn int save_project (FILE * fp, project * this_proj, int npi)
 
   \brief save project to file
