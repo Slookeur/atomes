@@ -135,7 +135,7 @@ Here is the step by step procedure:
                             "pixmaps/sp.png",
                             "pixmaps/ms.png",
                             "pixmaps/idc.png"};  // this is an example
-   ```
+   ``
 
 ### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
