@@ -398,7 +398,7 @@ extern gchar * ATOMES_CONFIG;
 extern gchar * ATOMES_URL;
 
 extern gchar * mode_name[2];
-extern gchar * graph_img[NGRAPHS];
+extern gchar * graph_img[NCALCS];
 extern gchar * dots[NDOTS];
 extern gchar * bravais_img[14];
 extern gchar * ifield[8];

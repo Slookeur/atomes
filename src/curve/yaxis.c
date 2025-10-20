@@ -73,20 +73,23 @@ void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, 
       this_curve -> axmax[aid] = max(this_curve -> axmax[aid], this_curve -> data[aid][i]);
       this_curve -> axmin[aid] = min(this_curve -> axmin[aid], this_curve -> data[aid][i]);
     }
-    CurveExtra * ctmp = this_curve -> extrac -> first;
-    project * that_proj;
-    for ( j=0 ; j < this_curve -> extrac -> extras ; j++ )
+    if (this_curve -> extrac)
     {
-      m = ctmp -> id.a;
-      k = ctmp -> id.b;
-      l = ctmp -> id.c;
-      that_proj = get_project_by_id(m);
-      for ( i=n ; i < that_proj -> analysis[k] -> curves[l] -> ndata ; i++ )
+      CurveExtra * ctmp = this_curve -> extrac -> first;
+      project * that_proj;
+      for ( j=0 ; j < this_curve -> extrac -> extras ; j++ )
       {
-        this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
-        this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
+        m = ctmp -> id.a;
+        k = ctmp -> id.b;
+        l = ctmp -> id.c;
+        that_proj = get_project_by_id(m);
+        for ( i=n ; i < that_proj -> analysis[k] -> curves[l] -> ndata ; i++ )
+        {
+          this_curve -> axmax[aid] = max(this_curve -> axmax[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
+          this_curve -> axmin[aid] = min(this_curve -> axmin[aid], that_proj -> analysis[k] -> curves[l] -> data[aid][i]);
+        }
+        if (ctmp -> next != NULL) ctmp = ctmp -> next;
       }
-      if (ctmp -> next != NULL) ctmp = ctmp -> next;
     }
   }
 

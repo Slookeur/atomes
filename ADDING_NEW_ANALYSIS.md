@@ -25,7 +25,7 @@ To get familiar with the code of the **atomes** program please refer to the exte
   - Prepare an image to illustrate the calculation for the GUI
     - PNG format 
     - 16x16 pixels 
-    - Place it in the `data/pixmaps` folder.
+    - Place it in the `data/pixmaps` folder
 
 ## Overview of the TODO list
 
@@ -93,32 +93,16 @@ Here is the step by step procedure:
 >when I wrote this tutorial `MSD` was the last one set to 9. 
 
 ### 2. Edit the file [`/src/gui/gui.c`][gui.c]
-  - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
+  - At the top modify the following variables to describe the new analysis, and to create the corresponding menu elements:
 
-    - [`char * calc_name[]`][calc_name] : append a line to add the new calculation name for the menu items
+    - [`gchar * calc_name`][calc_name] : append a line to add the new analysis name for the menu items
  
     ```C
-    char * calc_name[] = {"g(r)/G(r)",
-                          "S(q) from FFT[g(r)]",
-                          "S(q) from Debye equation",
-                          "g(r)/G(r) from FFT[S(q)]",
-                          "Bonds and angles",
-                          "Ring statistics",
-                          "Chain statistics",
-                          "Spherical harmonics",
-                          "Mean Squared Displacement",
-                          "The new analysis"};  // This is an example
-    ```
-
-    - [`char * graph_name[]`][graph_name] : append a line to add the new calculation name for the tool box window
-
-    ```C
-    char * graph_name[] = {"g(r)/G(r)",
+    gchar * calc_name[] = {"g(r)/G(r)",
                            "S(q) from FFT[g(r)]",
                            "S(q) from Debye equation",
                            "g(r)/G(r) from FFT[S(q)]",
-                           "Bonds properties",
-                           "Angle distributions",
+                           "Bonds and angles",
                            "Ring statistics",
                            "Chain statistics",
                            "Spherical harmonics",
@@ -126,17 +110,35 @@ Here is the step by step procedure:
                            "The new analysis"};  // This is an example
     ```
 
-  - In the function [`create_main_window`][create_main_window] declare the icon for the new calculation:
+    - [`gchar * graph_name`][graph_name] : append a line to add the new analysis name for the tool box window
 
-  ```C
-  GtkWidget * create_main_window (GApplication * atomes)
-  {
-    ...
+    ```C
+    gchar * graph_name[] = {"g(r)/G(r)",
+                            "S(q) from FFT[g(r)]",
+                            "S(q) from Debye equation",
+                            "g(r)/G(r) from FFT[S(q)]",
+                            "Bonds properties",
+                            "Angle distributions",
+                            "Ring statistics",
+                            "Chain statistics",
+                            "Spherical harmonics",
+                            "Mean Squared Displacement",
+                            "The new analysis"};  // This is an example
+    ```
+  - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
 
-    graph_img[IDC] = g_build_filename (PACKAGE_PREFIX, "pixmaps/idc.png", NULL);  // This is an example
-
-    ...
-  }
+    ```C
+    gchar * graph_icon[] = {"pixmaps/gr.png",
+                            "pixmaps/sq.png",
+                            "pixmaps/sq.png",
+                            "pixmaps/gr.png",
+                            "pixmaps/bd.png",
+                            "pixmaps/an.png",
+                            "pixmaps/ri.png",
+                            "pixmaps/ch.png",
+                            "pixmaps/sp.png",
+                            "pixmaps/ms.png",
+                            "pixmaps/idc.png};  // this is an example
   ```
 
 ### 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
@@ -150,12 +152,15 @@ void init_atomes_analysis ()
 
   int num_g = ;             // Total number of graph windows as result(s) of the analysis
   int num_c = ;             // Number of analysis compatible, to allow overlap of the data on the graph window
-  int c_list[num_c] = {};   // List of compatible analysis, including self
+  int c_list[num_c] = {};   // List of compatible analysis, integer list in the ID list, including self
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_g, num_c, c_list);  // This is an example
 
   ...
 }
 ```
+> [!WARNING]
+> Analyis compatibility list MUST include its own unique ID, in the example IDC, and all other compatible analysis if any. 
+> This information is used to handle superposition of data sets on graph windows 
 
 ### 4. Update the default availability for the new calculation:
 

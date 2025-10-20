@@ -436,10 +436,10 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
     }
     for (i=0; i<2; i++)
     {
-      j = this_curve -> extrac -> extras;
-      this_curve -> extrac -> extras = 0;
+      j = (this_curve -> extrac) ? this_curve -> extrac -> extras : 0;
+      if (this_curve -> extrac) this_curve -> extrac -> extras = 0;
       autoscale_axis (active_project, this_curve, * rid, * cid, i);
-      this_curve -> extrac -> extras = j;
+      if (this_curve -> extrac) this_curve -> extrac -> extras = j;
       this_curve -> majt[i] = scale (this_curve -> axmax[i] - this_curve -> axmin[i]);
       this_curve -> mint[i] = 2;
     }

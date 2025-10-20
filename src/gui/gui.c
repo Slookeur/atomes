@@ -103,42 +103,43 @@ GtkWidget * MainEvent;
 #endif
 
 gchar * dots[NDOTS];
-gchar * graph_img[NGRAPHS];
+gchar * graph_img[NCALCS];
 
 atomes_action edition_acts[] = {{"edit.chemistry",   GINT_TO_POINTER(0)},
                                 {"edit.periodicity", GINT_TO_POINTER(1)},
                                 {"edit.cutoffs",     GINT_TO_POINTER(2)}};
 
-atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
-                                {"analyze.sq",     GINT_TO_POINTER(SQD)},
-                                {"analyze.sk",     GINT_TO_POINTER(SKD)},
-                                {"analyze.gk",     GINT_TO_POINTER(GDK)},
-                                {"analyze.bonds",  GINT_TO_POINTER(BND)},
-                                {"analyze.rings",  GINT_TO_POINTER(RIN-1)},
-                                {"analyze.chains", GINT_TO_POINTER(CHA-1)},
-                                {"analyze.sp",     GINT_TO_POINTER(SPH-1)},
-                                {"analyze.msd",    GINT_TO_POINTER(MSD-1)}};
-
-char * calc_name[] = {"g(r)/G(r)",
-                      "S(q) from FFT[g(r)]",
-                      "S(q) from Debye equation",
-                      "g(r)/G(r) from FFT[S(q)]",
-                      "Bonds and angles",
-                      "Ring statistics",
-                      "Chain statistics",
-                      "Spherical harmonics",
-                      "Mean Squared Displacement"};
-
-char * graph_name[] = {"g(r)/G(r)",
+gchar * calc_name[] = {"g(r)/G(r)",
                        "S(q) from FFT[g(r)]",
                        "S(q) from Debye equation",
                        "g(r)/G(r) from FFT[S(q)]",
-                       "Bonds properties",
-                       "Angle distributions",
+                       "Bonds and angles",
                        "Ring statistics",
                        "Chain statistics",
                        "Spherical harmonics",
                        "Mean Squared Displacement"};
+
+gchar * graph_name[] = {"g(r)/G(r)",
+                        "S(q) from FFT[g(r)]",
+                        "S(q) from Debye equation",
+                        "g(r)/G(r) from FFT[S(q)]",
+                        "Bonds properties",
+                        "Angle distributions",
+                        "Ring statistics",
+                        "Chain statistics",
+                        "Spherical harmonics",
+                        "Mean Squared Displacement"};
+
+gchar * graph_icon[] = {"pixmaps/gr.png",
+                        "pixmaps/sq.png",
+                        "pixmaps/sq.png",
+                        "pixmaps/gr.png",
+                        "pixmaps/bd.png",
+                        "pixmaps/an.png",
+                        "pixmaps/ri.png",
+                        "pixmaps/ch.png",
+                        "pixmaps/sp.png",
+                        "pixmaps/ms.png"};
 
 tint cut_sel;
 dint davect[9];
@@ -536,7 +537,7 @@ void add_analysis_action (int act)
   GSimpleAction * this_action = g_simple_action_new (str, NULL);
   g_free (str);
   g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(this_action));
-  // g_signal_connect (this_action, "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(act));
+  g_signal_connect (this_action, "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(act));
 }
 
 /*!
@@ -572,7 +573,7 @@ void remove_edition_and_analyze_actions ()
   remove_edition_actions ();
   int i;
   gchar * str;
-  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
+  for (i=0; i<NCALCS-1; i++)
   {
     str = g_strdup_printf ("analyze.%d", i);
     remove_action (str);
@@ -978,10 +979,9 @@ GMenu * create_analyze_menu ()
   GMenu * menu = g_menu_new ();
   gchar * str;
   int i;
-  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
+  for (i=0; i<NCALCS-1; i++)
   {
     str = g_strdup_printf ("app.analyze.%d", i);
-    // analyze_acts[i].action_name);
     append_menu_item (menu, calc_name[i], str, NULL, NULL, IMG_FILE, graph_img[(i < ANG) ? i : i+1], FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
@@ -1087,16 +1087,10 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_window_set_resizable (GTK_WINDOW(window), TRUE);
   gtk_widget_set_size_request (window, 900, 450);
 
-  graph_img[0] = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
-  graph_img[1] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
-  graph_img[2] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
-  graph_img[3] = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
-  graph_img[4] = g_build_filename (PACKAGE_PREFIX, "pixmaps/bd.png", NULL);
-  graph_img[5] = g_build_filename (PACKAGE_PREFIX, "pixmaps/an.png", NULL);
-  graph_img[6] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ri.png", NULL);
-  graph_img[7] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ch.png", NULL);
-  graph_img[8] = g_build_filename (PACKAGE_PREFIX, "pixmaps/sp.png", NULL);
-  graph_img[9] = g_build_filename (PACKAGE_PREFIX, "pixmaps/ms.png", NULL);
+  for (i=0; i<NCALCS; i++)
+  {
+    graph_img[i] = g_build_filename (PACKAGE_PREFIX, graph_icon[i], NULL);
+  }
 
   atomes_action main_actions[] = {{ "workspace.open", GINT_TO_POINTER(2)},
                                   { "workspace.save",  GINT_TO_POINTER(3)},
