@@ -116,7 +116,7 @@ void update_idc_view (project * this_proj)
 /*!
   \fn G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
-  \brief compute the new analysis
+  \brief compute the new IDC analysis
 
   \param widg the GtkWidget sending the signal
   \param data the associated data pointer
@@ -155,8 +155,10 @@ But that is ultimately up to you to decide.
 Please give a look to the **atomes** [project data structure][atomes_project] to know how to retrieve the elements you might need for your calculation, 
 at this point you only need to call the element of the active project `active_project`. 
 
-My only concern at this point is to ensure for the implementation in **atomes** to be as fast as possible. 
-That is why I am asking, if not done yet, you to parallelize the analysis in OpenMP. 
+ >[!IMPORTANT]
+ > To ensure for the implementation in **atomes** to be as fast as possible,  
+ > I am asking you, if not done yet, to parallelize the analysis in OpenMP. 
+ > Do not hesitate to ask for my help in the process.
 
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
 [atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
