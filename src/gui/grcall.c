@@ -209,12 +209,12 @@ G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
   prepostcalc (widg, TRUE, GDR, i, 1.0);
   if (! i)
   {
-    remove_action (analyze_acts[SQD].action_name);
+    remove_action ("analyze.1");
     show_error ("The RDF's calculation has failed", 0, widg);
   }
   else
   {
-    add_action (analyze_actions[SQD]);
+    add_analysis_action (1);
     update_rdf_view (active_project, GDR);
     show_the_widgets (curvetoolbox);
   }

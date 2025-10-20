@@ -59,12 +59,14 @@ extern GtkTreeStore * tool_model;
 void prep_calc_actions ()
 {
   int i;
+  gchar * str;
   // Depends on the number of calculations available
-  for (i=0; i<G_N_ELEMENTS(analyze_actions); i++)
+  for (i=0; i<NCALCS-1; i++)
   {
+    str = g_strdup_printf ("analyze.%d", i);
     if (! active_project -> analysis)
     {
-      remove_action (analyze_acts[i].action_name);
+      remove_action (str);
     }
     else
     {
@@ -74,16 +76,16 @@ void prep_calc_actions ()
         {
           if (active_project -> analysis[i] -> avail_ok)
           {
-            add_action (analyze_actions[i]);
+            add_analysis_action (i);
           }
           else
           {
-            remove_action (analyze_acts[i].action_name);
+            remove_action (str);
           }
         }
         else
         {
-          remove_action (analyze_acts[i].action_name);
+          remove_action (str);
         }
       }
       else
@@ -92,19 +94,20 @@ void prep_calc_actions ()
         {
           if (active_project -> analysis[i+1] -> avail_ok)
           {
-            add_action (analyze_actions[i]);
+            add_analysis_action (i);
           }
           else
           {
-            remove_action (analyze_acts[i].action_name);
+            remove_action (str);
           }
         }
         else
         {
-          remove_action (analyze_acts[i].action_name);
+          remove_action (str);
         }
       }
     }
+    g_free (str);
   }
 }
 
@@ -256,16 +259,16 @@ void active_project_changed (int id)
     if (active_project -> analysis)
     {
       prep_calc_actions ();
-      add_action (edition_actions[0]);
+      g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[0]));
       if (active_cell -> npt)
       {
         remove_action (edition_acts[1].action_name);
       }
       else
       {
-        add_action (edition_actions[1]);
+        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[1]));
       }
-      add_action (edition_actions[2]);
+      g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
       fill_tool_model ();
       correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
       correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));

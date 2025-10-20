@@ -187,7 +187,6 @@ double opac = 0.75;
 double pi = 3.141592653589793238462643383279502884197;
 
 GSimpleAction * edition_actions[3];
-GSimpleAction * analyze_actions[9];
 
 GtkApplication * AtomesApp = NULL;
 GtkWidget * MainWindow = NULL;

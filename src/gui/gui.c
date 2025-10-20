@@ -39,7 +39,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void clean_view ();
   void view_buffer (GtkTextBuffer * buffer);
   void atomes_key_pressed (guint keyval, GdkModifierType state);
-  void add_action (GSimpleAction * action);
+  void add_analysis_action (int act);
   void remove_action (gchar * action_name);
   void remove_edition_actions ();
   void remove_edition_and_analyze_actions ();
@@ -389,53 +389,6 @@ void atomes_key_pressed (guint keyval, GdkModifierType state)
 }
 
 /*!
-  \fn void add_action (GSimpleAction * action)
-
-  \brief add action to the main window action map
-
-  \param action the GAction sending the signal the action to add
-*/
-void add_action (GSimpleAction * action)
-{
-  g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(action));
-}
-
-/*!
-  \fn void remove_action (gchar * action_name)
-
-  \brief add action from the main window action map
-
-  \param action_name the action to remove
-*/
-void remove_action (gchar * action_name)
-{
-  g_action_map_remove_action (G_ACTION_MAP(AtomesApp), (const gchar *)action_name);
-}
-
-/*!
-  \fn void remove_edition_actions ()
-
-  \brief remove all edition actions
-*/
-void remove_edition_actions ()
-{
-  int i;
-  for (i=0; i<G_N_ELEMENTS(edition_acts); i++) remove_action (edition_acts[i].action_name);
-}
-
-/*!
-  \fn void remove_edition_and_analyze_actions ()
-
-  \brief remove all edition and analysis action
-*/
-void remove_edition_and_analyze_actions ()
-{
-  remove_edition_actions ();
-  int i;
-  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++) remove_action (analyze_acts[i].action_name);
-}
-
-/*!
   \fn G_MODULE_EXPORT void show_periodic_table (GtkWidget * widg, gpointer data)
 
   \brief show the periodic table of the elements
@@ -540,42 +493,6 @@ G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * 
   {
     on_edit_activate (NULL, data);
   }
-  else if (g_strcmp0 (name, "analyze.gr") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.sq") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.sk") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.gk") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.bonds") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.rings") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.chains") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.sp") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
-  else if (g_strcmp0 (name, "analyze.msd") == 0)
-  {
-    on_calc_activate (NULL, data);
-  }
   else if (g_strcmp0 (name, "analyze.tool-box") == 0)
   {
     on_show_curve_toolbox (NULL, data);
@@ -598,7 +515,69 @@ G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * 
   {
     create_user_preferences_dialog ();
   }
+  else
+  {
+    // Only remains analysis actions
+    on_calc_activate (NULL, data);
+  }
   g_free (name);
+}
+
+/*!
+  \fn void add_analysis_action (int act)
+
+  \brief add action to the main window action map
+
+  \param the action the GAction sending the signal the action to add
+*/
+void add_analysis_action (int act)
+{
+  gchar * str = g_strdup_printf ("analyze.%d", act);
+  GSimpleAction * this_action = g_simple_action_new (str, NULL);
+  g_free (str);
+  g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(this_action));
+  // g_signal_connect (this_action, "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(act));
+}
+
+/*!
+  \fn void remove_action (gchar * action_name)
+
+  \brief add action from the main window action map
+
+  \param action_name the action to remove
+*/
+void remove_action (gchar * action_name)
+{
+  g_action_map_remove_action (G_ACTION_MAP(AtomesApp), (const gchar *)action_name);
+}
+
+/*!
+  \fn void remove_edition_actions ()
+
+  \brief remove all edition actions
+*/
+void remove_edition_actions ()
+{
+  int i;
+  for (i=0; i<G_N_ELEMENTS(edition_acts); i++) remove_action (edition_acts[i].action_name);
+}
+
+/*!
+  \fn void remove_edition_and_analyze_actions ()
+
+  \brief remove all edition and analysis action
+*/
+void remove_edition_and_analyze_actions ()
+{
+  remove_edition_actions ();
+  int i;
+  gchar * str;
+  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
+  {
+    str = g_strdup_printf ("analyze.%d", i);
+    remove_action (str);
+    g_free (str);
+  }
 }
 
 /*!
@@ -1001,7 +980,8 @@ GMenu * create_analyze_menu ()
   int i;
   for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
   {
-    str = g_strdup_printf ("app.%s", analyze_acts[i].action_name);
+    str = g_strdup_printf ("app.analyze.%d", i);
+    // analyze_acts[i].action_name);
     append_menu_item (menu, calc_name[i], str, NULL, NULL, IMG_FILE, graph_img[(i < ANG) ? i : i+1], FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
@@ -1142,7 +1122,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   for (i=0; i<G_N_ELEMENTS(main_actions); i++)
   {
     main_act[i] = g_simple_action_new (main_actions[i].action_name, NULL);
-    add_action (main_act[i]);
+    g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(main_act[i]));
     g_signal_connect (main_act[i], "activate", G_CALLBACK(atomes_menu_bar_action), main_actions[i].action_data);
   }
   for (i=0; i<G_N_ELEMENTS(edition_acts); i++)
@@ -1150,10 +1130,14 @@ GtkWidget * create_main_window (GApplication * atomes)
     edition_actions[i] = g_simple_action_new (edition_acts[i].action_name, NULL);
     g_signal_connect (edition_actions[i], "activate", G_CALLBACK(atomes_menu_bar_action), edition_acts[i].action_data);
   }
-  for (i=0; i<G_N_ELEMENTS(analyze_acts); i++)
+  gchar * str;
+  GSimpleAction * this_action;
+  for (i=0; i<NCALCS-1; i++)
   {
-    analyze_actions[i] = g_simple_action_new (analyze_acts[i].action_name, NULL);
-    g_signal_connect (analyze_actions[i], "activate", G_CALLBACK(atomes_menu_bar_action), analyze_acts[i].action_data);
+    str = g_strdup_printf ("analyze.%d", i);
+    this_action = g_simple_action_new (str, NULL);
+    g_free (str);
+    g_signal_connect (this_action, "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(i));
   }
 
   /*GtkBuilder * builder = gtk_builder_new_from_file ("menus/main.ui");

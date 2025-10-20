@@ -271,12 +271,12 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
     prepostcalc (widg, TRUE, SKD, j, 1.0);
     if (! j)
     {
-      remove_action (analyze_acts[GDK].action_name);
+      remove_action ("analyze.3");
       show_error ("The S(q) calculation has failed", 0, widg);
     }
     else
     {
-      add_action (analyze_actions[GDK]);
+      add_analysis_action (GDK);
       update_sq_view (active_project, SKD);
       show_the_widgets (curvetoolbox);
     }

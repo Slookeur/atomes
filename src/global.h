@@ -1069,9 +1069,8 @@ struct workspace
 
 extern atomes_action edition_acts[];
 extern atomes_action analyze_acts[];
-extern GSimpleAction * edition_actions[3];
-extern GSimpleAction * analyze_actions[9];
-extern void add_action (GSimpleAction * action);
+extern GSimpleAction * edition_actions[];
+extern void add_analysis_action (int act);
 extern void remove_action (gchar * action_name);
 extern void remove_edition_actions ();
 extern void remove_edition_and_analyze_actions ();

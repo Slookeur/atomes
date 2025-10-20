@@ -203,11 +203,14 @@ void close_project (project * to_close)
     {
       if (to_close -> analysis)
       {
-        to_close -> analysis[i] -> calc_ok = FALSE;
-        if (to_close -> analysis[i] -> curves)
+        if (to_close -> analysis[i])
         {
-          hide_curves (to_close, i);
-          erase_curves (to_close, i);
+          to_close -> analysis[i] -> calc_ok = FALSE;
+          if (to_close -> analysis[i] -> curves)
+          {
+            hide_curves (to_close, i);
+            erase_curves (to_close, i);
+          }
         }
       }
     }
@@ -288,13 +291,19 @@ void close_project (project * to_close)
           }
         }
       }
-      for (j=0; j<NGRAPHS; j++)
+      if (this_proj -> analysis)
       {
-        if (this_proj -> analysis[j] -> idcc != NULL)
+        for (j=0; j<NGRAPHS; j++)
         {
-          for (k=0; k<this_proj -> analysis[j] -> numc; k++)
+          if (this_proj -> analysis[j])
           {
-            this_proj -> analysis[j] -> idcc[k].a = i;
+            if (this_proj -> analysis[j] -> idcc != NULL)
+            {
+              for (k=0; k<this_proj -> analysis[j] -> numc; k++)
+              {
+                this_proj -> analysis[j] -> idcc[k].a = i;
+              }
+            }
           }
         }
       }
@@ -304,16 +313,22 @@ void close_project (project * to_close)
     for (i=0 ; i<nprojects ; i++)
     {
       this_proj -> id = i;
-      for (j=0; j<NGRAPHS; j++)
+      if (this_proj -> analysis)
       {
-        for (k=0; k<this_proj -> analysis[j] -> numc; k++)
+        for (j=0; j<NGRAPHS; j++)
         {
-          if (this_proj -> analysis[j] -> curves[k] -> window)
+          if (this_proj -> analysis[j])
           {
-            curve_window_add_menu_bar (&  this_proj -> analysis[j] -> idcc[k]);
-            if (is_the_widget_visible(this_proj -> analysis[j] -> curves[k] -> plot))
+            for (k=0; k<this_proj -> analysis[j] -> numc; k++)
             {
-              gtk_widget_queue_draw (this_proj -> analysis[j] -> curves[k] -> plot);
+              if (this_proj -> analysis[j] -> curves[k] -> window)
+              {
+                curve_window_add_menu_bar (&  this_proj -> analysis[j] -> idcc[k]);
+                if (is_the_widget_visible(this_proj -> analysis[j] -> curves[k] -> plot))
+                {
+                  gtk_widget_queue_draw (this_proj -> analysis[j] -> curves[k] -> plot);
+                }
+              }
             }
           }
         }

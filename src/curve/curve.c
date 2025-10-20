@@ -498,23 +498,29 @@ void remove_this_curve_from_extras (int a, int b, int c)
     if (i != a)
     {
       this_proj = get_project_by_id (i);
-      for (j=0; j<NCALCS; j++)
+      if (this_proj -> analysis)
       {
-        if (this_proj -> analysis[j] -> idcc != NULL)
+        for (j=0; j<NCALCS; j++)
         {
-          for (k=0; k<this_proj -> analysis[j] -> numc; k++)
+          if (this_proj -> analysis[j])
           {
-            if (this_proj -> analysis[j] -> curves[k] -> extrac > 0)
+            if (this_proj -> analysis[j] -> idcc != NULL)
             {
-              ctmp = this_proj -> analysis[j] -> curves[k] -> extrac -> first;
-              for (l=0; l<this_proj -> analysis[j] -> curves[k] -> extrac -> extras; l++)
+              for (k=0; k<this_proj -> analysis[j] -> numc; k++)
               {
-                if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
+                if (this_proj -> analysis[j] -> curves[k] -> extrac > 0)
                 {
-                  remove_extra (this_proj -> analysis[j] -> curves[k] -> extrac, ctmp);
-                  break;
+                  ctmp = this_proj -> analysis[j] -> curves[k] -> extrac -> first;
+                  for (l=0; l<this_proj -> analysis[j] -> curves[k] -> extrac -> extras; l++)
+                  {
+                    if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
+                    {
+                      remove_extra (this_proj -> analysis[j] -> curves[k] -> extrac, ctmp);
+                      break;
+                    }
+                    if (ctmp -> next != NULL) ctmp = ctmp -> next;
+                  }
                 }
-                if (ctmp -> next != NULL) ctmp = ctmp -> next;
               }
             }
           }

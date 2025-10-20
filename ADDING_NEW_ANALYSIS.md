@@ -95,21 +95,6 @@ Here is the step by step procedure:
 ### 2. Edit the file [`/src/gui/gui.c`][gui.c]
   - At the top modify the following variables to describe the new calculation, and to create the corresponding menu elements:
 
-    - [`atomes_action analyze_acts[]`][analyze_acts] : append a line similar to `{"analyze.idc",    GINT_TO_POINTER(IDC-1)}`
-
-    ```C
-    atomes_action analyze_acts[] = {{"analyze.gr",     GINT_TO_POINTER(GDR)},
-                                    {"analyze.sq",     GINT_TO_POINTER(SQD)},
-                                    {"analyze.sk",     GINT_TO_POINTER(SKD)},
-                                    {"analyze.gk",     GINT_TO_POINTER(GDK)},
-                                    {"analyze.bonds",  GINT_TO_POINTER(BND)},
-                                    {"analyze.rings",  GINT_TO_POINTER(RIN-1)},
-                                    {"analyze.chains", GINT_TO_POINTER(CHA-1)},
-                                    {"analyze.sp",     GINT_TO_POINTER(SPH-1)},
-                                    {"analyze.msd",    GINT_TO_POINTER(MSD-1)},
-                                    {"analyze.idc",    GINT_TO_POINTER(IDC-1)}};  // This is an example
-    ```
-
     - [`char * calc_name[]`][calc_name] : append a line to add the new calculation name for the menu items
  
     ```C
@@ -141,22 +126,6 @@ Here is the step by step procedure:
                            "The new analysis"};  // This is an example
     ```
 
-  - In the function [`atomes_menu_bar_action`][atomes_menu_bar_action] add the calculation menu callback:
-
-  ```C
-  G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
-  {
-    ...
-
-    else if (g_strcmp0 (name, "analyze.idc") == 0)  // Update this line using the value in analyze_acts[]
-    {
-      on_calc_activate (NULL, data); // This does not change
-    }
-
-    ...
-  }
-  ```
-
   - In the function [`create_main_window`][create_main_window] declare the icon for the new calculation:
 
   ```C
@@ -179,9 +148,9 @@ void init_atomes_analysis ()
 {
   ...
 
-  int num_g = ;        // Total number of graph windows as result(s) of the analysis
-  int num_c = ;        // Number of analysis compatible, to allow overlap of the data on the graph window
-  int * c_list = {};   // List of compatible analysis, including self
+  int num_g = ;             // Total number of graph windows as result(s) of the analysis
+  int num_c = ;             // Number of analysis compatible, to allow overlap of the data on the graph window
+  int c_list[num_c] = {};   // List of compatible analysis, including self
   active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_g, num_c, c_list);  // This is an example
 
   ...
