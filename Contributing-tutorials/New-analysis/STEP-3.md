@@ -3,11 +3,11 @@
 ## 1. Create a new file to implement the calculation
 
   - The new file must be located in the [`src/gui`][src-gui] directory
-  - The new file must be named `**analysis**call.c`
+  - The new file must be named **analysis**call.c, in the following `idccall.c`
   - The new file must contain the callback for the analysis, that is what happen when the user click on `Apply` in the calculation dialog. 
   - The new file can contain the analysis it-self
 
-## 2. Writting the calculation callbacks in the file `**analysis**call.c`
+## 2. Writting the calculation callbacks in the file `analysiscall.c`
 
 ```C
 /* This file is part of the 'atomes' software
@@ -142,4 +142,4 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 ## 3. Implementing the new analysis
 
  
-
+[gui.c]:https://slookeur.github.io/atomes-doxygen/d5/d03/gui_8c.html
