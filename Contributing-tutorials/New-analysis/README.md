@@ -48,13 +48,13 @@ Overall step **1.** is easy, step **2.** and **3.** are slightly more complicate
  
 Step **.4** is the most complicated part that will most likely require my help.
 
-## [Adding the new analysis description in the code][adding]
+## 1. [Adding the new analysis description in the code][adding]
 
-## [Coding the new analysis user dialog and its callbacks][codding]
+## 2. [Coding the new analysis user dialog and its callbacks][codding]
 
-## [Adding the new analysis to the **atomes** software][analysing]
+## 3. [Adding the new analysis to the **atomes** software][analysing]
 
-## [**atomes** release candidate requirements][releasing]
+## 4. [**atomes** release candidate requirements][releasing]
 
 
 [Doxygen]:https://www.doxygen.nl/
