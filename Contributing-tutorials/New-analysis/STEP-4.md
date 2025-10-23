@@ -88,22 +88,27 @@ This is only required if:
   - You modified the `atomes_anlysis` data structure to match your requirements
   - You need to save more information than available in the current data structure
 
-#### 1. Modifying the file `src/project/open_p.c`
+#### 1. Modifying the file  [`src/project/open_p.c`][open_p.c]
 
 This is actually mandatory
 
 ### 2. Reading the IDC analysis calculation data 
 
-#### 1. Modifying the file `src/project/save_p.c` 
+#### 1. Modifying the file [`src/project/save_p.c`][save_p.c]
 
   - Incrementing the project file version number
 
 ### 
 
-## 3. Modifying the `preferences.c` file to save and read user preferences
+## 3. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 
 
 ## 4. Modifyinf the GNU archive for the official software distribution
 
 
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
+[open_p.c]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html
+[open_project]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html#a0b222c223270264f9754d008a37317aa
+[calcs_to_read]:to_be_done
+[save_p.c]:https://slookeur.github.io/atomes-doxygen/d7/d70/save__p_8c.html
+[preferences.c]:https://slookeur.github.io/atomes-doxygen/de/dee/preferences_8c.html
