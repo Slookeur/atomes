@@ -143,7 +143,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
   prepostcalc (widg, TRUE, IDC, (! res_idc) ? 1 : 0, 1.0);
   if (res_idc)
   {
-    // You can decided to specify the reason of the error at this point
+    // You can announce the error of the analysis at this point
     // If needed use the value of 'res_idc' to select the error message to diplay
     show_error ("The IDC calculation has failed", 0, widg);
   }
