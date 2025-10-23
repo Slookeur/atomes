@@ -129,16 +129,22 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
   // active_project is a pointer on the active atomes project
   // Initializing the graph for this calculation, if this was done already
   if (! active_project -> analysis[IDC] -> init_ok)  init_idc ();
+
   // Cleaning previous results, if any
   clean_curves_data (IDC, 0, active_project -> analysis[IDC] -> numc);
   prepostcalc (widg, FALSE, IDC, 0, opac);
   clock_gettime (CLOCK_MONOTONIC, & start_time);
-  int i = calc_idc ( ); // The calculation is perfomed here, getting back and integer value as status (1 = ok, 0 = bad)
+
+  // The IDC calculation is perfomed on the next line, result status is an integer (0 = ok, other = error)
+  int res_idc = calc_idc ( ); 
+
   clock_gettime (CLOCK_MONOTONIC, & stop_time);  
   active_project -> analysis[IDC] -> calc_time = get_calc_time (start_time, stop_time);
-  prepostcalc (widg, TRUE, IDC, i, 1.0);
-  if (! i)
+  prepostcalc (widg, TRUE, IDC, (! res_idc) ? 1 : 0, 1.0);
+  if (res_idc)
   {
+    // You can decided to specify the reason of the error at this point
+    // If needed use the value of 'res_idc' to select the error message to diplay
     show_error ("The IDC calculation has failed", 0, widg);
   }
   else
