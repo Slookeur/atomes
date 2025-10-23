@@ -58,7 +58,6 @@ For that edit the file [`src/project/open_pc.c`][open_p.c]
 
     ...
     calcs_to_read --;
- 
   }
   ```
 Repeat the process for any version listed in that testing section, you might need to decrement even more the value of `calcs_to_read`:
