@@ -57,6 +57,7 @@ For that edit the file [`src/project/open_pc.c`][open_p.c]
   {
 
     ...
+
     calcs_to_read --;
   }
   ```
