@@ -993,7 +993,6 @@ struct project
   */
   /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   atomes_analysis ** analysis;         /*!< The analysis data and results */
-  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
 
   int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
   gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
@@ -1029,6 +1028,9 @@ struct project
                                             1 = Standard deviation for CpS */
   double fact[4];                      /*!< Gaussian smoothing factors: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt */
   double sk_advanced[2];               /*!< */
+
+  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for general information */
+
   /*
      OpenGL related parameters
   */

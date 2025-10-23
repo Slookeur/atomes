@@ -442,7 +442,7 @@ int open_project (FILE * fp, int npi)
           {
             active_project -> analysis[SPH] -> numc = j;
             alloc_analysis_curves (active_project -> analysis[SPH]);
-            addcurwidgets (activep, SPH, 0);
+            add_curve_widgets (activep, SPH, 0);
             active_project -> analysis[SPH] -> avail_ok = TRUE;
             for (k=0; k<j; k++)
             {

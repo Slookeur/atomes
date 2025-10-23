@@ -84,7 +84,7 @@ void initsh (int str)
       }
       k += active_coord -> ntg[1][i]+1;
     }
-    addcurwidgets (activep, SPH, 0);
+    add_curve_widgets (activep, SPH, 0);
     active_project -> analysis[SPH] -> init_ok = TRUE;
   }
 }
@@ -194,7 +194,6 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
     k = 0;
     l = active_project -> nspec;
     m = active_project -> analysis[SPH] -> num_delta;
-    clock_gettime (CLOCK_MONOTONIC, & start_time);
     for (i=0; i<active_project -> nspec; i++)
     {
       for (j=0; j< active_coord -> ntg[1][i]; j++)
@@ -204,8 +203,6 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
         k ++;
       }
     }
-    clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SPH] -> calc_time = get_calc_time (start_time, stop_time);
     if (l != active_project -> analysis[SPH] -> numc)
     {
       i = 0;

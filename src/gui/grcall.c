@@ -112,7 +112,7 @@ void initgr (int r)
     k=k+1;
     active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[CC] - smoothed");
   }
-  addcurwidgets (activep, r, 0);
+  add_curve_widgets (activep, r, 0);
   active_project -> analysis[r] -> init_ok = TRUE;
 }
 
@@ -202,10 +202,7 @@ G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
   clean_curves_data (GDR, 0, active_project -> analysis[GDR] -> numc);
   active_project -> analysis[GDR] -> delta = active_project -> analysis[GDR] -> max / active_project -> analysis[GDR] -> num_delta;
   prepostcalc (widg, FALSE, GDR, 0, opac);
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
   i = g_of_r_ (& active_project -> analysis[GDR] -> num_delta, & active_project -> analysis[GDR] -> delta, & fitc);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[GDR] -> calc_time = get_calc_time (start_time, stop_time);
   prepostcalc (widg, TRUE, GDR, i, 1.0);
   if (! i)
   {
@@ -323,12 +320,9 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
   clean_curves_data (GDK, 0, active_project -> analysis[GDK] -> numc);
   active_project -> analysis[GDK] -> delta = active_project -> analysis[GDK] -> max / active_project -> analysis[GDK] -> num_delta;
   prepostcalc (widg, FALSE, GDK, 0, opac);
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
   i = g_of_r_fft_ (& active_project -> analysis[GDK] -> num_delta,
                    & active_project -> analysis[GDK] -> delta,
                    & active_project -> analysis[GDK] -> max);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[GDK] -> calc_time = get_calc_time (start_time, stop_time);
   prepostcalc (widg, TRUE, GDK, i, 1.0);
   if (! i)
   {

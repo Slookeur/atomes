@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve);
   void initcurve (project * pid, int rid, int cid);
-  void addcurwidgets (int pid, int rid, int str);
+  void add_curve_widgets (int pid, int rid, int str);
 
   DataLayout * curve_default_layout (project * pid, int rid, int cid);
 
@@ -248,7 +248,7 @@ void initcurve (project * pid, int rid, int cid)
 }
 
 /*!
-  \fn void addcurwidgets (int pid, int rid, int str)
+  \fn void add_curve_widgets (int pid, int rid, int str)
 
   \brief add curve widgets to the project
 
@@ -256,7 +256,7 @@ void initcurve (project * pid, int rid, int cid)
   \param rid the analysis id
   \param str at the project creation stage (1) or latter on (0)
 */
-void addcurwidgets (int pid, int rid, int str)
+void add_curve_widgets (int pid, int rid, int str)
 {
   int j, k;
   project * this_proj = get_project_by_id(pid);

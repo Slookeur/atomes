@@ -61,11 +61,14 @@ extern void apply_analysis_default_parameters_to_project (project * this_proj);
 void clean_curves_data (int calc, int start, int end)
 {
   int i;
-  for (i=start; i<end; i++)
+  if (active_project -> analysis[calc])
   {
     if (active_project -> analysis[calc] -> curves)
     {
-      clean_this_curve_window (i, calc);
+      for (i=start; i<end; i++)
+      {
+        clean_this_curve_window (i, calc);
+      }
     }
   }
 }
@@ -83,12 +86,10 @@ void clean_curves_data (int calc, int start, int end)
 */
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc)
 {
-  //int i;
-//  char * bar[2] = {"bond properties", "nearest neigbhors table"};
-//  char * mess;
   if (run < NGRAPHS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
   if (! status)
   {
+    clock_gettime (CLOCK_MONOTONIC, & start_time);
 #ifdef GTK3
     if (widg != NULL) gdk_window_set_opacity (gtk_widget_get_window(widg), opc);
 #endif
@@ -110,6 +111,11 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
     {
       //gtk_statusbar_remove (statusbar, run, statusval);
       //destroy_this_widget(pop);
+    }
+    if (run > -1)
+    {
+      clock_gettime (CLOCK_MONOTONIC, & stop_time);
+      active_project -> analysis[run] -> calc_time = get_calc_time (start_time, stop_time);
     }
 #ifdef GTK3
     if (widg != NULL) gdk_window_set_opacity (gtk_widget_get_window(widg), opc);

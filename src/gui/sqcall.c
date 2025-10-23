@@ -108,7 +108,7 @@ void initsq (int r)
     k=k+1;
     active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ] - smoothed");
   }
-  addcurwidgets (activep, r, 0);
+  add_curve_widgets (activep, r, 0);
   active_project -> analysis[r] -> init_ok = TRUE;
 }
 
@@ -196,12 +196,9 @@ G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data)
   clean_curves_data (SQD, 0, active_project -> analysis[SQD] -> numc);
   active_project -> analysis[SQD] -> delta = (active_project -> analysis[SQD] -> max - active_project -> analysis[SQD] -> min) / active_project -> analysis[SQD] -> num_delta;
   prepostcalc (widg, FALSE, SQD, 0, opac);
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
   i = s_of_q_ (& active_project -> analysis[SQD] -> max,
                & active_project -> analysis[SQD] -> min,
                & active_project -> analysis[SQD] -> num_delta);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> analysis[SQD] -> calc_time = get_calc_time (start_time, stop_time);
   prepostcalc (widg, TRUE, SQD, i, 1.0);
   if (! i)
   {
@@ -253,22 +250,18 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
              & active_project -> analysis[SKD] -> num_delta,
              & active_project -> sk_advanced[0],
              & active_project -> sk_advanced[1]);
-  prepostcalc (widg, TRUE, SKD, i, 1.0);
   if (i == 1)
   {
-    prepostcalc (widg, FALSE, SKD, 0, opac);
     for (i=0; i<active_project -> analysis[SKD] -> numc; i++)
     {
       active_project -> analysis[SKD] -> curves[i] -> ndata = 0;
     }
-    clock_gettime (CLOCK_MONOTONIC, & start_time);
     j = s_of_k_ (& active_project -> analysis[SKD] -> num_delta, & active_project -> xcor);
-    clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[SKD] -> calc_time = get_calc_time (start_time, stop_time);
     g_free (xsk);
     xsk = NULL;
-    active_project -> analysis[GDK] -> avail_ok = j;
     prepostcalc (widg, TRUE, SKD, j, 1.0);
+    active_project -> analysis[GDK] -> avail_ok = j;
+
     if (! j)
     {
       remove_action ("analyze.3");
@@ -283,6 +276,7 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   }
   else
   {
+    prepostcalc (widg, TRUE, SKD, i, 1.0);
     show_error ("Problem during the selection of the k-points\nused to sample the recipocal lattice", 0, widg);
   }
   fill_tool_model ();

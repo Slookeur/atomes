@@ -103,6 +103,8 @@ int save_analysis (FILE * fp, atomes_analysis * this_analysis)
     if (fwrite (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
     if (fwrite (& this_analysis -> c_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   }
+
+  return OK;
 }
 
 /*!

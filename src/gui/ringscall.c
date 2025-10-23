@@ -100,7 +100,7 @@ void initrng ()
       }
     }
   }
-  addcurwidgets (activep, RIN, 0);
+  add_curve_widgets (activep, RIN, 0);
   active_project -> analysis[RIN] -> init_ok = TRUE;
 }
 
@@ -479,14 +479,12 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
       }
     }
     prepostcalc (widg, FALSE, RIN, 0, opac);
-    clock_gettime (CLOCK_MONOTONIC, & start_time);
     j = initrings_ (& search,
                     & active_project -> rsparam[i][1],
                     & active_project -> rsparam[i][0],
                     & active_project -> rsearch[1],
                     & active_project -> rsparam[i][2],
                     & active_project -> rsparam[i][3]);
-    clock_gettime (CLOCK_MONOTONIC, & stop_time);
     active_project -> rsdata[i][4] = get_calc_time (start_time, stop_time);
     if (j == 0)
     {

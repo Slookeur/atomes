@@ -153,7 +153,7 @@ void initbd ()
       k=k+1;
     }
   }
-  addcurwidgets (activep, BND, 0);
+  add_curve_widgets (activep, BND, 0);
   active_project -> analysis[BND] -> init_ok = TRUE;
 }
 
@@ -197,7 +197,7 @@ void initang ()
       }
     }
   }
-  addcurwidgets (activep, ANG, 0);
+  add_curve_widgets (activep, ANG, 0);
   active_project -> analysis[ANG] -> init_ok = TRUE;
 }
 
@@ -375,7 +375,6 @@ gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb)
       }
     }
   }
-  prepostcalc (widg, FALSE, -1, (active_project -> steps > 1) ? 1 : 0, opac);
   i = j = 0;
   k = up_ngb;;
   if (calc > 3 && calc < 6) i = 1;
@@ -392,7 +391,6 @@ gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb)
 #endif
   clock_gettime (CLOCK_MONOTONIC, & start_time);
   res = rundmtx_ (& i, & j, & k);
-  prepostcalc (widg, TRUE, -1, 0, 1.0);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
   g_print ("Time to calculate distance matrix: %s\n", calculation_time(FALSE, get_calc_time (start_time, stop_time)));
   return res;
@@ -551,12 +549,9 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       }
       // debug_chemical_information (active_project);
       active_project -> analysis[BND] -> delta = (active_project -> analysis[BND] -> max-active_project -> analysis[BND] -> min) / active_project -> analysis[BND] -> num_delta;
-      clock_gettime (CLOCK_MONOTONIC, & start_time);
       j = bonding_ (& m, & l, & bonding, & active_project -> analysis[BND] -> num_delta, & active_project -> analysis[BND] -> min, & active_project -> analysis[BND] -> delta, active_project -> bondfile);
-      clock_gettime (CLOCK_MONOTONIC, & stop_time);
-      active_project -> analysis[BND] -> calc_time = get_calc_time (start_time, stop_time);
-      active_project -> analysis[SPH] -> avail_ok = j;
       prepostcalc (widg, bonding, BND, (bonding) ? j : vis_bd, 1.0);
+      active_project -> analysis[SPH] -> avail_ok = j;
       if (! j)
       {
         show_error ("Unexpected error when calculating bond properties", 0, (widg) ? widg : MainWindow);
@@ -567,7 +562,6 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
         bonding = 1;
         if (frag_update)
         {
-          prepostcalc (widg, FALSE, -1, statusb, opac);
           k = active_glwin -> allbonds[0] + active_glwin -> allbonds[1];
           clock_gettime (CLOCK_MONOTONIC, & start_time);
           if (! molecules_ (& mol_update, & k))
@@ -605,7 +599,6 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           // Using the unused RI calc_time slot to store Frag-mol calc time.
           active_project -> analysis[RIN] -> calc_time = get_calc_time (start_time, stop_time);
           active_project_changed (activep);
-          prepostcalc (widg, TRUE, -1, statusb, 1.0);
           if (widg != NULL) show_the_widgets (curvetoolbox);
         }
         else
@@ -619,19 +612,17 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     {
       if (! active_project -> analysis[ANG] -> init_ok) initang ();
       clean_curves_data (ANG, 0, active_project -> analysis[ANG] -> numc);
-      prepostcalc (widg, FALSE, ANG, statusb, opac);
       active_project ->analysis[ANG] -> delta = 180.0 / active_project -> analysis[ANG] -> num_delta;
-      clock_gettime (CLOCK_MONOTONIC, & start_time);
       j = bond_angles_ (& active_project -> analysis[ANG] -> num_delta);
       if (! j)
       {
+        prepostcalc (widg, TRUE, ANG, j, 1.0);
         show_error ("Unexpected error when calculating the bond angles distribution", 0, (widg) ? widg : MainWindow);
       }
       else
       {
         j = bond_diedrals_ (& active_project -> analysis[ANG] -> num_delta);
-        clock_gettime (CLOCK_MONOTONIC, & stop_time);
-        active_project -> analysis[ANG] -> calc_time = get_calc_time (start_time, stop_time);
+        prepostcalc (widg, TRUE, ANG, j, 1.0);
         if (! j)
         {
           show_error ("Unexpected error when calculating the dihedral angles distribution", 0, (widg) ? widg : MainWindow);
@@ -642,7 +633,6 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           if (! active_project -> runc[0]) update_ang_view (active_project);
         }
       }
-      prepostcalc (widg, TRUE, ANG, j, 1.0);
     }
   }
   else

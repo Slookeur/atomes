@@ -72,7 +72,7 @@ void initchn ()
   {
     active_project -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
   }
-  addcurwidgets (activep, CHA, 0);
+  add_curve_widgets (activep, CHA, 0);
   active_project -> analysis[CHA] -> init_ok = TRUE;
 }
 
@@ -325,7 +325,6 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
     }
     k = 1;
     prepostcalc (widg, FALSE, CHA, 0, opac);
-    clock_gettime (CLOCK_MONOTONIC, & start_time);
     j = initchains_ (& active_project -> csparam[0],
                      & active_project -> csparam[1],
                      & active_project -> csparam[2],
@@ -333,8 +332,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
                      & active_project -> csparam[4],
                      & active_project -> csparam[5],
                      & active_project -> csearch);
-    clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> analysis[CHA] -> calc_time = get_calc_time (start_time, stop_time);
+    prepostcalc (widg, TRUE, CHA, (j == 1) ? 1 : 0, 1.0);
     if (j == 0)
     {
       show_error ("The chain statistics calculation has failed", 0, widg);
@@ -351,7 +349,6 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
       g_free (str);
       j = 0;
     }
-    prepostcalc (widg, TRUE, CHA, j, 1.0);
   }
   else
   {
