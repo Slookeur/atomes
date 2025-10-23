@@ -76,9 +76,9 @@ void init_idc ()
   {
     active_project -> analysis[IDC] -> curves[i] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[i]);
   }
-  // The total number of curves declare in this function
-  // should be equal to active_project -> analysis[IDC] -> numc
-  addcurwidgets (activep, IDC, 0);
+  // The total number of curves to be declared in this function
+  // should be equal to 'active_project -> analysis[IDC] -> numc'
+  add_curve_widgets (activep, IDC, 0);
   active_project -> analysis[IDC] -> init_ok = TRUE;
 }
 
@@ -99,6 +99,11 @@ void update_idc_view (project * this_proj)
   } 
   // Display the text buffer for the IDC calculation
   view_buffer (this_proj -> analysis[IDC] -> calc_buffer);
+
+  // To print information in the text buffer use 'print_info'
+  // print_info (text_to_display, font_style, target_text_buffer)
+  // For the list of available font style, or tag, see 'void setup_text_tags (GtkTextBuffer * buffer)' in 'gtk-misc.c'
+
   print_info ("\n\nThis is the new IDC analysis\n\n", "heading", this_proj -> analysis[IDC] -> calc_buffer);
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[IDC] -> calc_buffer);
   
