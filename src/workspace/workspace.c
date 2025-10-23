@@ -431,7 +431,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
       }
     }
     g_free (tmp_title);
-    for (j=0; j<NGRAPHS; j++)
+    for (j=0; j<NCALCS; j++)
     {
       if (this_proj -> analysis[j] -> init_ok)
       {

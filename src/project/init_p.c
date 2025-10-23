@@ -71,7 +71,7 @@ void init_curves_and_calc (project * this_proj)
   int i;
   if (this_proj -> analysis)
   {
-    for (i=0; i<NGRAPHS; i++)
+    for (i=0; i<NCALCS; i++)
     {
       this_proj -> analysis[i] -> avail_ok = FALSE;
       this_proj -> analysis[i] -> init_ok = FALSE;

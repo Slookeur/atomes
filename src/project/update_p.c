@@ -144,7 +144,7 @@ void update_analysis_availability (project * this_proj)
   else if (this_proj -> analysis)
   {
     int i;
-    for (i=0; i<NGRAPHS; i++)
+    for (i=0; i<NCALCS; i++)
     {
       if (this_proj -> analysis[i]) this_proj -> analysis[i] -> avail_ok = FALSE;
     }

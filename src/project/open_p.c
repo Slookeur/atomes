@@ -234,7 +234,9 @@ int open_project (FILE * fp, int npi)
   gboolean correct_x = TRUE;
   old_la_bo_ax_gr = TRUE;
   bad_ogl_axis = TRUE;
-  // test on ver for version
+  int calcs_to_read = -1;
+
+  // Start version related tests
   if (g_strcmp0(ver, "%\n% project file v-2.6\n%\n") == 0)
   {
     labels_in_file = TRUE;
@@ -256,7 +258,10 @@ int open_project (FILE * fp, int npi)
     labels_in_file = TRUE;
     correct_x = FALSE;
     bad_ogl_axis = FALSE;
+    calcs_to_read = 0;
   }
+  // End version related tests
+
  #ifdef DEBUG
   g_debug ("%s", ver);
  #endif // DEBUG
@@ -280,15 +285,22 @@ int open_project (FILE * fp, int npi)
     active_project -> bondfile = read_this_string (fp);
     if (active_project -> bondfile == NULL) return ERROR_PROJECT;
   }
-
+  if (! calcs_to_read)
+  {
+    if (fread (& calcs_to_read, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  }
+  else
+  {
+    calcs_to_read = NCALCS;
+  }
   // We need temporary buffers to read this data
   gboolean * tmp_avail, * tmp_init, * tmp_calc;
-  tmp_avail = allocbool (NGRAPHS);
-  tmp_init = allocbool (NGRAPHS);
-  tmp_calc = allocbool (NGRAPHS);
-  if (fread (tmp_avail, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (tmp_init, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (tmp_calc, sizeof(gboolean), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  tmp_avail = allocbool (calcs_to_read);
+  tmp_init = allocbool (calcs_to_read);
+  tmp_calc = allocbool (calcs_to_read);
+  if (fread (tmp_avail, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  if (fread (tmp_init, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  if (fread (tmp_calc, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   //
   if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
@@ -327,10 +339,10 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   // Temporary buffers again
-  int * tmp_num_delta = allocint (NGRAPHS);
-  double * tmp_delta = allocdouble (NGRAPHS);
-  if (fread (tmp_num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (tmp_delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  int * tmp_num_delta = allocint (calcs_to_read);
+  double * tmp_delta = allocdouble (calcs_to_read);
+  if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   //
   if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
@@ -342,10 +354,10 @@ int open_project (FILE * fp, int npi)
   if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
   // Temporary buffers again
-  double * tmp_min = allocdouble (NGRAPHS);
-  double * tmp_max = allocdouble (NGRAPHS);
-  if (fread (tmp_min, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fread (tmp_max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  double * tmp_min = allocdouble (calcs_to_read);
+  double * tmp_max = allocdouble (calcs_to_read);
+  if (fread (tmp_min, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   //
   if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
@@ -408,7 +420,7 @@ int open_project (FILE * fp, int npi)
         // Read curves
         init_atomes_analysis (FALSE);
         // Using temporary buffers
-        for (i=0; i<NGRAPHS; i++)
+        for (i=0; i<calcs_to_read; i++)
         {
           if (active_project -> analysis[i])
           {

@@ -147,6 +147,8 @@ int save_project (FILE * fp, project * this_proj, int npi)
     if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   }
   // Create temporary buffers to write down the information
+  int i = NCALCS;
+  if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   gboolean * avail_ok = allocbool (NCALCS);
   gboolean * init_ok = allocbool (NCALCS);
   gboolean * calc_ok = allocbool (NCALCS);
@@ -198,15 +200,15 @@ int save_project (FILE * fp, project * this_proj, int npi)
   if (fwrite (& this_proj -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (this_proj -> modelgl -> pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   // Create temporary buffers to write down the information
-  int * tmp_num_delta = allocint (NGRAPHS);
-  double * tmp_delta = allocdouble (NGRAPHS);
-  for (j=0; i<NGRAPHS; j++)
+  int * tmp_num_delta = allocint (NCALCS);
+  double * tmp_delta = allocdouble (NCALCS);
+  for (j=0; i<NCALCS; j++)
   {
     tmp_num_delta[j] = this_proj -> analysis[j] -> num_delta;
     tmp_delta[j] = this_proj -> analysis[j] -> delta;
   }
-  if (fwrite (tmp_num_delta, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fwrite (tmp_delta, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fwrite (tmp_num_delta, sizeof(int), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  if (fwrite (tmp_delta, sizeof(double), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
   g_free (tmp_num_delta);
   g_free (tmp_delta);
   //
@@ -220,15 +222,15 @@ int save_project (FILE * fp, project * this_proj, int npi)
   if (fwrite (this_proj -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fwrite (this_proj -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
   // Create temporary buffers to write down the information
-  double * tmp_min = allocdouble (NGRAPHS);
-  double * tmp_max = allocdouble (NGRAPHS);
-  for (j=0; i<NGRAPHS; j++)
+  double * tmp_min = allocdouble (NCALCS);
+  double * tmp_max = allocdouble (NCALCS);
+  for (j=0; i<NCALCS; j++)
   {
     tmp_min[j] = this_proj -> analysis[j] -> min;
     tmp_max[j] = this_proj -> analysis[j] -> max;
   }
-  if (fwrite (tmp_min, sizeof(int), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
-  if (fwrite (tmp_max, sizeof(double), NGRAPHS, fp) != NGRAPHS) return ERROR_PROJECT;
+  if (fwrite (tmp_min, sizeof(int), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
+  if (fwrite (tmp_max, sizeof(double), NCALCS, fp) != NCALCS) return ERROR_PROJECT;
   g_free (tmp_min);
   g_free (tmp_max);
   if (fwrite (& this_proj -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
@@ -260,7 +262,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
     if (this_proj -> run)
     {
       k = 0;
-      for (i=0; i<NGRAPHS; i++)
+      for (i=0; i<NCALCS; i++)
       {
         for (j=0; j<this_proj -> analysis[i] -> numc; j++)
         {
@@ -281,7 +283,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
             if (save_this_string (fp, this_proj -> analysis[SPH] -> curves[i] -> name) != OK) return ERROR_PROJECT;
           }
         }
-        for (i=0; i<NGRAPHS; i++)
+        for (i=0; i<NCALCS; i++)
         {
           for (j=0; j<this_proj -> analysis[i] -> numc; j++)
           {

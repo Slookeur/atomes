@@ -199,7 +199,7 @@ void close_project (project * to_close)
   }
   if (to_close -> run)
   {
-    for (i=0 ; i<NGRAPHS ; i++)
+    for (i=0 ; i<NCALCS ; i++)
     {
       if (to_close -> analysis)
       {
@@ -293,7 +293,7 @@ void close_project (project * to_close)
       }
       if (this_proj -> analysis)
       {
-        for (j=0; j<NGRAPHS; j++)
+        for (j=0; j<NCALCS; j++)
         {
           if (this_proj -> analysis[j])
           {
@@ -315,7 +315,7 @@ void close_project (project * to_close)
       this_proj -> id = i;
       if (this_proj -> analysis)
       {
-        for (j=0; j<NGRAPHS; j++)
+        for (j=0; j<NCALCS; j++)
         {
           if (this_proj -> analysis[j])
           {

@@ -4,9 +4,9 @@
 
   - Project `*.apf` and workspace `*.awf` files version should evolve to save and read the new calculation data
 
-  - Modify the `preferences.c` file to offer the options to save user preferences for this calculation
+  - Modify the [`preferences.c`][preferences.c] file to offer the options to save user preferences for this calculation
 
-The dialog preferences offers the user the possibility to configure preferences that will be applied for any new project
+The preferences dialog offers the user the possibility to configure preferences that will be applied for any new project
 to be opened in **atomes** workspace, that include analysis. 
 
 It is required to update this preference dialog to include the new analysis, 
@@ -15,78 +15,19 @@ However this is likely to be more complicated.
 
   - Modify the GNU archive for the official software distribution
 
-## 1. Ensuring the compatibility with older files
-
-During the [first step of this process][step-1] you modified the number of available calculations `NCACLS` that is used extensively in the code,
-including when reading and saving project files, therefore you need to consider that reading older file versions will required to read 
-`NCALCS - 1` data sets. 
-
-For that edit the file [`src/project/open_pc.c`][open_p.c] 
-
-  - Search for the [open_project][open_project] function and at the beginning locate the [`calcs_to_read`][calcs_to_read] variable definition:
-
-  ```C
-  int open_project (FILE * fp, int npi)
-  {
-
-    ...
-
-    int calcs_to_read = NCALCS;
-    // Start version related tests
-
-    ...
-
-    // End version related tests
-
-    ...
-
-  }
-  ```
-  - **DO NOT MODIFY** this line, instead modify it for other versions tested afterwards in the section related to version testing:
-
-  ```C
-
-  if (g_strcmp0(ver, "%\n% project file v-2.6\n%\n") == 0)  
-  {
-
-    ...
-
-    calcs_to_read --;
-  }
-  else if (g_strcmp0(ver, "%\n% project file v-2.7\n%\n") == 0)
-  {
-
-    ...
-
-    calcs_to_read --;
-  }
-  ```
-Repeat the process for any version listed in that testing section.
-
-> [!WARNING]
-> You might need to decrement the value of `calcs_to_read` even more, 
-> for instance change
-> ```C
->   calcs_to_read --;
-> ```
-> Into
-> ```C
->   calcs_to_read -= 2;
-> ```
-
-## 2. Modifying the `*.apf` and `*.awf` files for the IDC analysis
+## 1. Modifying the `*.apf` and `*.awf` files to save the IDC analysis
 
 You will need to consider and modify:
 
-  - How to save the data for the IDC calculation
-  - How to read the data saved about an IDC calculation
+  - How to save the data used, or needed, to perform the IDC calculation
+  - How to read the data used, or needed, to perform the IDC calculation
 
-### 1. Saving the IDC analysis calculation data
+If the fields available in the [`atomes_analysis`][atomes_analysis] data structure are enough to store the information and parameters, 
+then you will have nothing to do. 
 
-This is only required if: 
+Otherwise 2 options are available to you, either modify [`atomes_project`] data structure to store the extra parameters, or modify
+ [`atomes_analysis`][atomes_analysis] data structure to do it. 
 
-  - You modified the `atomes_anlysis` data structure to match your requirements
-  - You need to save more information than available in the current data structure
 
 #### 1. Modifying the file  [`src/project/open_p.c`][open_p.c]
 
@@ -107,8 +48,8 @@ This is actually mandatory
 
 
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
+[preferences.c]:https://slookeur.github.io/atomes-doxygen/de/dee/preferences_8c.html
 [open_p.c]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html
 [open_project]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html#a0b222c223270264f9754d008a37317aa
 [calcs_to_read]:to_be_done
 [save_p.c]:https://slookeur.github.io/atomes-doxygen/d7/d70/save__p_8c.html
-[preferences.c]:https://slookeur.github.io/atomes-doxygen/de/dee/preferences_8c.html

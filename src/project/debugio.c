@@ -240,7 +240,7 @@ void debugioproj (project * this_proj, gchar * iost)
                         this_proj -> cell.box[0].param[1][0], this_proj -> cell.box[0].param[1][1], this_proj -> cell.box[0].param[1][2]);
   g_debug ("IODEBUG::%s: vmod[0]= %f, vmod[1]= %f, vmod[2]= %f", iost,
                         this_proj -> cell.box[0].param[0][0], this_proj -> cell.box[0].param[0][1], this_proj -> cell.box[0].param[0][2]);
-  for (i=0; i<NGRAPHS; i++)
+  for (i=0; i<NCALCS; i++)
   {
     g_debug ("IODEBUG::%s: i= %d, visok[i]= %d", iost, i, this_proj -> analysis[i] -> calc_ok);
     g_debug ("IODEBUG::%s: i= %d, initok[i]= %d", iost, i, this_proj -> analysis[i] -> init_ok);

@@ -86,7 +86,7 @@ void clean_curves_data (int calc, int start, int end)
 */
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc)
 {
-  if (run < NGRAPHS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
+  if (run < NCALCS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
   if (! status)
   {
     clock_gettime (CLOCK_MONOTONIC, & start_time);
@@ -190,7 +190,6 @@ atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, g
   From global.h:
 
   #define NCALCS 10
-  #define NGRAPHS 10
 
   #define GDR 0
   #define SQD 1

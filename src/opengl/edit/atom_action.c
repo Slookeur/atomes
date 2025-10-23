@@ -457,7 +457,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   }
 
   // Clean curves data
-  for (i=0 ; i<NGRAPHS ; i++)
+  for (i=0 ; i<NCALCS ; i++)
   {
     if (this_proj -> analysis)
     {

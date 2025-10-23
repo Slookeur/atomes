@@ -311,11 +311,6 @@ enum ImageFormats {
 */
 #define NCALCS 10
 
-/*!< \def NGRAPHS
-  \brief number of analysis with results in curve window(s)
-*/
-#define NGRAPHS 10
-
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
 */

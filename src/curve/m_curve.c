@@ -202,7 +202,7 @@ void curve_window_add_menu_bar (tint * data);
 void prep_extra_rid (tint * data)
 {
   int i;
-  extrarid = allocdint (nprojects, NGRAPHS);
+  extrarid = allocdint (nprojects, NCALCS);
   Curve * this_curve = get_curve_from_pointer (data);
   if (this_curve -> extrac -> extras > 0)
   {

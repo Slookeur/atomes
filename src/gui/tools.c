@@ -104,7 +104,7 @@ void fill_tool_model ()
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), FALSE);
   }
   gtk_tree_store_clear (tool_model);
-  for (i=0; i<NGRAPHS; i++)
+  for (i=0; i<NCALCS; i++)
   {
     if (i != MSD)
     {
