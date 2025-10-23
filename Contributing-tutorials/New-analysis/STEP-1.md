@@ -12,11 +12,6 @@
   #define NCALCS 11   // The previous value was 10
   ```
 
-  - Increment the total number of calculations using graphs : `NGRAPHS`
-  ```C
-  #define NGRAPHS 11  // The previous value was 10
-  ```
-
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
   ```C
   #define GDR 0
