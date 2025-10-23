@@ -102,7 +102,7 @@ void update_idc_view (project * this_proj)
 
   // To print information in the text buffer use 'print_info'
   // print_info (text_to_display, font_style, target_text_buffer)
-  // For the list of available font style, or tag, can be found, and amended if needed, 
+  // The list of available font styles, or tags, can be found, and amended if needed, 
   // in the file 'src/gui/gtk-misc.c' in the function 'void setup_text_tags (GtkTextBuffer * buffer)' 
 
   print_info ("\n\nThis is the new IDC analysis\n\n", "heading", this_proj -> analysis[IDC] -> calc_buffer);
