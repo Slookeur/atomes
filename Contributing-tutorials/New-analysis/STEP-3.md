@@ -133,13 +133,13 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
   // Cleaning previous results, if any
   clean_curves_data (IDC, 0, active_project -> analysis[IDC] -> numc);
 
-  // Calculation time starts here !
+  // Calculation time for IDC analysis starts here !
   prepostcalc (widg, FALSE, IDC, 0, opac);
 
   // The IDC calculation is perfomed on the next line, result status is an integer (0 = ok, other = error)
   int res_idc = calc_idc ( ); 
 
-  // Calculation time stops here !
+  // Calculation time for IDC analysis stops here !
   prepostcalc (widg, TRUE, IDC, (! res_idc) ? 1 : 0, 1.0);
 
   if (res_idc)
