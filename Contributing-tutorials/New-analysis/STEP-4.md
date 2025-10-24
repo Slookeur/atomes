@@ -54,11 +54,11 @@ You will need to consider and modify:
 
   ...
   ```
-    - Increment the project version numbers `i` and `j`  
-    ```C
-      i = 3;
-      j = 0;
-    ```
+  - Increment the project version numbers `i` and `j`, in this example: 
+  ```C
+    i = 3;
+    j = 0;
+  ```
 > [!WARNING]
 >    In the next line these integer numbers are written on a single digit, which I confess might not have been my best idea at the time. 
 >    It now requires to ensure to increment `i` if `j` should reach `10`. 
