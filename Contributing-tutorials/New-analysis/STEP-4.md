@@ -34,15 +34,14 @@ You will need to consider and modify:
   - Search for the [`save_project`][save_project] function
   ```C
   /*!
-    \fn int save_project (FILE * fp, project * this_proj, int npw)
+    \fn int save_project (FILE * fp, project * this_proj)
 
     \brief save project to file
 
     \param fp the file pointer
     \param this_proj the target project
-    \param npw the total number of projects in the workspace
   */
-  int save_project (FILE * fp, project * this_proj, int npw)
+  int save_project (FILE * fp, project * this_proj)
   {
     int i, j, k;
     gchar * ver;
@@ -84,14 +83,13 @@ You will need to consider and modify:
   - At the beginning of the [`open_project`][open_project] function, set the value of the new variable to `FALSE`
   ```C
   /*!
-    \fn int open_project (FILE * fp, int npw)
+    \fn int open_project (FILE * fp)
 
     \brief open atomes project file
 
     \param fp the file pointer
-    \param npw the total number of projects in the workspace
   */
-  int open_project (FILE * fp, int npw)
+  int open_project (FILE * fp)
   {
     
     ...
