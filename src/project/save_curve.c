@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int cid);
+  int save_project_curve (FILE * fp, project * this_proj, int rid, int cid);
 
   gboolean write_data_layout (FILE * fp, DataLayout * layout);
 
@@ -63,23 +63,19 @@ gboolean write_data_layout (FILE * fp, DataLayout * layout)
 }
 
 /*!
-  \fn int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int cid)
+  \fn int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
 
   \brief save project curve to file
 
   \param fp the file pointer
-  \param wid the total number of project file in the workspace
   \param this_proj the target project
   \param rid the calculation to save
   \param cid the curve id to save
 */
-int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int cid)
+int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
 {
   int i, j;
-  if (wid > 0)
-  {
-    if (fwrite (& this_proj -> id, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  }
+
   if (fwrite (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];

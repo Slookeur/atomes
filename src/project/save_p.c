@@ -31,8 +31,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   int save_this_string (FILE * fp, gchar * string);
-  int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis);
-  int save_project (FILE * fp, project * this_proj, int npw);
+  int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis);
+  int save_project (FILE * fp, project * this_proj);
 
 */
 
@@ -74,16 +74,15 @@ int save_this_string (FILE * fp, gchar * string)
 }
 
 /*!
-  \fn int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+  \fn int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
 
   \brief saving analysis parameter(s) and result(s) to project file
 
   \param fp the file pointer
-  \param npw number of projects in the workspace
   \param this_proj the target project
   \param this_analysis the target analysis
 */
-int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
 {
   int i, j;
   if (fwrite (& this_analysis -> aid, sizeof(int), 1, fp) != 1) return ERROR_ANA;
@@ -123,25 +122,29 @@ int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
         {
           if (this_analysis -> curves[j] -> ndata)
           {
-            if (save_project_curve (fp, npw, this_proj, this_analysis -> aid, j) != OK) return ERROR_CURVE;
+            if (save_project_curve (fp, this_proj, this_analysis -> aid, j) != OK) return ERROR_CURVE;
           }
         }
       }
+    }
+    else
+    {
+      i = 0;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
     }
   }
   return OK;
 }
 
 /*!
-  \fn int save_project (FILE * fp, project * this_proj, int npw)
+  \fn int save_project (FILE * fp, project * this_proj)
 
   \brief save project to file
 
   \param fp the file pointer
   \param this_proj the target project
-  \param npw the total number of projects in the workspace
 */
-int save_project (FILE * fp, project * this_proj, int npw)
+int save_project (FILE * fp, project * this_proj)
 {
   int i, j, k;
   gchar * ver;
@@ -253,7 +256,7 @@ int save_project (FILE * fp, project * this_proj, int npw)
         {
           if (this_proj -> analysis[i])
           {
-            j = save_analysis (fp, npw, this_proj, this_proj -> analysis[i]);
+            j = save_analysis (fp, this_proj, this_proj -> analysis[i]);
             if (j != OK) return j;
           }
         }

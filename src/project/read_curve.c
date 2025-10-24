@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int read_project_curve (FILE * fp, int wid, int pid);
+  int read_project_curve (FILE * fp, int pid);
 
   gboolean read_data_layout (FILE * fp, DataLayout * layout);
 
@@ -65,27 +65,22 @@ gboolean read_data_layout (FILE * fp, DataLayout * layout)
 }
 
 /*!
-  \fn int read_project_curve (FILE * fp, int wid, int pid)
+  \fn int read_project_curve (FILE * fp, int pid)
 
   \brief read a project curve from file
 
   \param fp the file pointer
-  \param wid the total number of projects in the workspace
   \param pid the active project id
 */
-int read_project_curve (FILE * fp, int wid, int pid)
+int read_project_curve (FILE * fp, int pid)
 {
   int i, j;
-  int pic, rid, cid;
-  if (wid > 0)
+  int rid, cid;
+  if (! version_2_9_and_above)
   {
-    if (fread (& pic, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   }
-  else
-  {
-    pic = pid;
-  }
-  project * this_proj = get_project_by_id (pic);
+  project * this_proj = get_project_by_id (pid);
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];

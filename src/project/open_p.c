@@ -30,8 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis);
-  int open_project (FILE * fp, int npw);
+  int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis);
+  int open_project (FILE * fp;
 
   char * read_string (int i, FILE * fp);
 
@@ -218,16 +218,15 @@ void alloc_proj_data (project * this_proj, int cid)
 }
 
 /*!
-  \fn int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+  \fn int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
 
   \brief saving analysis parameter(s) and result(s) to project file
 
   \param fp the file pointer
-  \param npw number of projects in the workspace
   \param this_proj the target project
   \param this_analysis the target analysis
 */
-int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
 {
   int i, j;
   if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
@@ -269,7 +268,7 @@ int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
     {
       for (j=0; j<i; j++)
       {
-        if (read_project_curve (fp, npw, this_proj) != OK)
+        if (read_project_curve (fp, this_proj -> id) != OK)
         {
           // error
           return ERROR_CURVE;
@@ -281,14 +280,13 @@ int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
 }
 
 /*!
-  \fn int open_project (FILE * fp, int npw)
+  \fn int open_project (FILE * fp)
 
   \brief open atomes project file
 
   \param fp the file pointer
-  \param npw the total number of projects in the workspace
 */
-int open_project (FILE * fp, int npw)
+int open_project (FILE * fp)
 {
   int i, j, k;
   gchar * version;
@@ -501,7 +499,11 @@ int open_project (FILE * fp, int npw)
           {
             if (active_project -> analysis[i])
             {
-              if (read_analysis (fp, npw, active_project, active_project -> analysis[i]) != OK) return ERROR_ANA;
+              j = read_analysis (fp, active_project, active_project -> analysis[i]);
+              if (j != OK)
+              {
+                return j;
+              }
             }
           }
         }
@@ -550,7 +552,7 @@ int open_project (FILE * fp, int npw)
             }
             for (j=0; j<i; j++)
             {
-              if (read_project_curve (fp, npw, activep) != OK)
+              if (read_project_curve (fp, activep) != OK)
               {
                 // error
                 return ERROR_CURVE;

@@ -37,7 +37,7 @@ void quit_gtk ();
 void show_Help ();
 
 G_MODULE_EXPORT int open_save_workspace (FILE * fp, int act);
-G_MODULE_EXPORT int open_save (FILE * fp, int i, int pid, int aid, int np, gchar * pfile);
+G_MODULE_EXPORT int open_save (FILE * fp, int i, int pid, int aid, gchar * pfile);
 G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data);
 G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data);
 G_MODULE_EXPORT void on_save_as_activate (GtkWidget * widg, gpointer data);

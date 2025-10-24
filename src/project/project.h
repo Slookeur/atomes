@@ -43,7 +43,7 @@ extern int num_dihedrals (int i);
 extern int read_atom_a (FILE * fp, project * this_proj, int s, int a);
 extern int read_atom_b (FILE * fp, project * this_proj, int s, int a);
 extern int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
-extern int read_project_curve (FILE * fp, int wid, int pid);
+extern int read_project_curve (FILE * fp, int pid);
 extern int read_mol (FILE * fp);
 extern int read_bonding (FILE * fp);
 extern int read_dlp_field_data (FILE * fp, project * this_proj);
@@ -52,12 +52,12 @@ extern int read_cpmd_data (FILE * fp, int cid, project * this_proj);
 extern int read_cp2k_data (FILE * fp, int cid, project * this_proj);
 extern gchar * read_this_string (FILE * fp);
 extern void alloc_proj_data (project * this_proj,  int cid);
-extern int open_project (FILE * fp, int npw);
+extern int open_project (FILE * fp);
 
 // Save
 extern int save_atom_a (FILE * fp, project * this_proj, int s, int a);
 extern int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
-extern int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int cid);
+extern int save_project_curve (FILE * fp, project * this_proj, int rid, int cid);
 extern int save_dlp_field_data (FILE * fp, project * this_proj);
 extern int save_lmp_field_data (FILE * fp, project * this_proj);
 extern int save_cpmd_data (FILE * fp, int cid, project * this_proj);
@@ -65,7 +65,7 @@ extern int save_cp2k_data (FILE * fp, int cid, project * this_proj);
 extern int save_this_string (FILE * fp, gchar * string);
 extern int save_mol (FILE * fp, project * this_proj);
 extern int save_bonding (FILE * fp, project * this_proj);
-extern int save_project (FILE * fp, project * this_proj, int wid);
+extern int save_project (FILE * fp, project * this_proj);
 
 extern G_MODULE_EXPORT void set_color_map (GtkWidget * widg, gpointer data);
 extern int * save_color_map (glwin * view);
