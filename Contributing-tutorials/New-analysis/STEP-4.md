@@ -75,17 +75,7 @@ You will need to consider and modify:
   gboolean version_2_7_and_above;
   gboolean version_2_8_and_above;
   gboolean version_2_9_and_above;
-
-  ...
-
-  ```
-  Ex:
-  ```C
-
-  ...
-
-  gboolean version_2_9_and_above;
-  gboolean version_3_0_and_above;
+  gboolean version_3_0_and_above;  // This is an example
 
   ...
 
