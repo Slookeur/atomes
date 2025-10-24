@@ -83,6 +83,10 @@ int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int ci
   if (fwrite (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
+  if (rid == SPH)
+  {
+    if (save_this_string (fp, this_curve -> name) != OK) return ERROR_RW;
+  }
   if (fwrite (& this_curve -> displayed, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& this_curve -> ndata, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (this_curve -> data[0],

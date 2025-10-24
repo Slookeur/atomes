@@ -39,6 +39,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "project.h"
 
+extern gboolean version_2_9_and_above;
+
 /*!
   \fn gboolean read_data_layout (FILE * fp, DataLayout * layout)
 
@@ -87,6 +89,10 @@ int read_project_curve (FILE * fp, int wid, int pid)
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
+  if (rid == SPH)
+  {
+    this_curve -> name = read_this_string (fp);
+  }
   if (fread (& this_curve -> displayed, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fread (& this_curve -> ndata, sizeof(int), 1, fp) != 1) return ERROR_RW;
   this_curve -> data[0] = allocdouble (this_curve -> ndata);

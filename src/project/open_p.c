@@ -65,7 +65,12 @@ extern void initmsd ();
 extern void initsh (int s);
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 
-gboolean old_la_bo_ax_gr;
+gboolean version_2_5_and_bellow;
+gboolean version_2_6_and_above;
+gboolean version_2_7_and_above;
+gboolean version_2_8_and_above;
+gboolean version_2_9_and_above;
+
 gboolean bad_ogl_axis;
 
 /*!
@@ -214,58 +219,132 @@ void alloc_proj_data (project * this_proj, int cid)
 }
 
 /*!
-  \fn int open_project (FILE * fp, int npi)
+  \fn int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+
+  \brief saving analysis parameter(s) and result(s) to project file
+
+  \param fp the file pointer
+  \param npw number of projects in the workspace
+  \param this_proj the target project
+  \param this_analysis the target analysis
+*/
+int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
+{
+  int i, j;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (i != this_analysis -> aid)
+  {
+    // This is not supposed to happen
+    return ERROR_ANA;
+  }
+  this_analysis -> name = read_this_string (fp);
+  if (! this_analysis -> name) return ERROR_ANA;
+  if (save_this_string (fp, this_analysis -> name) != OK) return ERROR_ANA;
+  if (fread (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> min, sizeof(double), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> max, sizeof(double), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> fact, sizeof(double), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (this_analysis -> graph_res)
+  {
+    if (fread (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (i != this_analysis -> c_sets)
+    {
+      // This is not supposed to happen
+      return ERROR_ANA;
+    }
+    if (fread (this_analysis -> compat_id, sizeof(int), this_analysis -> c_sets, fp) != this_analysis -> c_sets) return ERROR_ANA;
+    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (i)
+    {
+      this_analysis -> x_title = read_this_string (fp);
+      if (save_this_string (fp, this_analysis -> x_title) != OK) return ERROR_ANA;
+    }
+    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (i)
+    {
+      for (j=0; j<i; j++)
+      {
+        if (read_project_curve (fp, npw, activep) != OK)
+        {
+          // error
+          return ERROR_CURVE;
+        }
+      }
+    }
+  }
+  return OK;
+}
+
+/*!
+  \fn int open_project (FILE * fp, int npw)
 
   \brief open atomes project file
 
   \param fp the file pointer
-  \param npi the total number of projects in the workspace
+  \param npw the total number of projects in the workspace
 */
-int open_project (FILE * fp, int npi)
+int open_project (FILE * fp, int npw)
 {
   int i, j, k;
-  gchar * ver;
-  // First 2 lines for compatibility issues
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  ver = g_malloc0 (i*sizeof*ver);
-  if (fread (ver, sizeof(char), i, fp) != i) return ERROR_PROJECT;
+  gchar * version;
+  version = read_this_string (fp);
+  if (! version) return ERROR_PROJECT;
 
-  gboolean labels_in_file = FALSE;
-  gboolean correct_x = TRUE;
-  old_la_bo_ax_gr = TRUE;
-  bad_ogl_axis = TRUE;
-  int calcs_to_read = -1;
+  version_2_5_and_bellow = TRUE;
+  version_2_6_and_above = FALSE;
+  version_2_7_and_above = FALSE;
+  version_2_8_and_above = FALSE;
+  version_2_9_and_above = FALSE;
 
+  int calcs_to_read;
   // Start version related tests
-  if (g_strcmp0(ver, "%\n% project file v-2.6\n%\n") == 0)
+  if (g_strcmp0(version, "%\n% project file v-2.6\n%\n") == 0)
   {
-    labels_in_file = TRUE;
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
   }
-  else if (g_strcmp0(ver, "%\n% project file v-2.7\n%\n") == 0)
+  else if (g_strcmp0(version, "%\n% project file v-2.7\n%\n") == 0)
   {
-    labels_in_file = TRUE;
-    correct_x = FALSE;
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
+    version_2_7_and_above = TRUE;
   }
-  else if (g_strcmp0(ver, "%\n% project file v-2.8\n%\n") == 0)
+  else if (g_strcmp0(version, "%\n% project file v-2.8\n%\n") == 0)
   {
-    old_la_bo_ax_gr = FALSE;
-    labels_in_file = TRUE;
-    correct_x = FALSE;
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
+    version_2_7_and_above = TRUE;
+    version_2_8_and_above = TRUE;
   }
-  else if (g_strcmp0(ver, "%\n% project file v-2.9\n%\n") == 0)
+  else if (g_strcmp0(version, "%\n% project file v-2.9\n%\n") == 0)
   {
-    old_la_bo_ax_gr = FALSE;
-    labels_in_file = TRUE;
-    correct_x = FALSE;
-    bad_ogl_axis = FALSE;
-    calcs_to_read = 0;
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
+    version_2_7_and_above = TRUE;
+    version_2_8_and_above = TRUE;
+    version_2_9_and_above = TRUE;
+    version_2_9_and_above = TRUE;
   }
   // End version related tests
 
+  // Temporary buffers for version compatibility < 2.9
+  gboolean * tmp_avail, * tmp_init, * tmp_calc;
+  int * tmp_num_delta;
+  double * tmp_delta;
+  double * tmp_min;
+  double * tmp_max;
+
  #ifdef DEBUG
-  g_debug ("%s", ver);
+  g_debug ("%s", version);
  #endif // DEBUG
-  g_free (ver);
+  g_free (version);
 
   // After that we read the data
   active_project -> name = read_this_string (fp);
@@ -285,23 +364,22 @@ int open_project (FILE * fp, int npi)
     active_project -> bondfile = read_this_string (fp);
     if (active_project -> bondfile == NULL) return ERROR_PROJECT;
   }
-  if (! calcs_to_read)
+  if (version_2_9_and_above)
   {
     if (fread (& calcs_to_read, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   }
   else
   {
-    calcs_to_read = NCALCS;
+    // NCALCS was first set to 10
+    calcs_to_read = 10;
+    // We need temporary buffers to read this data
+    tmp_avail = allocbool (calcs_to_read);
+    tmp_init = allocbool (calcs_to_read);
+    tmp_calc = allocbool (calcs_to_read);
+    if (fread (tmp_avail, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_init, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_calc, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   }
-  // We need temporary buffers to read this data
-  gboolean * tmp_avail, * tmp_init, * tmp_calc;
-  tmp_avail = allocbool (calcs_to_read);
-  tmp_init = allocbool (calcs_to_read);
-  tmp_calc = allocbool (calcs_to_read);
-  if (fread (tmp_avail, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  if (fread (tmp_init, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  if (fread (tmp_calc, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  //
   if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
@@ -338,12 +416,14 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
-  // Temporary buffers again
-  int * tmp_num_delta = allocint (calcs_to_read);
-  double * tmp_delta = allocdouble (calcs_to_read);
-  if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  //
+  if (! version_2_9_and_above)
+  {
+    // Temporary buffers again
+    tmp_num_delta = allocint (calcs_to_read);
+    tmp_delta = allocdouble (calcs_to_read);
+    if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  }
   if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
   {
@@ -353,18 +433,20 @@ int open_project (FILE * fp, int npi)
   if (fread (& active_project -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
-  // Temporary buffers again
-  double * tmp_min = allocdouble (calcs_to_read);
-  double * tmp_max = allocdouble (calcs_to_read);
-  if (fread (tmp_min, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-  //
+  if (! version_2_9_and_above)
+  {
+    // Temporary buffers again
+    tmp_min = allocdouble (calcs_to_read);
+    tmp_max = allocdouble (calcs_to_read);
+    if (fread (tmp_min, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+  }
   if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
   {
     alloc_proj_data (active_project, 1);
     active_chem = active_project -> chemistry;
-    if (labels_in_file)
+    if (! version_2_5_and_bellow)
     {
       for (i=0; i<active_project -> nspec; i++)
       {
@@ -381,7 +463,7 @@ int open_project (FILE * fp, int npi)
     {
       if (fread (active_chem -> chem_prop[i], sizeof(double), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
     }
-    if (correct_x)
+    if (! version_2_7_and_above)
     {
       for (i=0; i<active_project -> nspec; i++)
       {
@@ -412,62 +494,70 @@ int open_project (FILE * fp, int npi)
                        & active_project -> steps);
       if (i == 1)
       {
-        if (! labels_in_file)
+        if (version_2_5_and_bellow)
         {
           j = 1;
           prep_spec_ (active_chem -> chem_prop[CHEM_Z], active_chem -> nsps, & j);
         }
         // Read curves
         init_atomes_analysis (FALSE);
-        // Using temporary buffers
-        for (i=0; i<calcs_to_read; i++)
+        if (version_2_9_and_above)
         {
-          if (active_project -> analysis[i])
-          {
-            active_project -> analysis[i] -> avail_ok = tmp_avail[i];
-            active_project -> analysis[i] -> init_ok = tmp_init[i];
-            active_project -> analysis[i] -> calc_ok = tmp_calc[i];
-            active_project -> analysis[i] -> delta = tmp_delta[i];
-            active_project -> analysis[i] -> num_delta = tmp_num_delta[i];
-            active_project -> analysis[i] -> min = tmp_min[i];
-            active_project -> analysis[i] -> max = tmp_max[i];
-            if (active_project -> analysis[i] -> avail_ok) initcnames (i);
-          }
+         for (i=0; i<calcs_to_read; i++)
+         {
+           read_analysis (fp, npw, active_project, active_project -> analysis[i]);
+         }
         }
-        g_free (tmp_avail);
-        g_free (tmp_init);
-        g_free (tmp_calc);
-        g_free (tmp_delta);
-        g_free (tmp_num_delta);
-        g_free (tmp_min);
-        g_free (tmp_max);
-        // Temporary buffers end
-        if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-#ifdef DEBUG
-        g_debug ("\n**********************************************\n curves to read= %d\n**********************************************\n", i);
-#endif
-        if (i != 0)
+        else
         {
-          j = 0;
-          if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-          if (j)
+          for (i=0; i<calcs_to_read; i++)
           {
-            active_project -> analysis[SPH] -> numc = j;
-            alloc_analysis_curves (active_project -> analysis[SPH]);
-            add_curve_widgets (activep, SPH, 0);
-            active_project -> analysis[SPH] -> avail_ok = TRUE;
-            for (k=0; k<j; k++)
+            if (active_project -> analysis[i])
             {
-              active_project -> analysis[SPH] -> curves[k] -> name = read_this_string (fp);
-              if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return ERROR_PROJECT;
+              active_project -> analysis[i] -> avail_ok = tmp_avail[i];
+              active_project -> analysis[i] -> init_ok = tmp_init[i];
+              active_project -> analysis[i] -> calc_ok = tmp_calc[i];
+              active_project -> analysis[i] -> delta = tmp_delta[i];
+              active_project -> analysis[i] -> num_delta = tmp_num_delta[i];
+              active_project -> analysis[i] -> min = tmp_min[i];
+              active_project -> analysis[i] -> max = tmp_max[i];
+              if (active_project -> analysis[i] -> avail_ok) initcnames (i);
             }
           }
-          for (j=0; j<i; j++)
+          g_free (tmp_avail);
+          g_free (tmp_init);
+          g_free (tmp_calc);
+          g_free (tmp_delta);
+          g_free (tmp_num_delta);
+          g_free (tmp_min);
+          g_free (tmp_max);
+          if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+#ifdef DEBUG
+          g_debug ("\n**********************************************\n curves to read= %d\n**********************************************\n", i);
+#endif
+          if (i != 0)
           {
-            if (read_project_curve (fp, npi, activep) != OK)
+            j = 0;
+            if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+            if (j)
             {
-              // error
-              return ERROR_CURVE;
+              active_project -> analysis[SPH] -> numc = j;
+              alloc_analysis_curves (active_project -> analysis[SPH]);
+              add_curve_widgets (activep, SPH, 0);
+              active_project -> analysis[SPH] -> avail_ok = TRUE;
+              for (k=0; k<j; k++)
+              {
+                active_project -> analysis[SPH] -> curves[k] -> name = read_this_string (fp);
+                if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return ERROR_PROJECT;
+              }
+            }
+            for (j=0; j<i; j++)
+            {
+              if (read_project_curve (fp, npw, activep) != OK)
+              {
+                // error
+                return ERROR_CURVE;
+              }
             }
           }
         }

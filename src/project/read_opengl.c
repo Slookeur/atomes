@@ -46,8 +46,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "initcoord.h"
 #include "preferences.h"
 
-extern gboolean old_la_bo_ax_gr;
-extern gboolean bad_ogl_axis;
+extern gboolean version_2_8_and_above;
 
 /*!
   \fn int read_atom_a (FILE * fp, project * this_proj, int s, int a)
@@ -337,7 +336,7 @@ int read_this_axis (FILE * fp, axis * xyz)
   if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (bad_ogl_axis)
+  if (! version_2_8_and_above)
   {
     if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   }
@@ -381,7 +380,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   gboolean val;
 
   duplicate_background_data (img -> back, & default_background);
-  if (! old_la_bo_ax_gr)
+  if (version_2_8_and_above)
   {
     if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (img -> back -> gradient)
@@ -436,7 +435,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
   if (fread (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
   if (fread (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (old_la_bo_ax_gr)
+  if (! version_2_8_and_above)
   {
     for (i=0; i<5; i++)
     {
@@ -514,7 +513,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fread (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
 
   // Model box and axis
-  if (old_la_bo_ax_gr)
+  if (! version_2_8_and_above)
   {
     if (fread (& img -> abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (fread (& img -> xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;

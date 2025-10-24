@@ -293,6 +293,7 @@ enum ImageFormats {
 #define ERROR_RINGS  10
 #define ERROR_CHAINS 11
 #define ERROR_MOL    12
+#define ERROR_ANA    13
 
 /*!< \def CHEM_PARAMS
   \brief number of chemical parameters
