@@ -89,7 +89,7 @@ int read_project_curve (FILE * fp, int wid, int pid)
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
-  if (rid == SPH)
+  if (rid == SPH && version_2_9_and_above)
   {
     this_curve -> name = read_this_string (fp);
   }
@@ -207,12 +207,7 @@ int read_project_curve (FILE * fp, int wid, int pid)
         }
       }
     }
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (i == 1)
-    {
-      this_curve -> cfile = read_this_string (fp);
-      if (this_curve -> cfile == NULL) return ERROR_RW;
-    }
+    this_curve -> cfile = read_this_string (fp);
   }
 #ifdef DEBUG
   // debugiocurve (this_proj, win, rid, cid, "READ");
