@@ -30,7 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int open_project (FILE * fp, int npi);
+  int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis);
+  int open_project (FILE * fp, int npw);
 
   char * read_string (int i, FILE * fp);
 

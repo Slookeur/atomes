@@ -52,7 +52,7 @@ extern int read_cpmd_data (FILE * fp, int cid, project * this_proj);
 extern int read_cp2k_data (FILE * fp, int cid, project * this_proj);
 extern gchar * read_this_string (FILE * fp);
 extern void alloc_proj_data (project * this_proj,  int cid);
-extern int open_project (FILE * fp, int wid);
+extern int open_project (FILE * fp, int npw);
 
 // Save
 extern int save_atom_a (FILE * fp, project * this_proj, int s, int a);

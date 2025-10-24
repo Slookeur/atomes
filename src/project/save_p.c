@@ -31,7 +31,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 * List of functions:
 
   int save_this_string (FILE * fp, gchar * string);
-  int save_project (FILE * fp, project * this_proj, int npi);
+  int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis);
+  int save_project (FILE * fp, project * this_proj, int npw);
 
 */
 
@@ -132,15 +133,15 @@ int save_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
 }
 
 /*!
-  \fn int save_project (FILE * fp, project * this_proj, int npi)
+  \fn int save_project (FILE * fp, project * this_proj, int npw)
 
   \brief save project to file
 
   \param fp the file pointer
   \param this_proj the target project
-  \param npi the total number of projects in the workspace
+  \param npw the total number of projects in the workspace
 */
-int save_project (FILE * fp, project * this_proj, int npi)
+int save_project (FILE * fp, project * this_proj, int npw)
 {
   int i, j, k;
   gchar * ver;
@@ -252,7 +253,7 @@ int save_project (FILE * fp, project * this_proj, int npi)
         {
           if (this_proj -> analysis[i])
           {
-            j = save_analysis (fp, npi, this_proj, this_proj -> analysis[i]);
+            j = save_analysis (fp, npw, this_proj, this_proj -> analysis[i]);
             if (j != OK) return j;
           }
         }
