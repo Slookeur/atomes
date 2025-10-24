@@ -34,15 +34,15 @@ You will need to consider and modify:
   - Search for the [`save_project`][save_project] function
   ```C
   /*!
-    \fn int save_project (FILE * fp, project * this_proj, int npi)
+    \fn int save_project (FILE * fp, project * this_proj, int npw)
 
     \brief save project to file
 
     \param fp the file pointer
     \param this_proj the target project
-    \param npi the total number of projects in the workspace
+    \param npw the total number of projects in the workspace
   */
-  int save_project (FILE * fp, project * this_proj, int npi)
+  int save_project (FILE * fp, project * this_proj, int npw)
   {
     int i, j, k;
     gchar * ver;
@@ -70,7 +70,6 @@ You will need to consider and modify:
 
   ...
 
-  gboolean version_2_5_and_bellow;
   gboolean version_2_6_and_above;
   gboolean version_2_7_and_above;
   gboolean version_2_8_and_above;
@@ -97,20 +96,21 @@ You will need to consider and modify:
     
     ...
 
+    version_2_8_and_above = FALSE; 
+    version_2_9_and_above = FALSE;
     version_3_0_and_above = FALSE;  // This is an example
 
     ...
 
   ```
   - Then create a new test case for the project version with a number matching the one specified when creating the new project file. 
-To do that copy the previous test case, and for this new test case only, set the value of the variable to `TRUE`
+To do that copy the previous test case, change the version number, and for this new test case only, set the value of the variable to `TRUE`
   ```C
 
   ...
 
   else if (g_strcmp0(version, "%\n% project file v-2.9\n%\n") == 0)
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
     version_2_7_and_above = TRUE;
     version_2_8_and_above = TRUE;
@@ -118,9 +118,7 @@ To do that copy the previous test case, and for this new test case only, set the
     version_2_9_and_above = TRUE;
   }
   else if (g_strcmp0(version, "%\n% project file v-3.0\n%\n") == 0)  // This is an example
-
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
     version_2_7_and_above = TRUE;
     version_2_8_and_above = TRUE;
@@ -137,7 +135,7 @@ To do that copy the previous test case, and for this new test case only, set the
 
   ...
 
-  if (version_3_0_and_above) // Do something only for the new file version to read IDC information
+  if (version_3_0_and_above) // Do something only for the new file version to read IDC related information
   {
 
 
@@ -146,6 +144,8 @@ To do that copy the previous test case, and for this new test case only, set the
   ...
 
   ```
+ >[!TIP]
+ > Contact me if you need any help !
 
 ## 3. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 

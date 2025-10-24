@@ -47,6 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "preferences.h"
 
 extern gboolean version_2_8_and_above;
+extern gboolean version_2_9_and_above;
 
 /*!
   \fn int read_atom_a (FILE * fp, project * this_proj, int s, int a)
@@ -336,7 +337,7 @@ int read_this_axis (FILE * fp, axis * xyz)
   if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (! version_2_8_and_above)
+  if (! version_2_9_and_above)
   {
     if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
   }

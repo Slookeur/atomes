@@ -72,8 +72,6 @@ gboolean version_2_7_and_above;
 gboolean version_2_8_and_above;
 gboolean version_2_9_and_above;
 
-gboolean bad_ogl_axis;
-
 /*!
   \fn char * read_string (int i, FILE * fp)
 
@@ -232,7 +230,7 @@ void alloc_proj_data (project * this_proj, int cid)
 int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * this_analysis)
 {
   int i, j;
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
   if (i != this_analysis -> aid)
   {
     // This is not supposed to happen
@@ -240,7 +238,6 @@ int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
   }
   this_analysis -> name = read_this_string (fp);
   if (! this_analysis -> name) return ERROR_ANA;
-  if (save_this_string (fp, this_analysis -> name) != OK) return ERROR_ANA;
   if (fread (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
   if (fread (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
   if (fread (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
@@ -265,14 +262,14 @@ int read_analysis (FILE * fp, int npw, project * this_proj, atomes_analysis * th
     if (i)
     {
       this_analysis -> x_title = read_this_string (fp);
-      if (save_this_string (fp, this_analysis -> x_title) != OK) return ERROR_ANA;
+      if (! this_analysis -> x_title) return ERROR_ANA;
     }
     if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
     if (i)
     {
       for (j=0; j<i; j++)
       {
-        if (read_project_curve (fp, npw, activep) != OK)
+        if (read_project_curve (fp, npw, this_proj) != OK)
         {
           // error
           return ERROR_CURVE;
@@ -298,7 +295,6 @@ int open_project (FILE * fp, int npw)
   version = read_this_string (fp);
   if (! version) return ERROR_PROJECT;
 
-  version_2_5_and_bellow = TRUE;
   version_2_6_and_above = FALSE;
   version_2_7_and_above = FALSE;
   version_2_8_and_above = FALSE;
@@ -308,29 +304,24 @@ int open_project (FILE * fp, int npw)
   // Start version related tests
   if (g_strcmp0(version, "%\n% project file v-2.6\n%\n") == 0)
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
   }
   else if (g_strcmp0(version, "%\n% project file v-2.7\n%\n") == 0)
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
     version_2_7_and_above = TRUE;
   }
   else if (g_strcmp0(version, "%\n% project file v-2.8\n%\n") == 0)
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
     version_2_7_and_above = TRUE;
     version_2_8_and_above = TRUE;
   }
   else if (g_strcmp0(version, "%\n% project file v-2.9\n%\n") == 0)
   {
-    version_2_5_and_bellow = FALSE;
     version_2_6_and_above = TRUE;
     version_2_7_and_above = TRUE;
     version_2_8_and_above = TRUE;
-    version_2_9_and_above = TRUE;
     version_2_9_and_above = TRUE;
   }
   // End version related tests
@@ -447,12 +438,14 @@ int open_project (FILE * fp, int npw)
   {
     alloc_proj_data (active_project, 1);
     active_chem = active_project -> chemistry;
-    if (! version_2_5_and_bellow)
+    if (version_2_6_and_above)
     {
       for (i=0; i<active_project -> nspec; i++)
       {
         active_chem -> label[i] = read_this_string (fp);
+        if (! active_chem -> label[i]) return ERROR_PROJECT;
         active_chem -> element[i] = read_this_string (fp);
+        if (! active_chem -> element[i]) return ERROR_PROJECT;
       }
     }
     if (fread (active_chem -> nsps, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
@@ -495,7 +488,7 @@ int open_project (FILE * fp, int npw)
                        & active_project -> steps);
       if (i == 1)
       {
-        if (version_2_5_and_bellow)
+        if (! version_2_6_and_above)
         {
           j = 1;
           prep_spec_ (active_chem -> chem_prop[CHEM_Z], active_chem -> nsps, & j);
@@ -504,10 +497,13 @@ int open_project (FILE * fp, int npw)
         init_atomes_analysis (FALSE);
         if (version_2_9_and_above)
         {
-         for (i=0; i<calcs_to_read; i++)
-         {
-           read_analysis (fp, npw, active_project, active_project -> analysis[i]);
-         }
+          for (i=0; i<calcs_to_read; i++)
+          {
+            if (active_project -> analysis[i])
+            {
+              if (read_analysis (fp, npw, active_project, active_project -> analysis[i]) != OK) return ERROR_ANA;
+            }
+          }
         }
         else
         {
