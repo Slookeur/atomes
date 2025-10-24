@@ -65,6 +65,98 @@ You will need to consider and modify:
 
 ### 2. To read the new IDC data edit the file [`src/project/open_p.c`][open_p.c]
 
+  - At te beginning of the file create a new gboolean variable for the new file version 
+  ```C
+
+  ...
+
+  gboolean version_2_5_and_bellow;
+  gboolean version_2_6_and_above;
+  gboolean version_2_7_and_above;
+  gboolean version_2_8_and_above;
+  gboolean version_2_9_and_above;
+
+  ...
+
+  ```
+  Ex:
+  ```C
+
+  ...
+
+  gboolean version_2_9_and_above;
+  gboolean version_3_0_and_above;
+
+  ...
+
+  ```
+  This new variable `version_3_0_and_above` will be used, if needed, to trigger actions specific to the new analysis and to be performed when reading **atomes** project files.
+
+  - At the beginning of the [`open_project`][open_project] function, set the value of the new variable to `FALSE`
+  ```C
+  /*!
+    \fn int open_project (FILE * fp, int npw)
+
+    \brief open atomes project file
+
+    \param fp the file pointer
+    \param npw the total number of projects in the workspace
+  */
+  int open_project (FILE * fp, int npw)
+  {
+    
+    ...
+
+    version_3_0_and_above = FALSE;  // This is an example
+
+    ...
+
+  ```
+  - Then create a new test case for the project version with a number matching the one specified when creating the new project file. 
+To do that copy the previous test case, and for this new test case only, set the value of the variable to `TRUE`
+  ```C
+
+  ...
+
+  else if (g_strcmp0(version, "%\n% project file v-2.9\n%\n") == 0)
+  {
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
+    version_2_7_and_above = TRUE;
+    version_2_8_and_above = TRUE;
+    version_2_9_and_above = TRUE;
+    version_2_9_and_above = TRUE;
+  }
+  else if (g_strcmp0(version, "%\n% project file v-3.0\n%\n") == 0)  // This is an example
+
+  {
+    version_2_5_and_bellow = FALSE;
+    version_2_6_and_above = TRUE;
+    version_2_7_and_above = TRUE;
+    version_2_8_and_above = TRUE;
+    version_2_9_and_above = TRUE;
+    version_2_9_and_above = TRUE;
+    version_3_0_and_above = TRUE;                                    // This is an example
+  }
+
+  ...
+
+  ```
+  - The rest is up to you to decide, but if you need to adapt some part of the file for the new case scenario simply use the new `version_3_0_and_above` to avoid conflics with previous version:
+  ```C
+
+  ...
+
+  if (version_3_0_and_above) // Do something only for the new file version to read IDC information
+  {
+
+
+  }
+
+  ...
+
+  ```
+
 ## 3. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 
 
