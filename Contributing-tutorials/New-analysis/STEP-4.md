@@ -11,7 +11,7 @@ The preferences dialog offers the user the possibility to configure preferences 
 to be opened in **atomes** workspace, that include analysis. 
 
 It is required to update this preference dialog to include the new analysis, 
-doing so will offer the possibility to save and read user preferences for the new analysis from the `**atomes.pml**` file. 
+doing so will offer the possibility to save and read user preferences for the new analysis from the `atomes.pml` configuration file. 
 However this is likely to be more complicated. 
 
   - Modify the GNU archive for the official software distribution
