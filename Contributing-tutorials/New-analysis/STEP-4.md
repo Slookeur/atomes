@@ -152,9 +152,9 @@ To do that copy the previous test case, change the version number, and for this 
 
 
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
-[atomes_analysis]:
-[project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
 [preferences.c]:https://slookeur.github.io/atomes-doxygen/de/dee/preferences_8c.html
+[project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
+[atomes_analysis]:
 [open_p.c]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html
 [open_project]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html#a0b222c223270264f9754d008a37317aa
 [calcs_to_read]:to_be_done
