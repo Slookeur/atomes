@@ -148,7 +148,7 @@ To do that copy the previous test case, change the version number, and for this 
 ## 3. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 
 
-## 4. Modifyinf the GNU archive for the official software distribution
+## 4. Modifying the GNU archive for the official software distribution
 
 
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
