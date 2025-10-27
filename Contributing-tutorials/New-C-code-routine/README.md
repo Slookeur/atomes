@@ -63,7 +63,7 @@ int my_new_routine (int first_param, double second_param, project * this_proj)
 > All **atomes** functions are already documented, help yourself from the work already in place !
 
 > [!TIP]
-> For detail information please refer to the [offical Doxygen documentation][]doxydoc]
+> For detail information please refer to the [offical Doxygen documentation][doxydoc]
  
 [Doxygen]:https://www.doxygen.nl/
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
