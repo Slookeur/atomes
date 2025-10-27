@@ -1,11 +1,11 @@
-# Adding the new analysis using the **atomes** software
+# Adding the new analysis to the **atomes** software
 
 ## 1. Create a new file to implement the calculation
 
-  - The new file must be located in the [`src/gui`][gui] directory
-  - The new file must be named **analysis**call.c, in the following `idccall.c`
-  - The new file must contain the callback for the analysis, what happens when the user click on `Apply` in the calculation dialog. 
-  - The new file can contain the analysis it-self
+  - The new file **MUST** be located in the [`src/gui`][gui] directory
+  - The new file **MUST** be named **analysis**call.c, in the following `idccall.c`
+  - The new file **MUST** contain the callback for the analysis, what happens when the user click on `Apply` in the calculation dialog. 
+  - The new file **MUST NOT NECESSARILY** contain the analysis it-self, that can be in a separate file
 
  >[!WARNING]
  > The new file name must be unique, ensure that no other file in the project has the same name !
