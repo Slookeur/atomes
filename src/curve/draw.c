@@ -41,24 +41,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 /*!
   \fn void draw_curve (cairo_t * cr,
-                    int cid,
-                    int rid,
-                    project * this_proj,
-                    int points,
-                    ColRGBA withcolor,
-                    int xscale,
-                    int yscale,
-                    int asp,
-                    int vdash,
-                    double thick,
-                    int glyp,
-                    double gize,
-                    int freq,
-                    double hwidth,
-                    double hopac,
-                    int hpos,
-                   int extra,
-                    int pid)
+                      int cid,
+                      int rid,
+                      project * this_proj,
+                      int points,
+                      ColRGBA withcolor,
+                      int xscale,
+                      int yscale,
+                      int asp,
+                      int vdash,
+                      double thick,
+                      int glyp,
+                      double gize,
+                      int freq,
+                      double hwidth,
+                      double hopac,
+                      int hpos,
+                      int extra,
+                      int pid)
 
   \brief draw target curve to the cairo drawing context
 
@@ -118,7 +118,7 @@ void draw_curve (cairo_t * cr,
   {
     if (xscale == 0)
     {
-      plotdata[i][0] = x_min + XDRAW * (this_curve -> data[0][i] - cxy[0])/ xmax;
+      plotdata[i][0] = x_min + XDRAW * (this_curve -> data[0][i] - cxy[0]) / xmax;
     }
     else
     {

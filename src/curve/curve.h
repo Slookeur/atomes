@@ -130,7 +130,7 @@ extern G_MODULE_EXPORT gboolean to_hide_curve (GtkWindow * thecurve, gpointer da
 
 extern void clean_curves_data (int calc, int start, int end);
 extern void initcurve (project * pid, int rid, int cid);
-extern void add_curve_widgets (int pid, int rid, int st);
+extern void add_curve_widgets (project * this_proj, int rid);
 extern void allocextra (int a, int b, int c);
 
 extern void label_curve (cairo_t * cr, double val, int axe, int p, Curve * this_curve);

@@ -38,8 +38,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   void restore_color_map (glwin * view, int * colm);
   void recup_dmin_dmax_ (double * min, double * max);
-  void initbd ();
-  void initang ();
+  void initbd (project * this_proj);
+  void initang (project * this_proj);
   void initcutoffs (chemical_data * chem, int species);
   void cutoffsend ();
   void prep_ogl_bonds ();
@@ -134,46 +134,48 @@ void recup_dmin_dmax_ (double * min, double * max)
   }
 }
 /*!
-  \fn void initbd ()
+  \fn void initbd (project * this_proj)
 
   \brief initialize the curve widgets for the bond distribution
+
+  \param this_proj the target project
 */
-void initbd ()
+void initbd (project * this_proj)
 {
   int i, j, k;
 
   k = 0;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
-      active_project -> analysis[BND] -> curves[k] -> name = g_strdup_printf("Dij [%s-%s]",
-                                                         active_chem -> label[i],
-                                                         active_chem -> label[j]);
+      this_proj -> analysis[BND] -> curves[k] -> name = g_strdup_printf("Dij [%s-%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
     }
   }
-  add_curve_widgets (activep, BND, 0);
-  active_project -> analysis[BND] -> init_ok = TRUE;
+  add_curve_widgets (this_proj, BND);
+  this_proj -> analysis[BND] -> init_ok = TRUE;
 }
 
 /*!
-  \fn void initang ()
+  \fn void initang (project * this_proj)
 
   \brief initialize the curve widgets for the angle distribution
+
+  \param this_proj the target project
 */
-void initang ()
+void initang (project * this_proj)
 {
   int h, i, j, k, l;
 
   h=0;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
-      for ( k = 0 ; k < active_project -> nspec ; k++ )
+      for ( k = 0 ; k < this_proj -> nspec ; k++ )
       {
-        active_project -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Angles [%s-%s-%s]",
+        this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Angles [%s-%s-%s]",
                                                                            active_chem -> label[i],
                                                                            active_chem -> label[j],
                                                                            active_chem -> label[k]);
@@ -181,15 +183,15 @@ void initang ()
       }
     }
   }
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
-      for ( k = 0 ; k < active_project -> nspec ; k++ )
+      for ( k = 0 ; k < this_proj -> nspec ; k++ )
       {
-        for ( l = 0 ; l < active_project -> nspec ; l++ )
+        for ( l = 0 ; l < this_proj -> nspec ; l++ )
         {
-        active_project -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Dihedral [%s-%s-%s-%s]",
+        this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Dihedral [%s-%s-%s-%s]",
                                                                            active_chem -> label[i], active_chem -> label[j],
                                                                            active_chem -> label[k], active_chem -> label[l]);
           h=h+1;
@@ -197,8 +199,8 @@ void initang ()
       }
     }
   }
-  add_curve_widgets (activep, ANG, 0);
-  active_project -> analysis[ANG] -> init_ok = TRUE;
+  add_curve_widgets (this_proj, ANG);
+  this_proj -> analysis[ANG] -> init_ok = TRUE;
 }
 
 /*!
@@ -537,7 +539,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     //if (bonding && active_project -> steps > 1) statusb = 1;
     if (bonds_update || active_project -> runc[0] || active_project -> runc[2])
     {
-      if (! active_project -> analysis[BND] -> init_ok && bonding) initbd ();
+      if (! active_project -> analysis[BND] -> init_ok && bonding) initbd (active_project);
       if (active_project -> runc[0]) clean_curves_data (BND, 0, active_project -> analysis[BND] -> numc);
       prepostcalc (widg, FALSE, BND, statusb, opac);
       l = 0;
@@ -610,7 +612,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     }
     if (active_project -> runc[1])
     {
-      if (! active_project -> analysis[ANG] -> init_ok) initang ();
+      if (! active_project -> analysis[ANG] -> init_ok) initang (active_project);
       clean_curves_data (ANG, 0, active_project -> analysis[ANG] -> numc);
       active_project ->analysis[ANG] -> delta = 180.0 / active_project -> analysis[ANG] -> num_delta;
       j = bond_angles_ (& active_project -> analysis[ANG] -> num_delta);

@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve);
   void initcurve (project * pid, int rid, int cid);
-  void add_curve_widgets (int pid, int rid, int str);
+  void add_curve_widgets (project * this_proj, int rid);
 
   DataLayout * curve_default_layout (project * pid, int rid, int cid);
 
@@ -248,25 +248,20 @@ void initcurve (project * pid, int rid, int cid)
 }
 
 /*!
-  \fn void add_curve_widgets (int pid, int rid, int str)
+  \fn void add_curve_widgets (project * this_proj, int rid)
 
   \brief add curve widgets to the project
 
-  \param pid the project id
+  \param this_proj the target project
   \param rid the analysis id
-  \param str at the project creation stage (1) or latter on (0)
 */
-void add_curve_widgets (int pid, int rid, int str)
+void add_curve_widgets (project * this_proj, int rid)
 {
   int j, k;
-  project * this_proj = get_project_by_id(pid);
   for (j=0; j<this_proj -> analysis[rid] -> numc; j++)
   {
     this_proj -> analysis[rid] -> curves[j] -> cid = j;
-    this_proj -> analysis[rid] -> idcc[j].a = pid;
-    this_proj -> analysis[rid] -> idcc[j].b = rid;
-    this_proj -> analysis[rid] -> idcc[j].c = j;
-    if (str == 0 || this_proj -> analysis[rid] -> curves[j] -> ndata == 0)
+    if (this_proj -> analysis[rid] -> curves[j] -> ndata == 0)
     {
       initcurve (this_proj, rid, j);
     }

@@ -166,7 +166,7 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
   }
   xmax = this_curve -> axmax[0] - cxy[0];
   ymax = this_curve -> axmax[1] - cxy[1];
-// Ensuring no log scale issues
+// Ensuring no log scale issuesthis_curve -> extrac
   if (this_curve -> scale[0]) setup_xaxis_log (cr, this_curve, rid, cid, FALSE);
   if (this_curve -> scale[1]) setup_yaxis_log (cr, this_curve, FALSE);
 
@@ -190,61 +190,84 @@ void show_curve (GtkDrawingArea * area, cairo_t * cr, int width, int height, gpo
 // let's go for the plot
 // first we start by the possible extra curves
   i = 0;
-  CurveExtra * ctmp = this_curve -> extrac -> last;
-  for ( j=0 ; j < this_curve -> extrac -> extras + 1; j++ )
+  if (this_curve -> extrac)
   {
-    if (this_curve -> draw_id == j)
+    CurveExtra * ctmp = this_curve -> extrac -> last;
+    for ( j=0 ; j < this_curve -> extrac -> extras + 1; j++ )
     {
-      if (this_curve -> bshift && this_curve -> layout -> aspect && this_curve -> extrac -> extras) i ++;
-      k = (this_curve -> layout -> aspect) ? i : 0;
-      draw_curve (cr,
-                  cid,
-                  rid,
-                  this_proj,
-                  this_curve -> ndata,
-                  this_curve -> layout -> datacolor,
-                  this_curve -> scale[0],
-                  this_curve -> scale[1],
-                  this_curve -> layout -> aspect,
-                  this_curve -> layout -> dash,
-                  this_curve -> layout -> thickness,
-                  this_curve -> layout -> glyph,
-                  this_curve -> layout -> gsize,
-                  this_curve -> layout -> gfreq,
-                  this_curve -> layout -> hwidth,
-                  this_curve -> layout -> hopac,
-                  this_curve -> layout -> hpos,
-                  this_curve -> extrac -> extras,
-                  k);
-
-    }
-    else
-    {
-      if (this_curve -> bshift && ctmp -> layout -> aspect) i++;
-      k = (ctmp -> layout -> aspect) ? i : 0;
-      draw_curve (cr,
-                  ctmp -> id.c,
-                  ctmp -> id.b,
-                  get_project_by_id(ctmp -> id.a),
-                  get_project_by_id(ctmp -> id.a) -> analysis[ctmp -> id.b] -> curves[ctmp -> id.c] -> ndata,
-                  ctmp -> layout -> datacolor,
-                  this_curve -> scale[0],
-                  this_curve -> scale[1],
-                  ctmp -> layout -> aspect,
-                  ctmp -> layout -> dash,
-                  ctmp -> layout -> thickness,
-                  ctmp -> layout -> glyph,
-                  ctmp -> layout -> gsize,
-                  ctmp -> layout -> gfreq,
-                  ctmp -> layout -> hwidth,
-                  ctmp -> layout -> hopac,
-                  ctmp -> layout -> hpos,
-                  this_curve -> extrac -> extras,
-                  k);
-      if (ctmp -> prev != NULL) ctmp = ctmp -> prev;
+      if (this_curve -> draw_id == j)
+      {
+        if (this_curve -> bshift && this_curve -> layout -> aspect && this_curve -> extrac -> extras) i ++;
+        k = (this_curve -> layout -> aspect) ? i : 0;
+        draw_curve (cr,
+                    cid,
+                    rid,
+                    this_proj,
+                    this_curve -> ndata,
+                    this_curve -> layout -> datacolor,
+                    this_curve -> scale[0],
+                    this_curve -> scale[1],
+                    this_curve -> layout -> aspect,
+                    this_curve -> layout -> dash,
+                    this_curve -> layout -> thickness,
+                    this_curve -> layout -> glyph,
+                    this_curve -> layout -> gsize,
+                    this_curve -> layout -> gfreq,
+                    this_curve -> layout -> hwidth,
+                    this_curve -> layout -> hopac,
+                    this_curve -> layout -> hpos,
+                    this_curve -> extrac -> extras,
+                    k);
+      }
+      else
+      {
+        if (this_curve -> bshift && ctmp -> layout -> aspect) i++;
+        k = (ctmp -> layout -> aspect) ? i : 0;
+        draw_curve (cr,
+                    ctmp -> id.c,
+                    ctmp -> id.b,
+                   get_project_by_id(ctmp -> id.a),
+                   get_project_by_id(ctmp -> id.a) -> analysis[ctmp -> id.b] -> curves[ctmp -> id.c] -> ndata,
+                    ctmp -> layout -> datacolor,
+                    this_curve -> scale[0],
+                    this_curve -> scale[1],
+                    ctmp -> layout -> aspect,
+                    ctmp -> layout -> dash,
+                    ctmp -> layout -> thickness,
+                    ctmp -> layout -> glyph,
+                    ctmp -> layout -> gsize,
+                    ctmp -> layout -> gfreq,
+                    ctmp -> layout -> hwidth,
+                    ctmp -> layout -> hopac,
+                    ctmp -> layout -> hpos,
+                    this_curve -> extrac -> extras,
+                    k);
+        if (ctmp -> prev != NULL) ctmp = ctmp -> prev;
+      }
     }
   }
-
+  else
+  {
+    draw_curve (cr,
+                cid,
+                rid,
+                this_proj,
+                this_curve -> ndata,
+                this_curve -> layout -> datacolor,
+                this_curve -> scale[0],
+                this_curve -> scale[1],
+                this_curve -> layout -> aspect,
+                this_curve -> layout -> dash,
+                this_curve -> layout -> thickness,
+                this_curve -> layout -> glyph,
+                this_curve -> layout -> gsize,
+                this_curve -> layout -> gfreq,
+                this_curve -> layout -> hwidth,
+                this_curve -> layout -> hopac,
+                this_curve -> layout -> hpos,
+                0,
+                0);
+  }
   // Draw the axis bars - in option
   if (this_curve -> show_axis[1])
   {

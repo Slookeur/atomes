@@ -204,13 +204,16 @@ void prep_extra_rid (tint * data)
   int i;
   extrarid = allocdint (nprojects, NCALCS);
   Curve * this_curve = get_curve_from_pointer (data);
-  if (this_curve -> extrac -> extras > 0)
+  if (this_curve -> extrac)
   {
-    CurveExtra * ctmp = this_curve -> extrac -> first;
-    for (i=0; i<this_curve -> extrac -> extras; i++)
+    if (this_curve -> extrac -> extras > 0)
     {
-      extrarid[ctmp -> id.a][ctmp -> id.b] ++;
-      if (ctmp -> next != NULL) ctmp = ctmp -> next;
+      CurveExtra * ctmp = this_curve -> extrac -> first;
+      for (i=0; i<this_curve -> extrac -> extras; i++)
+      {
+        extrarid[ctmp -> id.a][ctmp -> id.b] ++;
+        if (ctmp -> next != NULL) ctmp = ctmp -> next;
+      }
     }
   }
 }
@@ -340,17 +343,20 @@ G_MODULE_EXPORT void curve_menu_bar_action (GSimpleAction * action, GVariant * p
 gboolean was_not_added (ExtraSets * sets, int a, int b, int c)
 {
   int i, j;
-  CurveExtra * ctmp = sets -> first;
-  for (i=0; i<sets -> extras; i++)
+  if (sets)
   {
-    if (ctmp -> id.a == a && ctmp -> id.b == b)
+    CurveExtra * ctmp = sets -> first;
+    for (i=0; i<sets -> extras; i++)
     {
-      for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
+      if (ctmp -> id.a == a && ctmp -> id.b == b)
       {
-        if (ctmp -> id.c == c) return FALSE;
+        for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
+        {
+          if (ctmp -> id.c == c) return FALSE;
+        }
       }
+      if (ctmp -> next != NULL) ctmp = ctmp -> next;
     }
-    if (ctmp -> next != NULL) ctmp = ctmp -> next;
   }
   return TRUE;
 }

@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initrng ();
+  void initrng (project * this_proj);
   void update_rings_menus (glwin * view);
   void update_rings_view (project * this_proj, int c);
   void clean_rings_data (int rid, glwin * view);
@@ -74,11 +74,13 @@ extern G_MODULE_EXPORT void show_hide_poly (GSimpleAction * action, GVariant * p
 gboolean toggled_rings;
 
 /*!
-  \fn void initrng ()
+  \fn void initrng (project * this_proj)
 
   \brief initialize the curve widgets for the ring statistics
+
+  \param this_proj the target project
 */
-void initrng ()
+void initrng (project * this_proj)
 {
   int i, j, k, l;
   char * cp[4] = {"Rc(n)[", "Pn(n)[", "Pmax(n)[", "Pmin(n)["};
@@ -88,20 +90,20 @@ void initrng ()
     for ( j = 0 ; j < 4 ; j++ )
     {
 
-      active_project -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %sAll]", rings_type[i], cp[j]);
+      this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %sAll]", rings_type[i], cp[j]);
       l=l+1;
     }
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
       for ( k = 0 ; k < 4 ; k++ )
       {
-        active_project -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %s%s]", rings_type[i], cp[k], active_chem -> label[j]);
+        this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %s%s]", rings_type[i], cp[k], active_chem -> label[j]);
         l=l+1;
       }
     }
   }
-  add_curve_widgets (activep, RIN, 0);
-  active_project -> analysis[RIN] -> init_ok = TRUE;
+  add_curve_widgets (this_proj, RIN);
+  this_proj -> analysis[RIN] -> init_ok = TRUE;
 }
 
 #ifdef GTK3
@@ -451,7 +453,7 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
 
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
-  if (! active_project -> analysis[RIN] -> init_ok) initrng ();
+  if (! active_project -> analysis[RIN] -> init_ok) initrng (active_project);
   active_project -> rsparam[search][5] = 0;
   if (! active_project -> dmtx || active_project -> rsparam[search][4] || (search > 2 && active_cell -> pbc))
   {

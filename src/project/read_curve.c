@@ -84,7 +84,7 @@ int read_project_curve (FILE * fp, int pid)
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
-  if (rid == SPH && version_2_9_and_above)
+  if (version_2_9_and_above)
   {
     this_curve -> name = read_this_string (fp);
   }

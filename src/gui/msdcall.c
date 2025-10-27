@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initmsd ();
+  void initmsd (project * this_proj);
   void update_msd_view (project * this_proj);
 
   G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
@@ -49,65 +49,67 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 
 /*!
-  \fn void initmsd ()
+  \fn void initmsd (project * this_proj)
 
   \brief initialize the curve widgets for the MSD
+
+  \param this_proj the target project
 */
-void initmsd ()
+void initmsd (project * this_proj)
 {
   int i, j;
   j = 0;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(nac)[%s]", active_chem -> label[i]);
     j=j+1;
   }
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz)[%s]", active_chem -> label[i]);
     j=j+1;
   }
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x/nac)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y/nac)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z/nac)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy/nac)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz/nac)[%s]", active_chem -> label[i]);
     j=j+1;
-    active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz/nac)[%s]", active_chem -> label[i]);
     j=j+1;
   }
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[x]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[x]");
   j=j+1;
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[y]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[y]");
   j=j+1;
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[z]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[z]");
   j=j+1;
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[x]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[x]");
   j=j+1;
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[y]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[y]");
   j=j+1;
-  active_project -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[z]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[z]");
 
-  add_curve_widgets (activep, MSD, 0);
-  active_project -> analysis[MSD] -> init_ok=TRUE;
+  add_curve_widgets (this_proj, MSD);
+  this_proj -> analysis[MSD] -> init_ok=TRUE;
 }
 
 /*!
@@ -152,7 +154,7 @@ void update_msd_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  if (! active_project -> analysis[MSD] -> init_ok)  initmsd ();
+  if (! active_project -> analysis[MSD] -> init_ok)  initmsd (active_project);
   clean_curves_data (MSD, 0, active_project -> analysis[MSD] -> numc);
   prepostcalc (widg, FALSE, MSD, 0, opac);
   active_project -> analysis[MSD] -> min = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;

@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   int recup_data_ (int * cd, int * rd);
 
-  void initgr (int r);
+  void initgr (project * this_proj, int rdf);
   void update_rdf_view (project * this_proj, int rdf);
   void sendcutoffs_ (int * nc, double * totc, double partc[* nc][* nc]);
 
@@ -56,64 +56,65 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 int fitc = 0;
 
 /*!
-  \fn void initgr (int r)
+  \fn void initgr (project * this_proj, int rdf)
 
   \brief initialize the curve widgets for the g(r)/g(k)
 
-  \param r GR = real space, GK = FFT
+  \param this_proj the target project
+  \param rdf GR = real space, GK = FFT
 */
-void initgr (int r)
+void initgr (project * this_proj, int rdf)
 {
   int i, j, k;
-  active_project -> analysis[r] -> curves[0] -> name = g_strdup_printf ("g(r) neutrons");
-  active_project -> analysis[r] -> curves[1] -> name = g_strdup_printf ("g(r) neutrons - smoothed");
-  active_project -> analysis[r] -> curves[2] -> name = g_strdup_printf ("G(r) neutrons");
-  active_project -> analysis[r] -> curves[3] -> name = g_strdup_printf ("G(r) neutrons - smoothed");
-  active_project -> analysis[r] -> curves[4] -> name = g_strdup_printf ("D(r) neutrons");
-  active_project -> analysis[r] -> curves[5] -> name = g_strdup_printf ("D(r) neutrons - smoothed");
-  active_project -> analysis[r] -> curves[6] -> name = g_strdup_printf ("T(r) neutrons");
-  active_project -> analysis[r] -> curves[7] -> name = g_strdup_printf ("T(r) neutrons - smoothed");
-  active_project -> analysis[r] -> curves[8] -> name = g_strdup_printf ("g(r) X-rays");
-  active_project -> analysis[r] -> curves[9] -> name = g_strdup_printf ("g(r) X-rays - smoothed");
-  active_project -> analysis[r] -> curves[10] -> name = g_strdup_printf ("G(r) X-rays");
-  active_project -> analysis[r] -> curves[11] -> name = g_strdup_printf ("G(r) X-rays - smoothed");
-  active_project -> analysis[r] -> curves[12] -> name = g_strdup_printf ("D(r) X-rays");
-  active_project -> analysis[r] -> curves[13] -> name = g_strdup_printf ("D(r) X-rays - smoothed");
-  active_project -> analysis[r] -> curves[14] -> name = g_strdup_printf ("T(r) X-rays");
-  active_project -> analysis[r] -> curves[15] -> name = g_strdup_printf ("T(r) X-rays - smoothed");
+  this_proj -> analysis[rdf] -> curves[0] -> name = g_strdup_printf ("g(r) neutrons");
+  this_proj -> analysis[rdf] -> curves[1] -> name = g_strdup_printf ("g(r) neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[2] -> name = g_strdup_printf ("G(r) neutrons");
+  this_proj -> analysis[rdf] -> curves[3] -> name = g_strdup_printf ("G(r) neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[4] -> name = g_strdup_printf ("D(r) neutrons");
+  this_proj -> analysis[rdf] -> curves[5] -> name = g_strdup_printf ("D(r) neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[6] -> name = g_strdup_printf ("T(r) neutrons");
+  this_proj -> analysis[rdf] -> curves[7] -> name = g_strdup_printf ("T(r) neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[8] -> name = g_strdup_printf ("g(r) X-rays");
+  this_proj -> analysis[rdf] -> curves[9] -> name = g_strdup_printf ("g(r) X-rays - smoothed");
+  this_proj -> analysis[rdf] -> curves[10] -> name = g_strdup_printf ("G(r) X-rays");
+  this_proj -> analysis[rdf] -> curves[11] -> name = g_strdup_printf ("G(r) X-rays - smoothed");
+  this_proj -> analysis[rdf] -> curves[12] -> name = g_strdup_printf ("D(r) X-rays");
+  this_proj -> analysis[rdf] -> curves[13] -> name = g_strdup_printf ("D(r) X-rays - smoothed");
+  this_proj -> analysis[rdf] -> curves[14] -> name = g_strdup_printf ("T(r) X-rays");
+  this_proj -> analysis[rdf] -> curves[15] -> name = g_strdup_printf ("T(r) X-rays - smoothed");
   k = 16;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    for ( j = 0 ; j < active_project -> nspec ; j++ )
+    for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
-      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("g(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
+      this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf ("g(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("g(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
+      this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf ("g(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("G(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
+      this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf ("G(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("G(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
+      this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf ("G(r)[%s,%s] - smoothed", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf ("dn(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
+      this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf ("dn(r)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
     }
   }
-  if ( active_project -> nspec == 2 )
+  if ( this_proj -> nspec == 2 )
   {
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[NN]");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[NN]");
     k=k+1;
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[NN] - smoothed");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[NN] - smoothed");
     k=k+1;
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[NC]");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[NC]");
     k=k+1;
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[NC] - smoothed");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[NC] - smoothed");
     k=k+1;
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[CC]");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[CC]");
     k=k+1;
-    active_project -> analysis[r] -> curves[k] -> name = g_strdup_printf("BT(r)[CC] - smoothed");
+    this_proj -> analysis[rdf] -> curves[k] -> name = g_strdup_printf("BT(r)[CC] - smoothed");
   }
-  add_curve_widgets (activep, r, 0);
-  active_project -> analysis[r] -> init_ok = TRUE;
+  add_curve_widgets (this_proj, rdf);
+  this_proj -> analysis[rdf] -> init_ok = TRUE;
 }
 
 /*!
@@ -198,7 +199,7 @@ void update_rdf_view (project * this_proj, int rdf)
 G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  if (! active_project -> analysis[GDR] -> init_ok) initgr (GDR);
+  if (! active_project -> analysis[GDR] -> init_ok) initgr (active_project, GDR);
   clean_curves_data (GDR, 0, active_project -> analysis[GDR] -> numc);
   active_project -> analysis[GDR] -> delta = active_project -> analysis[GDR] -> max / active_project -> analysis[GDR] -> num_delta;
   prepostcalc (widg, FALSE, GDR, 0, opac);
@@ -316,7 +317,7 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
 {
   int i;
 
-  if (! active_project -> analysis[GDK] -> init_ok) initgr (GDK);
+  if (! active_project -> analysis[GDK] -> init_ok) initgr (active_project, GDK);
   clean_curves_data (GDK, 0, active_project -> analysis[GDK] -> numc);
   active_project -> analysis[GDK] -> delta = active_project -> analysis[GDK] -> max / active_project -> analysis[GDK] -> num_delta;
   prepostcalc (widg, FALSE, GDK, 0, opac);

@@ -79,23 +79,17 @@ int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
   if (fwrite (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
-  if (rid == SPH)
-  {
-    if (save_this_string (fp, this_curve -> name) != OK) return ERROR_RW;
-  }
+  if (save_this_string (fp, this_curve -> name) != OK) return ERROR_RW;
   if (fwrite (& this_curve -> displayed, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& this_curve -> ndata, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (this_curve -> data[0],
-              sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
-  if (fwrite (this_curve -> data[1],
-              sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
+  if (fwrite (this_curve -> data[0], sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
+  if (fwrite (this_curve -> data[1], sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
   i = 0;
   if (this_curve -> err != NULL) i = 1;
   if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (this_curve -> err != NULL)
   {
-    if (fwrite (this_curve -> err,
-                sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
+    if (fwrite (this_curve -> err, sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
   }
 
   if (this_curve -> displayed)

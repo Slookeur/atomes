@@ -37,7 +37,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   gchar * read_this_string (FILE * fp);
 
-  void initcnames (int rid);
+  void initcnames (project * this_proj, int rid);
   void allocatoms (project * this_proj);
   void alloc_proj_data (project * this_proj, int cid);
 
@@ -56,14 +56,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 extern void init_box_calc ();
 extern void set_color_map_sensitive (glwin * view);
-extern void initgr (int r);
-extern void initsq (int r);
-extern void initbd ();
-extern void initang ();
-extern void initrng ();
-extern void initchn ();
-extern void initmsd ();
-extern void initsh (int s);
+extern void initgr (project * this_proj, int rdf);
+extern void initsq (project * this_proj, int sqk);
+extern void initbd (project * this_proj);
+extern void initang (project * this_proj);
+extern void initrng (project * this_proj);
+extern void initchn (project * this_proj);
+extern void initmsd (project * this_proj);
+extern void initsh (project * this_proj, int str);
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 
 gboolean version_2_5_and_bellow;
@@ -114,45 +114,46 @@ gchar * read_this_string (FILE * fp)
 
 
 /*!
-  \fn void initcnames (int rid)
+  \fn void initcnames (project * this_proj, int rid)
 
   \brief initialize curve names
 
+  \param project the target project
   \param rid calculation id
 */
-void initcnames (int rid)
+void initcnames (project * this_proj, int rid)
 {
   switch (rid)
   {
     case GDR:
-      initgr (rid);
+      initgr (this_proj, rid);
       break;
     case SQD:
-      initsq (rid);
+      initsq (this_proj, rid);
       break;
     case SKD:
-      initsq (rid);
+      initsq (this_proj, rid);
       break;
     case GDK:
-      initgr (rid);
+      initgr (this_proj, rid);
       break;
     case BND:
-      initbd ();
+      initbd (this_proj);
       break;
     case ANG:
-      initang ();
+      initang (this_proj);
       break;
     case RIN:
-      initrng ();
+      initrng (this_proj);
       break;
     case CHA:
-      initchn ();
+      initchn (this_proj);
       break;
     case SPH:
-      initsh (0);
+      initsh (this_proj, 0);
       break;
     case MSD:
-      initmsd ();
+      initmsd (this_proj);
       break;
   }
 }
@@ -266,6 +267,7 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
     if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
     if (i)
     {
+      initcnames (this_proj, this_analysis -> aid);
       for (j=0; j<i; j++)
       {
         if (read_project_curve (fp, this_proj -> id) != OK)
@@ -520,7 +522,7 @@ int open_project (FILE * fp)
               active_project -> analysis[i] -> num_delta = tmp_num_delta[i];
               active_project -> analysis[i] -> min = tmp_min[i];
               active_project -> analysis[i] -> max = tmp_max[i];
-              if (active_project -> analysis[i] -> avail_ok) initcnames (i);
+              if (active_project -> analysis[i] -> avail_ok) initcnames (active_project, i);
             }
           }
           g_free (tmp_avail);
@@ -542,7 +544,7 @@ int open_project (FILE * fp)
             {
               active_project -> analysis[SPH] -> numc = j;
               alloc_analysis_curves (active_project -> analysis[SPH]);
-              add_curve_widgets (activep, SPH, 0);
+              add_curve_widgets (active_project, SPH);
               active_project -> analysis[SPH] -> avail_ok = TRUE;
               for (k=0; k<j; k++)
               {

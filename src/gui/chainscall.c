@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initchn ();
+  void initchn (project * this_proj);
   void update_chains_menus (glwin * view);
   void update_chains_view (project * this_proj);
   void clean_chains_data (glwin * view);
@@ -60,20 +60,22 @@ extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 extern void clean_coord_window (project * this_proj);
 
 /*!
-  \fn void initchn ()
+  \fn void initchn (project * this_proj)
 
   \brief initialize the curve widgets for the chains statistics calculation
+
+  \param this_proj the target project
 */
-void initchn ()
+void initchn (project * this_proj)
 {
   int i;
-  active_project -> analysis[CHA] -> curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
-  for (i=0 ; i<active_project -> nspec ; i++)
+  this_proj -> analysis[CHA] -> curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  for (i=0 ; i<this_proj -> nspec ; i++)
   {
-    active_project -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
   }
-  add_curve_widgets (activep, CHA, 0);
-  active_project -> analysis[CHA] -> init_ok = TRUE;
+  add_curve_widgets (this_proj, CHA);
+  this_proj -> analysis[CHA] -> init_ok = TRUE;
 }
 
 #ifdef GTK3
@@ -302,7 +304,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
 
-  if (! active_project -> analysis[CHA] -> init_ok) initchn ();
+  if (! active_project -> analysis[CHA] -> init_ok) initchn (active_project);
   active_project -> csparam[6] = 0;
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 6, 0);
 
