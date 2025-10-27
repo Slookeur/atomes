@@ -64,22 +64,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 
 /*!
-  \fn void init_idc ()
+  \fn void init_idc (project * this_proj)
 
   \brief initialize the curve widgets for the IDC analysis
+
+  \param this_proj the target project
 */
-void init_idc ()
+void init_idc (project * this_proj)
 {
   int i;
   // In this example a result is described for each chemical species.
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> analysis[IDC] -> curves[i] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[i]);
+    this_proj -> analysis[IDC] -> curves[i] -> name = g_strdup_printf ("IDC[%s]", active_chem -> label[i]);
   }
   // The total number of curves to be declared in this function
-  // should be equal to 'active_project -> analysis[IDC] -> numc'
-  add_curve_widgets (activep, IDC, 0);
-  active_project -> analysis[IDC] -> init_ok = TRUE;
+  // should be equal to 'this_proj -> analysis[IDC] -> numc'
+  add_curve_widgets (this_proj -> id, IDC, 0);
+  this_proj -> analysis[IDC] -> init_ok = TRUE;
 }
 
 /*!
@@ -134,7 +136,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 {
   // active_project is a pointer on the active atomes project
   // Initializing the graph for this calculation, if this was done already
-  if (! active_project -> analysis[IDC] -> init_ok)  init_idc ();
+  if (! active_project -> analysis[IDC] -> init_ok)  init_idc (active_project);
 
   // Cleaning previous results, if any
   clean_curves_data (IDC, 0, active_project -> analysis[IDC] -> numc);

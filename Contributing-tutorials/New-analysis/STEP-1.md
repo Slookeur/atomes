@@ -81,14 +81,21 @@
 Search for the [`init_atomes_analysis`][init_atomes_analysis] function to declare the new analysis
 
 ```C
-void init_atomes_analysis ()
+/*!
+  \fn void init_atomes_analysis (gboolean apply_defaults)
+
+  \brief initialize analysis data structures for atomes
+
+  \param apply_defaults apply default parameters (1/0)
+*/
+void init_atomes_analysis (gboolean apply_defaults)
 {
   ...
 
   int num_g = ;             // Total number of graph windows as result(s) of the analysis
   int num_c = ;             // Number of analysis compatible, to allow overlap of the data on the graph window
   int c_list[num_c] = {};   // List of compatible analysis, integer list in the ID list, including self
-  active_project -> analysis[IDC] = setup_analysis (IDC, TRUE, num_g, num_c, c_list);  // This is an example
+  active_project -> analysis[IDC] = setup_analysis (pid, IDC, TRUE, num_g, num_c, c_list);  // This is an example
 
   ...
 }
