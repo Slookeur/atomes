@@ -630,7 +630,7 @@ void run_project ()
   {
     if (! active_project -> analysis)
     {
-      init_atomes_analysis (TRUE);
+      init_atomes_analysis (active_project, TRUE);
     }
     int i, j;
     j = (active_cell -> npt) ? active_project -> steps : 1;

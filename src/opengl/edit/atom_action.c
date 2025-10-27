@@ -929,7 +929,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
       }
     }
   }
-  init_atomes_analysis (TRUE);
+  init_atomes_analysis (active_project, TRUE);
   active_project -> dmtx = FALSE;
   active_project -> run = (active_project -> natomes) ? TRUE : FALSE;
   chemistry_ () ;

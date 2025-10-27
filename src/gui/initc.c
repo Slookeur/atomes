@@ -35,7 +35,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void initcwidgets ();
   void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
   void alloc_analysis_curves (atomes_analysis * this_analysis);
-  void init_atomes_analysis (gboolean apply_defaults);
+  void init_atomes_analysis (project * this_proj, gboolean apply_defaults);
   void initialize_this_analysis (project * this_proj, int ana);
 
   atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title);
@@ -212,67 +212,68 @@ atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean 
 */
 
 /*!
-  \fn void init_atomes_analysis (gboolean apply_defaults)
+  \fn void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
 
   \brief initialize analysis data structures for atomes
 
+  \param this_proj the target project
   \param apply_defaults apply default parameters (1/0)
 */
-void init_atomes_analysis (gboolean apply_defaults)
+void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
 {
-  int i = active_project -> nspec;
-  int pid = active_project -> id;
+  int i = this_proj -> nspec;
+  int pid = this_proj -> id;
   /* Compatible analysis:
     - always include self, and others if required
     - x axis must be similar or allow comparison (ex: distance)
   */
   int * comp_list;
-  active_project -> analysis = g_malloc0(NCALCS*sizeof*active_project -> analysis);
+  this_proj -> analysis = g_malloc0(NCALCS*sizeof*this_proj -> analysis);
   // g(r)
   comp_list = allocint (2);
   comp_list[0] = GDR;
   comp_list[1] = GDK;
-  active_project -> analysis[GDR] = setup_analysis (pid, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  this_proj -> analysis[GDR] = setup_analysis (pid, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GDK] = setup_analysis (pid, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  this_proj -> analysis[GDK] = setup_analysis (pid, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQD;
   comp_list[1] = SKD;
-  active_project -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  this_proj -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  this_proj -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
   comp_list[0] = BND;
-  active_project -> analysis[BND] = setup_analysis (pid, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "Dij [Å]");
+  this_proj -> analysis[BND] = setup_analysis (pid, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "Dij [Å]");
 
   // Angle distribution(s)
   comp_list[0] = ANG;
-  active_project -> analysis[ANG] = setup_analysis (pid, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+  this_proj -> analysis[ANG] = setup_analysis (pid, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
   comp_list[0] = RIN;
-  active_project -> analysis[RIN] = setup_analysis (pid, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+  this_proj -> analysis[RIN] = setup_analysis (pid, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size n of the ring [total number of nodes]");
 
   // Chain statistic(s)
   comp_list[0] = CHA;
-  active_project -> analysis[CHA] = setup_analysis (pid, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+  this_proj -> analysis[CHA] = setup_analysis (pid, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size n of the chain [total number of nodes]");
 
   // Spherical harmonic(s)
   comp_list[0] = SPH;
-  active_project -> analysis[SPH] = setup_analysis (pid, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
+  this_proj -> analysis[SPH] = setup_analysis (pid, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
 
   // Mean square displacement
   comp_list[0] = MSD;
-  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+  if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
 
   g_free (comp_list);
 
-  if (apply_defaults) apply_analysis_default_parameters_to_project (active_project);
+  if (apply_defaults) apply_analysis_default_parameters_to_project (this_proj);
 }
 
 /*!

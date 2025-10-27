@@ -494,7 +494,7 @@ int open_project (FILE * fp)
           prep_spec_ (active_chem -> chem_prop[CHEM_Z], active_chem -> nsps, & j);
         }
         // Read curves
-        init_atomes_analysis (FALSE);
+        init_atomes_analysis (active_project, FALSE);
         if (version_2_9_and_above)
         {
           for (i=0; i<calcs_to_read; i++)

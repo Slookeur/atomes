@@ -82,13 +82,14 @@ Search for the [`init_atomes_analysis`][init_atomes_analysis] function to declar
 
 ```C
 /*!
-  \fn void init_atomes_analysis (gboolean apply_defaults)
+  \fn void init_atomes_analysis (project * this_proj,  gboolean apply_defaults)
 
   \brief initialize analysis data structures for atomes
 
+  \param this_proj the target project
   \param apply_defaults apply default parameters (1/0)
 */
-void init_atomes_analysis (gboolean apply_defaults)
+void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
 {
   ...
 

@@ -61,5 +61,5 @@ void update_after_calc (int calc);
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
 void prep_calc_actions ();
 
-void init_atomes_analysis (gboolean apply_defaults);
+void init_atomes_analysis (project * this_proj, gboolean apply_defaults);
 #endif

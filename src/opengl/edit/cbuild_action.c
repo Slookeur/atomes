@@ -1690,7 +1690,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       active_image -> style = (active_project -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
       initcutoffs (active_chem, active_project -> nspec);
       init_curves_and_calc (active_project);
-      init_atomes_analysis (TRUE);
+      init_atomes_analysis (active_project, TRUE);
       active_project_changed (activep);
       init_camera (active_project, TRUE);
       setup_default_lights (active_project, active_image);
