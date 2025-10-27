@@ -34,7 +34,7 @@
 > Note that `test_idc()` is an optional testing routine you might want to write to ensure that conditions are met to perform the analysis.
 
 > [!IMPORTANT]
-> Note that `on_calc_idc_released` is a function you **MUST** write to perform the calculation ([see next step][step-3]).
+> Note that `on_calc_idc_released` is a function you **MUST** write to perform the calculation [see next step][step-3].
  
   2. In the function [`on_calc_activate`][on_calc_activate] add a test case for the new analysis
 
@@ -75,7 +75,7 @@
 > [!TIP]
 > Some examples are provided afterwards but many more are available in **atomes** source code, including in the file [`src/gui/calc_menu.c`][calc_menu.c]
 
-In the following examples are use to illustrate both how to create the user interface, and to read back the associated data what is usually call a **callback**. 
+In the following examples are use to illustrate both how to create the user interface, and to read back the associated data what is usually called a **callback**. 
 
   - Create an entry to read an integer value
 
