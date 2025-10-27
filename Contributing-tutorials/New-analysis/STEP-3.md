@@ -220,6 +220,9 @@ and remember that at this point you only need to call the element of the active 
 
    ```
 
+# Next : [Preparing **atomes** release candidate][releasing]
+
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
 [atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
 [makefile]:https://github.com/Slookeur/atomes/blob/devel/Makefile
+[releasing]:STEP-4.md

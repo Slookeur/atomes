@@ -32,7 +32,7 @@ To get familiar with the code of the **atomes** program please refer to the exte
   - **1** : Adding the new analysis description in the code
   - **2** : Coding the new analysis user dialog and its callbacks
   - **3** : Adding the new analysis to the **atomes** software
-  - **4** : **atomes** release candidate requirements:
+  - **4** : Preparing **atomes** release candidate:
 
     - Modifying the **atomes** project (`.apf`) and workspace (`.awf`) file formats
 
@@ -54,7 +54,7 @@ Step **.4** is the most complicated part that will most likely require my help.
 
 ## 3. [Adding the new analysis to the **atomes** software][analysing]
 
-## 4. [**atomes** release candidate requirements][releasing]
+## 4. [Preparing **atomes** release candidate][releasing]
 
 
 [Doxygen]:https://www.doxygen.nl/
