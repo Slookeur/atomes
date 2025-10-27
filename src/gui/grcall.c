@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   int recup_data_ (int * cd, int * rd);
 
-  void initgr (project * this_proj, int rdf);
+  void init_gr (project * this_proj, int rdf);
   void update_rdf_view (project * this_proj, int rdf);
   void sendcutoffs_ (int * nc, double * totc, double partc[* nc][* nc]);
 
@@ -56,14 +56,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 int fitc = 0;
 
 /*!
-  \fn void initgr (project * this_proj, int rdf)
+  \fn void init_gr (project * this_proj, int rdf)
 
   \brief initialize the curve widgets for the g(r)/g(k)
 
   \param this_proj the target project
   \param rdf GR = real space, GK = FFT
 */
-void initgr (project * this_proj, int rdf)
+void init_gr (project * this_proj, int rdf)
 {
   int i, j, k;
   this_proj -> analysis[rdf] -> curves[0] -> name = g_strdup_printf ("g(r) neutrons");
@@ -199,7 +199,7 @@ void update_rdf_view (project * this_proj, int rdf)
 G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  if (! active_project -> analysis[GDR] -> init_ok) initgr (active_project, GDR);
+  if (! active_project -> analysis[GDR] -> init_ok) init_gr (active_project, GDR);
   clean_curves_data (GDR, 0, active_project -> analysis[GDR] -> numc);
   active_project -> analysis[GDR] -> delta = active_project -> analysis[GDR] -> max / active_project -> analysis[GDR] -> num_delta;
   prepostcalc (widg, FALSE, GDR, 0, opac);
@@ -317,7 +317,7 @@ G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data)
 {
   int i;
 
-  if (! active_project -> analysis[GDK] -> init_ok) initgr (active_project, GDK);
+  if (! active_project -> analysis[GDK] -> init_ok) init_gr (active_project, GDK);
   clean_curves_data (GDK, 0, active_project -> analysis[GDK] -> numc);
   active_project -> analysis[GDK] -> delta = active_project -> analysis[GDK] -> max / active_project -> analysis[GDK] -> num_delta;
   prepostcalc (widg, FALSE, GDK, 0, opac);

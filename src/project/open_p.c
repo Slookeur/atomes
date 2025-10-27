@@ -56,14 +56,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 extern void init_box_calc ();
 extern void set_color_map_sensitive (glwin * view);
-extern void initgr (project * this_proj, int rdf);
-extern void initsq (project * this_proj, int sqk);
-extern void initbd (project * this_proj);
-extern void initang (project * this_proj);
-extern void initrng (project * this_proj);
-extern void initchn (project * this_proj);
-extern void initmsd (project * this_proj);
-extern void initsh (project * this_proj, int str);
+extern void init_gr (project * this_proj, int rdf);
+extern void init_sq (project * this_proj, int sqk);
+extern void init_bond (project * this_proj);
+extern void init_ang (project * this_proj);
+extern void init_ring (project * this_proj);
+extern void init_chain (project * this_proj);
+extern void init_msd (project * this_proj);
+extern void init_sph (project * this_proj, int str);
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 
 gboolean version_2_5_and_bellow;
@@ -126,34 +126,34 @@ void initcnames (project * this_proj, int rid)
   switch (rid)
   {
     case GDR:
-      initgr (this_proj, rid);
+      init_gr (this_proj, rid);
       break;
     case SQD:
-      initsq (this_proj, rid);
+      init_sq (this_proj, rid);
       break;
     case SKD:
-      initsq (this_proj, rid);
+      init_sq (this_proj, rid);
       break;
     case GDK:
-      initgr (this_proj, rid);
+      init_gr (this_proj, rid);
       break;
     case BND:
-      initbd (this_proj);
+      init_bond (this_proj);
       break;
     case ANG:
-      initang (this_proj);
+      init_ang (this_proj);
       break;
     case RIN:
-      initrng (this_proj);
+      init_ring (this_proj);
       break;
     case CHA:
-      initchn (this_proj);
+      init_chain (this_proj);
       break;
     case SPH:
-      initsh (this_proj, 0);
+      init_sph (this_proj, 0);
       break;
     case MSD:
-      initmsd (this_proj);
+      init_msd (this_proj);
       break;
   }
 }

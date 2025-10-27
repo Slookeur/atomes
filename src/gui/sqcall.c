@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initsq (project * this_proj, int sqk);
+  void init_sq (project * this_proj, int sqk);
   void update_sq_view (project * this_proj, int sqk);
   void save_xsk_ (int * interv, double datacurve[* interv]);
 
@@ -51,14 +51,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn void initsq (project * this_proj, int sqk)
+  \fn void init_sq (project * this_proj, int sqk)
 
   \brief initialize the curve widgets for the s(q) / s(k) calculation
 
   \param this_proj the target project
   \param sqk s(q) (SQ) or s(k) (SK)
 */
-void initsq (project * this_proj, int sqk)
+void init_sq (project * this_proj, int sqk)
 {
   int i, j, k;
 
@@ -193,7 +193,7 @@ void update_sq_view (project * this_proj, int sqk)
 G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  if (! active_project -> analysis[SQD] -> init_ok) initsq (active_project, SQD);
+  if (! active_project -> analysis[SQD] -> init_ok) init_sq (active_project, SQD);
   clean_curves_data (SQD, 0, active_project -> analysis[SQD] -> numc);
   active_project -> analysis[SQD] -> delta = (active_project -> analysis[SQD] -> max - active_project -> analysis[SQD] -> min) / active_project -> analysis[SQD] -> num_delta;
   prepostcalc (widg, FALSE, SQD, 0, opac);
@@ -242,7 +242,7 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
 {
   int i, j;
 
-  if (! active_project -> analysis[SKD] -> init_ok) initsq (active_project, SKD);
+  if (! active_project -> analysis[SKD] -> init_ok) init_sq (active_project, SKD);
   clean_curves_data (SKD, 0, active_project -> analysis[SKD] -> numc);
   active_project -> analysis[SKD] -> delta = (active_project -> analysis[SKD] -> max - active_project -> analysis[SKD] -> min) / active_project -> analysis[SKD] -> num_delta;
   prepostcalc (widg, FALSE, SKD, 0, opac);

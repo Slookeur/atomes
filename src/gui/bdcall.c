@@ -38,8 +38,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   void restore_color_map (glwin * view, int * colm);
   void recup_dmin_dmax_ (double * min, double * max);
-  void initbd (project * this_proj);
-  void initang (project * this_proj);
+  void init_bond (project * this_proj);
+  void init_ang (project * this_proj);
   void initcutoffs (chemical_data * chem, int species);
   void cutoffsend ();
   void prep_ogl_bonds ();
@@ -134,13 +134,13 @@ void recup_dmin_dmax_ (double * min, double * max)
   }
 }
 /*!
-  \fn void initbd (project * this_proj)
+  \fn void init_bond (project * this_proj)
 
   \brief initialize the curve widgets for the bond distribution
 
   \param this_proj the target project
 */
-void initbd (project * this_proj)
+void init_bond (project * this_proj)
 {
   int i, j, k;
 
@@ -158,13 +158,13 @@ void initbd (project * this_proj)
 }
 
 /*!
-  \fn void initang (project * this_proj)
+  \fn void init_ang (project * this_proj)
 
   \brief initialize the curve widgets for the angle distribution
 
   \param this_proj the target project
 */
-void initang (project * this_proj)
+void init_ang (project * this_proj)
 {
   int h, i, j, k, l;
 
@@ -539,7 +539,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     //if (bonding && active_project -> steps > 1) statusb = 1;
     if (bonds_update || active_project -> runc[0] || active_project -> runc[2])
     {
-      if (! active_project -> analysis[BND] -> init_ok && bonding) initbd (active_project);
+      if (! active_project -> analysis[BND] -> init_ok && bonding) init_bond (active_project);
       if (active_project -> runc[0]) clean_curves_data (BND, 0, active_project -> analysis[BND] -> numc);
       prepostcalc (widg, FALSE, BND, statusb, opac);
       l = 0;
@@ -612,7 +612,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     }
     if (active_project -> runc[1])
     {
-      if (! active_project -> analysis[ANG] -> init_ok) initang (active_project);
+      if (! active_project -> analysis[ANG] -> init_ok) init_ang (active_project);
       clean_curves_data (ANG, 0, active_project -> analysis[ANG] -> numc);
       active_project ->analysis[ANG] -> delta = 180.0 / active_project -> analysis[ANG] -> num_delta;
       j = bond_angles_ (& active_project -> analysis[ANG] -> num_delta);

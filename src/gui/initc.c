@@ -221,6 +221,7 @@ atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean 
 void init_atomes_analysis (gboolean apply_defaults)
 {
   int i = active_project -> nspec;
+  int pid = active_project -> id;
   /* Compatible analysis:
     - always include self, and others if required
     - x axis must be similar or allow comparison (ex: distance)
@@ -231,43 +232,43 @@ void init_atomes_analysis (gboolean apply_defaults)
   comp_list = allocint (2);
   comp_list[0] = GDR;
   comp_list[1] = GDK;
-  active_project -> analysis[GDR] = setup_analysis (activep, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  active_project -> analysis[GDR] = setup_analysis (pid, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  active_project -> analysis[GDK] = setup_analysis (activep, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  active_project -> analysis[GDK] = setup_analysis (pid, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQD;
   comp_list[1] = SKD;
-  active_project -> analysis[SQD] = setup_analysis (activep, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   // s(k) - same compatibility list
-  active_project -> analysis[SKD] = setup_analysis (activep, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  active_project -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
   comp_list[0] = BND;
-  active_project -> analysis[BND] = setup_analysis (activep, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "Dij [Å]");
+  active_project -> analysis[BND] = setup_analysis (pid, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "Dij [Å]");
 
   // Angle distribution(s)
   comp_list[0] = ANG;
-  active_project -> analysis[ANG] = setup_analysis (activep, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+  active_project -> analysis[ANG] = setup_analysis (pid, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
   comp_list[0] = RIN;
-  active_project -> analysis[RIN] = setup_analysis (activep, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size n of the ring [total number of nodes]");
+  active_project -> analysis[RIN] = setup_analysis (pid, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size n of the ring [total number of nodes]");
 
   // Chain statistic(s)
   comp_list[0] = CHA;
-  active_project -> analysis[CHA] = setup_analysis (activep, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size n of the chain [total number of nodes]");
+  active_project -> analysis[CHA] = setup_analysis (pid, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size n of the chain [total number of nodes]");
 
   // Spherical harmonic(s)
   comp_list[0] = SPH;
-  active_project -> analysis[SPH] = setup_analysis (activep, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
+  active_project -> analysis[SPH] = setup_analysis (pid, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
 
   // Mean square displacement
   comp_list[0] = MSD;
-  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis (activep, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+  if (active_project -> steps > 1) active_project -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
 
   g_free (comp_list);
 

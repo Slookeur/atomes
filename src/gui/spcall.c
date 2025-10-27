@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initsh (project * this_proj, int str);
+  void init_sph (project * this_proj, int str);
   void update_spherical_view (project * this_proj);
 
   G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data);
@@ -48,14 +48,14 @@ extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 
 /*!
-  \fn void initsh (project * this_proj, int str)
+  \fn void init_sph (project * this_proj, int str)
 
   \brief initialize the curve widgets for the spherical harmonics
 
   \param this_proj the target project
   \param str initialize or not (1/0)
 */
-void initsh (project * this_proj, int str)
+void init_sph (project * this_proj, int str)
 {
   int i, j, k;
   if (str)
@@ -185,7 +185,7 @@ void update_spherical_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
-  if (! active_project -> analysis[SPH] -> init_ok) initsh(active_project, 1);
+  if (! active_project -> analysis[SPH] -> init_ok) init_sph(active_project, 1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)
