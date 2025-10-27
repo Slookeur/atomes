@@ -67,7 +67,7 @@
   {
     GtkWidget * idc_box;
 
-   // This part requires to be a litte bit familiar with GTK+
+    // This part requires to be a litte bit familiar with GTK+
 
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
   }

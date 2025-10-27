@@ -212,7 +212,7 @@ Specify if the analysis is always available, or if conditions have to be met:
 
 The autoscale is performed immediately after in this function. 
 
-## Next : [Coding the new analysis user dialog and its callbacks][codding]
+## Next : [Coding the new analysis user dialog and its callbacks][coding]
 ## Previous : [Adding a new analysis to the atomes software][adding]
 
 [Doxygen]:https://www.doxygen.nl/
@@ -233,5 +233,5 @@ The autoscale is performed immediately after in this function.
 [yaxis.c]:https://slookeur.github.io/atomes-doxygen/df/dfb/yaxis_8c.html
 [DataLayout]:https://slookeur.github.io/atomes-doxygen/d0/d5d/struct_data_layout.html
 [Curve]:https://slookeur.github.io/atomes-doxygen/da/d6e/struct_curve.html
-[codding]:STEP-2.md
+[coding]:STEP-2.md
 [adding]:README.md

@@ -50,7 +50,7 @@ Step **.4** is the most complicated part that will most likely require my help.
 
 ## 1. [Adding the new analysis description in the code][adding]
 
-## 2. [Coding the new analysis user dialog and its callbacks][codding]
+## 2. [Coding the new analysis user dialog and its callbacks][coding]
 
 ## 3. [Adding the new analysis to the **atomes** software][analysing]
 
@@ -60,6 +60,6 @@ Step **.4** is the most complicated part that will most likely require my help.
 [Doxygen]:https://www.doxygen.nl/
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
 [adding]:STEP-1.md
-[codding]:STEP-2.md
+[coding]:STEP-2.md
 [analysing]:STEP-3.md
 [releasing]:STEP-4.md
