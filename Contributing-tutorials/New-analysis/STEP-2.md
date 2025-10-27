@@ -253,11 +253,12 @@ In the following examples are use to illustrate both how to create the user inte
   }
   ```
 
-More information on the severak home made functions be found in the [`src/gui/gtk-misck.c`][gtk-misc.c] including:
-
- - [create_entry][create_entry]
- - [check_button][check_button]
- - [create_combo][create_combo]
+> [!TIP]
+> More information on several home made functions be found in the file [`src/gui/gtk-misck.c`][gtk-misc.c] including:
+>
+> - [create_entry][create_entry]
+> - [check_button][check_button]
+> - [create_combo][create_combo]
 
 ## Next : [Adding the new analysis to the **atomes** software][analysing]
 ## Previous : [Adding the new analysis description in the code][adding]
