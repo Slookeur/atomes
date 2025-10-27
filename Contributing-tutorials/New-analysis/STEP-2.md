@@ -232,7 +232,10 @@ In the following examples are use to illustrate both how to create the user inte
     ...
 
     GtkWidget * hbox = create_hbox (0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("Please select this", 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, 
+                         hbox, 
+                         markup_label ("Please select this", 250, -1, 0.0, 0.5), 
+                         FALSE, FALSE, 0);
     GtkWidget * combo = create_combo ();
     int i;
     gchar * list_items[] = {"First choice", "Second choice", "Third choice"};
