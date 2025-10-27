@@ -80,7 +80,7 @@ void init_idc (project * this_proj)
   }
   // The total number of curves to be declared in this function
   // should be equal to 'this_proj -> analysis[IDC] -> numc'
-  add_curve_widgets (this_proj, IDC, 0);
+  add_curve_widgets (this_proj, IDC);
   this_proj -> analysis[IDC] -> init_ok = TRUE;
 }
 
