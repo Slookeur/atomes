@@ -256,7 +256,7 @@ More information on the severak home made functions be found in the ['src/gui/gt
  - [check_button][check_button]
  - [create_combo][create_combo]
 
-# Next : [Adding the new analysis to the **atomes** software][analysing
+## Next : [Adding the new analysis to the **atomes** software][analysing
 
 [calc_menu.c]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html
 [on_calc_activate]:https://slookeur.github.io/atomes-doxygen/d8/d5e/calc__menu_8c.html#a981fd6ae8aa02f6ba86bbfdfbeace7ed

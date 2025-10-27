@@ -1,4 +1,4 @@
-# **atomes** release candidate requirements
+# Preparing **atomes** release candidate
 
   - Version compatibitilty **MUST** be ensured to read older poject `*.apf` and workspace `*.awf` files
 

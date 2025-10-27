@@ -212,7 +212,7 @@ Specify if the analysis is always available, or if conditions have to be met:
 
 The autoscale is performed immediately after in this function. 
 
-# Next : [Coding the new analysis user dialog and its callbacks][codding]
+## Next : [Coding the new analysis user dialog and its callbacks][codding]
 
 [Doxygen]:https://www.doxygen.nl/
 [atomes_doxygen]:https://slookeur.github.io/atomes-doxygen/index.html
