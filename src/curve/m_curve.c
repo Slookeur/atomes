@@ -343,20 +343,17 @@ G_MODULE_EXPORT void curve_menu_bar_action (GSimpleAction * action, GVariant * p
 gboolean was_not_added (ExtraSets * sets, int a, int b, int c)
 {
   int i, j;
-  if (sets)
+  CurveExtra * ctmp = sets -> first;
+  for (i=0; i<sets -> extras; i++)
   {
-    CurveExtra * ctmp = sets -> first;
-    for (i=0; i<sets -> extras; i++)
+    if (ctmp -> id.a == a && ctmp -> id.b == b)
     {
-      if (ctmp -> id.a == a && ctmp -> id.b == b)
+      for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
       {
-        for (j=0; j<get_project_by_id(a) -> analysis[b] -> numc; j++)
-        {
-          if (ctmp -> id.c == c) return FALSE;
-        }
+        if (ctmp -> id.c == c) return FALSE;
       }
-      if (ctmp -> next != NULL) ctmp = ctmp -> next;
     }
+    if (ctmp -> next != NULL) ctmp = ctmp -> next;
   }
   return TRUE;
 }
