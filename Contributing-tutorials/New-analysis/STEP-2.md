@@ -253,7 +253,7 @@ In the following examples are use to illustrate both how to create the user inte
   }
   ```
 
-More information on the severak home made functions be found in the ['src/gui/gtk-misck.c'][gtk-misc.c] including:
+More information on the severak home made functions be found in the [`src/gui/gtk-misck.c`][gtk-misc.c] including:
 
  - [create_entry][create_entry]
  - [check_button][check_button]
