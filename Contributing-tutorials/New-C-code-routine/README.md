@@ -6,7 +6,7 @@ Your are more than welcome to start coding in **atomes** I am simply asking to f
 
 **atomes** source code is using the [Doxygen][doxygen] source documentation system, please respect it, and at minimum ensure that **EVERY** function or data structure you create is documented properly, so that it will be available in [atomes code source documentation web site][atomes_doxygen]
 
-## 2. GTK3 and GTK4 preprocessor variables
+## 2. GUI guidelines: GTK3 and GTK4 preprocessor variables
 
 **atomes** user interface is written using the [GTK library][gtk] both in version [3][gtk3] and [4][gtk4]. 
 
