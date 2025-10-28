@@ -13,6 +13,9 @@ Your are more than welcome to start coding in **atomes** I am simply asking to f
 If you consider to write a part of code that uses the graphical interface, then keep in mind that both versions should be available. 
 The choice being made when building the software using the preprocessors flags `GTK3` or `GTK4`. 
 
+> [!REMARK]
+> Since both flags are mutually exclusive you simply need to use either the `GTK3` or the `GTK4` flag.
+
 > [!TIP]
 > The file [`src/gui/gtk-misc.c`][gtk-misc.c] is used as much as possible as a buffer for the GTK library
 > to offer a simple user programming interface to implement GTK commands. 
