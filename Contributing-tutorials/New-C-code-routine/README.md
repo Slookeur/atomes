@@ -32,7 +32,7 @@ My preference is not to use tab, but **2** spaces when opening a new bracket, th
 
   \param first_param brief description of the first parameter
   \param second_param brief descrition of the second parameter
-  \param this_proj the target project (this is an example)
+  \param this_proj the target aomtes project data structure
 */
 int my_new_routine (int first_param, double second_param, project * this_proj)
 {
