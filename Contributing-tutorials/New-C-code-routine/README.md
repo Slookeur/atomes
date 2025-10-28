@@ -50,9 +50,9 @@ int my_new_routine (int first_param, double second_param, project * this_proj)
       if (second_param < 0.0)
       {
 #ifdef GTK3
-
+        // GTK3 only instructions
 #else
-
+        // GTK4 only instructions
 #endif 
       }
       else
@@ -64,9 +64,9 @@ int my_new_routine (int first_param, double second_param, project * this_proj)
       if (second_param > 0.0)
       {
 #ifdef GTK4
-
+        // GTK4 only instructions
 #else
-
+        // GTK3 only instructions
 #endif
       }
       else
