@@ -72,6 +72,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 !
 ! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
 !
+
+! The next lines are Doxygen comments to describe the contents of the file
 !>
 !! @file file_name.F90
 !! @short File content description
