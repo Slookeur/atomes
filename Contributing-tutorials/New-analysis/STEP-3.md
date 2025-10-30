@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>
 Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 /*!
-* @file msdcall.c
+* @file idccall.c
 * @short Callbacks for the IDC calculation dialog
 * @author Your name <your@email.com>
 */
