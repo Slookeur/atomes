@@ -51,6 +51,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 extern GtkTreeStore * tool_model;
 extern GtkTreeModel * replace_combo_tree (gboolean insert, int proj);
+extern G_MODULE_EXPORT void spin_stop (GtkButton * but, gpointer data);
 
 /*!
   \fn void update_insert_combos ()
@@ -135,6 +136,8 @@ void close_project (project * to_close)
       to_close -> modelgl -> player -> win = destroy_this_widget (to_close -> modelgl -> player -> win);
       g_free (to_close -> modelgl -> player);
     }
+    // Stop the spinning if any
+    spin_stop (NULL, to_close -> modelgl);
     if (to_close -> modelgl -> spiner)
     {
       to_close -> modelgl -> spiner -> win = destroy_this_widget (to_close -> modelgl -> spiner -> win);

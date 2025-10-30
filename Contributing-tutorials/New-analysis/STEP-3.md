@@ -12,6 +12,13 @@
 
 ## 2. Writting the calculation callbacks in the file `analysiscall.c`
 
+The following code is a framework designed to help you prepare the new analysis calculation callbacks. 
+
+Simply adapt this example for your needs.
+
+> [!IMPORTANT]
+> Please remember that in the following `idc` or `IDC` are keywords related to this example, do not forget to correct ! 
+
 ```C
 /* This file is part of the 'atomes' software
 
