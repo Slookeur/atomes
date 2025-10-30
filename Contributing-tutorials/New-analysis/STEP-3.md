@@ -179,11 +179,10 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
 ## 3. Implementing the new analysis
 
-I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading. 
-But that is ultimately up to you to decide. 
+I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading, but that is ultimately up to you to decide. 
 
 Please give a look to the **atomes** [project data structure][atomes_project] to know how to retrieve the elements you might need for your calculation, 
-and remember that at this point you only need to call the element of the active project `active_project`. 
+and remember that at this point you only need to call element(s) of the active project `active_project`. 
 
  >[!IMPORTANT]
  > To ensure for the implementation in **atomes** to be as fast as possible,  
@@ -191,6 +190,8 @@ and remember that at this point you only need to call the element of the active 
  > Do not hesitate to ask for my help in the process.
 
 ## 4. Modifying the [Makefile][makefile]
+
+This step is required to build the [Code::Blocks][codeblocks] version of **atomes**, further modifications are required for to produce a release candidate version, for more details [see step N°3][releasing]
 
   - Add the `analysiscall.c` file to the `OBJ_GUI` variable: 
   
@@ -235,3 +236,4 @@ and remember that at this point you only need to call the element of the active 
 [makefile]:https://github.com/Slookeur/atomes/blob/devel/Makefile
 [releasing]:STEP-4.md
 [coding]:STEP-2.md
+[codeblocks]:https://www.codeblocks.org/
