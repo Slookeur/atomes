@@ -1,4 +1,4 @@
-# Coding a new C code routine for the **atomes** program
+# Adding a new C code routine to the **atomes** program
 
 Your are more than welcome to start coding in **atomes** I am simply asking to follow the next few requirements: 
 

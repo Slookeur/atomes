@@ -19,7 +19,8 @@ Please consider that:
 
 Documentation is available to help you with:
 
-  - [Coding a new C code routine for the **atomes** program][new_routine]
+  - [Adding a new C code routine to the **atomes** program][new_routine]
+  - [Adding new source code file(s) to the **atomes** program][new_file]
   - [Adding a new analysis to the **atomes** program][new_analysis] to make use of the graph visualization system
 
 ## Contributions other than software development
@@ -38,4 +39,5 @@ There are many possible task:
 
 [atomes]:https://atomes.ipcms.fr/
 [new_routine]:Contributing-tutorials/New-C-code-routine/README.md
+[new_file]:Contributing-tutorials/New-file/README.md
 [new_analysis]:Contributing-tutorials/New-analysis/README.md
