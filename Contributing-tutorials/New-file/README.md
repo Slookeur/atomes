@@ -44,8 +44,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 
 #include <gtk/gtk.h>
-#include <string.h>
-#include <stdlib.h>
 
 #include "global.h"
 #include "interface.h"
