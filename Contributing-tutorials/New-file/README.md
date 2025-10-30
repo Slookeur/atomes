@@ -81,4 +81,4 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 ```
 
  >[!WARNING]
- > For the compiler to process this remember to modify the `Makefile` accordingly.
+ > For the compiler to process your modifications remember to modify the `Makefile` accordingly.
