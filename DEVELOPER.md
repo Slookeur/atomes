@@ -201,12 +201,14 @@ sequenceDiagram
 
 ## Source code map
 
-- **[`src/global.h`][global.h]**: Main header with all struct definitions.
-- **[`src/project/`][proj_dir]**: Project management logic ([`project.c`][project.c], [`project.h`][project.h]).
+- **[`src/global.h`][global.h]**: Main header with many, if not all, struct definitions.
+- **[`src/project/`][proj_dir]**: Project management ([`project.c`][project.c], [`project.h`][project.h]).
 - **[`src/workspace/`][work_dir]**: Workspace management ([`workspace.c`][workspace.c], [`workspace.h`][workspace.h]).
-- **[`src/calc/`][calc_dir]**: Analysis implementations.
-- **[`src/opengl/`][ogl_dir]**: Rendering code.
+- **[`src/curve/`][curve_dir]**: 2D graph interface implementation.
+- **[`src/calc/`][calc_dir]**: MD helper constructions.
+- **[`src/opengl/`][ogl_dir]**: OpenGL rendering code.
 - **[`src/gui/`][gui_dir]**: GTK interface construction.
+- **[`src/fortran`][for_dir]**: Analysis implementation.
 
 [atomes]:https://atomes.ipcms.fr/
 [new_routine]:Contributing-tutorials/New-C-code-routine/README.md
@@ -238,6 +240,8 @@ sequenceDiagram
 [update_analysis_availability]:https://slookeur.github.io/atomes-doxygen/globals_func.html
 [proj_dir]:https://slookeur.github.io/atomes-doxygen/dir_167790342fb55959539d550b874be046.html
 [work_dir]:https://slookeur.github.io/atomes-doxygen/dir_a5be7bbed3ff2f129951759fe96bf5d5.html
+[curve_dir]:https://slookeur.github.io/atomes-doxygen/dir_f503eccc909c3cc44ffd239385415fa7.html
 [calc_dir]:https://slookeur.github.io/atomes-doxygen/dir_b23ce9843a0cf83641620a63d26b700d.html
 [ogl_dir]:https://slookeur.github.io/atomes-doxygen/dir_35aa532d637074063c646a4cf80a0972.html
 [gui_dir]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
+[for_dir]:https://slookeur.github.io/atomes-doxygen/dir_9d95adc37effe2d0447790667f945c24.html
