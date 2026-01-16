@@ -1,4 +1,4 @@
-# Developer Documentation for atomes
+# Developer documentation for atomes
 
 This document provides a brief technical overview of the **atomes** software architecture  
 intended for developers who want to contribute to the project. 
@@ -30,26 +30,26 @@ The application is built around a hierarchical structure managed by global state
 ```mermaid
 classDiagram
     class AtomesApp {
-        +GtkApplication* app
+        GtkApplication* app
     }
     class Workspace {
-        +Project* first
-        +Project* last
+        Project* first
+        Project* last
     }
     class Project {
-        +int id
-        +char* name
-        +Atom** atoms
-        +Model* modelfc
-        +Project* next
-        +Project* prev
+        int id
+        char* name
+        Atom** atoms
+        Model* modelfc
+        Project* next
+        Project* prev
     }
     class Model {
-        +Molecule** mols
+        Molecule** mols
     }
     class Atom {
-        +int id
-        +double x, y, z
+        int id
+        double x, y, z
     }
     
     AtomesApp --> Workspace : Managed by
@@ -202,18 +202,18 @@ sequenceDiagram
 ## Source code map
 
 - **[`src/global.h`][global.h]**: Main header with all struct definitions.
-- **`src/project/`**: Project management logic ([`project.c`][project.c], [`project.h`][project.h]).
-- **`src/workspace/`**: Workspace management ([`workspace.c`][workspace.c], [`workspace.h`][workspace.h]).
-- **`src/calc/`**: Analysis implementations.
-- **`src/opengl/`**: Rendering code.
-- **`src/gui/`**: GTK interface construction.
+- **[`src/project/`][proj_dir]**: Project management logic ([`project.c`][project.c], [`project.h`][project.h]).
+- **[`src/workspace/`][work_dir]**: Workspace management ([`workspace.c`][workspace.c], [`workspace.h`][workspace.h]).
+- **[`src/calc/`][calc_dir]**: Analysis implementations.
+- **[`src/opengl/`][ogl_dir]**: Rendering code.
+- **[`src/gui/`][gui_dir]**: GTK interface construction.
 
 [atomes]:https://atomes.ipcms.fr/
 [new_routine]:Contributing-tutorials/New-C-code-routine/README.md
 [new_file]:Contributing-tutorials/New-file/README.md
 [new_analysis]:Contributing-tutorials/New-analysis/README.md
 
-[AtomesApp]:https://slookeur.github.io/atomes-doxygen/annotated.html
+[AtomesApp]:https://slookeur.github.io/atomes-doxygen/dc/d57/global_8c_source.html
 [struct workspace]:https://slookeur.github.io/atomes-doxygen/d2/d73/structworkspace.html
 [struct project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
 [struct atom]:https://slookeur.github.io/atomes-doxygen/da/d81/structatom.html
@@ -236,3 +236,8 @@ sequenceDiagram
 [workspace.c]:https://slookeur.github.io/atomes-doxygen/d3/da6/workspace_8c.html
 [workspace.h]:https://slookeur.github.io/atomes-doxygen/d4/de6/workspace_8h.html
 [update_analysis_availability]:https://slookeur.github.io/atomes-doxygen/globals_func.html
+[proj_dir]:https://slookeur.github.io/atomes-doxygen/dir_167790342fb55959539d550b874be046.html
+[work_dir]:https://slookeur.github.io/atomes-doxygen/dir_a5be7bbed3ff2f129951759fe96bf5d5.html
+[calc_dir]:https://slookeur.github.io/atomes-doxygen/dir_b23ce9843a0cf83641620a63d26b700d.html
+[ogl_dir]:https://slookeur.github.io/atomes-doxygen/dir_35aa532d637074063c646a4cf80a0972.html
+[gui_dir]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
