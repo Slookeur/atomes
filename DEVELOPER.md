@@ -1,7 +1,7 @@
 # Developer Documentation for atomes
 
 This document provides a brief technical overview of the **atomes** software architecture  
-intended for developers contributing to the project. 
+intended for developers who want to contribute to the project. 
 
 It provides some guidlines to get started with [atomes][atomes] development, 
 and briefly covers the internal organization, core data structures, and the implementation of key features.
@@ -25,7 +25,7 @@ Documentation is available to help you with:
 
 The application is built around a hierarchical structure managed by global state variables. The core hierarchy is:
 
-**Application -> Workspace -> Project -> Model -> Atom**
+**[AtomesApp][AtomesApp] -> [Workspace][struct workspace] -> [Project][struct project] -> [Model][struct model] -> [Atom][struct atom]**
 
 ```mermaid
 classDiagram
@@ -60,26 +60,26 @@ classDiagram
 
 ### Global state (`global.h`)
 
-The application state is maintained through several key global variables defined in `src/global.h`:
+The application state is maintained through several key global variables defined in [`src/global.h`][global.h]:
 
-- **`AtomesApp`**: The main GTK application instance.
-- **`workzone`**: The global `workspace` structure containing all open projects.
-- **`active_project`**: Pointer to the currently selected `project`.
-- **`active_glwin`**: Pointer to the active OpenGL widget (`glwin`).
-- **`active_chem`**, **`active_coord`**, **`active_cell`**: Shortcuts to the chemical data, coordination info, and unit cell of the active project.
+- **[`AtomesApp`][AtomesApp]**: The main GTK application instance.
+- **`workzone`**: The global [`workspace`][struct workspace] structure containing all open [projects][struct project].
+- **`active_project`**: Pointer to the currently selected [`project`][struct project].
+- **`active_glwin`**: Pointer to the active OpenGL widget ([`glwin`][struct glwin]).
+- **`active_chem`**, **`active_coord`**, **`active_cell`**: Shortcuts to the [chemical data][struct chemical_data], [coordination info][struct coord_info], and [unit cell][struct cell_info] of the active project.
 
 ### Workspace and projects
 
-- **Workspace** (`struct workspace`): A doubly linked list acting as a container for all open projects (`first` and `last` pointers).
-- **Project** (`struct project`): The central data structure that contains:
+- **Workspace** ([`struct workspace`][struct workspace]): A doubly linked list acting as a container for all open projects (`first` and `last` pointers).
+- **Project** ([`struct project`][struct project]): The central data structure that contains:
     - **Metadata**: Name, ID, file paths.
     - **Simulation Data**: `natomes` (atom count), `steps` (MD steps), `box` (simulation box).
     - **Core Data Pointers**:
-        - `atoms`: 2D array of `atom` pointers (`atoms[step][atom_index]`).
-        - `coord`: Coordination statistics.
-        - `chemistry`: Chemical properties.
-        - `analysis`: Analysis results.
-    - **UI Elements**: OpenGL widget (`modelgl`), text buffers.
+        - `atoms`: 2D array of [`atom`][struct atom] pointers (`atoms[step][atom_index]`).
+        - `coord`: [Coordination statistics][struct coord_info].
+        - `chemistry`: [Chemical properties][struct chemical_data].
+        - `analysis`: [Analysis results][struct atomes_analysis].
+    - **UI Elements**: OpenGL widget ([`modelgl`][struct glwin]), text buffers.
     - **Linked List**: `next` and `prev` pointers for workspace navigation.
 
 ```mermaid
@@ -117,7 +117,7 @@ erDiagram
 
 ## Core data structures
 
-### Atom (`struct atom`)
+### Atom ([`struct atom`][struct atom])
 
 The fundamental unit of data.
 - **Identification**: `id` (index), `sp` (species index).
@@ -128,46 +128,46 @@ The fundamental unit of data.
     - `coord`: Array storing coordination numbers (total, partial, fragment ID, molecule ID).
 - **Visual State**: Flags for `show`, `pick` (selected), `label`.
 
-### Molecule (`struct molecule`) & Model (`struct model`)
+### Molecule ([`struct molecule`][struct molecule]) & Model ([`struct model`][struct model])
 
 Used for analyzing connectivity beyond simple bonds.
 - **Model**: Represents the topology for the entire system, containing a list of molecules per step.
 - **Molecule**: Contains a list of `fragments` (connected components) and `atoms` comprising the molecule.
 
-### Coordinates file (`struct coord_file`)
+### Coordinates file ([`struct coord_file`][struct coord_file])
 
 Used during I/O operations to parse different file formats (XYZ, PDB, CIF, etc.).
-- Stores raw data (`coord`, `z` numbers) before it is processed into the `project` structure.
+- Stores raw data (`coord`, `z` numbers) before it is processed into the [`project`][struct project] structure.
 - Handles crystallographic data like symmetry positions and Wyckoff positions (for CIF).
 
-### Curve (`struct Curve`)
+### Curve ([`struct Curve`][struct Curve])
 
 A versatile structure for 2D plotting (used in Analysis and properties display).
 - **Data**: `data[2]` (X/Y arrays), `err` (error bars).
 - **Layout**: Stores axis limits, titles, colors, legends, and rendering styles.
 - **UI**: Embedded `GtkWidget * plot` drawing area.
 
-### Analysis (`struct atomes_analysis`)
+### Analysis ([`struct atomes_analysis`][struct atomes_analysis])
 
 Manages the state and results of various physical analyses (RDF, XRD, etc.).
 - **`aid`**: Analysis ID (e.g., 0 for g(r), 1 for S(q)).
 - **State**: Flags for availability (`avail_ok`) and calculation status (`calc_ok`).
-- **Results**: Contains pointers to `Curve` structures holding the computed data.
+- **Results**: Contains pointers to [`Curve`][struct Curve] structures holding the computed data.
 
 ## Key features implementation
 
 ### MD input preparation
 
 **atomes** assists in preparing inputs for MD codes (DL_POLY, LAMMPS, CPMD, CP2K). 
-These are managed via specific structures linked in `struct project`:
-- **`classical_field`**: Stores force field parameters, potentials, and system settings for classical MD.
-- **`cpmd` / `cp2k`**: Stores DFT/ab-initio specific parameters (functional, basis sets, pseudopotentials).
+These are managed via specific structures linked in [`struct project`][struct project]:
+- **[`classical_field`][struct classical_field]**: Stores force field parameters, potentials, and system settings for classical MD.
+- **[`cpmd`][struct cpmd] / [`cp2k`][struct cp2k]**: Stores DFT/ab-initio specific parameters (functional, basis sets, pseudopotentials).
 
 ### Analysis workflow
 
-1.  **Availability**: `update_analysis_availability()` checks if an analysis is possible based on current data (e.g., periodic boundary conditions).
-2.  **Calculation**: Triggered by user actions. Results are typically stored in `atomes_analysis` structs.
-3.  **Visualization**: Results are converted into `Curve` objects for plotting in the GUI.
+1.  **Availability**: [`update_analysis_availability()`][update_analysis_availability] checks if an analysis is possible based on current data (e.g., periodic boundary conditions).
+2.  **Calculation**: Triggered by user actions. Results are typically stored in [`atomes_analysis`][struct atomes_analysis] structs.
+3.  **Visualization**: Results are converted into [`Curve`][struct Curve] objects for plotting in the GUI.
 
 ```mermaid
 sequenceDiagram
@@ -195,15 +195,15 @@ sequenceDiagram
 
 ### Visualization (OpenGL)
 
-- **`glwin`**: The core widget for 3D rendering.
-- **Rendering**: Uses OpenGL calls (often legacy GL or epoxy). The `project` struct contains `modelgl`, which links the data to the visual representation.
-- **Interaction**: Mouse events on `glwin` drive selection (`pick` flag in `atom`) and camera manipulation.
+- **[`glwin`][struct glwin]**: The core widget for 3D rendering.
+- **Rendering**: Uses OpenGL calls (often legacy GL or epoxy). The [`project`][struct project] struct contains [`modelgl`][struct glwin], which links the data to the visual representation.
+- **Interaction**: Mouse events on [`glwin`][struct glwin] drive selection (pick flag in [`atom`][struct atom]) and camera manipulation.
 
 ## Source code map
 
-- **`src/global.h`**: Main header with all struct definitions.
-- **`src/project/`**: Project management logic (`project.c`, `project.h`).
-- **`src/workspace/`**: Workspace management (`workspace.c`, `workspace.h`).
+- **[`src/global.h`][global.h]**: Main header with all struct definitions.
+- **`src/project/`**: Project management logic ([`project.c`][project.c], [`project.h`][project.h]).
+- **`src/workspace/`**: Workspace management ([`workspace.c`][workspace.c], [`workspace.h`][workspace.h]).
 - **`src/calc/`**: Analysis implementations.
 - **`src/opengl/`**: Rendering code.
 - **`src/gui/`**: GTK interface construction.
@@ -212,3 +212,27 @@ sequenceDiagram
 [new_routine]:Contributing-tutorials/New-C-code-routine/README.md
 [new_file]:Contributing-tutorials/New-file/README.md
 [new_analysis]:Contributing-tutorials/New-analysis/README.md
+
+[AtomesApp]:https://slookeur.github.io/atomes-doxygen/annotated.html
+[struct workspace]:https://slookeur.github.io/atomes-doxygen/d2/d73/structworkspace.html
+[struct project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
+[struct atom]:https://slookeur.github.io/atomes-doxygen/da/d81/structatom.html
+[struct molecule]:https://slookeur.github.io/atomes-doxygen/dc/d7f/structmolecule.html
+[struct model]:https://slookeur.github.io/atomes-doxygen/dc/d1b/structmodel.html
+[struct coord_file]:https://slookeur.github.io/atomes-doxygen/d0/d2f/structcoord__file.html
+[struct Curve]:https://slookeur.github.io/atomes-doxygen/da/d6e/struct_curve.html
+[struct atomes_analysis]:https://slookeur.github.io/atomes-doxygen/annotated.html
+[struct classical_field]:https://slookeur.github.io/atomes-doxygen/d6/da3/structclassical__field.html
+[struct cpmd]:https://slookeur.github.io/atomes-doxygen/da/d1f/structcpmd.html
+[struct cp2k]:https://slookeur.github.io/atomes-doxygen/dd/d27/structcp2k.html
+[struct glwin]:https://slookeur.github.io/atomes-doxygen/d5/dd2/structglwin.html
+[struct chemical_data]:https://slookeur.github.io/atomes-doxygen/da/d11/structchemical__data.html
+[struct coord_info]:https://slookeur.github.io/atomes-doxygen/df/ddc/structcoord__info.html
+[struct cell_info]:https://slookeur.github.io/atomes-doxygen/de/df1/structcell__info.html
+
+[global.h]:https://slookeur.github.io/atomes-doxygen/d2/d49/global_8h.html
+[project.c]:https://slookeur.github.io/atomes-doxygen/d2/d0d/project_8c.html
+[project.h]:https://slookeur.github.io/atomes-doxygen/dc/d8d/project_8h.html
+[workspace.c]:https://slookeur.github.io/atomes-doxygen/d3/da6/workspace_8c.html
+[workspace.h]:https://slookeur.github.io/atomes-doxygen/d4/de6/workspace_8h.html
+[update_analysis_availability]:https://slookeur.github.io/atomes-doxygen/globals_func.html
