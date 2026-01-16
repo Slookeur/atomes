@@ -1,8 +1,27 @@
-# Developer Documentation for Atomes
+# Developer Documentation for atomes
 
-This document provides a technical overview of the **atomes** software architecture, intended for developers contributing to the project. It covers the internal organization, core data structures, and the implementation of key features.
+This document provides a brief technical overview of the **atomes** software architecture  
+intended for developers contributing to the project. 
 
-## Internal Organization
+It provides some guidlines to get started with [atomes][atomes] development, 
+and briefly covers the internal organization, core data structures, and the implementation of key features.
+
+To get started with [atomes][atomes] development, please give a look to the code source documentation: 
+
+[https://slookeur.github.io/atomes-doxygen/index.html](https://slookeur.github.io/atomes-doxygen/index.html)
+
+Please consider that: 
+
+  - Any new file / function should include approriate description and commentary in the [Doxygen](https://www.doxygen.nl/) format
+  - Changes to atomes should be submitted for review through pull-request.
+
+Documentation is available to help you with:
+
+  - [Adding a new C code routine to the **atomes** program][new_routine]
+  - [Adding new source code file(s) to the **atomes** program][new_file]
+  - [Adding a new analysis to the **atomes** program][new_analysis] to make use of the graph visualization system
+
+## Internal organization
 
 The application is built around a hierarchical structure managed by global state variables. The core hierarchy is:
 
@@ -39,7 +58,7 @@ classDiagram
     Project "1" *-- "1" Model : Has Topology
 ```
 
-### Global State (`global.h`)
+### Global state (`global.h`)
 
 The application state is maintained through several key global variables defined in `src/global.h`:
 
@@ -49,10 +68,10 @@ The application state is maintained through several key global variables defined
 - **`active_glwin`**: Pointer to the active OpenGL widget (`glwin`).
 - **`active_chem`**, **`active_coord`**, **`active_cell`**: Shortcuts to the chemical data, coordination info, and unit cell of the active project.
 
-### Workspace and Projects
+### Workspace and projects
 
 - **Workspace** (`struct workspace`): A doubly linked list acting as a container for all open projects (`first` and `last` pointers).
-- **Project** (`struct project`): The central data structure representing an open file/session. It contains:
+- **Project** (`struct project`): The central data structure that contains:
     - **Metadata**: Name, ID, file paths.
     - **Simulation Data**: `natomes` (atom count), `steps` (MD steps), `box` (simulation box).
     - **Core Data Pointers**:
@@ -96,7 +115,7 @@ erDiagram
     }
 ```
 
-## Core Data Structures
+## Core data structures
 
 ### Atom (`struct atom`)
 
@@ -115,7 +134,7 @@ Used for analyzing connectivity beyond simple bonds.
 - **Model**: Represents the topology for the entire system, containing a list of molecules per step.
 - **Molecule**: Contains a list of `fragments` (connected components) and `atoms` comprising the molecule.
 
-### Coordinates File (`struct coord_file`)
+### Coordinates file (`struct coord_file`)
 
 Used during I/O operations to parse different file formats (XYZ, PDB, CIF, etc.).
 - Stores raw data (`coord`, `z` numbers) before it is processed into the `project` structure.
@@ -135,15 +154,16 @@ Manages the state and results of various physical analyses (RDF, XRD, etc.).
 - **State**: Flags for availability (`avail_ok`) and calculation status (`calc_ok`).
 - **Results**: Contains pointers to `Curve` structures holding the computed data.
 
-## Key Features Implementation
+## Key features implementation
 
-### MD Input Preparation
+### MD input preparation
 
-Atomes assists in preparing inputs for MD codes (DL_POLY, LAMMPS, CPMD, CP2K). These are managed via specific structures linked in `struct project`:
+**atomes** assists in preparing inputs for MD codes (DL_POLY, LAMMPS, CPMD, CP2K). 
+These are managed via specific structures linked in `struct project`:
 - **`classical_field`**: Stores force field parameters, potentials, and system settings for classical MD.
 - **`cpmd` / `cp2k`**: Stores DFT/ab-initio specific parameters (functional, basis sets, pseudopotentials).
 
-### Analysis Workflow
+### Analysis workflow
 
 1.  **Availability**: `update_analysis_availability()` checks if an analysis is possible based on current data (e.g., periodic boundary conditions).
 2.  **Calculation**: Triggered by user actions. Results are typically stored in `atomes_analysis` structs.
@@ -179,7 +199,7 @@ sequenceDiagram
 - **Rendering**: Uses OpenGL calls (often legacy GL or epoxy). The `project` struct contains `modelgl`, which links the data to the visual representation.
 - **Interaction**: Mouse events on `glwin` drive selection (`pick` flag in `atom`) and camera manipulation.
 
-## Source Code Map
+## Source code map
 
 - **`src/global.h`**: Main header with all struct definitions.
 - **`src/project/`**: Project management logic (`project.c`, `project.h`).
