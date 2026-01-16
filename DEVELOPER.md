@@ -207,3 +207,8 @@ sequenceDiagram
 - **`src/calc/`**: Analysis implementations.
 - **`src/opengl/`**: Rendering code.
 - **`src/gui/`**: GTK interface construction.
+
+[atomes]:https://atomes.ipcms.fr/
+[new_routine]:Contributing-tutorials/New-C-code-routine/README.md
+[new_file]:Contributing-tutorials/New-file/README.md
+[new_analysis]:Contributing-tutorials/New-analysis/README.md

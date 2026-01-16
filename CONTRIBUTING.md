@@ -8,20 +8,7 @@ If your are interested in helping to improve [atomes][atomes] you are welcome to
 
 ## Software development 
 
-To get started with [atomes][atomes] development, give a look to the code source documentation: 
-
-[https://slookeur.github.io/atomes-doxygen/index.html](https://slookeur.github.io/atomes-doxygen/index.html)
-
-Please consider that: 
-
-  - Any new file / function should include approriate description and commentary in the [Doxygen](https://www.doxygen.nl/) format
-  - Changes to atomes should be submitted for review through pull-request.
-
-Documentation is available to help you with:
-
-  - [Adding a new C code routine to the **atomes** program][new_routine]
-  - [Adding new source code file(s) to the **atomes** program][new_file]
-  - [Adding a new analysis to the **atomes** program][new_analysis] to make use of the graph visualization system
+To get started with [atomes][atomes] development give a look to the [DEVELOPER.md](./DEVELOPER.md) file. 
 
 ## Contributions other than software development
 
@@ -38,6 +25,3 @@ There are many possible task:
   - Bugs should be filled on the GitHub issue tracker: [issue](https://github.com/Slookeur/atomes-GNU/issues)
 
 [atomes]:https://atomes.ipcms.fr/
-[new_routine]:Contributing-tutorials/New-C-code-routine/README.md
-[new_file]:Contributing-tutorials/New-file/README.md
-[new_analysis]:Contributing-tutorials/New-analysis/README.md
