@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file gui.c
@@ -117,7 +117,8 @@ gchar * calc_name[] = {"g(r)/G(r)",
                        "Ring statistics",
                        "Chain statistics",
                        "Spherical harmonics",
-                       "Mean Squared Displacement"};
+                       "Mean Squared Displacement",
+                       "Dynamic structure factor"};
 
 gchar * graph_name[] = {"g(r)/G(r)",
                         "S(q) from FFT[g(r)]",
@@ -128,7 +129,8 @@ gchar * graph_name[] = {"g(r)/G(r)",
                         "Ring statistics",
                         "Chain statistics",
                         "Spherical harmonics",
-                        "Mean Squared Displacement"};
+                        "Mean Squared Displacement",
+                        "Dynamic structure factor"};
 
 gchar * graph_icon[] = {"pixmaps/gr.png",
                         "pixmaps/sq.png",
@@ -139,7 +141,8 @@ gchar * graph_icon[] = {"pixmaps/gr.png",
                         "pixmaps/ri.png",
                         "pixmaps/ch.png",
                         "pixmaps/sp.png",
-                        "pixmaps/ms.png"};
+                        "pixmaps/ms.png",
+                        "pixmaps/sq.png"};
 
 tint cut_sel;
 dint davect[9];

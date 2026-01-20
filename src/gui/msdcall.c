@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file msdcall.c
@@ -154,7 +154,8 @@ void update_msd_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  if (! active_project -> analysis[MSD] -> init_ok)  init_msd (active_project);
+  // if (! active_project -> analysis[MSD] -> init_ok)
+  init_msd (active_project);
   clean_curves_data (MSD, 0, active_project -> analysis[MSD] -> numc);
   prepostcalc (widg, FALSE, MSD, 0, opac);
   active_project -> analysis[MSD] -> min = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;

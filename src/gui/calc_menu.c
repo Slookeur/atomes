@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file calc_menu.c
@@ -767,7 +767,7 @@ gboolean test_gr (int rdf)
 
   \brief is it safe to compute s(q) ?
 
-  \param fdq type of s(q): FFT (1) or direct (SK)
+  \param fdq type of s(q): 0 = FFT g(r), 1 = Debye, 2 = Dynamic
 */
 gboolean test_sq (int fdq)
 {
@@ -1375,6 +1375,95 @@ void calc_gr_sq (GtkWidget * box, int id)
 }
 
 /*!
+  \fn void calc_sk_t (GtkWidget * box)
+
+  \brief creation of the s(k,t) calculation widgets
+
+  \param box GtkWidget that will receive the data
+*/
+void calc_sk_t (GtkWidget * box)
+{
+  gchar * val_a="Number of &#x3b4;q steps";
+  gchar * val_b="Q<sub>max</sub> [&#xC5;<sup>-1</sup>]";
+  gchar * val_c=" ";
+
+  GtkWidget * vbox = create_vbox (5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
+  GtkWidget * hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  GtkWidget * entry= create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SKT] -> num_delta);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+
+  hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+
+  hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  //entry= create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 0);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
+                       markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
+                       FALSE, FALSE, 0);
+
+  vbox = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
+  GtkWidget * aentry;
+
+  gchar * adv_name[2]={"Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> [0.0-1.0]",
+                       "Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] in [Q<sub>min</sub>-Q<sub>max</sub>]"};
+  GtkWidget * advanced_options = create_expander ("  Advanced options", NULL);
+  gtk_widget_set_size_request (advanced_options, -1, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, advanced_options, FALSE, TRUE, 10);
+  avbox = create_vbox (5);
+  GtkWidget * ahbox;
+  GtkWidget * fixed;
+  int i;
+  for (i=0; i<2; i++)
+  {
+    ahbox = create_hbox (5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, ahbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label (adv_name[i], 175, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, GINT_TO_POINTER(i));
+    update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[i]);
+    fixed = gtk_fixed_new ();
+    gtk_fixed_put (GTK_FIXED(fixed), aentry, 0.0, 0.0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, fixed, FALSE, FALSE, 10);
+  }
+  g_signal_connect (G_OBJECT(advanced_options), "activate", G_CALLBACK(expand_opt), GINT_TO_POINTER(1));
+  add_container_child (CONTAINER_EXP, advanced_options, avbox);
+  show_the_widgets (advanced_options);
+  widget_set_sensitive (advanced_options, 1);
+
+  GtkWidget * smooth_options = create_expander ("  Gaussian data smoothing", NULL);
+  gtk_widget_set_size_request (smooth_options, -1, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, smooth_options, FALSE, TRUE, 10);
+  avbox = create_vbox (5);
+  smbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, gtk_label_new("Factor [0.0-1.0]"), FALSE, FALSE, 0);
+  aentry = create_entry (G_CALLBACK(set_sfact), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  update_entry_double (GTK_ENTRY(aentry), active_project -> fact[SKT]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, aentry, FALSE, TRUE, 10);
+  GtkWidget * smooth = create_button ("Smooth", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_smoother_released), GINT_TO_POINTER(SKT));
+  g_signal_connect (G_OBJECT(smooth_options), "activate", G_CALLBACK(expand_opt), GINT_TO_POINTER(0));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, smooth, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, smbox, FALSE, FALSE, 5);
+  add_container_child (CONTAINER_EXP, smooth_options, avbox);
+  show_the_widgets (smooth_options);
+  widget_set_sensitive (smooth_options, 1);
+}
+
+/*!
   \fn G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, gpointer data)
 
   \brief create a calculation dialog: run the dialog
@@ -1434,6 +1523,8 @@ G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, g
         case MSD-1:
           if (test_msd ()) on_calc_msd_released (calc_win, NULL);
           break;
+        case SKT-1:
+          // if (test_sq(SKT) && active_project -> steps) on_calc_skt_released (calc_win, NULL);
         default:
           break;
       }
@@ -1479,6 +1570,9 @@ G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
       break;
     case MSD-1:
       calc_msd (box);
+      break;
+    case SKT-1:
+      calc_sk_t (box, );
       break;
     default:
       calc_gr_sq (box, id);

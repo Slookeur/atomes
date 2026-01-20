@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file curve.c
@@ -402,8 +402,8 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   int i, j;
   Curve * this_curve = active_project -> analysis[* rid] -> curves[* cid];
 #ifdef DEBUG
-  /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
-  for ( i=0 ; i < *interv ; i++ )
+  g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
+  /*for ( i=0 ; i < *interv ; i++ )
   {
     g_debug ("SAVECURVE:: i= %d, data[i]= %f", i, datacurve[i]);
   }*/

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file m_curve.c
@@ -428,15 +428,18 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
   {
     this_proj = get_project_by_id(i);
     create_proj[i] = FALSE;
-    for (j=0; j<this_proj -> analysis[data -> b] -> c_sets; j++)
+    if (this_proj -> analysis[data -> b])
     {
-      k = this_proj -> analysis[data -> b] -> compat_id[j];
-      create_menu[i][k] = FALSE;
-      if (((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
-      || (! add && extrarid[i][k] > 0)) && this_proj -> analysis[k] -> calc_ok)
+      for (j=0; j<this_proj -> analysis[data -> b] -> c_sets; j++)
       {
-        create_menu[i][k] = TRUE;
-        create_proj[i] = TRUE;
+        k = this_proj -> analysis[data -> b] -> compat_id[j];
+        create_menu[i][k] = FALSE;
+        if (((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
+        || (! add && extrarid[i][k] > 0)) && this_proj -> analysis[k] -> calc_ok)
+        {
+          create_menu[i][k] = TRUE;
+          create_proj[i] = TRUE;
+        }
       }
     }
   }

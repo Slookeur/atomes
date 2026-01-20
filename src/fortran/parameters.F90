@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file parameters.F90
@@ -166,6 +166,7 @@ INTEGER :: IDRI=6
 INTEGER :: IDCH=7
 INTEGER :: IDSP=8
 INTEGER :: IDMSD=9
+INTEGER :: IDSKT=10
 
 INTEGER :: MAXN=20                      ! The maximun number of neighbors an atom can have
 

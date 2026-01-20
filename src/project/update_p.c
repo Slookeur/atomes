@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file update_p.c
@@ -126,6 +126,7 @@ void update_analysis_availability (project * this_proj)
     {
       if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = TRUE;
       if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = TRUE;
+      if (this_proj -> steps > 1 && this_proj -> analysis[SKT]) this_proj -> analysis[SKT] -> avail_ok = TRUE;
     }
     else
     {

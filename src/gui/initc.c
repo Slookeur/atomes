@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initc.c
@@ -267,9 +267,16 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   comp_list[0] = SPH;
   this_proj -> analysis[SPH] = setup_analysis (pid, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Ql");
 
-  // Mean square displacement
-  comp_list[0] = MSD;
-  if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+  if (this_proj -> steps > 1)
+  {
+    // Mean square displacement
+    comp_list[0] = MSD;
+    this_proj -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+
+    // Dynamic structure factor
+    comp_list[0] = SKT;
+    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  }
 
   g_free (comp_list);
 
@@ -357,6 +364,11 @@ void initialize_this_analysis (project * this_proj, int ana)
       comp_list = allocint (1);
       comp_list[0] = MSD;
       if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (this_proj -> id, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+      break;
+    case SKT:
+      comp_list = allocint (1);
+      comp_list[0] = SKT;
+      if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
       break;
   }
   g_free (comp_list);

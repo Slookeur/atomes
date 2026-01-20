@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file cqvf.F90
@@ -58,7 +58,7 @@ INTEGER (KIND=c_int) FUNCTION cqvf (QMAX, QMIN, NQ, PROBA, LIMQ) BIND (C,NAME='c
     NKPTS(i) = AnINT(QMAX/qmrecip(i))+1
   enddo
   hkl=0
-! To simply the case of the calculation in the case of a simple cubic box
+! To simplify the case of the calculation in the case of a simple cubic box
   if (OVERALL_CUBIC) then
     QMAX2=(QMAX/QMIN)**2
     QMIN2=1.0d0
@@ -139,6 +139,7 @@ do i=1, 2
           kpy= k
           kpz= l
         else
+          ! Note : because we only consider the first step this is an approximation in the case of NPT trajectory
           kpx= 2.0d0*PI*(h*THE_BOX(1)%lrecp(1,1) + k*THE_BOX(1)%lrecp(2,1) + l*THE_BOX(1)%lrecp(3,1))
           kpy= 2.0d0*PI*(h*THE_BOX(1)%lrecp(1,2) + k*THE_BOX(1)%lrecp(2,2) + l*THE_BOX(1)%lrecp(3,2))
           kpz= 2.0d0*PI*(h*THE_BOX(1)%lrecp(1,3) + k*THE_BOX(1)%lrecp(2,3) + l*THE_BOX(1)%lrecp(3,3))
@@ -148,7 +149,7 @@ do i=1, 2
 !       we want the maximum number of k-points in the FSDP part of the spectra
 !       therefore we choose to keep all qvectors with qmod in:
 !                   minr < qmod < limq
-!       where 'minr' is minimum q modulus accessible considering the analysed
+!       where 'minr' is minimum q modulus accessible considering the analyzed
 !       lattice ie. the minimum modulus of the reciprocal cell vectors,
 !       limq is the limit to be fixed for the FSDP part of the spectra
 !       Thereafter: QMIN=minr**2 and LIMQ2=limq**2.

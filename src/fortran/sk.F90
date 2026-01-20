@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file sk.F90
@@ -32,6 +32,13 @@ IMPLICIT NONE
 
 INTEGER (KIND=c_int), INTENT(IN) :: NQ, XA
 DOUBLE PRECISION :: factor, xfactor
+
+INTERFACE
+  DOUBLE PRECISION FUNCTION FQX(TA, Q)
+    INTEGER, INTENT(IN) :: TA
+    DOUBLE PRECISION, INTENT(IN) :: Q
+  END FUNCTION
+END INTERFACE
 
 if(allocated(Sij)) deallocate(Sij)
 allocate(Sij(NQ,NSP,NSP), STAT=ERR)
@@ -61,10 +68,10 @@ if (ERR .ne. 0) then
 endif
 
 #ifdef OPENMP
-!t0 = OMP_GET_WTIME ()
-call FOURIER_TRANS_QVECT ()
-!t1 = OMP_GET_WTIME ()
-!write (*,*) "temps d’excecution QVT 2:", t1-t0
+  !t0 = OMP_GET_WTIME ()
+  call FOURIER_TRANS_QVECT () ! Default Q-vector parallelization
+  !t1 = OMP_GET_WTIME ()
+  !write (*,*) "temps d’excecution QVT 2:", t1-t0
 #else
   call FOURIER_TRANS_STEPS ()
 #endif
@@ -111,31 +118,33 @@ S(:)=0.0d0
 XS(:)=0.0d0
 
 do i=1,  NQ
-  do k=1, NSP
-  do j=1, NSP
-    S(i)=S(i)+Sij(i,k,j)*NSCATTL(k)*NSCATTL(j)
-    if (XA .eq. 1) then
-      XS(i)=XS(i)+Sij(i,k,j)*XSCATTL(k)*XSCATTL(j)
-    else
-      XS(i)=XS(i)+Sij(i,k,j)*FQX(INT(XSCATTL(k)),K_POINT(i))*FQX(INT(XSCATTL(j)),K_POINT(i))
-    endif
-  enddo
-  enddo
-  S(i)=S(i)/(factor*degeneracy(i))
-  if (XA .eq. 1) then
-    XS(i)=XS(i)/(xfactor*degeneracy(i))
-  else
-    xfactor=0.0d0
+  if (degeneracy(i) .gt. 0) then
     do k=1, NSP
-      xfactor=xfactor + NBSPBS(k)*FQX(INT(XSCATTL(k)),K_POINT(i))**2
+      do j=1, NSP
+        S(i)=S(i)+Sij(i,k,j)*NSCATTL(k)*NSCATTL(j)
+        if (XA .eq. 1) then
+          XS(i)=XS(i)+Sij(i,k,j)*XSCATTL(k)*XSCATTL(j)
+        else
+          XS(i)=XS(i)+Sij(i,k,j)*FQX(INT(XSCATTL(k)),K_POINT(i))*FQX(INT(XSCATTL(j)),K_POINT(i))
+        endif
+      enddo
     enddo
-    XS(i)=XS(i)/(xfactor*degeneracy(i)*NS)
+    S(i)=S(i)/(factor*degeneracy(i))
+    if (XA .eq. 1) then
+      XS(i)=XS(i)/(xfactor*degeneracy(i))
+    else
+      xfactor=0.0d0
+      do k=1, NSP
+        xfactor=xfactor + NBSPBS(k)*FQX(INT(XSCATTL(k)),K_POINT(i))**2
+      enddo
+      XS(i)=XS(i)/(xfactor*degeneracy(i)*NS)
+    endif
+    do j=1, NSP
+      do k=1, NSP
+        Sij(i,j,k)=Sij(i,j,k)/(degeneracy(i)*sqrt(dble(NBSPBS(k)*NBSPBS(j)))*NS)
+      enddo
+    enddo
   endif
-  do j=1, NSP
-  do k=1, NSP
-    Sij(i,j,k)=Sij(i,j,k)/(degeneracy(i)*sqrt(dble(NBSPBS(k)*NBSPBS(j)))*NS)
-  enddo
-  enddo
 enddo
 
 if (allocated(degeneracy)) deallocate(degeneracy)
@@ -162,25 +171,14 @@ CONTAINS
 ! this subroutine computes the sine and cosine sums from the
 ! configuration for all q-vectors needed
 !
-#ifdef OPENMP
-SUBROUTINE FOURIER_TRANS_STEPS (NUMTH)
-#else
 SUBROUTINE FOURIER_TRANS_STEPS ()
-#endif
+
   USE PARAMETERS
 
   IMPLICIT NONE
   DOUBLE PRECISION :: qx, qy, qz, qtr, sini, cosi
+  INTEGER :: sp
 
-#ifdef OPENMP
-  INTEGER, INTENT(IN) :: NUMTH
-! // on Steps, Qvect or Atoms ?
-  ! OpemMP on MD steps
-  !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
-  !$OMP& PRIVATE(qx, qy, qz, cij, sik, qtr, sini, cosi, i, j, k, l, m, n) &
-  !$OMP& SHARED(NUMTH, qvectx, qvecty, qvectz, FULLPOS, NS, NSP, NA, LOT, DELTA_Q, NUMBER_OF_QVECT, NQ, modq, qvmin, Sij)
-  !$OMP DO SCHEDULE(STATIC,NS/NUMTH)
-#endif
   do k=1, NS
     do j=1, NUMBER_OF_QVECT
 
@@ -201,15 +199,13 @@ SUBROUTINE FOURIER_TRANS_STEPS ()
           qtr = qx*FULLPOS(i,1,k)+qy*FULLPOS(i,2,k)+qz*FULLPOS(i,3,k)
           sini = sin(qtr)
           cosi = cos(qtr)
-          sik(LOT(i)) = sik(LOT(i)) + sini
-          cij(LOT(i)) = cij(LOT(i)) + cosi
+          sp = LOT(i)
+          sik(sp) = sik(sp) + sini
+          cij(sp) = cij(sp) + cosi
         enddo
 
         do i=1, NSP
         do m=1, NSP
-#ifdef OPENMP
-          !$OMP ATOMIC
-#endif
           Sij(l,i,m) = Sij(l,i,m) + cij(i)*cij(m) + sik(i)*sik(m)
         enddo
         enddo
@@ -217,17 +213,13 @@ SUBROUTINE FOURIER_TRANS_STEPS ()
      endif
     enddo
   enddo
-#ifdef OPENMP
-  !$OMP END DO NOWAIT
-  !$OMP END PARALLEL
-#endif
 
 END SUBROUTINE
 
 #ifdef OPENMP
 !************************************************************
 !
-! this subroutine computes the sine and cosine sums from the
+! This subroutine computes the sine and cosine sums from the
 ! configuration for all q-vectors needed
 ! OpenMP // on Qvect
 !
@@ -238,14 +230,14 @@ SUBROUTINE FOURIER_TRANS_QVECT ()
   !$ USE OMP_LIB
   IMPLICIT NONE
 
-  INTEGER :: NUMTH
+  INTEGER :: NUMTH, sp
   DOUBLE PRECISION :: qx, qy, qz, qtr, sini, cosi
 
   NUMTH = OMP_GET_MAX_THREADS ()
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
  ! OpemMP on Qvect
  !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
- !$OMP& PRIVATE(qx, qy, qz, cij, sik, qtr, sini, cosi, i, j, k, l, m) &
+ !$OMP& PRIVATE(qx, qy, qz, cij, sik, qtr, sini, cosi, i, j, k, l, m, sp) &
  !$OMP& SHARED(NUMTH, qvectx, qvecty, qvectz, &
  !$OMP& FULLPOS, NS, NSP, NA, LOT, DELTA_Q, NUMBER_OF_QVECT, NQ, modq, qvmin, Sij)
  !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
@@ -269,8 +261,9 @@ SUBROUTINE FOURIER_TRANS_QVECT ()
           qtr = qx*FULLPOS(i,1,k)+qy*FULLPOS(i,2,k)+qz*FULLPOS(i,3,k)
           sini = sin(qtr)
           cosi = cos(qtr)
-          sik(LOT(i)) = sik(LOT(i)) + sini
-          cij(LOT(i)) = cij(LOT(i)) + cosi
+          sp = LOT(i)
+          sik(sp) = sik(sp) + sini
+          cij(sp) = cij(sp) + cosi
         enddo
 
         do i=1, NSP
@@ -291,31 +284,6 @@ SUBROUTINE FOURIER_TRANS_QVECT ()
 
 END SUBROUTINE
 #endif
-
-DOUBLE PRECISION FUNCTION FQX(TA, Q)
-
-USE MENDELEIEV
-
-INTEGER, INTENT(IN) :: TA
-DOUBLE PRECISION, INTENT(IN) :: Q
-DOUBLE PRECISION :: SINLA
-DOUBLE PRECISION, PARAMETER :: PI=acos(-1.0)
-!
-! Acta Cryst. (1968). A24, 321
-!
-! SINLA = ((sin(THETA)/LAMBDA)**2
-! and 2 d Sin(THETA) = LAMBDA
-! so 2 d = LAMBDA / Sin(THETA)
-! with d = 2 PI / Q we get:
-! 4.0 PI / Q =  LAMBDA / Sin(THETA)
-SINLA=(Q/(4.0*PI))**2
-
-FQX = a1(TA)*exp(-b1(TA)*SINLA) &
-    + a2(TA)*exp(-b2(TA)*SINLA) &
-    + a3(TA)*exp(-b3(TA)*SINLA) &
-    + a4(TA)*exp(-b4(TA)*SINLA) + c(TA)
-
-END FUNCTION
 
 INTEGER FUNCTION SK_SAVE()
 
@@ -500,5 +468,30 @@ smooth_and_save=1
 001 continue
 
 if (allocated(SQTAB)) deallocate(SQTAB)
+
+END FUNCTION
+
+DOUBLE PRECISION FUNCTION FQX(TA, Q)
+
+USE MENDELEIEV
+
+INTEGER, INTENT(IN) :: TA
+DOUBLE PRECISION, INTENT(IN) :: Q
+DOUBLE PRECISION :: SINLA
+DOUBLE PRECISION, PARAMETER :: PI=acos(-1.0)
+!
+! Acta Cryst. (1968). A24, 321
+!
+! SINLA = ((sin(THETA)/LAMBDA)**2
+! and 2 d Sin(THETA) = LAMBDA
+! so 2 d = LAMBDA / Sin(THETA)
+! with d = 2 PI / Q we get:
+! 4.0 PI / Q =  LAMBDA / Sin(THETA)
+SINLA=(Q/(4.0*PI))**2
+
+FQX = a1(TA)*exp(-b1(TA)*SINLA) &
+    + a2(TA)*exp(-b2(TA)*SINLA) &
+    + a3(TA)*exp(-b3(TA)*SINLA) &
+    + a4(TA)*exp(-b4(TA)*SINLA) + c(TA)
 
 END FUNCTION

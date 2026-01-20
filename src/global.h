@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file global.h
@@ -310,7 +310,7 @@ enum ImageFormats {
 /*!< \def NCALCS
   \brief number of analysis
 */
-#define NCALCS 10
+#define NCALCS 11
 
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
@@ -330,6 +330,8 @@ enum ImageFormats {
 #define CHA 7
 #define SPH 8
 #define MSD 9
+#define SKT 10
+
 // #define FF 12
 
 #define DEFAULT_FONT_SIZE 8
@@ -693,7 +695,7 @@ struct atomes_analysis
   /*
      Analysis related parameters
   */
-  int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,ω) */
+  int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,t) */
   gchar * name;                /*!< Analysis name for menu item */
   gboolean avail_ok;           /*!< Analysis calculation availability */
   gboolean init_ok;            /*!< Curves initialization */

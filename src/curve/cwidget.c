@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cwidget.c
@@ -115,7 +115,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
 */
 void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
 {
-  if (rid < RIN || rid == MSD)
+  if (rid < RIN || rid == MSD || rid == SKT)
   {
     this_curve -> cmin[0] = this_proj -> analysis[rid] -> min;
     this_curve -> cmax[0] = this_proj ->  analysis[rid] -> max;
