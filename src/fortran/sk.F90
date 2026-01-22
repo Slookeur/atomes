@@ -293,8 +293,10 @@ INTEGER :: NSQ
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
 
 INTERFACE
-  LOGICAL FUNCTION FZBT (NDQ)
+  LOGICAL FUNCTION FZBT (NDQ, SQIJ)
+    USE PARAMETERS
     INTEGER, INTENT(IN) :: NDQ
+    DOUBLE PRECISION, DIMENSION(NDQ,NSP,NSP), INTENT(IN) :: SQIJ
   END FUNCTION
 END INTERFACE
 
@@ -376,7 +378,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
   enddo
 
   !  To compute FZ and BT partials
-  if (.not.FZBT (NQ)) then
+  if (.not.FZBT (NQ, Sij)) then
     SK_SAVE = 0
     goto 001
   endif

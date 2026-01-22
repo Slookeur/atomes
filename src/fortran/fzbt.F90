@@ -18,7 +18,7 @@
 !! @short Partial structure factors: Faber-Ziman and Bathia-Thornton analysis
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 
-LOGICAL FUNCTION FZBT (NDQ)
+LOGICAL FUNCTION FZBT (NDQ, SQIJ)
 
 !
 ! Compute Faber-Ziman and Bathia-Thornton S(q) from Ashcroft S(q)
@@ -29,6 +29,7 @@ USE PARAMETERS
 IMPLICIT NONE
 
 INTEGER, INTENT(IN) :: NDQ
+DOUBLE PRECISION, DIMENSION(NDQ,NSP,NSP), INTENT(IN) :: SQIJ
 DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: Xr
 
 
@@ -72,13 +73,13 @@ do m=1, NDQ
   do n=1, NSP
     do o=1, NSP
       if (o .eq. n) then
-        FZSij(m,n,o) = 1 + (Sij(m,n,o)-1)/Xr(n)
+        FZSij(m,n,o) = 1 + (SQIJ(m,n,o)-1)/Xr(n)
         if (NSP .eq. 2) then
           BTij(m,1) = BTij(m,1) + Xr(o)*Xr(o)*FZSij(m,n,o)
           BTij(m,3) = BTij(m,3) + FZSij(m,n,o)
         endif
       else
-        FZSij(m,n,o) = Sij(m,n,o)/sqrt(Xr(n)*Xr(o)) + 1
+        FZSij(m,n,o) = SQIJ(m,n,o)/sqrt(Xr(n)*Xr(o)) + 1
         if (NSP .eq. 2) then
           BTij(m,1) = BTij(m,1) + Xr(o)*Xr(n)*FZSij(m,n,o)
           BTij(m,3) = BTij(m,3) - FZSij(m,n,o)

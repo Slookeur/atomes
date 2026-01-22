@@ -274,6 +274,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
     this_proj -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
 
     // Dynamic structure factor
+    // Number of graphs depends on the number of correlation states, not appearing here
     comp_list[0] = SKT;
     this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
   }
@@ -368,6 +369,7 @@ void initialize_this_analysis (project * this_proj, int ana)
     case SKT:
       comp_list = allocint (1);
       comp_list[0] = SKT;
+      // Total number of graphs depends on the number of correlation states, not appearing here
       if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
       break;
   }

@@ -1406,8 +1406,8 @@ void calc_sk_t (GtkWidget * box)
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  //entry= create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
+  // entry= create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  // update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 0);
@@ -1572,7 +1572,7 @@ G_MODULE_EXPORT void on_calc_activate (GtkWidget * widg, gpointer data)
       calc_msd (box);
       break;
     case SKT-1:
-      calc_sk_t (box, );
+      calc_sk_t (box);
       break;
     default:
       calc_gr_sq (box, id);

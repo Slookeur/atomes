@@ -78,7 +78,7 @@ int read_project_curve (FILE * fp, int pid)
   int rid, cid;
   if (! version_2_9_and_above)
   {
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    // if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   }
   project * this_proj = get_project_by_id (pid);
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
@@ -87,6 +87,7 @@ int read_project_curve (FILE * fp, int pid)
   if (version_2_9_and_above)
   {
     this_curve -> name = read_this_string (fp);
+    if (this_curve -> name == NULL) return ERROR_RW;
   }
   if (fread (& this_curve -> displayed, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fread (& this_curve -> ndata, sizeof(int), 1, fp) != 1) return ERROR_RW;

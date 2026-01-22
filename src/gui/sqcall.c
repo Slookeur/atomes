@@ -114,7 +114,7 @@ void init_sq (project * this_proj, int sqk)
 }
 
 /*!
-  \fn void update_sq_view (project * this_proj, int sqk)
+  \fn ;
 
   \brief update the text view for s(q) / s(k) calculation
 
@@ -127,7 +127,7 @@ void update_sq_view (project * this_proj, int sqk)
   if (this_proj -> analysis[sqk] -> calc_buffer == NULL) this_proj -> analysis[sqk] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
-  if (sqk == SKD)
+  if (sqk == SKD || sqk == SKT)
   {
     print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
@@ -179,6 +179,10 @@ void update_sq_view (project * this_proj, int sqk)
   print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\n", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  if (sqk == SKT)
+  {
+
+  }
   print_info (calculation_time(TRUE, this_proj -> analysis[sqk] -> calc_time), NULL, this_proj -> analysis[sqk] -> calc_buffer);
 }
 

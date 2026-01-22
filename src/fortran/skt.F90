@@ -42,9 +42,9 @@ IMPLICIT NONE
 INTEGER (KIND=c_int), INTENT(IN) :: NQ_IN, XA_IN, MAX_IN
 DOUBLE PRECISION :: factor, xfactor
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
-DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: SQT
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
-INTEGER :: NCORR_STEPS
+DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE :: LocalCorr
+DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: SQT
 
 INTERFACE
   DOUBLE PRECISION FUNCTION FQX(TA, Q)
@@ -53,7 +53,7 @@ INTERFACE
   END FUNCTION
 END INTERFACE
 
-allocate(SQT(NQ_IN, MAX_MSD+1, NSP, NSP), STAT=ERR)
+allocate(SQT(NQ_IN, MAX_IN+1, NSP, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: SQT"//CHAR(0))
@@ -203,8 +203,9 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
 
   INTEGER, INTENT(IN) :: MAX_IN
 
-  INTEGER :: sp, n_origins
+  INTEGER :: q, n_origins, t0
   DOUBLE PRECISION :: qx, qy, qz, qtr
+  DOUBLE PRECISION :: Corr
 
 #ifdef OPENMP
   INTEGER :: NUMTH
@@ -212,7 +213,7 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
 
   !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
-  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t0, t, n_origins, RHO_C, RHO_S, LocalCorr, corr_real) &
+  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t0, t, n_origins, RHO_C, RHO_S, LocalCorr, Corr) &
   !$OMP& SHARED(NUMTH, NUMBER_OF_QVECT, SQT, NQ_IN, modq, qvmin, DELTA_Q) &
   !$OMP& SHARED(qvectx, qvecty, qvectz, FULLPOS, NS, NSP, NA, LOT, MAX_IN)
   !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
@@ -246,8 +247,8 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
           do m=1, NSP
             do n=1, NSP
               ! Correlation Real Part: Rc(t)*Rc(0) + Rs(t)*Rs(0)
-              corr_real = RHO_C(t0+t, m) * RHO_C(t0, n) + RHO_S(t0+t, m) * RHO_S(t0, n)
-              LocalCorr(t+1, m, n) = LocalCorr(t+1, m, n) + corr_real
+              Corr = RHO_C(t0+t, m) * RHO_C(t0, n) + RHO_S(t0+t, m) * RHO_S(t0, n)
+              LocalCorr(t+1, m, n) = LocalCorr(t+1, m, n) + Corr
             enddo
           enddo
         enddo
@@ -280,35 +281,48 @@ INTEGER :: NSQ
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
 
 INTERFACE
-  LOGICAL FUNCTION FZBT (NDQ)
+  LOGICAL FUNCTION FZBT (NDQ, SQIJ)
+    USE PARAMETERS
     INTEGER, INTENT(IN) :: NDQ
+    DOUBLE PRECISION, DIMENSION(NDQ,NSP,NSP), INTENT(IN) :: SQIJ
   END FUNCTION
 END INTERFACE
 
 h = 8+4*NSP*NSP
 if (NSP .eq. 2) h=h+8
 
+if (allocated(SQTAB)) deallocate(SQTAB)
+allocate(SQTAB(NQ_IN), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: SKT_SAVE"//CHAR(0), "Table: SQTAB"//CHAR(0))
+  SKT_SAVE = 0
+  goto 001
+endif
+if(allocated(Sij)) deallocate(Sij)
+allocate(Sij(NQ_IN,NSP,NSP), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: SKT_SAVE"//CHAR(0), "Table: Sij"//CHAR(0))
+  SKT_SAVE = 0
+  goto 001
+endif
+
 do t=1, MAX_IN+1
 
+  write (6 , *)
+  write (6, '("t = ",i4)') t
   i=0
-  do j=1, NQ
+  do j=1, NQ_IN
     if (NSQT(j,t) .ne. 0.0) i=i+1
   enddo
   NSQ=i
 
   if (NSQ .gt. 0) then  ! If wave vectors exist
 
-    if (allocated(SQTAB)) deallocate(SQTAB)
-    allocate(SQTAB(NSQ), STAT=ERR)
-    if (ERR .ne. 0) then
-      call show_error ("Impossible to allocate memory"//CHAR(0), &
-                       "Function: SK_SAVE"//CHAR(0), "Table: SQTAB"//CHAR(0))
-      SKT_SAVE = 0
-      goto 001
-    endif
-
+    SQTAB(:)=0.0d0
     i = 0;
-    do k=1, NQ
+    do k=1, NQ_IN
       if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
         i=i+1
         SQTAB(i)= K_POINT(k)
@@ -318,58 +332,63 @@ do t=1, MAX_IN+1
     ! call save_xsk (NSQ, SQTAB)
 
     i=0
-    do k=1, NQ
+    do k=1, NQ_IN
       if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
         i=i+1
         SQTAB(i)= NSQT(k,t)
       endif
     enddo
-    call save_curve (NSQ, SQTAB, (t-1)*h, IDSKT)
+
+    ! call save_curve (NSQ, SQTAB, (t-1)*h, IDSKT)
 
     i=0
-    do k=1, NQ
+    do k=1, NQ_IN
       if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
         i=i+1
         SQTAB(i)= (NSQT(k,t)-1.0)*K_POINT(k)
       endif
     enddo
-    call save_curve (NSQ, SQTAB, 2 + (t-1)*h, IDSKT)
+    ! call save_curve (NSQ, SQTAB, 2 + (t-1)*h, IDSKT)
 
     i=0
-    do k=1, NQ
+    do k=1, NQ_IN
       if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
         i=i+1
-        SQTAB(i)= XNSQT(k,t)
+        SQTAB(i)= XSQT(k,t)
       endif
     enddo
-    call save_curve (NSQ, SQTAB, 4 + (t-1)*h, IDSKT)
+    ! call save_curve (NSQ, SQTAB, 4 + (t-1)*h, IDSKT)
 
     i=0
-    do k=1, NQ
+    do k=1, NQ_IN
       if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
         i=i+1
-        SQTAB(i)= (XNSQT(k,t)-1.0)*K_POINT(k)
+        SQTAB(i)= (XSQT(k,t)-1.0)*K_POINT(k)
       endif
     enddo
-    call save_curve (NSQ, SQTAB, 6 + (t-1)*h, IDSKT)
+    ! call save_curve (NSQ, SQTAB, 6 + (t-1)*h, IDSKT)
 
+    SQTAB(:)=0.0d0
+    Sij(:,:,:)=0.0d0
     l = 8
     do i=1, NSP
       do j=1, NSP
         m=0
-        do k=1, NQ
+        do k=1, NQ_IN
+          Sij(k,i,j) = SQT(k,t,i,j)
           if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
+            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
           endif
         enddo
-        call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
         l=l+2
       enddo
     enddo
 
   !  To compute FZ and BT partials
-    if (.not.FZBT (NQ)) then
+    if (.not.FZBT (NQ_IN, Sij)) then
       SKT_SAVE = 0
       goto 001
     endif
@@ -377,31 +396,32 @@ do t=1, MAX_IN+1
     do i=1, NSP
       do j=1, NSP
         m=0
-        do k=1, NQ
+        do k=1, NQ_IN
           if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
+            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
           endif
         enddo
-        call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
         l=l+2
       enddo
     enddo
     if (NSP .eq. 2) then
       do i=1, 4
         k=0
-        do j=1, NQ
+        do j=1, NQ_IN
           if (j.eq.1 .or. S(j).ne.0.0) then
             k=k+1
             SQTAB(k)= BTij(j,i)
           endif
         enddo
-        call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
         l=l+2
       enddo
     endif
 
-    SK_SAVE=1
+    SKT_SAVE=1
 
   endif ! If wave vectors exist
 
@@ -412,6 +432,9 @@ enddo
 if (allocated(FZSij)) deallocate(FZSij)
 if (NSP.eq.2 .and. allocated(BTij)) deallocate(BTij)
 if (allocated(SQTAB)) deallocate(SQTAB)
+if(allocated(Sij)) deallocate(Sij)
+if(allocated(FZSij)) deallocate(FZSij)
+if(allocated(BTij)) deallocate(BTij)
 
 END FUNCTION
 
