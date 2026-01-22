@@ -33,7 +33,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file idccall.c
@@ -142,7 +142,7 @@ void update_idc_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 {
   // active_project is a pointer on the active atomes project
-  // Initializing the graph for this calculation, if this was done already
+  // Initializing the graph for this calculation, if not done already
   if (! active_project -> analysis[IDC] -> init_ok)  init_idc (active_project);
 
   // Cleaning previous results, if any
