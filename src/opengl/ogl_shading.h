@@ -72,16 +72,22 @@ extern const GLchar * degree_vertex;
 // Triangles: Multiple lights + Materials + Transparency shaders
 extern const GLchar * full_vertex;
 extern const GLchar * full_color;
+extern const GLchar * full_color_ray;
 
 // Sphere
 extern const GLchar * sphere_vertex;
+extern const GLchar * sphere_vertex_ray;
 
 // Cylinder and caps
 extern const GLchar * cylinder_vertex;
+extern const GLchar * cylinder_vertex_ray;
 extern const GLchar * cone_vertex;
+extern const GLchar * cone_vertex_ray;
 extern const GLchar * cap_vertex;
+extern const GLchar * cap_vertex_ray;
 
 extern const GLchar * axis_sphere_vertex;
+extern const GLchar * axis_sphere_vertex_ray;
 extern const GLchar * axis_cylinder_geom;
 extern const GLchar * axis_line_vertex;
 

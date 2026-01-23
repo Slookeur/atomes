@@ -80,6 +80,7 @@ extern G_MODULE_EXPORT void on_calc_gr_released (GtkWidget * widg, gpointer data
 extern G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data);
+extern G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data);
 extern gboolean toggled_rings;
 extern G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data);
@@ -1392,10 +1393,9 @@ void calc_sk_t (GtkWidget * box)
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  GtkWidget * entry= create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  GtkWidget * entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(SKT));
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SKT] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
@@ -1403,12 +1403,12 @@ void calc_sk_t (GtkWidget * box)
   update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
 
-  hbox = create_hbox (0);
+  /* hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  // entry= create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  // update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+  entry = create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10); */
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 0);
 
@@ -1444,7 +1444,6 @@ void calc_sk_t (GtkWidget * box)
   add_container_child (CONTAINER_EXP, advanced_options, avbox);
   show_the_widgets (advanced_options);
   widget_set_sensitive (advanced_options, 1);
-
   GtkWidget * smooth_options = create_expander ("  Gaussian data smoothing", NULL);
   gtk_widget_set_size_request (smooth_options, -1, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, smooth_options, FALSE, TRUE, 10);
@@ -1524,7 +1523,7 @@ G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, g
           if (test_msd ()) on_calc_msd_released (calc_win, NULL);
           break;
         case SKT-1:
-          // if (test_sq(SKT) && active_project -> steps) on_calc_skt_released (calc_win, NULL);
+          if (test_sq(SKT) && active_project -> steps) on_calc_skt_released (calc_win, NULL);
         default:
           break;
       }

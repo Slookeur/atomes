@@ -33,6 +33,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
+extern gboolean reading_project;
+
 #define IODEBUG FALSE
 
 extern int num_bonds (int i);

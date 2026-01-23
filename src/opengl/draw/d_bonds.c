@@ -752,7 +752,7 @@ int create_bond_lists (gboolean to_pick)
         }
         if (! to_pick)
         {
-          wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, cyl);
+          wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CYLINDERS, cylinder_vertex_ray, NULL, full_color_ray, GL_TRIANGLE_STRIP, 6, 1, TRUE, cyl);
           g_free (cyl);
           l ++;
           if (ncap[f] > 0)
@@ -766,7 +766,7 @@ int create_bond_lists (gboolean to_pick)
             {
               setup_all_cylinder_vertices (f-1, FALSE, 1, h, cap -> instances);
             }
-            wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CAPS, cap_vertex, NULL, full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, cap);
+            wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CAPS, cap_vertex_ray, NULL, full_color_ray, GL_TRIANGLE_FAN, 5, 1, TRUE, cap);
             g_free (cap);
             l ++;
           }

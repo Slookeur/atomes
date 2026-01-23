@@ -572,9 +572,11 @@ gboolean has_box_changed ()
   {
     for (j=0; j<3; j++)
     {
+      g_debug ("i= %d, j= %d, tmp_lattice[%d][%d]= %f, active_box -> param[%d][%d]= %f", i, j, i, j, tmp_lattice[i][j], i, j, active_box -> param[i][j]);
       if (tmp_lattice[i][j] != active_box -> param[i][j])
       {
         active_box -> param[i][j] = tmp_lattice[i][j];
+
         changed = TRUE;
       }
     }
@@ -616,12 +618,14 @@ void prep_box (int id)
   if (tmp_lat < 2 && tmp_lat != active_cell -> ltype) active_project -> run = 0;
   if (tmp_lat > 0)
   {
-    if (tmp_lat == 1 && has_box_changed())
+    if (has_box_changed())
     {
+      tmp_lat = 1;
       active_project -> run = 0;
     }
-    else if (tmp_lat == 2 && have_vectors_changed())
+    else if (have_vectors_changed())
     {
+      tmp_lat = 2;
       active_project -> run = 0;
     }
   }

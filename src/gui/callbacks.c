@@ -297,7 +297,9 @@ void open_this_proj (gpointer data, gpointer user_data)
   FILE * fp = fopen (data, dfi[0]);
   int pactive = activep;
   init_project (FALSE);
+  reading_project = TRUE;
   open_save (fp, 0, activew, pactive, data);
+  reading_project = FALSE;
   fclose (fp);
   activew = activep;
 }

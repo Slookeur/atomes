@@ -40,6 +40,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "project.h"
 
 extern gboolean version_2_9_and_above;
+// Project reading flag, required for project files < v2.9
+gboolean reading_project = FALSE;
 
 /*!
   \fn gboolean read_data_layout (FILE * fp, DataLayout * layout)
@@ -76,9 +78,9 @@ int read_project_curve (FILE * fp, int pid)
 {
   int i, j;
   int rid, cid;
-  if (! version_2_9_and_above)
+  if (! version_2_9_and_above && ! reading_project)
   {
-    // if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   }
   project * this_proj = get_project_by_id (pid);
   if (fread (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;

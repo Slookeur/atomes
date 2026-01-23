@@ -659,7 +659,7 @@ void create_atom_lists (gboolean to_pick)
         {
           if (sphere)
           {
-            wingl -> ogl_glsl[ATOMS][step][k] = init_shader_program (ATOMS, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
+            wingl -> ogl_glsl[ATOMS][step][k] = init_shader_program (ATOMS, GLSL_SPHERES, sphere_vertex_ray, NULL, full_color_ray, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
           }
           else
           {
