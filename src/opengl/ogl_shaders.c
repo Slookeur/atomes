@@ -1068,14 +1068,10 @@ const GLchar * full_color_ray = GLSL(
   {
     vec3 ba = pb - pa;
     vec3 oa = ro - pa;
-    vec3 ob = ro - pb;
 
     float m0 = dot(ba,ba);
     float m1 = dot(oa,ba);
     float m2 = dot(rd,ba);
-    float m3 = dot(rd,oa);
-    float m4 = dot(oa,oa);
-    float m5 = dot(ob,ob); // Not used?
 
     // ra is radius at base. radius at apex (pa) is 0.
     // tan(theta) = ra / length(ba)
@@ -1086,21 +1082,12 @@ const GLchar * full_color_ray = GLSL(
 
     if (m0 < 1e-6) return false;
 
-    float hyp_sq = m0 + ra*ra; // Slant height squared unnormalized?
-    // k = R^2 / H^2
     float k = (ra*ra) / m0;
-    // float k = ra*ra / (m0 - ra*ra); ? No vertex radius 0.
-
-    // Equation: (p - pa)^2 * (1+k) = ((p-pa).dir)^2 * (something) ??
-    // Simplification: (x)^2 + (z)^2 = (y * R/H)^2
-    // Let's use Inigo Quilez's cone implementation logic adapted.
-
-    vec3  oc = oa;
     float m = dot(rd,ba)/m0; // ~ cos angle of ray with axis
-    float n = dot(oc,ba)/m0;
+    float n = dot(oa,ba)/m0;
     float a = dot(rd,rd) - m2*m2*(1.0+k)/m0;
-    float b = dot(rd,oc) - m2*m1*(1.0+k)/m0;
-    float c = dot(oc,oc) - m1*m1*(1.0+k)/m0;
+    float b = dot(rd,oa) - m2*m1*(1.0+k)/m0;
+    float c = dot(oa,oa) - m1*m1*(1.0+k)/m0;
 
     float h = b*b - a*c;
     if (h < 0.0) return false;
@@ -1112,17 +1099,6 @@ const GLchar * full_color_ray = GLSL(
     if (y > 0.0 && y < m0)
     {
       hitPos = ro + t * rd;
-      // Normal?
-      // Derived from gradient
-      // vec3 cp = hitPos - pa;
-      // hitNorm = normalize(cp * dot(ba,cp)/dot(cp,cp) - ba); ??
-      // Simple geometric normal construction:
-      // Project P onto axis: Q = pa + y/m0 * ba
-      // Radial vector R = P - Q
-      // Normal is R + slope component.
-      // Slope is ra/H.
-      // Simplified:
-      // hitNorm = normalize( m0*(hitPos-pa) - ba*y*(1.0+k) );
       hitNorm = normalize(m0*(hitPos-pa) - ba*(1.0+k)*y);
       return true;
     }
@@ -1171,6 +1147,493 @@ const GLchar * full_color_ray = GLSL(
     }
 
     if (!hit) discard;
+    if (dot(hitNorm, surfaceToCamera) < 0.0) hitNorm = -hitNorm;
+
+    // Properties
+    vec3 color;
+    float alpha;
+    if (lights_on == 0)
+    {
+      color = vec3(1.0);
+      alpha = surfaceColor.w;
+    }
+    else
+    {
+     // mix between metal and non-metal material, for non-metal
+     // constant base specular factor of 0.04 grey is used
+      vec3 specular = mix(vec3(0.04), mat.albedo, mat.metallic);
+      color = vec3(0.0);
+      for(int i = 0; i < numLights; i++)
+      {
+        color +=  Apply_lighting_model (lights_on, AllLights[i], specular, hitPos, hitNorm);
+      }
+      color = pow(color, vec3(1.0/mat.gamma));
+      alpha = surfaceColor.w * mat.alpha;
+    }
+
+    vec3 final_color = surfaceColor.xyz * color;
+
+    if (fog.mode > 0)
+    {
+      fragment_color = vec4 (Apply_fog(final_color, hitPos), alpha);
+    }
+    else
+    {
+      fragment_color = vec4 (final_color, alpha);
+    }
+  }
+);
+
+const GLchar * axis_color_ray = GLSL(
+
+  int PHONG           = 1;
+  int BLINN           = 2;
+  int COOK_BLINN      = 3;
+  int COOK_BECKMANN   = 4;
+  int COOK_GGX        = 5;
+
+  struct Light {
+    int type;
+    vec3 position;
+    vec3 direction;
+    vec3 intensity;
+    float constant;
+    float linear;
+    float quadratic;
+    float cone_angle;
+    float spot_inner;
+    float spot_outer;
+  };
+
+  struct Material {
+    vec3 albedo;
+    float metallic;
+    float roughness;
+    float back_light;
+    float gamma;
+    float alpha;
+  };
+
+  struct Fog {
+    int mode;
+    int based;
+    float density;
+    vec2 depth;
+    vec3 color;
+  };
+
+  uniform Light AllLights[10];
+  uniform Material mat;
+  uniform Fog fog;
+  uniform int lights_on;
+  uniform int numLights;
+
+  in vec4 surfaceColor;
+  in vec3 surfacePosition;
+  in vec3 surfaceNormal;
+  in vec3 surfaceToCamera;
+
+  // Standardized Raytracing parameters
+  in vec3 imp_a;
+  in vec3 imp_b;
+  in float imp_r;
+  flat in int form_type;
+
+  out vec4 fragment_color;
+
+  const float PI = 3.14159265359;
+
+  // clamping to 0 - 1 range
+  float saturate (in float value)
+  {
+    return clamp(value, 0.0, 1.0);
+  }
+
+  // phong (lambertian) diffuse term
+  float phong_diffuse()
+  {
+    return (1.0 / PI);
+  }
+
+  // compute Fresnel specular factor for given base specular and product
+  // product could be NdV or VdH depending on used technique
+  vec3 fresnel_factor (in vec3 f0, in float product)
+  {
+    return mix(f0, vec3(1.0), pow(1.01 - product, 5.0));
+  }
+
+  // following functions are copies of UE4
+  // for computing Cook-Torrance specular lighting terms
+
+  float D_blinn(in float roughness, in float NdH)
+  {
+    float m = roughness * roughness;
+    float m2 = m * m;
+    float n = 2.0 / m2 - 2.0;
+    return (n + 2.0) / (2.0 * PI) * pow(NdH, n);
+  }
+
+  float D_beckmann(in float roughness, in float NdH)
+  {
+    float m = roughness * roughness;
+    float m2 = m * m;
+    float NdH2 = NdH * NdH;
+    return exp((NdH2 - 1.0) / (m2 * NdH2)) / (PI * m2 * NdH2 * NdH2);
+  }
+
+  float D_GGX(in float roughness, in float NdH)
+  {
+    float m = roughness * roughness;
+    float m2 = m * m;
+    float d = (NdH * m2 - NdH) * NdH + 1.0;
+    return m2 / (PI * d * d);
+  }
+
+  float G_schlick(in float roughness, in float NdV, in float NdL)
+  {
+    float k = roughness * roughness * 0.5;
+    float V = NdV * (1.0 - k) + k;
+    float L = NdL * (1.0 - k) + k;
+    return 0.25 / (V * L);
+  }
+
+  // simple Phong specular calculation with normalization
+  vec3 phong_specular(in vec3 V, in vec3 L, in vec3 N, in vec3 specular, in float roughness)
+  {
+    vec3 R = reflect(-L, N);
+    float spec = max(0.0, dot(V, R));
+
+    float k = 1.999 / (roughness * roughness);
+
+    return min(1.0, 3.0 * 0.0398 * k) * pow(spec, min(10000.0, k)) * specular;
+  }
+
+  // simple Blinn specular calculation with normalization
+  vec3 blinn_specular(in float NdH, in vec3 specular, in float roughness)
+  {
+    float k = 1.999 / (roughness * roughness);
+
+    return min(1.0, 3.0 * 0.0398 * k) * pow(NdH, min(10000.0, k)) * specular;
+  }
+
+  // Cook-Torrance specular calculation
+  vec3 cooktorrance_specular (in int cook, in float NdL, in float NdV, in float NdH, in vec3 specular, in float roughness)
+  {
+    float D;
+    if (cook == COOK_BLINN)
+    {
+      D = D_blinn(roughness, NdH);
+    }
+    else if (cook == COOK_BECKMANN)
+    {
+      D = D_beckmann(roughness, NdH);
+    }
+    else if (cook == COOK_GGX)
+    {
+      D = D_GGX(roughness, NdH);
+    }
+
+    float G = G_schlick(roughness, NdV, NdL);
+
+    float rim = mix(1.0 - roughness * mat.back_light * 0.9, 1.0, NdV);
+
+    return (1.0 / rim) * specular * G * D;
+  }
+
+  vec3 Apply_lighting_model (in int model, in Light light, in vec3 specular, in vec3 v_pos, in vec3 N)
+  {
+    // L, V, H vectors
+    vec3 L;
+    float A;
+    float I = 1.0;
+    if (light.type == 0)
+    {
+      // Directional light
+      L = normalize (-light.direction);
+      A = 1.0;
+    }
+    else
+    {
+      vec3 L = light.position - v_pos;
+      float dist = length (L);
+      L = normalize(L);
+      A = 1.0 / (light.constant + light.linear*dist + light.quadratic*dist*dist);
+      if (light.type == 2)
+      {
+        float theta = dot(L, normalize(light.position-light.direction));
+        if(theta > light.cone_angle)
+        {
+          float epsilon = light.spot_inner - light.spot_outer;
+          I = saturate((theta - light.spot_outer) / epsilon);
+        }
+        else
+        {
+          return vec3(0.0001);
+        }
+      }
+    }
+    vec3 V = normalize(-v_pos);
+    vec3 H = normalize(L + V);
+    // vec3 N = surfaceNormal; // Using argument now
+
+    // compute material reflectance
+    float NdL = max(0.0, dot(N, L));
+    float NdV = max(0.001, dot(N, V));
+    float NdH = max(0.001, dot(N, H));
+    float HdV = max(0.001, dot(H, V));
+    float LdV = max(0.001, dot(L, V));
+
+    // Fresnel term is common for any, except Phong
+    // so it will be calculated inside ifdefs
+    vec3 specfresnel;
+    vec3 specref;
+    if (model == PHONG)
+    {
+      // specular reflectance with Phong
+      specfresnel = fresnel_factor (specular, NdV);
+      specref = phong_specular (V, L, N, specfresnel, mat.roughness);
+    }
+    else if (model == BLINN)
+    {
+      // specular reflectance with Blinn
+      specfresnel = fresnel_factor (specular, HdV);
+      specref = blinn_specular (NdH, specfresnel, mat.roughness);
+    }
+    else
+    {
+      // specular reflectance with Cook-Torrance
+      specfresnel = fresnel_factor(specular, HdV);
+      specref = cooktorrance_specular(model, NdL, NdV, NdH, specfresnel, mat.roughness);
+    }
+
+    specref *= vec3(NdL);
+
+    // diffuse is common for any model
+    vec3 diffref = (vec3(1.0) - specfresnel) * phong_diffuse() * NdL;
+
+    // compute lighting
+    vec3 reflected_light = vec3(0);
+    vec3 diffuse_light = vec3(0);    // initial value == constant ambient light
+
+    // point light
+    vec3 light_color = light.intensity * A * I;
+    reflected_light += specref * light_color;
+    diffuse_light += diffref * light_color;
+
+    // final result
+    return diffuse_light * mix(mat.albedo, vec3(0.0), mat.metallic) + reflected_light;
+  }
+
+  vec3 Apply_fog (in vec3 lightColor, in vec3 v_pos)
+  {
+     // distance
+    float dist = 0.0;
+    float fogFactor = 0.0;
+
+    // compute distance used in fog equations
+    if (fog.based == 0)
+    {
+      // plane based
+      dist = abs (v_pos.z);
+    }
+    else
+    {
+      // range based
+      dist = length (v_pos);
+    }
+
+    if (fog.mode == 1) // linear fog
+    {
+      fogFactor = (fog.depth.x - dist)/(fog.depth.y - fog.depth.x);
+    }
+    else if (fog.mode == 2) // exponential fog
+    {
+      fogFactor = 1.0 / exp (dist * fog.density);
+    }
+    else
+    {
+      fogFactor = 1.0 / exp((dist * fog.density)* (dist * fog.density));
+    }
+    fogFactor = saturate (fogFactor);
+    return mix (fog.color, lightColor, fogFactor);
+  }
+
+  bool intersect_sphere(vec3 ro, vec3 rd, vec3 center, float radius, out vec3 hitPos, out vec3 hitNorm)
+  {
+    vec3 m = ro - center;
+    float b = dot(m, rd);
+    float c = dot(m, m) - radius * radius;
+
+    if (c > 0.0 && b > 0.0) return false;
+
+    float discr = b*b - c;
+    if (discr < 0.0) return false;
+
+    float t = -b - sqrt(discr);
+    if (t < 0.0) t = 0.0;
+
+    hitPos = ro + t * rd;
+    hitNorm = normalize(hitPos - center);
+    return true;
+  }
+
+  bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
+  {
+    vec3 ba = pb - pa;
+    vec3 oc = ro - pa;
+
+    float baba = dot(ba,ba);
+    float bard = dot(ba,rd);
+    float baoc = dot(ba,oc);
+
+    vec3 va = cross(oc, ba);
+    vec3 vb = cross(rd, ba);
+
+    float k2 = dot(vb, vb); // baba - bard*bard
+    float k1 = dot(va, vb); // baba*dot(oc,rd) - baoc*bard
+    float k0 = dot(va, va) - ra*ra*baba; // baba*dot(oc,oc) - baoc*baoc - ra*ra*baba
+
+    if (k2 == 0.0) return false; // Parallel to axis off-center
+
+    float h = k1*k1 - k2*k0;
+    if(h < 0.0) return false;
+
+    h = sqrt(h);
+    float t = (-k1 - h)/k2;
+
+    // body
+    float y = baoc + t*bard;
+    if(y > 0.0 && y < baba)
+    {
+      hitPos = ro + t * rd;
+      hitNorm = normalize((hitPos - pa) * baba - ba * y);
+      return true;
+    }
+    return false;
+  }
+
+  bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out vec3 hitPos, out vec3 hitNorm)
+  {
+    float denom = dot(normal, rd);
+    if (abs(denom) > 1e-6)
+    {
+      float t = dot(center - ro, normal) / denom;
+      if (t >= 0.0)
+      {
+        vec3 p = ro + t * rd;
+        vec3 v = p - center;
+        if (dot(v, v) <= radius * radius)
+        {
+          hitPos = p;
+          hitNorm = normal;
+          // Orient normal towards ray
+          if (dot(hitNorm, rd) > 0.0) hitNorm = -hitNorm;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool intersect_cone(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
+  {
+    vec3 ba = pb - pa;
+    vec3 oa = ro - pa;
+
+    float m0 = dot(ba,ba);
+    float m1 = dot(oa,ba);
+    float m2 = dot(rd,ba);
+
+    // ra is radius at base. radius at apex (pa) is 0.
+    // tan(theta) = ra / length(ba)
+    // k = ra*ra / m0 ??
+    // Let's use standard cone intersection
+    // Infinite cone defined by apex PA, axis BA, angle alpha.
+    // r(h) = (h/H)*R.  h = dist from PA along axis. H = length(BA). R = ra.
+
+    if (m0 < 1e-6) return false;
+
+    float k = (ra*ra) / m0;
+    float m = dot(rd,ba)/m0; // ~ cos angle of ray with axis
+    float n = dot(oa,ba)/m0;
+    float a = dot(rd,rd) - m2*m2*(1.0+k)/m0;
+    float b = dot(rd,oa) - m2*m1*(1.0+k)/m0;
+    float c = dot(oa,oa) - m1*m1*(1.0+k)/m0;
+
+    float h = b*b - a*c;
+    if (h < 0.0) return false;
+
+    h = sqrt(h);
+    float t = (-b - h)/a;
+    float y = m1 + t*m2;
+
+    if (y > 0.0 && y < m0)
+    {
+      hitPos = ro + t * rd;
+      hitNorm = normalize(m0*(hitPos-pa) - ba*(1.0+k)*y);
+      return true;
+    }
+    return false;
+  }
+
+  void main ()
+  {
+     // Raytracing
+    // Ortho vs Perspective detection
+    bool means_ortho = (fwidth(gl_FragCoord.w) < 1e-9);
+    vec3 ray_dir;
+    vec3 ray_origin;
+    vec3 cam_dir = surfaceToCamera;
+
+    if (means_ortho)
+    {
+      ray_dir = vec3(0.0, 0.0, -1.0);
+      ray_origin = vec3(surfacePosition.xy, 5000.0);
+      cam_dir = vec3(0.0, 0.0, 1.0);
+    }
+    else
+    {
+      ray_dir = normalize(surfacePosition); // View space ray direction (from 0,0,0)
+      ray_origin = vec3(0.0);
+    }
+
+    vec3 hitPos;
+    vec3 hitNorm;
+    bool hit = false;
+
+    if (form_type == 0) // Sphere
+    {
+      hit = intersect_sphere (ray_origin, ray_dir, imp_a, imp_r, hitPos, hitNorm);
+    }
+    else if (form_type == 1) // Cylinder
+    {
+      hit = intersect_cylinder (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
+    }
+    else if (form_type == 2) // Cap
+    {
+      hit = intersect_cap (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
+    }
+    else if (form_type == 3) // Cone
+    {
+      // imp_a = apex, imp_b = base center, imp_r = radius
+      hit = intersect_cone (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
+    }
+    else if (form_type == 4) // Triangle/Mesh
+    {
+      hit = true;
+      hitPos = surfacePosition;
+      if (length(surfaceNormal) > 0.0)
+      {
+        hitNorm = normalize(surfaceNormal);
+      }
+      else
+      {
+        hitNorm = vec3(0,0,1);
+      }
+    }
+
+    if (!hit) discard;
+    if (dot(hitNorm, cam_dir) < 0.0) hitNorm = -hitNorm;
 
     // Properties
     vec3 color;
@@ -1268,63 +1731,6 @@ const GLchar * sphere_vertex_ray = GLSL(
   }
 );
 
-const GLchar * axis_sphere_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  uniform vec4 vertColor;
-
-  in vec3 vert;
-  in vec3 vertNormal;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec4 pos = vec4(vert, 1.0);
-    surfacePosition = vec3(m_view * pos);
-    surfaceNormal   = mat3(m_view) * vertNormal;
-    surfaceToCamera = normalize (- surfacePosition);
-    gl_PointSize = 1.0;
-    gl_Position = mvp * pos;
-  }
-);
-
-const GLchar * axis_sphere_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  uniform vec4 vertColor;
-
-  in vec3 vert;
-  in vec3 vertNormal;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  // Standardized Raytracing parameters
-  out vec3 imp_a;         // Sphere Center
-  out vec3 imp_b;         // Unused for sphere
-  out float imp_r;        // Radius
-  flat out int form_type; // 0: Sphere
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec4 pos = vec4(vert, 1.0);
-    surfacePosition = vec3(m_view * pos);
-    surfaceNormal   = mat3(m_view) * vertNormal;
-    surfaceToCamera = normalize (- surfacePosition);
-    imp_a = vec3(m_view * vec4(offset, 1.0));
-    imp_r = radius;
-    form_type = 0;
-    gl_PointSize = 1.0;
-    gl_Position = mvp * pos;
-  }
-);
-
-
 // Cylinder
 
 const GLchar * gs_cylinder_vertex = GLSL(
@@ -1421,8 +1827,8 @@ const GLchar * cylinder_vertex_ray = GLSL(
     surfaceToCamera = normalize (- surfacePosition);
 
     // Raytracing
-    vec3 p1 = vec3(0.0, 0.0, 0.0);
-    vec3 p2 = vec3(0.0, 0.0, height);
+    vec3 p1 = vec3(0.0, 0.0, -0.5*height);
+    vec3 p2 = vec3(0.0, 0.0, 0.5*height);
     if (quat.w != 0.0)
     {
       p1 = rotate_this (p1, quat);
@@ -1532,14 +1938,8 @@ const GLchar * cone_vertex_ray = GLSL(
     surfaceToCamera = normalize (- surfacePosition);
 
     // Raytracing data
-    // Apex is at local (0,0,height), Base center at local (0,0,0) ?
-    // Check original cone_vertex: pos uses height*vert.z. If vert.z ranges 0..1, then base is at 0, top at height.
-    // Usually a cone tip is at height, base at 0.
-    // Wait, typical cone vertex gen usually puts base at z=0 and tip at z=height or vice versa.
-    // Assuming base at z=0 (radius r), tip at z=height (radius 0).
-
-    vec3 p_base = vec3(0.0, 0.0, 0.0);
-    vec3 p_apex = vec3(0.0, 0.0, height);
+    vec3 p_base = vec3(0.0, 0.0, -0.5*height);
+    vec3 p_apex = vec3(0.0, 0.0, 0.5*height);
 
     if (quat.w != 0.0)
     {
@@ -1719,72 +2119,6 @@ const GLchar * gs_cylinder_geom = GLSL(
       surfacePosition = vec3(m_view * vec4(p2, 1.0));
       surfaceToCamera = normalize (- surfacePosition);
       surfaceColor = vertCol[1];
-      EmitVertex();
-    }
-    EndPrimitive();
-  }
-);
-
-// Axis cylinder
-
-const GLchar * axis_cylinder_geom = GLSL(
-
-  layout (lines) in;
-  layout (triangle_strip, max_vertices=64) out;
-
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  uniform float radius;
-
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  float pi = 3.141592653;
-
-  vec3 create_perp (in vec3 axis)
-  {
-    vec3 u = vec3(0.0, 0.0, 1.0);
-    vec3 v = vec3(0.0, 1.0, 0.0);
-    vec3 res =  cross(u, axis);
-    if (length(res) == 0.0)
-    {
-      res = cross (v, axis);
-    }
-    return res;
-  }
-
-  void main()
-  {
-
-    vec3 v1 = gl_in[0].gl_Position.xyz;
-    vec3 v2 = gl_in[1].gl_Position.xyz;
-    float r1 = gl_in[0].gl_Position.w;
-    float r2 = gl_in[1].gl_Position.w;
-    vec3 axis = normalize(v2 - v1);
-    vec3 perp_x = create_perp (axis);
-    vec3 perp_y = cross (axis, perp_x);
-    float step = 2.0 * pi / float(32 - 1);
-    for(int i=0; i<32; i++)
-    {
-      float a = i * step;
-      float ca = cos(a);
-      float sa = sin(a);
-
-      vec3 normal = normalize(ca*perp_x + sa*perp_y);
-      vec3 p1 = v1 + r1 * normal;
-      vec3 p2 = v2 + r2 * normal;
-
-      surfaceNormal =  mat3(m_view) * normal;
-      gl_Position = mvp * vec4(p1, 1.0);
-
-      surfacePosition = vec3(m_view * vec4(p1, 1.0));
-      surfaceToCamera = normalize (- surfacePosition);
-      EmitVertex();
-
-      gl_Position = mvp * vec4 (p2, 1.0);
-      surfacePosition = vec3(m_view * vec4(p2, 1.0));
-      surfaceToCamera = normalize (- surfacePosition);
       EmitVertex();
     }
     EndPrimitive();

@@ -533,12 +533,14 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
       }
     }
     l = 1;
-    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
+    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
+                                                                                         (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
     g_free (cyl);
     if (caps)
     {
       l ++;
-      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, cap_vertex, NULL, full_color, GL_TRIANGLE_FAN, 5, 1, cylinder, cap);
+      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex, NULL,
+                                                                                        (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_FAN, 5, 1, cylinder, cap);
       g_free (cap);
     }
   }
@@ -795,7 +797,8 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
 
   if (sphere)
   {
-    wingl -> ogl_glsl[SELEC][step][nshaders+shaders] = init_shader_program (SELEC, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
+    wingl -> ogl_glsl[SELEC][step][nshaders+shaders] = init_shader_program (SELEC, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex, NULL,
+                                                                                                 (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
   }
   else
   {

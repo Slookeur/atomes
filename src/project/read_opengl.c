@@ -566,6 +566,10 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fread (img -> c_shift, sizeof(GLdouble), 2, fp) != 2) return ERROR_RW;
   if (fread (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
+  if (version_2_9_and_above)
+  {
+    if (fread (& img -> ray_tracing, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  }
   if (fread (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
   if (fread (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (img -> l_ghtning.spot != NULL)

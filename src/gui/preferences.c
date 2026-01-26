@@ -451,10 +451,11 @@ int save_preferences_to_xml_file ()
                               "Only search for ABAB chains",
                               "No homopolar bonds in the chains (A-A, B-B ...)",
                               "Only search for 1-(2)n-1 chains"};
-  gchar * xml_opengl_leg[4] = {"Default style",
+  gchar * xml_opengl_leg[5] = {"Default style",
                                "Atom(s) color map",
                                "Polyhedra color map",
-                               "Quality"};
+                               "Quality",
+                               "Ray tracing"};
   gchar * xml_material_leg[8] = {"Predefine material",
                                  "Lightning model",
                                  "Metallic",
@@ -594,7 +595,7 @@ int save_preferences_to_xml_file ()
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"opengl");
   if (rc < 0) return 0;
-  for (i=0; i<4; i++)
+  for (i=0; i<5; i++)
   {
 
     str = g_strdup_printf ("%d", default_opengl[i]);
@@ -2083,6 +2084,7 @@ void set_atomes_defaults ()
 
   for (i=0; i<3; i++) default_opengl[i] = 0;
   default_opengl[3] = QUALITY;
+  default_opengl[4] = TRUE;
   // Material
   default_material.predefine = 4; // Plastic
   default_material.albedo = vec3(0.5, 0.5, 0.5);
@@ -4447,7 +4449,7 @@ void prepare_tmp_default ()
   tmp_delta_t = duplicate_double (2, default_delta_t);
   tmp_rsparam = duplicate_int (7, default_rsparam);
   tmp_csparam = duplicate_int (7, default_csparam);
-  tmp_opengl = duplicate_int (4, default_opengl);
+  tmp_opengl = duplicate_int (5, default_opengl);
   duplicate_material (& tmp_material, & default_material);
   tmp_lightning.lights = default_lightning.lights;
   tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
@@ -4589,7 +4591,7 @@ void save_preferences ()
     g_free (default_opengl);
     default_opengl = NULL;
   }
-  default_opengl = duplicate_int (4, tmp_opengl);
+  default_opengl = duplicate_int (5, tmp_opengl);
   duplicate_material (& default_material, & tmp_material);
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
@@ -4873,6 +4875,7 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
       case 0:
         // OpenGL preferences, style and color mpas not included : rendering only
         default_opengl[3] = img -> quality;
+        default_opengl[4] = img -> ray_tracing;
         duplicate_material (& default_material, & img -> m_terial);
         default_lightning.lights = img -> l_ghtning.lights;
         default_lightning.spot = copy_light_sources (img -> l_ghtning.lights, img -> l_ghtning.lights, img ->  l_ghtning.spot);

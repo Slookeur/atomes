@@ -61,6 +61,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void set_light_fix (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void show_this_light (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void show_this_light (GtkToggleButton * but, gpointer data);
+  G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data);
+  G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void set_use_template_toggle (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data);
@@ -1029,6 +1031,44 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
 
 #ifdef GTK4
 /*!
+  \fn G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data)
+
+  \brief use or not OpenGL ray tracing shaders callback GTK4
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data)
+
+  \brief use or not OpenGL ray tracing shaders callback GTK3
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data)
+#endif
+{
+  glwin * view;
+  int i = button_get_status ((GtkWidget *)but);
+  if (! preferences)
+  {
+    view = (glwin *)data;
+    view -> anim -> last -> img -> ray_tracing = i;
+    view -> create_shaders[MAXIS] = TRUE;
+    view -> create_shaders[MDBOX] = TRUE;
+    init_default_shaders (view);
+  }
+  else
+  {
+    tmp_opengl[4] = i;
+  }
+}
+
+#ifdef GTK4
+/*!
   \fn G_MODULE_EXPORT void set_use_template_toggle (GtkCheckButton * but, gpointer data)
 
   \brief use or not OpenGL material template callback GTK4
@@ -1328,8 +1368,11 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   GtkWidget * box, * hbox;
 
   box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (2, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200,
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200,
                        G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, check_button ("<b>Ray tracing</b>", 100, 40, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4], G_CALLBACK(set_use_ray_tracing_toggle), view),
+                       FALSE, FALSE, 0);
+
   box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 20);

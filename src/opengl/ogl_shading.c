@@ -846,6 +846,7 @@ void set_lights_data (glsl_program * glsl)
   int j, k;
   vec3_t l_pos, l_dir;
   k = (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0];
+
   glUniformMatrix4fv (glsl -> light_uniform[0], 1, GL_FALSE, & wingl -> model_view_matrix.m00);
   glUniform1i (glsl -> light_uniform[1], k);
   glUniform3f (glsl -> light_uniform[2], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);

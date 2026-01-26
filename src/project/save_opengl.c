@@ -296,6 +296,7 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fwrite (img -> c_shift, sizeof(GLdouble), 2, fp) != 2) return ERROR_RW;
   if (fwrite (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& img -> ray_tracing, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
   for (i=0; i<img -> l_ghtning.lights; i++)

@@ -1356,6 +1356,7 @@ void setup_default_image (project * this_proj, image * img)
   img -> quality = default_opengl[3];
   img -> rep = default_rep.rep;
   img -> filled_type = NONE;
+  img -> ray_tracing = default_opengl[4];
   // Visual styles
   if (! default_opengl[0])
   {

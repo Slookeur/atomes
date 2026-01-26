@@ -277,7 +277,8 @@ void create_ring_lists ()
           }
         }
       }
-      wingl -> ogl_glsl[RINGS][step][0] = init_shader_program (RINGS, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, rings);
+      wingl -> ogl_glsl[RINGS][step][0] = init_shader_program (RINGS, GLSL_POLYEDRA, (plot -> ray_tracing) ? full_vertex_ray : full_vertex, NULL,
+                                                                                     (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLES, 3, 1, TRUE, rings);
       g_free (rings);
     }
   }

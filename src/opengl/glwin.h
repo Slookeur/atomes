@@ -486,6 +486,8 @@ struct image
   Material m_terial;                            /*!< Material description, if any */
   Fog f_g;                                      /*!< Fog description, if any*/
 
+  gboolean ray_tracing;                         /*!< Use or not raytracing rendering, default = TRUE */
+
   int step;                                     /*!< The MD step, in case of trajectory */
   int rep;                                      /*!< Representation: 0 = orthographic, 1 = perspective */
   int id;                                       /*!< Image ID */
