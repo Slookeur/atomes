@@ -177,7 +177,9 @@ do t=1, MAX_IN+1
 
 enddo
 
+write (6, *) "Before saving"
 s_of_k_t = SKT_SAVE ()
+write (6, *) "After saving :: s_of_k_t = ",s_of_k_t
 
 001 continue
 
@@ -411,7 +413,7 @@ do t=1, MAX_IN+1
       do i=1, 4
         k=0
         do j=1, NQ_IN
-          if (j.eq.1 .or. S(j).ne.0.0) then
+          if (j.eq.1 .or. NSQT(j,t).ne.0.0) then
             k=k+1
             SQTAB(k)= BTij(j,i)
           endif
@@ -421,11 +423,11 @@ do t=1, MAX_IN+1
       enddo
     endif
 
-    SKT_SAVE=1
-
   endif ! If wave vectors exist
 
 enddo
+
+SKT_SAVE=1
 
 001 continue
 

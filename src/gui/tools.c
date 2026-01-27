@@ -97,9 +97,9 @@ void fill_tool_model ()
     i = (active_project -> steps > 1) ? 25 : 0;
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), TRUE);
 #ifdef GTK4
-    gtk_widget_set_size_request (curvetoolbox, 300, 210+i);
+    gtk_widget_set_size_request (curvetoolbox, 300, 225+i);
 #else
-    gtk_widget_set_size_request (curvetoolbox, 300, 240+i);
+    gtk_widget_set_size_request (curvetoolbox, 300, 255+i);
 #endif
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), FALSE);
   }
@@ -332,9 +332,9 @@ GtkWidget * curvetbox ()
   GtkWidget * ctbox;
   ctbox = create_win ("Toolboxes", MainWindow, FALSE, FALSE);
 #ifdef GTK4
-  gtk_widget_set_size_request (ctbox, 300, 210);
+  gtk_widget_set_size_request (ctbox, 300, 225);
 #else
-  gtk_widget_set_size_request (ctbox, 300, 240);
+  gtk_widget_set_size_request (ctbox, 300, 255);
 #endif
   // New calculation icon to be added here
 

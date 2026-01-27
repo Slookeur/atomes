@@ -341,17 +341,16 @@ int create_axis_lists ()
     pcol.blue = 0.0;
     pcol.alpha = 1.0;
     setup_sphere_vertice (axis_d -> instances, vec3(0.0,0.0,0.0), pcol, axis_radius, 1.0);
-    wingl -> ogl_glsl[MAXIS][0][0] = init_shader_program (MAXIS, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex, NULL,
-                                                                               (plot -> ray_tracing) ? axis_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, axis_d);
+    // So far ray tracing for the axis has some issues:
+    //  - When perspective projection is used, and if the axis not at the center of the scene
+    //  - When the atom edition dialog is active to display motion axis
+    wingl -> ogl_glsl[MAXIS][0][0] = init_shader_program (MAXIS, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, axis_d);
     // Cylinders
-    wingl -> ogl_glsl[MAXIS][0][1] = init_shader_program (MAXIS, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
-                                                                                 (plot -> ray_tracing) ? axis_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_a);
+    wingl -> ogl_glsl[MAXIS][0][1] = init_shader_program (MAXIS, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_a);
     // Cones
-    wingl -> ogl_glsl[MAXIS][0][2] = init_shader_program (MAXIS, GLSL_CYLINDERS, (plot -> ray_tracing) ? cone_vertex_ray : cone_vertex, NULL,
-                                                                                 (plot -> ray_tracing) ? axis_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_b);
+    wingl -> ogl_glsl[MAXIS][0][2] = init_shader_program (MAXIS, GLSL_CYLINDERS, cone_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_b);
     // Cones Caps
-    wingl -> ogl_glsl[MAXIS][0][3] = init_shader_program (MAXIS, GLSL_CAPS, (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex, NULL,
-                                                                            (plot -> ray_tracing) ? axis_color_ray : full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, axis_c);
+    wingl -> ogl_glsl[MAXIS][0][3] = init_shader_program (MAXIS, GLSL_CAPS, cap_vertex, NULL, full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, axis_c);
     g_free (axis_c);
     g_free (axis_d);
   }

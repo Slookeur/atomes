@@ -719,10 +719,17 @@ void edit_bonds (GtkWidget * vbox)
   gchar * str;
   if (! preferences)
   {
-    if (active_project -> analysis[GDR] -> max != 0.0)
+    if (active_project -> analysis)
     {
-      str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
-                             m_end, active_project -> analysis[GDR] -> max);
+      if (active_project -> analysis[GDR] -> max != 0.0)
+      {
+        str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
+                               m_end, active_project -> analysis[GDR] -> max);
+      }
+      else
+      {
+        str = g_strdup_printf ("With %s", m_end);
+      }
     }
     else
     {

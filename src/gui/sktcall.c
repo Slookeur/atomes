@@ -87,7 +87,7 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
     g_free (xsk);
     xsk = NULL;
     prepostcalc (widg, TRUE, SKT, res_skt, 1.0);
-    if (res_skt)
+    if (! res_skt)
     {
       show_error ("The dynamic structure factor calculation has failed", 0, widg);
     }

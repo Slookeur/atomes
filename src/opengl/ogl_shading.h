@@ -92,12 +92,6 @@ extern const GLchar * cap_vertex_ray;
 extern const GLchar * gs_cylinder_vertex;
 extern const GLchar * gs_cylinder_geom;
 
-extern const GLchar * polyedron_vertex;
-extern const GLchar * polyedron_geom;
-extern const GLchar * polyedron_color;
-
-extern const GLchar * pick_color;
-
 extern const GLchar * string_vertex;
 extern const GLchar * string_color;
 extern const GLchar * string_color_2d;
