@@ -203,9 +203,9 @@ enddo
 NUMBER_OF_QVECT=q_index
 
 ! NQ is given in input
-! the value of each Q_POINT is find in the
+! the value of each K_POINT is found in the
 ! interval |qvmax - qvmin| and then we compute
-! the degeneracy of each Q_POINT in q modulus.
+! the degeneracy of each K_POINT in q modulus.
 
 if (allocated(degeneracy)) deallocate(degeneracy)
 allocate(degeneracy(NQ+1), STAT=ERR)
@@ -240,8 +240,6 @@ if (ERR .ne. 0) then
 endif
 
 do i=1, NQ
-! The next line to avoid NAN error when computing the normalisation factor of the S(q)
-  if (degeneracy(i) .eq. 0) degeneracy(i)=1
   K_POINT(i)=(i-1.0)*DELTA_Q+qvmin
 enddo
 

@@ -147,18 +147,11 @@ do i=1,  NQ
   endif
 enddo
 
-if (allocated(degeneracy)) deallocate(degeneracy)
-if (allocated(cij)) deallocate(cij)
-if (allocated(sik)) deallocate(sik)
-if (allocated(qvectx)) deallocate(qvectx)
-if (allocated(qvecty)) deallocate(qvecty)
-if (allocated(qvectz)) deallocate(qvectz)
-if (allocated(modq)) deallocate(modq)
-
 s_of_k = SK_SAVE ()
 
 001 continue
 
+if (allocated(degeneracy)) deallocate(degeneracy)
 if (allocated(K_POINT)) deallocate(K_POINT)
 if (allocated(Sij)) deallocate(Sij)
 if (allocated(S)) deallocate(S)
@@ -319,7 +312,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   i = 0;
   do k=1, NQ
-    if (k.eq.1 .or. S(k).ne.0.0) then
+    if (degeneracy(k).gt.0) then
       i=i+1
       SQTAB(i)= K_POINT(k)
     endif
@@ -328,7 +321,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   i=0
   do k=1, NQ
-    if (k.eq.1 .or. S(k).ne.0.0) then
+    if (degeneracy(k).gt.0) then
       i=i+1
       SQTAB(i)= S(k)
     endif
@@ -337,7 +330,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   i=0
   do k=1, NQ
-    if (k.eq.1 .or. S(k).ne.0.0) then
+    if (degeneracy(k).gt.0) then
       i=i+1
       SQTAB(i)= (S(k)-1.0)*K_POINT(k)
     endif
@@ -346,7 +339,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   i=0
   do k=1, NQ
-    if (k.eq.1 .or. S(k).ne.0.0) then
+    if (degeneracy(k).gt.0) then
       i=i+1
       SQTAB(i)= XS(k)
     endif
@@ -355,7 +348,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   i=0
   do k=1, NQ
-    if (k.eq.1 .or. S(k).ne.0.0) then
+    if (degeneracy(k).gt.0) then
       i=i+1
       SQTAB(i)= (XS(k)-1.0)*K_POINT(k)
     endif
@@ -367,7 +360,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do j=1, NSP
       m=0
       do k=1, NQ
-        if (k.eq.1 .or. S(k).ne.0.0) then
+        if (degeneracy(k).gt.0) then
           m=m+1
           SQTAB(m)=Sij(k,i,j)
         endif
@@ -387,7 +380,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do j=1, NSP
       m=0
       do k=1, NQ
-        if (k.eq.1 .or. S(k).ne.0.0) then
+        if (degeneracy(k).gt.0) then
           m=m+1
           SQTAB(m)= FZSij(k,i,j)
         endif
@@ -400,7 +393,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, 4
       k=0
       do j=1, NQ
-        if (j.eq.1 .or. S(j).ne.0.0) then
+        if (degeneracy(j).gt.0) then
           k=k+1
           SQTAB(k)= BTij(j,i)
         endif
