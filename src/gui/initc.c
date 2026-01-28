@@ -224,7 +224,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   int i = this_proj -> nspec;
   int pid = this_proj -> id;
   /* Compatible analysis:
-    - always include self, and others if required
+    - always include self first, and others if required
     - x axis must be similar or allow comparison (ex: distance)
   */
   int * comp_list;

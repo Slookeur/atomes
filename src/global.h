@@ -712,7 +712,7 @@ struct atomes_analysis
   gboolean graph_res;          /*!< Results to be displayed using graphs ? */
   int numc;                    /*!< Number of curves, if any */
   int c_sets;                  /*!< Number of compatible sets */
-  int * compat_id;             /*!< List of compatible sets, in 0 - 10 */
+  int * compat_id;             /*!< List of compatible sets */
   Curve ** curves;             /*!< The curves, graph for the results of the calculations, if any */
   tint * idcc;                 /*!< Pointers for the curves */
 };

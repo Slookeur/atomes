@@ -455,8 +455,10 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
     if (create_proj[i])
     {
       smenu = g_menu_new ();
-      if (create_menu[i][data -> b]) append_submenu (smenu, graph_name[data -> b], curve_section(action_group, act, this_curve -> extrac, add, edit, i, data -> b, data));
-      if (j && create_menu[i][k]) append_submenu (smenu, graph_name[k], curve_section(action_group, act, this_curve -> extrac, add, edit, i, k, data));
+      for (j=0; j<NCALCS; j++)
+      {
+        if (create_menu[i][j]) append_submenu (smenu, graph_name[j], curve_section(action_group, act, this_curve -> extrac, add, edit, i, j, data));
+      }
       // This way GTK3 will not be able to apply markup
       append_submenu (menu, get_project_by_id(i) -> name, smenu);
       g_object_unref (smenu);

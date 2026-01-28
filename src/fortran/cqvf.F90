@@ -74,7 +74,7 @@ INTEGER (KIND=c_int) FUNCTION cqvf (QMAX, QMIN, NQ, PROBA, LIMQ) BIND (C,NAME='c
 
 do i=1, 2
 
-! The firt iteration to evaluate the number of k-points
+! The first iteration to evaluate the number of k-points
 ! to be saved for the analysis, and the second to store them.
 
   if (i .eq. 2) then

@@ -402,7 +402,7 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   int i, j;
   Curve * this_curve = active_project -> analysis[* rid] -> curves[* cid];
 #ifdef DEBUG
-  g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
+  // g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
   /*for ( i=0 ; i < *interv ; i++ )
   {
     g_debug ("SAVECURVE:: i= %d, data[i]= %f", i, datacurve[i]);
