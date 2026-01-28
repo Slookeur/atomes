@@ -295,7 +295,7 @@ END INTERFACE
 
 i=0
 do j=1, NQ
-  if (S(j) .ne. 0.0) i=i+1
+  if (degeneracy(j) .gt. 0) i=i+1
 enddo
 NSQ=i
 

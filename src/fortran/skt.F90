@@ -310,22 +310,23 @@ if (ERR .ne. 0) then
   goto 001
 endif
 
-do t=1, MAX_IN+1
+i=0
+do j=1, NQ_IN
+  if (degeneracy(j) .gt. 0) i=i+1
+enddo
+NSQ=i
 
-  write (6 , *)
-  write (6, '("t = ",i4)') t
-  i=0
-  do j=1, NQ_IN
-    if (NSQT(j,t) .ne. 0.0) i=i+1
-  enddo
-  NSQ=i
+if (NSQ .gt. 0) then  ! If wave vectors exist
 
-  if (NSQ .gt. 0) then  ! If wave vectors exist
+  do t=1, MAX_IN+1
+
+    write (6 , *)
+    write (6, '("t = ",i4)') t
 
     SQTAB(:)=0.0d0
     i = 0;
     do k=1, NQ_IN
-      if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+      if (degeneracy(k) .gt. 0) then
         i=i+1
         SQTAB(i)= K_POINT(k)
       endif
@@ -335,7 +336,7 @@ do t=1, MAX_IN+1
 
     i=0
     do k=1, NQ_IN
-      if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+      if (degeneracy(k) .gt. 0) then
         i=i+1
         SQTAB(i)= NSQT(k,t)
       endif
@@ -345,7 +346,7 @@ do t=1, MAX_IN+1
 
     i=0
     do k=1, NQ_IN
-      if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+      if (degeneracy(k) .gt. 0) then
         i=i+1
         SQTAB(i)= (NSQT(k,t)-1.0)*K_POINT(k)
       endif
@@ -354,7 +355,7 @@ do t=1, MAX_IN+1
 
     i=0
     do k=1, NQ_IN
-      if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+      if (degeneracy(k) .gt. 0) then
         i=i+1
         SQTAB(i)= XSQT(k,t)
       endif
@@ -363,7 +364,7 @@ do t=1, MAX_IN+1
 
     i=0
     do k=1, NQ_IN
-      if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+      if (degeneracy(k) .gt. 0) then
         i=i+1
         SQTAB(i)= (XSQT(k,t)-1.0)*K_POINT(k)
       endif
@@ -378,7 +379,7 @@ do t=1, MAX_IN+1
         m=0
         do k=1, NQ_IN
           Sij(k,i,j) = SQT(k,t,i,j)
-          if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+          if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
             if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
@@ -399,7 +400,7 @@ do t=1, MAX_IN+1
       do j=1, NSP
         m=0
         do k=1, NQ_IN
-          if (k.eq.1 .or. NSQT(k,t).ne.0.0) then
+          if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
             if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
@@ -413,7 +414,7 @@ do t=1, MAX_IN+1
       do i=1, 4
         k=0
         do j=1, NQ_IN
-          if (j.eq.1 .or. NSQT(j,t).ne.0.0) then
+          if (degeneracy(j) .gt. 0) then
             k=k+1
             SQTAB(k)= BTij(j,i)
           endif
@@ -423,9 +424,9 @@ do t=1, MAX_IN+1
       enddo
     endif
 
-  endif ! If wave vectors exist
+  enddo
 
-enddo
+endif ! If wave vectors exist
 
 SKT_SAVE=1
 
