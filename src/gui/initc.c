@@ -276,7 +276,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
     // Dynamic structure factor
     // Number of graphs depends on the number of correlation states, not appearing here
     comp_list[0] = SKT;
-    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 1, comp_list, "q [Å-1]");
   }
 
   g_free (comp_list);

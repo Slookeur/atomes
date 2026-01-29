@@ -1868,171 +1868,178 @@ void read_preferences_from_xml_file ()
   xmlNodePtr node, p_node, l_node, c_node;
   const xmlChar aml[22]="atomes_preferences-xml";
   int i;
+  g_debug ("Starting to read from XML file");
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
   {
+    g_debug ("Reader was set !");
     doc = xmlParseFile (ATOMES_CONFIG);
     if (doc)
     {
+      g_debug ("Doc was set !");
       racine = xmlDocGetRootElement (doc);
-      if (! g_strcmp0 ((char *)(racine -> name), (char *)aml))
+      if (racine)
       {
-        node = findnode(racine -> children, "analysis");
-        if (node)
+        g_debug ("racine -> name= %s, aml= %s", (char *)racine -> name, (char *)aml);
+        if (g_strcmp0 ((char *)(racine -> name), (char *)aml) == 0)
         {
-          p_node = findnode (node  -> children, "cutoffs");
-          if (p_node)
+          node = findnode(racine -> children, "analysis");
+          if (node)
           {
-            read_preferences (p_node);
-            l_node = findnode(p_node -> children, "partials");
-            if (l_node)
+            p_node = findnode (node  -> children, "cutoffs");
+            if (p_node)
             {
-              read_preferences (l_node);
-            }
-          }
-          read_preferences (node);
-        }
-        node = findnode(racine -> children, "opengl");
-        if (node)
-        {
-          p_node = findnode (node  -> children, "material");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode (node  -> children, "lightning");
-          if (p_node)
-          {
-            read_preferences (p_node);
-            l_node = findnode (p_node -> children, "light");
-            while (l_node)
-            {
-              read_light (l_node);
-              l_node = l_node -> next;
-              l_node = findnode (l_node, "light");
-            }
-          }
-          p_node = findnode (node  -> children, "fog");
-          if (p_node)
-          {
-            read_preferences(p_node);
-          }
-          read_preferences (node);
-        }
-        node = findnode(racine -> children, "model");
-        if (node)
-        {
-          read_preferences (node);
-          p_node = findnode(node -> children, "atoms_and_bonds");
-          if (p_node)
-          {
-            for (i=0; i<OGL_STYLES; i++)
-            {
-              l_node = findnode (p_node -> children, xml_style_leg[i]);
+              read_preferences (p_node);
+              l_node = findnode(p_node -> children, "partials");
               if (l_node)
               {
-                read_style_from_xml_file (l_node -> children, i);
+                read_preferences (l_node);
               }
             }
+            read_preferences (node);
           }
-          p_node = findnode(node -> children, "labels");
-          if (p_node)
+          node = findnode(racine -> children, "opengl");
+          if (node)
           {
-            for (i=0; i<2; i++)
+            p_node = findnode (node  -> children, "material");
+            if (p_node)
             {
-              l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
-              if (l_node)
+              read_preferences (p_node);
+            }
+            p_node = findnode (node  -> children, "lightning");
+            if (p_node)
+            {
+              read_preferences (p_node);
+              l_node = findnode (p_node -> children, "light");
+              while (l_node)
               {
-                label_id = i;
-                read_preferences (l_node);
-                c_node = findnode(l_node -> children, "colors");
-                if (c_node)
+                read_light (l_node);
+                l_node = l_node -> next;
+                l_node = findnode (l_node, "light");
+              }
+            }
+            p_node = findnode (node  -> children, "fog");
+            if (p_node)
+            {
+              read_preferences(p_node);
+            }
+            read_preferences (node);
+          }
+          node = findnode(racine -> children, "model");
+          if (node)
+          {
+            read_preferences (node);
+            p_node = findnode(node -> children, "atoms_and_bonds");
+            if (p_node)
+            {
+              for (i=0; i<OGL_STYLES; i++)
+              {
+                l_node = findnode (p_node -> children, xml_style_leg[i]);
+                if (l_node)
                 {
-                  read_preferences (c_node);
+                  read_style_from_xml_file (l_node -> children, i);
                 }
               }
             }
-          }
-          c_node = findnode(node -> children, "colors");
-          if (c_node)
-          {
-            for (i=0; i<2; i++)
+            p_node = findnode(node -> children, "labels");
+            if (p_node)
             {
-              l_node = findnode (c_node -> children, (i) ? "clones" : "atoms");
+              for (i=0; i<2; i++)
+              {
+                l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
+                if (l_node)
+                {
+                  label_id = i;
+                  read_preferences (l_node);
+                  c_node = findnode(l_node -> children, "colors");
+                  if (c_node)
+                  {
+                    read_preferences (c_node);
+                  }
+                }
+              }
+            }
+            c_node = findnode(node -> children, "colors");
+            if (c_node)
+            {
+              for (i=0; i<2; i++)
+              {
+                l_node = findnode (c_node -> children, (i) ? "clones" : "atoms");
+                if (l_node)
+                {
+                  label_id = i;
+                  read_preferences (l_node);
+                }
+              }
+            }
+            p_node = findnode(node -> children, "box");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+          }
+          node = findnode(racine -> children, "view");
+          if (node)
+          {
+            read_preferences (node);
+            p_node = findnode(node -> children, "background");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+            p_node = findnode(node -> children, "representation");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+            p_node = findnode(node -> children, "axis");
+            if (p_node)
+            {
+              read_preferences (p_node);
+              l_node = findnode(p_node -> children, "labels");
               if (l_node)
               {
-                label_id = i;
+                label_id = 2;
+                default_axis.labels = TRUE;
+                read_preferences (l_node);
+              }
+              c_node = findnode(p_node -> children, "colors");
+              if (c_node)
+              {
+                read_preferences (c_node);
+             }
+            }
+            p_node = findnode(node -> children, "measures");
+            if (p_node)
+            {
+              l_node = findnode(p_node -> children, "standard");
+              if (l_node)
+              {
+                c_node = findnode(l_node -> children, "labels");
+                if (c_node)
+                {
+                  label_id = 3;
+                  read_preferences (c_node);
+                }
+                read_preferences (l_node);
+              }
+              l_node = findnode(p_node -> children, "selection");
+              if (l_node)
+              {
+                c_node = findnode(l_node -> children, "labels");
+                if (c_node)
+                {
+                  label_id = 4;
+                  read_preferences (c_node);
+                }
                 read_preferences (l_node);
               }
             }
-          }
-          p_node = findnode(node -> children, "box");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-        }
-        node = findnode(racine -> children, "view");
-        if (node)
-        {
-          read_preferences (node);
-          p_node = findnode(node -> children, "background");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode(node -> children, "representation");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode(node -> children, "axis");
-          if (p_node)
-          {
-            read_preferences (p_node);
-            l_node = findnode(p_node -> children, "labels");
-            if (l_node)
+            p_node = findnode(node -> children, "atom-selections");
+            if (p_node)
             {
-              label_id = 2;
-              default_axis.labels = TRUE;
-              read_preferences (l_node);
+              read_preferences (p_node);
             }
-            c_node = findnode(p_node -> children, "colors");
-            if (c_node)
-            {
-              read_preferences (c_node);
-            }
-          }
-          p_node = findnode(node -> children, "measures");
-          if (p_node)
-          {
-            l_node = findnode(p_node -> children, "standard");
-            if (l_node)
-            {
-              c_node = findnode(l_node -> children, "labels");
-              if (c_node)
-              {
-                label_id = 3;
-                read_preferences (c_node);
-              }
-              read_preferences (l_node);
-            }
-            l_node = findnode(p_node -> children, "selection");
-            if (l_node)
-            {
-              c_node = findnode(l_node -> children, "labels");
-              if (c_node)
-              {
-                label_id = 4;
-                read_preferences (c_node);
-              }
-              read_preferences (l_node);
-            }
-          }
-          p_node = findnode(node -> children, "atom-selections");
-          if (p_node)
-          {
-            read_preferences (p_node);
           }
         }
       }
@@ -2253,7 +2260,7 @@ void set_atomes_preferences ()
   default_delta_t = allocdouble (2);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
-  default_opengl = allocint (4);
+  default_opengl = allocint (5);
   default_at_rs = allocdouble (10);
   default_o_at_rs = allocbool (10);
   default_bd_rw = allocdouble (6);

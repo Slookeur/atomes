@@ -423,7 +423,6 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   }
 
   if (fread (& img -> cloned_poly, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-
   if (fread (img -> at_color, sizeof(ColRGBA), sid*2, fp) != sid*2) return ERROR_RW;
   if (fread (img -> sphererad, sizeof(double), sid*2, fp) != sid*2) return ERROR_RW;
   if (fread (img -> pointrad, sizeof(double), sid*2, fp) != sid*2) return ERROR_RW;
