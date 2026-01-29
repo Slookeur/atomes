@@ -373,7 +373,7 @@ gchar * get_this_prop_string (int sid, int oid, int type, int calc)
 */
 field_object_match * duplicate_match (field_object_match * old_m)
 {
-  field_object_match * new_m = g_malloc0 (sizeof*new_m);
+  field_object_match * new_m = g_malloc0(sizeof*new_m);
   new_m -> id = old_m -> id;
   new_m -> obj = old_m -> obj;
   new_m -> oid = old_m -> oid;
@@ -1076,12 +1076,12 @@ void look_up_this_field_object (int fsid, int fpid, int ssid, int nat, int * fsp
       {
         if (up_match[fsid] == NULL)
         {
-          up_match[fsid] = g_malloc0 (sizeof*up_match[fsid]);
+          up_match[fsid] = g_malloc0(sizeof*up_match[fsid]);
           tmp_match = up_match[fsid];
         }
         else
         {
-          tmp_match -> next = g_malloc0 (sizeof*tmp_match);
+          tmp_match -> next = g_malloc0(sizeof*tmp_match);
           tmp_match = tmp_match -> next;
         }
         tmp_match -> id = ssid;
@@ -1367,12 +1367,12 @@ void check_atom_for_updates ()
           {
             if (up_match[8] == NULL)
             {
-              up_match[8] = g_malloc0 (sizeof*up_match[8]);
+              up_match[8] = g_malloc0(sizeof*up_match[8]);
               tmp_match = up_match[8];
             }
             else
             {
-              tmp_match -> next = g_malloc0 (sizeof*tmp_match);
+              tmp_match -> next = g_malloc0(sizeof*tmp_match);
               tmp_match = tmp_match -> next;
             }
             tmp_match -> id = 8;
@@ -1537,7 +1537,7 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
   gchar * str;
   h = (f == 15) ? 2 : struct_id(f);
   i = (f == 15) ? 2 : 1;
-  for (j=0; j<i; j++) up_match[j] = g_malloc0 (sizeof*up_match[j]);
+  for (j=0; j<i; j++) up_match[j] = g_malloc0(sizeof*up_match[j]);
   int * spec_z = allocint (h);
   vbox = create_vbox (BSEP);
   if (f == 15)
@@ -1637,12 +1637,12 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
           g_free (str);
           if (up_match[j] == NULL)
           {
-            up_match[j] = g_malloc0 (sizeof*up_match[j]);
+            up_match[j] = g_malloc0(sizeof*up_match[j]);
             tmp_match = up_match[j];
           }
           else
           {
-            tmp_match -> next = g_malloc0 (sizeof*tmp_match -> next);
+            tmp_match -> next = g_malloc0(sizeof*tmp_match -> next);
             tmp_match -> next -> id = tmp_match -> id + 1;
             tmp_match = tmp_match -> next;
           }

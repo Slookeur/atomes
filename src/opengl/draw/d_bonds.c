@@ -98,7 +98,7 @@ int cylinder_indices (int qual)
 object_3d * draw_cylinder (int quality, float ra, float rb)
 {
   int i, j;
-  object_3d * new_cylinder = g_malloc0 (sizeof*new_cylinder);
+  object_3d * new_cylinder = g_malloc0(sizeof*new_cylinder);
   new_cylinder -> quality = quality;
   new_cylinder -> num_vertices = cylinder_vertices (quality);
   new_cylinder -> vert_buffer_size = 3;
@@ -170,7 +170,7 @@ object_3d * draw_cylinder_cap (int quality, float rad, gboolean picked)
 {
   int i, j;
 
-  object_3d * new_cap = g_malloc0 (sizeof*new_cap);
+  object_3d * new_cap = g_malloc0(sizeof*new_cap);
   new_cap -> quality = quality;
   new_cap -> num_vertices = cap_vertices(quality);
   new_cap -> vert_buffer_size = 3;
@@ -732,7 +732,7 @@ int create_bond_lists (gboolean to_pick)
   g_debug ("Bond LIST:: to_pick= %s, shaders= %d", (to_pick) ? "true" : "false", nshaders);
 #endif
   if (nshaders == 0) return nshaders;
-  if (! to_pick) wingl -> ogl_glsl[BONDS][step] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[BONDS][step]);
+  if (! to_pick) wingl -> ogl_glsl[BONDS][step] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[BONDS][step]);
   l = 0;
   for (f=0; f<NUM_STYLES; f++)
   {
@@ -789,7 +789,7 @@ int create_bond_lists (gboolean to_pick)
             {
               if (nbonds[f][h][i][j])
               {
-                cyl = g_malloc0 (sizeof*cyl);
+                cyl = g_malloc0(sizeof*cyl);
                 cyl -> vert_buffer_size = LINE_BUFF_SIZE;
                 cyl -> num_vertices = nbonds[f][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
                 cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);

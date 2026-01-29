@@ -365,7 +365,7 @@ gboolean * remove_bonds_from_project (project * this_proj, atomic_object * this_
   }
   g_free (in_frag);
   g_free (per_frag);
-  atom ** atom_list = g_malloc0 (nat*sizeof*atom_list);
+  atom ** atom_list = g_malloc0(nat*sizeof*atom_list);
   tmp_list = new_list;
   while (tmp_list)
   {
@@ -497,7 +497,7 @@ gboolean * remove_bonds_from_project (project * this_proj, atomic_object * this_
         }
         if (tmpbond[i])
         {
-          if (i) this_proj -> modelgl -> clones[0] = g_malloc0 (tmpbond[i]*sizeof*this_proj -> modelgl -> clones[0]);
+          if (i) this_proj -> modelgl -> clones[0] = g_malloc0(tmpbond[i]*sizeof*this_proj -> modelgl -> clones[0]);
           this_proj -> modelgl -> bondid[0][i] = allocdint (tmpbond[i], 2);
           for (k=0; k<tmpbond[i]; k++)
           {

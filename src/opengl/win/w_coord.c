@@ -1453,7 +1453,7 @@ G_MODULE_EXPORT void coord_properties (GtkWidget * widg, gpointer data)
   int page = get_page_from_geo_coord(view, id -> b, id -> c);
   if (view -> coord_win == NULL)
   {
-    view -> coord_win = g_malloc0 (sizeof*view -> coord_win);
+    view -> coord_win = g_malloc0(sizeof*view -> coord_win);
     view -> coord_win -> win = advanced_coord_properties (view, page);
   }
   else if (GTK_IS_WIDGET(view -> coord_win -> win))

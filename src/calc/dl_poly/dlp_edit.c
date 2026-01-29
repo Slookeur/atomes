@@ -2048,7 +2048,7 @@ void adjust_vdw_interactions (gboolean add_shell)
   {
     gboolean add_vdw;
     gchar * str;
-    gchar ** to_be_vdw = g_malloc (i*sizeof*to_be_vdw);
+    gchar ** to_be_vdw = g_malloc0(i*sizeof*to_be_vdw);
     int * vdw_mlist = allocint (i);
     int ** vdw_aids = allocdint (i,i);
     int ** vdw_mids = allocdint (i,i);
@@ -2955,10 +2955,10 @@ void check_tersoffs (int id, int key)
     }
     if (cross)
     {
-      tmp_field -> cross = g_malloc (tmp_field -> nbody[2]*sizeof*tmp_field -> cross);
+      tmp_field -> cross = g_malloc0(tmp_field -> nbody[2]*sizeof*tmp_field -> cross);
       for (i=0; i<tmp_field -> nbody[2]; i++)
       {
-        tmp_field -> cross[i] = g_malloc (tmp_field -> nbody[2]*sizeof*tmp_field -> cross[i]);
+        tmp_field -> cross[i] = g_malloc0(tmp_field -> nbody[2]*sizeof*tmp_field -> cross[i]);
         for (j=0; j<tmp_field -> nbody[2]; j++) tmp_field -> cross[i][j] = duplicate_double (3, cross[i][j]);
       }
     }
@@ -3018,10 +3018,10 @@ G_MODULE_EXPORT void edit_field_prop (GSimpleAction * action, GVariant * paramet
         cross = NULL;
         if (tmp_field -> cross != NULL)
         {
-          cross = g_malloc (tmp_field -> nbody[2]*sizeof*cross);
+          cross = g_malloc0(tmp_field -> nbody[2]*sizeof*cross);
           for (j=0; j<tmp_field -> nbody[2]; j++)
           {
-            cross[j] = g_malloc (tmp_field -> nbody[2]*sizeof*cross[j]);
+            cross[j] = g_malloc0(tmp_field -> nbody[2]*sizeof*cross[j]);
             for (k=0; k<tmp_field -> nbody[2]; k++) cross[j][k] = duplicate_double (3, tmp_field -> cross[j][k]);
           }
         }
@@ -3064,7 +3064,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fshell = get_active_shell (j, fmol -> shells);
       tmp_fshell -> next = init_field_shell (fmol -> shells, 0, 0);
-      tmp_fshell -> next -> prev = g_malloc (sizeof*tmp_fshell -> next -> prev);
+      tmp_fshell -> next -> prev = g_malloc0(sizeof*tmp_fshell -> next -> prev);
       tmp_fshell -> next -> prev = tmp_fshell;
     }
     row_id = fmol -> shells;
@@ -3091,7 +3091,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fcons = get_active_constraint (j, fmol -> constraints);
       tmp_fcons -> next = init_field_constraint (fmol -> constraints, 0, 0);
-      tmp_fcons -> next -> prev = g_malloc0 (sizeof*tmp_fcons -> next -> prev);
+      tmp_fcons -> next -> prev = g_malloc0(sizeof*tmp_fcons -> next -> prev);
       tmp_fcons -> next -> prev = tmp_fcons;
     }
     row_id = fmol -> constraints;
@@ -3118,7 +3118,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fpmf = get_active_pmf (j, fmol -> pmfs);
       tmp_fpmf -> next = init_field_pmf (fmol -> pmfs, NULL, NULL, NULL);
-      tmp_fpmf -> next -> prev = g_malloc0 (sizeof*tmp_fpmf -> next -> prev);
+      tmp_fpmf -> next -> prev = g_malloc0(sizeof*tmp_fpmf -> next -> prev);
       tmp_fpmf -> next -> prev = tmp_fpmf;
     }
     row_id = fmol -> pmfs;
@@ -3150,7 +3150,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_frig = get_active_rigid (j, fmol -> rigids);
       tmp_frig -> next = init_field_rigid (fmol -> rigids, 0, NULL);
-      tmp_frig -> next -> prev = g_malloc0 (sizeof*tmp_frig -> next -> prev);
+      tmp_frig -> next -> prev = g_malloc0(sizeof*tmp_frig -> next -> prev);
       tmp_frig -> next -> prev = tmp_frig;
     }
     row_id = fmol -> rigids;
@@ -3177,7 +3177,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_ftet = get_active_tethered (j, fmol -> tethered);
       tmp_ftet -> next = init_field_tethered (fmol -> tethered, 0);
-      tmp_ftet -> next -> prev = g_malloc0 (sizeof*tmp_ftet -> next -> prev);
+      tmp_ftet -> next -> prev = g_malloc0(sizeof*tmp_ftet -> next -> prev);
       tmp_ftet -> next -> prev = tmp_ftet;
     }
     row_id = fmol -> tethered;
@@ -3204,7 +3204,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fext = get_active_external (tmp_field -> extern_fields-1);
       tmp_fext -> next = init_field_external (tmp_field -> extern_fields);
-      tmp_fext -> next -> prev = g_malloc0 (sizeof*tmp_fext -> next -> prev);
+      tmp_fext -> next -> prev = g_malloc0(sizeof*tmp_fext -> next -> prev);
       tmp_fext -> next -> prev = tmp_fext;
     }
     row_id = tmp_field -> extern_fields;
@@ -3232,7 +3232,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fbody = get_active_body (tmp_field -> nbody[j], j);
       tmp_fbody -> next = init_field_nth_body (tmp_field -> nbody[j], j, NULL, NULL, NULL);
-      tmp_fbody -> next -> prev = g_malloc0 (sizeof*tmp_fbody -> next -> prev);
+      tmp_fbody -> next -> prev = g_malloc0(sizeof*tmp_fbody -> next -> prev);
       tmp_fbody -> next -> prev = tmp_fbody;
     }
     if (j == 2)

@@ -246,7 +246,7 @@ gboolean * allocbool (int  val)
 {
   gboolean * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -263,7 +263,7 @@ gboolean ** allocdbool (int xal, int yal)
   gboolean ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -286,7 +286,7 @@ gboolean *** alloctbool (int xal, int yal, int zal)
   gboolean *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -306,7 +306,7 @@ int * allocint (int  val)
 {
   int * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -323,7 +323,7 @@ int ** allocdint (int xal, int yal)
   int ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -346,7 +346,7 @@ int *** alloctint (int xal, int yal, int zal)
   int *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -370,7 +370,7 @@ int **** allocqint (int wal, int xal, int yal, int zal)
   int **** var = NULL;
   int i;
 
-  var = g_malloc (wal*sizeof*var);
+  var = g_malloc0(wal*sizeof*var);
   for ( i = 0 ; i < wal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -390,7 +390,7 @@ float * allocfloat (int  val)
 {
   float * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -407,7 +407,7 @@ float ** allocdfloat (int xal, int yal)
   float ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -430,7 +430,7 @@ float *** alloctfloat (int xal, int yal, int zal)
   float *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -451,7 +451,7 @@ double * allocdouble (int val)
 {
   double * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -468,7 +468,7 @@ double ** allocddouble (int xal, int yal)
   double ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -491,7 +491,7 @@ double *** alloctdouble (int xal, int yal, int zal)
   double *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -515,7 +515,7 @@ double **** allocqdouble (int wal, int xal, int yal, int zal)
   double **** var = NULL;
   int i;
 
-  var = g_malloc (wal*sizeof*var);
+  var = g_malloc0(wal*sizeof*var);
   for ( i = 0 ; i < wal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -534,7 +534,7 @@ double **** allocqdouble (int wal, int xal, int yal, int zal)
 */
 gchar ** duplicate_strings (int num, gchar ** old_val)
 {
-  gchar ** new_val = g_malloc0 (num*sizeof*new_val);
+  gchar ** new_val = g_malloc0(num*sizeof*new_val);
   int i;
   for (i=0; i<num; i++) new_val[i] = g_strdup_printf ("%s", old_val[i]);
   return new_val;

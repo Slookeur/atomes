@@ -1868,19 +1868,15 @@ void read_preferences_from_xml_file ()
   xmlNodePtr node, p_node, l_node, c_node;
   const xmlChar aml[22]="atomes_preferences-xml";
   int i;
-  g_debug ("Starting to read from XML file");
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
   {
-    g_debug ("Reader was set !");
     doc = xmlParseFile (ATOMES_CONFIG);
     if (doc)
     {
-      g_debug ("Doc was set !");
       racine = xmlDocGetRootElement (doc);
       if (racine)
       {
-        g_debug ("racine -> name= %s, aml= %s", (char *)racine -> name, (char *)aml);
         if (g_strcmp0 ((char *)(racine -> name), (char *)aml) == 0)
         {
           node = findnode(racine -> children, "analysis");
@@ -2105,7 +2101,7 @@ void set_atomes_defaults ()
   // Lights
   default_lightning.lights = 3;
   if (default_lightning.spot) g_free (default_lightning.spot);
-  default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
+  default_lightning.spot = g_malloc0(3*sizeof*default_lightning.spot);
   default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
   default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
   default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
@@ -2170,7 +2166,7 @@ void set_atomes_defaults ()
     default_label[i].n_colors = (i > 2) ? 1 : 0;
     if (default_label[i].n_colors)
     {
-      default_label[i].color = g_malloc (sizeof*default_label[i].color);
+      default_label[i].color = g_malloc0(sizeof*default_label[i].color);
       default_label[i].color[0].red = 1.0;
       default_label[i].color[0].green = 1.0;
       default_label[i].color[0].blue = 1.0;
@@ -4477,7 +4473,7 @@ void prepare_tmp_default ()
   }
   for (i=0; i<5; i++)
   {
-    tmp_label[i] = g_malloc(sizeof*tmp_label[i]);
+    tmp_label[i] = g_malloc0(sizeof*tmp_label[i]);
     duplicate_screen_label (tmp_label[i], & default_label[i]);
   }
   for (i=0; i<2; i++)

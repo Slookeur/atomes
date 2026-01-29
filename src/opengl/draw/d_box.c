@@ -306,7 +306,7 @@ int create_box_lists (int b_step)
   {
     shaders = 1;
     BOX_BUFF_SIZE = LINE_BUFF_SIZE;
-    box_b = g_malloc0 (sizeof*box_b);
+    box_b = g_malloc0(sizeof*box_b);
     box_b -> vert_buffer_size = LINE_BUFF_SIZE;
     box_b -> num_vertices = vertex*3;
     box_b -> vertices = allocfloat (box_b -> vert_buffer_size*box_b -> num_vertices);
@@ -327,7 +327,7 @@ int create_box_lists (int b_step)
     box_b -> instances = allocfloat (box_b -> num_instances*CYLI_BUFF_SIZE);
 
   }
-  wingl -> ogl_glsl[MDBOX][b_step] = g_malloc0 (shaders*sizeof*wingl -> ogl_glsl[MDBOX][b_step]);
+  wingl -> ogl_glsl[MDBOX][b_step] = g_malloc0(shaders*sizeof*wingl -> ogl_glsl[MDBOX][b_step]);
 
   nbs = nbl = 0;
   pcol = plot -> abc -> color;
@@ -437,7 +437,7 @@ GLfloat cuboid_vertices[] = {
 void prepare_cuboid (vec3_t position, int id)
 {
   float lgt = 1.0;
-  object_3d * light = g_malloc0 (sizeof*light);
+  object_3d * light = g_malloc0(sizeof*light);
   light -> vert_buffer_size = POLY_BUFF_SIZE;
   light -> num_vertices = 36;
   light -> vertices = allocfloat (light -> vert_buffer_size*light -> num_vertices);
@@ -487,7 +487,7 @@ void create_light_lists ()
 
   if (j > 0)
   {
-    wingl -> ogl_glsl[LIGHT][0] = g_malloc0 (wingl -> n_shaders[LIGHT][0]*sizeof*wingl -> ogl_glsl[LIGHT][0]);
+    wingl -> ogl_glsl[LIGHT][0] = g_malloc0(wingl -> n_shaders[LIGHT][0]*sizeof*wingl -> ogl_glsl[LIGHT][0]);
     plot -> light_loc = allocint (j);
     j = 0;
     for (i=0; i<plot -> l_ghtning.lights; i++)
@@ -536,7 +536,7 @@ double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t c
   cvol = fabs(cvol);
   if (draw)
   {
-    object_3d * slab = g_malloc0 (sizeof*slab);
+    object_3d * slab = g_malloc0(sizeof*slab);
     slab -> vert_buffer_size = POLY_BUFF_SIZE;
     slab -> num_vertices = 36*(plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     slab -> vertices = allocfloat (slab -> vert_buffer_size*slab -> num_vertices);
@@ -746,8 +746,8 @@ void cylinder_slab (mat4_t rot)
   vec3_t axis = v3_sub (pos_b, pos_a);
   if (! wingl -> cell_win -> cut_this_slab)
   {
-    object_3d * slab = g_malloc0 (sizeof*slab);
-    object_3d * slab_cap = g_malloc0 (sizeof*slab_cap);
+    object_3d * slab = g_malloc0(sizeof*slab);
+    object_3d * slab_cap = g_malloc0(sizeof*slab_cap);
     slab = draw_cylinder (30, 1.0, 1.0);
     slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
     slab -> inst_buffer_size = CYLI_BUFF_SIZE;
@@ -844,7 +844,7 @@ void spherical_slab ()
   vec3_t pos;
   if (! wingl -> cell_win -> cut_this_slab)
   {
-    object_3d * slab = g_malloc0 (sizeof*slab);
+    object_3d * slab = g_malloc0(sizeof*slab);
     slab = draw_sphere (50);
     slab -> inst_buffer_size = ATOM_BUFF_SIZE;
     slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
@@ -918,7 +918,7 @@ void create_slab_lists (project * this_proj)
     {
       wingl -> n_shaders[SLABS][0] = 1;
       if (wingl -> cell_win -> slab_type == 1) wingl -> n_shaders[SLABS][0] ++;
-      wingl -> ogl_glsl[SLABS][0] = g_malloc0 (wingl -> n_shaders[SLABS][0]*sizeof*wingl -> ogl_glsl[SLABS][0]);
+      wingl -> ogl_glsl[SLABS][0] = g_malloc0(wingl -> n_shaders[SLABS][0]*sizeof*wingl -> ogl_glsl[SLABS][0]);
       nbs = nbl = 0;
     }
     mat4_t rot = m4_rotation_xyz (wingl -> cell_win -> cparam[18], wingl -> cell_win -> cparam[19], wingl -> cell_win -> cparam[20]);
@@ -966,7 +966,7 @@ void create_volumes_lists ()
   }
   if (wingl -> n_shaders[VOLMS][step])
   {
-    wingl -> ogl_glsl[VOLMS][step] = g_malloc0 (wingl -> n_shaders[VOLMS][step]*sizeof*wingl -> ogl_glsl[VOLMS][step]);
+    wingl -> ogl_glsl[VOLMS][step] = g_malloc0(wingl -> n_shaders[VOLMS][step]*sizeof*wingl -> ogl_glsl[VOLMS][step]);
     mat4_t rot;
     vec3_t bx;
     double paral[3][3];

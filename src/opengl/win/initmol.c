@@ -122,8 +122,8 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
   new_mol -> nspec = old_mol -> nspec;
   new_mol -> species = duplicate_int (active_project -> nspec, old_mol -> species);
   int j, k;
-  new_mol -> pbonds = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
-  new_mol -> pangles = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
+  new_mol -> pbonds = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
+  new_mol -> pangles = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
   if (old_mol -> atoms)
   {
     new_mol -> atoms = duplicate_int (old_mol -> natoms*old_mol -> multiplicity, old_mol -> atoms);
@@ -140,7 +140,7 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
     {
       for (j=0; j<active_project -> coord -> totcoord[1]; j++)
       {
-        new_mol -> pangles[j] = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles[j]);
+        new_mol -> pangles[j] = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles[j]);
         for (k=0; k<active_project -> coord -> totcoord[1]; k++)
         {
           new_mol -> pangles[j][k] = duplicate_int (active_project -> coord -> totcoord[1], old_mol -> pangles[j][k]);
@@ -148,7 +148,7 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
       }
     }
   }
-  new_mol -> lgeo = g_malloc0 (active_project -> nspec*sizeof*new_mol -> lgeo);
+  new_mol -> lgeo = g_malloc0(active_project -> nspec*sizeof*new_mol -> lgeo);
   for (j=0; j<active_project -> nspec; j++)
   {
     new_mol -> lgeo[j] = duplicate_int (active_project -> coord -> totcoord[1], old_mol -> lgeo[j]);
@@ -188,7 +188,7 @@ void allocate_mol_data_ ()
     active_project -> modelfc = NULL;
   }
   in_calc_mol = g_malloc0(active_project -> steps*sizeof*in_calc_mol);
-  active_project -> modelfc = g_malloc0 (sizeof*active_project -> modelfc);
+  active_project -> modelfc = g_malloc0(sizeof*active_project -> modelfc);
   active_project -> modelfc -> mols = g_malloc0(active_project -> steps*sizeof*active_project -> modelfc -> mols);
   active_project -> modelfc -> mol_by_step = allocint (active_project -> steps);
   for (i=0; i<2; i++)
@@ -196,7 +196,7 @@ void allocate_mol_data_ ()
     if (active_project -> force_field[i]) g_free (active_project -> force_field[i]);
     active_project -> force_field[i] = NULL;
   }
-  pgeo = g_malloc0 ((active_project -> nspec+1)*sizeof*pgeo);
+  pgeo = g_malloc0((active_project -> nspec+1)*sizeof*pgeo);
   for (i=1; i<active_project -> nspec+1; i++)
   {
     pgeo[i] = pgeo[i-1] + active_coord -> ntg[1][i-1];

@@ -135,21 +135,21 @@ int read_cpmd_data (FILE * fp, int cid, project * this_proj)
   int i;
   if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (! i) return OK;
-  this_proj -> cpmd_input[cid] = g_malloc0 (sizeof*this_proj -> cpmd_input[cid]);
+  this_proj -> cpmd_input[cid] = g_malloc0(sizeof*this_proj -> cpmd_input[cid]);
   if (fread (& this_proj -> cpmd_input[cid] -> calc_type, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (this_proj -> cpmd_input[cid] -> default_opts, sizeof(double), 17, fp) != 17) return ERROR_RW;
   if (fread (this_proj -> cpmd_input[cid] -> calc_opts, sizeof(double), 24, fp) != 24) return ERROR_RW;
   if (fread (& this_proj -> cpmd_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (this_proj -> cpmd_input[cid] -> thermostats)
   {
-    this_proj -> cpmd_input[cid] -> ions_thermostat = g_malloc0 (sizeof*this_proj -> cpmd_input[cid] -> ions_thermostat);
+    this_proj -> cpmd_input[cid] -> ions_thermostat = g_malloc0(sizeof*this_proj -> cpmd_input[cid] -> ions_thermostat);
     thermostat * thermo = this_proj -> cpmd_input[cid] -> ions_thermostat;
     for (i=0; i<this_proj -> cpmd_input[cid] -> thermostats; i++)
     {
       if (read_thermo (fp, thermo) != OK) return ERROR_RW;
       if (i < this_proj -> cpmd_input[cid] -> thermostats - 1)
       {
-        thermo -> next = g_malloc0 (sizeof*thermo -> next);
+        thermo -> next = g_malloc0(sizeof*thermo -> next);
         thermo -> next -> prev = thermo;
         thermo = thermo -> next;
       }
@@ -157,7 +157,7 @@ int read_cpmd_data (FILE * fp, int cid, project * this_proj)
     if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (i)
     {
-      this_proj -> cpmd_input[cid] -> elec_thermostat = g_malloc0 (sizeof*this_proj -> cpmd_input[cid] -> elec_thermostat);
+      this_proj -> cpmd_input[cid] -> elec_thermostat = g_malloc0(sizeof*this_proj -> cpmd_input[cid] -> elec_thermostat);
       if (read_thermo (fp, this_proj -> cpmd_input[cid] -> elec_thermostat) != OK) return ERROR_RW;
     }
   }
@@ -168,7 +168,7 @@ int read_cpmd_data (FILE * fp, int cid, project * this_proj)
   if (fread (& this_proj -> cpmd_input[cid] -> dummies, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (this_proj -> cpmd_input[cid] -> dummies)
   {
-    this_proj -> cpmd_input[cid] -> dummy = g_malloc0 (sizeof*this_proj -> cpmd_input[cid] -> dummy);
+    this_proj -> cpmd_input[cid] -> dummy = g_malloc0(sizeof*this_proj -> cpmd_input[cid] -> dummy);
     dummy_atom * dummy = this_proj -> cpmd_input[cid] -> dummy;
     for (i=0; i < this_proj -> cpmd_input[cid] -> dummies; i ++)
     {
@@ -185,7 +185,7 @@ int read_cpmd_data (FILE * fp, int cid, project * this_proj)
       }
       if (i < this_proj -> cpmd_input[cid] -> dummies - 1)
       {
-        dummy -> next = g_malloc0 (sizeof*dummy -> next);
+        dummy -> next = g_malloc0(sizeof*dummy -> next);
         dummy -> next -> prev = dummy;
         dummy = dummy -> next;
       }
@@ -218,7 +218,7 @@ int read_cp2k_data (FILE * fp, int cid, project * this_proj)
   int i, j;
   if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (! i) return OK;
-  this_proj -> cp2k_input[cid] = g_malloc0 (sizeof*this_proj -> cp2k_input[cid]);
+  this_proj -> cp2k_input[cid] = g_malloc0(sizeof*this_proj -> cp2k_input[cid]);
   if (fread (& this_proj -> cp2k_input[cid] -> input_type, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (this_proj -> cp2k_input[cid] -> opts, sizeof(double), 42, fp) != 42) return ERROR_RW;
   for (i=0; i<3; i++)
@@ -228,14 +228,14 @@ int read_cp2k_data (FILE * fp, int cid, project * this_proj)
   if (fread (& this_proj -> cp2k_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (this_proj -> cp2k_input[cid] -> thermostats)
   {
-    this_proj -> cp2k_input[cid] -> ions_thermostat = g_malloc0 (sizeof*this_proj -> cp2k_input[cid] -> ions_thermostat);
+    this_proj -> cp2k_input[cid] -> ions_thermostat = g_malloc0(sizeof*this_proj -> cp2k_input[cid] -> ions_thermostat);
     thermostat * thermo = this_proj -> cp2k_input[cid] -> ions_thermostat;
     for (i=0; i<this_proj -> cp2k_input[cid] -> thermostats; i++)
     {
       if (read_thermo (fp, thermo) != OK) return ERROR_RW;
       if (i < this_proj -> cp2k_input[cid] -> thermostats - 1)
       {
-        thermo -> next = g_malloc0 (sizeof*thermo -> next);
+        thermo -> next = g_malloc0(sizeof*thermo -> next);
         thermo -> next -> prev = thermo;
         thermo = thermo -> next;
       }
@@ -249,11 +249,11 @@ int read_cp2k_data (FILE * fp, int cid, project * this_proj)
     }
   }
   this_proj -> cp2k_input[cid] -> spec_data = allocdint (this_proj -> nspec, 2);
-  this_proj -> cp2k_input[cid] -> spec_files = g_malloc0 (this_proj -> nspec*sizeof*this_proj -> cp2k_input[cid] -> spec_files);
+  this_proj -> cp2k_input[cid] -> spec_files = g_malloc0(this_proj -> nspec*sizeof*this_proj -> cp2k_input[cid] -> spec_files);
   for (i=0; i<this_proj -> nspec; i++)
   {
     if (fread (this_proj -> cp2k_input[cid] -> spec_data[i], sizeof(int), 2, fp) != 2) return ERROR_RW;
-    this_proj -> cp2k_input[cid] -> spec_files[i] = g_malloc0 (2*sizeof*this_proj -> cp2k_input[cid] -> spec_files[i]);
+    this_proj -> cp2k_input[cid] -> spec_files[i] = g_malloc0(2*sizeof*this_proj -> cp2k_input[cid] -> spec_files[i]);
     for (j=0; j<2; j++)
     {
       this_proj -> cp2k_input[cid] -> spec_files[i][j] = read_this_string (fp);

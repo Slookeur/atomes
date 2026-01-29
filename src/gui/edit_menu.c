@@ -453,7 +453,7 @@ void edit_chem (GtkWidget * vbox)
           g_signal_connect(G_OBJECT(rad_box), "changed", G_CALLBACK(on_rad_changed), NULL);
           gtk_grid_attach (GTK_GRID (table), rad_box, 1, i+1, 1, 1);
         }
-        tmp_chem[i-3] = g_malloc (active_project -> nspec*sizeof*tmp_chem[i-3]);
+        tmp_chem[i-3] = g_malloc0(active_project -> nspec*sizeof*tmp_chem[i-3]);
         for (j=0; j<active_project -> nspec; j++)
         {
           tmp_chem[i-3][j] =  active_chem -> chem_prop[i-2][j];

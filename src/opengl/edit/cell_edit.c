@@ -229,7 +229,7 @@ G_MODULE_EXPORT void edition_win (GtkWidget * widg, gpointer data)
   project * this_proj = get_project_by_id(id -> a);
   if (this_proj -> modelgl -> cell_win == NULL)
   {
-    this_proj -> modelgl -> cell_win = g_malloc0 (sizeof*this_proj -> modelgl -> cell_win);
+    this_proj -> modelgl -> cell_win = g_malloc0(sizeof*this_proj -> modelgl -> cell_win);
     this_proj -> modelgl -> cell_win -> homo_density = TRUE;
     this_proj -> modelgl -> cell_win -> slab_alpha = 0.75;
     this_proj -> modelgl -> cell_win -> slab_lot = allocint (this_proj -> nspec);

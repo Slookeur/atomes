@@ -1570,7 +1570,7 @@ void create_qm_input_file (int c, int p, int s)
     is_cpmd = TRUE;
     if (qm_proj -> cpmd_input[s] == NULL)
     {
-      qm_proj -> cpmd_input[s] = g_malloc0 (sizeof*qm_proj -> cpmd_input[s]);
+      qm_proj -> cpmd_input[s] = g_malloc0(sizeof*qm_proj -> cpmd_input[s]);
       qm_proj -> cpmd_input[s] -> calc_type = 0;
       qm_proj -> cpmd_input[s] -> thermostats = 0;
       qm_proj -> cpmd_input[s] -> ions_thermostat = NULL;
@@ -1603,7 +1603,7 @@ void create_qm_input_file (int c, int p, int s)
     is_cpmd = FALSE;
     if (qm_proj -> cp2k_input[s] == NULL)
     {
-      qm_proj -> cp2k_input[s] = g_malloc0 (sizeof*qm_proj -> cp2k_input[s]);
+      qm_proj -> cp2k_input[s] = g_malloc0(sizeof*qm_proj -> cp2k_input[s]);
       qm_proj -> cp2k_input[s] -> input_type = 0;
       for (i=0; i<2; i++)
       {
@@ -1622,12 +1622,12 @@ void create_qm_input_file (int c, int p, int s)
         if (i == 0) qm_proj -> cp2k_input[s] -> extra_opts[i][2] = default_vdw_cut[0];
       }
       qm_proj -> cp2k_input[s] -> spec_data = allocdint(qm_proj -> nspec, 2);
-      qm_proj -> cp2k_input[s] -> spec_files = g_malloc (qm_proj -> nspec*sizeof*qm_proj -> cp2k_input[s] -> spec_files);
+      qm_proj -> cp2k_input[s] -> spec_files = g_malloc0(qm_proj -> nspec*sizeof*qm_proj -> cp2k_input[s] -> spec_files);
       for (i=0; i<qm_proj -> nspec; i++)
       {
         qm_proj -> cp2k_input[s] -> spec_data[i][0] = cp2k_is_basis_in_database (i);
         qm_proj -> cp2k_input[s] -> spec_data[i][1] = cp2k_is_pseudo_in_database (i);
-        qm_proj -> cp2k_input[s] -> spec_files[i] = g_malloc0 (2*sizeof*qm_proj -> cp2k_input[s] -> spec_files[i]);
+        qm_proj -> cp2k_input[s] -> spec_files[i] = g_malloc0(2*sizeof*qm_proj -> cp2k_input[s] -> spec_files[i]);
         qm_proj -> cp2k_input[s] -> spec_files[i][0] = NULL;
         qm_proj -> cp2k_input[s] -> spec_files[i][1] = NULL;
       }

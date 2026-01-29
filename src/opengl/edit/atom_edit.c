@@ -385,7 +385,7 @@ GtkWidget * create_atom_notebook (project * this_proj, GtkWidget * vbox)
 */
 atom_search * allocate_atom_search (int proj, int action, int searchid, int tsize)
 {
-  atom_search * asearch = g_malloc0 (sizeof*asearch);
+  atom_search * asearch = g_malloc0(sizeof*asearch);
   asearch -> search_digit = -1;
   asearch -> proj = proj;
   asearch -> action = action;
@@ -457,7 +457,7 @@ void prepare_atom_edition (gpointer data, gboolean visible)
   int i;
   if (this_proj -> modelgl -> atom_win == NULL)
   {
-    this_proj -> modelgl -> atom_win = g_malloc0 (sizeof*this_proj -> modelgl -> atom_win);
+    this_proj -> modelgl -> atom_win = g_malloc0(sizeof*this_proj -> modelgl -> atom_win);
     for (i=0; i<2; i++) this_proj -> modelgl -> atom_win -> adv_bonding[i] = this_proj -> modelgl -> adv_bonding[i];
     if (this_proj -> modelgl -> anim)
     {

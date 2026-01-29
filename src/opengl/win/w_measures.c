@@ -741,7 +741,7 @@ G_MODULE_EXPORT void window_measures (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *) data;
   if (view -> measure_win == NULL)
   {
-    view -> measure_win = g_malloc0 (sizeof*view -> measure_win);
+    view -> measure_win = g_malloc0(sizeof*view -> measure_win);
     gchar * str = g_strdup_printf ("%s - measures", get_project_by_id(view -> proj) -> name);
     int pi = get_selection_type (view);
     view -> measure_win -> win = create_win (str, view -> win, FALSE, FALSE);

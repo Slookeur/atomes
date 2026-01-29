@@ -1115,7 +1115,7 @@ GtkWidget * create_main_window (GApplication * atomes)
                                   { "help.shortcuts", NULL},
                                   { "help.preferences", NULL}};
 
-  GSimpleAction ** main_act = g_malloc0 (G_N_ELEMENTS(main_actions)*sizeof*main_act);
+  GSimpleAction ** main_act = g_malloc0(G_N_ELEMENTS(main_actions)*sizeof*main_act);
   for (i=0; i<G_N_ELEMENTS(main_actions); i++)
   {
     main_act[i] = g_simple_action_new (main_actions[i].action_name, NULL);

@@ -56,7 +56,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 */
 DataLayout * curve_default_layout (project * pid, int rid, int cid)
 {
-  DataLayout * layout = g_malloc0 (sizeof*layout);
+  DataLayout * layout = g_malloc0(sizeof*layout);
   layout -> datacolor.red = RED;
   layout -> datacolor.green = GREEN;
   layout -> datacolor.blue = BLUE;
@@ -238,7 +238,7 @@ void initcurve (project * pid, int rid, int cid)
   this_curve -> backcolor.alpha = 1.0;
   this_curve -> layout = curve_default_layout (pid, rid, cid);
   this_curve -> extrac = NULL;
-  this_curve -> extrac = g_malloc0 (sizeof*this_curve -> extrac);
+  this_curve -> extrac = g_malloc0(sizeof*this_curve -> extrac);
   this_curve -> extrac -> extras = 0;
   if (this_curve -> cfile != NULL)
   {

@@ -2193,7 +2193,7 @@ G_MODULE_EXPORT void edit_in_new_project (GtkWidget * widg, gpointer data)
   int h, i, j;
   atom_selection * selected;
   atom_in_selection * tmp_a;
-  selected = g_malloc0 (sizeof*selected);
+  selected = g_malloc0(sizeof*selected);
   h = get_to_be_selected (opengl_project -> modelgl);
   if (! sel -> b)
   {
@@ -2278,7 +2278,7 @@ G_MODULE_EXPORT void edit_coord (GtkWidget * widg, gpointer data)
   atom_in_selection * tmp_a;
   gboolean save_it;
 
-  selected = g_malloc0 (sizeof*selected);
+  selected = g_malloc0(sizeof*selected);
   j = opengl_project -> modelgl -> anim -> last -> img -> step;
   for (i=0; i<opengl_project -> natomes; i++)
   {
@@ -2343,7 +2343,7 @@ G_MODULE_EXPORT void edit_atoms (GtkWidget * widg, gpointer data)
   atom_selection * selected;
   atom_in_selection * tmp_a;
 
-  selected = g_malloc0 (sizeof*selected);
+  selected = g_malloc0(sizeof*selected);
   j = opengl_project -> modelgl -> anim -> last -> img -> step;
   for (i=0; i<opengl_project -> natomes; i++)
   {
@@ -2874,7 +2874,7 @@ G_MODULE_EXPORT void select_action_for_all_bonds (GtkWidget * widg, gpointer dat
         {
           if (! bond_selection)
           {
-            bond_selection = g_malloc0 (sizeof*bond_selection);
+            bond_selection = g_malloc0(sizeof*bond_selection);
             bond_selection -> first = new_atom_in_selection (j, opengl_project -> atoms[s][j].sp);
             tmp_a = bond_selection -> first;
           }

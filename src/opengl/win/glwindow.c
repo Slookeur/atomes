@@ -1413,7 +1413,7 @@ gboolean create_3d_model (int p, gboolean load)
       g_free (this_proj -> modelgl);
       this_proj -> modelgl = NULL;
     }
-    this_proj -> modelgl = g_malloc0 (sizeof*this_proj -> modelgl);
+    this_proj -> modelgl = g_malloc0(sizeof*this_proj -> modelgl);
     this_proj -> modelgl -> init = FALSE;
     this_proj -> modelgl -> proj = this_proj -> id;
     GtkWidget * gl_vbox;
@@ -1549,8 +1549,8 @@ void prep_model (int p)
       active_project_changed (p);
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      active_glwin -> ogl_box_axis[0] = g_malloc0 (OGL_BOX*sizeof*active_glwin -> ogl_box_axis[0]);
-      active_glwin -> ogl_box_axis[1] = g_malloc0 (OGL_AXIS*sizeof*active_glwin -> ogl_box_axis[1]);
+      active_glwin -> ogl_box_axis[0] = g_malloc0(OGL_BOX*sizeof*active_glwin -> ogl_box_axis[0]);
+      active_glwin -> ogl_box_axis[1] = g_malloc0(OGL_AXIS*sizeof*active_glwin -> ogl_box_axis[1]);
 #endif
       prepare_opengl_menu_bar (active_glwin);
 #ifdef GTK3

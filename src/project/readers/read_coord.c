@@ -101,7 +101,7 @@ void add_reader_info (gchar * info, int mid)
   {
     if (! this_reader -> msg)
     {
-      this_reader -> info = g_malloc0 (sizeof*this_reader -> info);
+      this_reader -> info = g_malloc0(sizeof*this_reader -> info);
     }
     else
     {
@@ -297,7 +297,7 @@ int open_coord_file (gchar * filename, int fti)
   fclose (coordf);
   int linecount = 0;
   for (j=0; j<fsize; j++) if (coord_content[j] == '\n') linecount ++;
-  coord_line = g_malloc0 (linecount*sizeof*coord_line);
+  coord_line = g_malloc0(linecount*sizeof*coord_line);
   coord_line[0] = & coord_content[0];
   i = 1;
   for (j=0; j<fsize; j++)
@@ -321,16 +321,16 @@ int open_coord_file (gchar * filename, int fti)
   {
     if (head == NULL)
     {
-      head = g_malloc0 (sizeof*head);
-      tail = g_malloc0 (sizeof*tail);
+      head = g_malloc0(sizeof*head);
+      tail = g_malloc0(sizeof*tail);
       tail = head;
     }
     else
     {
-      tail -> next = g_malloc0 (sizeof*tail -> next);
+      tail -> next = g_malloc0(sizeof*tail -> next);
       if (fti == 9 || fti == 10)
       {
-        tail -> next -> prev = g_malloc0 (sizeof*tail -> next -> prev);
+        tail -> next -> prev = g_malloc0(sizeof*tail -> next -> prev);
         tail -> next -> prev = tail;
       }
       tail = tail -> next;

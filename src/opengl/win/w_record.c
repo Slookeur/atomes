@@ -154,7 +154,7 @@ G_MODULE_EXPORT void window_recorder (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *) data;
   if (view -> rec == NULL)
   {
-    view -> rec = g_malloc0 (sizeof*view -> rec);
+    view -> rec = g_malloc0(sizeof*view -> rec);
     gchar * str = g_strdup_printf ("%s - record", get_project_by_id(view -> proj) -> name);
     view -> rec -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);

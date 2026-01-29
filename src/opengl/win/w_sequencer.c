@@ -457,7 +457,7 @@ G_MODULE_EXPORT void window_sequencer (GtkWidget * widg, gpointer data)
   if (view -> player == NULL)
   {
     //p = view -> proj;
-    view -> player = g_malloc0 (sizeof*view -> player);
+    view -> player = g_malloc0(sizeof*view -> player);
     view -> player -> win = create_win (" ", view -> win, FALSE, FALSE);
     set_player_title (view);
     GtkWidget * vbox = create_vbox (BSEP);

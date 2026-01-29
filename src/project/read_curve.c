@@ -174,28 +174,28 @@ int read_project_curve (FILE * fp, int pid)
     if (fread (this_curve -> frame_pos, sizeof(this_curve -> frame_pos), 1, fp) != 1) return ERROR_RW;
     if (fread (& this_curve -> backcolor, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
     // Data
-    this_curve -> layout = g_malloc0 (sizeof*this_curve -> layout);
+    this_curve -> layout = g_malloc0(sizeof*this_curve -> layout);
     if (! read_data_layout (fp, this_curve -> layout)) return ERROR_RW;
     if (fread (& this_curve -> draw_id, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (fread (& this_curve -> bshift, sizeof(int), 1, fp) != 1) return ERROR_RW;
 
-    this_curve -> extrac = g_malloc0 (sizeof*this_curve -> extrac);
+    this_curve -> extrac = g_malloc0(sizeof*this_curve -> extrac);
     if (fread (& this_curve -> extrac -> extras, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (this_curve -> extrac -> extras > 0)
     {
-      this_curve -> extrac -> first = g_malloc0 (sizeof*this_curve -> extrac -> first);
-      this_curve -> extrac -> last = g_malloc0 (sizeof*this_curve -> extrac -> last);
+      this_curve -> extrac -> first = g_malloc0(sizeof*this_curve -> extrac -> first);
+      this_curve -> extrac -> last = g_malloc0(sizeof*this_curve -> extrac -> last);
       CurveExtra * ctmp = this_curve -> extrac -> first;
       for (i=0; i<this_curve -> extrac -> extras; i++)
       {
         if (fread (& ctmp -> id.a, sizeof(int), 1, fp) != 1) return ERROR_RW;
         if (fread (& ctmp -> id.b, sizeof(int), 1, fp) != 1) return ERROR_RW;
         if (fread (& ctmp -> id.c, sizeof(int), 1, fp) != 1) return ERROR_RW;
-        ctmp -> layout = g_malloc0 (sizeof*ctmp -> layout);
+        ctmp -> layout = g_malloc0(sizeof*ctmp -> layout);
         if (! read_data_layout (fp, ctmp -> layout)) return ERROR_RW;
         if (i < this_curve -> extrac -> extras - 1)
         {
-          ctmp -> next = g_malloc0 (sizeof*ctmp -> next);
+          ctmp -> next = g_malloc0(sizeof*ctmp -> next);
           ctmp -> next -> prev = ctmp;
           ctmp = ctmp -> next;
         }

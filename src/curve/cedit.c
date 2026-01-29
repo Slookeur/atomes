@@ -172,8 +172,8 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
    /* Append a top level row and leave it empty */
   if (cedit -> ppath != NULL) g_free (cedit -> ppath);
   if (cedit -> cpath != NULL) g_free (cedit -> cpath);
-  cedit -> ppath = g_malloc0 (nprojects*sizeof*cedit -> ppath);
-  cedit -> cpath = g_malloc0 (nprojects*sizeof*cedit -> cpath);
+  cedit -> ppath = g_malloc0(nprojects*sizeof*cedit -> ppath);
+  cedit -> cpath = g_malloc0(nprojects*sizeof*cedit -> cpath);
 
   project * the_proj = get_project_by_id (pid);
   for (i=0; i<nprojects; i++)

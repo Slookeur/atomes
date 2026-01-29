@@ -290,7 +290,7 @@ GtkWidget * prepare_basis_combo (int sp, int obj)
 {
   int i, j;
   GtkWidget * widg = create_combo ();
-  int * sp_id = g_malloc0 (100*sizeof*sp_id);
+  int * sp_id = g_malloc0(100*sizeof*sp_id);
   if (obj)
   {
     i = prepare_cp2k_basis_pseudo_list (sp, sp_id, N_POTS, pot_elem);

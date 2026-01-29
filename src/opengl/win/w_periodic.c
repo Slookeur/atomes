@@ -692,7 +692,7 @@ int get_atom_id_from_periodic_table (atom_search * asearch)
   else
   {
     str = g_strdup_printf ("Periodic table of the elements");
-    periodic_search = g_malloc0 (sizeof*periodic_search);
+    periodic_search = g_malloc0(sizeof*periodic_search);
     periodic_search -> proj = -1;
     periodic_search -> action = -1;
 #ifdef GTK3

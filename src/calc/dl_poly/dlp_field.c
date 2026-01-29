@@ -1813,10 +1813,10 @@ void get_is_energy (int i, int l)
 {
   int j, k;
   j = (i > 1 && i < 8) ? (i-1)/2 + 1 - i/7 : i;
-  is_energy = g_malloc (fetypes[activef][i+1]*sizeof*is_energy);
+  is_energy = g_malloc0(fetypes[activef][i+1]*sizeof*is_energy);
   if (l)
   {
-    is_var = g_malloc (fetypes[activef][i+1]*sizeof*is_var);
+    is_var = g_malloc0(fetypes[activef][i+1]*sizeof*is_var);
   }
   switch (j)
   {
@@ -4660,7 +4660,7 @@ void create_classical_force_field (int p, int f)
   tmp_coord = tmp_proj -> coord;
   tmp_view = tmp_proj -> modelgl;
   tmp_fmol = NULL;
-  tmp_fmol = g_malloc0 (sizeof*tmp_fmol);
+  tmp_fmol = g_malloc0(sizeof*tmp_fmol);
   gchar * field_type[2] = {"DL-POLY 4", "LAMMPS"};
 
   // Preparing data structure and pointers
@@ -4668,7 +4668,7 @@ void create_classical_force_field (int p, int f)
   if (tmp_proj -> force_field[activef] == NULL)
   {
     assist_init = FALSE;
-    tmp_proj -> force_field[activef] = g_malloc0 (sizeof*tmp_proj -> force_field[activef]);
+    tmp_proj -> force_field[activef] = g_malloc0(sizeof*tmp_proj -> force_field[activef]);
     tmp_proj -> force_field[activef] -> type = -1;
     tmp_proj -> force_field[activef] -> atom_init = -1;
     for (i=0; i<2; i++) tmp_proj -> force_field[activef] -> prepare_file[i] = TRUE;

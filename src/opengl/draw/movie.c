@@ -247,8 +247,8 @@ static GLubyte * capture_opengl_image (unsigned int width, unsigned int height)
 {
   size_t i, nvals;
   nvals = width * height * 4;
-  GLubyte * pixels = g_malloc (nvals * sizeof(GLubyte));
-  GLubyte * rgb = g_malloc (nvals * sizeof(GLubyte));
+  GLubyte * pixels = g_malloc0(nvals * sizeof(GLubyte));
+  GLubyte * rgb = g_malloc0(nvals * sizeof(GLubyte));
   glReadPixels (0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
   // Flip data veritcally
   for (i = 0; i < height; i++)
@@ -450,7 +450,7 @@ AVCodecContext * add_codec_context (AVFormatContext * fc, const AVCodec * vc, vi
 */
 VideoStream * add_video_stream (AVFormatContext * fc, const AVCodec * vc, video_options * vopts)
 {
-  VideoStream * stream = g_malloc0 (sizeof*stream);
+  VideoStream * stream = g_malloc0(sizeof*stream);
   stream -> cc = add_codec_context (fc, vc, vopts);
   if (stream -> cc == NULL) return NULL;
 

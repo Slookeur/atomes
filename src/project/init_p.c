@@ -216,7 +216,7 @@ void apply_default_parameters_to_project (project * this_proj)
 */
 void init_project (gboolean alloc_box)
 {
-  project * new_proj = g_malloc0 (sizeof*new_proj);
+  project * new_proj = g_malloc0(sizeof*new_proj);
   nprojects ++;
   activep = nprojects - 1;
   new_proj -> id = activep;
@@ -232,15 +232,15 @@ void init_project (gboolean alloc_box)
   new_proj -> sk_advanced[0] = 1.0;
   new_proj -> sk_advanced[1] = 15.0;
   //
-  new_proj -> coord = g_malloc0 (sizeof*new_proj -> coord);
+  new_proj -> coord = g_malloc0(sizeof*new_proj -> coord);
   if (alloc_box) new_proj -> cell.box = g_malloc0(sizeof*new_proj -> cell.box);
 
   remove_edition_actions ();
   if (nprojects == 1)
   {
-    workzone.first = g_malloc0 (sizeof*workzone.first);
+    workzone.first = g_malloc0(sizeof*workzone.first);
     workzone.first = new_proj;
-    workzone.last = g_malloc0 (sizeof*workzone.last);
+    workzone.last = g_malloc0(sizeof*workzone.last);
   }
   else
   {

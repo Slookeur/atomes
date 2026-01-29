@@ -427,7 +427,7 @@ void update_all_selections (glwin * view, int pi)
 */
 atom_in_selection * new_atom_in_selection (int id, int sp)
 {
-  atom_in_selection * new_sel = g_malloc0 (sizeof*new_sel);
+  atom_in_selection * new_sel = g_malloc0(sizeof*new_sel);
   new_sel -> id = id;
   new_sel -> sp = sp;
   return new_sel;

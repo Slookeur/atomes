@@ -133,13 +133,13 @@ void gcid_spcolor_setup (int sp, int id)
   int i;
   if (active_glwin -> gcid[id] == NULL)
   {
-    active_glwin -> gcid[id] = g_malloc0 (active_coord -> totcoord[id]*sizeof*active_glwin -> gcid[id]);
+    active_glwin -> gcid[id] = g_malloc0(active_coord -> totcoord[id]*sizeof*active_glwin -> gcid[id]);
     for (i=0; i<active_coord -> totcoord[id]; i++)
     {
-      active_glwin -> gcid[id][i] = g_malloc0 (64*sizeof*active_glwin -> gcid[id][i]);
+      active_glwin -> gcid[id][i] = g_malloc0(64*sizeof*active_glwin -> gcid[id][i]);
     }
   }
-  active_image -> spcolor[id][sp] = g_malloc0 (active_coord -> totcoord[id]*sizeof*active_image -> spcolor[id][sp]);
+  active_image -> spcolor[id][sp] = g_malloc0(active_coord -> totcoord[id]*sizeof*active_image -> spcolor[id][sp]);
 }
 
 #ifdef GTK3
@@ -326,7 +326,7 @@ void allocate_partial_geo_ (int * sp, int * ngsp)
     g_free (active_coord -> partial_geo[* sp]);
     active_coord -> partial_geo[* sp] = NULL;
   }
-  active_coord -> partial_geo[* sp] = g_malloc (* ngsp * sizeof*active_coord -> partial_geo[* sp]);
+  active_coord -> partial_geo[* sp] = g_malloc0(* ngsp * sizeof*active_coord -> partial_geo[* sp]);
 }
 
 /*!
@@ -492,8 +492,8 @@ void init_menu_fragmol_ (int * id)
     // GTK3 Menu Action To Check
     if (active_coord -> totcoord[3] <= COORD_MAX_MENU)
     {
-      active_glwin -> ogl_geom[0][3] =  g_malloc (active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[0][3]);
-      active_glwin -> ogl_geom[1][3] =  g_malloc (active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[1][3]);
+      active_glwin -> ogl_geom[0][3] =  g_malloc0(active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[0][3]);
+      active_glwin -> ogl_geom[1][3] =  g_malloc0(active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[1][3]);
     }
 #endif
   }
@@ -607,7 +607,7 @@ void init_menurings_ (int * coo, int * ids, int * ngsp, int coordt[* ngsp], int 
     j = 0;
     active_glwin -> oglmc[i][* coo][j] = NULL;
     active_glwin -> oglmc[i][* coo][j] = coord_color_setup (& j, * coo, i);
-    if (! * init) active_glwin -> ogl_poly[i][* coo] = g_malloc0 (*ngsp*sizeof*active_glwin -> ogl_poly[i][* coo]);
+    if (! * init) active_glwin -> ogl_poly[i][* coo] = g_malloc0(*ngsp*sizeof*active_glwin -> ogl_poly[i][* coo]);
     for ( j=0 ; j < * ngsp ; j++ )
     {
       if (i == 0)
@@ -666,7 +666,7 @@ void init_opengl_coords (int id, int nt, int init)
   for (i=0; i<2; i++)
   {
     if (active_glwin -> ogl_geom[i][id]) g_free (active_glwin -> ogl_geom[i][id]);
-    active_glwin -> ogl_geom[i][id] =  g_malloc0 (nt*sizeof*active_glwin -> ogl_geom[i][id]);
+    active_glwin -> ogl_geom[i][id] =  g_malloc0(nt*sizeof*active_glwin -> ogl_geom[i][id]);
     for (j=0; j < nt; j++)
     {
       active_glwin -> ogl_geom[i][id][j] = NULL;
@@ -677,7 +677,7 @@ void init_opengl_coords (int id, int nt, int init)
   {
     k = (id > 3) ? 1 : active_project -> nspec;
     if (active_coord -> ntg[id]) g_free (active_coord -> ntg[id]);
-    active_coord -> ntg[id] = g_malloc0 (k*sizeof*active_coord -> ntg[id]);
+    active_coord -> ntg[id] = g_malloc0(k*sizeof*active_coord -> ntg[id]);
     if (id > 3) active_coord -> ntg[id][0] = nt;
     if (id < 9)
     {
@@ -690,7 +690,7 @@ void init_opengl_coords (int id, int nt, int init)
       for (i=0; i<2; i++)
       {
         if (active_glwin -> ogl_poly[i][id]) g_free (active_glwin -> ogl_poly[i][id]);
-        active_glwin -> ogl_poly[i][id] = g_malloc0 (nt*sizeof*active_glwin -> ogl_poly[i][id]);
+        active_glwin -> ogl_poly[i][id] = g_malloc0(nt*sizeof*active_glwin -> ogl_poly[i][id]);
         for (j=0; j < nt; j++)
         {
           active_glwin -> ogl_poly[i][id][j] = NULL;

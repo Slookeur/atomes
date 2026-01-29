@@ -162,7 +162,7 @@ void unrotate_camera ()
 */
 screen_string * duplicate_screen_string (screen_string * old_s)
 {
-  screen_string * new_s = g_malloc0 (sizeof*new_s);
+  screen_string * new_s = g_malloc0(sizeof*new_s);
   new_s -> word = g_strdup_printf ("%s", old_s -> word);
   new_s -> col = old_s -> col;
   int i;
@@ -279,7 +279,7 @@ void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
 image * duplicate_image (image * old_img)
 {
   int i, j, k, l, m;
-  image * new_img = g_malloc0 (sizeof*new_img);
+  image * new_img = g_malloc0(sizeof*new_img);
 
   // This line will copy all the stuff that is not dynamically allocated
   * new_img = * old_img;
@@ -297,8 +297,8 @@ image * duplicate_image (image * old_img)
   new_img -> sphererad = duplicate_double(2*j, old_img -> sphererad);
   new_img -> pointrad = duplicate_double(2*j, old_img -> pointrad);
   new_img -> atomicrad = duplicate_double(2*j, old_img -> atomicrad);
-  new_img -> bondrad = g_malloc0 (2*j*sizeof*new_img -> bondrad);
-  new_img -> linerad = g_malloc0 (2*j*sizeof*new_img -> linerad);
+  new_img -> bondrad = g_malloc0(2*j*sizeof*new_img -> bondrad);
+  new_img -> linerad = g_malloc0(2*j*sizeof*new_img -> linerad);
   new_img -> at_color = duplicate_color (2*j, old_img -> at_color);
   for (i=0; i<2*j; i++)
   {
@@ -311,13 +311,13 @@ image * duplicate_image (image * old_img)
     new_img -> show_coord[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_coord[i]);
     if (i < 2 || i > 3) new_img -> show_poly[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_poly[i]);
     k = (i < 2) ? proj_gl -> nspec : 1;
-    new_img -> spcolor[i] = g_malloc (k*sizeof*new_img -> spcolor[i]);
+    new_img -> spcolor[i] = g_malloc0(k*sizeof*new_img -> spcolor[i]);
     for (j=0; j<k; j++)
     {
      new_img -> spcolor[i][j] = duplicate_color (coord_gl -> totcoord[i], old_img -> spcolor[i][j]);
     }
   }
-  new_img -> at_data = g_malloc0 (proj_gl -> natomes*sizeof*new_img -> at_data);
+  new_img -> at_data = g_malloc0(proj_gl -> natomes*sizeof*new_img -> at_data);
   for (i=0; i<proj_gl -> natomes; i++)
   {
     new_img -> at_data[i].show[0] = proj_gl -> atoms[step][i].show[0];
@@ -409,7 +409,7 @@ image * duplicate_image (image * old_img)
 */
 void add_image ()
 {
-  snapshot * nextsnap = g_malloc0 (sizeof*nextsnap);
+  snapshot * nextsnap = g_malloc0(sizeof*nextsnap);
   nextsnap -> img = duplicate_image (plot);
   nextsnap -> img -> id ++;
 
@@ -443,7 +443,7 @@ extern void update_gl_pick_colors ();
 */
 atom * duplicate_atom (atom * at)
 {
-  atom * bt = g_malloc0 (sizeof*bt);
+  atom * bt = g_malloc0(sizeof*bt);
   bt -> x = at -> x;
   bt -> y = at -> y;
   bt -> z = at -> z;

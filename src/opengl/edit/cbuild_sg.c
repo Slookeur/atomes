@@ -603,7 +603,7 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
         }
         if (! val) return 0;
         spg -> settings[j].nump = val;
-        spg -> settings[j].points = g_malloc(val*sizeof*spg -> settings[j].points);
+        spg -> settings[j].points = g_malloc0(val*sizeof*spg -> settings[j].points);
         ps_node = ps_node -> children;
         if (ps_node == NULL) return 0;
         k = 0;
@@ -613,7 +613,7 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
           {
             s_node = pp_node -> properties;
             if (s_node == NULL) return 0;
-            spg -> settings[j].points[k] = g_malloc(3*sizeof*spg -> settings[j].points[k]);
+            spg -> settings[j].points[k] = g_malloc0(3*sizeof*spg -> settings[j].points[k]);
             while (s_node)
             {
               the_point = s_node -> children;
@@ -735,7 +735,7 @@ space_group * read_sg_xml_file (const char * filetoread)
           }
           w_node = w_node -> next;
         }
-        spg -> wyckoff[i].pos = g_malloc(spg -> wyckoff[i].multi*sizeof*spg -> wyckoff[i].pos);
+        spg -> wyckoff[i].pos = g_malloc0(spg -> wyckoff[i].multi*sizeof*spg -> wyckoff[i].pos);
         wp_node = cp_node -> children;
         if (wp_node == NULL) return clean_sgl_data (doc, reader);
         j = 0;
@@ -745,7 +745,7 @@ space_group * read_sg_xml_file (const char * filetoread)
           {
             p_node = wc_node -> properties;
             if (p_node == NULL) return clean_sgl_data (doc, reader);
-            spg -> wyckoff[i].pos[j] = g_malloc(3*sizeof*spg -> wyckoff[i].pos[j]);
+            spg -> wyckoff[i].pos[j] = g_malloc0(3*sizeof*spg -> wyckoff[i].pos[j]);
             while (p_node)
             {
               the_pos = p_node -> children;

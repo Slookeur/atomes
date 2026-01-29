@@ -312,17 +312,17 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   {
     clean_curves_data (CHA, 0, active_project -> analysis[CHA] -> numc);
     clean_chains_data (active_glwin);
-    active_glwin -> all_chains = g_malloc0 (active_project -> steps*sizeof*active_glwin -> all_chains);
-    active_glwin -> num_chains = g_malloc0 (active_project -> steps*sizeof*active_glwin -> num_chains);
+    active_glwin -> all_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> all_chains);
+    active_glwin -> num_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> num_chains);
     for (j=0; j<active_project -> steps; j++)
     {
-      active_glwin -> all_chains[j] = g_malloc0 (active_project -> csparam[5]*sizeof*active_glwin -> all_chains[j]);
+      active_glwin -> all_chains[j] = g_malloc0(active_project -> csparam[5]*sizeof*active_glwin -> all_chains[j]);
       active_glwin -> num_chains[j] = allocint (active_project -> csparam[5]);
       for (k=0; k < active_project -> natomes; k++)
       {
         if (active_project -> atoms[j][k].chain) g_free (active_project -> atoms[j][k].chain);
         active_project -> atoms[j][k].chain = NULL;
-        active_project -> atoms[j][k].chain = g_malloc0 (active_project -> csparam[5]*sizeof*active_project -> atoms[j][k].chain);
+        active_project -> atoms[j][k].chain = g_malloc0(active_project -> csparam[5]*sizeof*active_project -> atoms[j][k].chain);
       }
     }
     k = 1;

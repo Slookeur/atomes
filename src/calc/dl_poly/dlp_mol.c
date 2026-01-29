@@ -363,10 +363,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           next_fmol -> fragments = allocint(a_mol);
           for (i=0; i<a_mol; i++) next_fmol -> fragments[i] = new_mol[i];
           // Atoms_id and field atoms
-          atomd_id_save = g_malloc (next_fmol-> mol -> natoms*sizeof*atomd_id_save);
+          atomd_id_save = g_malloc0(next_fmol-> mol -> natoms*sizeof*atomd_id_save);
           for (i=0; i<next_fmol-> mol -> natoms; i++)
           {
-            atomd_id_save[i] = g_malloc (next_fmol -> multi*sizeof*atomd_id_save[i]);
+            atomd_id_save[i] = g_malloc0(next_fmol -> multi*sizeof*atomd_id_save[i]);
           }
           tmp_fat = next_fmol -> first_atom;
           for (i=0; i < next_fmol -> atoms; i++)
@@ -377,10 +377,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           }
           g_free (next_fmol -> atoms_id);
           next_fmol -> atoms_id = NULL;
-          next_fmol -> atoms_id = g_malloc (next_fmol-> mol -> natoms*sizeof*next_fmol -> atoms_id);
+          next_fmol -> atoms_id = g_malloc0(next_fmol-> mol -> natoms*sizeof*next_fmol -> atoms_id);
           for (i=0; i<next_fmol-> mol -> natoms; i++)
           {
-            next_fmol -> atoms_id[i] = g_malloc (next_fmol -> multi*sizeof*next_fmol -> atoms_id[i]);
+            next_fmol -> atoms_id[i] = g_malloc0(next_fmol -> multi*sizeof*next_fmol -> atoms_id[i]);
             for (j=0; j<next_fmol -> multi; j++)
             {
               next_fmol -> atoms_id[i][j].a = atomd_id_save[i][j].a;
@@ -409,10 +409,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           }
           new_mol = NULL;
           // Now we deal with atoms_id and the field atoms
-          atomd_id_save = g_malloc (old_fmol-> mol -> natoms*sizeof*atomd_id_save);
+          atomd_id_save = g_malloc0(old_fmol-> mol -> natoms*sizeof*atomd_id_save);
           for (i=0; i<old_fmol -> mol -> natoms; i++)
           {
-            atomd_id_save[i] = g_malloc ((old_fmol -> multi - a_mol)*sizeof*atomd_id_save[i]);
+            atomd_id_save[i] = g_malloc0((old_fmol -> multi - a_mol)*sizeof*atomd_id_save[i]);
           }
           tmp_fat = old_fmol -> first_atom;
           for (i=0; i < old_fmol -> atoms; i++)
@@ -423,10 +423,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           old_fmol -> multi -= a_mol;
           g_free (old_fmol -> atoms_id);
           old_fmol -> atoms_id = NULL;
-          old_fmol -> atoms_id = g_malloc (old_fmol-> mol -> natoms*sizeof*old_fmol -> atoms_id);
+          old_fmol -> atoms_id = g_malloc0(old_fmol-> mol -> natoms*sizeof*old_fmol -> atoms_id);
           for (i=0; i<old_fmol-> mol -> natoms; i++)
           {
-            old_fmol -> atoms_id[i] = g_malloc (old_fmol -> multi*sizeof*old_fmol -> atoms_id[i]);
+            old_fmol -> atoms_id[i] = g_malloc0(old_fmol -> multi*sizeof*old_fmol -> atoms_id[i]);
             for (j=0; j<old_fmol -> multi; j++)
             {
               old_fmol -> atoms_id[i][j].a = atomd_id_save[i][j].a;
@@ -613,7 +613,7 @@ void prepare_atoms_to_merge (field_atom* at, field_molecule * new_mol, field_mol
 field_atom* new_atom_to_merge (int id, field_molecule * fmol)
 {
   field_atom* fat, * fbt;
-  fat = g_malloc (sizeof*fat);
+  fat = g_malloc0(sizeof*fat);
   fat -> id = id;
   fat -> sp = -1;
   fat -> num = fmol -> mol -> natoms * fmol -> multi;
@@ -665,10 +665,10 @@ G_MODULE_EXPORT void run_remove_molecule_from_field (GtkDialog * rmol, gint resp
         {
           to_merge -> fragments[i] = to_remove -> fragments[i - to_merge -> multi];
         }
-        atomd_id_save = g_malloc (to_merge -> mol -> natoms*sizeof*atomd_id_save);
+        atomd_id_save = g_malloc0(to_merge -> mol -> natoms*sizeof*atomd_id_save);
         for (i=0; i<to_merge -> mol -> natoms; i++)
         {
-          atomd_id_save[i] = g_malloc ((to_merge -> multi+to_remove -> multi)*sizeof*atomd_id_save[i]);
+          atomd_id_save[i] = g_malloc0((to_merge -> multi+to_remove -> multi)*sizeof*atomd_id_save[i]);
           for (j=0; j<to_merge -> multi; j++)
           {
             atomd_id_save[i][j].a = to_merge -> atoms_id[i][j].a;
@@ -682,10 +682,10 @@ G_MODULE_EXPORT void run_remove_molecule_from_field (GtkDialog * rmol, gint resp
         }
         to_merge -> multi += to_remove -> multi;
         g_free (to_merge -> atoms_id);
-        to_merge -> atoms_id = g_malloc (to_merge -> mol -> natoms*sizeof*to_merge -> atoms_id);
+        to_merge -> atoms_id = g_malloc0(to_merge -> mol -> natoms*sizeof*to_merge -> atoms_id);
         for (i=0; i<to_merge -> mol -> natoms; i++)
         {
-          to_merge -> atoms_id[i] = g_malloc (to_merge -> multi*sizeof*to_merge -> atoms_id[i]);
+          to_merge -> atoms_id[i] = g_malloc0(to_merge -> multi*sizeof*to_merge -> atoms_id[i]);
           for (j=0; j<to_merge -> multi; j++)
           {
             to_merge -> atoms_id[i][j].a = atomd_id_save[i][j].a;

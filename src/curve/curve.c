@@ -135,7 +135,7 @@ int lenp = 1;
 curve_dash * selectdash (int iddash)
 {
   curve_dash * dashtab;
-  dashtab = g_malloc0 (sizeof*dashtab);
+  dashtab = g_malloc0(sizeof*dashtab);
 
   if (iddash == 0)
   {

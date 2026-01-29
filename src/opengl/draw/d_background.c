@@ -49,13 +49,13 @@ void create_background_lists ()
   wingl -> create_shaders[BACKG] = FALSE;
 
   wingl -> n_shaders[BACKG][0] = 1;
-  object_3d * back = g_malloc0 (sizeof*back);
+  object_3d * back = g_malloc0(sizeof*back);
   back -> vert_buffer_size = 2;
   back -> num_vertices = 4;
   back -> vertices = allocfloat (back -> vert_buffer_size*back -> num_vertices);
   back -> vertices[0] = back -> vertices[1] = back -> vertices[3] = back -> vertices[4] = -1.0;
   back -> vertices[2] = back -> vertices[5] = back -> vertices[6] = back -> vertices[7] = 1.0;
-  wingl -> ogl_glsl[BACKG][0] = g_malloc0 (sizeof*wingl -> ogl_glsl[BACKG][0]);
+  wingl -> ogl_glsl[BACKG][0] = g_malloc0(sizeof*wingl -> ogl_glsl[BACKG][0]);
   switch (plot -> back -> gradient)
   {
     case 1:

@@ -94,7 +94,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
     {
       if (this_proj -> modelgl -> ring_max[i])
       {
-        this_proj -> atoms[s][a].rings[i] = g_malloc0 (this_proj -> rsparam[i][1]*sizeof*this_proj -> atoms[s][a].rings[i]);
+        this_proj -> atoms[s][a].rings[i] = g_malloc0(this_proj -> rsparam[i][1]*sizeof*this_proj -> atoms[s][a].rings[i]);
         for (j=0; j<this_proj -> rsparam[i][1]; j++)
         {
           rings_ij = allocint(this_proj -> modelgl -> num_rings[i][s][j]);
@@ -123,7 +123,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
   {
     if (this_proj -> modelgl -> chain_max)
     {
-      this_proj -> atoms[s][a].chain = g_malloc0 (this_proj -> csparam[5]*sizeof*this_proj -> atoms[s][a].chain);
+      this_proj -> atoms[s][a].chain = g_malloc0(this_proj -> csparam[5]*sizeof*this_proj -> atoms[s][a].chain);
       for (j=0; j<this_proj -> csparam[5]; j++)
       {
         rings_ij = allocint(this_proj -> modelgl -> num_chains[s][j]);
@@ -172,14 +172,14 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
     if (view -> ring_max[rid])
     {
       view -> num_rings[rid] = allocdint (steps, size);
-      view -> show_rpoly[rid] = g_malloc0 (steps*sizeof*view -> show_rpoly[rid]);
-      view -> all_rings[rid] = g_malloc0 (steps*sizeof*view -> all_rings[rid]);
+      view -> show_rpoly[rid] = g_malloc0(steps*sizeof*view -> show_rpoly[rid]);
+      view -> all_rings[rid] = g_malloc0(steps*sizeof*view -> all_rings[rid]);
       tmpcoo = allocint(size);
       for (i=0; i<steps; i++)
       {
         if (fread (view -> num_rings[rid][i], sizeof(int), size, fp) != size) return ERROR_RW;
-        view -> all_rings[rid][i] = g_malloc0 (size*sizeof*view -> all_rings[rid][i]);
-        view -> show_rpoly[rid][i] = g_malloc0 (size*sizeof*view -> show_rpoly[rid][i]);
+        view -> all_rings[rid][i] = g_malloc0(size*sizeof*view -> all_rings[rid][i]);
+        view -> show_rpoly[rid][i] = g_malloc0(size*sizeof*view -> show_rpoly[rid][i]);
         for (j=0; j<size; j++)
         {
           tmpcoo[j] += view -> num_rings[rid][i][j];
@@ -228,12 +228,12 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
     if (view -> chain_max)
     {
       view -> num_chains = allocdint (steps, size);
-      view -> all_chains = g_malloc0 (steps*sizeof*view -> all_rings[rid]);
+      view -> all_chains = g_malloc0(steps*sizeof*view -> all_rings[rid]);
       tmpcoo = allocint(size);
       for (i=0; i<steps; i++)
       {
         if (fread (view -> num_chains[i], sizeof(int), size, fp) != size) return ERROR_RW;
-        view -> all_chains[i] = g_malloc0 (size*sizeof*view -> all_chains[i]);
+        view -> all_chains[i] = g_malloc0(size*sizeof*view -> all_chains[i]);
         for (j=0; j<size; j++)
         {
           tmpcoo[j] += view -> num_chains[i][j];
@@ -293,7 +293,7 @@ int read_this_image_label (FILE * fp, screen_label * label)
   if (fread (& label -> n_colors, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (label -> n_colors)
   {
-    label -> color = g_malloc (label -> n_colors*sizeof*label -> color);
+    label -> color = g_malloc0(label -> n_colors*sizeof*label -> color);
     if (fread (label -> color, sizeof(ColRGBA), label -> n_colors, fp) != label -> n_colors) return ERROR_RW;
   }
   else if (label -> color)
@@ -339,7 +339,10 @@ int read_this_axis (FILE * fp, axis * xyz)
   if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
   if (! version_2_9_and_above)
   {
-    if (fread (& xyz  -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    xyz -> color = g_malloc0(sizeof*xyz -> color);
+    if (fread (& xyz  -> color[0], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    g_free (xyz -> color);
+    xyz -> color = NULL;
   }
   if (fread (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
@@ -349,7 +352,7 @@ int read_this_axis (FILE * fp, axis * xyz)
   if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (val)
   {
-    xyz -> color = g_malloc (3*sizeof*xyz -> color);
+    xyz -> color = g_malloc0(3*sizeof*xyz -> color);
     for (i=0; i<3; i++)
     {
       if (fread (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
@@ -411,7 +414,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     if (fread (& this_proj -> modelgl -> custom_map -> cmax, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (fread (& this_proj -> modelgl -> custom_map -> cmin, sizeof(int), 1, fp) != 1) return ERROR_RW;
     this_proj -> modelgl -> custom_map -> positions = allocfloat (j);
-    this_proj -> modelgl -> custom_map -> values = g_malloc (j*sizeof*this_proj -> modelgl -> custom_map -> values);
+    this_proj -> modelgl -> custom_map -> values = g_malloc0(j*sizeof*this_proj -> modelgl -> custom_map -> values);
     if (fread (this_proj -> modelgl -> custom_map -> positions, sizeof(float), j, fp) != j) return ERROR_RW;
     if (fread (this_proj -> modelgl -> custom_map -> values, sizeof(ColRGBA), j, fp) != j) return ERROR_RW;
     j = this_proj -> steps*this_proj -> natomes;
@@ -469,7 +472,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
           j = 1;
         }
         img -> labels[i].n_colors = j;
-        img -> labels[i].color = g_malloc0 (j*sizeof*img -> labels[i].color);
+        img -> labels[i].color = g_malloc0(j*sizeof*img -> labels[i].color);
         for (k=0; k<j; k++)
         {
           if (fread (& img -> labels[i].color[k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
@@ -531,7 +534,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
     if (val)
     {
-      img -> xyz -> color = g_malloc (3*sizeof*img -> xyz -> color);
+      img -> xyz -> color = g_malloc0(3*sizeof*img -> xyz -> color);
       for (i=0; i<3; i++)
       {
         if (fread (& img -> xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
@@ -576,7 +579,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     g_free (img -> l_ghtning.spot);
     img -> l_ghtning.spot = NULL;
   }
-  img -> l_ghtning.spot = g_malloc0 (img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
+  img -> l_ghtning.spot = g_malloc0(img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
     if (fread (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
@@ -682,7 +685,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
             if (fread (this_proj -> modelgl -> frag_box[j][m][n], sizeof(double), 9, fp) != 9) return ERROR_RW;
             this_proj -> modelgl -> fm_comp_vol[0][j][m][n] = TRUE;
           }
-          active_image -> fm_vol_col[0][j] = g_malloc0 (i*sizeof*active_image -> fm_vol_col[0][j]);
+          active_image -> fm_vol_col[0][j] = g_malloc0(i*sizeof*active_image -> fm_vol_col[0][j]);
           if (fread (active_image -> fm_show_vol[0][j], sizeof(gboolean), i, fp) != i) return ERROR_RW;
           if (fread (active_image -> fm_vol_col[0][j], sizeof(ColRGBA), i, fp) != i) return ERROR_RW;
         }
@@ -707,7 +710,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
               this_proj -> modelgl -> fm_comp_vol[1][j][m][n] = TRUE;
             }
             if (fread (active_image -> fm_show_vol[1][j], sizeof(gboolean), i, fp) != i) return ERROR_RW;
-            active_image -> fm_vol_col[1][j] = g_malloc0 (i*sizeof*active_image -> fm_vol_col[1][j]);
+            active_image -> fm_vol_col[1][j] = g_malloc0(i*sizeof*active_image -> fm_vol_col[1][j]);
             if (fread (active_image -> fm_vol_col[1][j], sizeof(ColRGBA), i, fp) != i) return ERROR_RW;
           }
         }

@@ -184,7 +184,7 @@ void create_ring_lists ()
     int * nrings[5];
     for (i=0; i < 5; i++)
     {
-      nrings[i] = g_malloc0 (coord_gl -> totcoord[i+4]*sizeof*nrings[i]);
+      nrings[i] = g_malloc0(coord_gl -> totcoord[i+4]*sizeof*nrings[i]);
       for (j=0; j < coord_gl -> totcoord[i+4]; j++)
       {
         // k is the size of the ring in total number of atoms:
@@ -234,9 +234,9 @@ void create_ring_lists ()
     }
     if (rtot > 0)
     {
-      wingl -> ogl_glsl[RINGS][step] = g_malloc0 (sizeof*wingl -> ogl_glsl[RINGS][step]);
+      wingl -> ogl_glsl[RINGS][step] = g_malloc0(sizeof*wingl -> ogl_glsl[RINGS][step]);
       wingl -> n_shaders[RINGS][step] = 1;
-      object_3d * rings = g_malloc0 (sizeof*rings);
+      object_3d * rings = g_malloc0(sizeof*rings);
       rings -> vert_buffer_size = POLY_BUFF_SIZE;
       rings -> num_vertices = rtot * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       rings -> vertices = allocfloat (rings -> vert_buffer_size*rings -> num_vertices);

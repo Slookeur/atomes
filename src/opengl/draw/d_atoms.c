@@ -203,7 +203,7 @@ object_3d * draw_sphere (int quality)
   int stack, slice;
   int x, y, z;
 
-  object_3d * new_sphere = g_malloc0 (sizeof*new_sphere);
+  object_3d * new_sphere = g_malloc0(sizeof*new_sphere);
   new_sphere -> quality = quality;
   new_sphere -> num_vertices = sphere_vertices (quality);
   new_sphere -> vert_buffer_size = 3;
@@ -622,7 +622,7 @@ void create_atom_lists (gboolean to_pick)
     {
       wingl -> n_shaders[ATOMS][step] = 0;
       for (i=0; i<NUM_STYLES; i++) if (all_styles[i]) wingl -> n_shaders[ATOMS][step] ++;
-      wingl -> ogl_glsl[ATOMS][step] = g_malloc0 (wingl -> n_shaders[ATOMS][step]*sizeof*wingl -> ogl_glsl[ATOMS][step]);
+      wingl -> ogl_glsl[ATOMS][step] = g_malloc0(wingl -> n_shaders[ATOMS][step]*sizeof*wingl -> ogl_glsl[ATOMS][step]);
     }
     k = 0;
     for (i=0; i<NUM_STYLES; i++)
@@ -644,7 +644,7 @@ void create_atom_lists (gboolean to_pick)
         }
         else
         {
-          atos = g_malloc0 (sizeof*atos);
+          atos = g_malloc0(sizeof*atos);
           atos -> vert_buffer_size = 3;
           atos -> num_vertices = 1;
           atos -> vertices = allocfloat (3);

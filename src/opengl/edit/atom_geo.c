@@ -346,7 +346,7 @@ void check_coord_modification (project * this_proj, int * old_id, atom * new_lis
   }
 
   // first create a dummy coord structure to store an atom individual data
-  coord_info * new_coord = g_malloc0 (sizeof*new_coord);
+  coord_info * new_coord = g_malloc0(sizeof*new_coord);
   for (i=0; i<2; i++)
   {
     new_coord -> totcoord[i] = 1;

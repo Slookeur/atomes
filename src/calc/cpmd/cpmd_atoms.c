@@ -221,7 +221,7 @@ G_MODULE_EXPORT void changed_dummy_id_box (GtkComboBox * box, gpointer data)
 */
 dummy_atom * init_dummy (int type, int id)
 {
-  dummy_atom * dumm = g_malloc0 (sizeof*dumm);
+  dummy_atom * dumm = g_malloc0(sizeof*dumm);
   dumm -> id = id;
   dumm -> type = type;
   dumm -> show = FALSE;

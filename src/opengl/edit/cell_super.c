@@ -59,7 +59,7 @@ extern GtkWidget * cell_tab (int i, project * this_proj);
 gboolean ** duplicate_geom_info (project * this_proj)
 {
   int i, j;
-  gboolean ** show = g_malloc (2*sizeof*show);
+  gboolean ** show = g_malloc0(2*sizeof*show);
   for (i=0; i<2; i++)
   {
     show[i] = allocbool(this_proj -> coord -> totcoord[i]);
@@ -81,7 +81,7 @@ gboolean ** duplicate_geom_info (project * this_proj)
 gboolean ** duplicate_poly_info (project * this_proj)
 {
   int i, j;
-  gboolean ** show = g_malloc (2*sizeof*show);
+  gboolean ** show = g_malloc0(2*sizeof*show);
   for (i=0; i<2; i++)
   {
     show[i] = allocbool(this_proj -> coord -> totcoord[i]);

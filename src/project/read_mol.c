@@ -94,7 +94,7 @@ int read_mol (FILE * fp)
   int i, j;
   if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_MOL;
   if (! i) return OK;
-  active_project -> modelfc = g_malloc0 (sizeof*active_project -> modelfc);
+  active_project -> modelfc = g_malloc0(sizeof*active_project -> modelfc);
   for (i=1; i<4; i++)
   {
     if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_MOL;
@@ -103,10 +103,10 @@ int read_mol (FILE * fp)
   }
   active_project -> modelfc -> mol_by_step = allocint(active_project -> steps);
   if (fread (active_project -> modelfc -> mol_by_step, sizeof(int), active_project -> steps, fp) != active_project -> steps) return ERROR_MOL;
-  active_project -> modelfc -> mols = g_malloc0 (active_project -> steps*sizeof*active_project -> modelfc -> mols);
+  active_project -> modelfc -> mols = g_malloc0(active_project -> steps*sizeof*active_project -> modelfc -> mols);
   for (i=0; i<active_project -> steps; i++)
   {
-    active_project -> modelfc -> mols[i] = g_malloc0 (active_project -> modelfc -> mol_by_step[i]*sizeof*active_project -> modelfc -> mols[i]);
+    active_project -> modelfc -> mols[i] = g_malloc0(active_project -> modelfc -> mol_by_step[i]*sizeof*active_project -> modelfc -> mols[i]);
   }
 
   molecule * tmp = g_malloc0(sizeof*tmp);

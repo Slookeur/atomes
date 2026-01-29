@@ -61,9 +61,13 @@ const gchar * default_title (int ax, gpointer data)
     {
       return this_proj -> analysis[rid] -> x_title;
     }
-    else
+    else if (this_proj -> tunit > -1)
     {
       return g_strdup_printf ("t [%s]", untime[this_proj -> tunit]);
+    }
+    else
+    {
+      return NULL;
     }
   }
   else

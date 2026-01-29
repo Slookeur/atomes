@@ -703,8 +703,8 @@ int get_sml_files ()
 #endif
   if (val > 0)
   {
-    sml_file_name = g_malloc0 (val*sizeof*sml_file_name);
-    mol_name = g_malloc0 (val*sizeof*mol_name);
+    sml_file_name = g_malloc0(val*sizeof*sml_file_name);
+    mol_name = g_malloc0(val*sizeof*mol_name);
     val = 0;
 #ifdef G_OS_WIN32
     hFind = FindFirstFile (libwin32, & ffd);

@@ -132,7 +132,7 @@ GLuint * allocgluint (int  val)
 {
   GLuint * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -149,7 +149,7 @@ GLuint ** allocdgluint (int xal, int yal)
   GLuint ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -171,11 +171,11 @@ GLfloat ** allocdGLfloat (int xal, int yal)
   GLfloat ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = g_malloc0 (yal*sizeof*var[i]);
+    var[i] = g_malloc0(yal*sizeof*var[i]);
   }
   return var;
 }
@@ -365,7 +365,7 @@ void update_bonds_ (int * bd, int * stp,
         g_free (active_glwin -> clones[* stp]);
         active_glwin -> clones[* stp] = NULL;
       }
-      active_glwin -> clones[* stp] = g_malloc0 (*bdim*sizeof*active_glwin -> clones[* stp]);
+      active_glwin -> clones[* stp] = g_malloc0(*bdim*sizeof*active_glwin -> clones[* stp]);
       for (i=0; i< * bdim; i++)
       {
         active_glwin -> clones[* stp][i].x = x[i];
@@ -1272,7 +1272,7 @@ void setup_image_spec_data (project * this_proj, image * img)
     img -> show_atom[i] = allocbool(nsp);
     for (j=0; j<nsp; j++) img -> show_atom[i][j] = TRUE;
   }
-  img -> at_color = g_malloc0 (2*nsp*sizeof*img -> at_color);
+  img -> at_color = g_malloc0(2*nsp*sizeof*img -> at_color);
   img -> sphererad = allocdouble (2*nsp);
   img -> pointrad = allocdouble (2*nsp);
   img -> atomicrad = allocdouble (2*nsp);
@@ -1284,11 +1284,11 @@ void setup_image_spec_data (project * this_proj, image * img)
     img -> spcolor[i] = NULL;
     if (i < 2)
     {
-      img -> spcolor[i] = g_malloc (nsp*sizeof*img -> spcolor[i]);
+      img -> spcolor[i] = g_malloc0(nsp*sizeof*img -> spcolor[i]);
     }
     else
     {
-      img -> spcolor[i] = g_malloc (1*sizeof*img -> spcolor[i]);
+      img -> spcolor[i] = g_malloc0(1*sizeof*img -> spcolor[i]);
       img -> spcolor[i][0] = NULL;
     }
   }
@@ -1306,7 +1306,7 @@ void setup_default_lights (project * this_proj, image * img)
 {
   img -> l_ghtning.lights = default_lightning.lights;
   if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
-  img -> l_ghtning.spot = g_malloc0 (img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
+  img -> l_ghtning.spot = g_malloc0(img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
   float size = 0.0;
   int i;
   if (this_proj -> cell.box)
@@ -1409,7 +1409,7 @@ void init_img (project * this_proj)
   img -> m_depth = get_max_depth (img -> p_depth);
   setup_default_image (this_proj, img);
   int i;
-  for (i=0; i<2; i++) img -> selected[i] = g_malloc0 (sizeof*img -> selected[i]);
+  for (i=0; i<2; i++) img -> selected[i] = g_malloc0(sizeof*img -> selected[i]);
   if (this_proj -> nspec) setup_image_spec_data (this_proj, img);
 }
 
@@ -1641,7 +1641,7 @@ void glwin_init_spec_data (project * this_proj, int nspec)
   for (i=0; i<NUM_COLORS; i++)
   {
     this_proj -> modelgl -> colorp[i] = NULL;
-    this_proj -> modelgl -> colorp[i] = g_malloc (nspec*2*sizeof*this_proj -> modelgl -> colorp[i]);
+    this_proj -> modelgl -> colorp[i] = g_malloc0(nspec*2*sizeof*this_proj -> modelgl -> colorp[i]);
     for (j=0; j<nspec*2; j++)
     {
       this_proj -> modelgl -> colorp[i][j].a = this_proj -> id;
@@ -1661,16 +1661,16 @@ void glwin_init_spec_data (project * this_proj, int nspec)
     for (j = 0; j < 2; j++)
     {
       this_proj -> modelgl -> oglmv[j][i] = NULL;
-      this_proj -> modelgl -> oglmv[j][i] = g_malloc0 (k*sizeof*this_proj -> modelgl -> oglmv[j][i]);
+      this_proj -> modelgl -> oglmv[j][i] = g_malloc0(k*sizeof*this_proj -> modelgl -> oglmv[j][i]);
       if (i < 9)
       {
         this_proj -> modelgl -> oglmc[j][i] = NULL;
-        this_proj -> modelgl -> oglmc[j][i] = g_malloc0 (k*sizeof*this_proj -> modelgl -> oglmc[j][i]);
+        this_proj -> modelgl -> oglmc[j][i] = g_malloc0(k*sizeof*this_proj -> modelgl -> oglmc[j][i]);
       }
       if (i < 2 || (i > 3 && i < 9))
       {
         this_proj -> modelgl -> oglmpv[j][i] = NULL;
-        this_proj -> modelgl -> oglmpv[j][i] = g_malloc0 (k*sizeof*this_proj -> modelgl -> oglmpv[j][i]);
+        this_proj -> modelgl -> oglmpv[j][i] = g_malloc0(k*sizeof*this_proj -> modelgl -> oglmpv[j][i]);
       }
       for (l=0; l<k; l++)
       {
@@ -1682,14 +1682,14 @@ void glwin_init_spec_data (project * this_proj, int nspec)
 #endif
     if (i < 2 || i > 3)
     {
-      this_proj -> coord -> geolist[i] = g_malloc0 (k*sizeof*this_proj -> coord -> geolist[i]);
+      this_proj -> coord -> geolist[i] = g_malloc0(k*sizeof*this_proj -> coord -> geolist[i]);
       for (j=0; j<k; j++)
       {
         this_proj -> coord -> geolist[i][j] = NULL;
       }
     }
   }
-  this_proj -> coord -> partial_geo = g_malloc0 (nspec*sizeof*this_proj -> coord -> partial_geo);
+  this_proj -> coord -> partial_geo = g_malloc0(nspec*sizeof*this_proj -> coord -> partial_geo);
   for (i=0; i<nspec; i++) this_proj -> coord -> partial_geo[i] = NULL;
 }
 
@@ -1703,8 +1703,8 @@ void glwin_init_spec_data (project * this_proj, int nspec)
 void init_glwin (glwin * view)
 {
   project * this_proj = get_project_by_id(view -> proj);    // Have to be the active project
-  view -> anim = g_malloc0 (sizeof*view -> anim);
-  snapshot * snap = g_malloc0 (sizeof*snap);
+  view -> anim = g_malloc0(sizeof*view -> anim);
+  snapshot * snap = g_malloc0(sizeof*snap);
   view -> anim -> first = snap;
   view -> anim -> last = snap;
   init_img (this_proj);
@@ -1716,12 +1716,12 @@ void init_glwin (glwin * view)
   if (! this_proj -> cell.crystal) center_molecule (this_proj);
 
   view -> bonds = allocdint (this_proj -> steps, 2);
-  view -> bondid = g_malloc0 (this_proj -> steps*sizeof*view -> bondid);
-  view -> clones = g_malloc0 (this_proj -> steps*sizeof*view -> clones);
+  view -> bondid = g_malloc0(this_proj -> steps*sizeof*view -> bondid);
+  view -> clones = g_malloc0(this_proj -> steps*sizeof*view -> clones);
   int i;
   for (i=0; i < this_proj -> steps; i++)
   {
-    view -> bondid[i] = g_malloc0 (2*sizeof*view -> bondid[i]);
+    view -> bondid[i] = g_malloc0(2*sizeof*view -> bondid[i]);
     view -> clones[i] = NULL;
   }
 

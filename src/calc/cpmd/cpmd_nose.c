@@ -531,7 +531,7 @@ void remove_nose_thermostat (int num_to_remove)
 */
 thermostat * init_thermo (int id, int type, int sys)
 {
-  thermostat * thermo = g_malloc0 (sizeof*thermo);
+  thermostat * thermo = g_malloc0(sizeof*thermo);
   thermo -> id = id;
   thermo -> type = type;
   thermo -> sys = sys;

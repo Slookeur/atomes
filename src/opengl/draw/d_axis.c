@@ -277,11 +277,11 @@ int create_axis_lists ()
 
   if (plot -> xyz -> axis == WIREFRAME)
   {
-    axis_a = g_malloc0 (sizeof*axis_a);
+    axis_a = g_malloc0(sizeof*axis_a);
     axis_a -> vert_buffer_size = LINE_BUFF_SIZE;
     axis_a -> num_vertices = 3*2;
     axis_a -> vertices = allocfloat (axis_a -> vert_buffer_size*axis_a -> num_vertices);
-    axis_b = g_malloc0 (sizeof*axis_b);
+    axis_b = g_malloc0(sizeof*axis_b);
     axis_b -> vert_buffer_size = POLY_BUFF_SIZE;
     axis_b -> num_vertices = 3*6*9;
     axis_b -> vertices = allocfloat (axis_b -> vert_buffer_size*axis_b -> num_vertices);
@@ -319,12 +319,12 @@ int create_axis_lists ()
       prepare_string (plot -> xyz -> title[i], 2, color_axis (i), pos, shift, NULL, NULL, NULL);
     }
     nshaders += (plot -> labels[2].render+1) * (plot -> labels[2].list -> last -> id + 1);
-    wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
+    wingl -> ogl_glsl[MAXIS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
     render_all_strings (MAXIS, 2);
   }
   else
   {
-    wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
+    wingl -> ogl_glsl[MAXIS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
   }
   if (plot -> xyz -> axis == WIREFRAME)
   {

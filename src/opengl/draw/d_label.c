@@ -257,7 +257,7 @@ int create_label_lists ()
     {
       nshaders += (plot -> labels[1].render + 1) * (plot -> labels[1].list -> last -> id + 1);
     }
-    wingl -> ogl_glsl[LABEL][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[LABEL][0]);
+    wingl -> ogl_glsl[LABEL][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[LABEL][0]);
     for (i=0; i<2; i++) render_all_strings (LABEL, i);
   }
   return nshaders;

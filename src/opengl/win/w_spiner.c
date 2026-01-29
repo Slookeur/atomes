@@ -177,7 +177,7 @@ G_MODULE_EXPORT void window_spinner (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *) data;
   if (view -> spiner == NULL)
   {
-    view -> spiner = g_malloc0 (sizeof*view -> spiner);
+    view -> spiner = g_malloc0(sizeof*view -> spiner);
     gchar * str = g_strdup_printf ("%s - spin", prepare_for_title(get_project_by_id(view -> proj) -> name));
     view -> spiner -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);

@@ -576,7 +576,7 @@ G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * paramet
   project * this_proj = get_project_by_id (the_data -> a);
   if (this_proj -> modelgl -> model_win[atom_or_clone] == NULL)
   {
-    this_proj -> modelgl -> model_win[atom_or_clone] = g_malloc0 (sizeof*this_proj -> modelgl -> model_win[atom_or_clone]);
+    this_proj -> modelgl -> model_win[atom_or_clone] = g_malloc0(sizeof*this_proj -> modelgl -> model_win[atom_or_clone]);
     this_proj -> modelgl -> model_win[atom_or_clone] -> win = advanced_atom_properties (atom_or_clone, this_proj -> modelgl);
     show_the_widgets (this_proj -> modelgl -> model_win[atom_or_clone] -> win);
     if (this_proj -> natomes < 10000)

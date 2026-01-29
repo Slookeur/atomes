@@ -129,9 +129,9 @@ void compare_body (gchar * fatom, field_nth_body * new_body, int n_body, field_n
               p = 0;
               old_one -> na[l] --;
               old_one -> a[l] = NULL;
-              old_one -> a[l] = g_malloc (old_one -> na[l]*sizeof*old_one -> a[l]);
+              old_one -> a[l] = g_malloc0(old_one -> na[l]*sizeof*old_one -> a[l]);
               old_one -> ma[l] = NULL;
-              old_one -> ma[l] = g_malloc (old_one -> na[l]*sizeof*old_one -> ma[l]);
+              old_one -> ma[l] = g_malloc0(old_one -> na[l]*sizeof*old_one -> ma[l]);
               for (n=0; n<tmp_fbody -> na[l]; n++)
               {
                 if (n != o)

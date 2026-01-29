@@ -465,19 +465,19 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
     j = 4*(active_project -> nspec + 1) * i;
     clean_curves_data (RIN, j+4*active_project -> rsparam[i][0], j+4*(active_project -> rsparam[i][0]+1));
     clean_rings_data (i, active_glwin);
-    active_glwin -> all_rings[i] = g_malloc0 (active_project -> steps*sizeof*active_glwin -> all_rings[i]);
-    active_glwin -> num_rings[i] = g_malloc0 (active_project -> steps*sizeof*active_glwin -> num_rings[i]);
-    active_glwin -> show_rpoly[i] = g_malloc0 (active_project -> steps*sizeof*active_glwin -> show_rpoly[i]);
+    active_glwin -> all_rings[i] = g_malloc0(active_project -> steps*sizeof*active_glwin -> all_rings[i]);
+    active_glwin -> num_rings[i] = g_malloc0(active_project -> steps*sizeof*active_glwin -> num_rings[i]);
+    active_glwin -> show_rpoly[i] = g_malloc0(active_project -> steps*sizeof*active_glwin -> show_rpoly[i]);
     active_glwin -> ring_max[i] = active_project -> rsparam[i][1];
     active_glwin -> rings = TRUE;
     for (j=0; j<active_project -> steps; j++)
     {
-      active_glwin -> all_rings[i][j] = g_malloc0 (active_project -> rsparam[i][1]*sizeof*active_glwin -> all_rings[i][j]);
+      active_glwin -> all_rings[i][j] = g_malloc0(active_project -> rsparam[i][1]*sizeof*active_glwin -> all_rings[i][j]);
       active_glwin -> num_rings[i][j] = allocint (active_project -> rsparam[i][1]);
-      active_glwin -> show_rpoly[i][j] = g_malloc (active_project -> rsparam[i][1]*sizeof*active_glwin -> show_rpoly[i][j]);
+      active_glwin -> show_rpoly[i][j] = g_malloc0(active_project -> rsparam[i][1]*sizeof*active_glwin -> show_rpoly[i][j]);
       for (k=0; k < active_project -> natomes; k++)
       {
-        active_project -> atoms[j][k].rings[i] = g_malloc0 (active_project -> rsparam[i][1]*sizeof*active_project -> atoms[j][k].rings[i]);
+        active_project -> atoms[j][k].rings[i] = g_malloc0(active_project -> rsparam[i][1]*sizeof*active_project -> atoms[j][k].rings[i]);
       }
     }
     prepostcalc (widg, FALSE, RIN, 0, opac);

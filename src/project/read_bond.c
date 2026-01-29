@@ -53,7 +53,7 @@ int read_bonding (FILE * fp)
 {
   int i, j, k, l, m;
   distance clo;
-  coord_info * coord = g_malloc0 (sizeof*coord);
+  coord_info * coord = g_malloc0(sizeof*coord);
   coord -> species = active_project -> nspec;
   image * img = active_glwin -> anim -> last -> img;
   gboolean read_bond = FALSE;
@@ -64,7 +64,7 @@ int read_bonding (FILE * fp)
   if (read_bond)
   {
     active_glwin -> bonds = allocdint (active_project -> steps, 2);
-    active_glwin -> bondid = g_malloc0 (active_project -> steps*sizeof*active_glwin -> bondid);
+    active_glwin -> bondid = g_malloc0(active_project -> steps*sizeof*active_glwin -> bondid);
     for (i=0; i<active_project -> steps; i++)
     {
       for (j=0; j<active_project -> natomes; j++)
@@ -78,7 +78,7 @@ int read_bonding (FILE * fp)
         }
       }
       if (fread (active_glwin -> bonds[i], sizeof(int), 2, fp) != 2) return ERROR_COORD;
-      active_glwin -> bondid[i] = g_malloc0 (2*sizeof*active_glwin -> bondid[i]);
+      active_glwin -> bondid[i] = g_malloc0(2*sizeof*active_glwin -> bondid[i]);
       for (j=0; j<2; j++)
       {
         if (active_glwin -> bonds[i][j])
@@ -107,18 +107,18 @@ int read_bonding (FILE * fp)
     {
       coord -> ntg[i] = allocint(coord -> species);
       if (fread (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
-      coord -> geolist[i] = g_malloc0 (coord -> species*sizeof*coord -> geolist[i]);
-      if (i == 1) coord -> partial_geo = g_malloc0 (coord -> species*sizeof*coord -> partial_geo);
+      coord -> geolist[i] = g_malloc0(coord -> species*sizeof*coord -> geolist[i]);
+      if (i == 1) coord -> partial_geo = g_malloc0(coord -> species*sizeof*coord -> partial_geo);
       for (j=0; j<coord -> species; j++)
       {
-        coord -> geolist[i][j] = g_malloc0 (coord -> ntg[i][j]*sizeof*coord -> geolist[i][j]);
+        coord -> geolist[i][j] = g_malloc0(coord -> ntg[i][j]*sizeof*coord -> geolist[i][j]);
         if (fread (coord -> geolist[i][j], sizeof(int), coord -> ntg[i][j], fp) != coord -> ntg[i][j]) return ERROR_COORD;
         if (i == 1)
         {
-          coord -> partial_geo[j] = g_malloc0 (coord -> ntg[i][j]*sizeof*coord -> partial_geo[j]);
+          coord -> partial_geo[j] = g_malloc0(coord -> ntg[i][j]*sizeof*coord -> partial_geo[j]);
           for (k=0; k<coord -> ntg[i][j]; k++)
           {
-            coord -> partial_geo[j][k] = g_malloc0 (coord -> species*sizeof*coord -> partial_geo[j][k]);
+            coord -> partial_geo[j][k] = g_malloc0(coord -> species*sizeof*coord -> partial_geo[j][k]);
             if (fread (coord -> partial_geo[j][k], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
           }
         }

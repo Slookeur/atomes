@@ -407,7 +407,7 @@ void invert_selection (project * this_proj)
     i = this_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
     if (i < this_proj -> natomes)
     {
-      saved_c = g_malloc0 ((this_proj -> natomes - i)*sizeof*saved_c);
+      saved_c = g_malloc0((this_proj -> natomes - i)*sizeof*saved_c);
       k = 0;
       for (j=0; j<this_proj -> natomes; j++)
       {
@@ -425,7 +425,7 @@ void invert_selection (project * this_proj)
     this_proj -> modelgl -> saved_coord[1] = NULL;
     if (saved_c)
     {
-      this_proj -> modelgl -> saved_coord[1] = g_malloc0 ((this_proj -> natomes - i)*sizeof*this_proj -> modelgl -> saved_coord[1]);
+      this_proj -> modelgl -> saved_coord[1] = g_malloc0((this_proj -> natomes - i)*sizeof*this_proj -> modelgl -> saved_coord[1]);
       for (j=0; j<this_proj -> natomes - i; j++)
       {
         this_proj -> modelgl -> saved_coord[1][j] = duplicate_double(3, saved_c[j]);

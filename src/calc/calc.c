@@ -120,7 +120,7 @@ atom_selection * duplicate_ogl_selection (atom_selection * old_sel)
 {
   int i, j;
   atom_in_selection * at, * bt;
-  atom_selection * new_sel = g_malloc0 (sizeof*new_sel);
+  atom_selection * new_sel = g_malloc0(sizeof*new_sel);
   if (! old_sel -> selected) return new_sel;
   new_sel -> selected = old_sel -> selected;
   at = old_sel -> first;

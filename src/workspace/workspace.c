@@ -168,8 +168,8 @@ static void fill_workspace (GtkTreeStore * store)
   if (prpath != NULL) g_free (prpath);
   if (nprojects > 0)
   {
-    piter = g_malloc (nprojects*sizeof*piter);
-    prpath = g_malloc (nprojects*sizeof*prpath);
+    piter = g_malloc0(nprojects*sizeof*piter);
+    prpath = g_malloc0(nprojects*sizeof*prpath);
   }
   for (i=0; i<nprojects; i++)
   {
@@ -611,15 +611,15 @@ void add_project_to_workspace ()
     if (projects_in_workspace > 0)
     {
       GtkTreeIter ** tmpiter;
-      tmpiter = g_malloc (projects_in_workspace*sizeof*tmpiter);
+      tmpiter = g_malloc0(projects_in_workspace*sizeof*tmpiter);
       for (i=0; i<projects_in_workspace; i++)
       {
         tmpiter[i] = gtk_tree_iter_copy (& piter[i]);
       }
       if (piter != NULL) g_free (piter);
       if (prpath != NULL) g_free (prpath);
-      piter = g_malloc ((projects_in_workspace+1)*sizeof*piter);
-      prpath = g_malloc ((projects_in_workspace+1)*sizeof*prpath);
+      piter = g_malloc0((projects_in_workspace+1)*sizeof*piter);
+      prpath = g_malloc0((projects_in_workspace+1)*sizeof*prpath);
       for (i=0; i<projects_in_workspace; i++)
       {
         piter[i] = * gtk_tree_iter_copy (tmpiter[i]);
@@ -632,8 +632,8 @@ void add_project_to_workspace ()
     {
       if (prpath != NULL) g_free (prpath);
       if (piter != NULL) g_free (piter);
-      piter = g_malloc ((projects_in_workspace+1)*sizeof*piter);
-      prpath = g_malloc ((projects_in_workspace+1)*sizeof*prpath);
+      piter = g_malloc0((projects_in_workspace+1)*sizeof*piter);
+      prpath = g_malloc0((projects_in_workspace+1)*sizeof*prpath);
     }
     add_project (workstore, activep);
     newspace = FALSE;
@@ -677,7 +677,7 @@ void remove_project_from_workspace (int id)
     }
     if (projects_in_workspace > 1)
     {
-      tmpiter = g_malloc ((projects_in_workspace-1)*sizeof*tmpiter);
+      tmpiter = g_malloc0((projects_in_workspace-1)*sizeof*tmpiter);
       j = -1;
       for (i=0; i<projects_in_workspace; i++)
       {
@@ -691,8 +691,8 @@ void remove_project_from_workspace (int id)
       g_free (piter);
       g_free (prpath);
       projects_in_workspace --;
-      piter = g_malloc (projects_in_workspace*sizeof*piter);
-      prpath = g_malloc (projects_in_workspace*sizeof*prpath);
+      piter = g_malloc0(projects_in_workspace*sizeof*piter);
+      prpath = g_malloc0(projects_in_workspace*sizeof*prpath);
       j = -1;
       for (i=0; i<projects_in_workspace+1; i++)
       {

@@ -335,7 +335,7 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
                                              a_ato*tmp_fmol -> multi,
                                              -1,
                                              new_at);
-          tmp_fbt -> next -> prev = g_malloc (sizeof*tmp_fbt -> next -> prev);
+          tmp_fbt -> next -> prev = g_malloc0(sizeof*tmp_fbt -> next -> prev);
           tmp_fbt -> next -> prev = tmp_fbt;
           tmp_fmol -> atoms ++;
           clean_old_atom (tmp_fat, a_ato, new_at);

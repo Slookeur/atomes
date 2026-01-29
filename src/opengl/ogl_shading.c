@@ -98,7 +98,7 @@ GLuint create_shader (int type, const GLchar * src)
     int log_len;
     char *buffer;
     glGetShaderiv (shader, GL_INFO_LOG_LENGTH, & log_len);
-    buffer = g_malloc (log_len + 1);
+    buffer = g_malloc0(log_len + 1);
     glGetShaderInfoLog (shader, log_len, NULL, buffer);
     g_warning ("Compile failure in %s shader:\n%s",
                type == GL_VERTEX_SHADER ? "vertex" : "fragment",
@@ -509,7 +509,7 @@ void glsl_bind_string (glsl_program * glsl, object_3d * obj)
 */
 object_3d * duplicate_object_3d (object_3d * old_obj)
 {
-  object_3d * new_obj = g_malloc0 (sizeof*new_obj);
+  object_3d * new_obj = g_malloc0(sizeof*new_obj);
   new_obj -> quality = old_obj -> quality;
   // Vertices
   new_obj -> num_vertices = old_obj -> num_vertices;
@@ -557,7 +557,7 @@ glsl_program * init_shader_program (int object, int object_id,
                                     const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                     GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
 {
-  glsl_program * glsl = g_malloc0 (sizeof * glsl);
+  glsl_program * glsl = g_malloc0(sizeof * glsl);
 
   glsl -> id = glCreateProgram ();
   glsl -> object = object;
@@ -789,7 +789,7 @@ void init_shaders (glwin * view)
     view -> ogl_glsl[i] = NULL;
     if (in_md_shaders (this_proj, i))
     {
-      view -> ogl_glsl[i] = g_malloc0 (this_proj -> steps*sizeof*view -> ogl_glsl[i]);
+      view -> ogl_glsl[i] = g_malloc0(this_proj -> steps*sizeof*view -> ogl_glsl[i]);
       view -> n_shaders[i] = allocint (this_proj -> steps);
       for (j=0; j<this_proj -> steps; j++)
       {
@@ -799,7 +799,7 @@ void init_shaders (glwin * view)
     else
     {
       j = (i == MEASU) ? 2 : 1;
-      view -> ogl_glsl[i] = g_malloc0 (j*sizeof*view -> ogl_glsl[i]);
+      view -> ogl_glsl[i] = g_malloc0(j*sizeof*view -> ogl_glsl[i]);
       view -> ogl_glsl[i][0] = NULL;
       view -> n_shaders[i] = allocint (j);
     }

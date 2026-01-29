@@ -555,7 +555,7 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
         {
           if (nbonds[style][type][h][i][j])
           {
-            cyl = g_malloc0 (sizeof*cyl);
+            cyl = g_malloc0(sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
             cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
@@ -651,7 +651,7 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
         {
           if (nbonds[style][type][h][i][j])
           {
-            cyl = g_malloc0 (sizeof*cyl);
+            cyl = g_malloc0(sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
             cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
@@ -722,7 +722,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
   }
   else
   {
-    atos = g_malloc0 (sizeof*atos);
+    atos = g_malloc0(sizeof*atos);
     atos -> vert_buffer_size = 3;
     atos -> num_vertices = 1;
     atos -> vertices = allocfloat (3);
@@ -915,7 +915,7 @@ int create_selection_lists ()
     }
   }
   if (! nshaders) return 0;
-  wingl -> ogl_glsl[SELEC][step] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[SELEC][step]);
+  wingl -> ogl_glsl[SELEC][step] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[SELEC][step]);
   h = 0;
   for (k=0; k<j; k++)
   {
@@ -1000,7 +1000,7 @@ int create_pick_lists ()
   wingl -> color_to_pick = allocint(i);
 
   wingl -> n_shaders[PICKS][0] = nshaders;
-  wingl -> ogl_glsl[PICKS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[PICKS][0]);
+  wingl -> ogl_glsl[PICKS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[PICKS][0]);
 
   gColorID[0] = gColorID[1] = gColorID[2] = 0;
   create_atom_lists (TRUE);

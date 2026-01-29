@@ -1662,7 +1662,7 @@ GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
 */
 ColRGBA * duplicate_color (int num, ColRGBA * col)
 {
-  ColRGBA * new_col = g_malloc0 (num*sizeof*new_col);
+  ColRGBA * new_col = g_malloc0(num*sizeof*new_col);
   int i;
   for (i=0; i<num; i++) new_col[i] = col[i];
   return new_col;

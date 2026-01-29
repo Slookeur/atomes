@@ -612,7 +612,7 @@ void prepare_measure_shaders (int mode)
     if (plot -> mpattern[mode] > -1)
     {
       // First the bond distances
-      measure = g_malloc0 (sizeof*measure);
+      measure = g_malloc0(sizeof*measure);
       measure -> vert_buffer_size = LINE_BUFF_SIZE;
       measure -> num_vertices = 2 * num_bonds (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
@@ -634,7 +634,7 @@ void prepare_measure_shaders (int mode)
       // The angles
       if (plot -> selected[mode] -> selected > 2)
       {
-        measure = g_malloc0 (sizeof*measure);
+        measure = g_malloc0(sizeof*measure);
         measure -> vert_buffer_size = LINE_BUFF_SIZE;
         measure -> num_vertices = 3 * num_angles (plot -> selected[mode] -> selected) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         measure -> vertices = allocfloat (measure -> vert_buffer_size*measure -> num_vertices);
@@ -713,7 +713,7 @@ void create_measures_lists ()
     measures_drawing = 0;
     for (k=i; k<2; k++)
     {
-      wingl -> ogl_glsl[MEASU][k] = g_malloc0 (wingl -> n_shaders[MEASU][k]*sizeof*wingl -> ogl_glsl[MEASU][k]);
+      wingl -> ogl_glsl[MEASU][k] = g_malloc0(wingl -> n_shaders[MEASU][k]*sizeof*wingl -> ogl_glsl[MEASU][k]);
       prepare_measure_shaders (k);
     }
   }

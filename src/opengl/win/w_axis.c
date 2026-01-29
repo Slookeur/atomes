@@ -571,12 +571,12 @@ G_MODULE_EXPORT void use_axis_default_colors (GtkToggleButton * but, gpointer da
   {
     if (! preferences)
     {
-      view -> anim -> last -> img -> xyz -> color = g_malloc (3*sizeof*view -> anim -> last -> img -> xyz -> color);
+      view -> anim -> last -> img -> xyz -> color = g_malloc0(3*sizeof*view -> anim -> last -> img -> xyz -> color);
       init_axis_colors (view -> anim -> last -> img -> xyz -> color, the_axis);
     }
     else
     {
-      tmp_axis -> color = g_malloc (3*sizeof*tmp_axis -> color);
+      tmp_axis -> color = g_malloc0(3*sizeof*tmp_axis -> color);
       init_axis_colors (tmp_axis -> color, the_axis);
     }
 

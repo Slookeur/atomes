@@ -275,7 +275,7 @@ int * light_source_to_be_removed (int val, Lightning * ogl_lightning, opengl_edi
   }
   bbox (vbox, str);
   g_free (str);
-  light_but = g_malloc (ogl_lightning -> lights * sizeof*light_but);
+  light_but = g_malloc0(ogl_lightning -> lights * sizeof*light_but);
   for (i=0; i<ogl_lightning -> lights; i++)
   {
     str = g_strdup_printf ("Light N°%d", i+1);
@@ -404,7 +404,7 @@ Light copy_light_source (Light old_sp)
 Light * copy_light_sources (int dima, int dimb, Light * old_sp)
 {
   int j;
-  Light * new_sp = g_malloc (dima*sizeof * new_sp);
+  Light * new_sp = g_malloc0(dima*sizeof * new_sp);
   for (j=0; j<dimb; j++)
   {
     //print_light_source (old_sp[j], j);
@@ -611,7 +611,7 @@ void add_remove_lights (int val, gpointer data)
 #endif
       }
       g_free (this_lightning -> spot);
-      this_lightning -> spot = g_malloc (val*sizeof*this_lightning -> spot);
+      this_lightning -> spot = g_malloc0(val*sizeof*this_lightning -> spot);
       m = -1;
       for (j=0; j<i; j++)
       {
@@ -1715,7 +1715,7 @@ G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *)data;
   if (view -> opengl_win == NULL)
   {
-    view -> opengl_win = g_malloc0 (sizeof*view -> opengl_win);
+    view -> opengl_win = g_malloc0(sizeof*view -> opengl_win);
     view -> opengl_win -> proj = view -> proj;
     int i;
     for (i=0; i<6; i++)

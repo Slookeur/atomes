@@ -949,19 +949,19 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
     }
     if (! view -> volume_win -> fm_compb[geo-2][i])
     {
-      view -> volume_win -> fm_compb[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win ->fm_compb[geo-2][i]);
+      view -> volume_win -> fm_compb[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win ->fm_compb[geo-2][i]);
     }
     if (! view -> volume_win -> fm_hbvol[geo-2][i])
     {
-      view -> volume_win -> fm_hbvol[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hbvol[geo-2][i]);
+      view -> volume_win -> fm_hbvol[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hbvol[geo-2][i]);
     }
     if (! view -> volume_win -> fm_hboxv[geo-2][i])
     {
-      view -> volume_win -> fm_hboxv[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hboxv[geo-2][i]);
+      view -> volume_win -> fm_hboxv[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hboxv[geo-2][i]);
     }
     if (! view -> volume_win -> fm_lab_vol[geo-2][i])
     {
-      view -> volume_win -> fm_lab_vol[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_lab_vol[geo-2][i]);
+      view -> volume_win -> fm_lab_vol[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_lab_vol[geo-2][i]);
     }
   }
   GtkWidget * fragtab;
@@ -1125,7 +1125,7 @@ G_MODULE_EXPORT void window_volumes (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *) data;
   if (view -> volume_win == NULL)
   {
-    view -> volume_win = g_malloc0 (sizeof*view -> volume_win);
+    view -> volume_win = g_malloc0(sizeof*view -> volume_win);
     project * this_proj = get_project_by_id (view -> proj);
     gchar * str = g_strdup_printf ("%s - volumes", this_proj -> name);
     view -> volume_win -> win = create_win (str, view -> win, FALSE, FALSE);

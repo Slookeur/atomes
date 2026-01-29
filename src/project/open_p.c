@@ -83,7 +83,7 @@ gboolean version_2_9_and_above;
 char * read_string (int i, FILE * fp)
 {
   char * tmp = NULL;
-  tmp = g_malloc0 (i*sizeof*tmp);
+  tmp = g_malloc0(i*sizeof*tmp);
   int j;
   for (j=0; j<i; j++)
   {
@@ -155,6 +155,9 @@ void initcnames (project * this_proj, int rid)
     case MSD:
       init_msd (this_proj);
       break;
+    case SKT:
+      init_sq (this_proj, rid);
+      break;
   }
 }
 
@@ -173,10 +176,10 @@ void allocatoms (project * this_proj)
     g_free (this_proj -> atoms);
     this_proj -> atoms = NULL;
   }
-  this_proj -> atoms = g_malloc0 (this_proj -> steps*sizeof*this_proj -> atoms);
+  this_proj -> atoms = g_malloc0(this_proj -> steps*sizeof*this_proj -> atoms);
   for (i=0; i < this_proj -> steps; i++)
   {
-    this_proj -> atoms[i] = g_malloc0 (this_proj -> natomes*sizeof*this_proj -> atoms[i]);
+    this_proj -> atoms[i] = g_malloc0(this_proj -> natomes*sizeof*this_proj -> atoms[i]);
     for (j=0; j<this_proj -> natomes; j++)
     {
       this_proj -> atoms[i][j].style = NONE;
@@ -193,9 +196,9 @@ void allocatoms (project * this_proj)
 */
 chemical_data * alloc_chem_data (int spec)
 {
-  chemical_data * chem = g_malloc0 (sizeof*chem);
-  chem -> label = g_malloc0 (spec*sizeof*chem -> label);
-  chem -> element = g_malloc0 (spec*sizeof*chem -> element);
+  chemical_data * chem = g_malloc0(sizeof*chem);
+  chem -> label = g_malloc0(spec*sizeof*chem -> label);
+  chem -> element = g_malloc0(spec*sizeof*chem -> element);
   chem -> nsps = allocint (spec);
   chem -> formula = allocint (spec);
   chem -> grtotcutoff = default_totcut;
@@ -381,7 +384,7 @@ int open_project (FILE * fp)
   if (fread (& i,  sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (i > 1 && i != active_project -> steps) return ERROR_PROJECT;
   if (i > 1) active_cell -> npt = TRUE;
-  active_cell -> box = g_malloc0 (i*sizeof*active_cell -> box);
+  active_cell -> box = g_malloc0(i*sizeof*active_cell -> box);
   active_box = & active_cell -> box[0];
   for (j=0; j<i; j++)
   {
@@ -522,7 +525,10 @@ int open_project (FILE * fp)
               active_project -> analysis[i] -> num_delta = tmp_num_delta[i];
               active_project -> analysis[i] -> min = tmp_min[i];
               active_project -> analysis[i] -> max = tmp_max[i];
-              if (active_project -> analysis[i] -> avail_ok) initcnames (active_project, i);
+              if (active_project -> analysis[i] -> init_ok)
+              {
+                initcnames (active_project, i);
+              }
             }
           }
           g_free (tmp_avail);
@@ -575,9 +581,9 @@ int open_project (FILE * fp)
     // error
     return ERROR_NO_WAY;
   }
-/* #ifdef DEBUG
-  debugioproj (active_project, "READ INIT");
-#endif */
+#ifdef DEBUG
+  // debugioproj (active_project, "READ INIT");
+#endif
   if (update_project() == 1)
   {
     if (active_project -> initgl)

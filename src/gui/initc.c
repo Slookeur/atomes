@@ -139,7 +139,7 @@ void alloc_analysis_curves (int pid, atomes_analysis * this_analysis)
     g_free (this_analysis -> idcc);
     this_analysis -> idcc = NULL;
   }
-  this_analysis -> idcc = g_malloc0 (this_analysis -> numc*sizeof*this_analysis -> idcc);
+  this_analysis -> idcc = g_malloc0(this_analysis -> numc*sizeof*this_analysis -> idcc);
   for (i = 0; i < this_analysis -> numc; i++)
   {
     this_analysis -> idcc[i].a = pid;
@@ -151,10 +151,10 @@ void alloc_analysis_curves (int pid, atomes_analysis * this_analysis)
     g_free (this_analysis -> curves);
     this_analysis -> curves = NULL;
   }
-  this_analysis -> curves = g_malloc (this_analysis -> numc*sizeof*this_analysis -> curves);
+  this_analysis -> curves = g_malloc0(this_analysis -> numc*sizeof*this_analysis -> curves);
   for (i = 0; i < this_analysis -> numc; i++)
   {
-    this_analysis -> curves[i] = g_malloc0 (sizeof*this_analysis -> curves[i]);
+    this_analysis -> curves[i] = g_malloc0(sizeof*this_analysis -> curves[i]);
   }
 }
 

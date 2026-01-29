@@ -267,7 +267,7 @@ GtkWidget * show_atoms_submenu (glwin * view, int id, int at)
   project * this_proj = get_project_by_id (view -> proj);
   if (id == 0)
   {
-    view -> ogl_spec[at] = g_malloc (this_proj -> nspec*sizeof*view -> ogl_spec[at]);
+    view -> ogl_spec[at] = g_malloc0(this_proj -> nspec*sizeof*view -> ogl_spec[at]);
   }
   int i;
   for (i=0; i< this_proj -> nspec; i++)
@@ -370,7 +370,7 @@ GtkWidget * label_atoms_submenu (glwin * view, int id, int at)
   gboolean sensitive = (! at) ? TRUE : view -> anim -> last -> img -> draw_clones;
   if (id == 0)
   {
-    view -> ogl_lab[at] = g_malloc (this_proj -> nspec*sizeof*view -> ogl_lab[at]);
+    view -> ogl_lab[at] = g_malloc0(this_proj -> nspec*sizeof*view -> ogl_lab[at]);
   }
   int i;
   for (i=0; i< this_proj -> nspec; i++)

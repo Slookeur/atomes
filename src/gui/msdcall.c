@@ -109,7 +109,7 @@ void init_msd (project * this_proj)
   this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Drift[z]");
 
   add_curve_widgets (this_proj, MSD);
-  this_proj -> analysis[MSD] -> init_ok=TRUE;
+  this_proj -> analysis[MSD] -> init_ok = TRUE;
 }
 
 /*!

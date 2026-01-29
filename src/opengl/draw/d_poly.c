@@ -694,9 +694,9 @@ void create_poly_lists ()
       }
       if (ptot > 0)
       {
-        wingl -> ogl_glsl[POLYS][step] = g_malloc0 (sizeof*wingl -> ogl_glsl[POLYS][step]);
+        wingl -> ogl_glsl[POLYS][step] = g_malloc0(sizeof*wingl -> ogl_glsl[POLYS][step]);
         wingl -> n_shaders[POLYS][step] = 1;
-        object_3d * poly = g_malloc0 (sizeof*poly);
+        object_3d * poly = g_malloc0(sizeof*poly);
         poly -> vert_buffer_size = POLY_BUFF_SIZE;
         poly -> num_vertices = ptot * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
         poly -> vertices = allocfloat (poly -> vert_buffer_size*poly -> num_vertices);

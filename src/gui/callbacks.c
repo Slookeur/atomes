@@ -240,7 +240,7 @@ int open_save_workspace (FILE * fp, int act)
   if (act == 0)
   {
     if (fread (& i, sizeof(int), 1, fp) != 1) return 1;
-    ver = g_malloc0 (i*sizeof*ver);
+    ver = g_malloc0(i*sizeof*ver);
     if (fread (ver, sizeof(char), i, fp) != i) return 1;
     // test on ver for version
     g_free (ver);
@@ -1058,7 +1058,7 @@ G_MODULE_EXPORT void update_at_sp (GtkEntry * res, gpointer data)
         if (this_reader -> z) g_free (this_reader -> z);
         this_reader -> z = allocdouble (v);
         if (this_reader -> label) g_free (this_reader -> label);
-        this_reader -> label = g_malloc0 (v*sizeof*this_reader -> label);
+        this_reader -> label = g_malloc0(v*sizeof*this_reader -> label);
       }
       up = TRUE;
     }
@@ -1271,7 +1271,7 @@ int open_coordinate_file (int id)
   int result;
   int length = strlen(active_project -> coordfile);
   clock_gettime (CLOCK_MONOTONIC, & sta_time);
-  this_reader = g_malloc0 (sizeof*this_reader);
+  this_reader = g_malloc0(sizeof*this_reader);
   // Set default message type to warning
   this_reader -> mid = 1;
   switch (id)

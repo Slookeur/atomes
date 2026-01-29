@@ -341,12 +341,12 @@ void print_dlp_improper_inversion (int di, GtkTextBuffer * buf, field_struct * d
                         {
                           if (! first_imp_inv)
                           {
-                            first_imp_inv = g_malloc0 (sizeof*first_imp_inv);
+                            first_imp_inv = g_malloc0(sizeof*first_imp_inv);
                             this_ii = first_imp_inv;
                           }
                           else
                           {
-                            this_ii -> next = g_malloc0 (sizeof*this_ii);
+                            this_ii -> next = g_malloc0(sizeof*this_ii);
                             this_ii -> next -> prev = this_ii;
                             this_ii = this_ii -> next;
                           }

@@ -114,7 +114,7 @@ void autoscale (gpointer data)
 */
 CurveExtra * init_extra (tint * id)
 {
-  CurveExtra * ctmp = g_malloc0 (sizeof*ctmp);
+  CurveExtra * ctmp = g_malloc0(sizeof*ctmp);
   ctmp -> id.a = id -> a;
   ctmp -> id.b = id -> b;
   ctmp -> id.c = id -> c;
