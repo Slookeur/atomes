@@ -177,9 +177,7 @@ do t=1, MAX_IN+1
 
 enddo
 
-write (6, *) "Before saving"
 s_of_k_t = SKT_SAVE ()
-write (6, *) "After saving :: s_of_k_t = ",s_of_k_t
 
 001 continue
 
@@ -213,7 +211,7 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
   INTEGER :: NUMTH
   NUMTH = OMP_GET_MAX_THREADS ()
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
-
+  ! OpemMP on Qvect
   !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
   !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t0, t, n_origins, RHO_C, RHO_S, LocalCorr, Corr) &
   !$OMP& SHARED(NUMTH, NUMBER_OF_QVECT, SQT, NQ_IN, modq, qvmin, DELTA_Q) &
@@ -382,7 +380,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
-            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
+            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(k), SQTAB(m)
           endif
         enddo
         ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
@@ -403,7 +401,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
-            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(m), SQTAB(m)
+            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(k), SQTAB(m)
           endif
         enddo
         ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)

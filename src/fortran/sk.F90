@@ -228,12 +228,12 @@ SUBROUTINE FOURIER_TRANS_QVECT ()
 
   NUMTH = OMP_GET_MAX_THREADS ()
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
- ! OpemMP on Qvect
- !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
- !$OMP& PRIVATE(qx, qy, qz, cij, sik, qtr, sini, cosi, i, j, k, l, m, sp) &
- !$OMP& SHARED(NUMTH, qvectx, qvecty, qvectz, &
- !$OMP& FULLPOS, NS, NSP, NA, LOT, DELTA_Q, NUMBER_OF_QVECT, NQ, modq, qvmin, Sij)
- !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
+  ! OpemMP on Qvect
+  !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
+  !$OMP& PRIVATE(qx, qy, qz, cij, sik, qtr, sini, cosi, i, j, k, l, m, sp) &
+  !$OMP& SHARED(NUMTH, qvectx, qvecty, qvectz, &
+  !$OMP& FULLPOS, NS, NSP, NA, LOT, DELTA_Q, NUMBER_OF_QVECT, NQ, modq, qvmin, Sij)
+  !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
   do j=1, NUMBER_OF_QVECT
 
     l=AnINT((modq(j)-qvmin)/DELTA_Q)+1

@@ -254,6 +254,10 @@ if (OVERALL_CUBIC) then
   enddo
 endif
 
+!do i=1, NQ
+!  write (6, *) "i= ",i,", K_POINT(i)= ",K_POINT(i)
+!enddo
+
 CQVF=1
 
 001 continue
