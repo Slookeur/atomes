@@ -276,9 +276,11 @@ END SUBROUTINE
 INTEGER FUNCTION SKT_SAVE ()
 
 USE PARAMETERS
+USE MENDELEIEV
 
 INTEGER :: NSQ
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
+CHARACTER (LEN=20) :: NOM_F
 
 INTERFACE
   LOGICAL FUNCTION FZBT (NDQ, SQIJ)
@@ -318,9 +320,6 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   do t=1, MAX_IN+1
 
-    write (6 , *)
-    write (6, '("t = ",i4)') t
-
     SQTAB(:)=0.0d0
     i = 0;
     do k=1, NQ_IN
@@ -339,7 +338,6 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
         SQTAB(i)= NSQT(k,t)
       endif
     enddo
-
     ! call save_curve (NSQ, SQTAB, (t-1)*h, IDSKT)
 
     i=0
@@ -375,14 +373,17 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, NSP
       do j=1, NSP
         m=0
+        NOM_F="Sij-"//ATSYM(XSCATTL(i))//"-"//ATSYM(XSCATTL(j))//".dat"
+        open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
           Sij(k,i,j) = SQT(k,t,i,j)
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
-            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(k), SQTAB(m)
+            if (t .eq. 1) write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
+        close (9)
         ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
         l=l+2
       enddo
@@ -397,13 +398,16 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, NSP
       do j=1, NSP
         m=0
+        NOM_F="Fij-"//ATSYM(XSCATTL(i))//"-"//ATSYM(XSCATTL(j))//".dat"
+        open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
-            if (i.eq.1 .and. j.eq.1) write (6, '(i4,3x,f15.10,4x,f15.10)') t-1, K_POINT(k), SQTAB(m)
+            if (t .eq. 1) write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
+        close (9)
         ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
         l=l+2
       enddo

@@ -1245,6 +1245,7 @@
 		<Unit filename="src/fortran/rings-primitive.F90" />
 		<Unit filename="src/fortran/rings_ogl.F90" />
 		<Unit filename="src/fortran/sk.F90" />
+		<Unit filename="src/fortran/skt.F90" />
 		<Unit filename="src/fortran/spherical.F90" />
 		<Unit filename="src/fortran/sq.F90" />
 		<Unit filename="src/fortran/threads.F90" />
@@ -1412,6 +1413,9 @@
 			<Option target="cleancalc" />
 			<Option target="cleanogl" />
 			<Option target="cleanpoly" />
+		</Unit>
+		<Unit filename="src/gui/sktcall.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/gui/spcall.c">
 			<Option compilerVar="CC" />
