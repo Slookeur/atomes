@@ -81,14 +81,14 @@ endif
 XSQT(:,:) = 0.0d0
 
 ! Allocate density arrays RHO_C and RHO_S
-ALLOCATE(RHO_C(NS, NSP), STAT=ERR)
+ALLOCATE(RHO_C(MAX_IN+1, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: RHO_C"//CHAR(0))
   s_of_k_t = 0
   goto 001
 endif
-ALLOCATE(RHO_S(NS, NSP), STAT=ERR)
+ALLOCATE(RHO_S(MAX_IN+1, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: RHO_S"//CHAR(0))
@@ -231,18 +231,21 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
       qy=qvecty(q)
       qz=qvectz(q)
 
-      ! Compute density history for this Q vector
-      do k=1, NS
+      do t=0, MAX_IN-1
+
+        ! Compute density history for this Q vector
+        k = 1+t*NS/MAX_IN
         do i=1, NA
           j = LOT(i)
           qtr = qx*FULLPOS(i,1,k) + qy*FULLPOS(i,2,k) + qz*FULLPOS(i,3,k)
-          RHO_C(k, j) = RHO_C(k, j) + cos(qtr)
-          RHO_S(k, j) = RHO_S(k, j) + sin(qtr)
+          RHO_C(t+1, j) = RHO_C(t+1, j) + cos(qtr)
+          RHO_S(t+1, j) = RHO_S(t+1, j) + sin(qtr)
         enddo
+
       enddo
 
-      do t=0, MAX_IN
-        n_origins = NS - t
+      do t=0, MAX_IN-1
+        n_origins = MAX_IN - t
         do t0=1, n_origins
           do m=1, NSP
             do n=1, NSP
@@ -281,6 +284,7 @@ USE MENDELEIEV
 INTEGER :: NSQ
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
 CHARACTER (LEN=20) :: NOM_F
+CHARACTER (LEN=15) :: NOM_S
 
 INTERFACE
   LOGICAL FUNCTION FZBT (NDQ, SQIJ)
@@ -320,6 +324,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   do t=1, MAX_IN+1
 
+    call CHARINT(NOM_S, t-1)
     SQTAB(:)=0.0d0
     i = 0;
     do k=1, NQ_IN
@@ -373,14 +378,15 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, NSP
       do j=1, NSP
         m=0
-        NOM_F="Sij-"//ATSYM(XSCATTL(i))//"-"//ATSYM(XSCATTL(j))//".dat"
+
+        NOM_F="Sij-"//ATSYM(INT(XSCATTL(i)))//"-"//ATSYM(INT(XSCATTL(j)))//"-t-"//NOM_S(2:LEN_TRIM(NOM_S))//".dat"
         open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
           Sij(k,i,j) = SQT(k,t,i,j)
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
-            if (t .eq. 1) write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
+            write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
         close (9)
@@ -398,13 +404,13 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, NSP
       do j=1, NSP
         m=0
-        NOM_F="Fij-"//ATSYM(XSCATTL(i))//"-"//ATSYM(XSCATTL(j))//".dat"
+        NOM_F="Fij-"//ATSYM(INT(XSCATTL(i)))//"-"//ATSYM(INT(XSCATTL(j)))//"-t-"//NOM_S(2:LEN_TRIM(NOM_S))//".dat"
         open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
-            if (t .eq. 1) write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
+            write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
         close (9)
