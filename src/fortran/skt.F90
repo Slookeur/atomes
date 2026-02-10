@@ -245,7 +245,7 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
       enddo
 
       do t=0, MAX_IN-1
-        n_origins = MAX_IN - t
+        n_origins = MAX_IN-t
         do t0=1, n_origins
           do m=1, NSP
             do n=1, NSP
@@ -322,7 +322,7 @@ NSQ=i
 
 if (NSQ .gt. 0) then  ! If wave vectors exist
 
-  do t=1, MAX_IN+1
+  do t=1, MAX_IN
 
     call CHARINT(NOM_S, t-1)
     SQTAB(:)=0.0d0
