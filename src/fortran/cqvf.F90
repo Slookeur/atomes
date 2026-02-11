@@ -151,9 +151,9 @@ do i=1, 2
 !                   minr < qmod < limq
 !       where 'minr' is minimum q modulus accessible considering the analyzed
 !       lattice ie. the minimum modulus of the reciprocal cell vectors,
-!       limq is the limit to be fixed for the FSDP part of the spectra
+!       'limq' is the limit to be fixed for the FSDP part of the spectra
 !       Thereafter: QMIN=minr**2 and LIMQ2=limq**2.
-!       The qvectors with a qmod > limq are accepted with a probability of PROBA
+!       The qvectors with a 'qmod > limq' are accepted with a probability of 'PROBA'
 
         if (qvmod .le. QMAX2 .and. qvmod .ge. QMIN2) then
           KPTS=.true.
@@ -216,13 +216,6 @@ if (ERR .ne. 0) then
   goto 001
 endif
 degeneracy(:)=0
-
-! We do not sort the Q vectors by modulus,
-! to save CPU time we discretize the distribution
-! of the modulus, this approximation is perfect
-! if the variable NQ given by the user
-! in the input file is big enough (>= 1000).
-
 DELTA_Q=(qvmax-qvmin)/NQ
 
 do i=1, NUMBER_OF_QVECT
