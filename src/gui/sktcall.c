@@ -82,7 +82,7 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
     {
       active_project -> analysis[SKD] -> curves[i] -> ndata = 0;
     }
-    j = 10;
+    j = 20;
     int res_skt = s_of_k_t_ (& active_project -> analysis[SKT] -> num_delta, & active_project -> xcor, & j);
     g_free (xsk);
     xsk = NULL;

@@ -244,7 +244,10 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
 
       enddo
 
-      do t=0, MAX_IN-1
+      ! do t=0, MAX_IN/2-1
+      !   n_origins = MAX_IN-MAX_IN/2
+      do t=0, MAX_IN
+        ! Imply a decrease in statistics for t > MAX_IN/2
         n_origins = MAX_IN-t
         do t0=1, n_origins
           do m=1, NSP
