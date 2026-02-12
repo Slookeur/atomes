@@ -106,7 +106,7 @@ void fill_tool_model ()
   gtk_tree_store_clear (tool_model);
   for (i=0; i<NCALCS; i++)
   {
-    if (i != MSD)
+    if (i != MSD && i != SKT)
     {
       append = TRUE;
     }

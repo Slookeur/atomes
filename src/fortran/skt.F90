@@ -19,7 +19,7 @@
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 !! @author Noël Jakse <noel.jakse@grenoble-inp.fr>
 
-INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MAX_IN) BIND (C,NAME='s_of_k_t_')
+INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN) BIND (C,NAME='s_of_k_t_')
 
 ! Total and Partial Dynamic Structure Factor Calculation
 !
@@ -37,9 +37,9 @@ USE PARAMETERS
 #endif
 IMPLICIT NONE
 
-! MAX_IN is the maximum correlation time to compute the structure factor
-! Should be at least equal to NS/2
-INTEGER (KIND=c_int), INTENT(IN) :: NQ_IN, XA_IN, MAX_IN
+INTEGER (KIND=c_int), INTENT(IN) :: NQ_IN  ! Number of delta q
+INTEGER (KIND=c_int), INTENT(IN) :: XA_IN  ! How to compute X rays
+INTEGER (KIND=c_int), INTENT(IN) :: MIN_IN ! Minimum value of correlations
 DOUBLE PRECISION :: factor, xfactor
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
@@ -53,7 +53,7 @@ INTERFACE
   END FUNCTION
 END INTERFACE
 
-allocate(SQT(NQ_IN, MAX_IN+1, NSP, NSP), STAT=ERR)
+allocate(SQT(NQ_IN, NS-MIN_IN, NSP, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: SQT"//CHAR(0))
@@ -62,7 +62,7 @@ if (ERR .ne. 0) then
 endif
 SQT(:,:,:,:) = 0.0d0
 
-allocate(NSQT(NQ_IN, MAX_IN+1), STAT=ERR)
+allocate(NSQT(NQ_IN, NS-MIN_IN), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: NSQT"//CHAR(0))
@@ -71,7 +71,7 @@ if (ERR .ne. 0) then
 endif
 NSQT(:,:) = 0.0d0
 
-allocate(XSQT(NQ_IN, MAX_IN+1), STAT=ERR)
+allocate(XSQT(NQ_IN, NS-MIN_IN), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: XSQT"//CHAR(0))
@@ -81,21 +81,21 @@ endif
 XSQT(:,:) = 0.0d0
 
 ! Allocate density arrays RHO_C and RHO_S
-ALLOCATE(RHO_C(MAX_IN+1, NSP), STAT=ERR)
+ALLOCATE(RHO_C(NS, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: RHO_C"//CHAR(0))
   s_of_k_t = 0
   goto 001
 endif
-ALLOCATE(RHO_S(MAX_IN+1, NSP), STAT=ERR)
+ALLOCATE(RHO_S(NS, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: RHO_S"//CHAR(0))
   s_of_k_t = 0
   goto 001
 endif
-ALLOCATE(LocalCorr(MAX_IN+1, NSP, NSP), STAT=ERR)
+ALLOCATE(LocalCorr(NS, NSP, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: LocalCorr"//CHAR(0))
@@ -105,11 +105,11 @@ endif
 
 #ifdef OPENMP
   !t0 = OMP_GET_WTIME ()
-  call FOURIER_TRANS_QVECT_SKT (MAX_IN) ! Default Q-vector parallelization
+  call FOURIER_TRANS_QVECT_SKT (MIN_IN) ! Default Q-vector parallelization
   !t1 = OMP_GET_WTIME ()
   !write (*,*) "temps d’excecution QVT 2:", t1-t0
 #else
-  call FOURIER_TRANS_QVECT_SKT (MAX_IN)
+  call FOURIER_TRANS_QVECT_SKT (MIN_IN)
 #endif
 
 if (allocated(qvectx)) deallocate(qvectx)
@@ -131,7 +131,7 @@ if (XA_IN .eq. 1) then
   enddo
 endif
 
-do t=1, MAX_IN+1
+do t=1, NS-MIN_IN
 
   do i=1, NQ_IN
 
@@ -195,15 +195,15 @@ CONTAINS
 ! Compute S(q,t) loops over Q-vectors
 ! OpenMP // on Qvect
 !
-SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
+SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
 
   USE PARAMETERS
 
   IMPLICIT NONE
 
-  INTEGER, INTENT(IN) :: MAX_IN
+  INTEGER, INTENT(IN) :: MIN_IN
 
-  INTEGER :: q, n_origins, t0
+  INTEGER :: q, n_origins, t_n
   DOUBLE PRECISION :: qx, qy, qz, qtr
   DOUBLE PRECISION :: Corr
 
@@ -213,9 +213,9 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
   ! OpemMP on Qvect
   !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
-  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t0, t, n_origins, RHO_C, RHO_S, LocalCorr, Corr) &
+  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t, t_n, n_origins, RHO_C, RHO_S, LocalCorr, Corr) &
   !$OMP& SHARED(NUMTH, NUMBER_OF_QVECT, SQT, NQ_IN, modq, qvmin, DELTA_Q) &
-  !$OMP& SHARED(qvectx, qvecty, qvectz, FULLPOS, NS, NSP, NA, LOT, MAX_IN)
+  !$OMP& SHARED(qvectx, qvecty, qvectz, FULLPOS, NS, NSP, NA, LOT, MIN_IN)
   !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
 #endif
   do q=1, NUMBER_OF_QVECT
@@ -231,29 +231,22 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MAX_IN)
       qy=qvecty(q)
       qz=qvectz(q)
 
-      do t=0, MAX_IN-1
-
+      do t=1, NS
         ! Compute density history for this Q vector
-        k = 1+t*NS/MAX_IN
         do i=1, NA
           j = LOT(i)
-          qtr = qx*FULLPOS(i,1,k) + qy*FULLPOS(i,2,k) + qz*FULLPOS(i,3,k)
-          RHO_C(t+1, j) = RHO_C(t+1, j) + cos(qtr)
-          RHO_S(t+1, j) = RHO_S(t+1, j) + sin(qtr)
+          qtr = qx*FULLPOS(i,1,t) + qy*FULLPOS(i,2,t) + qz*FULLPOS(i,3,t)
+          RHO_C(t, j) = RHO_C(t, j) + cos(qtr)
+          RHO_S(t, j) = RHO_S(t, j) + sin(qtr)
         enddo
-
       enddo
 
-      ! do t=0, MAX_IN/2-1
-      !   n_origins = MAX_IN-MAX_IN/2
-      do t=0, MAX_IN
-        ! Imply a decrease in statistics for t > MAX_IN/2
-        n_origins = MAX_IN-t
-        do t0=1, n_origins
+      do t=0, NS-MIN_IN-1
+        n_origins = NS-t-1
+        do t_n=1, n_origins
           do m=1, NSP
             do n=1, NSP
-              ! Correlation Real Part: Rc(t)*Rc(0) + Rs(t)*Rs(0)
-              Corr = RHO_C(t0+t, m) * RHO_C(t0, n) + RHO_S(t0+t, m) * RHO_S(t0, n)
+              Corr = RHO_C(t+t_n, m) * RHO_C(t_n, n) + RHO_S(t+t_n, m) * RHO_S(t_n, n)
               LocalCorr(t+1, m, n) = LocalCorr(t+1, m, n) + Corr
             enddo
           enddo
@@ -325,7 +318,7 @@ NSQ=i
 
 if (NSQ .gt. 0) then  ! If wave vectors exist
 
-  do t=1, MAX_IN
+  do t=1, NS-MIN_IN
 
     call CHARINT(NOM_S, t-1)
     SQTAB(:)=0.0d0

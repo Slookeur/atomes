@@ -278,7 +278,7 @@ enum ImageFormats {
 /*!< \def STEP_LIMIT
   \brief MD step number limit to compute fragment(s) and molecule(s) analysis automatically
 */
-#define STEP_LIMIT 10000
+#define STEP_LIMIT 1000
 
 #define OK            0
 #define ERROR_RW      1
