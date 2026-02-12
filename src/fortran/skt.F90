@@ -203,7 +203,7 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
 
   INTEGER, INTENT(IN) :: MIN_IN
 
-  INTEGER :: q, n_origins, t_n
+  INTEGER :: q, NumCorr, t_n
   DOUBLE PRECISION :: qx, qy, qz, qtr
   DOUBLE PRECISION :: Corr
 
@@ -213,7 +213,8 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
   if (NUMBER_OF_QVECT.lt.NUMTH) NUMTH=NUMBER_OF_QVECT
   ! OpemMP on Qvect
   !$OMP PARALLEL NUM_THREADS(NUMTH) DEFAULT (NONE) &
-  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t, t_n, n_origins, RHO_C, RHO_S, LocalCorr, Corr) &
+  !$OMP& PRIVATE(qx, qy, qz, qtr, i, j, k, l, m, n, q, t) &
+  !$OMP& PRIVATE (t_n, NumCorr, RHO_C, RHO_S, LocalCorr, Corr) &
   !$OMP& SHARED(NUMTH, NUMBER_OF_QVECT, SQT, NQ_IN, modq, qvmin, DELTA_Q) &
   !$OMP& SHARED(qvectx, qvecty, qvectz, FULLPOS, NS, NSP, NA, LOT, MIN_IN)
   !$OMP DO SCHEDULE(STATIC,NUMBER_OF_QVECT/NUMTH)
@@ -241,9 +242,10 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
         enddo
       enddo
 
-      do t=0, NS-MIN_IN-1
-        n_origins = NS-t-1
-        do t_n=1, n_origins
+      ! If 'MIN_IN = 0' and 't = 0', then S(t=0) is the static structure factor
+      do t=0, NS-1-MIN_IN
+        NumCorr = NS-t-MIN_IN
+        do t_n=1, NumCorr
           do m=1, NSP
             do n=1, NSP
               Corr = RHO_C(t+t_n, m) * RHO_C(t_n, n) + RHO_S(t+t_n, m) * RHO_S(t_n, n)
@@ -251,8 +253,8 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
             enddo
           enddo
         enddo
-        ! Normalize by n_origins here
-        LocalCorr(t+1, :, :) = LocalCorr(t+1, :, :) / DBLE(n_origins)
+        ! Normalize by NumCorr here
+        LocalCorr(t+1, :, :) = LocalCorr(t+1, :, :) / DBLE(NumCorr)
       enddo
 
 #ifdef OPENMP
