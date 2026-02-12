@@ -126,7 +126,14 @@ void update_sq_view (project * this_proj, int sqk)
   gchar * str;
   if (this_proj -> analysis[sqk] -> calc_buffer == NULL) this_proj -> analysis[sqk] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+  if (sqk == SKD || sqk == SQD)
+  {
+    print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+  }
+  else
+  {
+    print_info ("\n\nDynamic structure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+  }
   if (sqk == SKD || sqk == SKT)
   {
     print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);

@@ -128,6 +128,9 @@ void workinfo (project * this_proj, int i)
             case MSD:
               update_msd_view (this_proj);
               break;
+            case SKT:
+              update_sq_view (this_proj, SKT);
+              break;
           }
         }
       }
