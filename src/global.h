@@ -702,12 +702,14 @@ struct atomes_analysis
   gboolean calc_ok;            /*!< Analysis calculation confirmation */
   gboolean requires_md;        /*!< Analysis requires multiple configurations */
   gchar * x_title;             /*!< x axis default title, ex: "r [Å] */
-  int num_delta;               /*!< Discretization */
   double calc_time;            /*!< Calculation time */
-  double delta;                /*!< Discretization */
+  int num_delta;               /*!< Number of intervals */
+  double delta;                /*!< Size of an interval */
   double min;                  /*!< Minimum x value */
   double max;                  /*!< Maximum x value */
   double fact;                 /*!< Gaussian smoothing factor, if available */
+  int other_params;            /*!< Number of other parameters for this analysis */
+  double * o_params;           /*!< List of other parameters */
   GtkTextBuffer * calc_buffer; /*!< The text buffer for the calculation */
   gboolean graph_res;          /*!< Results to be displayed using graphs ? */
   int numc;                    /*!< Number of curves, if any */
@@ -741,7 +743,7 @@ struct classical_field
   int nbody[5];
   struct field_nth_body * first_body[5];
   // Tersoff potential cross terms
-  double *** cross; /*!< Tersoff potential cross termms */
+  double *** cross; /*!< Tersoff potential cross terms */
   int extern_fields;
   struct field_external * first_external;
 
@@ -942,7 +944,7 @@ struct atom
   int ** rings[5];                /*!< Ring statistics information: \n
     0 = All, \n
     1 = King's, \n
-    2 = Guttman, \n
+    2 = Guttman's, \n
     3 = Primitive, \n
     4 = Strong
    */ // Rings statistics information
@@ -972,7 +974,7 @@ struct project
   char * name;                         /*!< Project name */
   char * projfile;                     /*!< Name of the project file, if any */
   char * coordfile;                    /*!< Name of atomic coordinates file, if any */
-  char * bondfile;                     /*!< Name of the file to ouput bonding information, if any */
+  char * bondfile;                     /*!< Name of the file to output bonding information, if any */
   gboolean newproj;                    /*!< New project ? yes / no */
   gboolean run;                        /*!< Run this project ? yes / no */
   gboolean dmtx;                       /*!< Trigger the calculation of the distance matrix ? yes / no */
@@ -1024,8 +1026,8 @@ struct project
   double csdata[2];                    /*!< Results for the chain statistics: \n
                                             0 = Total number of chains) per MD step: CpS, \n
                                             1 = Standard deviation for CpS */
-  double fact[4];                      /*!< Gaussian smoothing factors: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt */
-  double sk_advanced[2];               /*!< */
+  double sk_advanced[2][2];            /*!< Probability triggered k sampling, 0 = SKD, 1 = SKT */
+  int skt_correlations;                /*!< Minium number of correlated configurations to compute S(k,t) */
 
   GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for general information */
 

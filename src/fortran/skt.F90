@@ -95,7 +95,7 @@ if (ERR .ne. 0) then
   s_of_k_t = 0
   goto 001
 endif
-ALLOCATE(LocalCorr(NS, NSP, NSP), STAT=ERR)
+ALLOCATE(LocalCorr(NS-MIN_IN, NSP, NSP), STAT=ERR)
 if (ERR .ne. 0) then
   call show_error ("Impossible to allocate memory"//CHAR(0), &
                    "Function: s_of_k_t"//CHAR(0), "Table: LocalCorr"//CHAR(0))
@@ -322,7 +322,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
 
   do t=1, NS-MIN_IN
 
-    call CHARINT(NOM_S, t-1)
+    call CHARINT(NOM_S, t)
     SQTAB(:)=0.0d0
     i = 0;
     do k=1, NQ_IN

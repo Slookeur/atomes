@@ -70,20 +70,19 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
 
   // Calculation time for dynamic structure factor analysis starts here !
   prepostcalc (widg, FALSE, SKT, 0, opac);
-  int i, j;
+  int i;
   i = cqvf_ (& active_project -> analysis[SKT] -> max,
              & active_project -> analysis[SKT] -> min,
              & active_project -> analysis[SKT] -> num_delta,
-             & active_project -> sk_advanced[0],
-             & active_project -> sk_advanced[1]);
+             & active_project -> sk_advanced[1][0],
+             & active_project -> sk_advanced[1][1]);
   if (i == 1)
   {
     for (i=0; i<active_project -> analysis[SKT] -> numc; i++)
     {
       active_project -> analysis[SKT] -> curves[i] -> ndata = 0;
     }
-    j = 10;
-    int res_skt = s_of_k_t_ (& active_project -> analysis[SKT] -> num_delta, & active_project -> xcor, & j);
+    int res_skt = s_of_k_t_ (& active_project -> analysis[SKT] -> num_delta, & active_project -> xcor, & active_project -> skt_correlations);
     g_free (xsk);
     xsk = NULL;
     prepostcalc (widg, TRUE, SKT, res_skt, 1.0);
@@ -100,7 +99,7 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
   else
   {
     prepostcalc (widg, TRUE, SKT, i, 1.0);
-    show_error ("Problem during the selection of the k-points\nused to sample the recipocal lattice", 0, widg);
+    show_error ("Problem during the selection of the k-points\nused to sample the reciprocal lattice", 0, widg);
   }
   fill_tool_model ();
 }

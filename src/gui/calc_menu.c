@@ -980,6 +980,7 @@ GtkWidget * hbox_note (int i, double val)
 
 GtkWidget * avbox;
 GtkWidget * smbox;
+dint skadv[2];
 int avsize;
 
 /*!
@@ -1034,25 +1035,28 @@ G_MODULE_EXPORT void expand_opt (GtkWidget * exp, gpointer data)
 */
 G_MODULE_EXPORT void set_advanced_sq (GtkEntry * entry, gpointer data)
 {
-  int c = GPOINTER_TO_INT(data);
+  dint * idc = (dint *)data;
   const gchar * m = entry_get_text (entry);
   double v = string_to_double ((gpointer)m);
-  if (v != active_project -> sk_advanced[c])
+  double qmin = active_project -> analysis[idc -> a] -> min;
+  double qmax = active_project -> analysis[idc -> a] -> max;
+  int idk = (idc -> a == SKD) ? 0 : 1;
+  if (v != active_project -> sk_advanced[idk][idc -> b])
   {
-    if (c == 0 && (v < 0.0 || v > 1.0))
+    if (idc -> b == 0 && (v < 0.0 || v > 1.0))
     {
       show_warning ("You must specify a probability between 0.0 and 1.0", calc_win);
     }
-    else if (c == 1 && (v < active_project -> analysis[SKD] -> min || v > active_project -> analysis[SKD] -> max))
+    else if (idc -> b == 1 && (v < qmin || v > qmax))
     {
       show_warning ("Q<sub>lim</sub> must be &#8805; Q<sub>min</sub> and &#8804; Q<sub>max</sub>", calc_win);
     }
     else
     {
-      active_project -> sk_advanced[c] = v;
+      active_project -> sk_advanced[idk][idc -> b] = v;
     }
   }
-  update_entry_double (entry, active_project -> sk_advanced[c]);
+  update_entry_double (entry, active_project -> sk_advanced[idk][idc -> b]);
 }
 
 /*!
@@ -1273,6 +1277,12 @@ void calc_gr_sq (GtkWidget * box, int id)
                     "Q<sub>max</sub> [&#xC5;<sup>-1</sup>]",
                     "Q<sub>max</sub> for the FFT [&#xC5;<sup>-1</sup>]"};
 
+  if (id == SKD)
+  {
+    skadv[0].a = skadv[1].a = SKD;
+    skadv[0].b = 0;
+    skadv[1].b = 1;
+  }
   GtkWidget * vbox = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (0);
@@ -1345,8 +1355,8 @@ void calc_gr_sq (GtkWidget * box, int id)
       ahbox = create_hbox (5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, ahbox, FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label (adv_name[i], 175, -1, 0.0, 0.5), FALSE, FALSE, 5);
-      aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, GINT_TO_POINTER(i));
-      update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[i]);
+      aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, & skadv[i]);
+      update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[0][i]);
       fixed = gtk_fixed_new ();
       gtk_fixed_put (GTK_FIXED(fixed), aentry, 0.0, 0.0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, fixed, FALSE, FALSE, 10);
@@ -1364,7 +1374,7 @@ void calc_gr_sq (GtkWidget * box, int id)
   smbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, gtk_label_new("Factor [0.0-1.0]"), FALSE, FALSE, 0);
   aentry = create_entry (G_CALLBACK(set_sfact), 100, 15, FALSE, GINT_TO_POINTER(id));
-  update_entry_double (GTK_ENTRY(aentry), active_project -> fact[id]);
+  update_entry_double (GTK_ENTRY(aentry), active_project -> analysis[id] -> fact);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, aentry, FALSE, TRUE, 10);
   GtkWidget * smooth = create_button ("Smooth", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_smoother_released), GINT_TO_POINTER(id));
   g_signal_connect (G_OBJECT(smooth_options), "activate", G_CALLBACK(expand_opt), GINT_TO_POINTER(0));
@@ -1373,6 +1383,30 @@ void calc_gr_sq (GtkWidget * box, int id)
   add_container_child (CONTAINER_EXP, smooth_options, avbox);
   show_the_widgets (smooth_options);
   widget_set_sensitive (smooth_options, 1);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
+
+  \brief set the minimum number of correlated configuration to compute S(k,t)
+
+  \param entry the GtkEntry sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
+{
+  const gchar * m;
+  m = entry_get_text (entry);
+  int v = (int) string_to_double ((gpointer)m);
+  if (v <= 0 || v >= active_project -> steps-1)
+  {
+    show_warning ("This value must be between 0.0 and the number of steps - 1.0", calc_win);
+  }
+  else
+  {
+    active_project -> skt_correlations = v;
+  }
+  update_entry_int (entry, active_project -> skt_correlations);
 }
 
 /*!
@@ -1386,8 +1420,11 @@ void calc_sk_t (GtkWidget * box)
 {
   gchar * val_a="Number of &#x3b4;q steps";
   gchar * val_b="Q<sub>max</sub> [&#xC5;<sup>-1</sup>]";
-  gchar * val_c=" ";
+  gchar * val_c="Minimum";
 
+  skadv[0].a = skadv[1].a = SKT;
+  skadv[0].b = 0;
+  skadv[1].b = 1;
   GtkWidget * vbox = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (0);
@@ -1402,13 +1439,12 @@ void calc_sk_t (GtkWidget * box)
   entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(SKT));
   update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-
-  /* hbox = create_hbox (0);
+  hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  entry = create_entry (G_CALLBACK(set_thing), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> );
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10); */
+  entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, NULL);
+  update_entry_int (GTK_ENTRY(entry), active_project -> skt_correlations);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 0);
 
@@ -1434,8 +1470,8 @@ void calc_sk_t (GtkWidget * box)
     ahbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, ahbox, FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label (adv_name[i], 175, -1, 0.0, 0.5), FALSE, FALSE, 5);
-    aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, GINT_TO_POINTER(i));
-    update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[i]);
+    aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, & skadv[i]);
+    update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[1][i]);
     fixed = gtk_fixed_new ();
     gtk_fixed_put (GTK_FIXED(fixed), aentry, 0.0, 0.0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, fixed, FALSE, FALSE, 10);
@@ -1451,7 +1487,7 @@ void calc_sk_t (GtkWidget * box)
   smbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, gtk_label_new("Factor [0.0-1.0]"), FALSE, FALSE, 0);
   aentry = create_entry (G_CALLBACK(set_sfact), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  update_entry_double (GTK_ENTRY(aentry), active_project -> fact[SKT]);
+  update_entry_double (GTK_ENTRY(aentry), active_project -> analysis[SKT] -> fact);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, aentry, FALSE, TRUE, 10);
   GtkWidget * smooth = create_button ("Smooth", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_smoother_released), GINT_TO_POINTER(SKT));
   g_signal_connect (G_OBJECT(smooth_options), "activate", G_CALLBACK(expand_opt), GINT_TO_POINTER(0));

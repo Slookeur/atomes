@@ -227,10 +227,11 @@ void init_project (gboolean alloc_box)
   new_proj -> steps = 1;
   new_proj -> tunit = (int)default_delta_t[1];
 
-  // Other calculation related parameters
+  // Other calculation related parameters : to be added to user preferences
   new_proj -> xcor = 1;
-  new_proj -> sk_advanced[0] = 1.0;
-  new_proj -> sk_advanced[1] = 15.0;
+  new_proj -> sk_advanced[0][0] = new_proj -> sk_advanced[1][0] = 1.0;
+  new_proj -> sk_advanced[0][1] = new_proj -> sk_advanced[1][1] = 15.0;
+  new_proj -> skt_correlations = 10;
   //
   new_proj -> coord = g_malloc0(sizeof*new_proj -> coord);
   if (alloc_box) new_proj -> cell.box = g_malloc0(sizeof*new_proj -> cell.box);

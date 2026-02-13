@@ -260,8 +260,8 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   i = cqvf_ (& active_project -> analysis[SKD] -> max,
              & active_project -> analysis[SKD] -> min,
              & active_project -> analysis[SKD] -> num_delta,
-             & active_project -> sk_advanced[0],
-             & active_project -> sk_advanced[1]);
+             & active_project -> sk_advanced[0][0],
+             & active_project -> sk_advanced[0][1]);
   if (i == 1)
   {
     for (i=0; i<active_project -> analysis[SKD] -> numc; i++)
@@ -289,7 +289,7 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   else
   {
     prepostcalc (widg, TRUE, SKD, i, 1.0);
-    show_error ("Problem during the selection of the k-points\nused to sample the recipocal lattice", 0, widg);
+    show_error ("Problem during the selection of the k-points\nused to sample the reciprocal lattice", 0, widg);
   }
   fill_tool_model ();
   for (i=1; i<3; i++) update_after_calc (i);
