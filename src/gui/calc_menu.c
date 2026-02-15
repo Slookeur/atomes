@@ -1409,6 +1409,34 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
   update_entry_int (entry, active_project -> skt_correlations);
 }
 
+gboolean skt_all_sets;
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void toggle_skt_all (GtkCheckButton * but, gpointer data)
+
+  \brief toggle the output of all s(k,t) data sets
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggle_skt_all (GtkCheckButton * but, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
+
+  \brief toggle the output of all s(k,t) data sets
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
+#endif
+{
+  skt_all_sets = button_get_status ((GtkWidget *)but);
+  widget_set_sensitive (skt_delta_t, ! skt_all_sets);
+}
+
 /*!
   \fn void calc_sk_t (GtkWidget * box)
 
@@ -1420,7 +1448,7 @@ void calc_sk_t (GtkWidget * box)
 {
   gchar * val_a="Number of &#x3b4;q steps";
   gchar * val_b="Q<sub>max</sub> [&#xC5;<sup>-1</sup>]";
-  gchar * val_c="Minimum";
+  gchar * val_c="&#x3b4;t<sub>min</sub>";
 
   skadv[0].a = skadv[1].a = SKT;
   skadv[0].b = 0;
@@ -1445,9 +1473,11 @@ void calc_sk_t (GtkWidget * box)
   entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, NULL);
   update_entry_int (GTK_ENTRY(entry), active_project -> skt_correlations);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
+                       markup_label ("&#x3b4;t<sub>min</sub> is the lowest number of correlated steps", -1, -1, 0.0, 0.5),
+                       FALSE, FALSE, 0);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 0);
-
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
                        markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
                        FALSE, FALSE, 0);
@@ -1458,6 +1488,33 @@ void calc_sk_t (GtkWidget * box)
 
   gchar * adv_name[2]={"Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> [0.0-1.0]",
                        "Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] in [Q<sub>min</sub>-Q<sub>max</sub>]"};
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label ("<b>Results</b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label ("At the time being <b>atomes</b> can not yet display 3D results\n"
+                                                                     "while we are working on this feature, you need to decide what information"
+                                                                     "to display using the 2D graph system:", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  skt_all_sets = FALSE;
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button("All &#x3b4;t correlated calculations", -1, -1, FALSE, G_CALLBACK(toggle_skt_all), NULL), FALSE, FALSE, 0);
+  GtkWidget * skt_delta_t = create_vbox(0);
+  widget_set_sensitive (skt_delta_t, skt_all_sets);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, skt_delta_t, FALSE, FALSE, 0);
+
+  // For the time being no way to make 3D plot
+  // So we offer to select up to 'num_t' t correlations
+  // Number of t to save : int num_t
+  // List of t to save : int * list_t
+
+  // By default num_t = 10 or steps is steps < 10
+  int num_t = min (10, active_project -> steps - active_project -> skt_correlations);
+  // By default at first homogeneous cut of the MD trajectory, using t_min
+  int delta_t = (active_project -> steps - active_project -> skt_correlations)/num_t;
+  int * list_t = allocint (num_t);
+  for (i=0; i<num_t; i++) list_t[i]=1+i*delta_t;
+
+    // All list_t element must be different
+    // list_t elements must be sorted
+    // list_t elements must be <= active_project -> steps-active_project -> skt_correlations
+
   GtkWidget * advanced_options = create_expander ("  Advanced options", NULL);
   gtk_widget_set_size_request (advanced_options, -1, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, advanced_options, FALSE, TRUE, 10);
