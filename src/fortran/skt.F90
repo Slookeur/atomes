@@ -19,7 +19,7 @@
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 !! @author Noël Jakse <noel.jakse@grenoble-inp.fr>
 
-INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T) BIND (C,NAME='s_of_k_t_')
+INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T, DELTA_T, Q_NUM, Q_LIST, N_FREQ) BIND (C,NAME='s_of_k_t_')
 
 ! Total and Partial Dynamic Structure Factor Calculation
 !
@@ -42,11 +42,17 @@ INTEGER (KIND=c_int), INTENT(IN) :: XA_IN  ! How to compute X rays
 INTEGER (KIND=c_int), INTENT(IN) :: MIN_IN ! Minimum value of correlations
 INTEGER (KIND=c_int), INTENT(IN) :: N_SETS ! Number of t steps to save, or -1 for all
 INTEGER (KIND=c_int), DIMENSION(N_SETS), INTENT(IN) :: SETS_T
+INTEGER (KIND=c_int), INTENT(IN) :: Q_NUM  ! Number q compute (q,w) data
+INTEGER (KIND=c_int), INTENT(IN) :: N_FREQ ! Number of frequency points
+DOUBLE PRECISION (KIND=c_double), DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
+
+INTEGER, DIMENSION(:), ALLOCATABLE :: QID
 DOUBLE PRECISION :: factor, xfactor
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
 DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE :: LocalCorr
 DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: SQT
+DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
 
 INTERFACE
   DOUBLE PRECISION FUNCTION FQX(TA, Q)
@@ -179,10 +185,78 @@ do t=1, NS-MIN_IN
 
 enddo
 
+if (Q_DIN .gt. 0) then
+
+  if (allocated(SQTAB)) deallocate(SQTAB)
+  allocate(SQTAB(NQ_IN), STAT=ERR)
+  if (ERR .ne. 0) then
+    call show_error ("Impossible to allocate memory"//CHAR(0), &
+                     "Function: s_of_k_t"//CHAR(0), "Table: SQTAB"//CHAR(0))
+    s_of_k_t = 0
+    goto 001
+  endif
+  if (allocated(QID)) deallocate(QID)
+  allocate(QID(NQ_IN), STAT=ERR)
+  if (ERR .ne. 0) then
+    call show_error ("Impossible to allocate memory"//CHAR(0), &
+                     "Function: s_of_k_t"//CHAR(0), "Table: QID"//CHAR(0))
+    s_of_k_t = 0
+    goto 001
+  endif
+  SQTAB(:)=0.0d0
+  NSQ = 0;
+  do i=1, NQ_IN
+    if (degeneracy(i) .gt. 0) then
+      NSQ=NSQ+1
+      SQTAB(NSQ)= K_POINT(i)
+      QID(NSQ) = i
+    endif
+  enddo
+  call save_xsk (NSQ, SQTAB)
+
+  ALLOCATE(SQW_TAB(N_FREQ), STAT=ERR)
+  if (ERR .ne. 0) then
+     call show_error ("Impossible to allocate memory"//CHAR(0), &
+                      "Function: s_of_k_t"//CHAR(0), "Table: SQW_TAB"//CHAR(0))
+     s_of_k_t = 0
+     goto 001
+  endif
+
+  COMPUTE_SQW (NSQ, QID, NSQT, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+
+  COMPUTE_SQW (NSQ, QID, XSQT, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+
+  ALLOCATE(SKT_TAB(NQ_IN, NS-MIN_IN), STAT=ERR)
+  if (ERR .ne. 0) then
+     call show_error ("Impossible to allocate memory"//CHAR(0), &
+                      "Function: s_of_k_t"//CHAR(0), "Table: SKT_TAB"//CHAR(0))
+     s_of_k_t = 0
+     goto 001
+  endif
+
+  do j=1, NSP
+    do k=1, NSP
+      do l=1, NS-MIN_IN
+        do m=1, NQ_IN
+          SKT_TAB(l,m) = SQT(l,m,j,k)
+        enddo
+      enddo
+      COMPUTE_SQW (NSQ, QID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+    enddo
+  enddo
+
+  if (allocated(SKT_TAB)) deallocate(SKT_TAB)
+  if (allocated(SQW_TAB)) deallocate(SQW_TAB)
+
+endif
+
 s_of_k_t = SKT_SAVE ()
 
 001 continue
 
+if (allocated(SQTAB)) deallocate(SQTAB)
+if (allocated(SKT_TAB)) deallocate(SKT_TAB)
+if (allocated(SQW_TAB)) deallocate(SQW_TAB)
 if (allocated(SQT)) deallocate(SQT)
 if (allocated(NSQT)) deallocate(NSQT)
 if (allocated(XSQT)) deallocate(XSQT)
@@ -276,12 +350,61 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
 
 END SUBROUTINE
 
-INTEGER FUNCTION SKT_SAVE ()
+SUBROUTINE COMPUTE_SQW (N_Q_IN, NSQ, SQID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+
+  USE PARAMETERS
+
+  IMPLICIT NONE
+
+  INTEGER, INTENT(IN) :: N_Q_IN
+  INTEGER, INTENT(IN) :: NSQ
+  INTEGER, INTENT(IN) :: Q_NUM
+  INTEGER, DIMENSION(NSQ), INTENT(IN) :: SQID
+  INTEGER, DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
+  INTEGER, INTENT(IN) :: N_FREQ
+  DOUBLE PRECISION, DIMENSION (NQ_IN,NS-MIN_IN), INTENT(IN) :: SKT_TAB
+  DOUBLE PRECISION, INTENT(IN) :: DELTA_T
+
+  INTEGER :: q_num, id_q_num
+  DOUBLE PRECISION :: max_omega, delta_omega
+
+  max_omega = PI / DELTA_T
+  delta_omega = max_omega / DBLE(N_FREQ)
+
+  do q_num = 1, NSQ
+
+    id_q_num = SQID(q_num)
+
+    do freq = 1, N_FREQ
+
+      omega = DBLE(freq-1) * delta_omega
+      sqw_val = 0.5d0 * SKT_TAB(id_q_num, 1)
+
+      do t = 2, NS-MIN_IN
+        time_val = DBLE(t-1) * DELTA_T
+        sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val
+      enddo
+
+      sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
+      SQW_TAB(freq) = sqw_val
+
+    enddo
+
+    ! Save SQW_TAB here !
+    call save_curve (N_FREQ, SQW_TAB, , IDSKT)
+
+  enddo
+
+END SUBROUTINE
+
+INTEGER FUNCTION SKT_SAVE (NSQ)
 
 USE PARAMETERS
 USE MENDELEIEV
 
-INTEGER :: NSQ, NDT, tps, cid
+INTEGER, INTENT(IN) :: NSQ
+
+INTEGER :: NDT, tps, cid
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
 
 INTERFACE
@@ -312,24 +435,9 @@ if (ERR .ne. 0) then
   goto 001
 endif
 
-i=0
-do j=1, NQ_IN
-  if (degeneracy(j) .gt. 0) i=i+1
-enddo
-NSQ=i
-
 if (NSQ .gt. 0) then  ! If wave vectors exist
 
   SQTAB(:)=0.0d0
-  i = 0;
-  do k=1, NQ_IN
-    if (degeneracy(k) .gt. 0) then
-      i=i+1
-      SQTAB(i)= K_POINT(k)
-    endif
-  enddo
-  ! To do for SKT
-  call save_xsk (NSQ, SQTAB)
 
   if (N_SETS .eq. 1 .and. SETS_T(1) .eq. -1) then
     NDT = NS-MIN_IN
