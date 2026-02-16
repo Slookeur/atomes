@@ -460,6 +460,11 @@ int open_coord_file (gchar * filename, int fti)
         active_project -> atoms[i][j].cloned = FALSE;
       }
     }
+    if (active_project -> steps > 1)
+    {
+      active_project -> skt_correlations = (active_project -> steps < 20) ? 1 : 10;
+      active_project -> skt_n_data_sets = min (10, active_project -> steps);
+    }
     if (fti != 9 || this_reader -> cartesian)
     {
       active_project -> nspec = this_reader -> nspec;

@@ -19,7 +19,7 @@
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 !! @author Noël Jakse <noel.jakse@grenoble-inp.fr>
 
-INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN) BIND (C,NAME='s_of_k_t_')
+INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T) BIND (C,NAME='s_of_k_t_')
 
 ! Total and Partial Dynamic Structure Factor Calculation
 !
@@ -40,6 +40,8 @@ IMPLICIT NONE
 INTEGER (KIND=c_int), INTENT(IN) :: NQ_IN  ! Number of delta q
 INTEGER (KIND=c_int), INTENT(IN) :: XA_IN  ! How to compute X rays
 INTEGER (KIND=c_int), INTENT(IN) :: MIN_IN ! Minimum value of correlations
+INTEGER (KIND=c_int), INTENT(IN) :: N_SETS ! Number of t steps to save, or -1 for all
+INTEGER (KIND=c_int), DIMENSION(N_SETS), INTENT(IN) :: SETS_T
 DOUBLE PRECISION :: factor, xfactor
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
@@ -279,10 +281,8 @@ INTEGER FUNCTION SKT_SAVE ()
 USE PARAMETERS
 USE MENDELEIEV
 
-INTEGER :: NSQ
+INTEGER :: NSQ, NDT, tps, cid
 DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
-CHARACTER (LEN=20) :: NOM_F
-CHARACTER (LEN=15) :: NOM_S
 
 INTERFACE
   LOGICAL FUNCTION FZBT (NDQ, SQIJ)
@@ -320,55 +320,67 @@ NSQ=i
 
 if (NSQ .gt. 0) then  ! If wave vectors exist
 
-  do t=1, NS-MIN_IN
+  SQTAB(:)=0.0d0
+  i = 0;
+  do k=1, NQ_IN
+    if (degeneracy(k) .gt. 0) then
+      i=i+1
+      SQTAB(i)= K_POINT(k)
+    endif
+  enddo
+  ! To do for SKT
+  call save_xsk (NSQ, SQTAB)
 
-    call CHARINT(NOM_S, t)
-    SQTAB(:)=0.0d0
-    i = 0;
-    do k=1, NQ_IN
-      if (degeneracy(k) .gt. 0) then
-        i=i+1
-        SQTAB(i)= K_POINT(k)
-      endif
-    enddo
-    ! To do for SKT
-    ! call save_xsk (NSQ, SQTAB)
+  if (N_SETS .eq. 1 .and. SETS_T(1) .eq. -1) then
+    NDT = NS-MIN_IN
+  else
+    NDT = N_SETS
+  endif
 
-    i=0
-    do k=1, NQ_IN
-      if (degeneracy(k) .gt. 0) then
-        i=i+1
-        SQTAB(i)= NSQT(k,t)
-      endif
-    enddo
-    ! call save_curve (NSQ, SQTAB, (t-1)*h, IDSKT)
+  do t=1, NDT
 
-    i=0
-    do k=1, NQ_IN
-      if (degeneracy(k) .gt. 0) then
-        i=i+1
-        SQTAB(i)= (NSQT(k,t)-1.0)*K_POINT(k)
-      endif
-    enddo
-    ! call save_curve (NSQ, SQTAB, 2 + (t-1)*h, IDSKT)
+    cid = (t-1)*SKNUM
+    if (NDT .eq. NS-MIN_IN) then
+      tps = t
+    else
+      tps = SETS_T(t)
+    endif
 
     i=0
     do k=1, NQ_IN
       if (degeneracy(k) .gt. 0) then
         i=i+1
-        SQTAB(i)= XSQT(k,t)
+        SQTAB(i)= NSQT(k,tps)
       endif
     enddo
-    ! call save_curve (NSQ, SQTAB, 4 + (t-1)*h, IDSKT)
+    call save_curve (NSQ, SQTAB, cid, IDSKT)
 
     i=0
     do k=1, NQ_IN
       if (degeneracy(k) .gt. 0) then
         i=i+1
-        SQTAB(i)= (XSQT(k,t)-1.0)*K_POINT(k)
+        SQTAB(i)= (NSQT(k,tps)-1.0)*K_POINT(k)
       endif
     enddo
-    ! call save_curve (NSQ, SQTAB, 6 + (t-1)*h, IDSKT)
+    call save_curve (NSQ, SQTAB, cid + 2, IDSKT)
+
+    i=0
+    do k=1, NQ_IN
+      if (degeneracy(k) .gt. 0) then
+        i=i+1
+        SQTAB(i)= XSQT(k,tps)
+      endif
+    enddo
+    call save_curve (NSQ, SQTAB, cid + 4, IDSKT)
+
+    i=0
+    do k=1, NQ_IN
+      if (degeneracy(k) .gt. 0) then
+        i=i+1
+        SQTAB(i)= (XSQT(k,tps)-1.0)*K_POINT(k)
+      endif
+    enddo
+    call save_curve (NSQ, SQTAB, cid + 6, IDSKT)
 
     SQTAB(:)=0.0d0
     Sij(:,:,:)=0.0d0
@@ -377,18 +389,14 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
       do j=1, NSP
         m=0
 
-        NOM_F="Sij-"//ATSYM(INT(XSCATTL(i)))//"-"//ATSYM(INT(XSCATTL(j)))//"-t-"//NOM_S(2:LEN_TRIM(NOM_S))//".dat"
-        open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
-          Sij(k,i,j) = SQT(k,t,i,j)
+          Sij(k,i,j) = SQT(k,tps,i,j)
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)=Sij(k,i,j)
-            write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
-        close (9)
-        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        call save_curve (NSQ, SQTAB, cid + l, IDSKT)
         l=l+2
       enddo
     enddo
@@ -402,17 +410,13 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
     do i=1, NSP
       do j=1, NSP
         m=0
-        NOM_F="Fij-"//ATSYM(INT(XSCATTL(i)))//"-"//ATSYM(INT(XSCATTL(j)))//"-t-"//NOM_S(2:LEN_TRIM(NOM_S))//".dat"
-        open (unit=9, file=NOM_F, action='write', status='unknown')
         do k=1, NQ_IN
           if (degeneracy(k) .gt. 0) then
             m=m+1
             SQTAB(m)= FZSij(k,i,j)
-            write (9, '(f15.10,4x,f15.10)') K_POINT(k), SQTAB(m)
           endif
         enddo
-        close (9)
-        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        call save_curve (NSQ, SQTAB, cid + l, IDSKT)
         l=l+2
       enddo
     enddo
@@ -425,7 +429,7 @@ if (NSQ .gt. 0) then  ! If wave vectors exist
             SQTAB(k)= BTij(j,i)
           endif
         enddo
-        ! call save_curve (NSQ, SQTAB, l + (t-1)*h, IDSKT)
+        call save_curve (NSQ, SQTAB, cid + l, IDSKT)
         l=l+2
       enddo
     endif

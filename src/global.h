@@ -1028,6 +1028,9 @@ struct project
                                             1 = Standard deviation for CpS */
   double sk_advanced[2][2];            /*!< Probability triggered k sampling, 0 = SKD, 1 = SKT */
   int skt_correlations;                /*!< Minium number of correlated configurations to compute S(k,t) */
+  gboolean skt_all_sets;               /*!< Output calculation results for all t steps */
+  int skt_n_data_sets;                 /*!< Number of configuration to save when computing S(k,t) */
+  int * skt_step_id;                   /*!< The list of t steps to save when computing S(k,t) */
 
   GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for general information */
 

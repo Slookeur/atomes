@@ -745,6 +745,11 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid)
   active_project -> natomes = * nats;
   active_project -> nspec = * nspc;
   active_project -> steps = * stps;
+  if (active_project -> steps > 1)
+  {
+    active_project -> skt_correlations = (active_project -> steps < 20) ? 1 : 10;
+    active_project -> skt_n_data_sets = min (10, active_project -> steps);
+  }
   alloc_proj_data (active_project, * cid);
   if (* cid) active_chem = active_project -> chemistry;
 }

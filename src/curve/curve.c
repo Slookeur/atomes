@@ -413,7 +413,7 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   if (* interv != 0)
   {
     int inter = (* rid == SPH) ? * interv/2 + 1: * interv;
-    if (* rid == SKD)
+    if (* rid == SKD || * rid == SKT)
     {
       this_curve -> ndata = inter;
       this_curve -> data[0] = duplicate_double (inter, xsk);

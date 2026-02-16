@@ -54,7 +54,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void run_light_source_to_be_removed (GtkDialog * win, gint response_id, gpointer data);
   G_MODULE_EXPORT void show_light_param (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void set_nlights_spin (GtkSpinButton * res, gpointer data);
-  G_MODULE_EXPORT void set_nlights (GtkEntry * res, gpointer data);
   G_MODULE_EXPORT void update_light_param (GtkEntry * res, gpointer data);
   G_MODULE_EXPORT void set_object_pos (GtkEntry * res, gpointer data);
   G_MODULE_EXPORT void set_light_type (GtkComboBox * box, gpointer data);
@@ -648,7 +647,7 @@ void add_remove_lights (int val, gpointer data)
 /*!
   \fn G_MODULE_EXPORT void set_nlights_spin (GtkSpinButton * res, gpointer data)
 
-  \brief  change the number of light(s) - spin button
+  \brief change the number of light(s) - spin button
 
   \param res the GtkSpinButton sending the signal
   \param data the associated data pointer
@@ -656,23 +655,6 @@ void add_remove_lights (int val, gpointer data)
 G_MODULE_EXPORT void set_nlights_spin (GtkSpinButton * res, gpointer data)
 {
   add_remove_lights (gtk_spin_button_get_value_as_int(res), data);
-}
-
-/*!
-  \fn G_MODULE_EXPORT void set_nlights (GtkEntry * res, gpointer data)
-
-  \brief change the number of light(s) - entry
-
-  \param res the GtkEntry sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_nlights (GtkEntry * res, gpointer data)
-{
-  int i;
-  const gchar * m;
-  m = entry_get_text (res);
-  i = (int) string_to_double ((gpointer)m);
-  add_remove_lights (i, data);
 }
 
 /*!

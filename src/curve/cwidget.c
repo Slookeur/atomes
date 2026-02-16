@@ -126,14 +126,14 @@ void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_cu
     this_curve -> cmax[0] = this_curve -> ndata;
   }
 
-  if (rid < MSD)
+  if (rid != MSD)
   {
     this_curve -> scale[0] = 0;
     this_curve -> scale[1] = 0;
   }
   else
   {
-    if (cid < active_project -> analysis[MSD] -> numc - 6)
+    if (cid < active_project -> analysis[MSD] -> numc - 6 )
     {
       this_curve -> scale[0] = 1;
       this_curve -> scale[1] = 1;

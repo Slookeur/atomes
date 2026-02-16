@@ -197,7 +197,7 @@ atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean 
 /*
   From global.h:
 
-  #define NCALCS 10
+  #define NCALCS 11
 
   #define GDR 0
   #define SQD 1
@@ -209,6 +209,7 @@ atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean 
   #define CHA 7
   #define SPH 8
   #define MSD 9
+  #define SKT 10
 */
 
 /*!
@@ -276,7 +277,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
     // Dynamic structure factor
     // Number of graphs depends on the number of correlation states, not appearing here
     comp_list[0] = SKT;
-    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 1, comp_list, "q [Å-1]");
+    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 0, 1, comp_list, "q [Å-1]");
   }
 
   g_free (comp_list);
@@ -370,7 +371,7 @@ void initialize_this_analysis (project * this_proj, int ana)
       comp_list = allocint (1);
       comp_list[0] = SKT;
       // Total number of graphs depends on the number of correlation states, not appearing here
-      if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, "Dynamic structure factor", SKT, TRUE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+      if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, "Dynamic structure factor", SKT, TRUE, TRUE, 0, 2, comp_list, "q [Å-1]");
       break;
   }
   g_free (comp_list);
