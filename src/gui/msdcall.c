@@ -159,7 +159,7 @@ G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data)
   clean_curves_data (MSD, 0, active_project -> analysis[MSD] -> numc);
   prepostcalc (widg, FALSE, MSD, 0, opac);
   active_project -> analysis[MSD] -> min = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
-  active_project -> analysis[MSD] -> max = (active_project -> steps -1)*active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
+  active_project -> analysis[MSD] -> max = (active_project -> steps - 1)*active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
   i = msd_ (& active_project -> analysis[MSD] -> delta, & active_project -> analysis[MSD] -> num_delta);
   prepostcalc (widg, TRUE, MSD, i, 1.0);
   if (! i)

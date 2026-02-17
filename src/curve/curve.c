@@ -381,9 +381,20 @@ void set_curve_data_zero (int rid, int cid, int interv)
   active_project -> analysis[rid] -> curves[cid] -> ndata = interv;
   active_project -> analysis[rid] -> curves[cid] -> data[0] = allocdouble (interv);
   int i;
-  for (i=0; i<interv; i++)
+  if (rid != SKT)
   {
-    active_project -> analysis[rid] -> curves[cid] -> data[0][i] = active_project -> analysis[rid] -> min + i*active_project -> analysis[rid] -> delta;
+    for (i=0; i<interv; i++)
+    {
+      active_project -> analysis[rid] -> curves[cid] -> data[0][i] = active_project -> analysis[rid] -> min + i*active_project -> analysis[rid] -> delta;
+    }
+  }
+  else
+  {
+    double delta_omega = (pi/(active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta)) / active_project -> sqw_freq;
+    for (i=0; i<interv; i++)
+    {
+      active_project -> analysis[rid] -> curves[cid] -> data[0][i] = i*delta_omega;
+    }
   }
 }
 
@@ -413,7 +424,7 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   if (* interv != 0)
   {
     int inter = (* rid == SPH) ? * interv/2 + 1: * interv;
-    if (* rid == SKD || * rid == SKT)
+    if (* rid == SKD || (* rid == SKT && * cid < active_project -> skt_sets))
     {
       this_curve -> ndata = inter;
       this_curve -> data[0] = duplicate_double (inter, xsk);

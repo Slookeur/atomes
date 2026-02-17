@@ -1027,10 +1027,15 @@ struct project
                                             0 = Total number of chains) per MD step: CpS, \n
                                             1 = Standard deviation for CpS */
   double sk_advanced[2][2];            /*!< Probability triggered k sampling, 0 = SKD, 1 = SKT */
+  int skt_sets;                        /*!< Total number of S(k,t) curves */
   int skt_correlations;                /*!< Minium number of correlated configurations to compute S(k,t) */
   gboolean skt_all_sets;               /*!< Output calculation results for all t steps */
-  int skt_n_data_sets;                 /*!< Number of configuration to save when computing S(k,t) */
-  int * skt_step_id;                   /*!< The list of t steps to save when computing S(k,t) */
+  int skt_n_data_sets;                 /*!< Number of configuration(s) to save when computing S(k,t) */
+  int * skt_step_id;                   /*!< List of t step(s) to save when computing S(k,t) */
+  int sqw_sets;                        /*!< Total number of S(q,w) curves */
+  int sqw_n_data_sets;                 /*!< Number of q vector(s) to compute S(q,w) */
+  double * sqw_q_id;                   /*!< List of q vector(s) to compute S(q,w) */
+  int sqw_freq;                        /*!< Frequency intervals */
 
   GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for general information */
 

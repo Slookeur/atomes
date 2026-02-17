@@ -44,15 +44,20 @@ INTEGER (KIND=c_int), INTENT(IN) :: N_SETS ! Number of t steps to save, or -1 fo
 INTEGER (KIND=c_int), DIMENSION(N_SETS), INTENT(IN) :: SETS_T
 INTEGER (KIND=c_int), INTENT(IN) :: Q_NUM  ! Number q compute (q,w) data
 INTEGER (KIND=c_int), INTENT(IN) :: N_FREQ ! Number of frequency points
-DOUBLE PRECISION (KIND=c_double), DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
 
+REAL (KIND=c_double) :: DELTA_T
+REAL (KIND=c_double), DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
+
+INTEGER :: NSQ, PID
 INTEGER, DIMENSION(:), ALLOCATABLE :: QID
+INTEGER, DIMENSION(:), ALLOCATABLE :: SQW_QLIST
 DOUBLE PRECISION :: factor, xfactor
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
 DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE :: LocalCorr
 DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: SQT
-DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB
+DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB, SQW_TAB
+DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: SKT_TAB
 
 INTERFACE
   DOUBLE PRECISION FUNCTION FQX(TA, Q)
@@ -185,48 +190,100 @@ do t=1, NS-MIN_IN
 
 enddo
 
-if (Q_DIN .gt. 0) then
+if (allocated(SQTAB)) deallocate(SQTAB)
+allocate(SQTAB(NQ_IN), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: s_of_k_t"//CHAR(0), "Table: SQTAB"//CHAR(0))
+  s_of_k_t = 0
+  goto 001
+endif
 
-  if (allocated(SQTAB)) deallocate(SQTAB)
-  allocate(SQTAB(NQ_IN), STAT=ERR)
-  if (ERR .ne. 0) then
-    call show_error ("Impossible to allocate memory"//CHAR(0), &
-                     "Function: s_of_k_t"//CHAR(0), "Table: SQTAB"//CHAR(0))
-    s_of_k_t = 0
-    goto 001
+if (allocated(QID)) deallocate(QID)
+allocate(QID(NQ_IN), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: s_of_k_t"//CHAR(0), "Table: QID"//CHAR(0))
+  s_of_k_t = 0
+  goto 001
+endif
+SQTAB(:)=0.0d0
+NSQ = 0;
+do i=1, NQ_IN
+  if (degeneracy(i) .gt. 0) then
+    NSQ=NSQ+1
+    SQTAB(NSQ)= K_POINT(i)
+    QID(NSQ) = i
   endif
-  if (allocated(QID)) deallocate(QID)
-  allocate(QID(NQ_IN), STAT=ERR)
-  if (ERR .ne. 0) then
-    call show_error ("Impossible to allocate memory"//CHAR(0), &
-                     "Function: s_of_k_t"//CHAR(0), "Table: QID"//CHAR(0))
-    s_of_k_t = 0
-    goto 001
-  endif
-  SQTAB(:)=0.0d0
-  NSQ = 0;
-  do i=1, NQ_IN
-    if (degeneracy(i) .gt. 0) then
-      NSQ=NSQ+1
-      SQTAB(NSQ)= K_POINT(i)
-      QID(NSQ) = i
-    endif
-  enddo
-  call save_xsk (NSQ, SQTAB)
+enddo
 
-  ALLOCATE(SQW_TAB(N_FREQ), STAT=ERR)
+call save_xsk (NSQ, SQTAB)
+
+if (SKT_SAVE(NSQ) .eq. 0) then
+  s_of_k_t = 0
+  goto 001
+endif
+
+PID = 8+4*NSP*NSP
+if (NSP .eq. 2) PID=PID+8
+
+if (N_SETS .eq. 1 .and. SETS_T(1) .eq. -1) then
+  PID = PID*(NS-MIN_IN)
+else
+  PID = PID*N_SETS
+endif
+
+if (Q_NUM .gt. 0) then
+  allocate(SQW_TAB(N_FREQ), STAT=ERR)
   if (ERR .ne. 0) then
      call show_error ("Impossible to allocate memory"//CHAR(0), &
                       "Function: s_of_k_t"//CHAR(0), "Table: SQW_TAB"//CHAR(0))
      s_of_k_t = 0
      goto 001
   endif
+  allocate(SQW_QLIST(Q_NUM), STAT=ERR)
+  if (ERR .ne. 0) then
+     call show_error ("Impossible to allocate memory"//CHAR(0), &
+                      "Function: s_of_k_t"//CHAR(0), "Table: SQW_QLIST"//CHAR(0))
+     s_of_k_t = 0
+     goto 001
+  endif
 
-  COMPUTE_SQW (NSQ, QID, NSQT, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+  ! First select all k id for the analysis, as close as possible as the user selection
+  ! write (6, *) "Q_NUM= ",Q_NUM
+  do i=1, Q_NUM
+    j=1
+    do while (SQTAB(j).lt.Q_LIST(i))
+      j=j+1
+    enddo
+    if (j .gt. 1) then
+      if ((SQTAB(j) - Q_LIST(i)) .gt. (Q_LIST(i) - SQTAB(j-1))) then
+        j = j - 1
+      endif
+    endif
+    SQW_QLIST(i) = QID(j)
+    ! write (6, *) "i= ",i,", Q_LIST(i)= ",Q_LIST(i)," j= ",j,", QID(j)= ",QID(j)," K_POINT(QID(j))= ",K_POINT(QID(j))
+  enddo
 
-  COMPUTE_SQW (NSQ, QID, XSQT, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID)
 
-  ALLOCATE(SKT_TAB(NQ_IN, NS-MIN_IN), STAT=ERR)
+  do i=1, NQ_IN
+    do j=1, NS-MIN_IN
+      NSQT(i,j) =  (NSQT(i,j)-1.0)*K_POINT(i)
+    enddo
+  enddo
+  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID+2)
+
+  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+4)
+
+  do i=1, NQ_IN
+    do j=1, NS-MIN_IN
+      XSQT(i,j) =  (XSQT(i,j)-1.0)*K_POINT(i)
+    enddo
+  enddo
+  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+6)
+
+  allocate(SKT_TAB(NQ_IN, NS-MIN_IN), STAT=ERR)
   if (ERR .ne. 0) then
      call show_error ("Impossible to allocate memory"//CHAR(0), &
                       "Function: s_of_k_t"//CHAR(0), "Table: SKT_TAB"//CHAR(0))
@@ -234,29 +291,32 @@ if (Q_DIN .gt. 0) then
      goto 001
   endif
 
+  PID = PID+8
   do j=1, NSP
     do k=1, NSP
       do l=1, NS-MIN_IN
         do m=1, NQ_IN
-          SKT_TAB(l,m) = SQT(l,m,j,k)
+          SKT_TAB(m,l) = SQT(m,l,j,k)
         enddo
       enddo
-      COMPUTE_SQW (NSQ, QID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+      call COMPUTE_SQW (SKT_TAB, Q_NUM, SQW_QLIST, PID)
+      PID = PID + 2
+      ! Then FZ
+      ! Transform SKT_TAB to FZ
+      ! call COMPUTE_SQW (SKT_TAB, Q_NUM, SQW_QLIST)
+      ! The BT if 2 species
     enddo
   enddo
 
-  if (allocated(SKT_TAB)) deallocate(SKT_TAB)
-  if (allocated(SQW_TAB)) deallocate(SQW_TAB)
-
 endif
 
-s_of_k_t = SKT_SAVE ()
 
 001 continue
 
 if (allocated(SQTAB)) deallocate(SQTAB)
 if (allocated(SKT_TAB)) deallocate(SKT_TAB)
 if (allocated(SQW_TAB)) deallocate(SQW_TAB)
+if (allocated(SQW_QLIST)) deallocate(SQW_QLIST)
 if (allocated(SQT)) deallocate(SQT)
 if (allocated(NSQT)) deallocate(NSQT)
 if (allocated(XSQT)) deallocate(XSQT)
@@ -350,30 +410,35 @@ SUBROUTINE FOURIER_TRANS_QVECT_SKT (MIN_IN)
 
 END SUBROUTINE
 
-SUBROUTINE COMPUTE_SQW (N_Q_IN, NSQ, SQID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FREQ)
+!************************************************************
+!
+! Compute S(q,w) loops over frequencies
+!
+SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC)
 
   USE PARAMETERS
 
   IMPLICIT NONE
 
-  INTEGER, INTENT(IN) :: N_Q_IN
-  INTEGER, INTENT(IN) :: NSQ
   INTEGER, INTENT(IN) :: Q_NUM
-  INTEGER, DIMENSION(NSQ), INTENT(IN) :: SQID
+  INTEGER, INTENT(IN) :: PIC
   INTEGER, DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
-  INTEGER, INTENT(IN) :: N_FREQ
   DOUBLE PRECISION, DIMENSION (NQ_IN,NS-MIN_IN), INTENT(IN) :: SKT_TAB
-  DOUBLE PRECISION, INTENT(IN) :: DELTA_T
 
-  INTEGER :: q_num, id_q_num
-  DOUBLE PRECISION :: max_omega, delta_omega
+  INTEGER :: qid, id_q_num, freq
+  INTEGER :: SHIFT, CID
+  DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val
 
   max_omega = PI / DELTA_T
   delta_omega = max_omega / DBLE(N_FREQ)
 
-  do q_num = 1, NSQ
+  SHIFT = 8+4*NSP*NSP
+  if (NSP .eq. 2) SHIFT=SHIFT+8
+  CID = PIC
 
-    id_q_num = SQID(q_num)
+  do qid = 1, Q_NUM
+
+    id_q_num = Q_LIST(qid)
 
     do freq = 1, N_FREQ
 
@@ -382,7 +447,7 @@ SUBROUTINE COMPUTE_SQW (N_Q_IN, NSQ, SQID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FR
 
       do t = 2, NS-MIN_IN
         time_val = DBLE(t-1) * DELTA_T
-        sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val
+        sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val) ! To check
       enddo
 
       sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
@@ -391,9 +456,11 @@ SUBROUTINE COMPUTE_SQW (N_Q_IN, NSQ, SQID, SKT_TAB, DELTA_T, Q_NUM, Q_LIST, N_FR
     enddo
 
     ! Save SQW_TAB here !
-    call save_curve (N_FREQ, SQW_TAB, , IDSKT)
+    call save_curve (N_FREQ, SQW_TAB, CID, IDSKT)
+    CID = CID + SHIFT
 
   enddo
+
 
 END SUBROUTINE
 

@@ -194,6 +194,10 @@ extern int s_of_k_t_ (int *,
                       int *,
                       int *,
                       int *,
+                      int *,
+                      double *,
+                      int *,
+                      double *,
                       int *);
 
 extern int send_gr_ (int *,
