@@ -45,6 +45,7 @@ extern void update_rings_view (project * this_proj, int c);
 extern void update_chains_view (project * this_proj);
 extern void update_spherical_view (project * this_proj);
 extern void update_msd_view (project * this_proj);
+extern void update_skt_view (project * this_proj);
 extern void model_info (project * this_proj, GtkTextBuffer * buf);
 extern void opengl_info (project * this_proj, GtkTextBuffer * buf);
 
@@ -129,7 +130,7 @@ void workinfo (project * this_proj, int i)
               update_msd_view (this_proj);
               break;
             case SKT:
-              update_sq_view (this_proj, SKT);
+              update_skt_view (this_proj);
               break;
           }
         }

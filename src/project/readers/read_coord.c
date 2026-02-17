@@ -462,8 +462,9 @@ int open_coord_file (gchar * filename, int fti)
     }
     if (active_project -> steps > 1)
     {
-      active_project -> skt_correlations = (active_project -> steps < 20) ? 1 : 10;
-      active_project -> skt_n_data_sets = min (10, active_project -> steps);
+      active_project -> skt_corr_threshold = (active_project -> steps < 20) ? 1 : 10;
+      active_project -> skt_n_data_sets = min (5, active_project -> steps);
+      active_project -> sqw_n_data_sets = 5;
     }
     if (fti != 9 || this_reader -> cartesian)
     {

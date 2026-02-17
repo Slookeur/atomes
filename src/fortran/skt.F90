@@ -19,7 +19,8 @@
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 !! @author Noël Jakse <noel.jakse@grenoble-inp.fr>
 
-INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T, DELTA_T, Q_NUM, Q_LIST, N_FREQ) BIND (C,NAME='s_of_k_t_')
+INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T, &
+                                        DELTA_T, Q_NUM, Q_LIST, N_FREQ) BIND (C,NAME='s_of_k_t_')
 
 ! Total and Partial Dynamic Structure Factor Calculation
 !
@@ -52,12 +53,12 @@ INTEGER :: NSQ, PID
 INTEGER, DIMENSION(:), ALLOCATABLE :: QID
 INTEGER, DIMENSION(:), ALLOCATABLE :: SQW_QLIST
 DOUBLE PRECISION :: factor, xfactor
+DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB, SQW_TAB, SQW_QVAL
+DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: SKT_TAB
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RHO_C, RHO_S
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: NSQT, XSQT
 DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE :: LocalCorr
 DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: SQT
-DOUBLE PRECISION, DIMENSION (:), ALLOCATABLE :: SQTAB, SQW_TAB
-DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: SKT_TAB
 
 INTERFACE
   DOUBLE PRECISION FUNCTION FQX(TA, Q)
@@ -116,14 +117,10 @@ if (ERR .ne. 0) then
   goto 001
 endif
 
-#ifdef OPENMP
-  !t0 = OMP_GET_WTIME ()
-  call FOURIER_TRANS_QVECT_SKT (MIN_IN) ! Default Q-vector parallelization
-  !t1 = OMP_GET_WTIME ()
-  !write (*,*) "temps d’excecution QVT 2:", t1-t0
-#else
-  call FOURIER_TRANS_QVECT_SKT (MIN_IN)
-#endif
+!t0 = OMP_GET_WTIME ()
+call FOURIER_TRANS_QVECT_SKT (MIN_IN) ! Default Q-vector parallelization
+!t1 = OMP_GET_WTIME ()
+!write (*,*) "temps d’excecution QVT 2:", t1-t0
 
 if (allocated(qvectx)) deallocate(qvectx)
 if (allocated(qvecty))deallocate(qvecty)
@@ -248,6 +245,13 @@ if (Q_NUM .gt. 0) then
      s_of_k_t = 0
      goto 001
   endif
+  allocate(SQW_QVAL(Q_NUM), STAT=ERR)
+  if (ERR .ne. 0) then
+     call show_error ("Impossible to allocate memory"//CHAR(0), &
+                      "Function: s_of_k_t"//CHAR(0), "Table: SQW_QVAL"//CHAR(0))
+     s_of_k_t = 0
+     goto 001
+  endif
 
   ! First select all k id for the analysis, as close as possible as the user selection
   ! write (6, *) "Q_NUM= ",Q_NUM
@@ -262,26 +266,29 @@ if (Q_NUM .gt. 0) then
       endif
     endif
     SQW_QLIST(i) = QID(j)
+    SQW_QVAL(i) = K_POINT(QID(j))
     ! write (6, *) "i= ",i,", Q_LIST(i)= ",Q_LIST(i)," j= ",j,", QID(j)= ",QID(j)," K_POINT(QID(j))= ",K_POINT(QID(j))
   enddo
+  call recup_sqw_list (Q_NUM, SQW_QVAL)
+  if (allocated(SQW_QVAL)) deallocate(SQW_QVAL)
 
-  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID)
+  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID, 0, 0)
 
   do i=1, NQ_IN
     do j=1, NS-MIN_IN
       NSQT(i,j) =  (NSQT(i,j)-1.0)*K_POINT(i)
     enddo
   enddo
-  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID+2)
+  call COMPUTE_SQW (NSQT, Q_NUM, SQW_QLIST, PID+2, 0, 0)
 
-  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+4)
+  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+4, 0, 0)
 
   do i=1, NQ_IN
     do j=1, NS-MIN_IN
       XSQT(i,j) =  (XSQT(i,j)-1.0)*K_POINT(i)
     enddo
   enddo
-  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+6)
+  call COMPUTE_SQW (XSQT, Q_NUM, SQW_QLIST, PID+6, 0, 0)
 
   allocate(SKT_TAB(NQ_IN, NS-MIN_IN), STAT=ERR)
   if (ERR .ne. 0) then
@@ -299,17 +306,14 @@ if (Q_NUM .gt. 0) then
           SKT_TAB(m,l) = SQT(m,l,j,k)
         enddo
       enddo
-      call COMPUTE_SQW (SKT_TAB, Q_NUM, SQW_QLIST, PID)
+      call COMPUTE_SQW (SKT_TAB, Q_NUM, SQW_QLIST, PID, j, k)
       PID = PID + 2
-      ! Then FZ
-      ! Transform SKT_TAB to FZ
-      ! call COMPUTE_SQW (SKT_TAB, Q_NUM, SQW_QLIST)
-      ! The BT if 2 species
     enddo
   enddo
 
 endif
 
+s_of_k_t = 1
 
 001 continue
 
@@ -414,20 +418,19 @@ END SUBROUTINE
 !
 ! Compute S(q,w) loops over frequencies
 !
-SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC)
+SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
 
   USE PARAMETERS
 
   IMPLICIT NONE
 
-  INTEGER, INTENT(IN) :: Q_NUM
-  INTEGER, INTENT(IN) :: PIC
+  INTEGER, INTENT(IN) :: Q_NUM, PIC, SPA, SPB
   INTEGER, DIMENSION(Q_NUM), INTENT(IN) :: Q_LIST
   DOUBLE PRECISION, DIMENSION (NQ_IN,NS-MIN_IN), INTENT(IN) :: SKT_TAB
 
   INTEGER :: qid, id_q_num, freq
   INTEGER :: SHIFT, CID
-  DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val
+  DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val, fz_wal
 
   max_omega = PI / DELTA_T
   delta_omega = max_omega / DBLE(N_FREQ)
@@ -447,7 +450,7 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC)
 
       do t = 2, NS-MIN_IN
         time_val = DBLE(t-1) * DELTA_T
-        sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val) ! To check
+        sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val)
       enddo
 
       sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
@@ -457,6 +460,36 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC)
 
     ! Save SQW_TAB here !
     call save_curve (N_FREQ, SQW_TAB, CID, IDSKT)
+
+    if (SPA .gt. 0 .and. SPB .gt. 0) then
+
+      do freq = 1, N_FREQ
+
+        omega = DBLE(freq-1) * delta_omega
+        if (SPA .eq. SPB) then
+          sqw_val = 0.5d0 * (1.0d0 + (SKT_TAB(id_q_num, 1) - 1.0d0)/Xi(SPA))
+        else
+          sqw_val = 0.5d0 * (1.0d0 + SKT_TAB(id_q_num, 1)/sqrt(Xi(SPA)*Xi(SPB)))
+        endif
+
+        do t = 2, NS-MIN_IN
+          time_val = DBLE(t-1) * DELTA_T
+          if (SPA .eq. SPB) then
+            sqw_val = sqw_val + (1.0d0 + (SKT_TAB(id_q_num, t) - 1.0d0)/Xi(SPA)) * cos(omega * time_val)
+          else
+            sqw_val = sqw_val + (1.0d0 + SKT_TAB(id_q_num, t)/sqrt(Xi(SPA)*Xi(SPB))) * cos(omega * time_val)
+          endif
+        enddo
+
+        sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
+        SQW_TAB(freq) = sqw_val
+
+      enddo
+
+      call save_curve (N_FREQ, SQW_TAB, CID+2*NSP*NSP, IDSKT)
+
+    endif
+
     CID = CID + SHIFT
 
   enddo

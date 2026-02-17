@@ -31,6 +31,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   void init_msd (project * this_proj);
+  void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer);
   void update_msd_view (project * this_proj);
 
   G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
@@ -113,6 +114,32 @@ void init_msd (project * this_proj)
 }
 
 /*!
+  \fn void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer)
+
+  \brief print molecular dynamics information
+
+  \param this_proj the target project
+  \param calc_buffer the GtkTextBuffer to print into
+*/
+void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer)
+{
+  gchar * str;
+  print_info ("\t - Number of configurations: ", "bold", calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> steps);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info ("\n\n\t - Number of time steps between each configuration: ", "bold", calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> analysis[MSD] -> num_delta);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info ("\n\n\t - Time step δt used to integrate Newton's equations of motion: ", "bold", calc_buffer);
+  str = g_strdup_printf ("%f", this_proj -> analysis[MSD] -> delta);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info (" ", "bold", calc_buffer);
+  print_info (untime[this_proj -> tunit], "bold_red", calc_buffer);
+}
+/*!
   \fn void update_msd_view (project * this_proj)
 
   \brief update the project text view for the MSD calculation
@@ -121,25 +148,11 @@ void init_msd (project * this_proj)
 */
 void update_msd_view (project * this_proj)
 {
-  gchar * str;
   if (this_proj -> analysis[MSD] -> calc_buffer == NULL) this_proj -> analysis[MSD] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[MSD] -> calc_buffer);
   print_info ("\n\nMean Square Displacement\n\n", "heading", this_proj -> analysis[MSD] -> calc_buffer);
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[MSD] -> calc_buffer);
-  print_info ("\t - Number of configurations: ", "bold", this_proj -> analysis[MSD] -> calc_buffer);
-  str = g_strdup_printf ("%d", this_proj -> steps);
-  print_info (str, "bold_blue", this_proj -> analysis[MSD] -> calc_buffer);
-  g_free (str);
-  print_info ("\n\n\t - Number of time steps between each configuration: ", "bold", this_proj -> analysis[MSD] -> calc_buffer);
-  str = g_strdup_printf ("%d", this_proj -> analysis[MSD] -> num_delta);
-  print_info (str, "bold_blue", this_proj -> analysis[MSD] -> calc_buffer);
-  g_free (str);
-  print_info ("\n\n\t - Time step δt used to integrate Newton's equations of motion: ", "bold", this_proj -> analysis[MSD] -> calc_buffer);
-  str = g_strdup_printf ("%f", this_proj -> analysis[MSD] -> delta);
-  print_info (str, "bold_blue", this_proj -> analysis[MSD] -> calc_buffer);
-  g_free (str);
-  print_info (" ", "bold", this_proj -> analysis[MSD] -> calc_buffer);
-  print_info (untime[this_proj -> tunit], "bold_red", this_proj -> analysis[MSD] -> calc_buffer);
+  update_dynamic_view (this_proj, this_proj -> analysis[MSD] -> calc_buffer);
   print_info (calculation_time(TRUE, this_proj -> analysis[MSD] -> calc_time), NULL, this_proj -> analysis[MSD] -> calc_buffer);
 }
 

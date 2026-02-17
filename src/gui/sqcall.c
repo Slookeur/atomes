@@ -114,7 +114,7 @@ void init_sq (project * this_proj, int sqk)
 }
 
 /*!
-  \fn ;
+  \fn void update_sq_view (project * this_proj, int sqk)
 
   \brief update the text view for s(q) / s(k) calculation
 
@@ -186,11 +186,10 @@ void update_sq_view (project * this_proj, int sqk)
   print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\n", "bold", this_proj -> analysis[sqk] -> calc_buffer);
-  if (sqk == SKT)
+  if (sqk != SKT)
   {
-
+    print_info (calculation_time(TRUE, this_proj -> analysis[sqk] -> calc_time), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   }
-  print_info (calculation_time(TRUE, this_proj -> analysis[sqk] -> calc_time), NULL, this_proj -> analysis[sqk] -> calc_buffer);
 }
 
 /*!

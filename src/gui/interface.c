@@ -747,8 +747,9 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid)
   active_project -> steps = * stps;
   if (active_project -> steps > 1)
   {
-    active_project -> skt_correlations = (active_project -> steps < 20) ? 1 : 10;
-    active_project -> skt_n_data_sets = min (10, active_project -> steps);
+    active_project -> skt_corr_threshold = (active_project -> steps < 20) ? 1 : 10;
+    active_project -> skt_n_data_sets = min (5, active_project -> steps);
+    active_project -> sqw_n_data_sets = 5;
   }
   alloc_proj_data (active_project, * cid);
   if (* cid) active_chem = active_project -> chemistry;
@@ -799,7 +800,7 @@ void spec_data_ (int * status, int * ind, int * atd, int * nsp,
 
   \param str the text
   \param stag the tags
-  \param buffer the GtkTextBuffer to print to
+  \param buffer the GtkTextBuffer to print into
 */
 void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer)
 {

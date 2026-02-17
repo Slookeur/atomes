@@ -53,21 +53,38 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 */
 const gchar * default_title (int ax, gpointer data)
 {
-  project * this_proj = get_project_by_id (((tint *)data) -> a);
+  tint * pcc = (tint *)data;
+  project * this_proj = get_project_by_id (pcc -> a);
+  gchar * freq_unit[5]={" THz", " THz", " MHz", " KHz", " Hz"};
   if (ax == 0)
   {
-    int rid = ((tint *)data) -> b;
-    if (rid != MSD)
+    int rid = pcc -> b;
+    int cid = pcc -> c;
+    if (rid == MSD)
     {
-      return this_proj -> analysis[rid] -> x_title;
+      if (this_proj -> tunit > -1)
+      {
+        return g_strdup_printf ("t [%s]", untime[this_proj -> tunit]);
+      }
+      else
+      {
+        return NULL;
+      }
     }
-    else if (this_proj -> tunit > -1)
+    else if (rid == SKT)
     {
-      return g_strdup_printf ("t [%s]", untime[this_proj -> tunit]);
+      if (cid < this_proj -> skt_sets)
+      {
+        return g_strdup_printf ("q [Å-1]");
+      }
+      else
+      {
+        return g_strdup_printf ("ω %s", freq_unit[this_proj -> tunit]);
+      }
     }
     else
     {
-      return NULL;
+      return this_proj -> analysis[rid] -> x_title;
     }
   }
   else

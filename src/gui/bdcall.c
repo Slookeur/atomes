@@ -133,6 +133,7 @@ void recup_dmin_dmax_ (double * min, double * max)
     active_project -> analysis[BND] -> max = * max;
   }
 }
+
 /*!
   \fn void init_bond (project * this_proj)
 

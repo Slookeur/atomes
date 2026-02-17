@@ -30,6 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  void recup_sqw_list_ (int nq, double qval[nq]);
   void init_skt ();
   void update_skt_view (project * this_proj);
 
@@ -50,7 +51,29 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 extern void update_sq_view (project * this_proj, int sqk);
+extern void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer);
 extern gboolean skt_all_sets;
+
+/*!
+  \fn void recup_sqw_list_ (int nq, double qval[nq])
+
+  \brief retrieve exact q vector values from Fortran
+
+  \param nq the number of q vectors
+  \param qval the list of q vectors
+*/
+void recup_sqw_list_ (int nq, double qval[nq])
+{
+  if (nq != active_project -> sqw_n_data_sets)
+  {
+    // This should happen, error ?
+  }
+  int i;
+  for (i=0; i<* qval; i++)
+  {
+    active_project -> sqw_q_id[i] = qval[i];
+  }
+}
 
 /*!
   \fn void init_skt (project * this_proj)
@@ -68,7 +91,7 @@ void init_skt (project * this_proj)
   g = this_proj -> skt_sets;
   if (this_proj -> skt_all_sets)
   {
-    this_proj -> skt_sets *= (this_proj -> steps - this_proj -> skt_correlations);
+    this_proj -> skt_sets *= (this_proj -> steps - this_proj -> skt_corr_threshold);
   }
   else
   {
@@ -78,7 +101,7 @@ void init_skt (project * this_proj)
 
   this_proj -> analysis[SKT] -> numc = this_proj -> skt_sets + this_proj -> sqw_sets;
   alloc_analysis_curves (this_proj -> id, this_proj -> analysis[SKT]);
-  for (h=0; h < ((this_proj -> skt_all_sets) ? this_proj -> steps - this_proj -> skt_correlations : this_proj -> skt_n_data_sets); h++)
+  for (h=0; h < ((this_proj -> skt_all_sets) ? this_proj -> steps - this_proj -> skt_corr_threshold : this_proj -> skt_n_data_sets); h++)
   {
     i = h*g;
     j = (this_proj -> skt_all_sets) ? h+1 : active_project -> skt_step_id[h];
@@ -188,6 +211,83 @@ void init_skt (project * this_proj)
 }
 
 /*!
+  \fn void update_skt_view (project * this_proj)
+
+  \brief update the text view for s(k,t) and s(q,w) calculation
+
+  \param this_proj the target project
+*/
+void update_skt_view (project * this_proj)
+{
+  int i;
+  gchar * str;
+  update_sq_view (this_proj, SKT);
+  print_info ("\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  print_info ("\tMolecular dynamics information:\n\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  update_dynamic_view (this_proj, this_proj -> analysis[SKT] -> calc_buffer);
+
+  print_info ("\n\n\tIntermediate scattering - F(q,δt)\n\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+
+  print_info ("\t - Correlation threshold δt", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+  print_info ("min", "sup_bold", this_proj -> analysis[SKT] -> calc_buffer);
+  print_info (" = ", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> skt_corr_threshold);
+  print_info (str, "bold_blue", this_proj -> analysis[SKT] -> calc_buffer);
+  g_free (str);
+  print_info ("\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  if (this_proj -> skt_all_sets)
+  {
+    print_info ("\t - All ", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+    str = g_strdup_printf ("%d", this_proj -> skt_sets);
+    print_info (str, "bold_blue", this_proj -> analysis[SKT] -> calc_buffer);
+    g_free (str);
+    print_info (" correlated calculations saved", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+    print_info ("\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  }
+  else
+  {
+    print_info ("\t - Results saved for ", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+    str = g_strdup_printf ("%d", this_proj -> skt_n_data_sets);
+    print_info (str, "bold_blue", this_proj -> analysis[SKT] -> calc_buffer);
+    g_free (str);
+    print_info (" correlated calculations:\n\n", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+    for (i=0; i<this_proj -> skt_n_data_sets; i++)
+    {
+      print_info (" \t\t ", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+      str = g_strdup_printf ("%d", i);
+      print_info (str, NULL, this_proj -> analysis[SKT] -> calc_buffer);
+      g_free (str);
+      print_info (") δt\t=\t", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+      str = g_strdup_printf ("%d\n", this_proj -> skt_step_id[i]);
+      print_info (str, "bold_green", this_proj -> analysis[SKT] -> calc_buffer);
+      g_free (str);
+    }
+  }
+  print_info ("\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  print_info ("\tDynamic structure factor - S(q,ω)\n\n", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+  print_info ("\t - ", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> sqw_n_data_sets);
+  print_info (str, "bold_blue", this_proj -> analysis[SKT] -> calc_buffer);
+  g_free (str);
+  print_info (" q vectors were analyzed:\n\n", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+  for (i=0; i<this_proj -> sqw_n_data_sets; i++)
+  {
+    print_info (" \t\t ", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+    str = g_strdup_printf ("%d", i);
+    print_info (str, NULL, this_proj -> analysis[SKT] -> calc_buffer);
+    g_free (str);
+    print_info (") q\t=\t", NULL, this_proj -> analysis[SKT] -> calc_buffer);
+    str = g_strdup_printf ("%f", this_proj -> sqw_q_id[i]);
+    print_info (str, "bold_red", this_proj -> analysis[SKT] -> calc_buffer);
+    g_free (str);
+    print_info (" Å", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+    print_info ("-1", "sup_bold", this_proj -> analysis[SKT] -> calc_buffer);
+    print_info ("\n", "bold", this_proj -> analysis[SKT] -> calc_buffer);
+  }
+  print_info (calculation_time(TRUE, this_proj -> analysis[SKT] -> calc_time), NULL, this_proj -> analysis[SKT] -> calc_buffer);
+}
+
+/*!
   \fn G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
 
   \brief callback to compute the dynamic structure factor analysis
@@ -221,7 +321,7 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
     double detla_t = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
     int res_skt = s_of_k_t_ (& active_project -> analysis[SKT] -> num_delta,
                              & active_project -> xcor,
-                             & active_project -> skt_correlations,
+                             & active_project -> skt_corr_threshold,
                              & active_project -> skt_n_data_sets,
                              active_project -> skt_step_id,
                              & detla_t,
@@ -237,7 +337,7 @@ G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data)
     }
     else
     {
-      update_sq_view (active_project, SKT);
+      update_skt_view (active_project);
       show_the_widgets (curvetoolbox);
     }
   }

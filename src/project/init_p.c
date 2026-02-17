@@ -231,8 +231,9 @@ void init_project (gboolean alloc_box)
   new_proj -> xcor = 1;
   new_proj -> sk_advanced[0][0] = new_proj -> sk_advanced[1][0] = 1.0;
   new_proj -> sk_advanced[0][1] = new_proj -> sk_advanced[1][1] = 15.0;
-  // new_proj -> skt_correlations = 10;
-  // new_proj -> skt_n_data_sets = 1;
+  // new_proj -> skt_corr_threshold = 10;
+  // new_proj -> skt_n_data_sets = 5;
+  // new_proj -> sqw_n_data_sets = 5;
 
   //
   new_proj -> coord = g_malloc0(sizeof*new_proj -> coord);
