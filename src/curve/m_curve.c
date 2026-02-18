@@ -378,28 +378,36 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
   gchar * str_a, * str_b, * str_c;
   gchar * text[2] = {"curve.action", "edit.data"};
   project * this_proj = get_project_by_id(a);
-  int i;
-  for (i=0; i<this_proj -> analysis[b] -> numc; i++)
+  int g, h, i;
+  if (b == SKT)
   {
-
-
-    if (this_proj -> analysis[b] -> curves[i] -> ndata > 0)
+    g = (data -> c < get_project_by_id(data -> a) -> skt_sets) ? this_proj -> skt_sets : this_proj -> sqw_sets;
+    h = (data -> c < get_project_by_id(data -> a) -> skt_sets) ? 0 : this_proj -> skt_sets;
+  }
+  else
+  {
+    g = this_proj -> analysis[b] -> numc;
+    h = 0;
+  }
+  for (i=0; i<g; i++)
+  {
+    if (this_proj -> analysis[b] -> curves[i+h] -> ndata > 0)
     {
-      if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))
+      if (((a != data -> a || b != data -> b || i+h != data -> c) && add == was_not_added(sets, a, b, i+h)) || (a == data -> a && b == data -> b && i+h == data -> c && edit))
       {
-        str_a = g_strdup_printf ("%s", this_proj -> analysis[b] -> curves[i] -> name);
-        str_b = g_strdup_printf ("%s.%d-%d-%d", text[edit], a, b, i);
+        str_a = g_strdup_printf ("%s", this_proj -> analysis[b] -> curves[i+h] -> name);
+        str_b = g_strdup_printf ("%s.%d-%d-%d", text[edit], a, b, i+h);
         str_c = g_strdup_printf ("%s.%s", act, str_b);
         append_menu_item (menu, (const gchar *)str_a, (const gchar *)str_c, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
         g_free (str_a);
         g_free (str_c);
         if (edit)
         {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_edit_menu_action), & this_proj -> analysis[b] -> idcc[i+h], FALSE, FALSE, FALSE, NULL);
         }
         else
         {
-          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b] -> idcc[i], FALSE, FALSE, FALSE, NULL);
+          widget_add_action (action_group, (const gchar *)str_b, G_CALLBACK(curve_add_remove_menu_action), & this_proj -> analysis[b] -> idcc[i+h], FALSE, FALSE, FALSE, NULL);
         }
         g_free (str_b);
       }
@@ -423,7 +431,7 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
 {
   project * this_proj;
   GMenu * menu = g_menu_new ();
-  int i, j, k;
+  int i, j, k, l;
   gboolean * create_proj = allocbool (nprojects);
   gboolean ** create_menu = allocdbool (nprojects, NCALCS);
   for (i=0; i<nprojects; i++)
@@ -436,7 +444,15 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
       {
         k = this_proj -> analysis[data -> b] -> compat_id[j];
         create_menu[i][k] = FALSE;
-        if (((add && extrarid[i][k] < this_proj -> analysis[k] -> numc)
+        if (data -> b == SKT)
+        {
+          l = (data -> c < get_project_by_id(data -> a) -> skt_sets) ? this_proj -> skt_sets : this_proj -> sqw_sets;
+        }
+        else
+        {
+          l =  this_proj -> analysis[k] -> numc;
+        }
+        if (((add && extrarid[i][k] < l)
         || (! add && extrarid[i][k] > 0)) && this_proj -> analysis[k] -> calc_ok)
         {
           create_menu[i][k] = TRUE;
@@ -727,9 +743,23 @@ GtkWidget * curve_popup_menu (gpointer data)
     k = this_proj -> analysis[activer] -> compat_id[j];
     for ( l=0 ; l < nprojects; l++ )
     {
-      i += get_project_by_id(l) -> analysis[k] -> numc;
+      if (get_project_by_id(l) -> analysis)
+      {
+        if (get_project_by_id(l) -> analysis[k])
+        {
+          if (activer == SKT)
+          {
+            i += (activec < this_proj -> skt_sets) ? get_project_by_id(l) -> skt_sets : get_project_by_id(l) -> sqw_sets;
+          }
+          else
+          {
+            i += get_project_by_id(l) -> analysis[k] -> numc;
+          }
+        }
+      }
     }
   }
+  // i is the potential number of extra curves, skt is messing with that
   g_menu_append_section (menu, NULL, (GMenuModel *)create_add_remove_section(curve_popup_actions, str, i, cstate -> id));
   g_menu_append_section (menu, NULL, (GMenuModel *)autoscale_section(str));
   g_menu_append_section (menu, NULL, (GMenuModel *)curve_close_section(str));
