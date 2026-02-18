@@ -4145,12 +4145,13 @@ GtkWidget * calc_preferences ()
                                       "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "step(s) between configurations"};
   gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
                      "use it to setup your own default parameters:"};
-  gchar * m_list[3][2] = {{"Calculations", "most analysis options"},
+  gchar * m_list[4][2] = {{"Calculations", "most analysis options"},
                           {"Rings", "ring statistics options"},
-                          {"Chains", "chain statistics options"}};
+                          {"Chains", "chain statistics options"},
+                          {"S(q,&#969;)", "dynamic structure factor options"}};
 
   vbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 20);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("To determine the existence, or the absence, of a chemical bond", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("between 2 atoms is a key feature in the <b>atomes</b> software", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
@@ -4234,6 +4235,10 @@ GtkWidget * calc_preferences ()
     calc_rings (vbox);
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? "Chains" : "Rings"));
   }
+  vbox = create_vbox (BSEP);
+  // calc_sk_t (vbox);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, markup_label("S(q,&#969;)", -1, -1, 0.0, 0.5));
+
   show_the_widgets (notebook);
   return notebook;
 }

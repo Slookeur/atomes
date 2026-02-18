@@ -693,30 +693,30 @@ typedef struct atomes_analysis atomes_analysis;
 struct atomes_analysis
 {
   /*
-     Analysis related parameters
+     Analysis default structure and parameters
   */
-  int aid;                     /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,t) */
-  gchar * name;                /*!< Analysis name for menu item */
-  gboolean avail_ok;           /*!< Analysis calculation availability */
-  gboolean init_ok;            /*!< Curves initialization */
-  gboolean calc_ok;            /*!< Analysis calculation confirmation */
-  gboolean requires_md;        /*!< Analysis requires multiple configurations */
-  gchar * x_title;             /*!< x axis default title, ex: "r [Å] */
-  double calc_time;            /*!< Calculation time */
-  int num_delta;               /*!< Number of intervals */
-  double delta;                /*!< Size of an interval */
-  double min;                  /*!< Minimum x value */
-  double max;                  /*!< Maximum x value */
-  double fact;                 /*!< Gaussian smoothing factor, if available */
-  int other_params;            /*!< Number of other parameters for this analysis */
-  double * o_params;           /*!< List of other parameters */
-  GtkTextBuffer * calc_buffer; /*!< The text buffer for the calculation */
-  gboolean graph_res;          /*!< Results to be displayed using graphs ? */
-  int numc;                    /*!< Number of curves, if any */
-  int c_sets;                  /*!< Number of compatible sets */
-  int * compat_id;             /*!< List of compatible sets */
-  Curve ** curves;             /*!< The curves, graph for the results of the calculations, if any */
-  tint * idcc;                 /*!< Pointers for the curves */
+  int aid;                      /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,t) */
+  gchar * name;                 /*!< Analysis name for menu item */
+  gboolean avail_ok;            /*!< Analysis calculation availability */
+  gboolean init_ok;             /*!< Curves initialization */
+  gboolean calc_ok;             /*!< Analysis calculation confirmation */
+  gboolean requires_md;         /*!< Analysis requires multiple configurations */
+  gchar * x_title;              /*!< x axis default title, ex: "r [Å] */
+  double calc_time;             /*!< Calculation time */
+  int num_delta;                /*!< Number of intervals */
+  double delta;                 /*!< Size of an interval */
+  double min;                   /*!< Minimum x value */
+  double max;                   /*!< Maximum x value */
+  double fact;                  /*!< Gaussian smoothing factor, if available */
+  int other_params;             /*!< Number of other parameters for this analysis */
+  double * o_params;            /*!< List of other parameters */
+  GtkTextBuffer * calc_buffer;  /*!< The text buffer for the calculation */
+  gboolean graph_res;           /*!< Results to be displayed using graphs ? */
+  int numc;                     /*!< Number of curves, if any */
+  int c_sets;                   /*!< Number of compatible sets */
+  int * compat_id;              /*!< List of compatible sets */
+  Curve ** curves;              /*!< The curves, graph for the results of the calculations, if any */
+  tint * idcc;                  /*!< Pointers for the curves */
 };
 
 /*! \def MAXDATC
@@ -994,8 +994,10 @@ struct project
   /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
   atomes_analysis ** analysis;         /*!< The analysis data and results */
 
-  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
+  // Some parameters cannot be easily stored in a generic data structure
   gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
+  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
+  // Ring statistics parameters
   // 0 = Search type, 1 = NUMA
   int rsearch[2];                      /*!< Ring statistics parameters: 0 = Search type, 1 = Ring's allocation parameter NUMA */
   // First col : search type (up to chains stat). Second col: search info
@@ -1013,6 +1015,7 @@ struct project
                                             2 = Number of ring(s) with size > Rmax that potentially exist per MD step: RpE, \n
                                             3 = Standard deviation for RpE, \n
                                             4 = calculation time for the analysis */
+  // Chain statistics parameters
   int csearch;                         /*!< Chain statistics allocation parameter: CNUMA */
   // 0 = Initnode, 1 = AAAA, 2 = ABAB, 3 = Homo, 4 = 1221, 5 = RMAX, 6 = Done + Chains
   int csparam[7];                      /*!< Chain statistics parameters: \n
@@ -1026,6 +1029,7 @@ struct project
   double csdata[2];                    /*!< Results for the chain statistics: \n
                                             0 = Total number of chains) per MD step: CpS, \n
                                             1 = Standard deviation for CpS */
+  // F(k,t) and S(q,w) parameters
   double sk_advanced[2][2];            /*!< Probability triggered k sampling, 0 = SKD, 1 = SKT */
   int skt_sets;                        /*!< Total number of S(k,t) curves */
   int skt_corr_threshold;              /*!< Minium number of correlated configurations to compute S(k,t) */
