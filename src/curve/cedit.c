@@ -204,6 +204,22 @@ static void fill_proj_model (curve_edition * cedit, GtkTreeStore * store, gpoint
           {
             append = TRUE;
           }
+
+          if (append)
+          {
+            // Special condition for the F(k,t) and S(q,w)
+            if (rid == SKT)
+            {
+              if (cid < the_proj -> skt_sets && l > this_proj -> skt_sets-1)
+              {
+                append = FALSE;
+              }
+              else if (cid > the_proj -> skt_sets-1 && l < this_proj -> skt_sets)
+              {
+                append = FALSE;
+              }
+            }
+          }
           if (append)
           {
             gtk_tree_store_append (store, & curvelevel, & calclevel);

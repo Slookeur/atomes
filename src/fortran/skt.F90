@@ -486,6 +486,7 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
 
       enddo
 
+      ! Save SQW_TAB here !
       call save_curve (N_FREQ, SQW_TAB, CID+2*NSP*NSP, IDSKT)
 
     endif

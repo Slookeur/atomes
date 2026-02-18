@@ -381,6 +381,8 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
   int i;
   for (i=0; i<this_proj -> analysis[b] -> numc; i++)
   {
+
+
     if (this_proj -> analysis[b] -> curves[i] -> ndata > 0)
     {
       if (((a != data -> a || b != data -> b || i != data -> c) && add == was_not_added(sets, a, b, i)) || (a == data -> a && b == data -> b && i == data -> c && edit))

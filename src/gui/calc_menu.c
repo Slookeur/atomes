@@ -1693,7 +1693,7 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
     case 0:
       if (v <= 0 || v >= active_project -> steps-1)
       {
-        show_warning ("This value must be > 0 and < number of steps", calc_win);
+        show_warning ("This value must be &#62; 0 and &#60; number of steps", calc_win);
       }
       else
       {

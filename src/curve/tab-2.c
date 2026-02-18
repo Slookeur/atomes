@@ -52,6 +52,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   GtkWidget * create_org_list (gpointer data);
   GtkWidget * create_tab_2 (gpointer data);
 
+  DataLayout * duplicate_curve_layout (DataLayout * old_layout);
   DataLayout * get_extra_layout (gpointer data, int i);
 
 */
@@ -676,6 +677,32 @@ static void fill_org_model (GtkListStore * store, gpointer data)
 }
 
 /*!
+  \fn DataLayout * duplicate_curve_layout (DataLayout * old_layout)
+
+  \brief duplicate a curve layout
+
+  \param old_layout the layout to duplicate
+*/
+DataLayout * duplicate_curve_layout (DataLayout * old_layout)
+{
+  DataLayout * new_layout = g_malloc0(sizeof*new_layout);
+  new_layout -> datacolor.red = old_layout -> datacolor.red;
+  new_layout -> datacolor.green = old_layout -> datacolor.green;
+  new_layout -> datacolor.blue = old_layout -> datacolor.blue;
+  new_layout -> datacolor.alpha = 1.0;
+  new_layout -> thickness = old_layout -> thickness;
+  new_layout -> hwidth = old_layout -> hwidth;
+  new_layout -> hopac = old_layout -> hopac;
+  new_layout -> hpos = old_layout -> hpos;
+  new_layout -> dash = old_layout -> dash;
+  new_layout -> gfreq = old_layout -> gfreq;
+  new_layout -> aspect = old_layout -> aspect;
+  new_layout -> glyph = old_layout -> glyph;
+  new_layout -> gsize = old_layout -> gsize;
+  return new_layout;
+}
+
+/*!
   \fn G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * path, gpointer data)
 
   \brief move up or down data set in the tree model to move it front or back in the data plot
@@ -690,9 +717,10 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
   GtkTreeIter iter;
   gboolean valid;
   gboolean done;
+  gboolean initial, terminal;
   int i, j, k, l, m;
   tint cbid;
-  CurveExtra * ctmpa, * ctmpb, * ctmpc, * ctmpd;
+  CurveExtra * ctmpa, * ctmpb;
   Curve * this_curve = get_curve_from_pointer (data);
   curve_edition * cedit = this_curve -> curve_edit;
   m = combo_get_active (cedit -> setcolorbox);
@@ -703,9 +731,20 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
     for (i=0; i<m-1; i++) ctmpa = ctmpa -> next;
     cbid = ctmpa -> id;
   }
+  g_debug ("Before");
+  ctmpa = this_curve -> extrac -> first;
+  i = 0;
+  while (ctmpa)
+  {
+    g_debug ("i= %d, pid= %d, rid= %d, cid= %d, name= %s", i, ctmpa -> id.a, ctmpa -> id.b, ctmpa -> id.c,
+             get_project_by_id(ctmpa -> id.a) -> analysis[ctmpa -> id.b] -> curves[ctmpa -> id.c] -> name);
+    i++;
+    ctmpa = ctmpa -> next;
+  }
+  g_debug (" ");
+
   l = this_curve -> extrac -> extras;
   valid = gtk_tree_model_get_iter_first (tree_model, & iter);
-  ctmpa = this_curve -> extrac -> first;
   while (valid)
   {
     gtk_tree_model_get (tree_model, & iter, 0, & i, 1, & j, 2, & k, -1);
@@ -713,76 +752,80 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
     {
       // To set the draw order for the host curve
       this_curve -> draw_id = l;
+      valid = FALSE;
     }
-    else if (ctmpa -> id.a != i || ctmpa -> id.b != j || ctmpa -> id.c != k)
+    else
     {
-      ctmpb = ctmpa -> next;
-      done = FALSE;
-      // Setting the pointer ctmpb to the corresponding (i,j,k) extra curve
-      while (! done && ctmpb)
-      {
-        if (ctmpb -> id.a == i && ctmpb -> id.b == j && ctmpb -> id.c == k)
-        {
-          done = TRUE;
-        }
-        else
-        {
-          ctmpb = ctmpb -> next;
-          done = FALSE;
-        }
-      }
-      // At this point fixed ctmpb to (i,j,k) extra curve
-      if (done)
-      {
-        ctmpc = ctmpa -> prev;
-        if (ctmpb -> prev != ctmpa)
-        {
-          ctmpb -> prev -> next = ctmpa;
-          ctmpa -> prev = ctmpb -> prev;
-          ctmpd = ctmpa -> next;
-        }
-        else
-        {
-          ctmpa -> prev = ctmpb;
-          ctmpd = NULL;
-        }
-        if (ctmpb -> next)
-        {
-          ctmpb -> next -> prev = ctmpa;
-          ctmpa -> next = ctmpb -> next;
-        }
-        else
-        {
-          ctmpa -> next = NULL;
-          this_curve -> extrac -> last = ctmpa;
-        }
-
-        if (ctmpc)
-        {
-          ctmpb -> prev = ctmpc;
-          ctmpc -> next = ctmpb;
-        }
-        else
-        {
-          ctmpb -> prev = NULL;
-          this_curve -> extrac -> first = ctmpb;
-        }
-        if (ctmpd)
-        {
-          ctmpd -> prev = ctmpb;
-          ctmpb -> next = ctmpd;
-        }
-        else
-        {
-          ctmpb -> next = ctmpa;
-          ctmpa -> prev = ctmpb;
-        }
-        ctmpa = ctmpb;
-      }
+      valid = gtk_tree_model_iter_next (tree_model, & iter);
+      l --;
     }
-    l --;
+  }
+  valid = gtk_tree_model_get_iter_first (tree_model, & iter);
+  ctmpa = this_curve -> extrac -> first;
+
+  CurveExtra * tmp_extra = g_malloc0(sizeof*tmp_extra);
+  while (valid && ctmpa)
+  {
+    gtk_tree_model_get (tree_model, & iter, 0, & i, 1, & j, 2, & k, -1);
+    if (i != cid -> a  || j != cid -> b || k != cid -> c)
+    {
+      if (i != ctmpa -> id.a || j != ctmpa -> id.b || k != ctmpa -> id.c)
+      {
+        ctmpb = ctmpa -> next;
+        done = FALSE;
+        // Setting the pointer ctmpb to the corresponding (i,j,k) extra curve
+        while (! done && ctmpb)
+        {
+          if (ctmpb -> id.a == i && ctmpb -> id.b == j && ctmpb -> id.c == k)
+          {
+            done = TRUE;
+          }
+          else
+          {
+            ctmpb = ctmpb -> next;
+            done = FALSE;
+         }
+        }
+        // At this point fixed ctmpb to (i,j,k) extra curve
+        if (done)
+        {
+          initial = FALSE;
+          terminal = FALSE;
+          if (! ctmpa -> prev) initial = TRUE;
+          if (! ctmpb -> next) terminal = TRUE;
+          ctmpb -> prev -> next = ctmpa;
+          if (! initial) ctmpa -> prev = ctmpb -> prev;
+          if (! terminal) ctmpb -> next -> prev = ctmpa;
+          ctmpa -> next = ctmpb -> next;
+          ctmpb -> next = ctmpa;
+          if (initial)
+          {
+            ctmpb -> prev = NULL;
+            this_curve -> extrac -> first = ctmpb;
+          }
+          if (terminal)
+          {
+            ctmpa -> next = NULL;
+            this_curve -> extrac -> last = ctmpa;
+          }
+        }
+      }
+      ctmpa = ctmpa -> next;
+    }
     valid = gtk_tree_model_iter_next (tree_model, & iter);
   }
+
+  g_debug ("After");
+  ctmpa = this_curve -> extrac -> first;
+  i = 0;
+  while (ctmpa)
+  {
+    g_debug ("i= %d, pid= %d, rid= %d, cid= %d, name= %s", i, ctmpa -> id.a, ctmpa -> id.b, ctmpa -> id.c,
+             get_project_by_id(ctmpa -> id.a) -> analysis[ctmpa -> id.b] -> curves[ctmpa -> id.c] -> name);
+    i++;
+    ctmpa = ctmpa -> next;
+  }
+
   if (m > 0)
   {
     ctmpa = this_curve -> extrac -> first;
