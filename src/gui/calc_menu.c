@@ -177,7 +177,7 @@ void update_omega_max ()
   }
   else
   {
-    str = g_strdup_printf ("Update &#x3b4;t and interval to evaluate &#969;<sub>max</sub>");
+    str = g_strdup_printf ("Update step(s) between conf. and &#x3b4;t to evaluate &#969;<sub>max</sub>");
     omega_max_info = markup_label (str, -1, -1, 0.5, 0.5);
     g_free (str);
   }

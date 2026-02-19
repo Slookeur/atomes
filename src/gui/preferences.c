@@ -475,6 +475,10 @@ int save_preferences_to_xml_file ()
                               "Only search for ABAB chains",
                               "No homopolar bonds in the chains (A-A, B-B ...)",
                               "Only search for 1-(2)n-1 chains"};
+  gchar * xml_skt_leg[4] = {"Analysze all correlated δt steps",
+                            "Number of analyzed δt steps",
+                            "Number of analyzed q points",
+                            "Number of frequency points"};
   gchar * xml_opengl_leg[5] = {"Default style",
                                "Atom(s) color map",
                                "Polyhedra color map",
@@ -612,6 +616,24 @@ int save_preferences_to_xml_file ()
     g_free (str);
     if (! rc) return 0;
   }
+  // F(k,t) and S(q,w)
+  // Work to do here !
+  str = g_strdup_printf ("%d", default_skt_sets);
+  rc = xml_save_parameter_to_file (writer,  xml_skt_leg[0], "default_skt_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_skt_n_sets);
+  rc = xml_save_parameter_to_file (writer,  xml_skt_leg[1], "default_skt_n_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_sqw_n_sets);
+  rc = xml_save_parameter_to_file (writer,  xml_skt_leg[2], "default_sqw_n_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_sqw_freq);
+  rc = xml_save_parameter_to_file (writer,  xml_skt_leg[2], "default_sqw_freq", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
 
   // End analysis
   rc = xmlTextWriterEndElement (writer);
@@ -1283,6 +1305,22 @@ void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t *
   else if (g_strcmp0(key, "default_csparam") == 0)
   {
     default_csparam[vid] = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_skt_sets") == 0)
+  {
+    default_skt_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_skt_n_sets") == 0)
+  {
+    default_skt_n_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_sqw_n_sets") == 0)
+  {
+    default_sqw_n_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_sqw_freq") == 0)
+  {
+    default_sqw_freq = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "default_opengl") == 0)
   {
