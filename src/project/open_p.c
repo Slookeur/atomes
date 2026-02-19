@@ -64,6 +64,7 @@ extern void init_ring (project * this_proj);
 extern void init_chain (project * this_proj);
 extern void init_msd (project * this_proj);
 extern void init_sph (project * this_proj, int str);
+extern void init_skt (project * this_proj);
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 
 gboolean version_2_5_and_bellow;
@@ -156,7 +157,7 @@ void initcnames (project * this_proj, int rid)
       init_msd (this_proj);
       break;
     case SKT:
-      init_sq (this_proj, rid);
+      init_skt (this_proj);
       break;
   }
 }
@@ -419,6 +420,14 @@ int open_project (FILE * fp)
     if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
     if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   }
+  else
+  {
+    // Analysis data for k-points sampling
+    for (i=0; i<2; i++)
+    {
+      if (fread (active_project -> sk_advanced[i], sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+    }
+  }
   if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
   {
@@ -437,6 +446,30 @@ int open_project (FILE * fp)
     if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
   }
   if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (version_2_9_and_above)
+  {
+    if (active_project -> steps)
+    {
+      if (fread (& active_project -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (fread (& active_project -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+      if (! active_project -> skt_all_sets)
+      {
+        if (fread (& active_project -> skt_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+        if (active_project -> skt_n_data_sets)
+        {
+          active_project -> skt_step_id = allocint (active_project -> skt_n_data_sets);
+          if (fread (active_project -> skt_step_id, sizeof(int), active_project -> skt_n_data_sets, fp) != active_project -> skt_n_data_sets) return ERROR_PROJECT;
+        }
+      }
+      if (fread (& active_project -> sqw_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (active_project -> sqw_n_data_sets)
+      {
+        active_project -> sqw_q_id = allocdouble (active_project -> sqw_n_data_sets);
+        if (fread (active_project -> sqw_q_id, sizeof(double), active_project -> sqw_n_data_sets, fp) != active_project -> sqw_n_data_sets) return ERROR_PROJECT;
+      }
+      if (fread (& active_project -> sqw_freq, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    }
+  }
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
   {
     alloc_proj_data (active_project, 1);

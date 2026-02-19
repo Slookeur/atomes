@@ -211,6 +211,11 @@ int save_project (FILE * fp, project * this_proj)
   if (fwrite (& this_proj -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (& this_proj -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (this_proj -> modelgl -> pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+  // Analysis data for k-points sampling
+  for (i=0; i<2; i++)
+  {
+    if (fwrite (this_proj -> sk_advanced[i], sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+  }
   // Next lines are calculation data related to rings and chains statistics
   if (fwrite (this_proj -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
   for (i=0; i<5; i++)
@@ -221,8 +226,27 @@ int save_project (FILE * fp, project * this_proj)
   if (fwrite (& this_proj -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fwrite (this_proj -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
   if (fwrite (this_proj -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
-  // Time unit for MSD calculation
+  // Time unit for dynamical calculations, delta t and steps are stored in MSD analysis
   if (fwrite (& this_proj -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (this_proj -> steps)
+  {
+    if (fwrite (& this_proj -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& this_proj -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+    if (! this_proj -> skt_all_sets)
+    {
+      if (fwrite (& this_proj -> skt_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (this_proj -> skt_n_data_sets)
+      {
+        if (fwrite (this_proj -> skt_step_id, sizeof(int), this_proj -> skt_n_data_sets, fp) != this_proj -> skt_n_data_sets) return ERROR_PROJECT;
+      }
+    }
+    if (fwrite (& this_proj -> sqw_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (this_proj -> sqw_n_data_sets)
+    {
+      if (fwrite (this_proj -> sqw_q_id, sizeof(double), this_proj -> sqw_n_data_sets, fp) != this_proj -> sqw_n_data_sets) return ERROR_PROJECT;
+    }
+    if (fwrite (& this_proj -> sqw_freq, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  }
   if (this_proj -> natomes != 0 && this_proj -> nspec != 0)
   {
     for (i=0; i<this_proj -> nspec; i++)
