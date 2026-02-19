@@ -213,7 +213,7 @@ do i=1, NQ_IN
     QID(NSQ) = i
   endif
 enddo
-
+! Saving k-points
 call save_xsk (NSQ, SQTAB)
 
 if (SKT_SAVE(NSQ) .eq. 0) then
@@ -430,7 +430,7 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
 
   INTEGER :: qid, id_q_num, freq
   INTEGER :: SHIFT, CID
-  DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val, fz_wal
+  DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val
 
   max_omega = PI / DELTA_T
   delta_omega = max_omega / DBLE(N_FREQ)

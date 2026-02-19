@@ -32,6 +32,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve);
   void initcurve (project * pid, int rid, int cid);
+  void init_curve_title (project * this_proj, int rid, int cid);
   void add_curve_widgets (project * this_proj, int rid);
 
   DataLayout * curve_default_layout (project * pid, int rid, int cid);
@@ -248,6 +249,30 @@ void initcurve (project * pid, int rid, int cid)
 }
 
 /*!
+  \fn void init_curve_title (project * this_proj, int rid, int cid)
+
+  \brief init curve title and axis titles
+
+  \param this_proj the target project
+  \param rid the analysis id
+  \param cid the curve id
+*/
+void init_curve_title (project * this_proj, int rid, int cid)
+{
+  if (this_proj -> analysis[rid] -> curves[cid] -> default_title)
+  {
+    this_proj -> analysis[rid] -> curves[cid] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[rid] -> curves[cid] -> name);
+  }
+  int i;
+  for (i=0; i<2; i++)
+  {
+    if (this_proj -> analysis[rid] -> curves[cid] -> axis_defaut_title[i])
+    {
+      this_proj -> analysis[rid] -> curves[cid] -> axis_title[i] = g_strdup_printf ("%s", default_title(i, & this_proj -> analysis[rid] -> idcc[cid]));
+    }
+  }
+}
+/*!
   \fn void add_curve_widgets (project * this_proj, int rid)
 
   \brief add curve widgets to the project
@@ -257,24 +282,17 @@ void initcurve (project * pid, int rid, int cid)
 */
 void add_curve_widgets (project * this_proj, int rid)
 {
-  int j, k;
-  for (j=0; j<this_proj -> analysis[rid] -> numc; j++)
+  int i;
+  for (i=0; i<this_proj -> analysis[rid] -> numc; i++)
   {
-    this_proj -> analysis[rid] -> curves[j] -> cid = j;
-    if (this_proj -> analysis[rid] -> curves[j] -> ndata == 0)
+    this_proj -> analysis[rid] -> curves[i] -> cid = i;
+    if (this_proj -> analysis[rid] -> curves[i] -> ndata == 0)
     {
-      initcurve (this_proj, rid, j);
+      initcurve (this_proj, rid, i);
     }
-    if (this_proj -> analysis[rid] -> curves[j] -> default_title)
+    if (this_proj -> analysis[rid] -> curves[i] -> name)
     {
-      this_proj -> analysis[rid] -> curves[j] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[rid] -> curves[j] -> name);
-    }
-    for (k=0; k<2; k++)
-    {
-      if (this_proj -> analysis[rid] -> curves[j] -> axis_defaut_title[k])
-      {
-        this_proj -> analysis[rid] -> curves[j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, & this_proj -> analysis[rid] -> idcc[j]));
-      }
+      init_curve_title (this_proj, rid, i);
     }
   }
 }

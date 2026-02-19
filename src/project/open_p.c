@@ -64,7 +64,7 @@ extern void init_ring (project * this_proj);
 extern void init_chain (project * this_proj);
 extern void init_msd (project * this_proj);
 extern void init_sph (project * this_proj, int str);
-extern void init_skt (project * this_proj);
+extern void init_skt (project * this_proj, int opening);
 extern void alloc_analysis_curves (atomes_analysis * this_analysis);
 
 gboolean version_2_5_and_bellow;
@@ -157,7 +157,7 @@ void initcnames (project * this_proj, int rid)
       init_msd (this_proj);
       break;
     case SKT:
-      init_skt (this_proj);
+      init_skt (this_proj, 1);
       break;
   }
 }

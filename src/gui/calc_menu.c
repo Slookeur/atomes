@@ -1766,7 +1766,7 @@ G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
 #endif
 {
   gboolean status = button_get_status ((GtkWidget *)but);
-  if (preferences)
+  if (! preferences)
   {
     active_project -> skt_all_sets = status;
   }
