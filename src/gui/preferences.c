@@ -63,6 +63,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
   void add_cut_box ();
+  void dyna_parameters (GtkWidget * vbox, int cid);
   void clean_all_tmp ();
   void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep);
   void duplicate_background_data (background * new_back, background * old_back);
@@ -141,7 +142,9 @@ extern void apply_default_parameters_to_project (project * this_proj);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void edit_bonds (GtkWidget * vbox);
+extern void update_omega_max ();
 extern void calc_rings (GtkWidget * vbox);
+extern void calc_sk_t (GtkWidget * vbox);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
 extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
@@ -166,6 +169,8 @@ extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, f
 extern float mat_min_max[5][2];
 extern gchar * ogl_settings[3][10];
 
+GtkWidget * dyna_entry[2][2];
+GtkWidget * dyna_combo[2];
 GtkWidget * atom_entry_over[8];
 GtkWidget * bond_entry_over[6];
 GtkWidget * meas_combo;
@@ -178,11 +183,17 @@ double default_totcut;
 double tmp_totcut;
 bond_cutoff * default_bond_cutoff;
 bond_cutoff * tmp_bond_cutoff;
-int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd */
+
+// Generic parameters for all calculations
+#define NUM_DELTA 9
+int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd \n 8 = S(q,w) */
 int * tmp_num_delta = NULL;
+
+// Dynamical calculations
 double * default_delta_t = NULL;  /*!< 0 = time step, \n 1 = time unit , in: fs, ps, ns, µs, ms */
 double * tmp_delta_t = NULL;
 
+// Ring statistics
 int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        0 = Default search, \n
                                        1 = Initial node(s) for the search: selected chemical species or all atoms, \n
@@ -192,6 +203,8 @@ int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Include homopolar bond(s) when calculating the distance matrix */
 int * tmp_rsparam = NULL;
+
+// Chain statistics
 int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        0 = Initial node(s) for the search: selected chemical species or all atoms, \n
                                        1 = Maximum size for a chain Cmax, \n
@@ -201,6 +214,16 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
+
+// F(k,t) and S(q,w)
+gboolean default_skt_sets;        /*!< Output calculation results for all t steps */
+int default_skt_n_sets;           /*!< Number of configuration(s) to save when computing S(k,t) */
+int default_sqw_n_sets;           /*!< Number of q vector(s) to compute S(q,w) */
+int default_sqw_freq;             /*!< Frequency intervals */
+gboolean tmp_skt_sets;
+int tmp_skt_n_sets;
+int tmp_sqw_n_sets;
+int tmp_sqw_freq;
 
 // 5+3 styles + 5+3 cloned styles
 element_radius * default_atomic_rad[16];
@@ -433,9 +456,10 @@ int save_preferences_to_xml_file ()
   }
   xmlTextWriterPtr writer;
 
-  gchar * xml_delta_num_leg[8] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
-                                  "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",
-                                  "Spherical harmonics: l(max) in [2-40]", "MSD: steps between configurations"};
+  gchar * xml_delta_num_leg[NUM_DELTA] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
+                                          "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",
+                                          "Spherical harmonics: l(max) in [2-40]", "MSD: steps between configurations",
+                                          "F(k,t): number of δk"};
   gchar * xml_delta_t_leg[2] = {"MSD: time steps δt", "MSD: time unit"};
   gchar * xml_rings_leg[7] = {"Default search",
                               "Atom(s) to initiate the search from",
@@ -557,7 +581,7 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
   }
 
-  for (i=0; i<8; i++)
+  for (i=0; i<NUM_DELTA; i++)
   {
     str = g_strdup_printf ("%d",  default_num_delta[i]);
     rc = xml_save_parameter_to_file (writer, xml_delta_num_leg[i], "default_num_delta", TRUE, i, str);
@@ -2067,9 +2091,13 @@ void set_atomes_defaults ()
   default_num_delta[ANG] = 90;
   default_num_delta[CHA-1] = 20;
   default_num_delta[MSD-2] = 0;
+  default_num_delta[SKT-2] = 1000;
+
+  // Dynamical calculations
   default_delta_t[0] = 0.0;
   default_delta_t[1] = -1.0;
 
+  // Ring statistics
   default_rsparam[0] = -1;
   default_rsparam[1] = 0;
   default_rsparam[2] = 10;
@@ -2078,12 +2106,19 @@ void set_atomes_defaults ()
   default_rsparam[5] = 0;
   default_rsparam[6] = 0;
 
+  // Chain statistics
   default_csparam[0] = 0;
   default_csparam[1] = 10;
   default_csparam[2] = 500;
   default_csparam[3] = 0;
   default_csparam[4] = 0;
   default_csparam[5] = 0;
+
+  // F(k,t) and S(q,w)
+  default_skt_sets = FALSE;
+  default_skt_n_sets = 5;
+  default_sqw_n_sets = 5;
+  default_sqw_freq = 1000;
 
   for (i=0; i<3; i++) default_opengl[i] = 0;
   default_opengl[3] = QUALITY;
@@ -2252,7 +2287,7 @@ void set_atomes_defaults ()
 */
 void set_atomes_preferences ()
 {
-  default_num_delta = allocint (8);
+  default_num_delta = allocint (NUM_DELTA);
   default_delta_t = allocdouble (2);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
@@ -3799,15 +3834,22 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
     }
     update_entry_double (res, tmp_totcut);
   }
-  else if (i < 8)
+  else if (i < 9)
   {
     if (value > 0) tmp_num_delta[i] = (int) value;
     update_entry_int (res, tmp_num_delta[i]);
+    if (i == 7 || i == 8)
+    {
+      update_entry_int (GTK_ENTRY(dyna_entry[(i == 7) ? 1 : 0][0]), tmp_num_delta[i]);
+      update_omega_max ();
+    }
   }
-  else
+  else // delta_t
   {
     if (value > 0.0) tmp_delta_t[0] = value;
     update_entry_double (res, tmp_delta_t[0]);
+    update_entry_double (GTK_ENTRY(dyna_entry[(i == 9) ? 1 : 0][1]), tmp_delta_t[0]);
+    update_omega_max ();
   }
 }
 
@@ -3822,6 +3864,9 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
 {
   tmp_delta_t[1] = (double) combo_get_active ((GtkWidget *)box);
+  int i = GPOINTER_TO_INT(data);
+  combo_set_active (dyna_combo[(i == 7) ? 1 : 0], (int)tmp_delta_t[1]);
+  update_omega_max ();
 }
 
 GtkWidget * all_cut_box;
@@ -4129,6 +4174,42 @@ G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
 }
 
 /*!
+  \fn void dyna_parameters (GtkWidget * vbox, int cid)
+
+  \brief create time related configuration widgets
+
+  \param vbox the target box to insert the new widgets
+  \param cid the calculation ID (7 = MSD, 8 = S(q,w)
+*/
+void dyna_parameters (GtkWidget * vbox, int cid)
+{
+  gchar * default_leg[2] = {"Step(s) between configurations", "Step(s) between conf."};
+  int wid = (cid == 7) ? 0 : 1;
+  GtkWidget * hbox;
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_leg[(cid == 7) ? 0 : 1], (cid == 7) ? 285 : 150, -1, 0.0, 0.5), FALSE, FALSE, (cid == 7) ? 30 : 5);
+  dyna_entry[wid][0] = create_entry (G_CALLBACK(set_default_num_delta), (cid == 7) ? 110 : 100, (cid == 7) ? 10 : 15, FALSE, GINT_TO_POINTER(cid));
+  update_entry_int ((GtkEntry *)dyna_entry[wid][0], tmp_num_delta[cid]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_entry[wid][0], FALSE, FALSE, (cid == 7) ? 0 : 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("Time step &#x3b4;t", (cid == 7) ? 285 : 150, -1, 0.0, 0.5), FALSE, FALSE, (cid == 7) ? 30 : 5);
+  dyna_entry[wid][1] = create_entry (G_CALLBACK(set_default_num_delta), (cid == 7) ? 110 : 100, (cid == 7) ? 10 : 15, FALSE, GINT_TO_POINTER(cid+2));
+  update_entry_double ((GtkEntry *)dyna_entry[wid][1], tmp_delta_t[0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_entry[wid][1], FALSE, FALSE, (cid == 7) ? 0 : 10);
+  dyna_combo[wid] = create_combo ();
+  int i;
+  for (i=0; i<5 ; i++) combo_text_append (dyna_combo[wid], untime[i]);
+
+  combo_set_active (dyna_combo[wid], (int)tmp_delta_t[1]);
+  g_signal_connect(G_OBJECT(dyna_combo[wid]), "changed", G_CALLBACK(tunit_changed), GINT_TO_POINTER(cid));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_combo[wid], FALSE, FALSE, 0);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+}
+
+/*!
   \fn GtkWidget * calc_preferences ()
 
   \brief analysis preferences
@@ -4140,9 +4221,9 @@ GtkWidget * calc_preferences ()
   GtkWidget * hbox;
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-  gchar * default_delta_num_leg[8] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
-                                      "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
-                                      "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "step(s) between configurations"};
+  gchar * default_delta_num_leg[NUM_DELTA] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
+                                              "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
+                                              "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "Step(s) between configurations", "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"};
   gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
                      "use it to setup your own default parameters:"};
   gchar * m_list[4][2] = {{"Calculations", "most analysis options"},
@@ -4197,34 +4278,24 @@ GtkWidget * calc_preferences ()
   GtkWidget * entry;
   vbox = create_vbox (BSEP);
   int i;
-  for (i=0; i<8; i++)
+  for (i=0; i<NUM_DELTA; i++)
   {
-    if (i == 7)
+    if (i != 7)
     {
       hbox = create_hbox (BSEP);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Mean Squared Displacement</b>:", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
+      entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
+      update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     }
-    hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
-    entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
-    update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   }
+  // MSD
+  i = 7;
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("time step(s) &#x3b4;t", 285, -1, 0.0, 0.5), FALSE, FALSE, 30);
-  entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
-  update_entry_double ((GtkEntry *)entry, tmp_delta_t[0]);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-  GtkWidget * tcombo = create_combo ();
-  for (i=0; i<5 ; i++) combo_text_append (tcombo, untime[i]);
-
-  combo_set_active (tcombo, (int)tmp_delta_t[1]);
-  g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(tunit_changed), NULL);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tcombo, FALSE, FALSE, 0);
-
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Dynamical analysis: MSD, S(q,&#969;)</b>", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  dyna_parameters (vbox, i);
 
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Calculations"));
 
@@ -4236,7 +4307,7 @@ GtkWidget * calc_preferences ()
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? "Chains" : "Rings"));
   }
   vbox = create_vbox (BSEP);
-  // calc_sk_t (vbox);
+  calc_sk_t (vbox);
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, markup_label("S(q,&#969;)", -1, -1, 0.0, 0.5));
 
   show_the_widgets (notebook);
@@ -4453,10 +4524,18 @@ void prepare_tmp_default ()
   clean_all_tmp ();
   tmp_totcut = default_totcut;
   tmp_bond_cutoff = duplicate_cutoffs (default_bond_cutoff);
-  tmp_num_delta = duplicate_int (8, default_num_delta);
+  tmp_num_delta = duplicate_int (NUM_DELTA, default_num_delta);
   tmp_delta_t = duplicate_double (2, default_delta_t);
+  // Ring statistics
   tmp_rsparam = duplicate_int (7, default_rsparam);
+  // Chain statistics
   tmp_csparam = duplicate_int (7, default_csparam);
+  // F(k,t) and S(q,w)
+  tmp_skt_sets = default_skt_sets;
+  tmp_skt_n_sets = default_skt_n_sets;
+  tmp_sqw_n_sets = default_sqw_n_sets;
+  tmp_sqw_freq = default_sqw_freq;
+
   tmp_opengl = duplicate_int (5, default_opengl);
   duplicate_material (& tmp_material, & default_material);
   tmp_lightning.lights = default_lightning.lights;
@@ -4580,7 +4659,7 @@ void save_preferences ()
     g_free (default_num_delta);
     default_num_delta = NULL;
   }
-  default_num_delta = duplicate_int (8, tmp_num_delta);
+  default_num_delta = duplicate_int (NUM_DELTA, tmp_num_delta);
   default_delta_t = duplicate_double (2, tmp_delta_t);
   if (default_rsparam)
   {
@@ -4599,6 +4678,11 @@ void save_preferences ()
     g_free (default_opengl);
     default_opengl = NULL;
   }
+  default_skt_sets = tmp_skt_sets;
+  default_skt_n_sets = tmp_skt_n_sets;
+  default_sqw_n_sets = tmp_sqw_n_sets;
+  default_sqw_freq = tmp_sqw_freq;
+
   default_opengl = duplicate_int (5, tmp_opengl);
   duplicate_material (& default_material, & tmp_material);
   default_lightning.lights = tmp_lightning.lights;

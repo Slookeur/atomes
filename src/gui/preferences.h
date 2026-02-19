@@ -105,13 +105,26 @@ extern bond_cutoff * tmp_bond_cutoff;
 
 extern int * default_num_delta;
 extern int * tmp_num_delta;
-extern double * default_delta_t;
+// Ring statistics
 extern gchar * default_ring_param[7] ;
 extern int * default_rsparam;
 extern int * tmp_rsparam;
+// Chain statistics
 extern gchar * default_chain_param[7];
 extern int * default_csparam;
 extern int * tmp_csparam;
+// Dynamic
+extern double * default_delta_t;
+extern double * tmp_delta_t;
+// F(k,t) and S(q,w)
+extern gboolean default_skt_sets;
+extern int default_skt_n_sets;
+extern int default_sqw_n_sets;
+extern int default_sqw_freq;
+extern gboolean tmp_skt_sets;
+extern int tmp_skt_n_sets;
+extern int tmp_sqw_n_sets;
+extern int tmp_sqw_freq;
 
 // OpenGL
 extern int * default_opengl;

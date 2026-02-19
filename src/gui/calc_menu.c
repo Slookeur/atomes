@@ -99,6 +99,7 @@ extern G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer d
 extern G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data);
+extern void dyna_parameters (GtkWidget * vbox, int cid);
 
 GtkWidget * calc_win = NULL;
 GtkWidget * ba_entry[2];
@@ -161,15 +162,18 @@ void update_omega_max ()
   gchar * freq_unit[5]={" THz", " THz", " MHz", " KHz", " Hz"};
   gchar * str;
   omega_max_info = destroy_this_widget(omega_max_info);
-  if (active_project -> analysis[MSD] -> delta > 0.0 && active_project -> analysis[MSD] -> num_delta && active_project -> tunit > -1)
+  double delt = (preferences) ? tmp_delta_t[0]: active_project -> analysis[MSD] -> delta;
+  int num_delt = (preferences) ? tmp_num_delta[MSD-2] : active_project -> analysis[MSD] -> num_delta;
+  int t_unit = (preferences) ? (int)tmp_delta_t[1] : active_project -> tunit;
+  if ( delt > 0.0 && num_delt && t_unit > -1)
   {
     omega_max_info = create_hbox(0);
-    double omega_max = pi/(active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta);
+    double omega_max = pi/(delt * num_delt);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label ("&#969;<sub>max</sub> =", 50, -1, 0.0, 0.5), FALSE, FALSE, 2);
-    str = g_strdup_printf ("%f", (active_project -> tunit == 1) ? omega_max : omega_max * 1000.0);
+    str = g_strdup_printf ("%f", (t_unit == 1) ? omega_max : omega_max * 1000.0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label (str, 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label (freq_unit[active_project -> tunit], 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label (freq_unit[t_unit], 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
   }
   else
   {
@@ -1647,7 +1651,7 @@ void add_remove_t_steps_q_vectors (int val, int calc)
 */
 G_MODULE_EXPORT void set_t_q_spin (GtkSpinButton * res, gpointer data)
 {
-  add_remove_t_steps_q_vectors (gtk_spin_button_get_value_as_int(res), GPOINTER_TO_INT(data));
+  if (! preferences) add_remove_t_steps_q_vectors (gtk_spin_button_get_value_as_int(res), GPOINTER_TO_INT(data));
 }
 
 /*!
@@ -1666,9 +1670,18 @@ void add_correlations_options (int cid)
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, sktqw_delta[cid], hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
-  GtkWidget * spin = spin_button (G_CALLBACK(set_t_q_spin),
-                                 (! cid) ? active_project -> skt_n_data_sets : active_project -> sqw_n_data_sets, 1.0,
-                                 (! cid) ? active_project -> steps-active_project -> skt_corr_threshold : 100, 1.0, 0, 100, GINT_TO_POINTER(cid));
+  int val, vbl;
+  if (! cid)
+  {
+    val = (preferences) ? tmp_skt_n_sets : active_project -> skt_n_data_sets;
+    vbl = (preferences) ? 100 : active_project -> steps-active_project -> skt_corr_threshold;
+  }
+  else
+  {
+    val = (preferences) ? tmp_sqw_n_sets : active_project -> sqw_n_data_sets;
+    vbl = 100;
+  }
+  GtkWidget * spin = spin_button (G_CALLBACK(set_t_q_spin), val, 1.0, vbl, 1.0, 0, 100, GINT_TO_POINTER(cid));
   gtk_widget_set_size_request (spin, 25, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, spin, FALSE, FALSE, 10);
   show_the_widgets (sktqw_vbox[cid]);
@@ -1716,9 +1729,16 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
       }
       else
       {
-        active_project -> sqw_freq = v;
+        if (preferences)
+        {
+          tmp_sqw_freq = v;
+        }
+        else
+        {
+          active_project -> sqw_freq = v;
+        }
       }
-      update_entry_int (entry, active_project -> sqw_freq);
+      update_entry_int (entry, (preferences) ? tmp_sqw_freq : active_project -> sqw_freq);
       break;
   }
 }
@@ -1745,25 +1765,37 @@ G_MODULE_EXPORT void toggle_skt_all (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
 #endif
 {
-  active_project -> skt_all_sets = button_get_status ((GtkWidget *)but);
-  widget_set_sensitive (sktqw_delta[0], ! active_project -> skt_all_sets);
-  widget_set_sensitive (skt_all_info, active_project -> skt_all_sets);
-  if (active_project -> skt_all_sets)
+  gboolean status = button_get_status ((GtkWidget *)but);
+  if (preferences)
   {
-    hide_the_widgets (sktqw_delta[0]);
-    if (active_project -> skt_step_id) g_free (active_project -> skt_step_id);
-    active_project -> skt_step_id = NULL;
-    active_project -> skt_n_data_sets = 1;
-    active_project -> skt_step_id = allocint(1);
-    active_project -> skt_step_id[0] = -1;
+    active_project -> skt_all_sets = status;
   }
   else
   {
-    active_project -> skt_corr_threshold = (active_project -> steps < 20) ? 1 : 10;
-    active_project -> skt_n_data_sets = min (5, active_project -> steps);
-    add_remove_t_steps_q_vectors (active_project -> skt_n_data_sets, 0);
-    show_the_widgets (sktqw_delta[0]);
+    tmp_skt_sets = status;
   }
+  widget_set_sensitive (sktqw_delta[0], ! status);
+  if (! preferences)
+  {
+    widget_set_sensitive (skt_all_info, status);
+    if (status)
+    {
+      hide_the_widgets (sktqw_delta[0]);
+      if (active_project -> skt_step_id) g_free (active_project -> skt_step_id);
+      active_project -> skt_step_id = NULL;
+      active_project -> skt_n_data_sets = 1;
+      active_project -> skt_step_id = allocint(1);
+      active_project -> skt_step_id[0] = -1;
+    }
+    else
+    {
+      active_project -> skt_corr_threshold = (active_project -> steps < 20) ? 1 : 10;
+      active_project -> skt_n_data_sets = min (5, active_project -> steps);
+      add_remove_t_steps_q_vectors (active_project -> skt_n_data_sets, 0);
+      show_the_widgets (sktqw_delta[0]);
+    }
+  }
+
 }
 
 /*!
@@ -1780,14 +1812,6 @@ void calc_sk_t (GtkWidget * box)
   gchar * val_c="&#x3b4;t<sub>min</sub>";
   gchar * val_d="&#969; points in [0.0, &#969;<sub>max</sub>]";
 
-  active_project -> skt_step_id = NULL;
-  if (! active_project -> skt_corr_threshold) active_project -> skt_corr_threshold = 10;
-  if (! active_project -> skt_n_data_sets)
-  {
-    active_project -> skt_n_data_sets = 5;
-    active_project -> sqw_n_data_sets = 5;
-    active_project -> skt_all_sets = FALSE;
-  }
   skadv[0].a = skadv[1].a = SKT;
   skadv[0].b = 0;
   skadv[1].b = 1;
@@ -1798,8 +1822,9 @@ void calc_sk_t (GtkWidget * box)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox_skt, FALSE, FALSE, 5);
   GtkWidget * vbox_skt[2];
 
-  int i;
-  for (i=0; i<2; i++)
+  int i, j;
+  j = (preferences) ? 1 : 2;
+  for (i=0; i<j; i++)
   {
     vbox_skt[i] = create_vbox(BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox_skt, vbox_skt[i], FALSE, FALSE, 10);
@@ -1809,52 +1834,63 @@ void calc_sk_t (GtkWidget * box)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   GtkWidget * entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SKT] -> num_delta);
+  update_entry_int (GTK_ENTRY(entry), (preferences) ? tmp_num_delta[SKT-2] : active_project -> analysis[SKT] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
 
-  hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
-  entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(SKT));
-  update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+  if (! preferences)
+  {
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(SKT));
+    update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 5);
-  hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                       markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
-                       FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox_note (1, active_project -> analysis[SKT] -> min), FALSE, FALSE, 5);
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
+                         markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
+                         FALSE, FALSE, 5);
 
-  hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
-  entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(0));
-  update_entry_int (GTK_ENTRY(entry), active_project -> skt_corr_threshold);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-  hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                       markup_label ("&#x3b4;t<sub>min</sub> is the correlation threshold", -1, -1, 0.0, 0.5),
-                       FALSE, FALSE, 5);
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(0));
+    update_entry_int (GTK_ENTRY(entry), active_project -> skt_corr_threshold);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+    hbox = create_hbox (0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
+                         markup_label ("&#x3b4;t<sub>min</sub> is the correlation threshold", -1, -1, 0.0, 0.5),
+                         FALSE, FALSE, 5);
+  }
 
-  calc_msd (vbox_skt[0], SKT);
-
+  if (! preferences)
+  {
+    calc_msd (vbox_skt[0], SKT);
+  }
+  else
+  {
+    dyna_parameters (vbox_skt[0], SKT-2);
+  }
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_d, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(1));
-  update_entry_int (GTK_ENTRY(entry), active_project -> sqw_freq);
+  update_entry_int (GTK_ENTRY(entry), (preferences) ? tmp_sqw_freq : active_project -> sqw_freq);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
   omega_max_hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], omega_max_hbox, FALSE, FALSE, 5);
   update_omega_max ();
-  add_advanced_options (SKT, skadv, vbox_skt[0]);
-  add_smoothing_options (SKT, vbox_skt[0]);
-
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[1], markup_label ("<b>Results</b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  if (! preferences)
+  {
+    add_advanced_options (SKT, skadv, vbox_skt[0]);
+    add_smoothing_options (SKT, vbox_skt[0]);
+  }
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], markup_label ("<b>Results</b>", -1, -1, 0.0, 0.5), FALSE, FALSE, (preferences) ? 10 : 0);
   GtkWidget * tbox = create_vbox(0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[1], tbox, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], tbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("<b>atomes</b> cannot yet display 3D results,", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("but we are working to add this feature !", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("For the time being you need to select", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
@@ -1864,39 +1900,45 @@ void calc_sk_t (GtkWidget * box)
 #ifdef GTK4
   gtk_widget_set_vexpand (notebook, TRUE);10
 #endif
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[1], notebook, TRUE, TRUE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], notebook, TRUE, TRUE, (preferences) ? 10 : 5);
 
   GtkWidget * nbox;
   GtkWidget * scroll;
   gchar * str;
   for (i=0; i<2; i++)
   {
-    scroll = create_scroll (NULL, 200, 350, GTK_SHADOW_NONE);
+    scroll = create_scroll (NULL, 200, (preferences) ? 100 : 350, GTK_SHADOW_NONE);
     nbox = create_vbox(BSEP);
     add_container_child (CONTAINER_SCR, scroll, nbox);
     if (! i)
     {
       add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, check_button("All <b>&#x3b4;t</b> correlated calculations", -1, -1, FALSE, G_CALLBACK(toggle_skt_all), NULL), FALSE, FALSE, 5);
-      str = g_strdup_printf ("%d calculation results in total !", active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
-      skt_all_info = markup_label (str, -1, -1, 0.5, 0.5);
-      g_free (str);
-      skt_res_info = create_hbox (0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, skt_res_info, FALSE, FALSE, 5);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, skt_res_info, skt_all_info, FALSE, FALSE, 5);
+      if (! preferences)
+      {
+        str = g_strdup_printf ("%d calculation results in total !", active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
+        skt_all_info = markup_label (str, -1, -1, 0.5, 0.5);
+        g_free (str);
+        skt_res_info = create_hbox (0);
+        add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, skt_res_info, FALSE, FALSE, 5);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, skt_res_info, skt_all_info, FALSE, FALSE, 5);
+      }
     }
     sktqw_vbox[i] = create_vbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, sktqw_vbox[i], FALSE, FALSE, 0);
-    if (! i) widget_set_sensitive (sktqw_vbox[i], ! active_project -> skt_all_sets);
+    if (! i) widget_set_sensitive (sktqw_vbox[i], (preferences) ? ! tmp_skt_sets : ! active_project -> skt_all_sets);
     add_correlations_options (i);
-    if (! i && ! active_project -> skt_all_sets)
+    if (! preferences)
     {
-      add_remove_t_steps_q_vectors (active_project -> skt_n_data_sets, 0);
+      if (! i && ! active_project -> skt_all_sets)
+      {
+        add_remove_t_steps_q_vectors (active_project -> skt_n_data_sets, 0);
+      }
+      else if (i)
+      {
+        add_remove_t_steps_q_vectors (active_project -> sqw_n_data_sets, 1);
+      }
     }
-    else if (i)
-    {
-      add_remove_t_steps_q_vectors (active_project -> sqw_n_data_sets, 1);
-    }
-    if (! i) widget_set_sensitive(skt_all_info, active_project -> skt_all_sets);
+    if (! i) widget_set_sensitive(skt_all_info, (preferences) ? tmp_skt_sets : active_project -> skt_all_sets);
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scroll,
                               markup_label((! i) ? "<b>Intermediate scattering</b>: F(q,&#x3b4;t)" : "<b>Dynamic calculations</b>: S(q,&#969;)", -1, -1, 0.0, 0.5));
   }

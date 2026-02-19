@@ -126,6 +126,11 @@ void apply_analysis_default_parameters_to_project (project * this_proj)
   for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
   this_proj -> csparam[5] = default_csparam[1];
   this_proj -> csearch = default_csparam[2];
+  this_proj -> tunit = default_delta_t[1];
+  this_proj -> skt_all_sets = default_skt_sets;
+  this_proj -> skt_n_data_sets = default_skt_n_sets;
+  this_proj -> sqw_n_data_sets = default_sqw_n_sets;
+  this_proj -> sqw_freq = default_sqw_freq;
 }
 
 /*!
@@ -160,7 +165,12 @@ void apply_default_parameters_to_project (project * this_proj)
   for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
   this_proj -> csparam[5] = default_csparam[1];
   this_proj -> csearch = default_csparam[2];
-  //
+  this_proj -> tunit = default_delta_t[1];
+  this_proj -> skt_all_sets = default_skt_sets;
+  this_proj -> skt_n_data_sets = default_skt_n_sets;
+  this_proj -> sqw_n_data_sets = default_sqw_n_sets;
+  this_proj -> sqw_freq = default_sqw_freq;
+
   if (this_proj -> modelgl)
   {
     image * img = this_proj -> modelgl -> anim -> last -> img;
