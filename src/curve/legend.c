@@ -128,11 +128,10 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
       k = ctmp -> id.a;
       l = ctmp -> id.b;
       m = ctmp -> id.c;
-      str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
-                                        get_project_by_id(k) -> analysis[l] -> curves[m] -> name);
+      str = g_strdup_printf ("%s - %s", get_project_by_id(k) -> name, get_project_by_id(k) -> analysis[l] -> curves[m] -> name);
       if (ctmp -> next !=  NULL) ctmp = ctmp -> next;
     }
-    pango_layout_set_text (layout, str, -1);
+    pango_layout_set_markup (layout, str, -1);
     pango_layout_get_size (layout, & w, & h);
     z = (double) h / PANGO_SCALE;
     if (j == 0) ih = z;

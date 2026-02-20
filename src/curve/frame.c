@@ -181,7 +181,8 @@ void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid)
 // Draw X axis title
   cairo_move_to (cr, x_min  + XDRAW / 2.0 + this_curve -> axis_title_x[0], y_min + this_curve -> axis_title_y[0]);
   pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> axis_title_font[0]));
-  pango_layout_set_text (layout, this_curve -> axis_title[0], -1);
+  pango_layout_set_markup (layout, this_curve -> axis_title[0], -1);
+  // pango_layout_set_text (layout, this_curve -> axis_title[0], -1);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);
   cairo_stroke(cr);
@@ -201,7 +202,7 @@ void draw_frame (cairo_t * cr, Curve * this_curve, int rid, int cid)
   }
   cairo_move_to (cr, x_min - this_curve -> axis_title_x[1], y_min + YDRAW/2 - this_curve -> axis_title_y[1]);
   pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> axis_title_font[1]));
-  pango_layout_set_text (layout, this_curve -> axis_title[1], -1);
+  pango_layout_set_markup (layout, this_curve -> axis_title[1], -1);
   cairo_rotate (cr, -pi/2.0);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);

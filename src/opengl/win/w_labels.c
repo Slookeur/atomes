@@ -68,9 +68,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "preferences.h"
 
-#define LABEL_FORMATS 4
+#define LABEL_FORMATS 5
 
-gchar * lab_formats[LABEL_FORMATS] = {"Element name", "Atomic symbol", "Atomic symbol + ID number", "ID number"};
+gchar * lab_formats[LABEL_FORMATS] = {"Element name", "Atomic symbol", "Atomic symbol + ID number", "Sym. + ID num. subscript", "ID number"};
 
 GtkWidget * atom_color_box;
 GtkWidget ** color_title;

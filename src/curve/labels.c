@@ -82,7 +82,7 @@ void label_curve (cairo_t * cr, double val, int axe, int p, Curve * this_curve)
       g_free (tmp);
     }
   }
-  pango_layout_set_text (layout, label, -1);
+  pango_layout_set_markup (layout, label, -1);
   if (p == 1)
   {
     pango_layout_get_size (layout, & i, & j);

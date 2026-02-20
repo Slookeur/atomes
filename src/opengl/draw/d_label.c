@@ -106,6 +106,9 @@ void prepare_label (atom at, int id, double al)
     case SYMBOL_AND_NUM:
       str = g_strdup_printf ("%s%d", exact_name(proj_gl -> chemistry -> label[k]), at.id+1);
       break;
+    case SYMBOL_AND_IND:
+      str = g_strdup_printf ("%s<sub>%d</sub>", exact_name(proj_gl -> chemistry -> label[k]), at.id+1);
+      break;
     case NUM:
       str = g_strdup_printf ("%d", at.id+1);
       break;

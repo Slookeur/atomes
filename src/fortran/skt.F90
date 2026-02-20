@@ -439,9 +439,9 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
   if (NSP .eq. 2) SHIFT=SHIFT+8
   CID = PIC
 
-  do qid = 1, Q_NUM
+  do qid = 1, Q_NUM ! For all selected q points
 
-    id_q_num = Q_LIST(qid)
+    id_q_num = Q_LIST(qid) ! Select the q point ID number as referenced previously
 
     do freq = 1, N_FREQ
 

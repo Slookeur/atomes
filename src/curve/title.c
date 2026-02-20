@@ -75,7 +75,7 @@ const gchar * default_title (int ax, gpointer data)
     {
       if (cid < this_proj -> skt_sets)
       {
-        return g_strdup_printf ("q [Å-1]");
+        return g_strdup_printf ("q [Å<sup>-1</sup>]");
       }
       else
       {
@@ -112,7 +112,8 @@ void show_title (cairo_t * cr, Curve * this_curve)
                              this_curve -> title_color.blue,
                              this_curve -> title_color.alpha);
   pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> title_font));
-  pango_layout_set_text (layout, this_curve -> title, -1);
+  pango_layout_set_markup (layout, this_curve -> title, -1);
+  // pango_layout_set_text (layout, this_curve -> title, -1);
   cairo_move_to (cr, x, y);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);

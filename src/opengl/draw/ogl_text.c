@@ -443,7 +443,7 @@ void render_string (int glsl, int id, screen_string * this_string)
   }
   pango_font_description_set_absolute_size (pfont, font_size*PANGO_SCALE);
   pango_layout_set_font_description (playout, pfont);
-  pango_layout_set_text (playout, this_string -> word, strlen(this_string -> word));
+  pango_layout_set_markup (playout, this_string -> word, strlen(this_string -> word));
   string_to_render = gl_pango_render_layout (playout, ogl_texture, id, this_string);
   if (string_to_render == NULL)
   {

@@ -221,11 +221,12 @@ enum axisposition {
 
 /*! \enum labels */
 enum labels {
-  ELEMENT_NAME   = 0, /*!< 0 */
-  SYMBOL         = 1, /*!< 1 */
-  SYMBOL_AND_NUM = 2, /*!< 2 */
-  NUM            = 3, /*!< 3 */
-  ID_IN_MOLECULE = 4  /*!< 4 */
+  ELEMENT_NAME   = 0, /*!< 0 Element name */
+  SYMBOL         = 1, /*!< 1 Element symbol */
+  SYMBOL_AND_NUM = 2, /*!< 2 Element symbol and ID number */
+  SYMBOL_AND_IND = 3, /*!< 3 Element symbol and ID number in subscript font */
+  NUM            = 4, /*!< 4 ID number */
+  ID_IN_MOLECULE = 5  /*!< 5 ID number in molecule */
 };
 
 /*! \enum actions */
