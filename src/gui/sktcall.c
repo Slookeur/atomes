@@ -177,23 +177,23 @@ void init_skt (project * this_proj, int opening)
   {
     i = h*g;
     j = (this_proj -> skt_all_sets) ? h+1 : active_project -> skt_step_id[h];
-    this_proj -> analysis[SKT] -> curves[0+i] -> name = g_strdup_printf ("S(q,t) Neutrons - t= %d", j);
-    this_proj -> analysis[SKT] -> curves[1+i] -> name = g_strdup_printf ("S(q,t) Neutrons - t= %d - smoothed", j);
-    this_proj -> analysis[SKT] -> curves[2+i] -> name = g_strdup_printf ("Q(q,t) Neutrons - t= %d", j);
-    this_proj -> analysis[SKT] -> curves[3+i] -> name = g_strdup_printf ("Q(q,t) Neutrons - t= %d - smoothed", j);
-    this_proj -> analysis[SKT] -> curves[4+i] -> name = g_strdup_printf ("S(q,t) X-rays - t= %d", j);
-    this_proj -> analysis[SKT] -> curves[5+i] -> name = g_strdup_printf ("S(q,t) X-rays - t= %d - smoothed", j);
-    this_proj -> analysis[SKT] -> curves[6+i] -> name = g_strdup_printf ("Q(q,t) X-rays - t= %d", j);
-    this_proj -> analysis[SKT] -> curves[7+i] -> name = g_strdup_printf ("Q(q,t) X-rays - t= %d - smoothed", j);
+    this_proj -> analysis[SKT] -> curves[0+i] -> name = g_strdup_printf ("S(q,ẟt) Neutrons - ẟt= %d", j);
+    this_proj -> analysis[SKT] -> curves[1+i] -> name = g_strdup_printf ("S(q,ẟt) Neutrons - ẟt= %d - smoothed", j);
+    this_proj -> analysis[SKT] -> curves[2+i] -> name = g_strdup_printf ("Q(q,ẟt) Neutrons - ẟt= %d", j);
+    this_proj -> analysis[SKT] -> curves[3+i] -> name = g_strdup_printf ("Q(q,ẟt) Neutrons - ẟt= %d - smoothed", j);
+    this_proj -> analysis[SKT] -> curves[4+i] -> name = g_strdup_printf ("S(q,ẟt) X-rays - ẟt= %d", j);
+    this_proj -> analysis[SKT] -> curves[5+i] -> name = g_strdup_printf ("S(q,ẟt) X-rays - ẟt= %d - smoothed", j);
+    this_proj -> analysis[SKT] -> curves[6+i] -> name = g_strdup_printf ("Q(q,ẟt) X-rays - ẟt= %d", j);
+    this_proj -> analysis[SKT] -> curves[7+i] -> name = g_strdup_printf ("Q(q,ẟt) X-rays - ẟt= %d - smoothed", j);
 
     k = 8+i;
     for ( l = 0 ; l < this_proj -> nspec ; l++ )
     {
       for ( m = 0 ; m < this_proj -> nspec ; m++ )
       {
-        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("AL(q,t)[%s,%s] - t= %d", active_chem -> label[l], active_chem -> label[m], j);
+        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("AL(q,ẟt)[%s,%s] - ẟt= %d", active_chem -> label[l], active_chem -> label[m], j);
         k ++;
-        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("AL(q,t)[%s,%s] - t= %d - smoothed", active_chem -> label[l], active_chem -> label[m], j);
+        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("AL(q,ẟt)[%s,%s] - ẟt= %d - smoothed", active_chem -> label[l], active_chem -> label[m], j);
         k ++;
       }
     }
@@ -201,29 +201,29 @@ void init_skt (project * this_proj, int opening)
     {
       for ( m = 0 ; m < this_proj -> nspec ; m++ )
       {
-        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("FZ(q,t)[%s,%s] - t= %d", active_chem -> label[l], active_chem -> label[m], j);
+        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("FZ(q,ẟt)[%s,%s] - ẟt= %d", active_chem -> label[l], active_chem -> label[m], j);
         k ++;
-        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("FZ(q,t)[%s,%s] - t= %d - smoothed", active_chem -> label[l], active_chem -> label[m], j);
+        this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("FZ(q,ẟt)[%s,%s] - ẟt= %d - smoothed", active_chem -> label[l], active_chem -> label[m], j);
         k ++;
       }
     }
     if ( this_proj -> nspec == 2 )
     {
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[NN] - t= %d", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[NN] - ẟt= %d", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[NN] - t= %d - smoothed", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[NN] - ẟt= %d - smoothed", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[NC] - t= %d", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[NC] - ẟt= %d", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[NC] - t= %d - smoothed", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[NC] - ẟt= %d - smoothed", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[CC] - t= %d", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[CC] - ẟt= %d", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[CC] - t= %d - smoothed", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[CC] - ẟt= %d - smoothed", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[ZZ] - t= %d", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[ZZ] - ẟt= %d", j);
       k ++;
-      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,t)[ZZ] - t= %d - smoothed", j);
+      this_proj -> analysis[SKT] -> curves[k] -> name = g_strdup_printf ("BT(q,ẟt)[ZZ] - t= %d - smoothed", j);
     }
   }
   if (opening) init_sqw (this_proj);
