@@ -43,7 +43,7 @@
   {
     ...
 
-    case IDC-1:
+    case IDC:
       calc_idc (box);
       break;
       

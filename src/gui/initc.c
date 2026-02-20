@@ -241,9 +241,9 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   // s(q)
   comp_list[0] = SQD;
   comp_list[1] = SKD;
-  this_proj -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  this_proj -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-</sup>1</sup>]");
   // s(k) - same compatibility list
-  this_proj -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å-1]");
+  this_proj -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
 
   g_free (comp_list);
 

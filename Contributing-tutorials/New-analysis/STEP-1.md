@@ -96,7 +96,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   int num_g = ;             // Total number of graph windows as result(s) of the analysis
   int num_c = ;             // Number of analysis compatible, to allow overlap of the data on the graph window
   int c_list[num_c] = {};   // List of compatible analysis, integer list in the ID list, including self
-  active_project -> analysis[IDC] = setup_analysis (pid, IDC, TRUE, num_g, num_c, c_list);  // This is an example
+  active_project -> analysis[IDC] = setup_analysis (pid, "New analysis name", IDC, TRUE, num_g, num_c, c_list, "Default x axis title");  // This is an example
 
   ...
 }

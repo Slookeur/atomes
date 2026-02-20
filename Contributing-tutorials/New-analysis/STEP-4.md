@@ -142,13 +142,49 @@ To do that copy the previous test case, change the version number, and for this 
   ...
 
   ```
+
  >[!TIP]
  > Contact me if you need any help !
 
-## 3. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
+### 3. To prepare the new analysis buffers during the reading process edit the file [`src/project/open_p.c`][open_p.c]
+
+ >[!TIP]
+ > Contact me if you need any help !
+
+```C
+  /*!
+    \fn void initcnames (project * this_proj, int rid)
+
+    \brief initialize curve names
+
+    \param project the target project
+    \param rid calculation id
+  */
+  void initcnames (project * this_proj, int rid)
+  {
+
+  ...
+
+    case IDC:
+      init_idc (this_proj);
+      break;
+  ...
+
+```
+ - At te beginning of the [`src/project/open_p.c`][open_p.c] file do not forget to declare the new `init_idc` function 
+  ```C
+  ...
+
+  extern void init_idc (project * this_proj);
+
+  ...
+
+  ```
+
+## 4. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 
 
-## 4. Modifying the GNU archive for the official software distribution
+## 5. Modifying the GNU archive for the official software distribution
 
 ## Previous : [Adding the new analysis to the **atomes** software][analysing]
 

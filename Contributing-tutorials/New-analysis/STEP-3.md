@@ -142,7 +142,7 @@ void update_idc_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 {
   // active_project is a pointer on the active atomes project
-  // Initializing the graph for this calculation, if not done already
+  // Initializing the graph for this calculation, if this was done already
   if (! active_project -> analysis[IDC] -> init_ok)  init_idc (active_project);
 
   // Cleaning previous results, if any
@@ -176,8 +176,43 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
  > At this point **atomes** only cares for the elements of the active project and 
  > `active_project` is a pointer that was set on that particular project. 
 
+## 3. Display information results in the main software window
 
-## 3. Implementing the new analysis
+  - Edit the [`src/workspace/workinfo.c`][workinfo.c] file, in the `workinfo ()` routine search for the test case that calls for `update_*_view ()` functions,
+and add a test case for the new analysis:
+
+  ```C
+  /*!
+    \fn void workinfo (project * this_proj, int i)
+
+    \brief display information about a workspace menu item for a project
+
+    \param this_proj the target project
+    \param i the properties to display from the menu
+  */
+  void workinfo (project * this_proj, int i)
+  {
+
+  ...
+
+    case IDC:
+      update_idc_view (this_proj);
+      break;
+
+  ...
+
+  ```
+ - At te beginning of the [`src/workspace/workinfo.c`][workinfo.c] file do not forget to declare the new `update_idc_view` function 
+  ```C
+  ...
+
+  extern void update_idc_view (project * this_proj);
+
+  ...
+
+  ```
+
+## 4. Implementing the new analysis
 
 I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading, but that is ultimately up to you to decide. 
 
@@ -189,7 +224,7 @@ and remember that at this point you only need to call element(s) of the active p
  > I am asking you, if not done yet, to parallelize the analysis in OpenMP. 
  > Do not hesitate to ask for my help in the process.
 
-## 4. Modifying the [Makefile][makefile]
+## 5. Modifying the [Makefile][makefile]
 
 This step is required to build the [Code::Blocks][codeblocks] version of **atomes**, further modifications are required for to produce a release candidate version, for more details [see step N°3][releasing]
 
@@ -232,6 +267,7 @@ This step is required to build the [Code::Blocks][codeblocks] version of **atome
 ## Previous : [Coding the new analysis user dialog and its callbacks][coding]
 
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
+[workinfo.c]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
 [atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
 [makefile]:https://github.com/Slookeur/atomes/blob/devel/Makefile
 [releasing]:STEP-4.md
