@@ -201,8 +201,9 @@ and add a test case for the new analysis:
 
   ...
 
+  }
   ```
- - At te beginning of the [`src/workspace/workinfo.c`][workinfo.c] file do not forget to declare the new `update_idc_view` function 
+ - At te beginning of the [`src/workspace/workinfo.c`][workinfo.c] file do not forget to declare the new `update_idc_view ()` function 
   ```C
   ...
 
@@ -214,7 +215,7 @@ and add a test case for the new analysis:
 
 ## 4. Implementing the new analysis
 
-I would recommend to put the analysis, and therefore the implementation of the `calc_idc` function in a separate file to simply its reading, but that is ultimately up to you to decide. 
+I would recommend to put the analysis, and therefore the implementation of the `calc_idc ()` function in a separate file to simply its reading, but that is ultimately up to you to decide. 
 
 Please give a look to the **atomes** [project data structure][atomes_project] to know how to retrieve the elements you might need for your calculation, 
 and remember that at this point you only need to call element(s) of the active project `active_project`. 

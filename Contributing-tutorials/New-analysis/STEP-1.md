@@ -78,7 +78,7 @@
 
 ## 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
-Search for the [`init_atomes_analysis`][init_atomes_analysis] function to declare the new analysis
+Search for the [`init_atomes_analysis ()`][init_atomes_analysis] function to declare the new analysis
 
 ```C
 /*!
@@ -107,7 +107,7 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
 
 ## 4. Update the default availability for the new calculation:
 
-  - Edit [`src/project/update_p.c`][update_p.c] search for the [`update_analysis_availability`][update_analysis_availability] function to add the proper flags
+  - Edit [`src/project/update_p.c`][update_p.c] search for the [`update_analysis_availability ()`][update_analysis_availability] function to add the proper flags
 
 Specify if the analysis is always available, or if conditions have to be met:
 

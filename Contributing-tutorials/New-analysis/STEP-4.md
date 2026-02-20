@@ -31,7 +31,7 @@ You will need to consider and modify:
 
 ### 1. To save the new IDC data edit the file [`src/project/save_p.c`][save_p.c]
 
-  - Search for the [`save_project`][save_project] function
+  - Search for the [`save_project ()`][save_project] function
   ```C
   /*!
     \fn int save_project (FILE * fp, project * this_proj)
@@ -80,7 +80,7 @@ You will need to consider and modify:
   ```
   This new variable `version_3_0_and_above` will be used, if needed, to trigger actions specific to the new analysis and to be performed when reading **atomes** project files.
 
-  - At the beginning of the [`open_project`][open_project] function, set the value of the new variable to `FALSE`
+  - At the beginning of the [`open_project ()`][open_project] function, set the value of the new variable to `FALSE`
   ```C
   /*!
     \fn int open_project (FILE * fp)
@@ -171,7 +171,7 @@ To do that copy the previous test case, change the version number, and for this 
   ...
 
 ```
- - At te beginning of the [`src/project/open_p.c`][open_p.c] file do not forget to declare the new `init_idc` function 
+ - At te beginning of the [`src/project/open_p.c`][open_p.c] file do not forget to declare the new `init_idc ()` function 
   ```C
   ...
 
