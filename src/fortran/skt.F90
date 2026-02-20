@@ -433,7 +433,8 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
   DOUBLE PRECISION :: omega, max_omega, delta_omega, time_val, sqw_val
 
   max_omega = PI / DELTA_T
-  delta_omega = max_omega / DBLE(N_FREQ)
+  ! delta_omega = max_omega / DBLE(N_FREQ)
+  delta_omega = max_omega / DBLE(N_FREQ-1)
 
   SHIFT = 8+4*NSP*NSP
   if (NSP .eq. 2) SHIFT=SHIFT+8
@@ -442,18 +443,20 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
   do qid = 1, Q_NUM ! For all selected q points
 
     id_q_num = Q_LIST(qid) ! Select the q point ID number as referenced previously
-
     do freq = 1, N_FREQ
 
       omega = DBLE(freq-1) * delta_omega
       sqw_val = 0.5d0 * SKT_TAB(id_q_num, 1)
 
-      do t = 2, NS-MIN_IN
+      do t = 2, NS-MIN_IN-1
         time_val = DBLE(t-1) * DELTA_T
         sqw_val = sqw_val + SKT_TAB(id_q_num, t) * cos(omega * time_val)
       enddo
 
-      sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
+      time_val = DBLE(NS-MIN_IN-1) * DELTA_T
+      sqw_val = sqw_val + 0.5d0 * SKT_TAB(id_q_num, NS-MIN_IN) * cos(omega * time_val)
+
+      sqw_val = 2.0d0 * sqw_val * DELTA_T / PI
       SQW_TAB(freq) = sqw_val
 
     enddo
@@ -463,6 +466,8 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
 
     if (SPA .gt. 0 .and. SPB .gt. 0) then
 
+      ! For partials only evaluates Faber-Ziman formalism
+      sqw_val = 0.0d0
       do freq = 1, N_FREQ
 
         omega = DBLE(freq-1) * delta_omega
@@ -472,7 +477,7 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
           sqw_val = 0.5d0 * (1.0d0 + SKT_TAB(id_q_num, 1)/sqrt(Xi(SPA)*Xi(SPB)))
         endif
 
-        do t = 2, NS-MIN_IN
+        do t = 2, NS-MIN_IN-1
           time_val = DBLE(t-1) * DELTA_T
           if (SPA .eq. SPB) then
             sqw_val = sqw_val + (1.0d0 + (SKT_TAB(id_q_num, t) - 1.0d0)/Xi(SPA)) * cos(omega * time_val)
@@ -481,7 +486,13 @@ SUBROUTINE COMPUTE_SQW (SKT_TAB, Q_NUM, Q_LIST, PIC, SPA, SPB)
           endif
         enddo
 
-        sqw_val = 2.0d0 * sqw_val * DELTA_T ! Factor 2 for symmetry -inf to +inf
+        time_val = DBLE(NS-MIN_IN-1) * DELTA_T
+        if (SPA .eq. SPB) then
+          sqw_val = sqw_val + 0.5d0 * (1.0d0 + (SKT_TAB(id_q_num, t) - 1.0d0)/Xi(SPA)) * cos(omega * time_val)
+        else
+          sqw_val = sqw_val + 0.5d0 * (1.0d0 + SKT_TAB(id_q_num, t)/sqrt(Xi(SPA)*Xi(SPB))) * cos(omega * time_val)
+        endif
+        sqw_val = 2.0d0 * sqw_val * DELTA_T  / PI
         SQW_TAB(freq) = sqw_val
 
       enddo
