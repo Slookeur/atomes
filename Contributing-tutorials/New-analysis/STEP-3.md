@@ -178,7 +178,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
 ## 3. Display information results in the main software window
 
-  - Edit the [`src/workspace/workinfo.c`][workinfo.c] file, in the `workinfo ()` routine search for the test case that calls for `update_*_view ()` functions,
+  - Edit the [`src/workspace/workinfo.c`][workinfo.c] file, in the `workinfo ()` routine search for the switch case that calls for `update_*_view ()` functions,
 and add a test case for the new analysis:
 
   ```C
