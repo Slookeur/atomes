@@ -551,15 +551,21 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
       }
       if (oid == 0 && status)
       {
-        for (i=1; i<4; i++) button_set_status(rings_check[i], ! status);
+        for (i=1; i<4; i++)
+        {
+          button_set_status(rings_check[i], ! status);
+          active_project -> csparam[i+1] = ! status;
+        }
       }
       else if (oid == 1 && status)
       {
         button_set_status(rings_check[0], ! status);
+        active_project -> csparam[1] = ! status;
       }
       else if (oid == 2 && status)
       {
         button_set_status(rings_check[1], ! status);
+        active_project -> csparam[2] = ! status;
       }
       break;
   }
@@ -658,7 +664,7 @@ void calc_rings (GtkWidget * vbox)
     }
     else
     {
-      status =  (j < 0) ? 0 : (search_type) ? active_project -> csparam[i+1] : active_project -> rsparam[j][i+2];
+      status = (search_type) ? active_project -> csparam[i+1] : active_project -> rsparam[j][i+2];
     }
     rings_check[i] = check_button (val_c[search_type][i], -1, 40, status, G_CALLBACK(toggle_rings), GINT_TO_POINTER(i));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, rings_check[i], FALSE, FALSE, 0);
