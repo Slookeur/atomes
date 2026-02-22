@@ -195,8 +195,8 @@ since this is a little bit more tricky I recommend to get in touch with me at th
 
 Similarly get in touch with me at this point.
 
- > [!IMPORTANT]
- > Contact me when you reach that stage ! 
+> [!IMPORTANT]
+> Contact me when you reach that stage ! 
 
 
 ## Previous : [Adding the new analysis to the **atomes** software][analysing]
