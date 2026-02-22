@@ -73,7 +73,8 @@
   }
   ```
 > [!TIP]
-> Some examples are provided afterwards but many more are available in **atomes** source code, including in the file [`src/gui/calc_menu.c`][calc_menu.c]
+> Some examples are provided afterwards but many more are available in **atomes** source code, 
+> including in the file [`src/gui/calc_menu.c`][calc_menu.c]
 
 In the following examples are use to illustrate both how to create the user interface, and to read back the associated data what is usually called a **callback**. 
 
