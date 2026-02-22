@@ -21,8 +21,8 @@ However this is likely to be more complicated.
 If the fields available in the [`atomes_analysis`][atomes_analysis] data structure are enough to store the information and parameters, 
 to describe the IDC analysis then you will have nothing to do. 
 
-Otherwise 2 options are available to you, either modify the [`project`][project] data structure to store the extra parameters, or modify
- [`atomes_analysis`][atomes_analysis] data structure to do it. 
+Otherwise modify the [`project`][project] data structure to store the extra parameter(s), several examples are already in place to illustrate the idea. 
+I do not recommend to modify the [`atomes_analysis`][atomes_analysis] data structure to store the new required data. 
 
 You will need to consider and modify:
 
@@ -183,8 +183,23 @@ To do that copy the previous test case, change the version number, and for this 
 
 ## 4. Modifying the [`src/gui/preferences.c`][preferences.c] file to save and read user preferences
 
+This part requires to setup default values for your calculations, and to create the corresponding variables in **atomes** source code. \\
+The [`src/gui/preferences.c`][preferences.c] file handles the reading an saving of user preferences to an XML file named **`atomes.pml`** , 
+since this is a little bit more tricky I recommend to get in touch with me at this point. 
+
+> [!IMPORTANT]
+> Contact me when you reach that stage ! 
+> Contact me if you need any help !
+
 
 ## 5. Modifying the GNU archive for the official software distribution
+
+Similarly get in touch with me at this point.
+
+> [!IMPORTANT]
+> Contact me when you reach that stage ! 
+> Contact me if you need any help !
+
 
 ## Previous : [Adding the new analysis to the **atomes** software][analysing]
 
@@ -192,7 +207,6 @@ To do that copy the previous test case, change the version number, and for this 
 [preferences.c]:https://slookeur.github.io/atomes-doxygen/de/dee/preferences_8c.html
 [open_p.c]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html
 [open_project]:https://slookeur.github.io/atomes-doxygen/da/d5e/open__p_8c.html#a0b222c223270264f9754d008a37317aa
-[calcs_to_read]:to_be_done
 [save_p.c]:https://slookeur.github.io/atomes-doxygen/d7/d70/save__p_8c.html
 [save_project]:https://slookeur.github.io/atomes-doxygen/d7/d70/save__p_8c.html#ada55fbf67b7240b5158cdaa9f8a62810
 [project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html

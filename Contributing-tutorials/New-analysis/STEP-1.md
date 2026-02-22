@@ -24,7 +24,8 @@
   #define CHA 7
   #define SPH 8
   #define MSD 9
-  #define IDC 10  // This is an example
+  #define SKT 10
+  #define IDC 11  // This is an example
   ```
 
 >[!IMPORTANT]
@@ -45,6 +46,7 @@
                            "Chain statistics",
                            "Spherical harmonics",
                            "Mean Squared Displacement",
+                           "Dynamic structure factor",
                            "The new analysis"};  // This is an example
     ```
     - [`gchar * graph_name`][graph_name] : append a line to add the new analysis name for the tool box window
@@ -59,6 +61,7 @@
                             "Chain statistics",
                             "Spherical harmonics",
                             "Mean Squared Displacement",
+                            "Dynamic structure factor",
                             "The new analysis"};  // This is an example
     ```
     - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
@@ -73,6 +76,7 @@
                             "pixmaps/ch.png",
                             "pixmaps/sp.png",
                             "pixmaps/ms.png",
+                            "pixmaps/sq.png",
                             "pixmaps/idc.png"};  // this is an example
     ```
 
@@ -93,10 +97,11 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
 {
   ...
 
-  int num_g = ;             // Total number of graph windows as result(s) of the analysis
-  int num_c = ;             // Number of analysis compatible, to allow overlap of the data on the graph window
-  int c_list[num_c] = {};   // List of compatible analysis, integer list in the ID list, including self
-  active_project -> analysis[IDC] = setup_analysis (pid, "New analysis name", IDC, TRUE, num_g, num_c, c_list, "Default x axis title");  // This is an example
+  int num_g = ;                 // Total number of graph windows as result(s) of the analysis
+  int num_c = ;                 // Number of analysis compatible, to allow overlap of the data on the graph window
+  int c_list[num_c] = {};       // List of compatible analysis, integer list in the ID list, including self
+  gchar * d_title = "x title";  // Default x axis title for the analysis, if any, can be NULL
+  active_project -> analysis[IDC] = setup_analysis (pid, "New analysis name", IDC, TRUE, num_g, num_c, c_list, d_title);  // This is an example
 
   ...
 }
@@ -184,7 +189,7 @@ Specify if the analysis is always available, or if conditions have to be met:
 >
 > You can also consider to modify the corresponding data structures for your need !
 
-  - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information
+  - Edit the file [`src/curve/yaxis.c`][yaxis.c] to adjust specific axis autoscale information:
 
   ```C
   void autoscale_axis (project * this_proj, Curve * this_curve, int rid, int cid, int aid)

@@ -178,7 +178,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 
 ## 3. Display information results in the main software window
 
-  - Edit the [`src/workspace/workinfo.c`][workinfo.c] file, in the `workinfo ()` routine search for the switch case that calls for `update_*_view ()` functions,
+  - Edit the [`src/workspace/workinfo.c`][workinfo.c] file, in the [`workinfo ()`][worinfo] routine search for the switch case that calls for `update_*_view ()` functions,
 and add a test case for the new analysis:
 
   ```C
@@ -268,7 +268,8 @@ This step is required to build the [Code::Blocks][codeblocks] version of **atome
 ## Previous : [Coding the new analysis user dialog and its callbacks][coding]
 
 [gui]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
-[workinfo.c]:https://slookeur.github.io/atomes-doxygen/dir_11bc0974ce736ce9a6fadebbeb7a8314.html
+[workinfo.c]:https://slookeur.github.io/atomes-doxygen/d6/df5/workinfo_8c.html
+[workinfo]:https://slookeur.github.io/atomes-doxygen/d6/df5/workinfo_8c.html#ab472d26c2958f8fbeddb2c3237710dd4
 [atomes_project]:https://slookeur.github.io/atomes-doxygen/dd/dbe/structproject.html
 [makefile]:https://github.com/Slookeur/atomes/blob/devel/Makefile
 [releasing]:STEP-4.md
