@@ -189,16 +189,14 @@ since this is a little bit more tricky I recommend to get in touch with me at th
 
 > [!IMPORTANT]
 > Contact me when you reach that stage ! 
-> Contact me if you need any help !
 
 
 ## 5. Modifying the GNU archive for the official software distribution
 
 Similarly get in touch with me at this point.
 
-> [!IMPORTANT]
-> Contact me when you reach that stage ! 
-> Contact me if you need any help !
+ > [!IMPORTANT]
+ > Contact me when you reach that stage ! 
 
 
 ## Previous : [Adding the new analysis to the **atomes** software][analysing]

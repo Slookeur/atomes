@@ -72,10 +72,9 @@
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, idc_box, FALSE, FALSE, 0);
   }
   ```
-> [!TIP]
-> Some examples are provided afterwards but many more are available in **atomes** source code,
- 
-> including in the file [`src/gui/calc_menu.c`][calc_menu.c]
+ > [!TIP]
+ > Some examples are provided afterwards but many more are available in **atomes** source code, 
+ > including in the file [`src/gui/calc_menu.c`][calc_menu.c]
 
 In the following examples are use to illustrate both how to create the user interface, and to read back the associated data what is usually called a **callback**. 
 
