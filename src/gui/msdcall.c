@@ -153,6 +153,7 @@ void update_msd_view (project * this_proj)
   print_info ("\n\nMean Square Displacement\n\n", "heading", this_proj -> analysis[MSD] -> calc_buffer);
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[MSD] -> calc_buffer);
   update_dynamic_view (this_proj, this_proj -> analysis[MSD] -> calc_buffer);
+  print_info ("\n", NULL, this_proj -> analysis[MSD] -> calc_buffer);
   print_info (calculation_time(TRUE, this_proj -> analysis[MSD] -> calc_time), NULL, this_proj -> analysis[MSD] -> calc_buffer);
 }
 
@@ -167,8 +168,7 @@ void update_msd_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data)
 {
   int i;
-  // if (! active_project -> analysis[MSD] -> init_ok)
-  init_msd (active_project);
+  if (! active_project -> analysis[MSD] -> init_ok) init_msd (active_project);
   clean_curves_data (MSD, 0, active_project -> analysis[MSD] -> numc);
   prepostcalc (widg, FALSE, MSD, 0, opac);
   active_project -> analysis[MSD] -> min = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;

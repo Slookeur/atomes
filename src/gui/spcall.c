@@ -44,7 +44,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "curve.h"
 
-extern void alloc_analysis_curves (atomes_analysis * this_analysis);
+extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 
 /*!
@@ -65,7 +65,7 @@ void init_sph (project * this_proj, int str)
     {
       this_proj -> analysis[SPH] -> numc += active_coord -> ntg[1][i];
     }
-    alloc_analysis_curves (this_proj -> analysis[SPH]);
+    alloc_analysis_curves (this_proj -> id, this_proj -> analysis[SPH]);
     j = 0;
     for (i = 0 ; i < this_proj -> nspec ; i++)
     {
@@ -185,7 +185,7 @@ void update_spherical_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
-  if (! active_project -> analysis[SPH] -> init_ok) init_sph(active_project, 1);
+  if (! active_project -> analysis[SPH] -> init_ok) init_sph (active_project, 1);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)

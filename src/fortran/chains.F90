@@ -721,7 +721,7 @@ INTERFACE
   END FUNCTION
 END INTERFACE
 
-if (CID-1 .lt. TAILLC) then
+if (CID .lt. TAILLC) then
 
   do while (THE_CHAIN(CID)%NEIGHBOR .ge. 1)
 

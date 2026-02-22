@@ -487,6 +487,7 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
                     & active_project -> rsearch[1],
                     & active_project -> rsparam[i][2],
                     & active_project -> rsparam[i][3]);
+    prepostcalc (widg, TRUE, RIN, (j == 0 || j == 2) ? 0 : 1, 1.0);
     active_project -> rsdata[i][4] = get_calc_time (start_time, stop_time);
     if (j == 0)
     {
@@ -520,7 +521,6 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
         active_glwin -> ring_max[i] = 0;
       }
     }
-    prepostcalc (widg, TRUE, RIN, j, 1.0);
   }
   else
   {

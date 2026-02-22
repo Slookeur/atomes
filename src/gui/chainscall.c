@@ -115,7 +115,6 @@ void update_chains_view (project * this_proj)
   gchar * tab;
   gchar * cid;
   gchar * str;
-
   if (this_proj -> analysis[CHA] -> calc_buffer == NULL) this_proj -> analysis[CHA] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[CHA] -> calc_buffer);
   j = this_proj -> csparam[0];
@@ -356,7 +355,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   {
     show_error ("The nearest neighbors table calculation has failed", 0, widg);
   }
-  if (active_coord -> totcoord[9])
+  if (j == 1)
   {
     active_project -> csparam[6] = 1;
     active_glwin -> chains = TRUE;

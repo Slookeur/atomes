@@ -65,7 +65,7 @@ extern void init_chain (project * this_proj);
 extern void init_msd (project * this_proj);
 extern void init_sph (project * this_proj, int str);
 extern void init_skt (project * this_proj, int opening);
-extern void alloc_analysis_curves (atomes_analysis * this_analysis);
+extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 
 gboolean version_2_5_and_bellow;
 gboolean version_2_6_and_above;
@@ -582,7 +582,7 @@ int open_project (FILE * fp)
             if (j)
             {
               active_project -> analysis[SPH] -> numc = j;
-              alloc_analysis_curves (active_project -> analysis[SPH]);
+              alloc_analysis_curves (active_project -> id, active_project -> analysis[SPH]);
               add_curve_widgets (active_project, SPH);
               active_project -> analysis[SPH] -> avail_ok = TRUE;
               for (k=0; k<j; k++)

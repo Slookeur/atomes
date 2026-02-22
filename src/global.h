@@ -991,7 +991,7 @@ struct project
   /*
      Analysis related parameters
   */
-  /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
+  /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd \n 10 = skt */
   atomes_analysis ** analysis;         /*!< The analysis data and results */
 
   // Some parameters cannot be easily stored in a generic data structure
