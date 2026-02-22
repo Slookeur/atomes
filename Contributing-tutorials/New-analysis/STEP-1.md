@@ -9,7 +9,7 @@
 
   - Increment the total number of calculations available : `NCALCS`
   ```C
-  #define NCALCS 11   // The previous value was 10
+  #define NCALCS 12   // The previous value was 11
   ```
 
   - Define `IDC` a new, unique, 3 characters variable, associated to the new calculation ID number: 
