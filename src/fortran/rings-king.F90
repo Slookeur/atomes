@@ -995,7 +995,7 @@ INTERFACE
   END FUNCTION
 END INTERFACE
 
-if (RID .lt. TAE) then
+if (RID-1 .lt. TAE) then
 
   do while (THE_RING(RID)%NEIGHBOR .ge. 1)
 

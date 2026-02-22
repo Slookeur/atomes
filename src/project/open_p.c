@@ -274,9 +274,11 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
       initcnames (this_proj, this_analysis -> aid);
       for (j=0; j<i; j++)
       {
+        // g_debug ("Reading :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
         if (read_project_curve (fp, this_proj -> id) != OK)
         {
           // error
+          // g_debug ("Error :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
           return ERROR_CURVE;
         }
       }

@@ -88,8 +88,8 @@ int read_project_curve (FILE * fp, int pid)
   Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
   if (version_2_9_and_above)
   {
+    // curve name can be NULL, so do not test for emptyness
     this_curve -> name = read_this_string (fp);
-    if (this_curve -> name == NULL) return ERROR_RW;
   }
   if (fread (& this_curve -> displayed, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fread (& this_curve -> ndata, sizeof(int), 1, fp) != 1) return ERROR_RW;
@@ -103,7 +103,6 @@ int read_project_curve (FILE * fp, int pid)
     this_curve -> err = allocdouble (this_curve -> ndata);
     if (fread (this_curve -> err, sizeof(double), this_curve -> ndata, fp) != this_curve -> ndata) return ERROR_RW;
   }
-
   if (this_curve -> displayed)
   {
     if (fread (this_curve -> wsize, sizeof(int), 2, fp) != 2) return ERROR_RW;
@@ -207,6 +206,7 @@ int read_project_curve (FILE * fp, int pid)
     }
     this_curve -> cfile = read_this_string (fp);
   }
+
 #ifdef DEBUG
   // debugiocurve (this_proj, win, rid, cid, "READ");
 #endif

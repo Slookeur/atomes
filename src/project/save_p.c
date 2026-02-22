@@ -234,14 +234,16 @@ int save_project (FILE * fp, project * this_proj)
     if (fwrite (& this_proj -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
     if (! this_proj -> skt_all_sets)
     {
-      if (fwrite (& this_proj -> skt_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-      if (this_proj -> skt_n_data_sets)
+      i = (this_proj -> skt_step_id) ? this_proj -> skt_n_data_sets : 0;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (i)
       {
         if (fwrite (this_proj -> skt_step_id, sizeof(int), this_proj -> skt_n_data_sets, fp) != this_proj -> skt_n_data_sets) return ERROR_PROJECT;
       }
     }
-    if (fwrite (& this_proj -> sqw_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-    if (this_proj -> sqw_n_data_sets)
+    i = (this_proj -> sqw_q_id) ? this_proj -> sqw_n_data_sets : 0;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (i)
     {
       if (fwrite (this_proj -> sqw_q_id, sizeof(double), this_proj -> sqw_n_data_sets, fp) != this_proj -> sqw_n_data_sets) return ERROR_PROJECT;
     }
