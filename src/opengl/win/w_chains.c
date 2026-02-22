@@ -30,10 +30,13 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  gchar * chain_atoms (project * this_proj, int step, int size, int cid);
+
   int get_cmin (project * this_proj, int step);
   int get_cmax (project * this_proj, int step);
 
   void fill_chains_model (GtkTreeStore * store, project * this_proj);
+  void chains_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void add_this_chain_to_search_tree (project * this_proj);
 
   G_MODULE_EXPORT void on_select_chains (GtkCellRendererToggle * cell_renderer, gchar * string_path, gpointer data);
@@ -138,6 +141,33 @@ G_MODULE_EXPORT void on_select_chains (GtkCellRendererToggle * cell_renderer, gc
 }
 
 /*!
+  \fn gchar * chain_atoms (project * this_proj, int step, int size, int cid)
+
+  \brief create a string containing the list of atoms in a chain
+
+  \param this_proj the target project
+  \param step the configuration
+  \param size the size of the ring
+  \param cid the id number of the ring
+*/
+gchar * chain_atoms (project * this_proj, int step, int size, int cid)
+{
+  gchar * str;
+  int aid, sid;
+  aid = this_proj -> modelgl -> all_chains[step][size][cid][0];
+  sid = this_proj -> atoms[step][aid].sp;
+  str = g_strdup_printf ("%s<sub>%d</sub>", this_proj -> chemistry -> label[sid], aid+1);
+  int i;
+  for (i=1; i<size+1; i++)
+  {
+    aid = this_proj -> modelgl -> all_chains[step][size][cid][i];
+    sid = this_proj -> atoms[step][aid].sp;
+    str = g_strdup_printf ("%s-%s<sub>%d</sub>", str, this_proj -> chemistry -> label[sid], aid+1);
+  }
+  return str;
+}
+
+/*!
   \fn void fill_chains_model (GtkTreeStore * store, project * this_proj)
 
   \brief fill the entire chain(s) tree store
@@ -149,6 +179,7 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
 {
   GtkTreeIter step_level, size_level, chain_level;
   int h, i, j, k, l;
+  gchar * str;
   if (this_proj -> coord -> totcoord[9])
   {
     for (h=0; h < this_proj -> steps; h++)
@@ -189,6 +220,7 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
         for (l=0; l<k; l++)
         {
           gtk_tree_store_append (store, & chain_level, & size_level);
+          str = chain_atoms (this_proj, h, j-1, l);
           if (this_proj -> steps > 1)
           {
             gtk_tree_store_set (store, & chain_level, 0, -(h+1),
@@ -196,7 +228,8 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
                                                       2, l+1,
                                                       3, FALSE,
                                                       4, FALSE,
-                                                      5, FALSE, -1);
+                                                      5, FALSE,
+                                                      6, str, -1);
           }
           else
           {
@@ -204,12 +237,35 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
                                                       1, l+1,
                                                       2, FALSE,
                                                       3, FALSE,
-                                                      4, FALSE, -1);
+                                                      4, FALSE,
+                                                      5, str, -1);
           }
+          g_free (str);
         }
       }
     }
   }
+}
+
+/*!
+  \fn void chains_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
+
+  \brief Chains tree view set color and Pango markup in tree view
+
+  \param col the tree view column
+  \param renderer the column renderer
+  \param mod the tree model
+  \param iter the tree it
+  \param data the associated data pointer
+*/
+void chains_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
+{
+  int steps = GPOINTER_TO_INT(data);
+  // measure_set_color (col, renderer, mod, iter, dat);
+  gchar * str = NULL;
+  gtk_tree_model_get (mod, iter,  (steps) ? 6 : 5, & str, -1);
+  g_object_set (renderer, "markup", str, NULL, NULL);
+  g_free (str);
 }
 
 /*!
@@ -225,18 +281,20 @@ GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this)
   int i, j, k;
   GtkTreeViewColumn * chains_col[7];
   GtkCellRenderer * chains_cell[7];
-  gchar * ctitle[6]={"MD. step", "Chain(s) size", "Id.", "Show", "Label", "Pick"};
-  gchar * ctype[6]={"text", "text", "text", "active", "active", "active"};
-  GType col_type[6]={G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN};
+  gchar * ctitle[7]={"MD. step", "Chain(s) size", "Id.", "Show", "Label", "Pick", "Atoms"};
+  gchar * ctype[7]={"text", "text", "text", "active", "active", "active", "text"};
+  GType col_type_ms[7]={G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
+  GType col_type_ss[6]={G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
+
   coord_edition * coord = this_proj -> modelgl -> coord_win;
   j = (this_proj -> steps > 1) ? 1: 0;
   k = (this_proj -> steps > 1) ? 0: 1;
-  coord -> chains_model = gtk_tree_store_newv (5+j, col_type);
+  coord -> chains_model = gtk_tree_store_newv (6+j, (j) ? col_type_ms : col_type_ss);
   if (fill_this) fill_chains_model (coord -> chains_model, this_proj);
   GtkWidget * chains_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(coord -> chains_model));
-  for (i=0; i<5+j; i++)
+  for (i=0; i<6+j; i++)
   {
-    if (i < 2+j)
+    if (i < 2+j || i > 4+j)
     {
       chains_cell[i] = gtk_cell_renderer_text_new ();
     }
@@ -250,6 +308,7 @@ GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this)
     gtk_tree_view_append_column(GTK_TREE_VIEW(chains_tree), chains_col[i]);
     gtk_tree_view_column_set_alignment (chains_col[i], 0.5);
     gtk_tree_view_column_set_cell_data_func (chains_col[i], chains_cell[i], rings_set_visible, & this_proj -> modelgl -> colorp[i][0], NULL);
+    if (i > 4+j) gtk_tree_view_column_set_cell_data_func (chains_col[i], chains_cell[i], chains_set_markup, GINT_TO_POINTER(j), NULL);
   }
   return chains_tree;
 }
@@ -271,6 +330,7 @@ void add_this_chain_to_search_tree (project * this_proj)
   gboolean valid;
   gboolean insert = TRUE;
   int g, h, i, j, k, l, m;
+  gchar * str;
   int prepend = 0;
   if (this_proj -> steps > 1)
   {
@@ -346,6 +406,7 @@ void add_this_chain_to_search_tree (project * this_proj)
     }
     if (insert)
     {
+      str = chain_atoms (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1);
       switch (prepend)
       {
         case 0:
@@ -369,7 +430,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                     2, coord -> ch,
                                                     3, FALSE,
                                                     4, FALSE,
-                                                    5, FALSE, -1);
+                                                    5, FALSE,
+                                                    6, str, -1);
           break;
         case 1:
           gtk_tree_store_insert_before (store, & new_level, NULL, & step_level);
@@ -392,7 +454,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                     2, coord -> ch,
                                                     3, FALSE,
                                                     4, FALSE,
-                                                    5, FALSE, -1);
+                                                    5, FALSE,
+                                                    6, str, -1);
           break;
         case 2:
           gtk_tree_store_insert_after (store, & new_level, & step_level, & size_level);
@@ -408,7 +471,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                    2, coord -> ch,
                                                    3, FALSE,
                                                    4, FALSE,
-                                                   5, FALSE, -1);
+                                                   5, FALSE,
+                                                   6, str, -1);
           break;
         case 3:
           gtk_tree_store_insert_before (store, & new_level, & step_level, & size_level);
@@ -424,7 +488,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                     2, coord -> ch,
                                                     3, FALSE,
                                                     4, FALSE,
-                                                    5, FALSE, -1);
+                                                    5, FALSE,
+                                                    6, str, -1);
           break;
         case 4:
           gtk_tree_store_insert_after (store, & new_level, & size_level, & chain_level);
@@ -433,7 +498,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                   2, coord -> ch,
                                                   3, FALSE,
                                                   4, FALSE,
-                                                  5, FALSE, -1);
+                                                  5, FALSE,
+                                                  6, str, -1);
           break;
         case 5:
           gtk_tree_store_insert_before (store, & new_level, & size_level, & chain_level);
@@ -442,9 +508,11 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                   2, coord -> ch,
                                                   3, FALSE,
                                                   4, FALSE,
-                                                  5, FALSE, -1);
+                                                  5, FALSE,
+                                                  6, str, -1);
           break;
       }
+      g_free (str);
     }
   }
   else
@@ -495,6 +563,7 @@ void add_this_chain_to_search_tree (project * this_proj)
     }
     if (insert)
     {
+      str = chain_atoms  (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1);
       switch (prepend)
       {
         case 0:
@@ -509,7 +578,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                      1, coord -> ch,
                                                      2, FALSE,
                                                      3, FALSE,
-                                                     4, FALSE, -1);
+                                                     4, FALSE,
+                                                     5, str, -1);
          break;
        case 1:
           gtk_tree_store_insert_before (store, & new_level, NULL, & size_level);
@@ -523,7 +593,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                      1, coord -> ch,
                                                      2, FALSE,
                                                      3, FALSE,
-                                                     4, FALSE, -1);
+                                                     4, FALSE,
+                                                     5, str, -1);
           break;
         case 2:
           gtk_tree_store_insert_before (store, & new_level, & size_level, & chain_level);
@@ -531,7 +602,8 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                   1, coord -> ch,
                                                   2, FALSE,
                                                   3, FALSE,
-                                                  4, FALSE, -1);
+                                                  4, FALSE,
+                                                  5, str, -1);
           break;
         case 3:
           gtk_tree_store_insert_after (store, & new_level, & size_level, & chain_level);
@@ -539,9 +611,11 @@ void add_this_chain_to_search_tree (project * this_proj)
                                                   1, coord -> ch,
                                                   2, FALSE,
                                                   3, FALSE,
-                                                  4, FALSE, -1);
+                                                  4, FALSE,
+                                                  5, str, -1);
           break;
       }
+      g_free (str);
     }
   }
 }

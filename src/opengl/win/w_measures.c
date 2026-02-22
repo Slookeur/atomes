@@ -529,7 +529,7 @@ GtkWidget * create_selection_tree (glwin * view, int sid, int mid)
       sel_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[mid][i], sel_cell[i], ctype[mid][i], i, NULL);
     }
     gtk_tree_view_column_set_alignment (sel_col[i], 0.5);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(selection_tree), sel_col[i]);
+    gtk_tree_view_append_column (GTK_TREE_VIEW(selection_tree), sel_col[i]);
     if (i > 0 && i < 4+mid)
     {
       if (mid < 2)
