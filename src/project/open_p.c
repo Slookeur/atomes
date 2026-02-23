@@ -30,8 +30,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis);
-  int open_project (FILE * fp;
+  int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid);
+  int open_project (FILE * fp, int wid);
 
   char * read_string (int i, FILE * fp);
 
@@ -224,15 +224,16 @@ void alloc_proj_data (project * this_proj, int cid)
 }
 
 /*!
-  \fn int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
+  \fn int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 
   \brief saving analysis parameter(s) and result(s) to project file
 
   \param fp the file pointer
   \param this_proj the target project
   \param this_analysis the target analysis
+  \param wid reading workspace (1/0)
 */
-int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
+int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 {
   int i, j;
   if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
@@ -276,7 +277,7 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
       for (j=0; j<i; j++)
       {
         // g_debug ("Reading :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
-        if (read_project_curve (fp, this_proj -> id) != OK)
+        if (read_project_curve (fp, wid, this_proj -> id) != OK)
         {
           // error
           // g_debug ("Error :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
@@ -293,13 +294,14 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
 }
 
 /*!
-  \fn int open_project (FILE * fp)
+  \fn int open_project (FILE * fp, int wid)
 
   \brief open atomes project file
 
   \param fp the file pointer
+  \param wid reading workspace (1/0)
 */
-int open_project (FILE * fp)
+int open_project (FILE * fp, int wid)
 {
   int i, j, k;
   gchar * version;
@@ -544,7 +546,7 @@ int open_project (FILE * fp)
           {
             if (active_project -> analysis[i])
             {
-              j = read_analysis (fp, active_project, active_project -> analysis[i]);
+              j = read_analysis (fp, active_project, active_project -> analysis[i], wid);
               if (j != OK)
               {
                 return j;
@@ -600,7 +602,7 @@ int open_project (FILE * fp)
             }
             for (j=0; j<i; j++)
             {
-              if (read_project_curve (fp, activep) != OK)
+              if (read_project_curve (fp, wid, activep) != OK)
               {
                 // error
                 return ERROR_CURVE;

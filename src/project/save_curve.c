@@ -30,7 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int save_project_curve (FILE * fp, project * this_proj, int rid, int cid);
+  int save_project_curve (FILE * fp, project * this_proj, int wid, int rid, int cid);
 
   gboolean write_data_layout (FILE * fp, DataLayout * layout);
 
@@ -63,18 +63,19 @@ gboolean write_data_layout (FILE * fp, DataLayout * layout)
 }
 
 /*!
-  \fn int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
+  \fn int save_project_curve (FILE * fp, project * this_proj, int wid, int rid, int cid)
 
   \brief save project curve to file
 
   \param fp the file pointer
   \param this_proj the target project
+  \param wid saving workspace (1/0)
   \param rid the calculation to save
   \param cid the curve id to save
 */
-int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
+int save_project_curve (FILE * fp, project * this_proj, int wid, int rid, int cid)
 {
-  int i, j;
+  int i, j, k;
 
   if (fwrite (& rid, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fwrite (& cid, sizeof(int), 1, fp) != 1) return ERROR_RW;
@@ -158,16 +159,34 @@ int save_project_curve (FILE * fp, project * this_proj, int rid, int cid)
     if (! write_data_layout (fp, this_curve -> layout)) return ERROR_RW;
     if (fwrite (& this_curve -> draw_id, sizeof(int), 1, fp) != 1) return ERROR_RW;
     if (fwrite (& this_curve -> bshift, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fwrite (& this_curve -> extrac -> extras, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    i = 0;
+    CurveExtra * ctmp;
     if (this_curve -> extrac -> extras > 0)
     {
-      CurveExtra * ctmp = this_curve -> extrac -> first;
-      for (i=0; i<this_curve -> extrac -> extras; i++)
+      ctmp = this_curve -> extrac -> first;
+      for (j=0; j<this_curve -> extrac -> extras; j++)
       {
-        if (fwrite (& ctmp -> id.a, sizeof(int), 1, fp) != 1) return ERROR_RW;
-        if (fwrite (& ctmp -> id.b, sizeof(int), 1, fp) != 1) return ERROR_RW;
-        if (fwrite (& ctmp -> id.c, sizeof(int), 1, fp) != 1) return ERROR_RW;
-        if (! write_data_layout (fp, ctmp -> layout)) return ERROR_RW;
+        if (ctmp -> id.a == this_proj -> id || wid)
+        {
+          i ++;
+        }
+        if (ctmp -> next != NULL) ctmp = ctmp -> next;
+      }
+    }
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (i > 0)
+    {
+      ctmp = this_curve -> extrac -> first;
+      for (j=0; j<this_curve -> extrac -> extras; j++)
+      {
+        if (ctmp -> id.a == this_proj -> id || wid)
+        {
+          k = (wid) ? ctmp -> id.a : 0;
+          if (fwrite (& k, sizeof(int), 1, fp) != 1) return ERROR_RW;
+          if (fwrite (& ctmp -> id.b, sizeof(int), 1, fp) != 1) return ERROR_RW;
+          if (fwrite (& ctmp -> id.c, sizeof(int), 1, fp) != 1) return ERROR_RW;
+          if (! write_data_layout (fp, ctmp -> layout)) return ERROR_RW;
+        }
         if (ctmp -> next != NULL) ctmp = ctmp -> next;
       }
     }

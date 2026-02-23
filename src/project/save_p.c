@@ -31,8 +31,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   int save_this_string (FILE * fp, gchar * string);
-  int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis);
-  int save_project (FILE * fp, project * this_proj);
+  int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid);
+  int save_project (FILE * fp, project * this_proj, int wid);
 
 */
 
@@ -74,15 +74,16 @@ int save_this_string (FILE * fp, gchar * string)
 }
 
 /*!
-  \fn int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
+  \fn int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 
   \brief saving analysis parameter(s) and result(s) to project file
 
   \param fp the file pointer
   \param this_proj the target project
   \param this_analysis the target analysis
+  \param wid saving workspace (1/0)
 */
-int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis)
+int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 {
   int i, j;
   if (fwrite (& this_analysis -> aid, sizeof(int), 1, fp) != 1) return ERROR_ANA;
@@ -122,7 +123,7 @@ int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
         {
           if (this_analysis -> curves[j] -> ndata)
           {
-            if (save_project_curve (fp, this_proj, this_analysis -> aid, j) != OK) return ERROR_CURVE;
+            if (save_project_curve (fp, this_proj, wid, this_analysis -> aid, j) != OK) return ERROR_CURVE;
           }
         }
       }
@@ -137,14 +138,15 @@ int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
 }
 
 /*!
-  \fn int save_project (FILE * fp, project * this_proj)
+  \fn int save_project (FILE * fp, project * this_proj, int wid)
 
   \brief save project to file
 
   \param fp the file pointer
   \param this_proj the target project
+  \param wid saving workspace (1/0)
 */
-int save_project (FILE * fp, project * this_proj)
+int save_project (FILE * fp, project * this_proj, int wid)
 {
   int i, j, k;
   gchar * ver;
@@ -282,7 +284,7 @@ int save_project (FILE * fp, project * this_proj)
         {
           if (this_proj -> analysis[i])
           {
-            j = save_analysis (fp, this_proj, this_proj -> analysis[i]);
+            j = save_analysis (fp, this_proj, this_proj -> analysis[i], wid);
             if (j != OK) return j;
           }
         }

@@ -32,7 +32,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int open_save (FILE * fp, int i, int pid, int aid, gchar * pfile);
+  int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile);
   int open_save_workspace (FILE * fp, int act);
   int prep_chem_data ();
   int to_read_trj_or_vas (int ff);
@@ -160,25 +160,26 @@ G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
 gboolean save = TRUE;
 
 /*!
-  \fn int open_save (FILE * fp, int i, int pid, int aid, gchar * pfile)
+  \fn int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
 
   \brief open or save project file
 
   \param fp the file pointer
-  \param i 0 = read, 1 = write
+  \param act 0 = read, 1 = write
+  \param wid read or save workspace (1/0)
   \param pid the project id
   \param aid the active project id
   \param pfile the file name
 */
-int open_save (FILE * fp, int i, int pid, int aid, gchar * pfile)
+int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
 {
   int j;
   gchar * err;
 
-  if (i == 0)
+  if (act == 0)
   {
     reading_input = TRUE;
-    j = open_project (fp);
+    j = open_project (fp, wid);
     reading_input = FALSE;
     if (j != 0)
     {
@@ -200,7 +201,7 @@ int open_save (FILE * fp, int i, int pid, int aid, gchar * pfile)
   }
   else
   {
-    j = save_project (fp, get_project_by_id(pid));
+    j = save_project (fp, get_project_by_id(pid), wid);
     if (j != 0)
     {
       // error at write
@@ -267,12 +268,12 @@ int open_save_workspace (FILE * fp, int act)
       if (act == 0)
       {
         init_project (FALSE);
-        l = open_save (fp, act, j, k, NULL);
+        l = open_save (fp, act, 1, j, k, NULL);
         if (l != 0) return l;
       }
       else if (get_project_by_id(j) -> natomes)
       {
-        l = open_save (fp, act, j, k, NULL);
+        l = open_save (fp, act, 1, j, k, NULL);
         if (l != 0) return l;
       }
     }
@@ -298,7 +299,7 @@ void open_this_proj (gpointer data, gpointer user_data)
   int pactive = activep;
   init_project (FALSE);
   reading_project = TRUE;
-  open_save (fp, 0, activew, pactive, data);
+  open_save (fp, 0, 0, activew, pactive, data);
   reading_project = FALSE;
   fclose (fp);
   activew = activep;
@@ -387,7 +388,7 @@ G_MODULE_EXPORT void run_on_open_save_active (GtkDialog * info, gint response_id
     }
     else if (osp.a == 1)
     {
-      open_save (fp, osp.a, activew, osp.c, projfile);
+      open_save (fp, osp.a, 0, activew, osp.c, projfile);
     }
     else
     {

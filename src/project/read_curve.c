@@ -30,7 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int read_project_curve (FILE * fp, int pid);
+  int read_project_curve (FILE * fp, int wid, int pid);
 
   gboolean read_data_layout (FILE * fp, DataLayout * layout);
 
@@ -67,14 +67,15 @@ gboolean read_data_layout (FILE * fp, DataLayout * layout)
 }
 
 /*!
-  \fn int read_project_curve (FILE * fp, int pid)
+  \fn int read_project_curve (FILE * fp, int wid, int pid)
 
   \brief read a project curve from file
 
   \param fp the file pointer
+  \param wid reading workspace (1/0)
   \param pid the active project id
 */
-int read_project_curve (FILE * fp, int pid)
+int read_project_curve (FILE * fp, int wid, int pid)
 {
   int i, j;
   int rid, cid;
@@ -188,6 +189,7 @@ int read_project_curve (FILE * fp, int pid)
       for (i=0; i<this_curve -> extrac -> extras; i++)
       {
         if (fread (& ctmp -> id.a, sizeof(int), 1, fp) != 1) return ERROR_RW;
+        if (! wid) ctmp -> id.a += (nprojects - 1);
         if (fread (& ctmp -> id.b, sizeof(int), 1, fp) != 1) return ERROR_RW;
         if (fread (& ctmp -> id.c, sizeof(int), 1, fp) != 1) return ERROR_RW;
         ctmp -> layout = g_malloc0(sizeof*ctmp -> layout);
