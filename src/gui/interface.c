@@ -180,9 +180,13 @@ G_MODULE_EXPORT void create_about_dialog (GtkWidget * widg, gpointer data)
 #else
   GdkPixbuf * atomes_logo = gdk_pixbuf_new_from_file (PACKAGE_LAGPL, NULL);
 #endif
-  const gchar *authors[] = {"Dr. Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>", "", NULL};
+  const gchar * authors[] = {"Dr. Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>",
+                             "",
+                             "Collaborations:",
+                             "",
+                             "Dr. Noël Jakse <noel.jakse@grenoble-inp.fr> : dynamic structure factor", NULL};
   const gchar * weblabel = "https://atomes.ipcms.fr";
-  const gchar * comments = "Visualization, analyzis, creation/edition and post-processing of atomistic models !";
+  const gchar * comments = "Visualization, analyzis, creation/edition and post-processing of atomic scale models !";
   const gchar * copyrights = "Copyright © 2025 \nDr. Sébastien Le Roux";
 
   // gtk_about_dialog_set_url_hook (about_dialog_handle_url, NULL, NULL);
