@@ -30,7 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void init_sph (project * this_proj, int str);
+  void init_sph (project * this_proj, int opening);
   void update_spherical_view (project * this_proj);
 
   G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data);
@@ -48,46 +48,49 @@ extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
 
 /*!
-  \fn void init_sph (project * this_proj, int str)
+  \fn void init_sph (project * this_proj, int opening)
 
   \brief initialize the curve widgets for the spherical harmonics
 
   \param this_proj the target project
-  \param str initialize or not (1/0)
+  \param opening opening project file 1, otherwise 0
 */
-void init_sph (project * this_proj, int str)
+void init_sph (project * this_proj, int opening)
 {
   int i, j, k;
-  if (str)
+  if (! opening)
   {
     this_proj -> analysis[SPH] -> numc = this_proj -> nspec;
     for (i=0; i<this_proj -> nspec; i++)
     {
-      this_proj -> analysis[SPH] -> numc += active_coord -> ntg[1][i];
+      this_proj -> analysis[SPH] -> numc += this_proj -> coord -> ntg[1][i];
     }
-    alloc_analysis_curves (this_proj -> id, this_proj -> analysis[SPH]);
+  }
+  alloc_analysis_curves (this_proj -> id, this_proj -> analysis[SPH]);
+  if (! opening)
+  {
     j = 0;
     for (i = 0 ; i < this_proj -> nspec ; i++)
     {
       this_proj -> analysis[SPH] -> curves[i+j] -> name = g_strdup_printf("Q(l) [%s] (l=0 -> %d)",
-                                                                  active_chem -> label[i],
-                                                                  this_proj -> analysis[SPH] -> num_delta);
-      j += active_coord -> ntg[1][i];
+                                                                          this_proj -> chemistry -> label[i],
+                                                                          this_proj -> analysis[SPH] -> num_delta);
+      j += this_proj -> coord -> ntg[1][i];
     }
     k = 1;
     for (i=0 ; i < this_proj -> nspec; i++)
     {
-      for (j=0 ; j < active_coord -> ntg[1][i]; j++)
+      for (j=0 ; j < this_proj -> coord -> ntg[1][i]; j++)
       {
         this_proj -> analysis[SPH] -> curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
-                                                                    exact_name(env_name (this_proj, j, i, 0, NULL)),
-                                                                    this_proj -> analysis[SPH] -> num_delta);
+                                                                            exact_name(env_name (this_proj, j, i, 0, NULL)),
+                                                                            this_proj -> analysis[SPH] -> num_delta);
       }
-      k += active_coord -> ntg[1][i]+1;
+      k += this_proj -> coord -> ntg[1][i]+1;
     }
-    add_curve_widgets (this_proj, SPH);
-    this_proj -> analysis[SPH] -> init_ok = TRUE;
   }
+  add_curve_widgets (this_proj, SPH);
+  this_proj -> analysis[SPH] -> init_ok = TRUE;
 }
 
 /*!
@@ -185,7 +188,7 @@ void update_spherical_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
-  if (! active_project -> analysis[SPH] -> init_ok) init_sph (active_project, 1);
+  if (! active_project -> analysis[SPH] -> init_ok) init_sph (active_project, 0);
   if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
 
   if (active_project -> dmtx)

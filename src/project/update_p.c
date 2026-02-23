@@ -126,6 +126,8 @@ void update_analysis_availability (project * this_proj)
     {
       if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = TRUE;
       if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = TRUE;
+      if (this_proj -> analysis[SQD] && this_proj -> analysis[GDR]) this_proj -> analysis[SQD] -> avail_ok = this_proj -> analysis[GDR] -> calc_ok;
+      if (this_proj -> analysis[GDK] && this_proj -> analysis[SKD]) this_proj -> analysis[GDK] -> avail_ok = this_proj -> analysis[SKD] -> calc_ok;
       if (this_proj -> steps > 1 && this_proj -> analysis[SKT]) this_proj -> analysis[SKT] -> avail_ok = TRUE;
     }
     else

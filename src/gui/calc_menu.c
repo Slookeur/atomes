@@ -1836,6 +1836,18 @@ void calc_sk_t (GtkWidget * box)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox_skt, vbox_skt[i], FALSE, FALSE, 10);
   }
 
+  if (! preferences)
+  {
+    if (! active_project -> skt_step_id)
+    {
+      active_project -> skt_n_data_sets = default_skt_n_sets;
+    }
+    if (! active_project -> sqw_q_id)
+    {
+      active_project -> sqw_n_data_sets = default_sqw_n_sets;
+    }
+  }
+
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);

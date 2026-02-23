@@ -63,7 +63,7 @@ extern void init_ang (project * this_proj);
 extern void init_ring (project * this_proj);
 extern void init_chain (project * this_proj);
 extern void init_msd (project * this_proj);
-extern void init_sph (project * this_proj, int str);
+extern void init_sph (project * this_proj, int opening);
 extern void init_skt (project * this_proj, int opening);
 extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 
@@ -151,7 +151,7 @@ void initcnames (project * this_proj, int rid)
       init_chain (this_proj);
       break;
     case SPH:
-      init_sph (this_proj, 0);
+      init_sph (this_proj, 1);
       break;
     case MSD:
       init_msd (this_proj);
