@@ -910,10 +910,7 @@ void field_set_markup_and_visible (GtkTreeViewColumn * col, GtkCellRenderer * re
   gtk_cell_renderer_set_visible (renderer,  (i == 2) ? ! k : k);
   if ((j < 0 && i == 2) || (j>-1 && i != 7))
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, i, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, i);
   }
 }
 

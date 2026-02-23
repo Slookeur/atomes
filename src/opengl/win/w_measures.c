@@ -340,10 +340,8 @@ void dihedral_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * r
   tint * dat = (tint *)data;
   dat -> c = 2;
   measure_set_color (col, renderer, mod, iter, data);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, dat -> b, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+
+  set_renderer_markup (mod, iter, renderer, dat -> b);
 }
 
 /*!
@@ -361,10 +359,7 @@ void measure_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * re
 {
   tint * dat = (tint *)data;
   measure_set_color (col, renderer, mod, iter, dat);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, dat -> b, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, dat -> b);
 }
 
 GtkWidget * create_selection_tree (glwin * view, int sid, int mid);

@@ -261,11 +261,7 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
 void chains_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int steps = GPOINTER_TO_INT(data);
-  // measure_set_color (col, renderer, mod, iter, dat);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter,  (steps) ? 6 : 5, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, (steps) ? 6 : 5);
 }
 
 /*!

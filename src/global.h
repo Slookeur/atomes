@@ -1295,6 +1295,7 @@ extern ColRGBA get_button_color (GtkColorChooser * colob);
 extern ColRGBA get_window_color (GtkWidget * color_win);
 extern void set_color_chooser_color (GtkWidget * color_win, ColRGBA col);
 extern void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col);
+extern void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col);
 
 extern void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
 

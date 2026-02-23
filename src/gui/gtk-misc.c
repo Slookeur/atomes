@@ -78,6 +78,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void setup_text_tags (GtkTextBuffer * buffer);
   void add_menu_separator (GtkWidget * menu);
   void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col);
+  void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col);
   void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
   void adjust_label (GtkWidget * lab, int dimx, int dimy, float ax, float ay);
   void set_image_from_icon_name (GtkWidget * widg, gchar * icon);
@@ -1723,6 +1724,24 @@ void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col)
   {
     g_object_set(renderer, "foreground-set", FALSE, "weight", FALSE, NULL);
   }
+}
+
+/*!
+  \fn void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col)
+
+  \brief set Pango text markup for a GtkCellRenderer
+
+  \param mod the target tree model
+  \param iter the target tree iter
+  \param renderer the target GtkCellRenderer
+  \param col column number
+*/
+void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col)
+{
+  gchar * str = NULL;
+  gtk_tree_model_get (mod, iter, col, & str, -1);
+  g_object_set (renderer, "markup", str, NULL, NULL);
+  g_free (str);
 }
 
 /*!

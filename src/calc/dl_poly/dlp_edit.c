@@ -1038,7 +1038,6 @@ void select_atom_set_color (GtkCellRenderer * renderer, int i)
 void select_atom_set_cmv (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int h, i, j, k;
-  gchar * str = NULL;
   gtk_tree_model_get (mod, iter, 0, & h, -1);
   if (active_sel < 11)
   {
@@ -1057,17 +1056,13 @@ void select_atom_set_cmv (GtkTreeViewColumn * col, GtkCellRenderer * renderer, G
     case 1:
       if (active_sel > 10)
       {
-        gtk_tree_model_get (mod, iter, 1, & str, -1);
-        g_object_set (renderer, "markup", str, NULL, NULL);
-        g_free (str);
+        set_renderer_markup (mod, iter, renderer, 1);
         i = h;
       }
       gtk_cell_renderer_set_visible (renderer, i);
       break;
     case 2:
-      gtk_tree_model_get (mod, iter, 2, & str, -1);
-      g_object_set (renderer, "markup", str, NULL, NULL);
-      g_free (str);
+      set_renderer_markup (mod, iter, renderer, 2);
       gtk_cell_renderer_set_visible (renderer, i);
       break;
     case 3:

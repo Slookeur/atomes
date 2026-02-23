@@ -2718,10 +2718,7 @@ void search_set_visible (GtkTreeViewColumn * col, GtkCellRenderer * renderer, Gt
   gtk_cell_renderer_set_visible (renderer, vis);
   if (vis && (i < TOLAB || i > TOPIC))
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, i, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, i);
   }
 }
 

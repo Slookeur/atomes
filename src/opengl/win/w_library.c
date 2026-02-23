@@ -998,10 +998,7 @@ G_MODULE_EXPORT void select_library_data (GtkTreeView * tree_view, GtkTreePath *
 */
 G_MODULE_EXPORT void set_library_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, 1, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, 1);
 }
 
 /*!

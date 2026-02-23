@@ -346,10 +346,7 @@ void set_wisible (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeMo
   gtk_tree_model_get (mod, iter, 0, & j, -1);
   if ((j && (i > 1 && i < 5)) || (!j && i==5))
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, i, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, i);
   }
   gtk_cell_renderer_set_visible (renderer, (i<5) ? j : ! j);
 }

@@ -819,10 +819,7 @@ G_MODULE_EXPORT void move_back_front (GtkTreeModel * tree_model, GtkTreePath * p
 */
 void curve_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, 3, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, 3);
 }
 
 /*!

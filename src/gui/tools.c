@@ -204,6 +204,10 @@ void tool_set_visible (GtkTreeViewColumn * col,
       {
         gtk_tree_model_get (mod, iter, 1, & k, -1);
         if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j] -> curves[k] -> ndata);
+        if (i == 1)
+        {
+          set_renderer_markup (mod, iter, renderer, 3);
+        }
       }
     }
   }
@@ -314,8 +318,9 @@ GtkWidget * tooltree ()
         break;
     }
     tool_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[i], tool_cell[i], ctype[i], i+2, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tool_tree), tool_col[i]);
+    gtk_tree_view_append_column (GTK_TREE_VIEW(tool_tree), tool_col[i]);
     gtk_tree_view_column_set_alignment (tool_col[i], 0.5);
+    // if (i == 1) gtk_tree_view_column_set_attributes (tool_col[i], tool_cell[i], "markup", 3, NULL);
     gtk_tree_view_column_set_cell_data_func (tool_col[i], tool_cell[i], tool_set_visible, GINT_TO_POINTER(i), NULL);
   }
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW(tool_tree), FALSE);

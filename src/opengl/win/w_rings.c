@@ -373,10 +373,7 @@ void fill_rings_model (GtkTreeStore * store, project * this_proj, int rid)
 void rings_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int steps = GPOINTER_TO_INT(data);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter,  (steps) ? 7 : 6, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, (steps) ? 7 : 6);
 }
 
 /*!

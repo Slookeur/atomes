@@ -725,10 +725,7 @@ void atom_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTre
   k = GPOINTER_TO_INT(data);
   if (k == 2)
   {
-    gchar * str;
-    gtk_tree_model_get (mod, iter, 2, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, 2);
   }
 }
 

@@ -66,6 +66,7 @@ extern void init_msd (project * this_proj);
 extern void init_sph (project * this_proj, int opening);
 extern void init_skt (project * this_proj, int opening);
 extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
+extern void add_curve_widgets (project * this_proj, int rid);
 
 gboolean version_2_5_and_bellow;
 gboolean version_2_6_and_above;
@@ -280,6 +281,10 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
           // error
           // g_debug ("Error :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
           return ERROR_CURVE;
+        }
+        if (this_analysis -> aid == SPH)
+        {
+          init_curve_title (this_proj, SPH, j);
         }
       }
     }

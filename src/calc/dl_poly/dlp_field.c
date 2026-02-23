@@ -3184,10 +3184,7 @@ void field_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
 void field_set_markup_box (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int tree = GPOINTER_TO_INT(data);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, field_v[tree]-1, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, field_v[tree]-1);
 }
 
 /*!
@@ -3208,10 +3205,7 @@ void field_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkT
   i = (tree > 5) ? 1 : 0;
   if (i)
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, field_v[tree], & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, field_v[tree]);
   }
   else
   {
