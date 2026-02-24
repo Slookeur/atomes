@@ -69,10 +69,10 @@ extern void clean_coord_window (project * this_proj);
 void init_chain (project * this_proj)
 {
   int i;
-  this_proj -> analysis[CHA] -> curves[0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
+  this_proj -> analysis[CHA] -> curves[0] -> name = g_strdup_printf ("Chains - C<sub>c</sub>(n)[All]");
   for (i=0 ; i<this_proj -> nspec ; i++)
   {
-    this_proj -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf ("Chains - C<sub>c</sub>(n)[%s]", active_chem -> label[i]);
   }
   add_curve_widgets (this_proj, CHA);
   this_proj -> analysis[CHA] -> init_ok = TRUE;
@@ -172,7 +172,9 @@ void update_chains_view (project * this_proj)
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n\t n     Av. by step \tCc(n)[", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("\n\t n     Av. by step \tC", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("c", "sub_bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[CHA] -> calc_buffer);
     print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
     if (j == this_proj -> nspec)
     {
@@ -185,7 +187,9 @@ void update_chains_view (project * this_proj)
   }
   else
   {
-    print_info ("\n\t n\tNumber\t\tCc(n)[", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("\n\t n\tNumber\t\tC", "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("c", "sub_bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[CHA] -> calc_buffer);
     print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
     print_info ("]\n", NULL, this_proj -> analysis[CHA] -> calc_buffer);
   }

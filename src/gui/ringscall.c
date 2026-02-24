@@ -83,7 +83,7 @@ gboolean toggled_rings;
 void init_ring (project * this_proj)
 {
   int i, j, k, l;
-  char * cp[4] = {"Rc(n)[", "Pn(n)[", "Pmax(n)[", "Pmin(n)["};
+  char * cp[4] = {"R<sub>c</sub>(n)[", "P<sub>n</sub>(n)[", "P<sub>max</sub>(n)[", "P<sub>min</sub>(n)["};
   l = 0;
   for ( i = 0 ; i < 5 ; i++ )
   {
@@ -232,53 +232,41 @@ void update_rings_view (project * this_proj, int c)
     }
     print_info ("\n", NULL, this_proj -> analysis[RIN] -> calc_buffer);
   }
-  print_info ("\n\t n\tRc(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+  print_info ("\n\t n\tR", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+  print_info ("c", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+  print_info ("(n)[", "bold",  this_proj -> analysis[RIN] -> calc_buffer);
   print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
   if (this_proj -> steps > 1)
   {
-    if (j == this_proj -> nspec)
-    {
-      print_info ("]\t  +/-   \tPn(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t  +/-   \tPmax(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t  +/-   \tPmin(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t  +/-\n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-    }
-    else
-    {
-      print_info ("]\t   +/-  \tPn(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t   +/-  \tPmax(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t   +/-  \tPmin(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\t   +/-  \n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-    }
+    print_info ("]\t  +/-   \tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("n", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\t  +/-   \tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("max", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\t  +/-   \tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("min", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\t  +/-\n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
   }
   else
   {
-    if (j == this_proj -> nspec)
-    {
-      print_info ("]\tPn(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\tPmax(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\tPmin(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-    }
-    else
-    {
-      print_info ("]\tPn(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\tPmax(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\tPmin(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-      print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-      print_info ("]\n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
-    }
+    print_info ("]\tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("n", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("max", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\tP", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("min", "sub_bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("(n)[", "bold", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info ("]\n", "bold", this_proj -> analysis[RIN] -> calc_buffer);
   }
   tab = NULL;
   cid = NULL;

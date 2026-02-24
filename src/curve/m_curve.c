@@ -395,7 +395,11 @@ GMenu * curve_section (GSimpleActionGroup * action_group, gchar * act, ExtraSets
     {
       if (((a != data -> a || b != data -> b || i+h != data -> c) && add == was_not_added(sets, a, b, i+h)) || (a == data -> a && b == data -> b && i+h == data -> c && edit))
       {
+#ifdef GTK3
+        str_a = g_strdup_printf ("%s", prepare_for_title(this_proj -> analysis[b] -> curves[i+h] -> name));
+#else
         str_a = g_strdup_printf ("%s", this_proj -> analysis[b] -> curves[i+h] -> name);
+#endif
         str_b = g_strdup_printf ("%s.%d-%d-%d", text[edit], a, b, i+h);
         str_c = g_strdup_printf ("%s.%s", act, str_b);
         append_menu_item (menu, (const gchar *)str_a, (const gchar *)str_c, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
@@ -478,7 +482,11 @@ GMenu * create_curve_submenu (GSimpleActionGroup * action_group, gchar * act, ti
         if (create_menu[i][j]) append_submenu (smenu, graph_name[j], curve_section(action_group, act, this_curve -> extrac, add, edit, i, j, data));
       }
       // This way GTK3 will not be able to apply markup
+#ifdef GTK3
+      append_submenu (menu, prepare_for_title(get_project_by_id(i) -> name), smenu);
+#else
       append_submenu (menu, get_project_by_id(i) -> name, smenu);
+#endif
       g_object_unref (smenu);
     }
   }
