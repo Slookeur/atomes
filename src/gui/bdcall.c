@@ -332,7 +332,7 @@ void prep_ogl_bonds ()
 #endif
   active_image -> color_map[0] = 0;
   active_image -> color_map[1] = 0;
-  for (i=0; i<4; i++)
+  for (i=0; i<2; i++)
   {
     if (active_glwin -> gcid[i]) g_free (active_glwin -> gcid[i]);
     active_glwin -> gcid[i] = NULL;
@@ -343,7 +343,21 @@ void prep_ogl_bonds ()
     active_glwin -> allbonds[0] = 0;
     active_glwin -> allbonds[1] = 0;
   }
-  for (i=0; i<2; i++) active_glwin -> adv_bonding[i] = FALSE;
+  if (frag_update)
+  {
+    if (active_glwin -> gcid[2]) g_free (active_glwin -> gcid[2]);
+    active_glwin -> gcid[2] = NULL;
+    active_coord -> totcoord[2] = 0;
+    active_glwin -> adv_bonding[0] = FALSE;
+  }
+  if (mol_update)
+  {
+    if (active_glwin -> gcid[3]) g_free (active_glwin -> gcid[3]);
+    active_glwin -> gcid[3] = NULL;
+    active_coord -> totcoord[3] = 0;
+    active_glwin -> adv_bonding[1] = FALSE;
+  }
+
 }
 
 /*!
@@ -603,11 +617,6 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           active_project -> analysis[RIN] -> calc_time = get_calc_time (start_time, stop_time);
           active_project_changed (activep);
           if (widg != NULL) show_the_widgets (curvetoolbox);
-        }
-        else
-        {
-          active_glwin -> adv_bonding[0] = frag_update;
-          active_glwin -> adv_bonding[1] = mol_update;
         }
       }
     }

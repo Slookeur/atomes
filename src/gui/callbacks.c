@@ -866,7 +866,7 @@ void to_read_pos ()
 }
 
 GtkWidget * read_box;
-GtkWidget * all_sp_box;
+GtkWidget * all_sp_box = NULL;
 GtkWidget * sa_lab[2];
 GtkWidget * sa_entry[2];
 GtkWidget * read_this;
@@ -1115,6 +1115,16 @@ G_MODULE_EXPORT void run_to_read_trj_or_vas (GtkDialog * dialog, gint response_i
     default:
         reading_vas_trj = 3;
       break;
+  }
+  if (all_sp_box)
+  {
+    int i;
+    for (i=0; i<2; i++)
+    {
+      sa_lab[i] = destroy_this_widget(sa_lab[i]);
+      sa_entry[i] = destroy_this_widget(sa_entry[i]);
+    }
+    all_sp_box = destroy_this_widget(all_sp_box);
   }
   destroy_this_dialog (dialog);
 }
