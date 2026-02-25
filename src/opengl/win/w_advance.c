@@ -561,7 +561,7 @@ void create_lights_combo (int num_lights, opengl_edition * ogl_win)
 */
 void add_remove_lights (int val, gpointer data)
 {
-  int i, j, k, m;
+  int i, j, k;
   project * this_proj;
   glwin * view;
   Lightning * this_lightning;
@@ -610,19 +610,19 @@ void add_remove_lights (int val, gpointer data)
       old_spots = copy_light_sources (i, i, this_lightning -> spot);
       g_free (this_lightning -> spot);
       this_lightning -> spot = g_malloc0(val*sizeof*this_lightning -> spot);
-      m = -1;
+      k = -1;
       for (j=0; j<i; j++)
       {
         if (! ltr[j])
         {
-          // Keeping this ligth source
-          m ++;
-          this_lightning -> spot[m] = copy_light_source (old_spots[j]);
+          // Keeping this light source
+          k ++;
+          this_lightning -> spot[k] = copy_light_source (old_spots[j]);
         }
 #ifdef DEBUG
         else
         {
-          g_debug ("REMOVING_LIGHT_SOURCES:: k= %d, ltr[%d]= %d", k, k, ltr[k]);
+          g_debug ("REMOVING_LIGHT_SOURCES:: j= %d, ltr[%d]= %d", j, j, ltr[j]);
         }
 #endif // DEBUG
       }
