@@ -3787,8 +3787,8 @@ void clean_picked_and_labelled (atom_search * asearch, gboolean clean_msd)
 {
   project * this_proj;
   int val = get_asearch_num_objects (asearch);
-  asearch -> lab = allocint(val);
-  asearch -> pick = allocint(val);
+  asearch -> lab = allocint (val);
+  asearch -> pick = allocint (val);
   if (asearch -> action == RANMOVE)
   {
     this_proj = get_project_by_id (asearch -> proj);

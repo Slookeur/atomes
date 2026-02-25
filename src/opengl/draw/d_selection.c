@@ -997,7 +997,7 @@ int create_pick_lists ()
     wingl -> color_to_pick = NULL;
   }
   wingl -> to_be_picked = 0;
-  wingl -> color_to_pick = allocint(i);
+  wingl -> color_to_pick = allocint (i);
 
   wingl -> n_shaders[PICKS][0] = nshaders;
   wingl -> ogl_glsl[PICKS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[PICKS][0]);

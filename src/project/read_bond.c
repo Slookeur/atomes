@@ -73,7 +73,7 @@ int read_bonding (FILE * fp)
         if (fread (& active_project -> atoms[i][j].numv, sizeof(int), 1, fp) != 1) return ERROR_COORD;
         if (active_project -> atoms[i][j].numv)
         {
-          active_project -> atoms[i][j].vois = allocint(active_project -> atoms[i][j].numv);
+          active_project -> atoms[i][j].vois = allocint (active_project -> atoms[i][j].numv);
           if (fread (active_project -> atoms[i][j].vois, sizeof(int), active_project -> atoms[i][j].numv, fp) != active_project -> atoms[i][j].numv) return ERROR_COORD;
         }
       }
@@ -105,7 +105,7 @@ int read_bonding (FILE * fp)
 
     for (i=0; i<2; i++)
     {
-      coord -> ntg[i] = allocint(coord -> species);
+      coord -> ntg[i] = allocint (coord -> species);
       if (fread (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
       coord -> geolist[i] = g_malloc0(coord -> species*sizeof*coord -> geolist[i]);
       if (i == 1) coord -> partial_geo = g_malloc0(coord -> species*sizeof*coord -> partial_geo);

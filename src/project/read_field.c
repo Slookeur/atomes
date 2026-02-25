@@ -73,9 +73,9 @@ int read_field_atom (FILE * fp)
   tmp_fat -> frozen_id = allocbool(tmp_fat -> num);
   if (fread (tmp_fat -> frozen_id, sizeof(gboolean), tmp_fat -> num, fp) != tmp_fat -> num) return ERROR_RW;
   if (fread (& tmp_fat -> show, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  tmp_fat -> list = allocint(tmp_fat -> num);
+  tmp_fat -> list = allocint (tmp_fat -> num);
   if (fread (tmp_fat -> list, sizeof(int), tmp_fat -> num, fp) != tmp_fat -> num) return ERROR_RW;
-  tmp_fat -> list_id = allocint(tmp_fat -> num);
+  tmp_fat -> list_id = allocint (tmp_fat -> num);
   if (fread (tmp_fat -> list_id, sizeof(int), tmp_fat -> num, fp) != tmp_fat -> num) return ERROR_RW;
   return OK;
 }
@@ -411,19 +411,19 @@ int read_field_body (FILE * fp, int fid)
   }
   int i, j;
   i = body_at(tmp_fbody -> bd);
-  tmp_fbody -> na = allocint(i);
+  tmp_fbody -> na = allocint (i);
   if (fread (tmp_fbody -> na, sizeof(int), i, fp) != i) return ERROR_RW;
   tmp_fbody -> ma = g_malloc0(i*sizeof*tmp_fbody -> ma);
   tmp_fbody -> a = g_malloc0(i*sizeof*tmp_fbody -> a);
   for (j=0; j<i; j++)
   {
-    tmp_fbody -> ma[j] = allocint(tmp_fbody -> na[j]);
+    tmp_fbody -> ma[j] = allocint (tmp_fbody -> na[j]);
     if (fread (tmp_fbody -> ma[j], sizeof(int), tmp_fbody -> na[j], fp) != tmp_fbody -> na[j]) return ERROR_RW;
-    tmp_fbody -> a[j] = allocint(tmp_fbody -> na[j]);
+    tmp_fbody -> a[j] = allocint (tmp_fbody -> na[j]);
     if (fread (tmp_fbody -> a[j], sizeof(int), tmp_fbody -> na[j], fp) != tmp_fbody -> na[j]) return ERROR_RW;
   }
   i = fvalues[fid][9+tmp_fbody -> bd][tmp_fbody -> key];
-  tmp_fbody -> val = allocfloat(i);
+  tmp_fbody -> val = allocfloat (i);
   if (fread (tmp_fbody -> val, sizeof(float), i, fp) != i) return ERROR_RW;
   if (fread (& tmp_fbody -> show, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   if (fread (& tmp_fbody -> use, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
@@ -443,7 +443,7 @@ int read_field_external (FILE * fp, int fid)
   if (fread (& tmp_fext -> id, sizeof(int), 1, fp) != 1) return ERROR_RW;
   if (fread (& tmp_fext -> key, sizeof(int), 1, fp) != 1) return ERROR_RW;
   int i = fvalues[fid][14][tmp_fext -> key];
-  tmp_fext -> val = allocfloat(i);
+  tmp_fext -> val = allocfloat (i);
   if (fread (tmp_fext -> val, sizeof(float), i, fp) != i) return ERROR_RW;
   if (fread (& tmp_fext -> use, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
   return OK;

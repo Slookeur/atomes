@@ -459,7 +459,7 @@ field_molecule * duplicate_field_molecule (field_molecule * old_fmol)
   new_fmol -> mol = & tmp_proj -> modelfc -> mols[0][old_fmol -> mol -> id];
   // Duplicating atoms
   new_fmol -> fragments = NULL;
-  new_fmol -> fragments = allocint(new_fmol -> multi);
+  new_fmol -> fragments = allocint (new_fmol -> multi);
   for (i=0; i<new_fmol -> multi; i++) new_fmol -> fragments[i] = old_fmol -> fragments[i];
 
   new_fmol -> first_atom = duplicate_field_atom (old_fmol -> first_atom);

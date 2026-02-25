@@ -139,7 +139,7 @@ int print_lammps_dihedral (int did, int di, GtkTextBuffer * buf, field_struct * 
     same_atom = TRUE;
     already_done = allocbool (tmp_fmol -> mol -> natoms);
   }
-  int * ids = allocint(4);
+  int * ids = allocint (4);
   for (i=0; i<tmp_fat -> num; i++)
   {
     j = tmp_fat -> list[i];
@@ -201,7 +201,7 @@ int print_lammps_angle (int aid, int ai, GtkTextBuffer * buf, field_struct * an)
   int i, j, k, l, m, o, p, q;
   gchar * str;
   field_prop * tp_prop;
-  int * ids = allocint(3);
+  int * ids = allocint (3);
   gboolean same_atom = FALSE;
   gboolean * already_done;
   if (tmp_fat -> id == tmp_fct -> id)
@@ -263,7 +263,7 @@ int print_lammps_bond (int bid, int bi, GtkTextBuffer * buf, field_struct * bd)
   int i, j, k, l, m, n;
   gchar * str;
   field_prop * tp_prop;
-  int * ids = allocint(2);
+  int * ids = allocint (2);
   gboolean same_atom = FALSE;
   gboolean * already_done;
   if (tmp_fat -> id == tmp_fbt -> id)

@@ -327,7 +327,7 @@ int ** allocdint (int xal, int yal)
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocint(yal);
+    var[i] = allocint (yal);
   }
   return var;
 }
@@ -350,7 +350,7 @@ int *** alloctint (int xal, int yal, int zal)
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocdint(yal, zal);
+    var[i] = allocdint (yal, zal);
   }
   return var;
 }
@@ -374,7 +374,7 @@ int **** allocqint (int wal, int xal, int yal, int zal)
   for ( i = 0 ; i < wal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = alloctint(xal, yal, zal);
+    var[i] = alloctint (xal, yal, zal);
   }
   return var;
 }
@@ -411,7 +411,7 @@ float ** allocdfloat (int xal, int yal)
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocfloat(yal);
+    var[i] = allocfloat (yal);
   }
   return var;
 }

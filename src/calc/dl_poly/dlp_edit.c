@@ -1295,11 +1295,11 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
   // fill model
   if (active_sel < 2)
   {
-    sel_at = allocdint(2, tmp_fat -> num/tmp_fmol -> multi);
+    sel_at = allocdint (2, tmp_fat -> num/tmp_fmol -> multi);
   }
   else if (active_sel < 11)
   {
-    sel_at = allocdint(2, tmp_fmol -> mol -> natoms);
+    sel_at = allocdint (2, tmp_fmol -> mol -> natoms);
   }
   else
   {
@@ -1311,7 +1311,7 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
                      get_active_atom (tmp_fbo -> ma[1][0], tmp_fbo -> a[1][0]) -> name) == 0) k ++;
       if (tmp_fbo -> next != NULL) tmp_fbo = tmp_fbo -> next;
     }
-    sel_at = allocdint(1, k);
+    sel_at = allocdint (1, k);
     num_field_objects = k;
   }
 

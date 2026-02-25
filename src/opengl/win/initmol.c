@@ -300,7 +300,7 @@ void send_mol_details_ (int * stp, int * mol, int * ats, int * sps, int spec_in_
   tmp_mol -> id = * mol - 1;
   tmp_mol -> md = * stp - 1;
   tmp_mol -> multiplicity = 1;
-  tmp_mol -> fragments = allocint(1);
+  tmp_mol -> fragments = allocint (1);
   tmp_mol -> fragments[0] = * mol - 1;
   tmp_mol -> natoms = * ats;
   tmp_mol -> lgeo = allocdint (active_project -> nspec, active_coord -> totcoord[1]);

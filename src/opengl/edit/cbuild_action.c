@@ -623,9 +623,9 @@ crystal_data * allocate_crystal_data (int objects, int species)
   crystal_data * cryst = g_malloc0(sizeof*cryst);
   cryst -> objects = objects;
   cryst -> spec = species;
-  cryst -> at_by_object = allocint(cryst -> objects);
-  cryst -> pos_by_object = allocint(cryst -> objects);
-  cryst -> occupancy = allocdouble(cryst -> objects);
+  cryst -> at_by_object = allocint (cryst -> objects);
+  cryst -> pos_by_object = allocint (cryst -> objects);
+  cryst -> occupancy = allocdouble (cryst -> objects);
   cryst -> sites = g_malloc0(cryst -> objects*sizeof*cryst -> sites);
   cryst -> insert = g_malloc0(cryst -> objects*sizeof*cryst -> insert);
   cryst -> position = g_malloc0(cryst -> objects*sizeof*cryst -> position);
@@ -1143,7 +1143,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
             }
           }
           n = sp_group -> wyckoff[0].multi*npoints;
-          cdata -> at_type[i] = allocint(n);
+          cdata -> at_type[i] = allocint (n);
           cdata -> coord[i] = g_malloc0(n*sizeof*cdata -> coord[i]);
           cdata -> insert[i] = m4_mul_coord (sp_group -> coord_origin, vec3(object -> baryc[0], object -> baryc[1], object -> baryc[2]));
 #ifdef DEBUG
@@ -1176,7 +1176,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
           }
           cdata -> pos_by_object[i] = n;
           cdata -> occupancy[i] = object -> occ;
-          if (! cdata -> holes[i]) cdata -> lot[i] = allocint(object -> atoms);
+          if (! cdata -> holes[i]) cdata -> lot[i] = allocint (object -> atoms);
           cdata -> position[i] = g_malloc0(object -> atoms*sizeof*cdata -> position[i]);
           for (l=0; l<object -> atoms; l++)
           {
@@ -1529,7 +1529,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   {
     if (! cryst -> holes[i]) tot_new_at += cryst -> pos_by_object[i]*cryst -> at_by_object[i];
   }
-  int * tot_new_lot = allocint(tot_new_at);
+  int * tot_new_lot = allocint (tot_new_at);
   vec3_t * ncc = g_malloc0(tot_new_at*sizeof*ncc);
   i = 0;
   for (j=0; j<cryst -> objects; j++)

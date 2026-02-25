@@ -535,7 +535,7 @@ void bonds_loop (glwin * view, int id, int pi, GtkTreeStore * store)
   image * img = view -> anim -> last -> img;
   int n_dist = num_bonds (img -> selected[pi] -> selected);
 
-  if (id == 1) shift = allocint(2);
+  if (id == 1) shift = allocint (2);
   did_it = allocdint (n_dist, 2);
   bid = -1;
   tmp_a = img -> selected[pi] -> first;

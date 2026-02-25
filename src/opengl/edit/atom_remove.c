@@ -107,8 +107,8 @@ int test_this_fragment (int natomes, int fcoord, int fid, atom ** atom_list, int
 {
   int i, j, k, l, m, n;
   gboolean modif;
-  tigl = allocint(natomes);
-  migl = allocint(natomes);
+  tigl = allocint (natomes);
+  migl = allocint (natomes);
   i = 0;
   for (j=0; j<natomes; j++)
   {
@@ -137,7 +137,7 @@ int test_this_fragment (int natomes, int fcoord, int fid, atom ** atom_list, int
 
   if (i)
   {
-    togl = allocint(i);
+    togl = allocint (i);
     atoms_in_frag = i;
 
     // Check each atoms (recursive testing)

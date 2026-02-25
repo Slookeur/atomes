@@ -92,8 +92,8 @@ void print_coord_info (project * this_proj, coord_info * coord)
   int test;
   if (coord -> species)
   {
-    min_bs = allocint(coord -> species);
-    max_bs = allocint(coord -> species);
+    min_bs = allocint (coord -> species);
+    max_bs = allocint (coord -> species);
     g_debug (" ");
     g_debug ("coord -> species = %d", coord -> species);
     g_debug (" ");
@@ -330,7 +330,7 @@ void clean_coords_and_geoms (project * this_proj, atom_edition * edit,
         }
         if (l)
         {
-          tmp_coord -> geolist[i][j] = allocint(l);
+          tmp_coord -> geolist[i][j] = allocint (l);
           if (i)
           {
             // g_debug ("allocating partial[%d] of %d and %d", j, l, new_spec);

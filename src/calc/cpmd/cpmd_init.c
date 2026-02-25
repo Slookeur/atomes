@@ -1621,7 +1621,7 @@ void create_qm_input_file (int c, int p, int s)
         for (j=0;j<4;j++) qm_proj -> cp2k_input[s] -> extra_opts[i][j] = default_cp2k_extra[i][j];
         if (i == 0) qm_proj -> cp2k_input[s] -> extra_opts[i][2] = default_vdw_cut[0];
       }
-      qm_proj -> cp2k_input[s] -> spec_data = allocdint(qm_proj -> nspec, 2);
+      qm_proj -> cp2k_input[s] -> spec_data = allocdint (qm_proj -> nspec, 2);
       qm_proj -> cp2k_input[s] -> spec_files = g_malloc0(qm_proj -> nspec*sizeof*qm_proj -> cp2k_input[s] -> spec_files);
       for (i=0; i<qm_proj -> nspec; i++)
       {

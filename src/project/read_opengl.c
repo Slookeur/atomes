@@ -97,7 +97,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
         this_proj -> atoms[s][a].rings[i] = g_malloc0(this_proj -> rsparam[i][1]*sizeof*this_proj -> atoms[s][a].rings[i]);
         for (j=0; j<this_proj -> rsparam[i][1]; j++)
         {
-          rings_ij = allocint(this_proj -> modelgl -> num_rings[i][s][j]);
+          rings_ij = allocint (this_proj -> modelgl -> num_rings[i][s][j]);
           m = 0;
           for (k=0; k<this_proj -> modelgl -> num_rings[i][s][j]; k++)
           {
@@ -111,7 +111,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
               }
             }
           }
-          this_proj -> atoms[s][a].rings[i][j] = allocint(m+1);
+          this_proj -> atoms[s][a].rings[i][j] = allocint (m+1);
           this_proj -> atoms[s][a].rings[i][j][0] = m;
           for (k=0; k<m; k++) this_proj -> atoms[s][a].rings[i][j][k+1] = rings_ij[k];
           g_free (rings_ij);
@@ -126,7 +126,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
       this_proj -> atoms[s][a].chain = g_malloc0(this_proj -> csparam[5]*sizeof*this_proj -> atoms[s][a].chain);
       for (j=0; j<this_proj -> csparam[5]; j++)
       {
-        rings_ij = allocint(this_proj -> modelgl -> num_chains[s][j]);
+        rings_ij = allocint (this_proj -> modelgl -> num_chains[s][j]);
         m = 0;
         for (k=0; k<this_proj -> modelgl -> num_chains[s][j]; k++)
         {
@@ -140,7 +140,7 @@ int read_atom_b (FILE * fp, project * this_proj, int s, int a)
             }
           }
         }
-        this_proj -> atoms[s][a].chain[j] = allocint(m + 1);
+        this_proj -> atoms[s][a].chain[j] = allocint (m + 1);
         this_proj -> atoms[s][a].chain[j][0] = m;
         for (k=0; k<m; k++) this_proj -> atoms[s][a].chain[j][k+1] = rings_ij[k];
         g_free (rings_ij);
@@ -174,7 +174,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
       view -> num_rings[rid] = allocdint (steps, size);
       view -> show_rpoly[rid] = g_malloc0(steps*sizeof*view -> show_rpoly[rid]);
       view -> all_rings[rid] = g_malloc0(steps*sizeof*view -> all_rings[rid]);
-      tmpcoo = allocint(size);
+      tmpcoo = allocint (size);
       for (i=0; i<steps; i++)
       {
         if (fread (view -> num_rings[rid][i], sizeof(int), size, fp) != size) return ERROR_RW;
@@ -201,7 +201,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
         if (tmpcoo[j]) i++;
       }
 
-      tmpcoord = allocint(i);
+      tmpcoord = allocint (i);
       i = 0;
       for (j=0; j<size; j++)
       {
@@ -229,7 +229,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
     {
       view -> num_chains = allocdint (steps, size);
       view -> all_chains = g_malloc0(steps*sizeof*view -> all_rings[rid]);
-      tmpcoo = allocint(size);
+      tmpcoo = allocint (size);
       for (i=0; i<steps; i++)
       {
         if (fread (view -> num_chains[i], sizeof(int), size, fp) != size) return ERROR_RW;
@@ -252,7 +252,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
       {
         if (tmpcoo[j]) i++;
       }
-      tmpcoord = allocint(i);
+      tmpcoord = allocint (i);
       i = 0;
       for (j=0; j<size; j++)
       {

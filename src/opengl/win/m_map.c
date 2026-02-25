@@ -740,7 +740,7 @@ G_MODULE_EXPORT void edit_data_map (GtkWidget * but, gpointer data)
   gtk_widget_set_size_request (win, 250, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
   GtkWidget * maps = create_scroll(NULL, -1, -1, GTK_SHADOW_NONE);
-  tmp_data = allocfloat(this_proj -> natomes*this_proj -> steps);
+  tmp_data = allocfloat (this_proj -> natomes*this_proj -> steps);
   int i, j, k;
   k = 0;
   for (i=0; i<this_proj -> steps; i++)
@@ -771,7 +771,7 @@ gboolean open_save_map (FILE * fp, int act, project * this_proj)
   int i, j;
   if (act == 0)
   {
-    float * tmp_map = allocfloat(this_proj -> natomes*this_proj -> steps);
+    float * tmp_map = allocfloat (this_proj -> natomes*this_proj -> steps);
     rewind (fp);
     for (i=0; i<this_proj -> natomes*this_proj -> steps; i++)
     {

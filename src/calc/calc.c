@@ -274,7 +274,7 @@ void preserve_ogl_selection (glwin * view)
     {
       if (j && k)
       {
-        view -> stored_labels[i] = allocint(k+1);
+        view -> stored_labels[i] = allocint (k+1);
         view -> stored_labels[i][0] = k+1;
       }
       k = j;

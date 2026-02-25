@@ -417,7 +417,7 @@ void update_atom_neighbors_ (int * stp, int * at, int * nv)
   active_project -> atoms[* stp][* at].numv = * nv;
   if (* nv)
   {
-    active_project -> atoms[* stp][* at].vois = allocint(* nv);
+    active_project -> atoms[* stp][* at].vois = allocint (* nv);
   }
 }
 

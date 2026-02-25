@@ -2367,7 +2367,7 @@ int open_cif_configuration (int linec, int conf)
       for (i=0; i<num_pos; i++)
       {
         taken_pos[i] = allocbool(all_id[i]);
-        site_lot[i] = allocint(all_id[i]);
+        site_lot[i] = allocint (all_id[i]);
         for (j=0; j<cif_pos[i]; j++)
         {
           u = occ_pos[i][j]*all_id[i];
@@ -2492,7 +2492,7 @@ int open_cif_configuration (int linec, int conf)
       for (i=0; i<this_reader -> nspec; i++) this_reader -> nsps[i] = tmp_nsps[i];
       g_free (tmp_nsps);
       g_free (this_reader -> z);
-      this_reader -> z = allocdouble(i);
+      this_reader -> z = allocdouble (i);
       i = 0;
       for (j=0; j<120; j++)
       {

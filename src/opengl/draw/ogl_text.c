@@ -194,7 +194,7 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
   int csize = cwidth * cheight;
 
   int * rawbitmap;
-  rawbitmap = allocint(csize);
+  rawbitmap = allocint (csize);
   if (! rawbitmap) return NULL;
 
   n = 0;

@@ -77,7 +77,7 @@ void send_atom_rings_id_opengl_ (int * st, int * at, int * id, int * ta, int * n
   if (ring != NULL)
   {
     int i;
-    active_project -> atoms[* st][* at].rings[* id][* ta] = allocint(* num + 1);
+    active_project -> atoms[* st][* at].rings[* id][* ta] = allocint (* num + 1);
     active_project -> atoms[* st][* at].rings[* id][* ta][0] = * num;
     for (i=0; i < * num; i++)
     {

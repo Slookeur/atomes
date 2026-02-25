@@ -1129,8 +1129,8 @@ void check_this_fprop (int fsid, int fpid, int ssid, int * fat, int * fsp)
   {
     // Is there any field data available ?
     // Check the field data for available parameters
-    ffat = allocint(i);
-    ffsp = allocint(i);
+    ffat = allocint (i);
+    ffsp = allocint (i);
     for (j=0; j<i; j++)
     {
       ffat[j] = get_active_atom (tmp_fmol -> id, fat[j]) -> afid;
@@ -1318,7 +1318,7 @@ void check_atom_for_updates ()
       if (get_ff_data(i, 0) && tmp_field -> afp[i+15])
       {
         k = struct_id(i+7);
-        fsp = allocint(k);
+        fsp = allocint (k);
         tmp_fstr = tmp_fmol -> first_struct[i];
         while (tmp_fstr != NULL)
         {

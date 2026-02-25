@@ -834,9 +834,9 @@ void to_read_pos ()
   double * x, * y, * z;
   double lat[3];
 
-  x = allocdouble(active_project -> steps*active_project -> natomes);
-  y = allocdouble(active_project -> steps*active_project -> natomes);
-  z = allocdouble(active_project -> steps*active_project -> natomes);
+  x = allocdouble (active_project -> steps*active_project -> natomes);
+  y = allocdouble (active_project -> steps*active_project -> natomes);
+  z = allocdouble (active_project -> steps*active_project -> natomes);
   k = 0;
   lat[0] = lat[1] = lat[2] = 0.0;
   if (active_cell -> crystal)

@@ -319,7 +319,7 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
           done = TRUE;
           i = combo_get_active (combo_mol[0]);
           tmp_fbt = get_active_atom (i, tmp_fmol -> atoms-1);
-          new_at = allocint(a_ato);
+          new_at = allocint (a_ato);
           j = 0;
           for (k=0; k<tmp_fat -> num/tmp_fmol -> multi; k++)
           {
@@ -521,8 +521,8 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
         tmp_fpmf -> weight[i] = NULL;
         if (k > 0)
         {
-          tmp_fpmf -> list[i] = allocint(tmp_fpmf -> num[i]);
-          tmp_fpmf -> weight[i] = allocfloat(tmp_fpmf -> num[i]);
+          tmp_fpmf -> list[i] = allocint (tmp_fpmf -> num[i]);
+          tmp_fpmf -> weight[i] = allocfloat (tmp_fpmf -> num[i]);
           k = -1;
           for (j=0; j<tmp_fmol -> mol -> natoms; j++)
           {
@@ -541,7 +541,7 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
         tmp_frig -> list = NULL;
         if (k > 0)
         {
-          tmp_frig -> list = allocint(tmp_frig -> num);
+          tmp_frig -> list = allocint (tmp_frig -> num);
           k = -1;
           for (j=0; j<tmp_fmol -> mol -> natoms; j++)
           {
@@ -746,7 +746,7 @@ G_MODULE_EXPORT void remove_atom_from_field_molecule (GSimpleAction * action, GV
   GType col_type[4] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN};
 
   a_ato = 0;
-  new_at = allocint(1);
+  new_at = allocint (1);
   GtkTreeStore * remove_model = gtk_tree_store_newv (4, col_type);
   remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   num_field_objects = tmp_fmol -> atoms;

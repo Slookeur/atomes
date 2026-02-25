@@ -105,7 +105,7 @@ void correct_pos_and_get_dim (atomic_object * object, gboolean adjust)
 {
   int i;
   if (object -> baryc) g_free(object -> baryc);
-  object -> baryc = allocdouble(3);
+  object -> baryc = allocdouble (3);
   for (i=0; i<object -> atoms; i++)
   {
     object -> baryc[0] += object -> at_list[i].x;
@@ -742,7 +742,7 @@ atomic_object * create_object_from_selection (project * this_proj)
   this_object -> old_z = duplicate_z (this_proj -> nspec, this_proj -> chemistry -> chem_prop[CHEM_Z]);
   i = 0;
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
   for (j=0; j<this_proj -> natomes; j++)
@@ -857,7 +857,7 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
   this_object -> origin = this_proj -> id;
   this_object -> occ = 1.0;
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gchar * str;
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
@@ -945,7 +945,7 @@ atomic_object * create_object_from_frag_mol (project * this_proj, int coord, int
   this_object -> species = this_proj -> nspec;
   this_object -> old_z = duplicate_z (this_proj -> nspec, this_proj -> chemistry -> chem_prop[CHEM_Z]);
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
   i = 0;

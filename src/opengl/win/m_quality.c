@@ -102,7 +102,7 @@ G_MODULE_EXPORT void set_quality_spin (GtkSpinButton * res, gpointer data)
 G_MODULE_EXPORT void window_quality (GtkWidget * widg, gpointer data)
 {
   glwin * view = (glwin *)data;
-  GtkWidget * win =  dialogmodal ("Render Quality", GTK_WINDOW(view -> win));
+  GtkWidget * win = dialogmodal ("Render Quality", GTK_WINDOW(view -> win));
   GtkWidget * vbox = dialog_get_content_area (win);
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, TRUE, 10);

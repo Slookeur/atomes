@@ -471,7 +471,7 @@ void remove_nose_thermostat (int num_to_remove)
 
   GtkTreeIter thermo_level, atom_level;
   n_therm = 0;
-  old_thermo = allocint(get_num_thermo());
+  old_thermo = allocint (get_num_thermo());
   GtkTreeStore * remove_model = gtk_tree_store_newv (6, col_type);
   GtkWidget * remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   for (i=0; i<6; i++)

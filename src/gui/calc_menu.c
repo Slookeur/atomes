@@ -1790,7 +1790,7 @@ G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
       if (active_project -> skt_step_id) g_free (active_project -> skt_step_id);
       active_project -> skt_step_id = NULL;
       active_project -> skt_n_data_sets = 1;
-      active_project -> skt_step_id = allocint(1);
+      active_project -> skt_step_id = allocint (1);
       active_project -> skt_step_id[0] = -1;
     }
     else

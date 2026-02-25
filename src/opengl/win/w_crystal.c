@@ -781,7 +781,6 @@ int build_crystal_from_cif_database (project * this_proj)
   gtk_box_pack_start (GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
   cif_file_name = cif_name = NULL;
 
-
   database_store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
   gtk_box_pack_start (GTK_BOX(hbox), cif_tree (database_store, 0, "Database"), FALSE, FALSE, 0);
   group_store = gtk_list_store_new (3,  G_TYPE_INT, G_TYPE_INT,G_TYPE_STRING);
@@ -810,8 +809,6 @@ int build_crystal_from_cif_database (project * this_proj)
       gtk_widget_set_sensitive (vbox, 0);
       this_proj -> modelgl -> other_status = 2;
       create_object_from_library (cif_proj -> id);
-
-
       gtk_widget_set_sensitive (vbox, 1);
       break;
     default:

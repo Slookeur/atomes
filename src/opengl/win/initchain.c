@@ -79,7 +79,7 @@ void send_atom_chains_id_opengl_ (int * st, int * at, int * ta, int * num, int n
   if (nchain != NULL)
   {
     int i;
-    active_project -> atoms[* st][* at].chain[* ta - 1] = allocint(* num + 1);
+    active_project -> atoms[* st][* at].chain[* ta - 1] = allocint (* num + 1);
     active_project -> atoms[* st][* at].chain[* ta - 1][0] = * num;
     for (i=0; i < * num; i++)
     {

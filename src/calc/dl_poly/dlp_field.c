@@ -1916,7 +1916,7 @@ void get_is_energy (int i, int l)
 gboolean field_file_has_energy_parameters (gboolean scale, int sca, int scb)
 {
   int i, j, k, l;
-  is_param = allocdint(15, 21);
+  is_param = allocdint (15, 21);
   has_energy = allocint (15);
   i = 0;
   tmp_fmol = tmp_field -> first_molecule;

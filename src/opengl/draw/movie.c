@@ -1107,7 +1107,7 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
   recreate_all_shaders (view);
   for (frame_id=0; frame_id<2; frame_id++)
   {
-    old_cmap[frame_id] = allocint(get_project_by_id(view -> proj) -> steps);
+    old_cmap[frame_id] = allocint (get_project_by_id(view -> proj) -> steps);
     set_old_cmap (view -> anim -> last -> img, 0, frame_id);
   }
   double fraction;

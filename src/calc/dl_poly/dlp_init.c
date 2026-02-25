@@ -746,7 +746,7 @@ field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int *
   nthbd -> bd = bd;
   if (! bd)
   {
-    nthbd -> fpid = allocint(2);
+    nthbd -> fpid = allocint (2);
     nthbd -> fpid[0] = nthbd -> fpid[1] = -1;
   }
   j = body_at (bd);
@@ -1967,7 +1967,7 @@ void find_atom_id_in_field_molecule ()
   int seed = -1;
   assigned = 0;
 
-  coordnum = allocdint(tmp_proj -> nspec, tmp_coord -> totcoord[1]);
+  coordnum = allocdint (tmp_proj -> nspec, tmp_coord -> totcoord[1]);
   tmp_fat = tmp_fmol -> first_atom;
   while (tmp_fat)
   {

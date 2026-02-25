@@ -80,7 +80,7 @@ extern G_MODULE_EXPORT void set_filter_changed (GtkComboBox * box, gpointer data
 int * save_color_map (glwin * view)
 {
   int i;
-  int * colm = allocint(2);
+  int * colm = allocint (2);
   for (i=0; i<2; i++) colm[i] = view -> anim -> last -> img -> color_map[i];
   return colm;
 }
