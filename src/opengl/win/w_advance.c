@@ -232,18 +232,25 @@ GtkWidget ** light_but;
 */
 G_MODULE_EXPORT void run_light_source_to_be_removed (GtkDialog * win, gint response_id, gpointer data)
 {
-  Lightning * ogl_lightning = (Lightning *)data;
-  int i, j;
-  j = 0;
-  for (i=0; i<ogl_lightning -> lights; i++)
+  if (! status)
   {
-    if (button_get_status ((GtkWidget *)light_but[i]))
+    Lightning * ogl_lightning = (Lightning *)data;
+    int i;
+    for (i=0; i<ogl_lightning -> lights; i++)
     {
-      light_list[j] = i;
-      j ++;
+      if (button_get_status ((GtkWidget *)light_but[i]))
+      {
+        light_list[i] = i+1;
+      }
     }
+    destroy_this_dialog (win);
   }
-  destroy_this_dialog (win);
+  else
+  {
+    gchar * str = g_strdup_printf ("You must select %d light source(s) to be removed !", status);
+    show_warning (str, GTK_WIDGET(win));
+    g_free (str);
+  }
 }
 
 /*!
@@ -260,29 +267,28 @@ int * light_source_to_be_removed (int val, Lightning * ogl_lightning, opengl_edi
   int i;
   gchar * str;
   status = val;
-  GtkWidget * win = dialogmodal ("Remove light source(s)", GTK_WINDOW(ogl_edit -> win));
-  GtkWidget * vbox = dialog_get_content_area (win);
-  d_close =  gtk_dialog_get_widget_for_response (GTK_DIALOG (win), GTK_RESPONSE_CLOSE);
-  widget_set_sensitive (d_close, 0);
   if (val > 1)
   {
     str = g_strdup_printf ("Please select the %d light sources to be removed: ", val);
   }
   else
   {
-    str = g_strdup_printf ("Please select the %d light source to be removed: ", val);
+    str = g_strdup_printf ("Please select the light source to be removed: ");
   }
-  bbox (vbox, str);
+  GtkWidget * win = message_dialogmodal (str, "Remove light source(s)", GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, ogl_edit -> win);
+  GtkWidget * vbox = dialog_get_content_area (win);
+  d_close =  gtk_dialog_get_widget_for_response (GTK_DIALOG (win), GTK_RESPONSE_CLOSE);
+  widget_set_sensitive (d_close, 0);
   g_free (str);
   light_but = g_malloc0(ogl_lightning -> lights * sizeof*light_but);
   for (i=0; i<ogl_lightning -> lights; i++)
   {
     str = g_strdup_printf ("Light N°%d", i+1);
-    light_but[i] = check_button (str, -1, 40, FALSE, G_CALLBACK(toggled_delete_ligth), (gpointer)GINT_TO_POINTER(i));
+    light_but[i] = check_button (str, -1, 25, FALSE, G_CALLBACK(toggled_delete_ligth), (gpointer)GINT_TO_POINTER(i));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, light_but[i], TRUE, TRUE, 0);
     g_free (str);
   }
-  light_list = allocint(val);
+  light_list = allocint (ogl_lightning -> lights);
   run_this_gtk_dialog (win, G_CALLBACK(run_light_source_to_be_removed), ogl_lightning);
   return light_list;
 }
@@ -550,7 +556,7 @@ void create_lights_combo (int num_lights, opengl_edition * ogl_win)
 
   \brief add or remove lights
 
-  \param val total number of light(s)
+  \param val total number of light(s) to keep
   \param data the associated data pointer
 */
 void add_remove_lights (int val, gpointer data)
@@ -573,7 +579,6 @@ void add_remove_lights (int val, gpointer data)
     ogl_edit = pref_ogl_edit;
   }
 
-  gboolean delete_ligth;
   i = this_lightning -> lights;
   Light * old_spots;
   if (val > i)
@@ -591,7 +596,7 @@ void add_remove_lights (int val, gpointer data)
     {
       this_lightning -> spot[j] = init_light_source (0, pos, (! preferences) ? this_proj -> modelgl -> p_moy : 1.0); // Init directional by default
     }
-    //free (old_spots);
+    g_free (old_spots);
   }
   else if (val < i)
   {
@@ -603,27 +608,23 @@ void add_remove_lights (int val, gpointer data)
     if (ltr != NULL)
     {
       old_spots = copy_light_sources (i, i, this_lightning -> spot);
-      for (k=0; k < i-val; k++)
-      {
-#ifdef DEBUG
-        g_debug ("REMOVING_LIGHT_SOURCES:: k= %d, ltr[%d]= %d", k, k, ltr[k]);
-#endif
-      }
       g_free (this_lightning -> spot);
       this_lightning -> spot = g_malloc0(val*sizeof*this_lightning -> spot);
       m = -1;
       for (j=0; j<i; j++)
       {
-        delete_ligth = FALSE;
-        for (k=0; k< i-val; k++)
+        if (! ltr[j])
         {
-          if (j == ltr[k]) delete_ligth = TRUE;
-        }
-        if (! delete_ligth)
-        {
+          // Keeping this ligth source
           m ++;
           this_lightning -> spot[m] = copy_light_source (old_spots[j]);
         }
+#ifdef DEBUG
+        else
+        {
+          g_debug ("REMOVING_LIGHT_SOURCES:: k= %d, ltr[%d]= %d", k, k, ltr[k]);
+        }
+#endif // DEBUG
       }
       g_free (old_spots);
       this_lightning -> lights = val;
@@ -632,14 +633,14 @@ void add_remove_lights (int val, gpointer data)
 #endif
     }
   }
-  create_lights_combo (this_lightning -> lights, ogl_edit);
   ogl_edit -> lights = destroy_this_widget (ogl_edit -> lights);
+  create_lights_combo (this_lightning -> lights, ogl_edit);
   show_the_widgets (ogl_edit -> lights);
   combo_set_active (ogl_edit -> lights, 0);
   update_light_data (0, ogl_edit);
   if (! preferences)
   {
-    view -> create_shaders[LIGHT] = TRUE;
+    init_shaders (view);
     update (view);
   }
 }

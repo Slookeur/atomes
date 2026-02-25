@@ -1140,7 +1140,7 @@ int to_read_trj_or_vas (int ff)
 {
   int i;
   gchar * rlabel[2]={"Total number of atom(s):", "Number of chemical species:"};
-  GtkWidget * dialog = dialogmodal ("Data to read CPMD / VASP trajectory", GTK_WINDOW(MainWindow));
+  GtkWidget * dialog = dialogmodal ("Reading CPMD / VASP trajectory", GTK_WINDOW(MainWindow));
   read_this = gtk_dialog_add_button (GTK_DIALOG (dialog), "Apply", GTK_RESPONSE_APPLY);
   GtkWidget * vbox = dialog_get_content_area (dialog);
   widget_set_sensitive (read_this, 0);
