@@ -18,7 +18,17 @@
 !! @short S(k,t) analysis: dynamic structure factor calculation
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 !! @author Noël Jakse <noel.jakse@grenoble-inp.fr>
-
+!
+! Notes:
+!
+! LLM tool (Gemini via Antigravity) was used at few occasions to prepare some sections of this file, including:
+!    - To write a first draft version of the 's_of_k_t' function based on my work in the file 'sk.F90'
+!    - To write parts of the 'FOURIER_TRANS_QVECT_SKT' routine
+!    - To write parts of the 'COMPUTE_SQW' routine
+! Overall the inputs provided by the LLM in these occasions were bad,
+! But because I used them to get the first raw version of the code,
+! I feel compelled to declare it here.
+!
 INTEGER (KIND=c_int) FUNCTION s_of_k_t (NQ_IN, XA_IN, MIN_IN, N_SETS, SETS_T, &
                                         DELTA_T, Q_NUM, Q_LIST, N_FREQ) BIND (C,NAME='s_of_k_t_')
 

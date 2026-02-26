@@ -28,6 +28,13 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
  - The OpenGL shaders for the atomes program
 
 *
+* Notes:
+*
+
+  LLM tools (ChatGPT, Gemini via Antigravity) were used at few occasions to prepare some sections of this file, including:
+    - To write parts of the ray-tracing shaders
+    - To write parts the gradient background shaders
+
 */
 
 #include "global.h"
