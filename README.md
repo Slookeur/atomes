@@ -77,7 +77,7 @@ to
 ***atomes*** is developed by [Dr. Sébastien Le Roux][slr], research engineer for the [CNRS][cnrs]
 
 <p align="center">
-  <a href="https://www.cnrs.fr/"><img width="100" src="https://www.cnrs.fr/themes/custom/cnrs/logo.svg" alt="CNRS logo" align="center"></a>
+  <a href="https://www.cnrs.fr/"><img width="100" src="https://upload.wikimedia.org/wikipedia/fr/thumb/7/72/Logo_Centre_national_de_la_recherche_scientifique_%282023-%29.svg/langfr-250px-Logo_Centre_national_de_la_recherche_scientifique_%282023-%29.svg.png" alt="CNRS logo" align="center"></a>
 </p>
 
 [Dr. Sébastien Le Roux][slr] works at the Institut de Physique et Chimie des Matériaux de Strasbourg [IPCMS][ipcms]
