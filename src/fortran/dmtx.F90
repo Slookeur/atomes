@@ -174,7 +174,7 @@ do PIA=1, NSP
     ICUT=max(ICUT,Gr_TMP(PIA,PIB))
   enddo
 enddo
-ICUT=sqrt(ICUT)
+ICUT = sqrt(ICUT)
 ICUT = ICUT + 1.0d0
 ! The pixel size must be larger than the cutoff
 ! If the system is large with a low density the pixel box can be too big in number of pixels,
@@ -185,14 +185,16 @@ ICUT = ICUT + 1.0d0
 ! That is an extremely low number density, thus we need to check that as well.
 TARGETDP=1.85d0
 MPSIZE=1.0d0
+! Always adjust cutoff if periodicity is not applied
 ADAPT_CUT=2
+
 if (PBC) then
 ! Number density
   RHONUM=NP
   do PIA=1, 3
     RHONUM=RHONUM/(THE_BOX(1)%modv(PIA))
   enddo
-  if (RHONUM.lt.0.01) ADAPT_CUT=1
+  if (RHONUM.gt.0.01) ADAPT_CUT=1
 endif
 
 do TPIXD=1, ADAPT_CUT
@@ -202,11 +204,7 @@ do TPIXD=1, ADAPT_CUT
   CUTF=1.0d0/CUTF
   do PIA=1, 3
     isize(PIA) = INT(abs(pmax(PIA))*CUTF)
-    if (PBC) then
-      if (isize(PIA) .lt. 3) isize(PIA) = 1
-    else
-      if (isize(PIA) .eq. 0) isize(PIA) = 1
-    endif
+    if (isize(PIA) .lt. 3) isize(PIA) = 1
   enddo
 
   GETNBX = 1
@@ -224,12 +222,11 @@ do TPIXD=1, ADAPT_CUT
 
   if (TPIXD .eq. 1) then
     PIA = isize(1)*isize(2)*isize(3)
-    INID = NP
-    INID = INID/PIA
+    INID = NP/PIA
     NEW_MPSIZE = (TARGETDP/INID)**(1.0/3.0)
     if (NEW_MPSIZE .gt. MPSIZE) then
-      ! Adpatation only if the cutoff increases
-      ! Otherwise we add more pixels
+      ! Adaptation only if the cutoff increases
+      ! Otherwise we would increase the number of pixels
       MPSIZE = NEW_MPSIZE
     endif
   endif
@@ -567,8 +564,12 @@ if (DOATOMS) then
     do RA=1, NNA
       if (.not. PBC) then
         do RB=1, 3
-          pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
-          if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          if (isize(RB) .eq. 1) then
+            pixpos(RB) = 0
+          else
+            pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
+            if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          endif
         enddo
       else
         if (NBX .gt. 1) then
@@ -1065,8 +1066,12 @@ else
     do RA=1, NNA
       if (.not. PBC) then
         do RB=1, 3
-          pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
-          if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          if (isize(RB) .eq. 1) then
+            pixpos(RB) = 0
+          else
+            pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
+            if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          endif
         enddo
       else
         if (NBX .gt. 1) then
