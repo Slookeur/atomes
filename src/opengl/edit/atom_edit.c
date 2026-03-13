@@ -481,7 +481,7 @@ void prepare_atom_edition (gpointer data, gboolean visible)
     {
       if (i != 3)
       {
-        if (this_proj -> modelgl -> search_widg[i+2] -> todo_size < 10000)
+        if (this_proj -> modelgl -> search_widg[i+2] -> todo_size < GTK_LIMIT)
         {
           hide_the_widgets (this_proj -> modelgl -> search_widg[i+2] -> info[1]);
         }

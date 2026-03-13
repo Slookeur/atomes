@@ -1066,7 +1066,7 @@ void clean_all_trees (atom_search * asearch, project * this_proj)
       }
       update_search_tree (this_proj -> modelgl -> search_widg[i+2]);
     }
-    if ((i == 0 || i == 4) && this_proj -> modelgl -> search_widg[i+2] -> todo_size >= 10000)
+    if ((i == 0 || i == 4) && this_proj -> modelgl -> search_widg[i+2] -> todo_size >= GTK_LIMIT)
     {
       re_populate_tree_search (this_proj -> modelgl -> search_widg[i+2]);
     }

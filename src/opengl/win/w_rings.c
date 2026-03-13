@@ -968,6 +968,88 @@ GtkWidget * create_rings_search (project * this_proj, int rid)
   return rings_search;
 }
 
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void run_save_rings_to_file (GtkNativeDialog * info, gint response_id, gpointer data)
+
+  \brief save rings data to file: run the dialog
+
+  \param info the GtkNativeDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void run_toggle_bond (GtkNativeDialog * info, gint response_id, gpointer data)
+{
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkFileChooserNative *)info);
+#else
+/*!
+  \fn G_MODULE_EXPORT void run_save_rings_to_file (GtkDialog * info, gint response_id, gpointer data)
+
+  \brief save rings data to file: run the dialog
+
+  \param info the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void run_save_rings_to_file (GtkDialog * info, gint response_id, gpointer data)
+{
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
+#endif
+  if (response_id == GTK_RESPONSE_ACCEPT)
+  {
+    gchar * rings_file = file_chooser_get_file_name (chooser);
+    // Save data to file here !
+    if (rings_file)
+    {
+
+    }
+  }
+#ifdef GTK4
+  destroy_this_native_dialog (info);
+#else
+  destroy_this_dialog (info);
+#endif
+}
+
+/*!
+  \fn G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data)
+
+  \brief save rings data to file
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data)
+{
+  tint * dat = (tint *) data;
+#ifdef GTK4
+  GtkFileChooserNative * info;
+#else
+  GtkWidget * info;
+#endif
+  gchar * rtype[5] = {"all", "King", "Guttman", "primtive", "strong"};
+  gchar * crname = g_strdup_printf ("Save atoms in %s rings to file", rtype[dat -> b]);
+  info = create_file_chooser (crname,
+                              GTK_WINDOW(MainWindow),
+                              GTK_FILE_CHOOSER_ACTION_SAVE,
+                              "Save");
+  g_free (crname);
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
+#ifdef GTK3
+  gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+#endif
+  file_chooser_set_current_folder (chooser);
+
+  gchar * rings_file =  g_strdup_printf ("%s-rings.dat", rtype[dat -> b]);
+  gtk_file_chooser_set_current_name (chooser, rings_file);
+#ifdef GTK4
+  run_this_gtk_native_dialog ((GtkNativeDialog *)info, G_CALLBACK(run_save_rings_to_file), data);
+#else
+  run_this_gtk_dialog (info, G_CALLBACK(run_save_rings_to_file), data);
+#endif
+
+}
+
 /*!
   \fn GtkWidget * rings_tab (glwin * view, int rid)
 
@@ -978,7 +1060,8 @@ GtkWidget * create_rings_search (project * this_proj, int rid)
 */
 GtkWidget * rings_tab (glwin * view, int rid)
 {
-  GtkWidget * rings = create_scroll(NULL, -1, -1, GTK_SHADOW_NONE);
+  GtkWidget * rings = create_vbox (0);
+  GtkWidget * scroll = create_scroll (rings, -1, -1, GTK_SHADOW_NONE);
   gtk_widget_set_hexpand (rings, TRUE);
   gtk_widget_set_vexpand (rings, TRUE);
   int h, i, j, k;
@@ -992,13 +1075,18 @@ GtkWidget * rings_tab (glwin * view, int rid)
       k += this_proj -> modelgl -> num_rings[rid][h][j-1];
     }
   }
-  if (k < 10000)
+  if (k < GTK_LIMIT)
   {
-    add_container_child (CONTAINER_SCR, rings, create_rings_tree (this_proj, rid, TRUE));
+    add_container_child (CONTAINER_SCR, scroll, create_rings_tree (this_proj, rid, TRUE));
   }
   else
   {
-    add_container_child (CONTAINER_SCR, rings, create_rings_search (this_proj, rid));
+    add_container_child (CONTAINER_SCR, scroll, create_rings_search (this_proj, rid));
   }
+  GtkWidget * hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, rings, hbox, FALSE, FALSE, 2);
+  GtkWidget * hhbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, TRUE, TRUE, 100);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button("Save to file", IMG_NONE, NULL, 50, -1, GTK_RELIEF_NORMAL, G_CALLBACK(save_rings_to_file), & view -> colorp[rid][0]), TRUE, TRUE, 40);
   return rings;
 }

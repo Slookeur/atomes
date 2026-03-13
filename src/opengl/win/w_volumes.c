@@ -477,7 +477,7 @@ void adjust_vol_md_step (project * this_proj, int geo)
   int i, j, k;
   k = this_proj -> modelgl -> volume_win -> sid[geo-2];
   gchar * str;
-  if (this_proj -> coord -> totcoord[geo] <= 10000)
+  if (this_proj -> coord -> totcoord[geo] < GTK_LIMIT)
   {
     for (i=0; i<FILLED_STYLES; i++)
     {
@@ -710,7 +710,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   GtkWidget * fragtab;
   gchar * str;
   int i, j;
-  int ngeov = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> ngeov[geo-2] : this_proj -> coord -> totcoord[geo];
+  int ngeov = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> ngeov[geo-2] : this_proj -> coord -> totcoord[geo];
   if (geo == 3)
   {
     str = g_strdup_printf ("<u>Mean volume(s) occupied by the atom(s) for each %s:</u>", name_geo[geo-2]);
@@ -730,7 +730,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   int geoid;
   for (i=0; i<ngeov; i++)
   {
-    geoid = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> geov_id[geo-2][i] : i;
+    geoid = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> geov_id[geo-2][i] : i;
     str = g_strdup_printf ("%s N°%d", fmo[geo-2], geoid+1);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
@@ -768,7 +768,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   add_container_child (CONTAINER_SCR, fragtab, vvbox);
   for (i=0; i<ngeov; i++)
   {
-    geoid = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> geov_id[geo-2][i] : i;
+    geoid = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> geov_id[geo-2][i] : i;
     str = g_strdup_printf ("%s N°%d", fmo[geo-2], geoid+1);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
@@ -965,7 +965,7 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
     }
   }
   GtkWidget * fragtab;
-  if (this_proj -> coord -> totcoord[geo] >  10000)
+  if (this_proj -> coord -> totcoord[geo] >=  GTK_LIMIT)
   {
     fragtab = create_scroll (vbox, -1, -1, GTK_SHADOW_NONE);
     gtk_widget_set_hexpand (fragtab, TRUE);

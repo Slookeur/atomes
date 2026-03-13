@@ -534,7 +534,7 @@ GtkWidget * advanced_atom_properties (int atom_or_clone, glwin * view)
   gchar * win_title[2]={"Atom(s) configuration - ", "Clone(s) configuration - "};
   gchar * str = g_strdup_printf ("%s%s", win_title[atom_or_clone], prepare_for_title(get_project_by_id(view -> proj)->name));
   aprop = create_win (str, view -> win, FALSE, FALSE);
-  int i = (get_project_by_id(view -> proj)-> natomes > 10000) ? 170 : 0;
+  int i = (get_project_by_id(view -> proj)-> natomes >= GTK_LIMIT) ? 170 : 0;
   gtk_widget_set_size_request (aprop, -1, 580+i);
   GtkWidget * vbox = create_vbox (5);
   add_container_child (CONTAINER_WIN, aprop, vbox);
@@ -579,7 +579,7 @@ G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * paramet
     this_proj -> modelgl -> model_win[atom_or_clone] = g_malloc0(sizeof*this_proj -> modelgl -> model_win[atom_or_clone]);
     this_proj -> modelgl -> model_win[atom_or_clone] -> win = advanced_atom_properties (atom_or_clone, this_proj -> modelgl);
     show_the_widgets (this_proj -> modelgl -> model_win[atom_or_clone] -> win);
-    if (this_proj -> natomes < 10000)
+    if (this_proj -> natomes < GTK_LIMIT)
     {
       hide_the_widgets (this_proj -> modelgl -> search_widg[atom_or_clone] -> info[1]);
     }

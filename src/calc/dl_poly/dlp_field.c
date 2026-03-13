@@ -1269,7 +1269,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
 
   tmp_fmol = tmp_field -> first_molecule;
 
-  //if (get_active_field_elements(f) > 10000 &&  ! tmp_field -> show_all[f])
+  //if (get_active_field_elements(f) >= GTK_LIMIT &&  ! tmp_field -> show_all[f])
   {
 
   }

@@ -867,7 +867,7 @@ GtkWidget * chains_tab (glwin * view)
       k += this_proj -> modelgl -> num_chains[h][j-1];
     }
   }
-  if (k < 10000)
+  if (k < GTK_LIMIT)
   {
     add_container_child (CONTAINER_SCR, chains, create_chains_tree (this_proj, TRUE));
   }

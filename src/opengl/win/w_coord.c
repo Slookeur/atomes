@@ -994,7 +994,7 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
   gtk_widget_set_vexpand (fragmol, TRUE);
   project * this_proj = get_project_by_id(view -> proj);
   i =  this_proj -> coord -> totcoord[geo];
-  if (i >  10000)
+  if (i >= GTK_LIMIT)
   {
     add_container_child (CONTAINER_SCR, fragmol, create_frag_mol_search(this_proj, geo));
   }

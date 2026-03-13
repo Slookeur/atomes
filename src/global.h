@@ -64,6 +64,15 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+/*! \def GTK_LIMIT
+
+  \brief maximum number of elements in GTK widgets like GtkTreeView, GtkTreeStore or similar
+         rendering widgets can be an issue if the number of items to display is too high
+         if the number of element to display is < GTK_LIMIT then the widget is rendered,
+         otherwise a search engine is (or should be) used
+*/
+#define GTK_LIMIT 10000
+
 #include <pango/pangoft2.h>
 
 #ifdef MAC_INTEGRATION
