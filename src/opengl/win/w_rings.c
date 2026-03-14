@@ -30,7 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  gchar * ring_atoms (project * this_proj, int ring, int step, int size, int rid);
+  gchar * ring_atoms (project * this_proj, int ring, int step, int size, int rid, gboolean to_file);
 
   int get_rmin (project * this_proj, int rid, int step);
   int get_rmax (project * this_proj, int rid, int step);
@@ -42,6 +42,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   G_MODULE_EXPORT void on_select_rings (GtkCellRendererToggle * cell_renderer, gchar * string_path, gpointer data);
   G_MODULE_EXPORT void update_rings_search (GtkEntry * res, gpointer data);
+  G_MODULE_EXPORT void run_save_rings_to_file (GtkNativeDialog * info, gint response_id, gpointer data);
+  G_MODULE_EXPORT void run_save_rings_to_file (GtkDialog * info, gint response_id, gpointer data);
+  G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data);
 
   GtkWidget * create_rings_tree (project * this_proj, int rid, gboolean fill_this);
   GtkWidget * create_rings_search (project * this_proj, int rid);
@@ -53,6 +56,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "glview.h"
 #include "glwindow.h"
+
+extern const gchar * dfi[2];
+gchar * rtype[5] = {"all", "King", "Guttman", "primtive", "strong"};
 
 /*!
   \fn G_MODULE_EXPORT void on_select_rings (GtkCellRendererToggle * cell_renderer, gchar * string_path, gpointer data)
@@ -255,20 +261,34 @@ void rings_set_visible (GtkTreeViewColumn * col, GtkCellRenderer * renderer, Gtk
   \param step the configuration
   \param size the size of the ring
   \param rid the id number of the ring
+  \param to_file type of output
 */
-gchar * ring_atoms (project * this_proj, int ring, int step, int size, int rid)
+gchar * ring_atoms (project * this_proj, int ring, int step, int size, int rid, gboolean to_file)
 {
   gchar * str;
   int aid, sid;
   aid = this_proj -> modelgl -> all_rings[ring][step][size][rid][0];
   sid = this_proj -> atoms[step][aid].sp;
-  str = g_strdup_printf ("%s<sub>%d</sub>", this_proj -> chemistry -> label[sid], aid+1);
   int i;
-  for (i=1; i<size+1; i++)
+  if (to_file)
   {
-    aid = this_proj -> modelgl -> all_rings[ring][step][size][rid][i];
-    sid = this_proj -> atoms[step][aid].sp;
-    str = g_strdup_printf ("%s-%s<sub>%d</sub>", str, this_proj -> chemistry -> label[sid], aid+1);
+    str = g_strdup_printf ("%s%d", exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    for (i=1; i<size+1; i++)
+    {
+      aid = this_proj -> modelgl -> all_rings[ring][step][size][rid][i];
+      sid = this_proj -> atoms[step][aid].sp;
+      str = g_strdup_printf ("%s - %s%d", str, exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    }
+  }
+  else
+  {
+    str = g_strdup_printf ("%s<sub>%d</sub>", exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    for (i=1; i<size+1; i++)
+    {
+      aid = this_proj -> modelgl -> all_rings[ring][step][size][rid][i];
+      sid = this_proj -> atoms[step][aid].sp;
+      str = g_strdup_printf ("%s-%s<sub>%d</sub>", str, exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    }
   }
   return str;
 }
@@ -330,7 +350,7 @@ void fill_rings_model (GtkTreeStore * store, project * this_proj, int rid)
         for (l=0; l<k; l++)
         {
           gtk_tree_store_append (store, & ring_level, & size_level);
-          str = ring_atoms (this_proj, rid, h, j-1, l);
+          str = ring_atoms (this_proj, rid, h, j-1, l, FALSE);
           if (this_proj -> steps > 1)
           {
             gtk_tree_store_set (store, & ring_level, 0, -(h+1),
@@ -518,7 +538,7 @@ void add_this_ring_to_search_tree (project * this_proj, int rid)
     }
     if (insert)
     {
-      str = ring_atoms (this_proj, rid, coord -> rst[rid]-1, coord -> rsz[rid]-1, coord -> ri[rid]-1);
+      str = ring_atoms (this_proj, rid, coord -> rst[rid]-1, coord -> rsz[rid]-1, coord -> ri[rid]-1, FALSE);
       switch (prepend)
       {
         case 0:
@@ -687,7 +707,7 @@ void add_this_ring_to_search_tree (project * this_proj, int rid)
     }
     if (insert)
     {
-      str = ring_atoms (this_proj, rid, coord -> rst[rid]-1, coord -> rsz[rid]-1, coord -> ri[rid]-1);
+      str = ring_atoms (this_proj, rid, coord -> rst[rid]-1, coord -> rsz[rid]-1, coord -> ri[rid]-1, FALSE);
       switch (prepend)
       {
         case 0:
@@ -978,7 +998,7 @@ GtkWidget * create_rings_search (project * this_proj, int rid)
   \param response_id the response id
   \param data the associated data pointer
 */
-G_MODULE_EXPORT void run_toggle_bond (GtkNativeDialog * info, gint response_id, gpointer data)
+G_MODULE_EXPORT void run_save_rings_to_file (GtkNativeDialog * info, gint response_id, gpointer data)
 {
   GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkFileChooserNative *)info);
 #else
@@ -1001,7 +1021,51 @@ G_MODULE_EXPORT void run_save_rings_to_file (GtkDialog * info, gint response_id,
     // Save data to file here !
     if (rings_file)
     {
-
+      tint * dat = (tint *)data;
+      project * this_proj = get_project_by_id (dat -> a);
+      int rid = dat -> b;
+      if (this_proj -> coord -> totcoord[rid+4])
+      {
+        FILE * fp = fopen (rings_file, dfi[1]);
+        gchar * str;
+        if (fp)
+        {
+          if (! rid)
+          {
+            fprintf (fp, "# This file contains the list of all rings in the %s model\n\n",  prepare_for_title(this_proj -> name));
+          }
+          else
+          {
+            fprintf (fp, "# This file contains the list of all %s rings in the %s model\n\n", rtype[rid],  prepare_for_title(this_proj -> name));
+          }
+          int h, i, j, k, l;
+          for (h=0; h < this_proj -> steps; h++)
+          {
+            i = h+1;
+            if (this_proj -> steps > 1) fprintf (fp, "Step N°%d\n", i);
+            for (i=0; i < this_proj -> coord -> totcoord[rid+4]; i++)
+            {
+              j = this_proj -> coord -> geolist[rid+4][0][i];
+              fprintf (fp, (this_proj -> steps > 1) ? "\n\tRing(s) of size %d atoms\n" : "\nRing(s) of size %d atoms\n", j);
+              k = this_proj -> modelgl -> num_rings[rid][h][j-1];
+              // ring size
+              for (l=0; l<k; l++)
+              {
+                str = ring_atoms (this_proj, rid, h, j-1, l, TRUE);
+                fprintf (fp, (this_proj -> steps > 1) ? "\t\tN°%d\t:\t%s\n" : "\tN°%d\t:\t%s\n", l+1, str);
+                g_free (str);
+              }
+            }
+          }
+          fclose (fp);
+        }
+        else
+        {
+          str = g_strdup_printf ("Impossible to open file: %s", rings_file);
+          show_error (str, 0, this_proj -> modelgl -> coord_win -> win);
+          g_free (str);
+        }
+      }
     }
   }
 #ifdef GTK4
@@ -1027,7 +1091,6 @@ G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data)
 #else
   GtkWidget * info;
 #endif
-  gchar * rtype[5] = {"all", "King", "Guttman", "primtive", "strong"};
   gchar * crname = g_strdup_printf ("Save atoms in %s rings to file", rtype[dat -> b]);
   info = create_file_chooser (crname,
                               GTK_WINDOW(MainWindow),
@@ -1042,12 +1105,12 @@ G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data)
 
   gchar * rings_file =  g_strdup_printf ("%s-rings.dat", rtype[dat -> b]);
   gtk_file_chooser_set_current_name (chooser, rings_file);
+  // g_free (rings_file);
 #ifdef GTK4
   run_this_gtk_native_dialog ((GtkNativeDialog *)info, G_CALLBACK(run_save_rings_to_file), data);
 #else
   run_this_gtk_dialog (info, G_CALLBACK(run_save_rings_to_file), data);
 #endif
-
 }
 
 /*!

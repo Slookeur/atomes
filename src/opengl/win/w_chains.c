@@ -30,7 +30,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  gchar * chain_atoms (project * this_proj, int step, int size, int cid);
+  gchar * chain_atoms (project * this_proj, int step, int size, int cid, gboolean to_file);
 
   int get_cmin (project * this_proj, int step);
   int get_cmax (project * this_proj, int step);
@@ -41,6 +41,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   G_MODULE_EXPORT void on_select_chains (GtkCellRendererToggle * cell_renderer, gchar * string_path, gpointer data);
   G_MODULE_EXPORT void update_chains_search (GtkEntry * res, gpointer data);
+  G_MODULE_EXPORT void run_save_chains_to_file (GtkNativeDialog * info, gint response_id, gpointer data);
+  G_MODULE_EXPORT void run_save_chains_to_file (GtkDialog * info, gint response_id, gpointer data);
+  G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data);
 
   GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this);
   GtkWidget * create_chains_search (project * this_proj);
@@ -53,6 +56,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 
+extern const gchar * dfi[2];
 extern void rings_set_visible (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
 
 /*!
@@ -141,7 +145,7 @@ G_MODULE_EXPORT void on_select_chains (GtkCellRendererToggle * cell_renderer, gc
 }
 
 /*!
-  \fn gchar * chain_atoms (project * this_proj, int step, int size, int cid)
+  \fn gchar * chain_atoms (project * this_proj, int step, int size, int cid, gboolean to_file)
 
   \brief create a string containing the list of atoms in a chain
 
@@ -149,20 +153,34 @@ G_MODULE_EXPORT void on_select_chains (GtkCellRendererToggle * cell_renderer, gc
   \param step the configuration
   \param size the size of the ring
   \param cid the id number of the ring
+  \param to_file output
 */
-gchar * chain_atoms (project * this_proj, int step, int size, int cid)
+gchar * chain_atoms (project * this_proj, int step, int size, int cid, gboolean to_file)
 {
   gchar * str;
   int aid, sid;
   aid = this_proj -> modelgl -> all_chains[step][size][cid][0];
   sid = this_proj -> atoms[step][aid].sp;
-  str = g_strdup_printf ("%s<sub>%d</sub>", this_proj -> chemistry -> label[sid], aid+1);
   int i;
-  for (i=1; i<size+1; i++)
+  if (to_file)
   {
-    aid = this_proj -> modelgl -> all_chains[step][size][cid][i];
-    sid = this_proj -> atoms[step][aid].sp;
-    str = g_strdup_printf ("%s-%s<sub>%d</sub>", str, this_proj -> chemistry -> label[sid], aid+1);
+    str = g_strdup_printf ("%s%d", exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    for (i=1; i<size+1; i++)
+    {
+      aid = this_proj -> modelgl -> all_chains[step][size][cid][i];
+      sid = this_proj -> atoms[step][aid].sp;
+      str = g_strdup_printf ("%s - %s%d", str, exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    }
+  }
+  else
+  {
+    str = g_strdup_printf ("%s<sub>%d</sub>", exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    for (i=1; i<size+1; i++)
+    {
+      aid = this_proj -> modelgl -> all_chains[step][size][cid][i];
+      sid = this_proj -> atoms[step][aid].sp;
+      str = g_strdup_printf ("%s-%s<sub>%d</sub>", str, exact_name(this_proj -> chemistry -> label[sid]), aid+1);
+    }
   }
   return str;
 }
@@ -220,7 +238,7 @@ void fill_chains_model (GtkTreeStore * store, project * this_proj)
         for (l=0; l<k; l++)
         {
           gtk_tree_store_append (store, & chain_level, & size_level);
-          str = chain_atoms (this_proj, h, j-1, l);
+          str = chain_atoms (this_proj, h, j-1, l, FALSE);
           if (this_proj -> steps > 1)
           {
             gtk_tree_store_set (store, & chain_level, 0, -(h+1),
@@ -402,7 +420,7 @@ void add_this_chain_to_search_tree (project * this_proj)
     }
     if (insert)
     {
-      str = chain_atoms (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1);
+      str = chain_atoms (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1, FALSE);
       switch (prepend)
       {
         case 0:
@@ -559,7 +577,7 @@ void add_this_chain_to_search_tree (project * this_proj)
     }
     if (insert)
     {
-      str = chain_atoms  (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1);
+      str = chain_atoms  (this_proj, coord -> cst-1, coord -> csz-1, coord -> ch-1, FALSE);
       switch (prepend)
       {
         case 0:
@@ -844,6 +862,117 @@ GtkWidget * create_chains_search (project * this_proj)
   return chains_search;
 }
 
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void run_save_chains_to_file (GtkNativeDialog * info, gint response_id, gpointer data)
+
+  \brief save chains data to file: run the dialog
+
+  \param info the GtkNativeDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void run_save_chains_to_file (GtkNativeDialog * info, gint response_id, gpointer data)
+{
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkFileChooserNative *)info);
+#else
+/*!
+  \fn G_MODULE_EXPORT void run_save_chains_to_file (GtkDialog * info, gint response_id, gpointer data)
+
+  \brief save chains data to file: run the dialog
+
+  \param info the GtkDialog sending the signal
+  \param response_id the response id
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void run_save_chains_to_file (GtkDialog * info, gint response_id, gpointer data)
+{
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
+#endif
+  if (response_id == GTK_RESPONSE_ACCEPT)
+  {
+    gchar * chains_file = file_chooser_get_file_name (chooser);
+    // Save data to file here !
+    if (chains_file)
+    {
+      tint * dat = (tint *)data;
+      project * this_proj = get_project_by_id (dat -> a);
+      if (this_proj -> coord -> totcoord[9])
+      {
+        FILE * fp = fopen (chains_file, dfi[1]);
+        gchar * str;
+        if (fp)
+        {
+          fprintf (fp, "# This file contains the list of all chains in the %s model\n\n",  prepare_for_title(this_proj -> name));
+          int h, i, j, k, l;
+          for (h=0; h < this_proj -> steps; h++)
+          {
+            i = h+1;
+            if (this_proj -> steps > 1) fprintf (fp, "Step N°%d\n", i);
+            for (i=0; i < this_proj -> coord -> totcoord[9]; i++)
+            {
+              j = this_proj -> coord -> geolist[9][0][i];
+              fprintf (fp, (this_proj -> steps > 1) ? "\n\tChain(s) of size %d atoms\n" : "\nChain(s) of size %d atoms\n", j);
+              k = this_proj -> modelgl -> num_chains[h][j-1];
+              // ring size
+              for (l=0; l<k; l++)
+              {
+                str = chain_atoms (this_proj, h, j-1, l, TRUE);
+                fprintf (fp, (this_proj -> steps > 1) ? "\t\tN°%d\t:\t%s\n" : "\tN°%d\t:\t%s\n", l+1, str);
+                g_free (str);
+              }
+            }
+          }
+          fclose (fp);
+        }
+        else
+        {
+          str = g_strdup_printf ("Impossible to open file: %s", chains_file);
+          show_error (str, 0, this_proj -> modelgl -> coord_win -> win);
+          g_free (str);
+        }
+      }
+    }
+  }
+#ifdef GTK4
+  destroy_this_native_dialog (info);
+#else
+  destroy_this_dialog (info);
+#endif
+}
+
+/*!
+  \fn G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data)
+
+  \brief save chains data to file
+
+  \param but the GtkButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data)
+{
+#ifdef GTK4
+  GtkFileChooserNative * info;
+#else
+  GtkWidget * info;
+#endif
+  info = create_file_chooser ("Save atoms in chains to file",
+                              GTK_WINDOW(MainWindow),
+                              GTK_FILE_CHOOSER_ACTION_SAVE,
+                              "Save");
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
+#ifdef GTK3
+  gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+#endif
+  file_chooser_set_current_folder (chooser);
+  gtk_file_chooser_set_current_name (chooser, "chains.dat");
+#ifdef GTK4
+  run_this_gtk_native_dialog ((GtkNativeDialog *)info, G_CALLBACK(run_save_chains_to_file), data);
+#else
+  run_this_gtk_dialog (info, G_CALLBACK(run_save_chains_to_file), data);
+#endif
+}
+
 /*!
   \fn GtkWidget * chains_tab (glwin * view)
 
@@ -853,7 +982,8 @@ GtkWidget * create_chains_search (project * this_proj)
 */
 GtkWidget * chains_tab (glwin * view)
 {
-  GtkWidget * chains = create_scroll(NULL, -1, -1, GTK_SHADOW_NONE);
+  GtkWidget * chains = create_vbox (0);
+  GtkWidget * scroll = create_scroll (chains, -1, -1, GTK_SHADOW_NONE);
   gtk_widget_set_hexpand (chains, TRUE);
   gtk_widget_set_vexpand (chains, TRUE);
  int h, i, j, k;
@@ -869,11 +999,17 @@ GtkWidget * chains_tab (glwin * view)
   }
   if (k < GTK_LIMIT)
   {
-    add_container_child (CONTAINER_SCR, chains, create_chains_tree (this_proj, TRUE));
+    add_container_child (CONTAINER_SCR, scroll, create_chains_tree (this_proj, TRUE));
   }
   else
   {
-    add_container_child (CONTAINER_SCR, chains, create_chains_search (this_proj));
+    add_container_child (CONTAINER_SCR, scroll, create_chains_search (this_proj));
   }
+
+  GtkWidget * hbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, chains, hbox, FALSE, FALSE, 2);
+  GtkWidget * hhbox = create_hbox (0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, TRUE, TRUE, 100);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button("Save to file", IMG_NONE, NULL, 50, -1, GTK_RELIEF_NORMAL, G_CALLBACK(save_chains_to_file), & view -> colorp[0][0]), TRUE, TRUE, 40);
   return chains;
 }
