@@ -1916,7 +1916,7 @@ void calc_sk_t (GtkWidget * box)
 
   GtkWidget * notebook = gtk_notebook_new ();
 #ifdef GTK4
-  gtk_widget_set_vexpand (notebook, TRUE);10
+  gtk_widget_set_vexpand (notebook, TRUE);
 #endif
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], notebook, TRUE, TRUE, (preferences) ? 10 : 5);
 

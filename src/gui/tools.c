@@ -43,8 +43,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void toggle_show_hide_curve (GtkCellRendererToggle * cell_renderer,
                                                 gchar * string_path, gpointer data);
 
-  GtkWidget * tooltree ();
-  GtkWidget * curvetbox ();
+  GtkWidget * create_tool_tree ();
+  GtkWidget * create_curve_tool_box ();
 
 */
 
@@ -59,7 +59,7 @@ extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif
 
 GtkTreeStore * tool_model = NULL;
 GtkWidget * tool_tree = NULL;
-GtkWidget * toolscroll = NULL;
+GtkWidget * tool_scroll = NULL;
 
 /*!
   \fn gchar * prepare_for_title (gchar * init)
@@ -94,12 +94,12 @@ void fill_tool_model ()
 
   if (active_project)
   {
-    i = (active_project -> steps > 1) ? 25 : 0;
+    i = (active_project -> steps > 1) ? 45 : 0;
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), TRUE);
 #ifdef GTK4
-    gtk_widget_set_size_request (curvetoolbox, 300, 225+i);
+    gtk_window_set_default_size (GTK_WINDOW (curvetoolbox), 300, 210+i);
 #else
-    gtk_widget_set_size_request (curvetoolbox, 300, 255+i);
+    gtk_widget_set_size_request (curvetoolbox, 300, 235+i);
 #endif
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), FALSE);
   }
@@ -287,11 +287,11 @@ G_MODULE_EXPORT void toggle_show_hide_curve (GtkCellRendererToggle * cell_render
 }
 
 /*!
-  \fn GtkWidget * tooltree ()
+  \fn GtkWidget * create_tool_tree ()
 
   \brief create the toolbox tree view
 */
-GtkWidget * tooltree ()
+GtkWidget * create_tool_tree ()
 {
   GtkTreeViewColumn * tool_col[3];
   GtkCellRenderer * tool_cell[3];
@@ -328,25 +328,25 @@ GtkWidget * tooltree ()
 }
 
 /*!
-  \fn GtkWidget * curvetbox ()
+  \fn GtkWidget * create_curve_tool_box ()
 
   \brief create the curve tool box window
 */
-GtkWidget * curvetbox ()
+GtkWidget * create_curve_tool_box ()
 {
   GtkWidget * ctbox;
   ctbox = create_win ("Toolboxes", MainWindow, FALSE, FALSE);
 #ifdef GTK4
-  gtk_widget_set_size_request (ctbox, 300, 225);
+  gtk_widget_set_size_request (ctbox, 300, 210);
 #else
-  gtk_widget_set_size_request (ctbox, 300, 255);
+  gtk_widget_set_size_request (ctbox, 300, 235);
 #endif
   // New calculation icon to be added here
 
-  toolscroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);
-  add_container_child (CONTAINER_SCR, toolscroll, tooltree ());
-  add_container_child (CONTAINER_WIN, ctbox, toolscroll);
-  show_the_widgets (toolscroll);
+  tool_scroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);
+  add_container_child (CONTAINER_SCR, tool_scroll, create_tool_tree ());
+  add_container_child (CONTAINER_WIN, ctbox, tool_scroll);
+  show_the_widgets (tool_scroll);
   add_gtk_close_event (ctbox, G_CALLBACK(hide_this_window), NULL);
   return (ctbox);
 }

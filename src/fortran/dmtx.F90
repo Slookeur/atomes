@@ -188,14 +188,12 @@ MPSIZE=1.0d0
 ! Always adjust cutoff if periodicity is not applied
 ADAPT_CUT=2
 
-if (PBC) then
 ! Number density
-  RHONUM=NP
-  do PIA=1, 3
-    RHONUM=RHONUM/(THE_BOX(1)%modv(PIA))
-  enddo
-  if (RHONUM.gt.0.01) ADAPT_CUT=1
-endif
+RHONUM=NP
+do PIA=1, 3
+  RHONUM=RHONUM/pmax(PIA)
+enddo
+if (RHONUM.gt.0.01) ADAPT_CUT=1
 
 do TPIXD=1, ADAPT_CUT
 
@@ -222,7 +220,8 @@ do TPIXD=1, ADAPT_CUT
 
   if (TPIXD .eq. 1) then
     PIA = isize(1)*isize(2)*isize(3)
-    INID = NP/PIA
+    INID = NP
+    INID = INID/PIA
     NEW_MPSIZE = (TARGETDP/INID)**(1.0/3.0)
     if (NEW_MPSIZE .gt. MPSIZE) then
       ! Adaptation only if the cutoff increases

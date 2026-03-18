@@ -87,7 +87,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern int objects[3];
 extern int * object_was_selected[3];
 extern int ** tmp_object_id[3];
-extern GtkWidget * curvetbox ();
+extern GtkWidget * create_curve_tool_box ();
 extern GtkWidget * work_menu (int p, int c);
 
 extern G_MODULE_EXPORT void compute_this_prop (GtkWidget * widg, gpointer data);
@@ -1192,7 +1192,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   gtk_paned_pack1 (GTK_PANED (hpaned), MainFrame[0], FALSE, FALSE);
   gtk_paned_pack2 (GTK_PANED (hpaned), MainFrame[1], FALSE, FALSE);
 #endif
-  curvetoolbox = curvetbox ();
+  curvetoolbox = create_curve_tool_box ();
   add_project_to_workspace ();
   add_container_child (CONTAINER_WIN, window, hpaned);
   clean_view ();
