@@ -31,7 +31,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * Notes:
 *
 
-  LLM tools (ChatGPT, Gemini via Antigravity) were used at few occasions to prepare some sections of this file, including:
+  LLM tools (ChatGPT, Gemini via Antigravity, Claude) were used at few occasions to prepare some sections of this file, including:
     - To write parts of the ray-tracing shaders
     - To write parts the gradient background shaders
 
@@ -994,59 +994,63 @@ const GLchar * full_color_ray = GLSL(
     return mix (fog.color, lightColor, fogFactor);
   }
 
+  // Numerically stable sphere intersection.
+  // The standard b*b-c discriminant suffers catastrophic cancellation when
+  // |center| >> radius (large models / large p_depth in float32).
+  // This version uses discr = r^2 - |cross(rd, oc)|^2 which stays bounded.
   bool intersect_sphere(vec3 ro, vec3 rd, vec3 center, float radius, out vec3 hitPos, out vec3 hitNorm)
   {
-    vec3 m = ro - center;
-    float b = dot(m, rd);
-    float c = dot(m, m) - radius * radius;
-
-    if (c > 0.0 && b > 0.0) return false;
-
-    float discr = b*b - c;
+    vec3 oc   = ro - center;
+    vec3 cr   = cross(rd, oc);
+    float discr = radius * radius - dot(cr, cr);
     if (discr < 0.0) return false;
 
-    float t = -b - sqrt(discr);
-    if (t < 0.0) t = 0.0;
+    float tca = -dot(oc, rd);
+    float dt  = sqrt(discr);
+    float t   = tca - dt;
+    if (t < 0.0) t = tca + dt;
+    if (t < 0.0) return false;
 
-    hitPos = ro + t * rd;
+    hitPos  = ro + t * rd;
     hitNorm = normalize(hitPos - center);
     return true;
   }
 
+  // Numerically stable cylinder intersection via cross products.
   bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
   {
-    vec3 ba = pb - pa;
-    vec3 oc = ro - pa;
+    vec3 ba   = pb - pa;
+    vec3 oc   = ro - pa;
 
-    float baba = dot(ba,ba);
-    float bard = dot(ba,rd);
-    float baoc = dot(ba,oc);
+    float baba = dot(ba, ba);
+    float bard = dot(ba, rd);
+    float baoc = dot(ba, oc);
 
-    vec3 va = cross(oc, ba);
     vec3 vb = cross(rd, ba);
+    vec3 va = cross(oc, ba);
 
-    float k2 = dot(vb, vb); // baba - bard*bard
-    float k1 = dot(va, vb); // baba*dot(oc,rd) - baoc*bard
-    float k0 = dot(va, va) - ra*ra*baba; // baba*dot(oc,oc) - baoc*baoc - ra*ra*baba
+    float k2 = dot(vb, vb);
+    if (k2 < 1e-10) return false; // Parallel to axis off-center
 
-    if (k2 == 0.0) return false; // Parallel to axis off-center
+    float k1 = dot(va, vb);
+    float k0 = dot(va, va) - ra * ra * baba;
 
-    float h = k1*k1 - k2*k0;
-    if(h < 0.0) return false;
+    float h = k1 * k1 - k2 * k0;
+    if (h < 0.0) return false;
 
     h = sqrt(h);
-    float t = (-k1 - h)/k2;
+    float t = (-k1 - h) / k2;
 
-    // body
-    float y = baoc + t*bard;
-    if(y > 0.0 && y < baba)
+    float y = baoc + t * bard;
+    if (y > 0.0 && y < baba)
     {
-      hitPos = ro + t * rd;
+      hitPos  = ro + t * rd;
       hitNorm = normalize((hitPos - pa) * baba - ba * y);
       return true;
     }
     return false;
   }
+
 
   bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out vec3 hitPos, out vec3 hitNorm)
   {
@@ -1115,8 +1119,13 @@ const GLchar * full_color_ray = GLSL(
   void main ()
   {
     // Raytracing
-    vec3 ray_dir = normalize(surfacePosition); // View space ray direction (from 0,0,0)
-    vec3 ray_origin = vec3(0.0);
+    // Ray origin is surfacePosition (a point on the proxy mesh surface),
+    // NOT the camera origin (vec3(0)).
+    // This keeps oc = ray_origin - center small (~radius in magnitude),
+    // eliminating catastrophic float32 cancellation when p_depth >> radius.
+    // ray_dir is unchanged: the ray still points from the camera through the fragment.
+    vec3 ray_origin = surfacePosition;
+    vec3 ray_dir    = normalize(surfacePosition);
 
     vec3 hitPos;
     vec3 hitNorm;
@@ -1465,59 +1474,63 @@ const GLchar * axis_color_ray = GLSL(
     return mix (fog.color, lightColor, fogFactor);
   }
 
+  // Numerically stable sphere intersection.
+  // The standard b*b-c discriminant suffers catastrophic cancellation when
+  // |center| >> radius (large models / large p_depth in float32).
+  // This version uses discr = r^2 - |cross(rd, oc)|^2 which stays bounded.
   bool intersect_sphere(vec3 ro, vec3 rd, vec3 center, float radius, out vec3 hitPos, out vec3 hitNorm)
   {
-    vec3 m = ro - center;
-    float b = dot(m, rd);
-    float c = dot(m, m) - radius * radius;
-
-    if (c > 0.0 && b > 0.0) return false;
-
-    float discr = b*b - c;
+    vec3 oc   = ro - center;
+    vec3 cr   = cross(rd, oc);
+    float discr = radius * radius - dot(cr, cr);
     if (discr < 0.0) return false;
 
-    float t = -b - sqrt(discr);
-    if (t < 0.0) t = 0.0;
+    float tca = -dot(oc, rd);
+    float dt  = sqrt(discr);
+    float t   = tca - dt;
+    if (t < 0.0) t = tca + dt;
+    if (t < 0.0) return false;
 
-    hitPos = ro + t * rd;
+    hitPos  = ro + t * rd;
     hitNorm = normalize(hitPos - center);
     return true;
   }
 
+  // Numerically stable cylinder intersection via cross products.
   bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
   {
-    vec3 ba = pb - pa;
-    vec3 oc = ro - pa;
+    vec3 ba   = pb - pa;
+    vec3 oc   = ro - pa;
 
-    float baba = dot(ba,ba);
-    float bard = dot(ba,rd);
-    float baoc = dot(ba,oc);
+    float baba = dot(ba, ba);
+    float bard = dot(ba, rd);
+    float baoc = dot(ba, oc);
 
-    vec3 va = cross(oc, ba);
     vec3 vb = cross(rd, ba);
+    vec3 va = cross(oc, ba);
 
-    float k2 = dot(vb, vb); // baba - bard*bard
-    float k1 = dot(va, vb); // baba*dot(oc,rd) - baoc*bard
-    float k0 = dot(va, va) - ra*ra*baba; // baba*dot(oc,oc) - baoc*baoc - ra*ra*baba
+    float k2 = dot(vb, vb);
+    if (k2 < 1e-10) return false;
 
-    if (k2 == 0.0) return false; // Parallel to axis off-center
+    float k1 = dot(va, vb);
+    float k0 = dot(va, va) - ra * ra * baba;
 
-    float h = k1*k1 - k2*k0;
-    if(h < 0.0) return false;
+    float h = k1 * k1 - k2 * k0;
+    if (h < 0.0) return false;
 
     h = sqrt(h);
-    float t = (-k1 - h)/k2;
+    float t = (-k1 - h) / k2;
 
-    // body
-    float y = baoc + t*bard;
-    if(y > 0.0 && y < baba)
+    float y = baoc + t * bard;
+    if (y > 0.0 && y < baba)
     {
-      hitPos = ro + t * rd;
+      hitPos  = ro + t * rd;
       hitNorm = normalize((hitPos - pa) * baba - ba * y);
       return true;
     }
     return false;
   }
+
 
   bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out vec3 hitPos, out vec3 hitNorm)
   {
@@ -1586,8 +1599,8 @@ const GLchar * axis_color_ray = GLSL(
   void main ()
   {
     // Raytracing
-    vec3 ray_dir = normalize(surfacePosition); // View space ray direction (from 0,0,0)
-    vec3 ray_origin = vec3(0.0);
+    vec3 ray_origin = surfacePosition;
+    vec3 ray_dir    = normalize(surfacePosition);
 
     vec3 hitPos;
     vec3 hitNorm;

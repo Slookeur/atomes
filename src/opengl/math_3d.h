@@ -240,7 +240,7 @@ static inline mat4_t m4_look_at      (vec3_t from, vec3_t to, vec3_t up);
 
 static inline mat4_t m4_transpose    (mat4_t matrix);
 static inline mat4_t m4_mul          (mat4_t a, mat4_t b);
-static inline mat4_t m43_mul(mat4_t a, mat4_t b);
+static inline mat4_t m43_mul         (mat4_t a, mat4_t b);
 static inline mat4_t m4_invert_affine(mat4_t matrix);
 static inline mat4_t m4_translate    (mat4_t matrix, vec3_t translation);
 static inline vec3_t m4_mul_pos      (mat4_t matrix, vec3_t position);
