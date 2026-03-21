@@ -923,12 +923,12 @@ void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
 {
   float len;
   /* Row-major access: mvp.mRC where R=row, C=col */
-  planes[0] = vec4 (mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20, mvp.m33+mvp.m30); // Left
-  planes[1] = vec4 (mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20, mvp.m33-mvp.m30); // Right
-  planes[2] = vec4 (mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21, mvp.m33+mvp.m31); // Bottom
-  planes[3] = vec4 (mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21, mvp.m33-mvp.m31); // Top
-  planes[4] = vec4 (mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22, mvp.m33+mvp.m32); // Near
-  planes[5] = vec4 (mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22, mvp.m33-mvp.m32); // Far
+  planes[0] = vec4 (mvp.m33+mvp.m30, mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20); // Left
+  planes[1] = vec4 (mvp.m33-mvp.m30, mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20); // Right
+  planes[2] = vec4 (mvp.m33+mvp.m31, mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21); // Bottom
+  planes[3] = vec4 (mvp.m33-mvp.m31, mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21); // Top
+  planes[4] = vec4 (mvp.m33+mvp.m32, mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22); // Near
+  planes[5] = vec4 (mvp.m33-mvp.m32, mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22); // Far
   int i;
   for (i = 0; i < 6; i++)
   {
@@ -989,8 +989,8 @@ gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
   /* Reconstruct bond axis: rotate (0,0,1) by the stored quaternion.
      Simplified because v=(0,0,1): dot(u,v)=u.z, cross(u,v)=(u.y,-u.x,0) */
   float ax = 2.0f * (qz*qx + qw*qy);
-  float ay = 2.0f * (qz*qy - qw*qx);
-  float az = qw*qw - qx*qx - qy*qy + qz*qz;
+  float ay = 2.0f * (qy*qx - qz*qw);
+  float az = qz*qz + qy*qy - qw*qw - qx*qx;
 
   /* Endpoints of the half-bond */
   float p1x = ox - half_h*ax,  p1y = oy - half_h*ay,  p1z = oz - half_h*az;
