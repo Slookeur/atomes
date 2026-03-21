@@ -58,6 +58,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void init_shaders (glwin * view);
   void set_lights_data (glsl_program * glsl);
   void shading_glsl_text (glsl_program * glsl);
+  void compute_frustum_planes (mat4_t mvp, vec4_t planes[6]);
+  void update_ray_instances (glsl_program * glsl);
   void render_this_shader (glsl_program * glsl, int ids);
   void draw_vertices (int id);
 
@@ -70,8 +72,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r);
   gboolean cylinder_in_frustum (vec4_t planes[6], float * inst);
   gboolean cap_in_frustum (vec4_t planes[6], float * inst);
-  void compute_frustum_planes (mat4_t mvp, vec4_t planes[6]);
-  void update_ray_instances (glsl_program * glsl);
 
 */
 
@@ -910,33 +910,32 @@ int this_factor;
 /*!
   \fn void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
 
-  \brief Extract the 6 frustum planes from a MVP matrix (Gribb-Hartmann method).
-         Each plane is stored as (nx, ny, nz, d) with the convention:
+  \brief extract the 6 frustum planes from a MVP matrix (Gribb-Hartmann method).
+         each plane is stored as (nx, ny, nz, d) with the convention:
          a point P is inside if dot(plane.xyz, P) + plane.w >= 0.
-         Planes are normalized so that the w component equals the signed
+         planes are normalized so that the w component equals the signed
          distance from the origin to the plane.
 
-  \param mvp  the combined projection * model_view matrix
-  \param planes  output array of 6 planes [left, right, bottom, top, near, far]
+  \param mvp the combined projection * model_view matrix
+  \param planes output array of 6 planes [left, right, bottom, top, near, far]
 */
 void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
 {
   float len;
   /* Row-major access: mvp.mRC where R=row, C=col */
-  /* Left   */ planes[0] = vec4 (mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20, mvp.m33+mvp.m30);
-  /* Right  */ planes[1] = vec4 (mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20, mvp.m33-mvp.m30);
-  /* Bottom */ planes[2] = vec4 (mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21, mvp.m33+mvp.m31);
-  /* Top    */ planes[3] = vec4 (mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21, mvp.m33-mvp.m31);
-  /* Near   */ planes[4] = vec4 (mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22, mvp.m33+mvp.m32);
-  /* Far    */ planes[5] = vec4 (mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22, mvp.m33-mvp.m32);
+  planes[0] = vec4 (mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20, mvp.m33+mvp.m30); // Left
+  planes[1] = vec4 (mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20, mvp.m33-mvp.m30); // Right
+  planes[2] = vec4 (mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21, mvp.m33+mvp.m31); // Bottom
+  planes[3] = vec4 (mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21, mvp.m33-mvp.m31); // Top
+  planes[4] = vec4 (mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22, mvp.m33+mvp.m32); // Near
+  planes[5] = vec4 (mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22, mvp.m33-mvp.m32); // Far
   int i;
   for (i = 0; i < 6; i++)
   {
-    len = sqrt (planes[i].x*planes[i].x + planes[i].y*planes[i].y + planes[i].z*planes[i].z);
+    len = v3_length (vec3(planes[i].x, planes[i].y, planes[i].z));
     if (len > 0.0f)
     {
-      planes[i].x /= len;  planes[i].y /= len;
-      planes[i].z /= len;  planes[i].w /= len;
+      planes[i] = v4_divs (planes[i], len);
     }
   }
 }
@@ -944,8 +943,8 @@ void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
 /*!
   \fn gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r)
 
-  \brief Test whether a sphere is at least partially inside the view frustum.
-         Returns FALSE only if the sphere is entirely behind at least one plane.
+  \brief test whether a sphere is at least partially inside the view frustum.
+         returns FALSE only if the sphere is entirely behind at least one plane.
 
   \param planes  the 6 frustum planes (world-space, normalised)
   \param cx cy cz  sphere center in world-space
@@ -956,8 +955,7 @@ gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, floa
   int i;
   for (i = 0; i < 6; i++)
   {
-    if (planes[i].x*cx + planes[i].y*cy + planes[i].z*cz + planes[i].w < -r)
-      return FALSE;
+    if (planes[i].x*cx + planes[i].y*cy + planes[i].z*cz + planes[i].w < -r) return FALSE;
   }
   return TRUE;
 }
@@ -965,19 +963,19 @@ gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, floa
 /*!
   \fn gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
 
-  \brief Capsule test for a cylinder instance (half-bond).
-         Reconstructs the two endpoints from the instance buffer and tests
+  \brief capsule test for a cylinder instance (half-bond).
+         reconstructs the 2 endpoints from the instance buffer and tests
          whether at least one of them is within radius of any frustum plane.
 
-         Instance buffer layout (CYLI_BUFF_SIZE):
+         instance buffer layout (CYLI_BUFF_SIZE):
            [0..2] offset   = midpoint of the half-bond (world-space)
            [3]    height   = half-bond length
            [4]    radius   = cylinder radius
            [5]    quat.w
            [6..8] quat.xyz = quaternion rotating Z onto the bond axis
 
-  \param planes  the 6 frustum planes (world-space, normalised)
-  \param inst  pointer to the start of one cylinder instance in the buffer
+  \param planes the 6 frustum planes (world-space, normalized)
+  \param inst pointer to the start of 1 cylinder instance in the buffer
 */
 gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
 {
@@ -1011,18 +1009,17 @@ gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
 /*!
   \fn gboolean cap_in_frustum (vec4_t planes[6], float * inst)
 
-  \brief Sphere test for a cylinder cap instance.
-         A cap is a flat disk; a sphere of the same center and radius is
-         a safe conservative bounding volume.
+  \brief sphere test for a cylinder cap instance.
+         a cap is a flat disk; a sphere of the same center and radius is a safe conservative bounding volume.
 
-         Instance buffer layout (CAPS_BUFF_SIZE):
+         instance buffer layout (CAPS_BUFF_SIZE):
            [0..2] offset   = cap center (world-space)
            [3]    radius   = cap radius
            [4]    quat.w
            [5..7] quat.xyz
 
-  \param planes  the 6 frustum planes (world-space, normalised)
-  \param inst  pointer to the start of one cap instance in the buffer
+  \param planes the 6 frustum planes (world-space, normalized)
+  \param inst pointer to the start of one cap instance in the buffer
 */
 gboolean cap_in_frustum (vec4_t planes[6], float * inst)
 {
@@ -1033,16 +1030,14 @@ gboolean cap_in_frustum (vec4_t planes[6], float * inst)
 /*!
   \fn void update_ray_instances (glsl_program * glsl)
 
-  \brief Frustum-cull the instances of a ray tracing shader (GLSL_SPHERES,
-         GLSL_CYLINDERS or GLSL_CAPS) and update the GPU instance buffer
-         with only the visible subset.
+  \brief frustum-cull the instances of a ray tracing shader (GLSL_SPHERES, GLSL_CYLINDERS or GLSL_CAPS)
+         and update the GPU instance buffer with only the visible subset.
 
-         The full instance data remains in glsl->obj->instances (CPU-side).
-         Only the visible count and the GPU buffer content change.
-         This function is called once per frame, per shader, when ray_tracing
-         is active, from render_this_shader().
+         the full instance data remains in glsl -> obj -> instances (CPU-side).
+         only the visible count and the GPU buffer content change.
+         this function is called once per frame, per shader, only when ray_tracing is active, from render_this_shader().
 
-  \param glsl  the shader program to update
+  \param glsl the shader program to update
 */
 void update_ray_instances (glsl_program * glsl)
 {
@@ -1058,8 +1053,8 @@ void update_ray_instances (glsl_program * glsl)
   int i;
 
   /* Compute frustum planes from the current MVP matrix (world-space planes) */
-  vec4_t planes[6];
-  compute_frustum_planes (wingl -> proj_model_view_matrix, planes);
+  vec4_t frustum_planes[6];
+  compute_frustum_planes (wingl -> proj_model_view_matrix, frustum_planes);
 
   if (glsl -> draw_type == GLSL_SPHERES)
   {
@@ -1067,7 +1062,7 @@ void update_ray_instances (glsl_program * glsl)
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (sphere_in_frustum (planes, inst[0], inst[1], inst[2], inst[3]))
+      if (sphere_in_frustum (frustum_planes, inst[0], inst[1], inst[2], inst[3]))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1080,7 +1075,7 @@ void update_ray_instances (glsl_program * glsl)
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (cylinder_in_frustum (planes, inst))
+      if (cylinder_in_frustum (frustum_planes, inst))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1093,7 +1088,7 @@ void update_ray_instances (glsl_program * glsl)
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (cap_in_frustum (planes, inst))
+      if (cap_in_frustum (frustum_planes, inst))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1266,6 +1261,12 @@ void render_this_shader (glsl_program * glsl, int ids)
 
   if (glsl -> draw_type == GLSL_SPHERES || glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS)
   {
+    gboolean poly_offset = (! plot -> ray_tracing) && (glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS);
+    if (poly_offset)
+    {
+      glEnable (GL_POLYGON_OFFSET_FILL);
+      glPolygonOffset (1.0, 1.0);
+    }
     if (glsl -> draw_instanced)
     {
       glDrawElementsInstanced (glsl -> vert_type, glsl -> obj -> num_indices, GL_UNSIGNED_INT, 0, glsl -> obj -> num_instances);
@@ -1273,6 +1274,10 @@ void render_this_shader (glsl_program * glsl, int ids)
     else
     {
       glDrawElements (glsl -> vert_type, glsl -> obj -> num_indices, GL_UNSIGNED_INT, 0);
+    }
+    if (poly_offset)
+    {
+      glDisable (GL_POLYGON_OFFSET_FILL);
     }
   }
   else if (glsl -> draw_type == GLSL_POINTS || glsl -> draw_type == GLSL_LINES || glsl -> draw_type == GLSL_STRING)
