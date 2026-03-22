@@ -258,6 +258,41 @@ object_3d * draw_sphere (int quality)
 }
 
 /*!
+  \fn object_3d * draw_billboard_quad ()
+
+  \brief create a camera-aligned billboard quad proxy for perfect impostors.
+
+  The quad has 4 vertices at unit corners (±1, ±1, 0).  Each vertex shader
+  for perfect impostors uses the sign of vert.x / vert.y to select the
+  corresponding edge of the tight axis-aligned bounding box in view space.
+
+  Draw primitive: GL_TRIANGLE_STRIP with indices [0,1,2,3].
+    tri 0 → vertices 0,1,2
+    tri 1 → vertices 1,2,3
+*/
+object_3d * draw_billboard_quad ()
+{
+  object_3d * quad = g_malloc0(sizeof*quad);
+  quad -> quality       = 1;
+  quad -> num_vertices  = 4;
+  quad -> vert_buffer_size = 3;
+  quad -> vertices = allocfloat (3 * 4);
+  /* corners: (-1,-1,0), (-1,+1,0), (+1,-1,0), (+1,+1,0) */
+  quad -> vertices[0] = -1.0f;  quad -> vertices[1] = -1.0f;  quad -> vertices[2] = 0.0f;
+  quad -> vertices[3] = -1.0f;  quad -> vertices[4] =  1.0f;  quad -> vertices[5] = 0.0f;
+  quad -> vertices[6] =  1.0f;  quad -> vertices[7] = -1.0f;  quad -> vertices[8] = 0.0f;
+  quad -> vertices[9] =  1.0f;  quad -> vertices[10] = 1.0f;  quad -> vertices[11] = 0.0f;
+  quad -> num_indices  = 4;
+  quad -> ind_buffer_size = 1;
+  quad -> indices = allocint (4);
+  quad -> indices[0] = 0;
+  quad -> indices[1] = 1;
+  quad -> indices[2] = 2;
+  quad -> indices[3] = 3;
+  return quad;
+}
+
+/*!
   \fn float get_sphere_radius (int style, int sp, int ac, int sel)
 
   \brief get an atom sphere radius
@@ -640,7 +675,8 @@ void create_atom_lists (gboolean to_pick)
         }
         if (sphere)
         {
-          atos = draw_sphere (plot -> quality);
+          /* Ray: billboard quad proxy; classic: tessellated sphere */
+          atos = plot -> ray_tracing ? draw_billboard_quad () : draw_sphere (plot -> quality);
         }
         else
         {
@@ -652,15 +688,16 @@ void create_atom_lists (gboolean to_pick)
         }
         atos -> num_instances = j*all_styles[i];
         atos -> inst_buffer_size = ATOM_BUFF_SIZE;
-        atos -> instances = allocfloat (j*all_styles[i]*ATOM_BUFF_SIZE);
+        allocate_instances (atos);
         nbl = 0;
         atom_positions_colors_and_sizes (i-1, to_pick, atos -> instances);
         if (! to_pick)
         {
           if (sphere)
           {
-            wingl -> ogl_glsl[ATOMS][step][k] = init_shader_program (ATOMS, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex, NULL,
-                                                                                          (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
+            const GLchar * vs_atom = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
+            const GLchar * fs_atom = (plot -> ray_tracing) ? full_color_ray : full_color;
+            wingl -> ogl_glsl[ATOMS][step][k] = init_shader_program (ATOMS, GLSL_SPHERES, vs_atom, NULL, fs_atom, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
           }
           else
           {

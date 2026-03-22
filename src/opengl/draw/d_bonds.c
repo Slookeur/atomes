@@ -40,8 +40,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   float get_bond_radius (int sty, int ac, int at, int bt, int sel);
 
   void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha);
-  void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta);
-  void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha);
+  void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta, float r_sph_a, float r_sph_b);
+  void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, gboolean sel);
   void setup_this_bond (int sty, gboolean to_pick, gboolean picked, int cap, int bi, int pi, atom * at, atom * bt, float al, float * vertices);
   void prepare_bond (int sty, gboolean to_pick, gboolean picked, int cap, int bi, int pi, int bid, atom * at, atom * bt, float * vertices);
   void setup_all_cylinder_vertices (int style, gboolean to_pick, int cap, int bi, float * vertices);
@@ -57,6 +57,10 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "global.h"
 #include "glview.h"
 #include "dlp_field.h"
+
+extern object_3d * draw_billboard_quad (void);
+/* Sphere radius function (declared in d_atoms.c) — needed to fill clip radii */
+extern float get_sphere_radius (int style, int sp, int ac, int sel);
 
 extern ColRGBA get_atom_color (int i, int j, double al, int picked, gboolean to_picked);
 extern vec3_t model_position;
@@ -186,7 +190,7 @@ object_3d * draw_cylinder_cap (int quality, float rad, gboolean picked)
   // Center
   new_cap -> vertices[j] = 0.0;
   new_cap -> vertices[j+1] = 0.0;
-  new_cap -> vertices[j+2] = 0.0 - delta;
+  new_cap -> vertices[j+2] = - delta;
   j += 3;
   for(i = 0; i < quality; i++)
   {
@@ -276,7 +280,7 @@ void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha)
 }
 
 /*!
-  \fn void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta)
+  \fn void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta, float r_sph_a, float r_sph_b)
 
   \brief fill the OpenGL data buffer for a cylinder bond (or clone bond) to render
 
@@ -286,11 +290,14 @@ void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha)
   \param col the color
   \param rad the radius
   \param alpha the opacity (atom: 1.0, clone: 0.5)
-  \param delta radius correction(s) if atom(s) are shown
+  \param delta length correction if atom(s) are shown
+  \param r_sph_a sphere radius at the atom side (for in-sphere clipping in the frag shader)
+  \param r_sph_b sphere radius at the midpoint side (0.0 for a bond half, > 0 for axis cylinders)
 */
-void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta)
+void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta, float r_sph_a, float r_sph_b)
 {
-  int s = nbs*CYLI_BUFF_SIZE;
+  int cbs = (plot -> ray_tracing) ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+  int s = nbs*cbs;
   vertices[s] = (pos_a.x + pos_b.x)/2.0;
   vertices[s+1] = (pos_a.y + pos_b.y)/2.0;
   vertices[s+2] = (pos_a.z + pos_b.z)/2.0;
@@ -305,27 +312,34 @@ void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRG
   vertices[s+10] = col.green;
   vertices[s+11] = col.blue;
   vertices[s+12] = col.alpha * alpha;
+  if (r_sph_a > 0.0)
+  {
+    vertices[s+13] = r_sph_a;   /* sphere clip radius at pos_a endpoint */
+    vertices[s+14] = r_sph_b;   /* sphere clip radius at pos_b endpoint (0.0 for half-bonds) */
+  }
   nbs ++;
 }
 
 /*!
-  \fn void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha)
+  \fn void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, gboolean sel)
 
   \brief fill the OpenGL data buffer for a cylinder cap bond (or clone bond) to render
 
   \param vertices the OpenGL buffer to fill
-  \param pos_a the position vector
-  \param pos_b the rotation vector
+  \param pos_a initial atom position vector
+  \param pos_b cap center position vector
   \param col the color
   \param rad the radius
   \param alpha the opacity (atom: 1.0, clone: 0.5)
+  \param sel selected half bond (1/0)
 */
-void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha)
+void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, gboolean sel)
 {
   int s = nbs*CAPS_BUFF_SIZE;
-  vertices[s] = pos_b.x;
-  vertices[s+1] = pos_b.y;
-  vertices[s+2] = pos_b.z;
+  vec3_t dir = (sel) ? v3_norm (v3_sub(pos_a, pos_b)) : vec3(0.0, 0.0, 0.0);
+  vertices[s] = pos_b.x - 0.05*dir.x;
+  vertices[s+1] = pos_b.y - 0.05*dir.y;
+  vertices[s+2] = pos_b.z - 0.05*dir.z;
   vertices[s+3] = rad;
   vec4_t quat = rotate_bond (pos_b,  pos_a);
   vertices[s+4]  = quat.w;
@@ -366,7 +380,7 @@ void setup_this_bond (int sty, gboolean to_pick, gboolean picked, int cap, int b
   vec3_t pos_a, pos_b;
   ColRGBA col = get_atom_color (at -> sp, at -> id, 1.0, (picked) ? pi + 1 : 0, to_pick);
   float rad = get_bond_radius ((to_pick) ? BALL_AND_STICK : (sty == NONE) ? plot -> style : sty, bi, at -> sp, bt -> sp, (picked) ? 1.0 : 0.0);
-  if (! cap && picked)
+  if (picked)
   {
     gboolean show_a, show_b;
     int sta, stb;
@@ -403,11 +417,12 @@ void setup_this_bond (int sty, gboolean to_pick, gboolean picked, int cap, int b
         {
           if (cap)
           {
-            setup_cap_vertice (vertices, pos_a, pos_b, col, rad, alpha * al);
+            setup_cap_vertice (vertices, pos_a, pos_b, col, rad, alpha*al, (plot -> ray_tracing && delta > 0.0) ? TRUE : FALSE);
           }
           else
           {
-            setup_cylinder_vertice (vertices, pos_a, pos_b, col, rad, (to_pick) ? 1.0 : alpha*al, delta);
+            float r_sph = (plot -> ray_tracing) ? get_sphere_radius ((sty == NONE) ? plot -> style : sty, at -> sp, bi, 0) : 0.0f;
+            setup_cylinder_vertice (vertices, pos_a, pos_b, col, rad, (to_pick) ? 1.0 : alpha*al, delta, r_sph, 0.0f);
           }
         }
         else
@@ -740,10 +755,11 @@ int create_bond_lists (gboolean to_pick)
     {
       if (to_pick || (! f && (plot -> style == BALL_AND_STICK || plot -> style == CYLINDERS)) || (f && (f-1 == BALL_AND_STICK || f-1 == CYLINDERS)))
       {
-        cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
+        cyl = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder (plot -> quality, 1.0, 1.0);
         cyl -> num_instances =  (nbds[f]/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
-        cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
-        cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
+        /* Unreal mode: extend instance buffer by 2 floats per instance for sphere clip radii */
+        cyl -> inst_buffer_size = (plot -> ray_tracing) ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+        allocate_instances (cyl);
         nbs = 0;
         for (h=0; h<g; h++)
         {
@@ -752,23 +768,27 @@ int create_bond_lists (gboolean to_pick)
         }
         if (! to_pick)
         {
-          wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
-                                                                                          (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, cyl);
+          const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+          const GLchar * fs_cyl = (plot -> ray_tracing) ? full_color_ray : full_color;
+          /* narray=8 in ray_tracing mode to allocate slots for r_sphere_a/b attributes */
+          int narray_cyl = plot -> ray_tracing ? 8 : 6;
+          wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CYLINDERS, vs_cyl, NULL, fs_cyl, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, cyl);
           g_free (cyl);
           l ++;
           if (ncap[f] > 0)
           {
-            cap = draw_cylinder_cap (plot -> quality, 1.0, FALSE);
+            cap = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder_cap (plot -> quality, 1.0, FALSE);
             cap -> num_instances =  (ncap[f]/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cap -> inst_buffer_size = CAPS_BUFF_SIZE;
-            cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
+            allocate_instances (cap);
             nbs = 0;
             for (h=0; h<g; h++)
             {
               setup_all_cylinder_vertices (f-1, FALSE, 1, h, cap -> instances);
             }
-            wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CAPS, (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex, NULL,
-                                                                                       (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, cap);
+            const GLchar * vs_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
+            GLenum prim_cap = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
+            wingl -> ogl_glsl[BONDS][step][l] = init_shader_program (BONDS, GLSL_CAPS, vs_cap, NULL, fs_cyl, prim_cap, 5, 1, TRUE, cap);
             g_free (cap);
             l ++;
           }

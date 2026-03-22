@@ -71,10 +71,8 @@ extern const GLchar * degree_vertex;
 
 // Triangles: Multiple lights + Materials + Transparency shaders
 extern const GLchar * full_vertex;
-extern const GLchar * full_vertex_ray;
 extern const GLchar * full_color;
 extern const GLchar * full_color_ray;
-extern const GLchar * axis_color_ray;
 
 // Sphere
 extern const GLchar * sphere_vertex;
@@ -142,4 +140,5 @@ struct glsl_program
   ColRGBA * col;           /*!< String color */
 };
 
+extern void allocate_instances (object_3d * object);
 #endif

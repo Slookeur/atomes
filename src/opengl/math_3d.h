@@ -1,4 +1,5 @@
 /* This file is part of the 'atomes' software
+/* This file is part of the 'atomes' software
 
 'atomes' is free software: you can redistribute it and/or modify it under the terms
 of the GNU Affero General Public License as published by the Free Software Foundation,

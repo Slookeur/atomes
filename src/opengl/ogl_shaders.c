@@ -385,38 +385,6 @@ const GLchar * full_vertex = GLSL(
   }
 );
 
-const GLchar * full_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec3 vert;
-  in vec3 vertNormal;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  // Standardized Raytracing parameters
-  out vec3 imp_a;
-  out vec3 imp_b;
-  out float imp_r;
-  flat out int form_type; // 4: Triangle/Mesh
-
-  void main ()
-  {
-    surfaceColor    = vertColor;
-
-    surfacePosition = vec3(m_view * vec4(vert, 1.0f));
-    surfaceNormal   = mat3(m_view) * vertNormal;
-    surfaceToCamera = normalize (- surfacePosition);
-    imp_a = vec3(0.0);
-    imp_b = vec3(0.0);
-    imp_r = 0.0;
-    form_type = 4;
-    gl_Position     = mvp * vec4(vert, 1.0f);
-  }
-);
-
 const GLchar * full_color = GLSL(
 
   int PHONG           = 1;
@@ -709,6 +677,7 @@ const GLchar * full_color = GLSL(
       color = pow(color, vec3(1.0/mat.gamma));
       alpha = surfaceColor.w * mat.alpha;
     }
+
     if (fog.mode > 0)
     {
       fragment_color = vec4 (Apply_fog(surfaceColor.xyz*color), alpha);
@@ -720,8 +689,302 @@ const GLchar * full_color = GLSL(
   }
 );
 
-const GLchar * full_color_ray = GLSL(
+/* ===========================================================================
+ * Perfect-impostor shaders (plot -> ray_tracing).
+ *
+ * Principle: each primitive (sphere, cylinder, cone, cap) is rendered as a
+ * camera-aligned billboard quad (4 vertices, GL_TRIANGLE_STRIP).
+ * The fragment shader performs an exact analytic ray intersection
+ * and additionally writes gl_FragDepth with the depth of the actual hit point,
+ * giving pixel-perfect silhouettes AND correct depth-buffer occlusion between
+ * overlapping atoms / bonds.
+ *
+ * Billboard proxy geometry (draw_billboard_quad, see d_atoms.c):
+ *   vertices[0] = (-1,-1, 0)   GL_TRIANGLE_STRIP layout:
+ *   vertices[1] = (-1,+1, 0)      tri 0: verts 0-1-2
+ *   vertices[2] = (+1,-1, 0)      tri 1: verts 1-2-3
+ *   vertices[3] = (+1,+1, 0)
+ *   indices: 0 1 2 3
+ *
+ * Instance buffer layouts are IDENTICAL to the non-impostor counterparts
+ * (ATOM_BUFF_SIZE, CYLI_BUFF_SIZE, CAPS_BUFF_SIZE) so no changes are needed
+ * to the buffer-filling code in d_*.c.
+ * ===========================================================================*/
 
+/* --------------------------------------------------------------------------
+ * Sphere impostor – vertex shader
+ * Build a camera-aligned billboard quad that tightly covers the projected
+ * sphere footprint.  All work is done in view space; proj_matrix is used for
+ * the final clip-space position.
+ * --------------------------------------------------------------------------*/
+const GLchar * sphere_vertex_ray = GLSL(
+  uniform mat4 m_view;
+  uniform mat4 proj_matrix;
+
+  in vec3 vert;       /* billboard corner: (-1,-1,0)…(+1,+1,0)          */
+  in vec3 offset;     /* sphere center, world space (from instance data) */
+  in float radius;    /* sphere radius  (from instance data)             */
+  in vec4 vertColor;  /* RGBA color    (from instance data)             */
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 imp_a;             /* sphere center, view space */
+  out vec3 imp_b;             /* unused for sphere – set to 0                */
+  out float imp_r;            /* sphere radius (world-space units)           */
+  flat out int   form_type;   /* 0 = sphere                               */
+  flat out float clip_r_a;    /* sphere clip radius at imp_a endpoint (0 for non-cylinders) */
+  flat out float clip_r_b;    /* sphere clip radius at imp_b endpoint (0 for non-cylinders) */
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+
+    /* Sphere centre in view space */
+    vec3 center_vs = vec3(m_view * vec4(offset, 1.0));
+
+    vec3 billboard_vs = center_vs + radius * vec3(vert.x, vert.y, 0.0);
+    surfacePosition = billboard_vs;
+
+    imp_a      = center_vs;
+    imp_b      = vec3(0.0);
+    imp_r      = radius;
+    form_type  = 0;
+    clip_r_a   = 0.0;   /* spheres have no clipping */
+    clip_r_b   = 0.0;
+
+    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position.z = max(gl_Position.z, -gl_Position.w);
+  }
+);
+
+/* --------------------------------------------------------------------------
+ * Cylinder impostor – vertex shader
+ * Build a tight axis-aligned bounding-box billboard from the two cylinder
+ * endpoints (reconstructed from instance data).
+ * --------------------------------------------------------------------------*/
+const GLchar * cylinder_vertex_ray = GLSL(
+  uniform mat4 m_view;
+  uniform mat4 proj_matrix;
+
+  in vec4  quat;       /* rotation quaternion {w,x,y,z}                   */
+  in float height;     /* full cylinder length (from instance data)       */
+  in float radius;     /* cylinder radius                                 */
+  in vec3 offset;      /* cylinder midpoint, world space                  */
+  in vec3 vert;        /* billboard corner: (-1,-1,0)…(+1,+1,0)           */
+  in vec4 vertColor;
+  /* Sphere clip radii at the two cylinder endpoints (CYLI_BUFF_SIZE+2 layout).
+     r_sphere_a = sphere radius at the atom-side endpoint (imp_a / local z=+0.5h).
+     r_sphere_b = sphere radius at the midpoint-side endpoint (0.0 for half-bonds). */
+  in float r_sphere_a;
+  in float r_sphere_b;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 imp_a;             /* endpoint p1, view space */
+  out vec3 imp_b;             /* endpoint p2, view space */
+  out float imp_r;            /* view-space radius       */
+  flat out int   form_type;   /* 1 = cylinder            */
+  flat out float clip_r_a;    /* passed through to fragment for endpoint clipping */
+  flat out float clip_r_b;
+
+  vec3 rotate_this (in vec3 v, in vec4 q)
+  {
+    vec3 u = vec3(q.x, q.y, q.z);
+    float s = q.w;
+    return 2.0 * dot(u, v) * u + (s*s - dot(u, u)) * v + 2.0 * s * cross(u, v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+
+    /* Reconstruct world-space endpoints from instance data */
+    vec3 local_p1 = vec3(0.0, 0.0,  0.5 * height);
+    vec3 local_p2 = vec3(0.0, 0.0, -0.5 * height);
+    if (quat.w != 0.0)
+    {
+      local_p1 = rotate_this(local_p1, quat);
+      local_p2 = rotate_this(local_p2, quat);
+    }
+    vec3 p1_vs = vec3(m_view * vec4(offset + local_p1, 1.0));
+    vec3 p2_vs = vec3(m_view * vec4(offset + local_p2, 1.0));
+
+    /* View-space radius with scale correction */
+    float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+
+    /* View-space AABB of both endpoint discs */
+    float xmin = min(p1_vs.x, p2_vs.x) - r_vs;
+    float xmax = max(p1_vs.x, p2_vs.x) + r_vs;
+    float ymin = min(p1_vs.y, p2_vs.y) - r_vs;
+    float ymax = max(p1_vs.y, p2_vs.y) + r_vs;
+    float z_bb = max(p1_vs.z, p2_vs.z) + r_vs;
+
+    float bx = mix(xmin, xmax, (vert.x + 1.0) * 0.5);
+    float by = mix(ymin, ymax, (vert.y + 1.0) * 0.5);
+    vec3 billboard_vs = vec3(bx, by, z_bb);
+
+    surfacePosition = billboard_vs;
+
+    imp_a     = p1_vs;
+    imp_b     = p2_vs;
+    imp_r     = r_vs;
+    form_type = 1;
+    /* Pass sphere clip radii to the fragment shader.
+       clip_r_a is scaled to view space the same way as imp_r.  */
+    float r_scale = length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+    clip_r_a  = r_sphere_a * r_scale;
+    clip_r_b  = r_sphere_b * r_scale;
+
+    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position.z = max(gl_Position.z, -gl_Position.w);
+  }
+);
+
+/* --------------------------------------------------------------------------
+ * Cone impostor – vertex shader
+ * Same as cylinder impostor but accounts for the asymmetric radii:
+ * ra = 0 at p1 (apex, local z = +0.5·height), rb = radius at p2 (base).
+ * --------------------------------------------------------------------------*/
+const GLchar * cone_vertex_ray = GLSL(
+  uniform mat4 m_view;
+  uniform mat4 proj_matrix;
+
+  in vec4 quat;
+  in float height;
+  in float radius;   /* base radius; apex radius is 0 */
+  in vec3 offset;
+  in vec3 vert;
+  in vec4 vertColor;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 imp_a;             /* apex, view space  */
+  out vec3 imp_b;             /* base center, view space */
+  out float imp_r;            /* base radius, view space */
+  flat out int   form_type;   /* 3 = cone          */
+  flat out float clip_r_a;    /* 0.0 – cones are arrowheads, no sphere junction */
+  flat out float clip_r_b;
+
+  vec3 rotate_this (in vec3 v, in vec4 q)
+  {
+    vec3 u = vec3(q.x, q.y, q.z);
+    float s = q.w;
+    return 2.0 * dot(u, v) * u + (s*s - dot(u, u)) * v + 2.0 * s * cross(u, v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+
+    /* p1 = apex (ra=0, local z=+0.5h), p2 = base (rb=radius, local z=-0.5h) */
+    vec3 local_apex = vec3(0.0, 0.0,  0.5 * height);
+    vec3 local_base = vec3(0.0, 0.0, -0.5 * height);
+    if (quat.w != 0.0)
+    {
+      local_apex = rotate_this(local_apex, quat);
+      local_base = rotate_this(local_base, quat);
+    }
+    vec3 p_apex_vs = vec3(m_view * vec4(offset + local_apex, 1.0));
+    vec3 p_base_vs = vec3(m_view * vec4(offset + local_base, 1.0));
+
+    float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+
+    /* Asymmetric AABB: apex contributes radius 0, base contributes r_vs */
+    float xmin = min(p_apex_vs.x, p_base_vs.x - r_vs);
+    float xmax = max(p_apex_vs.x, p_base_vs.x + r_vs);
+    float ymin = min(p_apex_vs.y, p_base_vs.y - r_vs);
+    float ymax = max(p_apex_vs.y, p_base_vs.y + r_vs);
+    /* z: front face = closest of apex/base z + base radius (conservative bound). */
+    float z_bb = max(p_apex_vs.z, p_base_vs.z) + r_vs;
+
+    // float bx = (vert.x > 0.0) ? xmax : xmin;
+    // float by = (vert.y > 0.0) ? ymax : ymin;
+    float bx = mix(xmin, xmax, (vert.x + 1.0) * 0.5);
+    float by = mix(ymin, ymax, (vert.y + 1.0) * 0.5);
+    vec3 billboard_vs = vec3(bx, by, z_bb);
+
+    surfacePosition = billboard_vs;
+
+    /* imp_a = apex, imp_b = base centre (matches intersect_cone convention) */
+    imp_a     = p_apex_vs;
+    imp_b     = p_base_vs;
+    imp_r     = r_vs;
+    form_type = 3;
+    clip_r_a  = 0.0;
+    clip_r_b  = 0.0;
+
+    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position.z = max(gl_Position.z, -gl_Position.w);
+  }
+);
+
+/* --------------------------------------------------------------------------
+ * Cap impostor – vertex shader
+ * A cap is a flat disk; its impostor is a square billboard centered on the
+ * disk center with half-side = radius.
+ * --------------------------------------------------------------------------*/
+const GLchar * cap_vertex_ray = GLSL(
+  uniform mat4 m_view;
+  uniform mat4 proj_matrix;
+
+  in vec4 quat;
+  in float radius;
+  in vec3 offset;   /* cap center, world space  */
+  in vec3 vert;     /* billboard corner         */
+  in vec4 vertColor;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 imp_a;             /* cap center, view space  */
+  out vec3 imp_b;             /* cap normal, view space  */
+  out float imp_r;            /* cap radius              */
+  flat out int   form_type;   /* 2 = cap                 */
+  flat out float clip_r_a;    /* 0.0 – caps are at midpoints, no sphere junction */
+  flat out float clip_r_b;
+
+  vec3 rotate_this (in vec3 v, in vec4 q)
+  {
+    vec3 u = vec3(q.x, q.y, q.z);
+    float s = q.w;
+    return 2.0 * dot(u, v) * u + (s*s - dot(u, u)) * v + 2.0 * s * cross(u, v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+    vec3 center_vs = vec3(m_view * vec4(offset, 1.0));
+
+    /* Normal of the disk in view space */
+    vec3 norm_local = vec3(0.0, 0.0, -1.0);
+    if (quat.w != 0.0) norm_local = rotate_this(norm_local, quat);
+    vec3 norm_vs = normalize (mat3(m_view) * norm_local);
+
+    float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+
+    /* Camera-aligned square billboard.
+       Same z-offset rationale as sphere_vertex_ray: use vec3(vert.x, vert.y, 1.0)
+       so that the slab is at center_vs.z + r_vs — in front of the disk face —
+       ensuring intersect_cap always starts outside the disk plane.         */
+    vec3 billboard_vs = center_vs + r_vs * vec3(vert.x, vert.y, 1.0);
+
+    surfacePosition = billboard_vs;
+
+    imp_a     = center_vs;
+    imp_b     = norm_vs;
+    imp_r     = r_vs;
+    form_type = 2;
+    clip_r_a  = 0.0;
+    clip_r_b  = 0.0;
+
+    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position.z = max(gl_Position.z, -gl_Position.w);
+  }
+);
+
+/* --------------------------------------------------------------------------
+ * Perfect-impostor fragment shader.
+ * --------------------------------------------------------------------------*/
+const GLchar * full_color_ray = GLSL(
   int PHONG           = 1;
   int BLINN           = 2;
   int COOK_BLINN      = 3;
@@ -758,26 +1021,38 @@ const GLchar * full_color_ray = GLSL(
     vec3 color;
   };
 
+  struct Hit {
+    vec3 pos;
+    vec3 normal;
+  };
+
   uniform Light AllLights[10];
   uniform Material mat;
   uniform Fog fog;
   uniform int lights_on;
   uniform int numLights;
+  uniform mat4 proj_matrix;   /* pure projection matrix – for gl_FragDepth write */
 
-  in vec4 surfaceColor;
-  in vec3 surfacePosition;
-  in vec3 surfaceNormal;
-  in vec3 surfaceToCamera;
+  in vec4  surfaceColor;
+  in vec3  surfacePosition;
 
   // Standardized Raytracing parameters
-  in vec3 imp_a;
-  in vec3 imp_b;
+  in vec3  imp_a;
+  in vec3  imp_b;
   in float imp_r;
-  flat in int form_type;
+  flat in int   form_type;
+  /* Sphere clip radii at the two cylinder endpoints (passed from cylinder_vertex_ray).
+     Non-zero only for cylinders (form_type==1).  When a cylinder hit lies inside the
+     sphere at either endpoint, the fragment is discarded — the sphere impostor handles
+     that region.  This eliminates z-fighting at sphere/cylinder junctions without any
+     depth bias, which would break 3D depth perception.                              */
+  flat in float clip_r_a;
+  flat in float clip_r_b;
 
   out vec4 fragment_color;
 
   const float PI = 3.14159265359;
+  const float EPS = 1e-5;
 
   // clamping to 0 - 1 range
   float saturate (in float value)
@@ -994,30 +1269,30 @@ const GLchar * full_color_ray = GLSL(
     return mix (fog.color, lightColor, fogFactor);
   }
 
-  // Numerically stable sphere intersection.
-  // The standard b*b-c discriminant suffers catastrophic cancellation when
-  // |center| >> radius (large models / large p_depth in float32).
-  // This version uses discr = r^2 - |cross(rd, oc)|^2 which stays bounded.
-  bool intersect_sphere(vec3 ro, vec3 rd, vec3 center, float radius, out vec3 hitPos, out vec3 hitNorm)
+  bool intersect_sphere(vec3 ro, vec3 rd, vec3 c, float r, out Hit hit)
   {
-    vec3 oc   = ro - center;
-    vec3 cr   = cross(rd, oc);
-    float discr = radius * radius - dot(cr, cr);
-    if (discr < 0.0) return false;
+    vec3 oc = ro - c;
+
+    vec3 cr = cross(rd, oc);
+    float d2 = dot(cr, cr);
+
+    float r2 = r*r;
+    if (d2 > r2) return false;
 
     float tca = -dot(oc, rd);
-    float dt  = sqrt(discr);
-    float t   = tca - dt;
-    if (t < 0.0) t = tca + dt;
-    if (t < 0.0) return false;
+    float thc = sqrt(r2 - d2);
 
-    hitPos  = ro + t * rd;
-    hitNorm = normalize(hitPos - center);
+    float t = tca - thc;
+    if (t < EPS) t = tca + thc;
+    if (t < EPS) return false;
+
+    hit.pos = ro + rd*t;
+    hit.normal = normalize(hit.pos - c);
     return true;
   }
 
   // Numerically stable cylinder intersection via cross products.
-  bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
+  bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra,  out Hit hit)
   {
     vec3 ba   = pb - pa;
     vec3 oc   = ro - pa;
@@ -1040,42 +1315,20 @@ const GLchar * full_color_ray = GLSL(
 
     h = sqrt(h);
     float t = (-k1 - h) / k2;
+    if (t < EPS) t = (-k1 + h) / k2;
+    if (t < EPS) return false;
 
     float y = baoc + t * bard;
-    if (y > 0.0 && y < baba)
+    if (y > -EPS && y < baba + EPS)
     {
-      hitPos  = ro + t * rd;
-      hitNorm = normalize((hitPos - pa) * baba - ba * y);
+      hit.pos  = ro + t * rd;
+      hit.normal = normalize((hit.pos - pa) * baba - ba * y);
       return true;
     }
     return false;
   }
 
-
-  bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out vec3 hitPos, out vec3 hitNorm)
-  {
-    float denom = dot(normal, rd);
-    if (abs(denom) > 1e-6)
-    {
-      float t = dot(center - ro, normal) / denom;
-      if (t >= 0.0)
-      {
-        vec3 p = ro + t * rd;
-        vec3 v = p - center;
-        if (dot(v, v) <= radius * radius)
-        {
-          hitPos = p;
-          hitNorm = normal;
-          // Orient normal towards ray
-          if (dot(hitNorm, rd) > 0.0) hitNorm = -hitNorm;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  bool intersect_cone(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
+  bool intersect_cone(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out Hit hit)
   {
     vec3 ba = pb - pa;
     vec3 oa = ro - pa;
@@ -1083,13 +1336,6 @@ const GLchar * full_color_ray = GLSL(
     float m0 = dot(ba,ba);
     float m1 = dot(oa,ba);
     float m2 = dot(rd,ba);
-
-    // ra is radius at base. radius at apex (pa) is 0.
-    // tan(theta) = ra / length(ba)
-    // k = ra*ra / m0 ??
-    // Let's use standard cone intersection
-    // Infinite cone defined by apex PA, axis BA, angle alpha.
-    // r(h) = (h/H)*R.  h = dist from PA along axis. H = length(BA). R = ra.
 
     if (m0 < 1e-6) return false;
 
@@ -1104,543 +1350,108 @@ const GLchar * full_color_ray = GLSL(
     if (h < 0.0) return false;
 
     h = sqrt(h);
-    float t = (-b - h)/a;
+
+    float t1 = (-b - h)/a;
+    float t2 = (-b + h)/a;
+    float t = 1e20;
+
+    if (t1 > EPS) t = t1;
+    if (t2 > EPS && t2 < t) t = t2;
+
+    if (t == 1e20) return false;
+
     float y = m1 + t*m2;
 
-    if (y > 0.0 && y < m0)
+    if (y > -EPS && y < m0 + EPS)
     {
-      hitPos = ro + t * rd;
-      hitNorm = normalize(m0*(hitPos-pa) - ba*(1.0+k)*y);
+      hit.pos = ro + t * rd;
+      hit.normal = normalize(m0*(hit.pos-pa) - ba*(1.0+k)*y);
       return true;
     }
     return false;
   }
 
-  void main ()
+  bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out Hit hit)
   {
-    // Raytracing
-    // Ray origin is surfacePosition (a point on the proxy mesh surface),
-    // NOT the camera origin (vec3(0)).
-    // This keeps oc = ray_origin - center small (~radius in magnitude),
-    // eliminating catastrophic float32 cancellation when p_depth >> radius.
-    // ray_dir is unchanged: the ray still points from the camera through the fragment.
-    vec3 ray_origin = surfacePosition;
-    vec3 ray_dir    = normalize(surfacePosition);
+    float denom = dot(normal, rd);
+    if (abs(denom) < 1e-6) return false;
 
-    vec3 hitPos;
-    vec3 hitNorm;
-    bool hit = false;
+    float t = dot(center - ro, normal) / denom;
+    if (t < EPS) return false;
 
-    if (form_type == 0) // Sphere
-    {
-      hit = intersect_sphere (ray_origin, ray_dir, imp_a, imp_r, hitPos, hitNorm);
-    }
-    else if (form_type == 1) // Cylinder
-    {
-      hit = intersect_cylinder (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
-    }
-    else if (form_type == 2) // Cap
-    {
-      hit = intersect_cap (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
-    }
-    else if (form_type == 3) // Cone
-    {
-      // imp_a = apex, imp_b = base center, imp_r = radius
-      hit = intersect_cone (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
-    }
-    else if (form_type == 4) // Triangle/Mesh
-    {
-      hit = true;
-      hitPos = surfacePosition;
-      if (length(surfaceNormal) > 0.0)
-      {
-        hitNorm = normalize(surfaceNormal);
-      }
-      else
-      {
-        hitNorm = vec3(0,0,1);
-      }
-    }
+    vec3 p = ro + t * rd;
+    vec3 v = p - center;
+    if (dot(v, v) > radius * radius) return false;
 
-    if (!hit) discard;
-    if (dot(hitNorm, surfaceToCamera) < 0.0) hitNorm = -hitNorm;
+    hit.pos = p;
+    hit.normal = normal;
+    // Orient normal towards ray
+    if (dot(hit.normal, rd) > 0.0) hit.normal = -hit.normal;
 
-    // Properties
-    vec3 color;
-    float alpha;
-    if (lights_on == 0)
-    {
-      color = vec3(1.0);
-      alpha = surfaceColor.w;
-    }
-    else
-    {
-     // mix between metal and non-metal material, for non-metal
-     // constant base specular factor of 0.04 grey is used
-      vec3 specular = mix(vec3(0.04), mat.albedo, mat.metallic);
-      color = vec3(0.0);
-      for(int i = 0; i < numLights; i++)
-      {
-        color +=  Apply_lighting_model (lights_on, AllLights[i], specular, hitPos, hitNorm);
-      }
-      color = pow(color, vec3(1.0/mat.gamma));
-      alpha = surfaceColor.w * mat.alpha;
-    }
-
-    vec3 final_color = surfaceColor.xyz * color;
-
-    if (fog.mode > 0)
-    {
-      fragment_color = vec4 (Apply_fog(final_color, hitPos), alpha);
-    }
-    else
-    {
-      fragment_color = vec4 (final_color, alpha);
-    }
-  }
-);
-
-const GLchar * axis_color_ray = GLSL(
-
-  int PHONG           = 1;
-  int BLINN           = 2;
-  int COOK_BLINN      = 3;
-  int COOK_BECKMANN   = 4;
-  int COOK_GGX        = 5;
-
-  struct Light {
-    int type;
-    vec3 position;
-    vec3 direction;
-    vec3 intensity;
-    float constant;
-    float linear;
-    float quadratic;
-    float cone_angle;
-    float spot_inner;
-    float spot_outer;
-  };
-
-  struct Material {
-    vec3 albedo;
-    float metallic;
-    float roughness;
-    float back_light;
-    float gamma;
-    float alpha;
-  };
-
-  struct Fog {
-    int mode;
-    int based;
-    float density;
-    vec2 depth;
-    vec3 color;
-  };
-
-  uniform Light AllLights[10];
-  uniform Material mat;
-  uniform Fog fog;
-  uniform int lights_on;
-  uniform int numLights;
-
-  in vec4 surfaceColor;
-  in vec3 surfacePosition;
-  in vec3 surfaceNormal;
-  in vec3 surfaceToCamera;
-
-  // Standardized Raytracing parameters
-  in vec3 imp_a;
-  in vec3 imp_b;
-  in float imp_r;
-  flat in int form_type;
-
-  out vec4 fragment_color;
-
-  const float PI = 3.14159265359;
-
-  // clamping to 0 - 1 range
-  float saturate (in float value)
-  {
-    return clamp(value, 0.0, 1.0);
-  }
-
-  // phong (lambertian) diffuse term
-  float phong_diffuse()
-  {
-    return (1.0 / PI);
-  }
-
-  // compute Fresnel specular factor for given base specular and product
-  // product could be NdV or VdH depending on used technique
-  vec3 fresnel_factor (in vec3 f0, in float product)
-  {
-    return mix(f0, vec3(1.0), pow(1.01 - product, 5.0));
-  }
-
-  // following functions are copies of UE4
-  // for computing Cook-Torrance specular lighting terms
-
-  float D_blinn(in float roughness, in float NdH)
-  {
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float n = 2.0 / m2 - 2.0;
-    return (n + 2.0) / (2.0 * PI) * pow(NdH, n);
-  }
-
-  float D_beckmann(in float roughness, in float NdH)
-  {
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float NdH2 = NdH * NdH;
-    return exp((NdH2 - 1.0) / (m2 * NdH2)) / (PI * m2 * NdH2 * NdH2);
-  }
-
-  float D_GGX(in float roughness, in float NdH)
-  {
-    float m = roughness * roughness;
-    float m2 = m * m;
-    float d = (NdH * m2 - NdH) * NdH + 1.0;
-    return m2 / (PI * d * d);
-  }
-
-  float G_schlick(in float roughness, in float NdV, in float NdL)
-  {
-    float k = roughness * roughness * 0.5;
-    float V = NdV * (1.0 - k) + k;
-    float L = NdL * (1.0 - k) + k;
-    return 0.25 / (V * L);
-  }
-
-  // simple Phong specular calculation with normalization
-  vec3 phong_specular(in vec3 V, in vec3 L, in vec3 N, in vec3 specular, in float roughness)
-  {
-    vec3 R = reflect(-L, N);
-    float spec = max(0.0, dot(V, R));
-
-    float k = 1.999 / (roughness * roughness);
-
-    return min(1.0, 3.0 * 0.0398 * k) * pow(spec, min(10000.0, k)) * specular;
-  }
-
-  // simple Blinn specular calculation with normalization
-  vec3 blinn_specular(in float NdH, in vec3 specular, in float roughness)
-  {
-    float k = 1.999 / (roughness * roughness);
-
-    return min(1.0, 3.0 * 0.0398 * k) * pow(NdH, min(10000.0, k)) * specular;
-  }
-
-  // Cook-Torrance specular calculation
-  vec3 cooktorrance_specular (in int cook, in float NdL, in float NdV, in float NdH, in vec3 specular, in float roughness)
-  {
-    float D;
-    if (cook == COOK_BLINN)
-    {
-      D = D_blinn(roughness, NdH);
-    }
-    else if (cook == COOK_BECKMANN)
-    {
-      D = D_beckmann(roughness, NdH);
-    }
-    else if (cook == COOK_GGX)
-    {
-      D = D_GGX(roughness, NdH);
-    }
-
-    float G = G_schlick(roughness, NdV, NdL);
-
-    float rim = mix(1.0 - roughness * mat.back_light * 0.9, 1.0, NdV);
-
-    return (1.0 / rim) * specular * G * D;
-  }
-
-  vec3 Apply_lighting_model (in int model, in Light light, in vec3 specular, in vec3 v_pos, in vec3 N)
-  {
-    // L, V, H vectors
-    vec3 L;
-    float A;
-    float I = 1.0;
-    if (light.type == 0)
-    {
-      // Directional light
-      L = normalize (-light.direction);
-      A = 1.0;
-    }
-    else
-    {
-      vec3 L = light.position - v_pos;
-      float dist = length (L);
-      L = normalize(L);
-      A = 1.0 / (light.constant + light.linear*dist + light.quadratic*dist*dist);
-      if (light.type == 2)
-      {
-        float theta = dot(L, normalize(light.position-light.direction));
-        if(theta > light.cone_angle)
-        {
-          float epsilon = light.spot_inner - light.spot_outer;
-          I = saturate((theta - light.spot_outer) / epsilon);
-        }
-        else
-        {
-          return vec3(0.0001);
-        }
-      }
-    }
-    vec3 V = normalize(-v_pos);
-    vec3 H = normalize(L + V);
-    // vec3 N = surfaceNormal; // Using argument now
-
-    // compute material reflectance
-    float NdL = max(0.0, dot(N, L));
-    float NdV = max(0.001, dot(N, V));
-    float NdH = max(0.001, dot(N, H));
-    float HdV = max(0.001, dot(H, V));
-    float LdV = max(0.001, dot(L, V));
-
-    // Fresnel term is common for any, except Phong
-    // so it will be calculated inside ifdefs
-    vec3 specfresnel;
-    vec3 specref;
-    if (model == PHONG)
-    {
-      // specular reflectance with Phong
-      specfresnel = fresnel_factor (specular, NdV);
-      specref = phong_specular (V, L, N, specfresnel, mat.roughness);
-    }
-    else if (model == BLINN)
-    {
-      // specular reflectance with Blinn
-      specfresnel = fresnel_factor (specular, HdV);
-      specref = blinn_specular (NdH, specfresnel, mat.roughness);
-    }
-    else
-    {
-      // specular reflectance with Cook-Torrance
-      specfresnel = fresnel_factor(specular, HdV);
-      specref = cooktorrance_specular(model, NdL, NdV, NdH, specfresnel, mat.roughness);
-    }
-
-    specref *= vec3(NdL);
-
-    // diffuse is common for any model
-    vec3 diffref = (vec3(1.0) - specfresnel) * phong_diffuse() * NdL;
-
-    // compute lighting
-    vec3 reflected_light = vec3(0);
-    vec3 diffuse_light = vec3(0);    // initial value == constant ambient light
-
-    // point light
-    vec3 light_color = light.intensity * A * I;
-    reflected_light += specref * light_color;
-    diffuse_light += diffref * light_color;
-
-    // final result
-    return diffuse_light * mix(mat.albedo, vec3(0.0), mat.metallic) + reflected_light;
-  }
-
-  vec3 Apply_fog (in vec3 lightColor, in vec3 v_pos)
-  {
-     // distance
-    float dist = 0.0;
-    float fogFactor = 0.0;
-
-    // compute distance used in fog equations
-    if (fog.based == 0)
-    {
-      // plane based
-      dist = abs (v_pos.z);
-    }
-    else
-    {
-      // range based
-      dist = length (v_pos);
-    }
-
-    if (fog.mode == 1) // linear fog
-    {
-      fogFactor = (fog.depth.x - dist)/(fog.depth.y - fog.depth.x);
-    }
-    else if (fog.mode == 2) // exponential fog
-    {
-      fogFactor = 1.0 / exp (dist * fog.density);
-    }
-    else
-    {
-      fogFactor = 1.0 / exp((dist * fog.density)* (dist * fog.density));
-    }
-    fogFactor = saturate (fogFactor);
-    return mix (fog.color, lightColor, fogFactor);
-  }
-
-  // Numerically stable sphere intersection.
-  // The standard b*b-c discriminant suffers catastrophic cancellation when
-  // |center| >> radius (large models / large p_depth in float32).
-  // This version uses discr = r^2 - |cross(rd, oc)|^2 which stays bounded.
-  bool intersect_sphere(vec3 ro, vec3 rd, vec3 center, float radius, out vec3 hitPos, out vec3 hitNorm)
-  {
-    vec3 oc   = ro - center;
-    vec3 cr   = cross(rd, oc);
-    float discr = radius * radius - dot(cr, cr);
-    if (discr < 0.0) return false;
-
-    float tca = -dot(oc, rd);
-    float dt  = sqrt(discr);
-    float t   = tca - dt;
-    if (t < 0.0) t = tca + dt;
-    if (t < 0.0) return false;
-
-    hitPos  = ro + t * rd;
-    hitNorm = normalize(hitPos - center);
     return true;
   }
 
-  // Numerically stable cylinder intersection via cross products.
-  bool intersect_cylinder(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
-  {
-    vec3 ba   = pb - pa;
-    vec3 oc   = ro - pa;
-
-    float baba = dot(ba, ba);
-    float bard = dot(ba, rd);
-    float baoc = dot(ba, oc);
-
-    vec3 vb = cross(rd, ba);
-    vec3 va = cross(oc, ba);
-
-    float k2 = dot(vb, vb);
-    if (k2 < 1e-10) return false;
-
-    float k1 = dot(va, vb);
-    float k0 = dot(va, va) - ra * ra * baba;
-
-    float h = k1 * k1 - k2 * k0;
-    if (h < 0.0) return false;
-
-    h = sqrt(h);
-    float t = (-k1 - h) / k2;
-
-    float y = baoc + t * bard;
-    if (y > 0.0 && y < baba)
-    {
-      hitPos  = ro + t * rd;
-      hitNorm = normalize((hitPos - pa) * baba - ba * y);
-      return true;
-    }
-    return false;
-  }
-
-
-  bool intersect_cap(vec3 ro, vec3 rd, vec3 center, vec3 normal, float radius, out vec3 hitPos, out vec3 hitNorm)
-  {
-    float denom = dot(normal, rd);
-    if (abs(denom) > 1e-6)
-    {
-      float t = dot(center - ro, normal) / denom;
-      if (t >= 0.0)
-      {
-        vec3 p = ro + t * rd;
-        vec3 v = p - center;
-        if (dot(v, v) <= radius * radius)
-        {
-          hitPos = p;
-          hitNorm = normal;
-          // Orient normal towards ray
-          if (dot(hitNorm, rd) > 0.0) hitNorm = -hitNorm;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  bool intersect_cone(vec3 ro, vec3 rd, vec3 pa, vec3 pb, float ra, out vec3 hitPos, out vec3 hitNorm)
-  {
-    vec3 ba = pb - pa;
-    vec3 oa = ro - pa;
-
-    float m0 = dot(ba,ba);
-    float m1 = dot(oa,ba);
-    float m2 = dot(rd,ba);
-
-    // ra is radius at base. radius at apex (pa) is 0.
-    // tan(theta) = ra / length(ba)
-    // k = ra*ra / m0 ??
-    // Let's use standard cone intersection
-    // Infinite cone defined by apex PA, axis BA, angle alpha.
-    // r(h) = (h/H)*R.  h = dist from PA along axis. H = length(BA). R = ra.
-
-    if (m0 < 1e-6) return false;
-
-    float k = (ra*ra) / m0;
-    float m = dot(rd,ba)/m0; // ~ cos angle of ray with axis
-    float n = dot(oa,ba)/m0;
-    float a = dot(rd,rd) - m2*m2*(1.0+k)/m0;
-    float b = dot(rd,oa) - m2*m1*(1.0+k)/m0;
-    float c = dot(oa,oa) - m1*m1*(1.0+k)/m0;
-
-    float h = b*b - a*c;
-    if (h < 0.0) return false;
-
-    h = sqrt(h);
-    float t = (-b - h)/a;
-    float y = m1 + t*m2;
-
-    if (y > 0.0 && y < m0)
-    {
-      hitPos = ro + t * rd;
-      hitNorm = normalize(m0*(hitPos-pa) - ba*(1.0+k)*y);
-      return true;
-    }
-    return false;
-  }
-
   void main ()
   {
-    // Raytracing
-    vec3 ray_origin = surfacePosition;
-    vec3 ray_dir    = normalize(surfacePosition);
+    /* Ray from camera origin through billboard fragment (view space) */
+    vec3 surfaceToCamera = normalize(-surfacePosition);
+    vec3 ray_origin;
+    if (form_type == 0)
+    {
+      ray_origin = vec3(0.0);
+    }
+    else
+    {
+      ray_origin = surfacePosition;
+    }
+    vec3 ray_dir = normalize(surfacePosition);   /* perspective */
 
-    vec3 hitPos;
-    vec3 hitNorm;
+    Hit the_hit;
     bool hit = false;
 
-    if (form_type == 0) // Sphere
+    if (form_type == 0)      // Sphere
     {
-      hit = intersect_sphere (ray_origin, ray_dir, imp_a, imp_r, hitPos, hitNorm);
+      hit = intersect_sphere (ray_origin, ray_dir, imp_a, imp_r, the_hit);
     }
     else if (form_type == 1) // Cylinder
     {
-      hit = intersect_cylinder (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
+      hit = intersect_cylinder (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
     }
     else if (form_type == 2) // Cap
     {
-      hit = intersect_cap (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
+      hit = intersect_cap (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
     }
     else if (form_type == 3) // Cone
     {
       // imp_a = apex, imp_b = base center, imp_r = radius
-      hit = intersect_cone (ray_origin, ray_dir, imp_a, imp_b, imp_r, hitPos, hitNorm);
-    }
-    else if (form_type == 4) // Triangle/Mesh
-    {
-      hit = true;
-      hitPos = surfacePosition;
-      if (length(surfaceNormal) > 0.0)
-      {
-        hitNorm = normalize(surfaceNormal);
-      }
-      else
-      {
-        hitNorm = vec3(0,0,1);
-      }
+      hit = intersect_cone (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
     }
 
     if (! hit) discard;
-    if (dot(hitNorm, surfaceToCamera) < 0.0) hitNorm = -hitNorm;
+    if (dot(the_hit.normal, surfaceToCamera) < 0.0) the_hit.normal = -the_hit.normal;
 
-    // Properties
+    /* Sphere-entry clipping for cylinders (form_type == 1):
+       discard cylinder pixels that lie inside the sphere at each endpoint,
+       so the sphere impostor has exclusive ownership of those pixels.
+       This eliminates z-fighting at sphere/cylinder junctions analytically,
+       with no depth bias that would break 3D depth perception. */
+    const float CLIP_MARGIN = 1.00f; // Optional extra margin
+    if (clip_r_a > 0.0)
+    {
+      float r_clip = clip_r_a * CLIP_MARGIN;
+      if (dot(the_hit.pos - imp_a, the_hit.pos - imp_a) < r_clip * r_clip) discard;
+    }
+    if (clip_r_b > 0.0)
+    {
+      float r_clip = clip_r_b * CLIP_MARGIN;
+      if (dot(the_hit.pos - imp_b, the_hit.pos - imp_b) < r_clip * r_clip) discard;
+    }
+
+    vec4 hit_clip = proj_matrix * vec4(the_hit.pos, 1.0);
+    if (hit_clip.w <= 0.0) discard;
+    gl_FragDepth = clamp((hit_clip.z / hit_clip.w + 1.0) * 0.5, 0.0, 1.0);
+
+    /* Lighting */
     vec3 color;
     float alpha;
     if (lights_on == 0)
@@ -1650,13 +1461,13 @@ const GLchar * axis_color_ray = GLSL(
     }
     else
     {
-     // mix between metal and non-metal material, for non-metal
+      // mix between metal and non-metal material, for non-metal
      // constant base specular factor of 0.04 grey is used
       vec3 specular = mix(vec3(0.04), mat.albedo, mat.metallic);
       color = vec3(0.0);
       for(int i = 0; i < numLights; i++)
       {
-        color +=  Apply_lighting_model (lights_on, AllLights[i], specular, hitPos, hitNorm);
+        color +=  Apply_lighting_model (lights_on, AllLights[i], specular, the_hit.pos, the_hit.normal);
       }
       color = pow(color, vec3(1.0/mat.gamma));
       alpha = surfaceColor.w * mat.alpha;
@@ -1666,7 +1477,7 @@ const GLchar * axis_color_ray = GLSL(
 
     if (fog.mode > 0)
     {
-      fragment_color = vec4 (Apply_fog(final_color, hitPos), alpha);
+      fragment_color = vec4 (Apply_fog(final_color, the_hit.pos), alpha);
     }
     else
     {
@@ -1674,6 +1485,10 @@ const GLchar * axis_color_ray = GLSL(
     }
   }
 );
+
+/* ===========================================================================
+ * End of perfect-impostor shaders
+ * ===========================================================================*/
 
 // Sphere
 
@@ -1697,40 +1512,6 @@ const GLchar * sphere_vertex = GLSL(
     surfacePosition = vec3(m_view * pos);
     surfaceNormal   = mat3(m_view) * vert;
     surfaceToCamera = normalize (- surfacePosition);
-    gl_PointSize = 1.0;
-    gl_Position = mvp * pos;
-  }
-);
-
-const GLchar * sphere_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-
-  in vec3 vert;
-  in vec3 offset;
-  in vec4 vertColor;
-  in float radius;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  // Standardized Raytracing parameters
-  out vec3 imp_a;         // Sphere Center
-  out vec3 imp_b;         // Unused for sphere
-  out float imp_r;        // Radius
-  flat out int form_type; // 0: Sphere
-
-  void main ()
-  {
-    surfaceColor    = vertColor;
-    vec4 pos = vec4 (radius*vert + offset, 1.0);
-    surfacePosition = vec3(m_view * pos);
-    surfaceNormal   = mat3(m_view) * vert;
-    surfaceToCamera = normalize (- surfacePosition);
-    imp_a = vec3(m_view * vec4(offset, 1.0));
-    imp_r = radius;
-    form_type = 0;
     gl_PointSize = 1.0;
     gl_Position = mvp * pos;
   }
@@ -1789,71 +1570,6 @@ const GLchar * cylinder_vertex = GLSL(
   }
 );
 
-const GLchar * cylinder_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float height;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  // Standardized Raytracing parameters
-  out vec3 imp_a;         // Cylinder Start
-  out vec3 imp_b;         // Cylinder End
-  out float imp_r;        // Radius
-  flat out int form_type; // 1: Cylinder
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
-    vec3 norm = normalize (vec3(vert.x, vert.y, 0.0));
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-
-    // Raytracing
-    vec3 p1 = vec3(0.0, 0.0, -0.5*height);
-    vec3 p2 = vec3(0.0, 0.0, 0.5*height);
-    if (quat.w != 0.0)
-    {
-      p1 = rotate_this (p1, quat);
-      p2 = rotate_this (p2, quat);
-    }
-    p1 += offset;
-    p2 += offset;
-
-    imp_a = vec3(m_view * vec4(p1, 1.0));
-    imp_b = vec3(m_view * vec4(p2, 1.0));
-    // Apply View scale to radius
-    float scale = length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
-    imp_r = radius * scale;
-    // Previous imp_r = radius;
-    form_type = 1;
-
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
 const GLchar * cone_vertex = GLSL(
   uniform mat4 mvp;
   uniform mat4 m_view;
@@ -1896,73 +1612,6 @@ const GLchar * cone_vertex = GLSL(
   }
 );
 
-const GLchar * cone_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float height;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  // Standardized Raytracing parameters
-  out vec3 imp_a;         // Cone Apex (Tip)
-  out vec3 imp_b;         // Cone Base Center
-  out float imp_r;        // Base Radius
-  flat out int form_type; // 3: Cone
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
-
-    float B = sqrt(radius*radius + height*height);
-    vec3 norm = vec3(height*vert.x/B, height*vert.y/B, radius/B); // From existing shader
-
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-
-    // Raytracing data
-    vec3 p_base = vec3(0.0, 0.0, -0.5*height);
-    vec3 p_apex = vec3(0.0, 0.0, 0.5*height);
-
-    if (quat.w != 0.0)
-    {
-      p_base = rotate_this (p_base, quat);
-      p_apex = rotate_this (p_apex, quat);
-    }
-    p_base += offset;
-    p_apex += offset;
-
-    imp_a = vec3(m_view * vec4(p_apex, 1.0)); // Apex
-    imp_b = vec3(m_view * vec4(p_base, 1.0)); // Base Center
-    imp_r = radius;
-    form_type = 3;
-
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
 const GLchar * cap_vertex = GLSL(
   uniform mat4 mvp;
   uniform mat4 m_view;
@@ -1998,66 +1647,6 @@ const GLchar * cap_vertex = GLSL(
     surfacePosition = vec3(m_view * vec4(pos,1.0));
     surfaceNormal   = mat3(m_view) * norm;
     surfaceToCamera = normalize (- surfacePosition);
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
-const GLchar * cap_vertex_ray = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  // Standardized Raytracing parameters
-  out vec3 imp_a;         // Cap Center
-  out vec3 imp_b;         // Cap Normal
-  out float imp_r;        // Radius
-  flat out int form_type; // 2: Cap
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, vert.z);
-    vec3 norm = vec3(0.0, 0.0, -1.0);
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-
-    // Raytracing
-    vec3 c = vec3(0.0, 0.0, vert.z);
-    vec3 n = vec3(0.0, 0.0, -1.0);
-    if (quat.w != 0.0)
-    {
-      c = rotate_this (c, quat);
-      n = rotate_this (n, quat);
-    }
-    c += offset;
-
-    imp_a = vec3(m_view * vec4(c, 1.0));
-    imp_b = mat3(m_view) * n;
-    imp_r = radius;
-    form_type = 2;
-
     gl_Position = mvp * vec4(pos,1.0);
   }
 );

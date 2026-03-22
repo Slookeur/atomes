@@ -486,7 +486,7 @@ struct image
   Material m_terial;                            /*!< Material description, if any */
   Fog f_g;                                      /*!< Fog description, if any*/
 
-  gboolean ray_tracing;                         /*!< Use or not raytracing rendering, default = TRUE */
+  gboolean ray_tracing;                         /*!< Use or not raytracing rendering with quad billboards, default = TRUE */
 
   int step;                                     /*!< The MD step, in case of trajectory */
   int rep;                                      /*!< Representation: 0 = orthographic, 1 = perspective */
@@ -1003,7 +1003,7 @@ struct glwin
   GtkWidget * rbuild[2];
   GtkWidget * cbuilder;
 
-  // Matrices
+  // Matrices et OpenGL
   vec3_t model_position;
   vec4_t view_port;
   mat4_t projection_matrix;
@@ -1016,8 +1016,11 @@ struct glwin
   mat4_t proj_model_view_matrix;
   mat4_t proj_view_matrix;
   mat4_t normal_matrix;
+  mat4_t axis_model_view_matrix;
+  mat4_t axis_projection_matrix;
   mat4_t axis_proj_model_view_matrix;
   mat4_t label_projection_matrix;
+  vec4_t frustum_planes[6];
 
   gboolean create_shaders[NGLOBAL_SHADERS];
   glsl_program *** ogl_glsl[NGLOBAL_SHADERS];

@@ -60,14 +60,12 @@ extern int create_bond_lists (gboolean to_pick);
 extern object_3d * draw_sphere (int quality);
 extern object_3d * draw_cylinder (int quality, float ra, float rb);
 extern object_3d * draw_cylinder_cap (int quality, float rad, gboolean picked);
-extern void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha);
-extern void setup_sphere_vertice (float * vertices, vec3_t pos, ColRGBA col, float rad, float alpha);
-extern void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha);
-extern void setup_triangles (float * vertices, vec3_t sa, vec3_t sb, vec3_t sc);
 extern float get_bond_radius (int sty, int ac, int at, int b, int sel);
 extern void setup_this_atom (int style, gboolean to_pick, int picked, atom * at, int ac, float * vert, float al);
 extern void prepare_clone (int style, gboolean to_pick, int picked, atom at, atom bt, float x, float y, float z, float * vertices);
 extern void setup_this_bond (int sty, gboolean to_pick, gboolean picked, int cap, int bi, int pi, atom * at, atom * bt, float al, float * vertices);
+extern object_3d * draw_billboard_quad (void);
+extern float get_sphere_radius (int style, int sp, int ac, int sel);
 
 /*!
   \fn void setup_selected_clone_vertices (int style, int at, int pi, float * vertices)
@@ -487,7 +485,7 @@ void prepare_picked (int style, gboolean cylinder, int clone, int type)
 /*!
   \fn int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncaps, int type, int clone, int shader)
 
-  \brief prepare the OpenGL rendering data of to selected bond / clone bond
+  \brief prepare the OpenGL rendering data of the selected bond / clone bond
 
   \param style rendering style
   \param cylinder cylinders (1) or lines (0)
@@ -503,18 +501,19 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
   int h, i, j, k, l;
   atom_in_selection * sel;
   object_3d * cyl, * cap;
+
   if (cylinder)
   {
-    cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
+    cyl = plot -> ray_tracing ? draw_billboard_quad () : draw_cylinder (plot -> quality, 1.0, 1.0);
     cyl -> num_instances =  (bonds/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
-    cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
-    cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
+    cyl -> inst_buffer_size = plot -> ray_tracing ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+    allocate_instances (cyl);
     if (caps)
     {
-      cap = draw_cylinder_cap (plot -> quality, 1.0, TRUE);
+      cap = plot -> ray_tracing ? draw_billboard_quad () : draw_cylinder_cap (plot -> quality, 1.0, TRUE);
       cap -> num_instances =  (ncaps/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       cap -> inst_buffer_size = CAPS_BUFF_SIZE;
-      cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
+      allocate_instances (cap);
     }
     for (h=0; h<caps+1; h++)
     {
@@ -533,14 +532,17 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
       }
     }
     l = 1;
-    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
-                                                                                         (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
+    const GLchar * vs_sel_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+    const GLchar * fs_sel     = (plot -> ray_tracing) ? full_color_ray : full_color;
+    int narray_sel = plot -> ray_tracing ? 8 : 6;
+    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, vs_sel_cyl, NULL, fs_sel, GL_TRIANGLE_STRIP, narray_sel, 1, cylinder, cyl);
     g_free (cyl);
     if (caps)
     {
       l ++;
-      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex, NULL,
-                                                                                        (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_FAN, 5, 1, cylinder, cap);
+      const GLchar * vs_sel_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
+      GLenum prim_sel_cap = plot -> ray_tracing ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
+      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, vs_sel_cap, NULL, fs_sel, prim_sel_cap, 5, 1, cylinder, cap);
       g_free (cap);
     }
   }
@@ -602,16 +604,16 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
 
   if (cylinder)
   {
-    cyl = draw_cylinder (plot -> quality, 1.0, 1.0);
+    cyl = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder (plot -> quality, 1.0, 1.0);
     cyl -> num_instances =  (bonds/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
-    cyl -> inst_buffer_size = CYLI_BUFF_SIZE;
-    cyl -> instances = allocfloat (CYLI_BUFF_SIZE*cyl -> num_instances);
+    cyl -> inst_buffer_size = plot -> ray_tracing ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+    allocate_instances (cyl);
     if (caps)
     {
-      cap = draw_cylinder_cap (plot -> quality, 1.0, TRUE);
+      cap = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder_cap (plot -> quality, 1.0, TRUE);
       cap -> num_instances =  (ncaps/2) * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       cap -> inst_buffer_size = CAPS_BUFF_SIZE;
-      cap -> instances = allocfloat (CAPS_BUFF_SIZE*cap -> num_instances);
+      allocate_instances (cap);
     }
     for (h=0; h<caps+1; h++)
     {
@@ -631,12 +633,16 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
       }
     }
     l = 1;
-    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
+    const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+    const GLchar * fs_cyl = (plot -> ray_tracing) ? full_color_ray : full_color;
+    wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, vs_cyl, NULL, fs_cyl, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
     g_free (cyl);
     if (caps)
     {
       l ++;
-      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, cap_vertex, NULL, full_color, GL_TRIANGLE_FAN, 5, 1, cylinder, cap);
+      const GLchar * vs_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
+      GLenum prim_cap = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
+      wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, vs_cap, NULL, fs_cyl, prim_cap, 5, 1, cylinder, cap);
       g_free (cap);
     }
   }
@@ -696,29 +702,12 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
   gboolean cylinder = FALSE;
   object_3d * atos;
 
-  // Bonds
-  if (do_bonds)
-  {
-    if (bonds[style][type])
-    {
-      if ((style-1 == NONE && (plot -> style == BALL_AND_STICK || plot -> style == CYLINDERS)) || style-1 == BALL_AND_STICK || style-1 == CYLINDERS) cylinder = TRUE;
-      if (plot -> selected[type] -> selected > 0)
-      {
-        nshaders += render_selected (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders);
-      }
-      else
-      {
-        nshaders += render_picked (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders);
-      }
-      g_free (nbonds[style][type]);
-    }
-  }
   // Atoms
   if ((style-1 == NONE && (plot -> style == WIREFRAME || plot -> style == PUNT)) || style-1 == WIREFRAME || style-1 == PUNT) sphere = FALSE;
 
   if (sphere)
   {
-    atos = draw_sphere (plot -> quality);
+    atos = (plot -> ray_tracing) ? draw_billboard_quad () : draw_sphere (plot -> quality);
   }
   else
   {
@@ -731,7 +720,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
 
   atos -> num_instances = atoms[style][type] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
   atos -> inst_buffer_size = ATOM_BUFF_SIZE;
-  atos -> instances = allocfloat (atos -> num_instances*ATOM_BUFF_SIZE);
+  allocate_instances (atos);
 
   nbl = 0;
   if (plot -> selected[type] -> selected)
@@ -749,7 +738,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
       }
       if (doit)
       {
-        setup_this_atom (style-1, FALSE, type+1, & proj_gl -> atoms[step][sel -> id], 0, atos -> instances, 0.75);
+        setup_this_atom (style-1, FALSE, type+1, & proj_gl -> atoms[step][sel -> id], 0, atos -> instances, 1.0);//0.75);
       }
       if (sel -> next != NULL) sel = sel -> next;
     }
@@ -797,15 +786,34 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
 
   if (sphere)
   {
-    wingl -> ogl_glsl[SELEC][step][nshaders+shaders] = init_shader_program (SELEC, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex, NULL,
-                                                                                                 (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
+    const GLchar * vs_sel_sph = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
+    const GLchar * fs_sel_sph = (plot -> ray_tracing) ? full_color_ray : full_color;
+    wingl -> ogl_glsl[SELEC][step][shaders+nshaders] = init_shader_program (SELEC, GLSL_SPHERES, vs_sel_sph, NULL, fs_sel_sph, GL_TRIANGLE_STRIP, 4, 1, TRUE, atos);
   }
   else
   {
-    wingl -> ogl_glsl[SELEC][step][nshaders+shaders] = init_shader_program (SELEC, GLSL_POINTS, point_vertex, NULL, point_color, GL_POINTS, 4, 1, FALSE, atos);
+    wingl -> ogl_glsl[SELEC][step][shaders+nshaders] = init_shader_program (SELEC, GLSL_POINTS, point_vertex, NULL, point_color, GL_POINTS, 4, 1, FALSE, atos);
   }
-  nshaders ++;
   g_free (atos);
+  atos = NULL;
+  nshaders ++;
+  // Bonds
+  if (do_bonds)
+  {
+    if (bonds[style][type])
+    {
+      if ((style-1 == NONE && (plot -> style == BALL_AND_STICK || plot -> style == CYLINDERS)) || style-1 == BALL_AND_STICK || style-1 == CYLINDERS) cylinder = TRUE;
+      if (plot -> selected[type] -> selected > 0)
+      {
+        nshaders += render_selected (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders+nshaders);
+      }
+      else
+      {
+        nshaders += render_picked (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders+nshaders);
+      }
+      g_free (nbonds[style][type]);
+    }
+  }
   return nshaders;
 }
 
@@ -1002,12 +1010,16 @@ int create_pick_lists ()
   wingl -> n_shaders[PICKS][0] = nshaders;
   wingl -> ogl_glsl[PICKS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[PICKS][0]);
 
+  gboolean saved_ray = plot -> ray_tracing;
+  plot -> ray_tracing = FALSE;
+
   gColorID[0] = gColorID[1] = gColorID[2] = 0;
   create_atom_lists (TRUE);
 
   wingl -> bonds_to_be_picked = 0;
   if (bonds) create_bond_lists (TRUE);
 
+  plot -> ray_tracing = saved_ray;
   plot -> style = tmp_style;
 
   return nshaders;

@@ -61,10 +61,11 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern object_3d * draw_sphere (int quality);
 extern object_3d * draw_cylinder (int quality, float ra, float rb);
 extern object_3d * draw_cylinder_cap (int quality, float rad, gboolean picked);
+extern object_3d * draw_billboard_quad (void);
 extern void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha);
 extern void setup_sphere_vertice (float * vertices, vec3_t pos, ColRGBA col, float rad, float alpha);
-extern void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta);
-extern void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha);
+extern void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta, float r_sph_a, float r_sph_b);
+extern void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, gboolean sel);
 extern void create_slab_info (project * this_proj);
 extern void process_selected_atom (project * this_proj, glwin * view, int id, int ac, int se, int pi);
 extern ColRGBA pcol;
@@ -105,20 +106,34 @@ gboolean not_in_already (vec3_t a, vec3_t b, float * vertices)
 {
   int i, j, k;
   vec3_t tma, tmb;
-  for (i=0; i<nbs/2; i=i+2)
+
+  if (plot -> abc -> box == WIREFRAME)
   {
-    j = i*BOX_BUFF_SIZE;
-    k = j+BOX_BUFF_SIZE;
-    tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
-    tmb = vec3(vertices[k], vertices[k+1], vertices[k+2]);
-    if (are_identical_vec3(a, tma) && are_identical_vec3(b, tmb))
+    for (i=0; i<nbs/2; i=i+2)
     {
-      return FALSE;
+      j = i*BOX_BUFF_SIZE;
+      k = j+BOX_BUFF_SIZE;
+      tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
+      tmb = vec3(vertices[k], vertices[k+1], vertices[k+2]);
+      if (are_identical_vec3(a, tma) && are_identical_vec3(b, tmb))
+      {
+        return FALSE;
+      }
+      else if (are_identical_vec3(b, tma) && are_identical_vec3(a, tmb))
+      {
+        return FALSE;
+      }
     }
-    else if (are_identical_vec3(b, tma) && are_identical_vec3(a, tmb))
+  }
+  else
+  {
+    /*vec3_t mid_cand = vec3((a.x+b.x)/2.0, (a.y+b.y)/2.0, (a.z+b.z)/2.0);
+    for (i=0; i<nbs; i++)
     {
-      return FALSE;
-    }
+      j = i*BOX_BUFF_SIZE;
+      tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
+      if (are_identical_vec3(mid_cand, tma)) return FALSE;
+    }*/
   }
   return TRUE;
 }
@@ -190,7 +205,7 @@ void setup_extra_box_vertices (vec3_t a, vec3_t b, float * c_vert, float * s_ver
               {
                 if (not_in_corners(t_a, s_vert)) setup_sphere_vertice (s_vert, t_a, pcol, plot -> abc -> rad, pcol.alpha*0.5);
                 if (not_in_corners(t_b, s_vert)) setup_sphere_vertice (s_vert, t_b, pcol, plot -> abc -> rad, pcol.alpha*0.5);
-                setup_cylinder_vertice (c_vert, t_a, t_b, pcol, plot -> abc -> rad, 0.5, 0.0);
+                setup_cylinder_vertice (c_vert, t_a, t_b, pcol, plot -> abc -> rad, 0.5, 0.0, plot -> abc -> rad, 0.0);
               }
             }
           }
@@ -237,7 +252,7 @@ void setup_box_vertices (vec3_t ax, vec3_t bx, float * c_vert, float * s_vert)
     {
       if (not_in_corners(a, s_vert)) setup_sphere_vertice (s_vert, a, pcol, plot -> abc -> rad, pcol.alpha*1.0);
       if (not_in_corners(b, s_vert)) setup_sphere_vertice (s_vert, b, pcol, plot -> abc -> rad, pcol.alpha*1.0);
-      setup_cylinder_vertice (c_vert, a, b, pcol, plot -> abc -> rad, 1.0, 0.0);
+      setup_cylinder_vertice (c_vert, a, b, pcol, plot -> abc -> rad, 1.0, 0.0, plot -> abc -> rad, 0.0);
     }
   }
 }
@@ -314,18 +329,17 @@ int create_box_lists (int b_step)
   else
   {
     shaders = 2;
-    BOX_BUFF_SIZE = CYLI_BUFF_SIZE;
+    BOX_BUFF_SIZE = (plot -> ray_tracing) ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
     // Spheres at corners
-    box_a = draw_sphere (plot -> quality);
+    box_a = (plot -> ray_tracing) ? draw_billboard_quad () : draw_sphere (plot -> quality);
     box_a -> num_instances = 3*vertex*3/2;
     box_a -> inst_buffer_size = ATOM_BUFF_SIZE;
-    box_a -> instances = allocfloat (box_a -> num_instances*ATOM_BUFF_SIZE);
+    allocate_instances (box_a);
     // Cylinders
-    box_b = draw_cylinder (plot -> quality, 1.0, 1.0);
+    box_b = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder (plot -> quality, 1.0, 1.0);
     box_b -> num_instances = 3*vertex;
-    box_b -> inst_buffer_size = CYLI_BUFF_SIZE;
-    box_b -> instances = allocfloat (box_b -> num_instances*CYLI_BUFF_SIZE);
-
+    box_b -> inst_buffer_size = (plot -> ray_tracing) ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+    allocate_instances (box_b);
   }
   wingl -> ogl_glsl[MDBOX][b_step] = g_malloc0(shaders*sizeof*wingl -> ogl_glsl[MDBOX][b_step]);
 
@@ -348,12 +362,14 @@ int create_box_lists (int b_step)
   else
   {
     // Sphere at corners
-    wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex, NULL,
-                                                                                    (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, box_a);
+    const GLchar * vs_sph = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
+    const GLchar * fs_box = (plot -> ray_tracing) ? full_color_ray : full_color;
+    wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_SPHERES, vs_sph, NULL, fs_box, GL_TRIANGLE_STRIP, 4, 1, TRUE, box_a);
     g_free (box_a);
     // Cylinders
-    wingl -> ogl_glsl[MDBOX][b_step][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
-                                                                                      (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, box_b);
+    const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+    int narray_cyl = plot -> ray_tracing ? 8 : 6;
+    wingl -> ogl_glsl[MDBOX][b_step][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, vs_cyl, NULL, fs_box, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, box_b);
   }
   g_free (box_b);
 
@@ -459,8 +475,7 @@ void prepare_cuboid (vec3_t position, int id)
     light -> vertices[j+9] = 1.0;
     l ++;
   }
-  wingl -> ogl_glsl[LIGHT][0][id] = init_shader_program (LIGHT, GLSL_POLYEDRA, (plot -> ray_tracing) ? full_vertex_ray : full_vertex, NULL,
-                                                                               (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLES, 3, 1, FALSE, light);
+  wingl -> ogl_glsl[LIGHT][0][id] = init_shader_program (LIGHT, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, FALSE, light);
   g_free (light);
 }
 
@@ -590,8 +605,7 @@ double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t c
         }
       }
     }
-    wingl -> ogl_glsl[SHADID][(SHADID == SLABS) ? 0 : step][shadnum] = init_shader_program (SHADID, GLSL_POLYEDRA, (plot -> ray_tracing) ? full_vertex_ray : full_vertex, NULL,
-                                                                                                                   (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLES, 3, 1, TRUE, slab);
+    wingl -> ogl_glsl[SHADID][(SHADID == SLABS) ? 0 : step][shadnum] = init_shader_program (SHADID, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, slab);
     g_free (slab);
   }
   return cvol;
@@ -748,14 +762,14 @@ void cylinder_slab (mat4_t rot)
   {
     object_3d * slab = g_malloc0(sizeof*slab);
     object_3d * slab_cap = g_malloc0(sizeof*slab_cap);
-    slab = draw_cylinder (30, 1.0, 1.0);
+    slab = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder (30, 1.0, 1.0);
     slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
-    slab -> inst_buffer_size = CYLI_BUFF_SIZE;
-    slab -> instances = allocfloat (slab -> num_instances*CYLI_BUFF_SIZE);
-    slab_cap = draw_cylinder_cap (50, 1.0, FALSE);
+    slab -> inst_buffer_size = (plot -> ray_tracing) ? CYLI_BUFF_SIZE + 2 : CYLI_BUFF_SIZE;
+    allocate_instances (slab);
+    slab_cap = (plot -> ray_tracing) ? draw_billboard_quad () : draw_cylinder_cap (50, 1.0, FALSE);
     slab_cap -> num_instances = 2 * slab -> num_instances;
     slab_cap -> inst_buffer_size = CAPS_BUFF_SIZE;
-    slab_cap -> instances = allocfloat (slab_cap -> num_instances*CAPS_BUFF_SIZE);
+    allocate_instances (slab_cap);
     ColRGBA col;
     col.red = 0.0;
     col.blue = 1.0;
@@ -773,14 +787,16 @@ void cylinder_slab (mat4_t rot)
           shift.z = i*box_gl -> vect[0][2]+j*box_gl -> vect[1][2]+k*box_gl -> vect[2][2];
           pos_a = v3_add (pos_a, shift);
           pos_b = v3_add (pos_b, shift);
-          setup_cylinder_vertice (slab -> instances, pos_a, pos_b, col, wingl -> cell_win -> cparam[13], 1.0, 0.0);
+          setup_cylinder_vertice (slab -> instances, pos_a, pos_b, col, wingl -> cell_win -> cparam[13], 1.0, 0.0, 0.0, 0.0);
           pos_a = v3_sub (pos_a, shift);
           pos_b = v3_sub (pos_b, shift);
         }
       }
     }
-    wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_CYLINDERS, (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex, NULL,
-                                                                                 (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, slab);
+    const GLchar * vs_slc = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+    const GLchar * fs_slc = (plot -> ray_tracing) ? full_color_ray : full_color;
+    int narray_cyl = plot -> ray_tracing ? 8 : 6;
+    wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_CYLINDERS, vs_slc, NULL, fs_slc, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, slab);
     g_free (slab);
     nbs = 0;
     for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
@@ -794,15 +810,16 @@ void cylinder_slab (mat4_t rot)
           shift.z = i*box_gl -> vect[0][2]+j*box_gl -> vect[1][2]+k*box_gl -> vect[2][2];
           pos_a = v3_add (pos_a, shift);
           pos_b = v3_add (pos_b, shift);
-          setup_cap_vertice (slab_cap -> instances, pos_a, pos_b, col, wingl -> cell_win -> cparam[13], 1.0);
-          setup_cap_vertice (slab_cap -> instances, pos_b, pos_a, col, wingl -> cell_win -> cparam[13], 1.0);
+          setup_cap_vertice (slab_cap -> instances, pos_a, pos_b, col, wingl -> cell_win -> cparam[13], 1.0, FALSE);
+          setup_cap_vertice (slab_cap -> instances, pos_b, pos_a, col, wingl -> cell_win -> cparam[13], 1.0, FALSE);
           pos_a = v3_sub (pos_a, shift);
           pos_b = v3_sub (pos_b, shift);
         }
       }
     }
-    wingl -> ogl_glsl[SLABS][0][1] = init_shader_program (SLABS, GLSL_CAPS, (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex, NULL,
-                                                                            (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, slab_cap);
+    const GLchar * vs_slcp = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
+    GLenum prim_slcp = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
+    wingl -> ogl_glsl[SLABS][0][1] = init_shader_program (SLABS, GLSL_CAPS, vs_slcp, NULL, fs_slc, prim_slcp, 5, 1, TRUE, slab_cap);
     g_free (slab_cap);
   }
   wingl -> cell_win -> slab_vol = pi*pow(wingl -> cell_win -> cparam[13], 2)*wingl -> cell_win -> cparam[12];
@@ -845,10 +862,10 @@ void spherical_slab ()
   if (! wingl -> cell_win -> cut_this_slab)
   {
     object_3d * slab = g_malloc0(sizeof*slab);
-    slab = draw_sphere (50);
+    slab = (plot -> ray_tracing) ? draw_billboard_quad () : draw_sphere (50);
     slab -> inst_buffer_size = ATOM_BUFF_SIZE;
     slab -> num_instances = (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
-    slab -> instances = allocfloat (slab -> num_instances*ATOM_BUFF_SIZE);
+    allocate_instances (slab);
     ColRGBA col;
     col.red = 0.0;
     col.blue = 1.0;
@@ -867,8 +884,9 @@ void spherical_slab ()
         }
       }
     }
-    wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_SPHERES, (plot -> ray_tracing) ? sphere_vertex : sphere_vertex, NULL,
-                                                                               (plot -> ray_tracing) ? full_color_ray : full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, slab);
+    const GLchar * vs_sls = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
+    const GLchar * fs_sls = (plot -> ray_tracing) ? full_color_ray : full_color;
+    wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_SPHERES, vs_sls, NULL, fs_sls, GL_TRIANGLE_STRIP, 4, 1, TRUE, slab);
     g_free (slab);
   }
   wingl -> cell_win -> slab_vol = (4.0*pi/3.0)*(pow(wingl -> cell_win -> cparam[14], 3));

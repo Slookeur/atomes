@@ -40,6 +40,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   gboolean in_md_shaders (project * this_proj, int id);
   gboolean glsl_disable_cull_face (glsl_program * glsl);
 
+  void allocate_instances (object_3d * object);
   void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string);
   void glsl_bind_points (glsl_program * glsl, object_3d * obj);
   void glsl_bind_spheres (glsl_program * glsl, object_3d * obj);
@@ -58,7 +59,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void init_shaders (glwin * view);
   void set_lights_data (glsl_program * glsl);
   void shading_glsl_text (glsl_program * glsl);
-  void compute_frustum_planes (mat4_t mvp, vec4_t planes[6]);
   void update_ray_instances (glsl_program * glsl);
   void render_this_shader (glsl_program * glsl, int ids);
   void draw_vertices (int id);
@@ -73,6 +73,12 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   gboolean cylinder_in_frustum (vec4_t planes[6], float * inst);
   gboolean cap_in_frustum (vec4_t planes[6], float * inst);
 
+*
+* Notes:
+*
+
+  LLM tools (ChatGPT, Gemini via Antigravity, Claude) were used at few occasions to prepare some sections of this file, including:
+    - To write the frustum culling for the raytracing rendering of atoms and bonds
 */
 
 #include "global.h"
@@ -140,6 +146,17 @@ GLuint * alloc_shader_pointer (GLuint * pointer, int shaders)
 #define FOG_DATA       5
 #define LIGHT_DATA    10
 
+/*!
+  \fn void allocate_instances (object_3d * object)
+
+  \brief allocate the instances buffer of a 3D object
+
+  \param object the target object_3d
+*/
+void allocate_instances (object_3d * object)
+{
+  object -> instances = allocfloat (object -> num_instances * object -> inst_buffer_size);
+}
 
 /*!
   \fn void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string)
@@ -166,7 +183,7 @@ void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char 
 */
 GLuint * glsl_add_lights (glsl_program * glsl)
 {
-  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
+  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA + 1;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
   lightning[1]  = glGetUniformLocation (glsl -> id, "lights_on");
@@ -196,6 +213,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
     set_light_uniform_location (lightning, glsl -> id, j, 8, "spot_inner");
     set_light_uniform_location (lightning, glsl -> id, j, 9, "spot_outer");
   }
+  lightning[tot-1] = glGetUniformLocation (glsl -> id, "proj_matrix");
   return lightning;
 }
 
@@ -342,6 +360,19 @@ void glsl_bind_cylinders (glsl_program * glsl, object_3d * obj)
   glEnableVertexAttribArray (glsl -> array_pointer[5]);
   glVertexAttribPointer (glsl -> array_pointer[5], 4, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (9*sizeof(GLfloat)));
   glVertexAttribDivisor (glsl -> array_pointer[5], 1);
+
+  if (obj -> inst_buffer_size == CYLI_BUFF_SIZE + 2)
+  {
+    glsl -> array_pointer[6] = glGetAttribLocation (glsl -> id, "r_sphere_a");
+    glsl -> array_pointer[7] = glGetAttribLocation (glsl -> id, "r_sphere_b");
+    glEnableVertexAttribArray (glsl -> array_pointer[6]);
+    glVertexAttribPointer (glsl -> array_pointer[6], 1, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (13*sizeof(GLfloat)));
+    glVertexAttribDivisor (glsl -> array_pointer[6], 1);
+
+    glEnableVertexAttribArray (glsl -> array_pointer[7]);
+    glVertexAttribPointer (glsl -> array_pointer[7], 1, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (14*sizeof(GLfloat)));
+    glVertexAttribDivisor (glsl -> array_pointer[7], 1);
+  }
 }
 
 /*!
@@ -851,10 +882,9 @@ void set_lights_data (glsl_program * glsl)
 {
   int j, k;
   vec3_t l_pos, l_dir;
-  k = (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0];
 
   glUniformMatrix4fv (glsl -> light_uniform[0], 1, GL_FALSE, & wingl -> model_view_matrix.m00);
-  glUniform1i (glsl -> light_uniform[1], k);
+  glUniform1i (glsl -> light_uniform[1], (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0]);
   glUniform3f (glsl -> light_uniform[2], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);
   for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[3+j], plot -> m_terial.param[j+1]);
   glUniform1i (glsl -> light_uniform[8], plot -> f_g.mode);
@@ -893,6 +923,10 @@ void set_lights_data (glsl_program * glsl)
     glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
     glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
   }
+  /* Upload the pure projection matrix for unreal impostor shaders.
+     For all other shaders light_uniform[tot-1] == -1 → silently ignored. */
+  int pm_idx = LIGHT_INFO + MATERIAL_DATA + FOG_DATA + plot -> l_ghtning.lights * LIGHT_DATA;
+  glUniformMatrix4fv (glsl -> light_uniform[pm_idx], 1, GL_FALSE, & wingl -> projection_matrix.m00);
 }
 
 uint16_t stipple_pattern[NDOTS]={ 0xAAAA, 0x1111, 0x0000, 0x55FF, 0x24FF, 0x3F3F, 0x33FF, 0x27FF};
@@ -906,39 +940,6 @@ int this_factor;
  *  Frustum planes are extracted from proj_model_view_matrix so
  *  they already incorporate model, view and projection.
  * ============================================================ */
-
-/*!
-  \fn void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
-
-  \brief extract the 6 frustum planes from a MVP matrix (Gribb-Hartmann method).
-         each plane is stored as (nx, ny, nz, d) with the convention:
-         a point P is inside if dot(plane.xyz, P) + plane.w >= 0.
-         planes are normalized so that the w component equals the signed
-         distance from the origin to the plane.
-
-  \param mvp the combined projection * model_view matrix
-  \param planes output array of 6 planes [left, right, bottom, top, near, far]
-*/
-void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
-{
-  float len;
-  /* Row-major access: mvp.mRC where R=row, C=col */
-  planes[0] = vec4 (mvp.m33+mvp.m30, mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20); // Left
-  planes[1] = vec4 (mvp.m33-mvp.m30, mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20); // Right
-  planes[2] = vec4 (mvp.m33+mvp.m31, mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21); // Bottom
-  planes[3] = vec4 (mvp.m33-mvp.m31, mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21); // Top
-  planes[4] = vec4 (mvp.m33+mvp.m32, mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22); // Near
-  planes[5] = vec4 (mvp.m33-mvp.m32, mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22); // Far
-  int i;
-  for (i = 0; i < 6; i++)
-  {
-    len = v3_length (vec3(planes[i].x, planes[i].y, planes[i].z));
-    if (len > 0.0f)
-    {
-      planes[i] = v4_divs (planes[i], len);
-    }
-  }
-}
 
 /*!
   \fn gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r)
@@ -987,7 +988,7 @@ gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
   int i;
 
   /* Reconstruct bond axis: rotate (0,0,1) by the stored quaternion.
-     Simplified because v=(0,0,1): dot(u,v)=u.z, cross(u,v)=(u.y,-u.x,0) */
+  Simplified because v=(0,0,1): dot(u,v)=u.z, cross(u,v)=(u.y,-u.x,0) */
   float ax = 2.0f * (qz*qx + qw*qy);
   float ay = 2.0f * (qy*qx - qz*qw);
   float az = qz*qz + qy*qy - qw*qw - qx*qx;
@@ -1052,17 +1053,13 @@ void update_ray_instances (glsl_program * glsl)
   int n_visible = 0;
   int i;
 
-  /* Compute frustum planes from the current MVP matrix (world-space planes) */
-  vec4_t frustum_planes[6];
-  compute_frustum_planes (wingl -> proj_model_view_matrix, frustum_planes);
-
   if (glsl -> draw_type == GLSL_SPHERES)
   {
     /* ATOM_BUFF_SIZE layout: [0..2]=offset [3]=radius [4..7]=color */
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (sphere_in_frustum (frustum_planes, inst[0], inst[1], inst[2], inst[3]))
+      if (sphere_in_frustum (wingl -> frustum_planes, inst[0], inst[1], inst[2], inst[3]))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1075,7 +1072,7 @@ void update_ray_instances (glsl_program * glsl)
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (cylinder_in_frustum (frustum_planes, inst))
+      if (cylinder_in_frustum (wingl -> frustum_planes, inst))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1088,7 +1085,7 @@ void update_ray_instances (glsl_program * glsl)
     for (i = 0; i < n_total; i++)
     {
       float * inst = src + i * buf_size;
-      if (cap_in_frustum (frustum_planes, inst))
+      if (cap_in_frustum (wingl -> frustum_planes, inst))
       {
         memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
         n_visible ++;
@@ -1162,7 +1159,16 @@ void render_this_shader (glsl_program * glsl, int ids)
       }
     }
     wingl -> axis_proj_model_view_matrix = create_axis_matrices (j);
-    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
+    if (plot -> ray_tracing)
+    {
+      glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_model_view_matrix.m00);
+      int pm_idx = LIGHT_INFO + MATERIAL_DATA + FOG_DATA + plot->l_ghtning.lights * LIGHT_DATA;
+      glUniformMatrix4fv (glsl -> uniform_loc[pm_idx], 1, GL_FALSE, & wingl -> axis_projection_matrix.m00);
+    }
+    else
+    {
+      glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
+    }
     j = (plot -> xyz -> axis == WIREFRAME) ? 1 : 3;
     if (ids > j) shading_glsl_text (glsl);
   }
@@ -1231,17 +1237,20 @@ void render_this_shader (glsl_program * glsl, int ids)
 
   if (glsl -> light_uniform != NULL) set_lights_data (glsl);
 
-  /* Frustum culling for ray tracing impostors:
+  /* Frustum culling for ray tracing perfect impostors:
      Compact the instance buffer to visible instances only, then restore
      the original count after drawing so the CPU-side data is never lost. */
   int saved_num_instances = glsl -> obj -> num_instances;
-  if (plot -> ray_tracing && (glsl -> draw_type == GLSL_SPHERES  ||
-                              glsl -> draw_type == GLSL_CYLINDERS ||
-                              glsl -> draw_type == GLSL_CAPS))
+  if (plot -> ray_tracing)
   {
-    update_ray_instances (glsl);
+    if (glsl -> object == ATOMS || glsl -> object == BONDS || glsl -> object == SELEC)
+    {
+      if (glsl -> draw_type == GLSL_SPHERES || glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS)
+      {
+        update_ray_instances (glsl);
+      }
+    }
   }
-
   glBindVertexArray (glsl -> vao);
 
   if (glsl_disable_cull_face (glsl)) glDisable (GL_CULL_FACE);
@@ -1261,7 +1270,7 @@ void render_this_shader (glsl_program * glsl, int ids)
 
   if (glsl -> draw_type == GLSL_SPHERES || glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS)
   {
-    gboolean poly_offset = (! plot -> ray_tracing) && (glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS);
+    gboolean poly_offset = (! plot -> ray_tracing && (glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS));
     if (poly_offset)
     {
       glEnable (GL_POLYGON_OFFSET_FILL);
@@ -1308,19 +1317,13 @@ void render_this_shader (glsl_program * glsl, int ids)
   glBindVertexArray (0);
 
   /* Restore original instance count and full GPU buffer so subsequent
-     frames (and any non-ray-tracing use) see the complete data. */
-  if (plot -> ray_tracing && saved_num_instances != glsl -> obj -> num_instances &&
-      (glsl -> draw_type == GLSL_SPHERES  ||
-       glsl -> draw_type == GLSL_CYLINDERS ||
-       glsl -> draw_type == GLSL_CAPS))
+     frames (and any non-ray-tracing) see the complete data. */
+  if (saved_num_instances != glsl -> obj -> num_instances)
   {
     glsl -> obj -> num_instances = saved_num_instances;
     int inst_vbo = 2;
     glBindBuffer (GL_ARRAY_BUFFER, glsl -> vbo[inst_vbo]);
-    glBufferData (GL_ARRAY_BUFFER,
-                  saved_num_instances * glsl -> obj -> inst_buffer_size * sizeof (GLfloat),
-                  glsl -> obj -> instances,
-                  GL_STATIC_DRAW);
+    glBufferData (GL_ARRAY_BUFFER, saved_num_instances * glsl -> obj -> inst_buffer_size * sizeof (GLfloat), glsl -> obj -> instances, GL_STATIC_DRAW);
   }
 }
 
