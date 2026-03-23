@@ -31,7 +31,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   void print_matrices ();
-  void compute_frustum_planes (mat4_t mvp, vec4_t planes[6]);
   void setup_camera ();
   void unrotate_camera ();
   void duplicate_fog (Fog * new_fog, Fog * old_fog);
@@ -119,39 +118,6 @@ void print_matrices ()
 }
 
 /*!
-  \fn void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
-
-  \brief extract the 6 frustum planes from a MVP matrix (Gribb-Hartmann method).
-         each plane is stored as (nx, ny, nz, d) with the convention:
-         a point P is inside if dot(plane.xyz, P) + plane.w >= 0.
-         planes are normalized so that the w component equals the signed
-         distance from the origin to the plane.
-
-  \param mvp the combined projection * model_view matrix
-  \param planes output array of 6 planes [left, right, bottom, top, near, far]
-*/
-void compute_frustum_planes (mat4_t mvp, vec4_t planes[6])
-{
-  float len;
-  /* Row-major access: mvp.mRC where R=row, C=col */
-  planes[0] = vec4 (mvp.m33+mvp.m30, mvp.m03+mvp.m00, mvp.m13+mvp.m10, mvp.m23+mvp.m20); // Left
-  planes[1] = vec4 (mvp.m33-mvp.m30, mvp.m03-mvp.m00, mvp.m13-mvp.m10, mvp.m23-mvp.m20); // Right
-  planes[2] = vec4 (mvp.m33+mvp.m31, mvp.m03+mvp.m01, mvp.m13+mvp.m11, mvp.m23+mvp.m21); // Bottom
-  planes[3] = vec4 (mvp.m33-mvp.m31, mvp.m03-mvp.m01, mvp.m13-mvp.m11, mvp.m23-mvp.m21); // Top
-  planes[4] = vec4 (mvp.m33+mvp.m32, mvp.m03+mvp.m02, mvp.m13+mvp.m12, mvp.m23+mvp.m22); // Near
-  planes[5] = vec4 (mvp.m33-mvp.m32, mvp.m03-mvp.m02, mvp.m13-mvp.m12, mvp.m23-mvp.m22); // Far
-  int i;
-  for (i = 0; i < 6; i++)
-  {
-    len = v3_length (vec3(planes[i].x, planes[i].y, planes[i].z));
-    if (len > 0.0f)
-    {
-      planes[i] = v4_divs (planes[i], len);
-    }
-  }
-}
-
-/*!
   \fn void setup_camera ()
 
   \brief setup OpenGL camera
@@ -171,8 +137,6 @@ void setup_camera ()
   wingl -> proj_model_view_matrix = m4_mul (wingl -> projection_matrix, wingl -> model_view_matrix);
   wingl -> proj_view_matrix       = m4_mul (wingl -> projection_matrix, wingl -> view_matrix);
   wingl -> view_model_matrix      = m4_mul (wingl -> view_matrix, wingl -> model_matrix);
-  /* Compute frustum planes from the current MVP matrix (world-space planes) */
-  compute_frustum_planes (wingl -> proj_model_view_matrix, wingl -> frustum_planes);
   // print_matrices();
 }
 

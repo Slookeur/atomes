@@ -1020,7 +1020,6 @@ struct glwin
   mat4_t axis_projection_matrix;
   mat4_t axis_proj_model_view_matrix;
   mat4_t label_projection_matrix;
-  vec4_t frustum_planes[6];
 
   gboolean create_shaders[NGLOBAL_SHADERS];
   glsl_program *** ogl_glsl[NGLOBAL_SHADERS];

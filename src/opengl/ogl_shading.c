@@ -69,16 +69,10 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   object_3d * duplicate_object_3d (object_3d * old_obj);
 
-  gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r);
-  gboolean cylinder_in_frustum (vec4_t planes[6], float * inst);
-  gboolean cap_in_frustum (vec4_t planes[6], float * inst);
-
 *
 * Notes:
 *
 
-  LLM tools (ChatGPT, Gemini via Antigravity, Claude) were used at few occasions to prepare some sections of this file, including:
-    - To write the frustum culling for the raytracing rendering of atoms and bonds
 */
 
 #include "global.h"
@@ -934,188 +928,6 @@ int this_tilt;
 int this_pattern;
 int this_factor;
 
-/* ============================================================
- *  Frustum culling for ray tracing impostors
- *  All tests work in world-space (before model_view transform).
- *  Frustum planes are extracted from proj_model_view_matrix so
- *  they already incorporate model, view and projection.
- * ============================================================ */
-
-/*!
-  \fn gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r)
-
-  \brief test whether a sphere is at least partially inside the view frustum.
-         returns FALSE only if the sphere is entirely behind at least one plane.
-
-  \param planes  the 6 frustum planes (world-space, normalised)
-  \param cx cy cz  sphere center in world-space
-  \param r  sphere radius (world-space)
-*/
-gboolean sphere_in_frustum (vec4_t planes[6], float cx, float cy, float cz, float r)
-{
-  int i;
-  for (i = 0; i < 6; i++)
-  {
-    if (planes[i].x*cx + planes[i].y*cy + planes[i].z*cz + planes[i].w < -r) return FALSE;
-  }
-  return TRUE;
-}
-
-/*!
-  \fn gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
-
-  \brief capsule test for a cylinder instance (half-bond).
-         reconstructs the 2 endpoints from the instance buffer and tests
-         whether at least one of them is within radius of any frustum plane.
-
-         instance buffer layout (CYLI_BUFF_SIZE):
-           [0..2] offset   = midpoint of the half-bond (world-space)
-           [3]    height   = half-bond length
-           [4]    radius   = cylinder radius
-           [5]    quat.w
-           [6..8] quat.xyz = quaternion rotating Z onto the bond axis
-
-  \param planes the 6 frustum planes (world-space, normalized)
-  \param inst pointer to the start of 1 cylinder instance in the buffer
-*/
-gboolean cylinder_in_frustum (vec4_t planes[6], float * inst)
-{
-  float ox = inst[0], oy = inst[1], oz = inst[2];
-  float half_h = inst[3] * 0.5f;
-  float radius = inst[4];
-  float qw = inst[5], qx = inst[6], qy = inst[7], qz = inst[8];
-  float d1, d2;
-  int i;
-
-  /* Reconstruct bond axis: rotate (0,0,1) by the stored quaternion.
-  Simplified because v=(0,0,1): dot(u,v)=u.z, cross(u,v)=(u.y,-u.x,0) */
-  float ax = 2.0f * (qz*qx + qw*qy);
-  float ay = 2.0f * (qy*qx - qz*qw);
-  float az = qz*qz + qy*qy - qw*qw - qx*qx;
-
-  /* Endpoints of the half-bond */
-  float p1x = ox - half_h*ax,  p1y = oy - half_h*ay,  p1z = oz - half_h*az;
-  float p2x = ox + half_h*ax,  p2y = oy + half_h*ay,  p2z = oz + half_h*az;
-
-  /* Capsule test: reject only if BOTH endpoints are beyond -radius on the same plane */
-  for (i = 0; i < 6; i++)
-  {
-    d1 = planes[i].x*p1x + planes[i].y*p1y + planes[i].z*p1z + planes[i].w;
-    d2 = planes[i].x*p2x + planes[i].y*p2y + planes[i].z*p2z + planes[i].w;
-    if (d1 < -radius && d2 < -radius) return FALSE;
-  }
-  return TRUE;
-}
-
-/*!
-  \fn gboolean cap_in_frustum (vec4_t planes[6], float * inst)
-
-  \brief sphere test for a cylinder cap instance.
-         a cap is a flat disk; a sphere of the same center and radius is a safe conservative bounding volume.
-
-         instance buffer layout (CAPS_BUFF_SIZE):
-           [0..2] offset   = cap center (world-space)
-           [3]    radius   = cap radius
-           [4]    quat.w
-           [5..7] quat.xyz
-
-  \param planes the 6 frustum planes (world-space, normalized)
-  \param inst pointer to the start of one cap instance in the buffer
-*/
-gboolean cap_in_frustum (vec4_t planes[6], float * inst)
-{
-  /* Cap has zero thickness: treat as a sphere of the same radius */
-  return sphere_in_frustum (planes, inst[0], inst[1], inst[2], inst[3]);
-}
-
-/*!
-  \fn void update_ray_instances (glsl_program * glsl)
-
-  \brief frustum-cull the instances of a ray tracing shader (GLSL_SPHERES, GLSL_CYLINDERS or GLSL_CAPS)
-         and update the GPU instance buffer with only the visible subset.
-
-         the full instance data remains in glsl -> obj -> instances (CPU-side).
-         only the visible count and the GPU buffer content change.
-         this function is called once per frame, per shader, only when ray_tracing is active, from render_this_shader().
-
-  \param glsl the shader program to update
-*/
-void update_ray_instances (glsl_program * glsl)
-{
-  int n_total = glsl -> obj -> num_instances;
-  if (n_total <= 0) return;
-
-  int buf_size  = glsl -> obj -> inst_buffer_size;
-  float * src   = glsl -> obj -> instances;
-
-  /* Temporary CPU buffer for visible instances (worst case = all visible) */
-  float * visible = g_malloc (n_total * buf_size * sizeof (GLfloat));
-  int n_visible = 0;
-  int i;
-
-  if (glsl -> draw_type == GLSL_SPHERES)
-  {
-    /* ATOM_BUFF_SIZE layout: [0..2]=offset [3]=radius [4..7]=color */
-    for (i = 0; i < n_total; i++)
-    {
-      float * inst = src + i * buf_size;
-      if (sphere_in_frustum (wingl -> frustum_planes, inst[0], inst[1], inst[2], inst[3]))
-      {
-        memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
-        n_visible ++;
-      }
-    }
-  }
-  else if (glsl -> draw_type == GLSL_CYLINDERS)
-  {
-    /* CYLI_BUFF_SIZE layout: [0..2]=offset [3]=height [4]=radius [5..8]=quat [9..12]=color */
-    for (i = 0; i < n_total; i++)
-    {
-      float * inst = src + i * buf_size;
-      if (cylinder_in_frustum (wingl -> frustum_planes, inst))
-      {
-        memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
-        n_visible ++;
-      }
-    }
-  }
-  else if (glsl -> draw_type == GLSL_CAPS)
-  {
-    /* CAPS_BUFF_SIZE layout: [0..2]=offset [3]=radius [4..7]=quat [8..11]=color */
-    for (i = 0; i < n_total; i++)
-    {
-      float * inst = src + i * buf_size;
-      if (cap_in_frustum (wingl -> frustum_planes, inst))
-      {
-        memcpy (visible + n_visible * buf_size, inst, buf_size * sizeof (GLfloat));
-        n_visible ++;
-      }
-    }
-  }
-  else
-  {
-    g_free (visible);
-    return;
-  }
-
-  /* Upload only the visible instances to the GPU.
-     vbo layout for SPHERES:  vbo[0]=vertices, vbo[1]=indices, vbo[2]=instances
-     vbo layout for CYLINDERS: same
-     vbo layout for CAPS:      same                                            */
-  int inst_vbo = 2;  /* index of the instance VBO (always 2 for these types) */
-  glBindBuffer (GL_ARRAY_BUFFER, glsl -> vbo[inst_vbo]);
-  if (n_visible > 0)
-  {
-    glBufferData (GL_ARRAY_BUFFER,
-                  n_visible * buf_size * sizeof (GLfloat),
-                  visible,
-                  GL_DYNAMIC_DRAW);
-  }
-  glsl -> obj -> num_instances = n_visible;
-
-  g_free (visible);
-}
-
 /*!
   \fn void shading_glsl_text (glsl_program * glsl)
 
@@ -1237,20 +1049,6 @@ void render_this_shader (glsl_program * glsl, int ids)
 
   if (glsl -> light_uniform != NULL) set_lights_data (glsl);
 
-  /* Frustum culling for ray tracing perfect impostors:
-     Compact the instance buffer to visible instances only, then restore
-     the original count after drawing so the CPU-side data is never lost. */
-  int saved_num_instances = glsl -> obj -> num_instances;
-  if (plot -> ray_tracing)
-  {
-    if (glsl -> object == ATOMS || glsl -> object == BONDS || glsl -> object == SELEC)
-    {
-      if (glsl -> draw_type == GLSL_SPHERES || glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS)
-      {
-        update_ray_instances (glsl);
-      }
-    }
-  }
   glBindVertexArray (glsl -> vao);
 
   if (glsl_disable_cull_face (glsl)) glDisable (GL_CULL_FACE);
@@ -1315,16 +1113,6 @@ void render_this_shader (glsl_program * glsl, int ids)
   }
   if (glsl_disable_cull_face (glsl)) glEnable (GL_CULL_FACE);
   glBindVertexArray (0);
-
-  /* Restore original instance count and full GPU buffer so subsequent
-     frames (and any non-ray-tracing) see the complete data. */
-  if (saved_num_instances != glsl -> obj -> num_instances)
-  {
-    glsl -> obj -> num_instances = saved_num_instances;
-    int inst_vbo = 2;
-    glBindBuffer (GL_ARRAY_BUFFER, glsl -> vbo[inst_vbo]);
-    glBufferData (GL_ARRAY_BUFFER, saved_num_instances * glsl -> obj -> inst_buffer_size * sizeof (GLfloat), glsl -> obj -> instances, GL_STATIC_DRAW);
-  }
 }
 
 /*!

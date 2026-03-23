@@ -107,33 +107,20 @@ gboolean not_in_already (vec3_t a, vec3_t b, float * vertices)
   int i, j, k;
   vec3_t tma, tmb;
 
-  if (plot -> abc -> box == WIREFRAME)
+  for (i=0; i<nbs/2; i=i+2)
   {
-    for (i=0; i<nbs/2; i=i+2)
+    j = i*BOX_BUFF_SIZE;
+    k = j+BOX_BUFF_SIZE;
+    tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
+    tmb = vec3(vertices[k], vertices[k+1], vertices[k+2]);
+    if (are_identical_vec3(a, tma) && are_identical_vec3(b, tmb))
     {
-      j = i*BOX_BUFF_SIZE;
-      k = j+BOX_BUFF_SIZE;
-      tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
-      tmb = vec3(vertices[k], vertices[k+1], vertices[k+2]);
-      if (are_identical_vec3(a, tma) && are_identical_vec3(b, tmb))
-      {
-        return FALSE;
-      }
-      else if (are_identical_vec3(b, tma) && are_identical_vec3(a, tmb))
-      {
-        return FALSE;
-      }
+      return FALSE;
     }
-  }
-  else
-  {
-    /*vec3_t mid_cand = vec3((a.x+b.x)/2.0, (a.y+b.y)/2.0, (a.z+b.z)/2.0);
-    for (i=0; i<nbs; i++)
+    else if (are_identical_vec3(b, tma) && are_identical_vec3(a, tmb))
     {
-      j = i*BOX_BUFF_SIZE;
-      tma = vec3(vertices[j], vertices[j+1], vertices[j+2]);
-      if (are_identical_vec3(mid_cand, tma)) return FALSE;
-    }*/
+      return FALSE;
+    }
   }
   return TRUE;
 }
