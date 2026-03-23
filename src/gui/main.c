@@ -325,7 +325,9 @@ void read_this_file (int file_type, gchar * this_file)
   else
   {
     init_project (FALSE);
+    reading_project = TRUE;
     open_save (fp, 0, 0, activep, activep, this_file);
+    reading_project = FALSE;
   }
   fclose (fp);
 }
