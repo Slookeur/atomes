@@ -979,7 +979,6 @@ struct glwin
   GtkWidget * color_styles[ATOM_MAPS+POLY_MAPS];
   GtkWidget * ogl_render[OGL_RENDERS];
   GtkWidget * ogl_rep[OGL_REPS];
-  GtkWidget * ogl_quality;
   GtkWidget ** ogl_box_axis[2];
   GtkWidget * ogl_box[8];
   GtkWidget * ogl_mouse[3];

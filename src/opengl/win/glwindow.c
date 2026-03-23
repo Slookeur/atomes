@@ -427,7 +427,6 @@ void update_all_menus (glwin * view, int nats)
   }
   restore_color_map (view, cmap);
   g_free (cmap);
-  gtk_range_set_value (GTK_RANGE(view -> ogl_quality), view -> anim -> last -> img -> quality);
 #else
   update_menu_bar (view);
 #endif
@@ -493,7 +492,6 @@ void menu_items_opengl (GtkWidget * menu, glwin * view, int pop)
   gtk_menu_item_set_submenu ((GtkMenuItem *)style, menu_style(view, pop));
   gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Color Scheme(s)", get_project_by_id(view -> proj) -> nspec, menu_map(view, pop)));
   gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Render", get_project_by_id(view -> proj) -> nspec, menu_render(view, pop)));
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Quality", get_project_by_id(view -> proj) -> nspec, menu_quality(view, pop)));
   gtk3_menu_item (menu, "Material And Light(s)", IMG_NONE, NULL, G_CALLBACK(opengl_advanced), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   gtk3_menu_item (menu, "Render Image", IMG_FILE, (gpointer)PACKAGE_IMG, G_CALLBACK(render_gl_image), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
 }

@@ -714,12 +714,13 @@ const GLchar * full_color = GLSL(
 /* --------------------------------------------------------------------------
  * Sphere impostor – vertex shader
  * Build a camera-aligned billboard quad that tightly covers the projected
- * sphere footprint.  All work is done in view space; proj_matrix is used for
+ * sphere footprint.  All work is done in view space; m_proj is used for
  * the final clip-space position.
  * --------------------------------------------------------------------------*/
 const GLchar * sphere_vertex_ray = GLSL(
   uniform mat4 m_view;
-  uniform mat4 proj_matrix;
+  uniform mat4 m_proj;
+  uniform int view_is_ortho;
 
   in vec3 vert;       /* billboard corner: (-1,-1,0)…(+1,+1,0)          */
   in vec3 offset;     /* sphere center, world space (from instance data) */
@@ -741,8 +742,19 @@ const GLchar * sphere_vertex_ray = GLSL(
 
     /* Sphere centre in view space */
     vec3 center_vs = vec3(m_view * vec4(offset, 1.0));
+    vec3 billboard_vs;
 
-    vec3 billboard_vs = center_vs + radius * vec3(vert.x, vert.y, 0.0);
+    if (view_is_ortho == 0)
+    {
+      /* View-space radius with scale correction */
+      float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+      /* Billboard quad shifted forward to be in front of the sphere focal plane */
+      billboard_vs = center_vs + r_vs * vec3(vert.x, vert.y, 1.0);
+    }
+    else
+    {
+      billboard_vs = center_vs + radius * vec3(vert.x, vert.y, 0.0);
+    }
     surfacePosition = billboard_vs;
 
     imp_a      = center_vs;
@@ -751,8 +763,7 @@ const GLchar * sphere_vertex_ray = GLSL(
     form_type  = 0;
     clip_r_a   = 0.0;   /* spheres have no clipping */
     clip_r_b   = 0.0;
-
-    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position = m_proj * vec4(billboard_vs, 1.0);
     gl_Position.z = max(gl_Position.z, -gl_Position.w);
   }
 );
@@ -764,7 +775,7 @@ const GLchar * sphere_vertex_ray = GLSL(
  * --------------------------------------------------------------------------*/
 const GLchar * cylinder_vertex_ray = GLSL(
   uniform mat4 m_view;
-  uniform mat4 proj_matrix;
+  uniform mat4 m_proj;
 
   in vec4  quat;       /* rotation quaternion {w,x,y,z}                   */
   in float height;     /* full cylinder length (from instance data)       */
@@ -835,7 +846,7 @@ const GLchar * cylinder_vertex_ray = GLSL(
     clip_r_a  = r_sphere_a * r_scale;
     clip_r_b  = r_sphere_b * r_scale;
 
-    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position = m_proj * vec4(billboard_vs, 1.0);
     gl_Position.z = max(gl_Position.z, -gl_Position.w);
   }
 );
@@ -847,7 +858,7 @@ const GLchar * cylinder_vertex_ray = GLSL(
  * --------------------------------------------------------------------------*/
 const GLchar * cone_vertex_ray = GLSL(
   uniform mat4 m_view;
-  uniform mat4 proj_matrix;
+  uniform mat4 m_proj;
 
   in vec4 quat;
   in float height;
@@ -913,7 +924,7 @@ const GLchar * cone_vertex_ray = GLSL(
     clip_r_a  = 0.0;
     clip_r_b  = 0.0;
 
-    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position = m_proj * vec4(billboard_vs, 1.0);
     gl_Position.z = max(gl_Position.z, -gl_Position.w);
   }
 );
@@ -925,7 +936,7 @@ const GLchar * cone_vertex_ray = GLSL(
  * --------------------------------------------------------------------------*/
 const GLchar * cap_vertex_ray = GLSL(
   uniform mat4 m_view;
-  uniform mat4 proj_matrix;
+  uniform mat4 m_proj;
 
   in vec4 quat;
   in float radius;
@@ -976,7 +987,7 @@ const GLchar * cap_vertex_ray = GLSL(
     clip_r_a  = 0.0;
     clip_r_b  = 0.0;
 
-    gl_Position = proj_matrix * vec4(billboard_vs, 1.0);
+    gl_Position = m_proj * vec4(billboard_vs, 1.0);
     gl_Position.z = max(gl_Position.z, -gl_Position.w);
   }
 );
@@ -1031,7 +1042,9 @@ const GLchar * full_color_ray = GLSL(
   uniform Fog fog;
   uniform int lights_on;
   uniform int numLights;
-  uniform mat4 proj_matrix;   /* pure projection matrix – for gl_FragDepth write */
+  uniform int view_is_ortho;
+  uniform mat4 m_proj;
+
 
   in vec4  surfaceColor;
   in vec3  surfacePosition;
@@ -1396,16 +1409,24 @@ const GLchar * full_color_ray = GLSL(
     /* Ray from camera origin through billboard fragment (view space) */
     vec3 surfaceToCamera = normalize(-surfacePosition);
     vec3 ray_origin;
-    if (form_type == 0)
+    vec3 ray_dir;
+    if (view_is_ortho == 0)
     {
-      ray_origin = vec3(0.0);
+      ray_origin = surfacePosition;
+      ray_dir = vec3(0.0, 0.0, -1.0); // Parallel rays (Orthographic)
     }
     else
     {
-      ray_origin = surfacePosition;
+      if (form_type == 0)
+      {
+        ray_origin = vec3(0.0);
+      }
+      else
+      {
+        ray_origin = surfacePosition;
+      }
+      ray_dir = normalize(surfacePosition);   /* perspective */
     }
-    vec3 ray_dir = normalize(surfacePosition);   /* perspective */
-
     Hit the_hit;
     bool hit = false;
 
@@ -1447,7 +1468,7 @@ const GLchar * full_color_ray = GLSL(
       if (dot(the_hit.pos - imp_b, the_hit.pos - imp_b) < r_clip * r_clip) discard;
     }
 
-    vec4 hit_clip = proj_matrix * vec4(the_hit.pos, 1.0);
+    vec4 hit_clip = m_proj * vec4(the_hit.pos, 1.0);
     if (hit_clip.w <= 0.0) discard;
     gl_FragDepth = clamp((hit_clip.z / hit_clip.w + 1.0) * 0.5, 0.0, 1.0);
 

@@ -168,7 +168,6 @@ GMenu * prepare_opengl_menu (glwin * view, int popm)
   g_menu_item_set_submenu (item, (GMenuModel*)menu_map(view, popm));
   g_menu_append_item (menu, item);
   append_submenu (menu, "Render", menu_render(view, popm));
-  append_submenu (menu, "Quality", menu_quality(view, popm));
   append_opengl_item (view, menu, "Material And Lights", "material", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_opengl_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   append_opengl_item (view, menu, "Render Image", "image", popm, popm, "<CTRL>I", IMG_FILE, PACKAGE_IMG, FALSE, G_CALLBACK(to_render_gl_image), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;

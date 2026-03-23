@@ -175,6 +175,7 @@ GtkWidget * bdv_box (GtkWidget * box, char * lab, int size, float xalign)
   return hbox;
 }
 
+GtkWidget * quality_scale;
 GtkWidget * d_close;
 int status;
 
@@ -1040,6 +1041,7 @@ G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer
   {
     view = (glwin *)data;
     view -> anim -> last -> img -> ray_tracing = i;
+    widget_set_sensitive (quality_scale, ! i);
     view -> create_shaders[MAXIS] = TRUE;
     view -> create_shaders[MDBOX] = TRUE;
     init_default_shaders (view);
@@ -1351,10 +1353,12 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   GtkWidget * box, * hbox;
 
   box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200,
-                       G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, check_button ("<b>Ray tracing</b>", 100, 40, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4], G_CALLBACK(set_use_ray_tracing_toggle), view),
                        FALSE, FALSE, 0);
+  quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, quality_scale, FALSE, FALSE, 0);
+  widget_set_sensitive (quality_scale, ! view -> anim -> last -> img -> ray_tracing);
+
 
   box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);

@@ -136,7 +136,7 @@ GLuint * alloc_shader_pointer (GLuint * pointer, int shaders)
 }
 
 #define LIGHT_INFO     3
-#define MATERIAL_DATA  6
+#define MATERIAL_DATA  8
 #define FOG_DATA       5
 #define LIGHT_DATA    10
 
@@ -177,22 +177,24 @@ void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char 
 */
 GLuint * glsl_add_lights (glsl_program * glsl)
 {
-  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA + 1;
+  int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
-  lightning[1]  = glGetUniformLocation (glsl -> id, "lights_on");
-  lightning[2]  = glGetUniformLocation (glsl -> id, "mat.albedo");
-  lightning[3]  = glGetUniformLocation (glsl -> id, "mat.metallic");
-  lightning[4]  = glGetUniformLocation (glsl -> id, "mat.roughness");
-  lightning[5]  = glGetUniformLocation (glsl -> id, "mat.back_light");
-  lightning[6]  = glGetUniformLocation (glsl -> id, "mat.gamma");
-  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.alpha");
-  lightning[8]  = glGetUniformLocation (glsl -> id, "fog.mode");
-  lightning[9]  = glGetUniformLocation (glsl -> id, "fog.based");
-  lightning[10] = glGetUniformLocation (glsl -> id, "fog.density");
-  lightning[11] = glGetUniformLocation (glsl -> id, "fog.depth");
-  lightning[12] = glGetUniformLocation (glsl -> id, "fog.color");
-  lightning[13] = glGetUniformLocation (glsl -> id, "numLights");
+  lightning[1] = glGetUniformLocation (glsl -> id, "m_proj");
+  lightning[2]  = glGetUniformLocation (glsl -> id, "view_is_ortho");
+  lightning[3]  = glGetUniformLocation (glsl -> id, "lights_on");
+  lightning[4]  = glGetUniformLocation (glsl -> id, "mat.albedo");
+  lightning[5]  = glGetUniformLocation (glsl -> id, "mat.metallic");
+  lightning[6]  = glGetUniformLocation (glsl -> id, "mat.roughness");
+  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.back_light");
+  lightning[8]  = glGetUniformLocation (glsl -> id, "mat.gamma");
+  lightning[9]  = glGetUniformLocation (glsl -> id, "mat.alpha");
+  lightning[10]  = glGetUniformLocation (glsl -> id, "fog.mode");
+  lightning[11]  = glGetUniformLocation (glsl -> id, "fog.based");
+  lightning[12] = glGetUniformLocation (glsl -> id, "fog.density");
+  lightning[13] = glGetUniformLocation (glsl -> id, "fog.depth");
+  lightning[14] = glGetUniformLocation (glsl -> id, "fog.color");
+  lightning[15] = glGetUniformLocation (glsl -> id, "numLights");
   int j;
   for (j=0; j<plot -> l_ghtning.lights; j++)
   {
@@ -207,7 +209,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
     set_light_uniform_location (lightning, glsl -> id, j, 8, "spot_inner");
     set_light_uniform_location (lightning, glsl -> id, j, 9, "spot_outer");
   }
-  lightning[tot-1] = glGetUniformLocation (glsl -> id, "proj_matrix");
+
   return lightning;
 }
 
@@ -878,15 +880,17 @@ void set_lights_data (glsl_program * glsl)
   vec3_t l_pos, l_dir;
 
   glUniformMatrix4fv (glsl -> light_uniform[0], 1, GL_FALSE, & wingl -> model_view_matrix.m00);
-  glUniform1i (glsl -> light_uniform[1], (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0]);
-  glUniform3f (glsl -> light_uniform[2], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);
-  for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[3+j], plot -> m_terial.param[j+1]);
-  glUniform1i (glsl -> light_uniform[8], plot -> f_g.mode);
-  glUniform1i (glsl -> light_uniform[9], plot -> f_g.based);
-  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density/plot -> p_depth);
-  glUniform2f (glsl -> light_uniform[11], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
-  glUniform3f (glsl -> light_uniform[12], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
-  glUniform1i (glsl -> light_uniform[13], plot -> l_ghtning.lights);
+  glUniformMatrix4fv (glsl -> light_uniform[1], 1, GL_FALSE, & wingl -> projection_matrix.m00);
+  glUniform1i (glsl -> light_uniform[2], plot -> rep);
+  glUniform1i (glsl -> light_uniform[3], (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0]);
+  glUniform3f (glsl -> light_uniform[4], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);
+  for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[5+j], plot -> m_terial.param[j+1]);
+  glUniform1i (glsl -> light_uniform[10], plot -> f_g.mode);
+  glUniform1i (glsl -> light_uniform[11], plot -> f_g.based);
+  glUniform1f (glsl -> light_uniform[12], plot -> f_g.density/plot -> p_depth);
+  glUniform2f (glsl -> light_uniform[13], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
+  glUniform3f (glsl -> light_uniform[14], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
+  glUniform1i (glsl -> light_uniform[15], plot -> l_ghtning.lights);
   for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     k = j*LIGHT_DATA + LIGHT_INFO + MATERIAL_DATA + FOG_DATA;
@@ -917,10 +921,6 @@ void set_lights_data (glsl_program * glsl)
     glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
     glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
   }
-  /* Upload the pure projection matrix for unreal impostor shaders.
-     For all other shaders light_uniform[tot-1] == -1 → silently ignored. */
-  int pm_idx = LIGHT_INFO + MATERIAL_DATA + FOG_DATA + plot -> l_ghtning.lights * LIGHT_DATA;
-  glUniformMatrix4fv (glsl -> light_uniform[pm_idx], 1, GL_FALSE, & wingl -> projection_matrix.m00);
 }
 
 uint16_t stipple_pattern[NDOTS]={ 0xAAAA, 0x1111, 0x0000, 0x55FF, 0x24FF, 0x3F3F, 0x33FF, 0x27FF};
@@ -974,8 +974,7 @@ void render_this_shader (glsl_program * glsl, int ids)
     if (plot -> ray_tracing)
     {
       glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_model_view_matrix.m00);
-      int pm_idx = LIGHT_INFO + MATERIAL_DATA + FOG_DATA + plot->l_ghtning.lights * LIGHT_DATA;
-      glUniformMatrix4fv (glsl -> uniform_loc[pm_idx], 1, GL_FALSE, & wingl -> axis_projection_matrix.m00);
+      glUniformMatrix4fv (glsl -> uniform_loc[1], 1, GL_FALSE, & wingl -> axis_projection_matrix.m00);
     }
     else
     {
