@@ -275,7 +275,8 @@ int create_axis_lists ()
   cleaning_shaders (wingl, MAXIS);
   wingl -> create_shaders[MAXIS] = FALSE;
   if (plot -> xyz -> axis == NONE) return nshaders;
-
+  int saved_tracing = plot -> ray_tracing;
+  plot -> ray_tracing = FALSE;
   if (plot -> xyz -> axis == WIREFRAME)
   {
     axis_a = g_malloc0(sizeof*axis_a);
@@ -302,13 +303,14 @@ int create_axis_lists ()
     }
     else
     {
-      axis_a = draw_cylinder (plot -> quality, 1.0, 1.0);
+      int axis_quality = 50;
+      axis_a = draw_cylinder (axis_quality, 1.0, 1.0);
       axis_a -> inst_buffer_size = CYLI_BUFF_SIZE;
-      axis_b = draw_cylinder (plot -> quality, 0.0, 1.0);
+      axis_b = draw_cylinder (axis_quality, 0.0, 1.0);
       axis_b -> inst_buffer_size = CYLI_BUFF_SIZE;
-      axis_c = draw_cylinder_cap (plot -> quality, 1.0, FALSE);
+      axis_c = draw_cylinder_cap (axis_quality, 1.0, FALSE);
       axis_c -> inst_buffer_size = CAPS_BUFF_SIZE;
-      axis_d = draw_sphere (plot -> quality);
+      axis_d = draw_sphere (axis_quality);
       axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
     }
     axis_a -> num_instances = axis_b -> num_instances = axis_c -> num_instances = 3;
@@ -374,5 +376,6 @@ int create_axis_lists ()
   }
   g_free (axis_a);
   g_free (axis_b);
+  plot -> ray_tracing = saved_tracing;
   return nshaders;
 }

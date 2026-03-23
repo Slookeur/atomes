@@ -971,15 +971,7 @@ void render_this_shader (glsl_program * glsl, int ids)
       }
     }
     wingl -> axis_proj_model_view_matrix = create_axis_matrices (j);
-    if (plot -> ray_tracing)
-    {
-      glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_model_view_matrix.m00);
-      glUniformMatrix4fv (glsl -> uniform_loc[1], 1, GL_FALSE, & wingl -> axis_projection_matrix.m00);
-    }
-    else
-    {
-      glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
-    }
+    glUniformMatrix4fv (glsl -> uniform_loc[0], 1, GL_FALSE, & wingl -> axis_proj_model_view_matrix.m00);
     j = (plot -> xyz -> axis == WIREFRAME) ? 1 : 3;
     if (ids > j) shading_glsl_text (glsl);
   }

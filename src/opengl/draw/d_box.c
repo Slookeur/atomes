@@ -301,6 +301,8 @@ int create_box_lists (int b_step)
 
   if (plot -> abc -> box == NONE) return 0;
 
+  int saved_tracing = plot -> ray_tracing;
+  plot -> ray_tracing = FALSE;
   int shaders;
   vertex *= (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
 
@@ -359,7 +361,7 @@ int create_box_lists (int b_step)
     wingl -> ogl_glsl[MDBOX][b_step][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, vs_cyl, NULL, fs_box, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, box_b);
   }
   g_free (box_b);
-
+  plot -> ray_tracing  = saved_tracing;
   return shaders;
 }
 

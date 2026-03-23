@@ -1015,8 +1015,6 @@ struct glwin
   mat4_t proj_model_view_matrix;
   mat4_t proj_view_matrix;
   mat4_t normal_matrix;
-  mat4_t axis_model_view_matrix;
-  mat4_t axis_projection_matrix;
   mat4_t axis_proj_model_view_matrix;
   mat4_t label_projection_matrix;
 
