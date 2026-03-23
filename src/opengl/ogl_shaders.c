@@ -748,7 +748,10 @@ const GLchar * sphere_vertex_ray = GLSL(
 
     /* Billboard quad shifted forward to be in front of the sphere focal plane,
        and inflated by 2.0x to cover perspective distortion at screen edges. */
-    vec3 billboard_vs = center_vs + (2.0 * r_vs) * vec3(vert.x, vert.y, 1.0);
+    // vec3 billboard_vs = center_vs + (2.0 * r_vs) * vec3(vert.x, vert.y, 1.0);
+
+    float inflation = (view_is_ortho == 0) ? 1.05 : 2.0;
+    vec3 billboard_vs = center_vs + (inflation * r_vs) * vec3(vert.x, vert.y, 1.0);
 
     surfacePosition = billboard_vs;
 
@@ -763,6 +766,7 @@ const GLchar * sphere_vertex_ray = GLSL(
   }
 );
 
+
 /* --------------------------------------------------------------------------
  * Cylinder impostor – vertex shader
  * Build a tight axis-aligned bounding-box billboard from the two cylinder
@@ -771,6 +775,7 @@ const GLchar * sphere_vertex_ray = GLSL(
 const GLchar * cylinder_vertex_ray = GLSL(
   uniform mat4 m_view;
   uniform mat4 m_proj;
+  uniform int  view_is_ortho;
 
   in vec4  quat;       /* rotation quaternion {w,x,y,z}                   */
   in float height;     /* full cylinder length (from instance data)       */
@@ -818,8 +823,11 @@ const GLchar * cylinder_vertex_ray = GLSL(
     /* View-space radius with scale correction */
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
 
-    /* View-space AABB of both endpoint discs, inflated by 2.0x for perspective safely */
-    float r_vs_bb = 2.0 * r_vs;
+    /* Dual-endpoint perspective-aware inflation */
+    float inflation = (view_is_ortho == 0) ? 1.05 : 2.0;
+    float r_vs_bb = inflation * r_vs;
+
+    /* View-space AABB of both endpoint discs */
     float xmin = min(p1_vs.x, p2_vs.x) - r_vs_bb;
     float xmax = max(p1_vs.x, p2_vs.x) + r_vs_bb;
     float ymin = min(p1_vs.y, p2_vs.y) - r_vs_bb;
@@ -855,6 +863,7 @@ const GLchar * cylinder_vertex_ray = GLSL(
 const GLchar * cone_vertex_ray = GLSL(
   uniform mat4 m_view;
   uniform mat4 m_proj;
+  uniform int  view_is_ortho;
 
   in vec4 quat;
   in float height;
@@ -896,8 +905,10 @@ const GLchar * cone_vertex_ray = GLSL(
 
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
 
+    float inflation = (view_is_ortho == 0) ? 1.05 : 2.0;
+    float r_vs_bb = inflation * r_vs;
+
     /* Asymmetric AABB: apex contributes radius 0, base contributes r_vs_bb */
-    float r_vs_bb = 2.0 * r_vs;
     float xmin = min(p_apex_vs.x, p_base_vs.x - r_vs_bb);
     float xmax = max(p_apex_vs.x, p_base_vs.x + r_vs_bb);
     float ymin = min(p_apex_vs.y, p_base_vs.y - r_vs_bb);
@@ -934,6 +945,7 @@ const GLchar * cone_vertex_ray = GLSL(
 const GLchar * cap_vertex_ray = GLSL(
   uniform mat4 m_view;
   uniform mat4 m_proj;
+  uniform int  view_is_ortho;
 
   in vec4 quat;
   in float radius;
@@ -968,9 +980,10 @@ const GLchar * cap_vertex_ray = GLSL(
     vec3 norm_vs = normalize (mat3(m_view) * norm_local);
 
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+    float inflation = (view_is_ortho == 0) ? 1.05 : 2.0;
 
-    /* Camera-aligned square billboard, inflated by 2.0x for perspective safely. */
-    vec3 billboard_vs = center_vs + (2.0 * r_vs) * vec3(vert.x, vert.y, 1.0);
+    /* Camera-aligned square billboard, inflated for robustness. */
+    vec3 billboard_vs = center_vs + (inflation * r_vs) * vec3(vert.x, vert.y, 1.0);
 
     surfacePosition = billboard_vs;
 
@@ -1410,7 +1423,7 @@ const GLchar * full_color_ray = GLSL(
     }
     else
     {
-      ray_dir = normalize(surfacePosition);   /* perspective */
+      ray_dir = normalize(surfacePosition);   // Perspective
     }
     Hit the_hit;
     bool hit = false;
