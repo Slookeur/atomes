@@ -742,24 +742,19 @@ const GLchar * sphere_vertex_ray = GLSL(
 
     /* Sphere centre in view space */
     vec3 center_vs = vec3(m_view * vec4(offset, 1.0));
-    vec3 billboard_vs;
 
-    if (view_is_ortho == 0)
-    {
-      /* View-space radius with scale correction */
-      float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
-      /* Billboard quad shifted forward to be in front of the sphere focal plane */
-      billboard_vs = center_vs + r_vs * vec3(vert.x, vert.y, 1.0);
-    }
-    else
-    {
-      billboard_vs = center_vs + radius * vec3(vert.x, vert.y, 0.0);
-    }
+    /* View-space radius with scale correction */
+    float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
+
+    /* Billboard quad shifted forward to be in front of the sphere focal plane,
+       and inflated by 2.0x to cover perspective distortion at screen edges. */
+    vec3 billboard_vs = center_vs + (2.0 * r_vs) * vec3(vert.x, vert.y, 1.0);
+
     surfacePosition = billboard_vs;
 
     imp_a      = center_vs;
     imp_b      = vec3(0.0);
-    imp_r      = radius;
+    imp_r      = r_vs;
     form_type  = 0;
     clip_r_a   = 0.0;   /* spheres have no clipping */
     clip_r_b   = 0.0;
@@ -823,12 +818,13 @@ const GLchar * cylinder_vertex_ray = GLSL(
     /* View-space radius with scale correction */
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
 
-    /* View-space AABB of both endpoint discs */
-    float xmin = min(p1_vs.x, p2_vs.x) - r_vs;
-    float xmax = max(p1_vs.x, p2_vs.x) + r_vs;
-    float ymin = min(p1_vs.y, p2_vs.y) - r_vs;
-    float ymax = max(p1_vs.y, p2_vs.y) + r_vs;
-    float z_bb = max(p1_vs.z, p2_vs.z) + r_vs;
+    /* View-space AABB of both endpoint discs, inflated by 2.0x for perspective safely */
+    float r_vs_bb = 2.0 * r_vs;
+    float xmin = min(p1_vs.x, p2_vs.x) - r_vs_bb;
+    float xmax = max(p1_vs.x, p2_vs.x) + r_vs_bb;
+    float ymin = min(p1_vs.y, p2_vs.y) - r_vs_bb;
+    float ymax = max(p1_vs.y, p2_vs.y) + r_vs_bb;
+    float z_bb = max(p1_vs.z, p2_vs.z) + r_vs_bb;
 
     float bx = mix(xmin, xmax, (vert.x + 1.0) * 0.5);
     float by = mix(ymin, ymax, (vert.y + 1.0) * 0.5);
@@ -900,13 +896,14 @@ const GLchar * cone_vertex_ray = GLSL(
 
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
 
-    /* Asymmetric AABB: apex contributes radius 0, base contributes r_vs */
-    float xmin = min(p_apex_vs.x, p_base_vs.x - r_vs);
-    float xmax = max(p_apex_vs.x, p_base_vs.x + r_vs);
-    float ymin = min(p_apex_vs.y, p_base_vs.y - r_vs);
-    float ymax = max(p_apex_vs.y, p_base_vs.y + r_vs);
+    /* Asymmetric AABB: apex contributes radius 0, base contributes r_vs_bb */
+    float r_vs_bb = 2.0 * r_vs;
+    float xmin = min(p_apex_vs.x, p_base_vs.x - r_vs_bb);
+    float xmax = max(p_apex_vs.x, p_base_vs.x + r_vs_bb);
+    float ymin = min(p_apex_vs.y, p_base_vs.y - r_vs_bb);
+    float ymax = max(p_apex_vs.y, p_base_vs.y + r_vs_bb);
     /* z: front face = closest of apex/base z + base radius (conservative bound). */
-    float z_bb = max(p_apex_vs.z, p_base_vs.z) + r_vs;
+    float z_bb = max(p_apex_vs.z, p_base_vs.z) + r_vs_bb;
 
     // float bx = (vert.x > 0.0) ? xmax : xmin;
     // float by = (vert.y > 0.0) ? ymax : ymin;
@@ -972,11 +969,8 @@ const GLchar * cap_vertex_ray = GLSL(
 
     float r_vs = radius * length(mat3(m_view) * vec3(1.0, 0.0, 0.0));
 
-    /* Camera-aligned square billboard.
-       Same z-offset rationale as sphere_vertex_ray: use vec3(vert.x, vert.y, 1.0)
-       so that the slab is at center_vs.z + r_vs — in front of the disk face —
-       ensuring intersect_cap always starts outside the disk plane.         */
-    vec3 billboard_vs = center_vs + r_vs * vec3(vert.x, vert.y, 1.0);
+    /* Camera-aligned square billboard, inflated by 2.0x for perspective safely. */
+    vec3 billboard_vs = center_vs + (2.0 * r_vs) * vec3(vert.x, vert.y, 1.0);
 
     surfacePosition = billboard_vs;
 
@@ -1408,23 +1402,14 @@ const GLchar * full_color_ray = GLSL(
   {
     /* Ray from camera origin through billboard fragment (view space) */
     vec3 surfaceToCamera = normalize(-surfacePosition);
-    vec3 ray_origin;
+    vec3 ray_origin = surfacePosition;
     vec3 ray_dir;
     if (view_is_ortho == 0)
     {
-      ray_origin = surfacePosition;
       ray_dir = vec3(0.0, 0.0, -1.0); // Parallel rays (Orthographic)
     }
     else
     {
-      if (form_type == 0)
-      {
-        ray_origin = vec3(0.0);
-      }
-      else
-      {
-        ray_origin = surfacePosition;
-      }
       ray_dir = normalize(surfacePosition);   /* perspective */
     }
     Hit the_hit;
