@@ -410,7 +410,7 @@ const GLchar * full_color = GLSL(
     vec3 albedo;
     float metallic;
     float roughness;
-    float back_light;
+    float ambient_occlusion;
     float gamma;
     float alpha;
   };
@@ -437,6 +437,7 @@ const GLchar * full_color = GLSL(
   out vec4 fragment_color;
 
   const float PI = 3.14159265359;
+  const float EPS = 1e-5;
 
   // clamping to 0 - 1 range
   float saturate (in float value)
@@ -530,7 +531,7 @@ const GLchar * full_color = GLSL(
 
     float G = G_schlick(roughness, NdV, NdL);
 
-    float rim = mix(1.0 - roughness * mat.back_light * 0.9, 1.0, NdV);
+    float rim = mix(1.0 - roughness * 0.9, 1.0, NdV);
 
     return (1.0 / rim) * specular * G * D;
   }
@@ -550,7 +551,7 @@ const GLchar * full_color = GLSL(
     }
     else
     {
-      vec3 L = light.position - v_pos;
+      L = light.position - v_pos;
       float dist = length (L);
       L = normalize(L);
       A = 1.0 / (light.constant + light.linear*dist + light.quadratic*dist*dist);
@@ -654,6 +655,14 @@ const GLchar * full_color = GLSL(
     return mix (fog.color, lightColor, fogFactor);
   }
 
+  float computeAO(vec3 N)
+  {
+    float ao = 0.5 + 0.5 * N.y;  // plage 0.0 -> 1.0
+    ao = pow(ao, 1.0);           // gamma pour adoucir
+    ao *= mat.ambient_occlusion;
+    return saturate(ao);
+  }
+
   void main ()
   {
     // Properties
@@ -675,6 +684,8 @@ const GLchar * full_color = GLSL(
         color +=  Apply_lighting_model (lights_on, AllLights[i], specular);
       }
       color = pow(color, vec3(1.0/mat.gamma));
+      float ao = computeAO(surfaceNormal);
+      color *= ao;
       alpha = surfaceColor.w * mat.alpha;
     }
 
@@ -1003,6 +1014,7 @@ const GLchar * cap_vertex_ray = GLSL(
  * Perfect-impostor fragment shader.
  * --------------------------------------------------------------------------*/
 const GLchar * full_color_ray = GLSL(
+
   int PHONG           = 1;
   int BLINN           = 2;
   int COOK_BLINN      = 3;
@@ -1026,7 +1038,7 @@ const GLchar * full_color_ray = GLSL(
     vec3 albedo;
     float metallic;
     float roughness;
-    float back_light;
+    float ambient_occlusion;
     float gamma;
     float alpha;
   };
@@ -1051,7 +1063,6 @@ const GLchar * full_color_ray = GLSL(
   uniform int numLights;
   uniform int view_is_ortho;
   uniform mat4 m_proj;
-
 
   in vec4  surfaceColor;
   in vec3  surfacePosition;
@@ -1166,7 +1177,7 @@ const GLchar * full_color_ray = GLSL(
 
     float G = G_schlick(roughness, NdV, NdL);
 
-    float rim = mix(1.0 - roughness * mat.back_light * 0.9, 1.0, NdV);
+    float rim = mix(1.0 - roughness * 0.9, 1.0, NdV);
 
     return (1.0 / rim) * specular * G * D;
   }
@@ -1185,7 +1196,7 @@ const GLchar * full_color_ray = GLSL(
     }
     else
     {
-      vec3 L = light.position - v_pos;
+      L = light.position - v_pos;
       float dist = length (L);
       L = normalize(L);
       A = 1.0 / (light.constant + light.linear*dist + light.quadratic*dist*dist);
@@ -1205,7 +1216,6 @@ const GLchar * full_color_ray = GLSL(
     }
     vec3 V = normalize(-v_pos);
     vec3 H = normalize(L + V);
-    // vec3 N = surfaceNormal; // Using argument now
 
     // compute material reflectance
     float NdL = max(0.0, dot(N, L));
@@ -1234,7 +1244,7 @@ const GLchar * full_color_ray = GLSL(
     {
       // specular reflectance with Cook-Torrance
       specfresnel = fresnel_factor(specular, HdV);
-      specref = cooktorrance_specular(model, NdL, NdV, NdH, specfresnel, mat.roughness);
+      specref = cooktorrance_specular (model, NdL, NdV, NdH, specfresnel, mat.roughness);
     }
 
     specref *= vec3(NdL);
@@ -1255,7 +1265,7 @@ const GLchar * full_color_ray = GLSL(
     return diffuse_light * mix(mat.albedo, vec3(0.0), mat.metallic) + reflected_light;
   }
 
-  vec3 Apply_fog (in vec3 lightColor, in vec3 v_pos)
+  vec3 Apply_fog (in vec3 lightColor, in vec3 v_pos, in vec3 normal)
   {
      // distance
     float dist = 0.0;
@@ -1286,6 +1296,10 @@ const GLchar * full_color_ray = GLSL(
       fogFactor = 1.0 / exp((dist * fog.density)* (dist * fog.density));
     }
     fogFactor = saturate (fogFactor);
+
+    //float viewAngle = dot(normalize(-v_pos), normalize(normal));
+    // fogFactor *= mix(0.7, 1.0, viewAngle);
+
     return mix (fog.color, lightColor, fogFactor);
   }
 
@@ -1411,6 +1425,79 @@ const GLchar * full_color_ray = GLSL(
     return true;
   }
 
+  bool intersect_scene(vec3 ro, vec3 rd, out Hit hit)
+  {
+    if (form_type == 0) // Sphere
+    {
+      return intersect_sphere(ro, rd, imp_a, imp_r, hit);
+    }
+    else if (form_type == 1) // Cylinder
+    {
+      return intersect_cylinder(ro, rd, imp_a, imp_b, imp_r, hit);
+    }
+    else if (form_type == 2) // Cap
+    {
+      return intersect_cap(ro, rd, imp_a, imp_b, imp_r, hit);
+    }
+    else if (form_type == 3) // Cone
+    {
+      return intersect_cone(ro, rd, imp_a, imp_b, imp_r, hit);
+    }
+    return false;
+  }
+
+  float computeAO(vec3 pos, vec3 N)
+  {
+    float occlusion = 0.0;
+    vec3 tangent = normalize(abs(N.x) > 0.5 ? cross(N, vec3(0,1,0)) : cross(N, vec3(1,0,0)));
+    vec3 bitangent = cross(N, tangent);
+
+    const int AO_SAMPLES = 8;
+    float maxDist = imp_r * 5.0; // portée locale
+    const float EPS_AO = 0.001;
+
+    for(int i = 0; i < AO_SAMPLES; i++)
+    {
+      float u = float(i)/float(AO_SAMPLES);
+      float v = fract(sin(float(i) * 12.9898) * 43758.5453);
+
+      // conversion en hémisphère tangent
+      float theta = acos(sqrt(1.0 - u));
+      float phi   = 2.0 * PI * v;
+      vec3 dir = vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta));
+
+      // passage dans l’espace du tangent
+      dir = normalize(dir.x*tangent + dir.y*bitangent + dir.z*N);
+
+      Hit tmp;
+      if(intersect_scene(pos + N * EPS_AO, dir, tmp))
+      {
+        float dist = length(tmp.pos - pos);
+        float weight = 1.0 - saturate(dist / maxDist);
+        occlusion += weight;
+      }
+    }
+
+    float ao = 1.0 - (occlusion / float(AO_SAMPLES));
+    ao = pow(ao, 0.8); // adoucissement
+    return max(ao, 0.3) * mat.ambient_occlusion;
+  }
+
+  float ray_computeAO(vec3 N)
+  {
+    // Orientation vers le haut (Y est l'up vector)
+    float ao = 0.5 + 0.5 * N.y;
+
+    // Adoucissement gamma (optionnel, ici gamma = 1.0)
+    ao = pow(ao, 1.0);
+
+    // Appliquer le facteur global du GUI
+    ao *= mat.ambient_occlusion;
+
+    // Clamp entre 0 et 1 pour sécurité
+    return saturate(ao);
+  }
+
   void main ()
   {
     /* Ray from camera origin through billboard fragment (view space) */
@@ -1428,23 +1515,7 @@ const GLchar * full_color_ray = GLSL(
     Hit the_hit;
     bool hit = false;
 
-    if (form_type == 0)      // Sphere
-    {
-      hit = intersect_sphere (ray_origin, ray_dir, imp_a, imp_r, the_hit);
-    }
-    else if (form_type == 1) // Cylinder
-    {
-      hit = intersect_cylinder (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
-    }
-    else if (form_type == 2) // Cap
-    {
-      hit = intersect_cap (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
-    }
-    else if (form_type == 3) // Cone
-    {
-      // imp_a = apex, imp_b = base center, imp_r = radius
-      hit = intersect_cone (ray_origin, ray_dir, imp_a, imp_b, imp_r, the_hit);
-    }
+    hit = intersect_scene (ray_origin, ray_dir, the_hit);
 
     if (! hit) discard;
     if (dot(the_hit.normal, surfaceToCamera) < 0.0) the_hit.normal = -the_hit.normal;
@@ -1484,23 +1555,26 @@ const GLchar * full_color_ray = GLSL(
      // constant base specular factor of 0.04 grey is used
       vec3 specular = mix(vec3(0.04), mat.albedo, mat.metallic);
       color = vec3(0.0);
-      for(int i = 0; i < numLights; i++)
+      vec3 diffuse = vec3(0.0);
+      int i;
+      for(i = 0; i < numLights; i++)
       {
-        color +=  Apply_lighting_model (lights_on, AllLights[i], specular, the_hit.pos, the_hit.normal);
+        diffuse += Apply_lighting_model (lights_on, AllLights[i], specular, the_hit.pos, the_hit.normal);
       }
-      color = pow(color, vec3(1.0/mat.gamma));
-      alpha = surfaceColor.w * mat.alpha;
+      float ao = ray_computeAO (the_hit.normal); // computeAO (the_hit.pos, the_hit.normal);
+      diffuse *= ao;
+      vec3 lit_color = pow(diffuse,vec3(1.0/mat.gamma));
+      color = surfaceColor.xyz*lit_color;
+      alpha = surfaceColor.w*mat.alpha;
     }
-
-    vec3 final_color = surfaceColor.xyz * color;
 
     if (fog.mode > 0)
     {
-      fragment_color = vec4 (Apply_fog(final_color, the_hit.pos), alpha);
+      fragment_color = vec4 (Apply_fog(color, the_hit.pos, the_hit.normal), alpha);
     }
     else
     {
-      fragment_color = vec4 (final_color, alpha);
+      fragment_color = vec4 (color, alpha);
     }
   }
 );

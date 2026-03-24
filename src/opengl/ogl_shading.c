@@ -186,7 +186,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   lightning[4]  = glGetUniformLocation (glsl -> id, "mat.albedo");
   lightning[5]  = glGetUniformLocation (glsl -> id, "mat.metallic");
   lightning[6]  = glGetUniformLocation (glsl -> id, "mat.roughness");
-  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.back_light");
+  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.ambient_occlusion");
   lightning[8]  = glGetUniformLocation (glsl -> id, "mat.gamma");
   lightning[9]  = glGetUniformLocation (glsl -> id, "mat.alpha");
   lightning[10]  = glGetUniformLocation (glsl -> id, "fog.mode");

@@ -213,14 +213,14 @@ struct Material
   // 0 = lightning model
   // 2 = metallic
   // 3 = roughness
-  // 4 = back lightning
+  // 4 = ambient occlusion
   // 5 = gamma
   // 6 = opacity
   GLfloat param[6];    /*!< Material parameters \n
                          0 = lightning model, \n
                          1 = metallic, \n
                          2 = roughness, \n
-                         3 = back lightning, \n
+                         3 = ambient occlusion, \n
                          4 = gamma, \n
                          5 = opacity*/
 };
