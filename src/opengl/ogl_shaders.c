@@ -1448,23 +1448,23 @@ const GLchar * full_color_ray = GLSL(
 
   float computeAO(vec3 pos, vec3 N)
   {
+    const int AO_SAMPLES = 32;
+    const float EPS_AO = 0.001;
+
+    float maxDist = imp_r * 10.0;
     float occlusion = 0.0;
     vec3 tangent = normalize(abs(N.x) > 0.5 ? cross(N, vec3(0,1,0)) : cross(N, vec3(1,0,0)));
     vec3 bitangent = cross(N, tangent);
 
-    const int AO_SAMPLES = 8;
-    float maxDist = imp_r * 5.0; // portée locale
-    const float EPS_AO = 0.001;
-
     for(int i = 0; i < AO_SAMPLES; i++)
     {
       float u = float(i)/float(AO_SAMPLES);
-      float v = fract(sin(float(i) * 12.9898) * 43758.5453);
+      float v = fract(sin(float(i)*91.345) * 47453.545);
 
-      // conversion en hémisphère tangent
-      float theta = acos(sqrt(1.0 - u));
-      float phi   = 2.0 * PI * v;
-      vec3 dir = vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta));
+      float phi = 2.0 * PI * v;
+      float cosTheta = sqrt(1.0 - u);
+      float sinTheta = sqrt(u);
+      vec3 dir = vec3(cos(phi) * sinTheta,  sin(phi) * sinTheta, cosTheta);
 
       // passage dans l’espace du tangent
       dir = normalize(dir.x*tangent + dir.y*bitangent + dir.z*N);
@@ -1473,28 +1473,27 @@ const GLchar * full_color_ray = GLSL(
       if(intersect_scene(pos + N * EPS_AO, dir, tmp))
       {
         float dist = length(tmp.pos - pos);
-        float weight = 1.0 - saturate(dist / maxDist);
+        // float weight = 1.0 - saturate(dist / maxDist);
+        float weight = exp(-dist * 2.0 / maxDist);
         occlusion += weight;
       }
     }
 
     float ao = 1.0 - (occlusion / float(AO_SAMPLES));
-    ao = pow(ao, 0.8); // adoucissement
-    return max(ao, 0.3) * mat.ambient_occlusion;
+    ao = pow(ao, mat.gamma); // softening
+    // Safety clamp between 0.0 and 1.0
+    return saturate(ao);
   }
 
   float ray_computeAO(vec3 N)
   {
-    // Orientation vers le haut (Y est l'up vector)
+    // Up orientation (Y is the up vector)
     float ao = 0.5 + 0.5 * N.y;
 
-    // Adoucissement gamma (optionnel, ici gamma = 1.0)
-    ao = pow(ao, 1.0);
+    // Softening
+    ao = pow(ao, mat.gamma);
 
-    // Appliquer le facteur global du GUI
-    ao *= mat.ambient_occlusion;
-
-    // Clamp entre 0 et 1 pour sécurité
+    // Safety clamp between 0.0 and 1.0
     return saturate(ao);
   }
 
@@ -1561,8 +1560,8 @@ const GLchar * full_color_ray = GLSL(
       {
         diffuse += Apply_lighting_model (lights_on, AllLights[i], specular, the_hit.pos, the_hit.normal);
       }
-      float ao = ray_computeAO (the_hit.normal); // computeAO (the_hit.pos, the_hit.normal);
-      diffuse *= ao;
+      float ao = computeAO (the_hit.pos, the_hit.normal) * ray_computeAO (the_hit.normal);
+      diffuse *= ao * mat.ambient_occlusion;
       vec3 lit_color = pow(diffuse,vec3(1.0/mat.gamma));
       color = surfaceColor.xyz*lit_color;
       alpha = surfaceColor.w*mat.alpha;
