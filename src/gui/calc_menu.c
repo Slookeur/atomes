@@ -149,8 +149,8 @@ G_MODULE_EXPORT void set_max (GtkEntry * entry, gpointer data)
 }
 
 GtkWidget * rings_box[2];
-GtkWidget * omega_max_hbox;
-GtkWidget * omega_max_info;
+GtkWidget * omega_max_hbox = NULL;
+GtkWidget * omega_max_info = NULL;
 
 /*!
   \fn void update_omega_max ()

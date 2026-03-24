@@ -81,7 +81,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
   GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 
-  Light init_light_source (int type, float val, float vbl);
+  Light init_light_source (int type, float size);
   Light copy_light_source (Light old_sp);
   Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 
@@ -103,13 +103,13 @@ gchar * material_template[TEMPLATES] = {"Opaque",
                                         "Translucent",
                                         "Diffuse"};
 
-GLfloat template_parameters[TEMPLATES][5] ={{0.50, 0.50, 0.01, 1.00, 1.00},  // Ok
-                                            {0.90, 0.60, 0.01, 1.50, 1.00},  // Ok
-                                            {0.80, 0.40, 0.01, 1.00, 1.00},  // Ok
-                                            {0.35, 0.15, 0.01, 1.50, 1.00},  // Ok
-                                            {0.50, 0.50, 0.01, 1.00, 0.50},  //
-                                            {0.50, 0.50, 0.01, 1.00, 0.75},  //
-                                            {0.35, 0.80, 0.01, 1.50, 1.00}}; // Ok
+GLfloat template_parameters[TEMPLATES][5] ={{0.50, 0.50, 0.99, 1.00, 1.00},  // Ok
+                                            {0.90, 0.60, 0.99, 1.50, 1.00},  // Ok
+                                            {0.80, 0.40, 0.99, 1.00, 1.00},  // Ok
+                                            {0.35, 0.15, 0.99, 1.50, 1.00},  // Ok
+                                            {0.50, 0.50, 0.99, 1.00, 0.50},  //
+                                            {0.50, 0.50, 0.99, 1.00, 0.75},  //
+                                            {0.35, 0.80, 0.99, 1.50, 1.00}}; // Ok
 
 float mat_min_max[5][2] = {{0.0, 1.0},
                            {0.0, 1.0},
@@ -333,46 +333,43 @@ void print_light_source (Light source, int i)
 */
 
 /*!
-  \fn Light init_light_source (int type, float val, float vbl)
+  \fn Light init_light_source (int type, float size)
 
   \brief initialize a light source
 
   \param type the type of light
-  \param size depth or max (a,b,c)
-  \param depth field depth
-  \param intens
+  \param size system size
 */
-Light init_light_source (int type, float size, float depth)
+Light init_light_source (int type, float size)
 {
   Light new_light;
   new_light.type = type;
   new_light.fix = (type != 1) ? 0 : 1;
   new_light.show = 0;
+  new_light.intensity = vec3(0.0, 0.0, 0.0);
   new_light.direction = vec3(0.0, 0.0, 0.0);
-  double intensity = (type == 1) ? 100.0*DEFAULT_INTENSITY : DEFAULT_INTENSITY;
-  if (size != depth)
-  {
-    intensity *= exp (size/depth);
-  }
-  if (! preferences && depth <= 50.0) intensity *= depth / 100.0;
-  new_light.intensity = vec3 (intensity, intensity, intensity);
-  new_light.attenuation = vec3 (1.0, 0.14, 0.07);
-  new_light.spot_data = vec3 (20.0, 20.0, 20.0);
+  new_light.position = vec3(0.0, 0.0, 0.0);
+  new_light.attenuation = vec3(0.0, 0.0, 0.0);
   if (type == 0)
   {
+    new_light.intensity = vec3 (DEFAULT_INTENSITY, DEFAULT_INTENSITY, DEFAULT_INTENSITY);
     new_light.position = vec3 (0.0, 0.0, 0.0);
-    new_light.direction = vec3 (0.0, 0.0, -1.0);
+    new_light.direction = vec3 (0.5, 1.0, 0.7);
+    new_light.attenuation = vec3 (1.0, 0.0, 0.0);
+  }
+  else if (type == 1)
+  {
+    new_light.intensity = vec3 (1.2, 1.1, 1.0);
+    new_light.position  = vec3 (0.0, 0.0, size * 0.8);
+    new_light.attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
   }
   else
   {
-    new_light.position  = vec3 (depth*1.5, 0.0, 0.0);
-    if (type == 2)
-    {
-      new_light.intensity = v3_muls (new_light.intensity, 100.0);
-      float tan = (size * sqrt(2.0) / 2.0) / (depth - size);
-      float tetha = fabs(atanf (tan)) * 90.0 / pi;
-      new_light.spot_data = vec3 (tetha, tetha, tetha);
-    }
+    new_light.intensity = vec3 (1.5, 1.4, 1.3);
+    new_light.position = vec3 (0.0, 0.0, size * 0.5); // Au centre
+    new_light.direction = vec3 (0.0, 0.0, -1.0);      // Vers le bas
+    new_light.attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
+    new_light.spot_data = vec3 (45.0, 5.0, 8.0);
   }
   return new_light;
 }
@@ -592,10 +589,9 @@ void add_remove_lights (int val, gpointer data)
     g_free (this_lightning -> spot);
     this_lightning -> spot = copy_light_sources (val, i, old_spots);
     this_lightning -> lights = val;
-    float pos = (preferences) ? 20.0 : (this_proj -> cell.box[0].param[0][0] == 0.0) ? 20.0 : this_proj -> cell.box[0].param[0][0];
     for (j=i; j<val; j++)
     {
-      this_lightning -> spot[j] = init_light_source (0, pos, (! preferences) ? this_proj -> modelgl -> p_moy : 1.0); // Init directional by default
+      this_lightning -> spot[j] = init_light_source (0, (! preferences) ? this_proj -> modelgl -> p_moy : 1.0); // Init directional by default
     }
     g_free (old_spots);
   }
@@ -1357,8 +1353,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
                        FALSE, FALSE, 0);
   quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, quality_scale, FALSE, FALSE, 0);
-  widget_set_sensitive (quality_scale, ! view -> anim -> last -> img -> ray_tracing);
-
+  widget_set_sensitive (quality_scale, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4]);
 
   box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
@@ -1414,6 +1409,8 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
 }
 
 // ***************** FOG ******************* //
+
+GtkWidget * fogtype;
 
 /*!
   \fn void fog_param_changed (gpointer data, GLfloat u, GtkRange * range)
@@ -1550,6 +1547,8 @@ void setup_fog_dialogs (opengl_edition * ogl_edit, int fid)
     this_fog = & tmp_fog;
   }
   this_fog -> mode = fid;
+  widget_set_sensitive (fogtype, (this_fog -> mode == 1) ? TRUE : FALSE);
+  if (this_fog -> mode) combo_set_active (fogtype, 0);
   if (this_fog -> mode)
   {
     show_the_widgets (ogl_edit -> param_fog);
@@ -1613,12 +1612,13 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> param_fog, FALSE, FALSE, 0);
 
   box = adv_box (ogl_edit -> param_fog, "<b>Fog type</b> ", 5, 150, 0.0);
-  GtkWidget * fogtype = create_combo ();
+  fogtype = create_combo ();
   combo_text_append (fogtype, "Plane based");
   combo_text_append (fogtype, "Range based");
   gtk_widget_set_size_request (fogtype, 200, -1);
-  combo_set_active (fogtype, the_fog -> based);
+  combo_set_active (fogtype, the_fog -> mode);
   g_signal_connect (G_OBJECT (fogtype), "changed", G_CALLBACK(set_fog_type), ogl_edit);
+  widget_set_sensitive (fogtype, (the_fog -> mode == 1) ? TRUE : FALSE);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fogtype, FALSE, FALSE, 0);
 
   ogl_edit -> dens_box =  adv_box (ogl_edit -> param_fog, "<b>Fog density</b>", 10, 150.0, 0.0);

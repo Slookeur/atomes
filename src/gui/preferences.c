@@ -162,7 +162,7 @@ extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
-extern Light init_light_source (int type, float val, float vbl);
+extern Light init_light_source (int type, float size);
 extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
@@ -2175,9 +2175,9 @@ void set_atomes_defaults ()
   default_lightning.lights = 3;
   if (default_lightning.spot) g_free (default_lightning.spot);
   default_lightning.spot = g_malloc0(3*sizeof*default_lightning.spot);
-  default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
-  default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
-  default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
+  default_lightning.spot[0] = init_light_source (0, 1.0);
+  default_lightning.spot[1] = init_light_source (1, 1.0);
+  default_lightning.spot[2] = init_light_source (2, 1.0);
 
   // Fog
   default_fog.mode = 1;

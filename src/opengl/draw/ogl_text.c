@@ -434,7 +434,6 @@ void render_string (int glsl, int id, screen_string * this_string)
   j = pango_font_description_get_size (pfont);
   font_size = j / PANGO_SCALE;
 
-  //g_debug ("Zoom = %f, gnear= %f, p_moy= %f, p_depth= %f", plot -> zoom, plot -> gnear, wingl -> p_moy, plot -> p_depth);
   if (plot -> labels[id].scale) font_size *= ((ZOOM/plot -> zoom)*(plot -> gnear/6.0)*(wingl -> p_moy/plot -> p_depth));
   if (in_movie_encoding)
   {

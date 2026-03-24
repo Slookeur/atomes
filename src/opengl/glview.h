@@ -47,7 +47,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 /*! \def DEFAULT_LIGHTNING
   \brief Default OpenGL material ligthning
 */
-#define DEFAULT_LIGHTNING          1.00
+#define DEFAULT_LIGHTNING          5.00
 
 /*! \def DEFAULT_METALLIC
   \brief Default OpenGL material metallic
@@ -62,7 +62,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 /*! \def DEFAULT_AMBIANT_OCCLUSION
   \brief Default OpenGL material ambiant occlusion
 */
-#define DEFAULT_AMBIANT_OCCLUSION  1.00
+#define DEFAULT_AMBIANT_OCCLUSION  0.99
 
 /*! \def DEFAULT_GAMMA_CORRECTION
   \brief Default OpenGL material gamma correction
@@ -91,7 +91,7 @@ extern GLfloat template_parameters[TEMPLATES][5];
 /*! \def DEFAULT_INTENSITY
   \brief Default light intensity
 */
-#define DEFAULT_INTENSITY 10.0
+#define DEFAULT_INTENSITY 30.0
 
 /*! \def NEAR_PLANE
   \brief Default value for the OpenGL near plane

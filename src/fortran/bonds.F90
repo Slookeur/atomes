@@ -660,7 +660,8 @@ USE PARAMETERS
 
 IMPLICIT NONE
 
-DOUBLE PRECISION :: dmax
+DOUBLE PRECISION :: maxd
+DOUBLE PRECISION, DIMENSION(3) :: dmax
 
 do l=1,3
   pmin(l) = FULLPOS(1,l,1)
@@ -690,15 +691,19 @@ deallocate (NFULLPOS)
 
 if (PBC) then
   oglmax = sqrt(Dij)
-  dmax = 0.0d0
+  dmax(:) = 0.0d0
+  maxd = 0.0d0
   do l=1, NCELLS
-    dmax = max(dmax, THE_BOX(l)%maxv)
+    do m=1, 3
+      dmax(m) = max(dmax(m), THE_BOX(l)%modv(m)*THE_BOX(l)%modv(m))
+    enddo
   enddo
-  if (oglmax < dmax) oglmax = dmax*3.0;
+  maxd = sqrt(dmax(1)+dmax(2)+dmax(3))
+  if (oglmax < maxd) oglmax = maxd;
 else
-  oglmax=2.0*sqrt(Dij)
+  oglmax=sqrt(Dij)
 endif
-
+oglmax = 2.0*oglmax
 if (oglmax .lt. 10.0) oglmax = 10.0
 
 END FUNCTION

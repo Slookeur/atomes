@@ -1448,10 +1448,10 @@ const GLchar * full_color_ray = GLSL(
 
   float computeAO(vec3 pos, vec3 N)
   {
-    const int AO_SAMPLES = 32;
+    const int AO_SAMPLES = 16;
     const float EPS_AO = 0.001;
 
-    float maxDist = imp_r * 10.0;
+    float maxDist = imp_r * 8.0;
     float occlusion = 0.0;
     vec3 tangent = normalize(abs(N.x) > 0.5 ? cross(N, vec3(0,1,0)) : cross(N, vec3(1,0,0)));
     vec3 bitangent = cross(N, tangent);
@@ -1561,7 +1561,8 @@ const GLchar * full_color_ray = GLSL(
         diffuse += Apply_lighting_model (lights_on, AllLights[i], specular, the_hit.pos, the_hit.normal);
       }
       float ao = computeAO (the_hit.pos, the_hit.normal) * ray_computeAO (the_hit.normal);
-      diffuse *= ao * mat.ambient_occlusion;
+
+      diffuse *= (ao * mat.ambient_occlusion);
       vec3 lit_color = pow(diffuse,vec3(1.0/mat.gamma));
       color = surfaceColor.xyz*lit_color;
       alpha = surfaceColor.w*mat.alpha;

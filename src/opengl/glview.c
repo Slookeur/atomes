@@ -106,7 +106,7 @@ extern vec4_t old_rotation_quaternion;
 extern void process_the_hits (glwin * view, gint event_button, double ptx, double pty);
 extern void arc_ball_rotation (glwin * view, int x, int y);
 extern vec3_t get_arc_ball_vector (glwin * view, int x, int y);
-extern Light init_light_source (int type, float val, float vbl);
+extern Light init_light_source (int type, float size);
 extern void rotate_quat (project * this_proj, vec4_t q, int status, int axis);
 extern void translate (project * this_proj, int status, int axis, vec3_t trans);
 extern vec3_t get_bary (project * this_proj, int status);
@@ -1307,21 +1307,15 @@ void setup_default_lights (project * this_proj, image * img)
   img -> l_ghtning.lights = default_lightning.lights;
   if (img -> l_ghtning.spot) g_free (img -> l_ghtning.spot);
   img -> l_ghtning.spot = g_malloc0(img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
-  float size = 0.0;
   int i;
-  if (this_proj -> cell.box)
-  {
-    for (i=0; i<3; i++) size = max (size, this_proj -> cell.box[0].param[0][i]);
-  }
-  size = (size) ? size : img -> p_depth;
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, size, img -> p_depth);
+    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, img -> p_depth);
     img -> l_ghtning.spot[i].fix = default_lightning.spot[i].fix;
     img -> l_ghtning.spot[i].intensity = default_lightning.spot[i].intensity;
     if (img -> p_depth <= 50.0)
     {
-      img -> l_ghtning.spot[i].intensity = v3_muls (img -> l_ghtning.spot[i].intensity, img -> p_depth/100.0);
+      // img -> l_ghtning.spot[i].intensity = v3_muls (img -> l_ghtning.spot[i].intensity, img -> p_depth/100.0);
     }
     img -> l_ghtning.spot[i].attenuation = default_lightning.spot[i].attenuation;
     img -> l_ghtning.spot[i].direction = default_lightning.spot[i].direction;
