@@ -1461,6 +1461,8 @@ void init_opengl ()
 #ifdef GTK3
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #else
+  // Mandatory with GTK4 to obtain an alpha channel similar to the GTK3 version
+  // However it affects the rendering without ligthning (ex: WIREFRAME) for large systems
   glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 #endif
 
