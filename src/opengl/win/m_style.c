@@ -276,8 +276,9 @@ void set_this_style (glwin * view, int style)
   if (get_project_by_id(view -> proj) -> natomes)
   {
 #ifdef GTK4
+
     int sty = (style < SPACEFILL) ? style : (style > OGL_STYLES) ? SPACEFILL + (style - OGL_STYLES) : style + FILLED_STYLES;
-    gchar * str = g_strdup_printf ("set-style.%d.0", style);
+    gchar * str = g_strdup_printf ("set-style.%d.0", sty);
     activate_glwin_action (str, "set-style", view);
     g_free (str);
 #else

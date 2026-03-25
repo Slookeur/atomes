@@ -138,7 +138,7 @@ shortcuts opengl_shortcuts[] = {
   { "Atom(s) color map", "change atom(s) color map", GDK_KEY_a, "a" },
   { "Polyhedra color map", "change polyhedra color map", GDK_KEY_p, "p" },
   { "Ball and stick", "change global style to ball and stick", GDK_KEY_b, "b" },
-  { "Cylinders", "change global style to cylinders", GDK_KEY_w, "w" },
+  { "Cylinders", "change global style to cylinders", GDK_KEY_c, "c" },
   { "Spheres", "change global style to spheres", GDK_KEY_s, "s" },
   { "Covalent radius", "change global style to cylinders", GDK_KEY_o, "o" },
   { "Ionic radius", "change global style to cylinders", GDK_KEY_i, "i" },

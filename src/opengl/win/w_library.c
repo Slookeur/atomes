@@ -831,7 +831,7 @@ void insert_preview ()
 {
   gchar * str;
   lib_preview_plot = gtk_fixed_new ();
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lib_preview_box, lib_preview_plot, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lib_preview_box, lib_preview_plot, FALSE, FALSE, 0);
   GtkWidget * grid = gtk_grid_new ();
   gtk_fixed_put (GTK_FIXED(lib_preview_plot), grid, 0, 10);
   gtk_widget_set_size_request (grid, -1, 200);
@@ -1126,7 +1126,7 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
   molecule_store = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, library_tree (molecule_store, 1, "Molecule"), FALSE, FALSE, 0);
   lib_preview_box = create_hbox(0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lib_preview_box, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lib_preview_box, FALSE, FALSE, 10);
   lib_preview_plot = NULL;
   the_family = 0;
   gtk_tree_selection_select_iter (libselect[0], & first_family_iter);

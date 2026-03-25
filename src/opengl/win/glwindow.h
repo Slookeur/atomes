@@ -39,6 +39,7 @@ extern void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, 
 
 #ifdef GTK4
 extern G_MODULE_EXPORT void to_reset_view (GSimpleAction * action, GVariant * parameter, gpointer data);
+extern void activate_glwin_action (gchar * action_string, gchar * action_name, glwin * view);
 #else
 extern G_MODULE_EXPORT void to_reset_view (GtkWidget * widg, gpointer data);
 #endif

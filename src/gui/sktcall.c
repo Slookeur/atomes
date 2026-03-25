@@ -158,6 +158,13 @@ void recup_sqw_list_ (int nq, double qval[nq])
 void init_skt (project * this_proj, int opening)
 {
   int g, h, i, j, k, l, m;
+  if (this_proj -> analysis[SKT] -> curves)
+  {
+    for (i=0; i<this_proj -> analysis[SKT] -> numc; i++)
+    {
+      hide_the_widgets(this_proj -> analysis[SKT] -> curves[i] -> window);
+    }
+  }
   this_proj -> skt_sets = 8+4*this_proj -> nspec*this_proj -> nspec;
   if (this_proj -> nspec == 2) this_proj -> skt_sets += 8;
   this_proj -> sqw_sets = this_proj -> skt_sets;
