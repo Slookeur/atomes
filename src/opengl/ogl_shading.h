@@ -77,7 +77,6 @@ extern const GLchar * full_color_ray;
 // Sphere
 extern const GLchar * sphere_vertex;
 extern const GLchar * sphere_vertex_ray;
-
 // Cylinder and caps
 extern const GLchar * cylinder_vertex;
 extern const GLchar * cylinder_vertex_ray;
@@ -85,10 +84,6 @@ extern const GLchar * cone_vertex;
 extern const GLchar * cone_vertex_ray;
 extern const GLchar * cap_vertex;
 extern const GLchar * cap_vertex_ray;
-
-// Cylinder in geometry shader
-extern const GLchar * gs_cylinder_vertex;
-extern const GLchar * gs_cylinder_geom;
 
 extern const GLchar * string_vertex;
 extern const GLchar * string_color;

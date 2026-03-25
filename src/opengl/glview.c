@@ -1453,12 +1453,16 @@ void init_opengl ()
   glEnable (GL_LINE_SMOOTH);                       // Lines antialiasing
   glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
 
-  glDisable (GL_POLYGON_SMOOTH);                   // To disable ploygon antialiasing
+  glDisable (GL_POLYGON_SMOOTH);                   // To disable polygon antialiasing
   glEnable (GL_POLYGON_STIPPLE);
   glEnable (GL_POLYGON_OFFSET_FILL);
 
   glEnable (GL_BLEND);
+#ifdef GTK3
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#else
+  glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+#endif
 
   glPolygonOffset (1.0, 1.0);
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);

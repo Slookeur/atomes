@@ -68,14 +68,7 @@ const GLchar * point_color = GLSL(
   out vec4 fragment_color;
   void main()
   {
-    /*if(dot(gl_PointCoord-0.5,gl_PointCoord-0.5)>0.25)
-    {
-      discard;
-    }
-    else
-    {*/
-      fragment_color = vert_color;
-    //}
+    fragment_color = vert_color;
   }
 );
 
@@ -88,19 +81,6 @@ const GLchar * line_vertex = GLSL(
   uniform mat4 mvp;
   in vec3 vert;
   in vec4 vertColor;
-
-  out vec4 vert_color;
-  void main()
-  {
-    vert_color = vertColor;
-    gl_Position = mvp * vec4(vert, 1.0);
-  }
-);
-
-const GLchar * axis_line_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform vec4 vertColor;
-  in vec3 vert;
 
   out vec4 vert_color;
   void main()
@@ -382,6 +362,274 @@ const GLchar * full_vertex = GLSL(
     surfaceNormal   = mat3(m_view) * vertNormal;
     surfaceToCamera = normalize (- surfacePosition);
     gl_Position     = mvp * vec4(vert, 1.0f);
+  }
+);
+
+// Sphere
+
+const GLchar * sphere_vertex = GLSL(
+  uniform mat4 mvp;
+  uniform mat4 m_view;
+
+  in vec3 vert;
+  in vec3 offset;
+  in vec4 vertColor;
+  in float radius;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 surfaceNormal;
+  out vec3 surfaceToCamera;
+  void main ()
+  {
+    surfaceColor    = vertColor;
+    vec4 pos = vec4 (radius*vert + offset, 1.0);
+    surfacePosition = vec3(m_view * pos);
+    surfaceNormal   = mat3(m_view) * vert;
+    surfaceToCamera = normalize (- surfacePosition);
+    gl_PointSize = 1.0;
+    gl_Position = mvp * pos;
+  }
+);
+
+// Cylinder
+
+const GLchar * cylinder_vertex = GLSL(
+  uniform mat4 mvp;
+  uniform mat4 m_view;
+  in vec4 quat;
+  in float height;
+  in float radius;
+  in vec3 offset;
+  in vec3 vert;
+  in vec4 vertColor;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 surfaceNormal;
+  out vec3 surfaceToCamera;
+
+  vec3 rotate_this (in vec3 v, in vec4 quat)
+  {
+    vec3 u = vec3(quat.x, quat.y, quat.z);
+    float s = quat.w;
+    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
+    vec3 norm = normalize (vec3(vert.x, vert.y, 0.0));
+    if (quat.w != 0.0)
+    {
+      pos = rotate_this (pos, quat);
+      norm = rotate_this (norm, quat);
+    }
+    pos += offset;
+    surfacePosition = vec3(m_view * vec4(pos,1.0));
+    surfaceNormal   = mat3(m_view) * norm;
+    surfaceToCamera = normalize (- surfacePosition);
+    gl_Position = mvp * vec4(pos,1.0);
+  }
+);
+
+const GLchar * cone_vertex = GLSL(
+  uniform mat4 mvp;
+  uniform mat4 m_view;
+  in vec4 quat;
+  in float height;
+  in float radius;
+  in vec3 offset;
+  in vec3 vert;
+  in vec4 vertColor;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 surfaceNormal;
+  out vec3 surfaceToCamera;
+
+  vec3 rotate_this (in vec3 v, in vec4 quat)
+  {
+    vec3 u = vec3(quat.x, quat.y, quat.z);
+    float s = quat.w;
+    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
+    // The normal calculation changes / cylinders
+    float B = sqrt(radius*radius + height*height);
+    vec3 norm = vec3(height*vert.x/B, height*vert.y/B, radius/B);
+    if (quat.w != 0.0)
+    {
+      pos = rotate_this (pos, quat);
+      norm = rotate_this (norm, quat);
+    }
+    pos += offset;
+    surfacePosition = vec3(m_view * vec4(pos,1.0));
+    surfaceNormal   = mat3(m_view) * norm;
+    surfaceToCamera = normalize (- surfacePosition);
+    gl_Position = mvp * vec4(pos,1.0);
+  }
+);
+
+const GLchar * cap_vertex = GLSL(
+  uniform mat4 mvp;
+  uniform mat4 m_view;
+  in vec4 quat;
+  in float radius;
+  in vec3 offset;
+  in vec3 vert;
+  in vec4 vertColor;
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 surfaceNormal;
+  out vec3 surfaceToCamera;
+
+  vec3 rotate_this (in vec3 v, in vec4 quat)
+  {
+    vec3 u = vec3(quat.x, quat.y, quat.z);
+    float s = quat.w;
+    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
+  }
+
+  void main ()
+  {
+    surfaceColor = vertColor;
+    vec3 pos =  vec3(radius*vert.x, radius*vert.y, vert.z);
+    vec3 norm = vec3(0.0, 0.0, -1.0);
+    if (quat.w != 0.0)
+    {
+      pos = rotate_this (pos, quat);
+      norm = rotate_this (norm, quat);
+    }
+    pos += offset;
+    surfacePosition = vec3(m_view * vec4(pos,1.0));
+    surfaceNormal   = mat3(m_view) * norm;
+    surfaceToCamera = normalize (- surfacePosition);
+    gl_Position = mvp * vec4(pos,1.0);
+  }
+);
+
+const GLchar * gs_cylinder_geom = GLSL(
+  layout (lines) in;
+  layout (triangle_strip, max_vertices=64) out;
+
+  uniform mat4 mvp;
+  uniform mat4 m_view;
+  uniform int quality;
+  uniform float radius;
+
+  in vec4 vertCol[];
+
+  out vec4 surfaceColor;
+  out vec3 surfacePosition;
+  out vec3 surfaceNormal;
+  out vec3 surfaceToCamera;
+
+  float pi = 3.141592653;
+
+  vec3 create_perp (in vec3 axis)
+  {
+    vec3 u = vec3(0.0, 0.0, 1.0);
+    vec3 v = vec3(0.0, 1.0, 0.0);
+    vec3 res =  cross(u, axis);
+    if (length(res) == 0.0)
+    {
+      res = cross (v, axis);
+    }
+    return res;
+  }
+
+  void main()
+  {
+    vec3 v1 = gl_in[0].gl_Position.xyz;
+    vec3 v2 = gl_in[1].gl_Position.xyz;
+    vec3 axis = normalize(v2 - v1);
+    vec3 perp_x = create_perp (axis);
+    vec3 perp_y = cross (axis, perp_x);
+    float step = 2.0 * pi / float(quality - 1);
+    for(int i=0; i<quality; i++)
+    {
+      float a = i * step;
+      float ca = cos(a);
+      float sa = sin(a);
+
+      vec3 normal = normalize(ca*perp_x + sa*perp_y);
+      vec3 p1 = v1 + radius * normal;
+      vec3 p2 = v2 + radius * normal;
+
+      surfaceNormal =  mat3(m_view) * normal;
+      gl_Position = mvp * vec4(p1, 1.0);
+
+      surfacePosition = vec3(m_view * vec4(p1, 1.0));
+      surfaceToCamera = normalize (- surfacePosition);
+      surfaceColor = vertCol[0];
+      EmitVertex();
+
+      gl_Position = mvp * vec4 (p2, 1.0);
+      surfacePosition = vec3(m_view * vec4(p2, 1.0));
+      surfaceToCamera = normalize (- surfacePosition);
+      surfaceColor = vertCol[1];
+      EmitVertex();
+    }
+    EndPrimitive();
+  }
+);
+
+const GLchar * string_vertex = GLSL(
+  uniform mat4 mvp;
+  uniform mat4 un_view;
+  uniform mat4 text_proj;
+  uniform vec4 viewp;
+  uniform vec4 pos_shift;
+  in vec2 vert;
+  in vec2 tcoord;
+  in vec3 offset;
+  out float angle;
+
+  out vec2 text_coords;
+  mat4 translate_this (in vec3 coord)
+  {
+    mat4 translate;
+    translate[0] = vec4(1.0, 0.0, 0.0, 0.0);
+    translate[1] = vec4(0.0, 1.0, 0.0, 0.0);
+    translate[2] = vec4(0.0, 0.0, 1.0, 0.0);
+    translate[3][0] = coord.x;
+    translate[3][1] = coord.y;
+    translate[3][2] = coord.z;
+    translate[3][3] = 1.0;
+
+    return translate;
+  }
+
+  vec4 project (in vec3 coord)
+  {
+    mat4 n_mvp = ((mvp * translate_this (coord)) * un_view) * translate_this (pos_shift.xyz);
+    vec4 res = n_mvp * vec4(vec3(0.0), 1.0);
+    if (res.w != 0.0)
+    {
+      res.w = 1.0 / res.w;
+      res.x = res.w * res.x + 1.0;
+      res.y = res.w * res.y + 1.0;
+      res.z = res.w * res.z + 1.0;
+      return vec4 (res.x*viewp.z+viewp.x, res.y*viewp.w+viewp.y, pos_shift.w*res.z, 1.0);
+    }
+    else
+    {
+      return vec4 (0.0, 0.0, -1.0, 0.0);
+    }
+  }
+
+  void main()
+  {
+    text_coords = tcoord;
+    vec4 pos = project (offset) + vec4(vert, 0.0, 1.0);
+    gl_Position = text_proj * pos;
   }
 );
 
@@ -691,11 +939,12 @@ const GLchar * full_color = GLSL(
 
     if (fog.mode > 0)
     {
-      fragment_color = vec4 (Apply_fog(surfaceColor.xyz*color), alpha);
+      vec3 col = Apply_fog(surfaceColor.xyz*color);
+      fragment_color = vec4 (col * alpha, alpha);
     }
     else
     {
-      fragment_color = vec4 (surfaceColor.xyz*color, alpha);
+      fragment_color = vec4 ((surfaceColor.xyz*color) * alpha, alpha);
     }
   }
 );
@@ -776,7 +1025,6 @@ const GLchar * sphere_vertex_ray = GLSL(
     gl_Position.z = max(gl_Position.z, -gl_Position.w);
   }
 );
-
 
 /* --------------------------------------------------------------------------
  * Cylinder impostor – vertex shader
@@ -1570,11 +1818,12 @@ const GLchar * full_color_ray = GLSL(
 
     if (fog.mode > 0)
     {
-      fragment_color = vec4 (Apply_fog(color, the_hit.pos, the_hit.normal), alpha);
+      vec3 col = Apply_fog(color, the_hit.pos, the_hit.normal);
+      fragment_color = vec4 (col * alpha, alpha);
     }
     else
     {
-      fragment_color = vec4 (color, alpha);
+      fragment_color = vec4 (color * alpha, alpha);
     }
   }
 );
@@ -1582,287 +1831,6 @@ const GLchar * full_color_ray = GLSL(
 /* ===========================================================================
  * End of perfect-impostor shaders
  * ===========================================================================*/
-
-// Sphere
-
-const GLchar * sphere_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-
-  in vec3 vert;
-  in vec3 offset;
-  in vec4 vertColor;
-  in float radius;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-  void main ()
-  {
-    surfaceColor    = vertColor;
-    vec4 pos = vec4 (radius*vert + offset, 1.0);
-    surfacePosition = vec3(m_view * pos);
-    surfaceNormal   = mat3(m_view) * vert;
-    surfaceToCamera = normalize (- surfacePosition);
-    gl_PointSize = 1.0;
-    gl_Position = mvp * pos;
-  }
-);
-
-// Cylinder
-
-const GLchar * gs_cylinder_vertex = GLSL(
-  in vec3 vert;
-  in vec4 vertColor;
-  out vec4 vertCol;
-  void main ()
-  {
-    vertCol  = vertColor;
-    gl_Position = vec4(vert, 1.0);
-  }
-);
-
-const GLchar * cylinder_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float height;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
-    vec3 norm = normalize (vec3(vert.x, vert.y, 0.0));
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
-const GLchar * cone_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float height;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, height*vert.z);
-    // The normal calculation changes / cylinders
-    float B = sqrt(radius*radius + height*height);
-    vec3 norm = vec3(height*vert.x/B, height*vert.y/B, radius/B);
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
-const GLchar * cap_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  in vec4 quat;
-  in float radius;
-  in vec3 offset;
-  in vec3 vert;
-  in vec4 vertColor;
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  vec3 rotate_this (in vec3 v, in vec4 quat)
-  {
-    vec3 u = vec3(quat.x, quat.y, quat.z);
-    float s = quat.w;
-    return 2.0 * dot(u,v) * u + (s*s - dot(u,u)) * v + 2.0 * s * cross (u,v);
-  }
-
-  void main ()
-  {
-    surfaceColor = vertColor;
-    vec3 pos =  vec3(radius*vert.x, radius*vert.y, vert.z);
-    vec3 norm = vec3(0.0, 0.0, -1.0);
-    if (quat.w != 0.0)
-    {
-      pos = rotate_this (pos, quat);
-      norm = rotate_this (norm, quat);
-    }
-    pos += offset;
-    surfacePosition = vec3(m_view * vec4(pos,1.0));
-    surfaceNormal   = mat3(m_view) * norm;
-    surfaceToCamera = normalize (- surfacePosition);
-    gl_Position = mvp * vec4(pos,1.0);
-  }
-);
-
-const GLchar * gs_cylinder_geom = GLSL(
-
-  layout (lines) in;
-  layout (triangle_strip, max_vertices=64) out;
-
-  uniform mat4 mvp;
-  uniform mat4 m_view;
-  uniform int quality;
-  uniform float radius;
-
-  in vec4 vertCol[];
-
-  out vec4 surfaceColor;
-  out vec3 surfacePosition;
-  out vec3 surfaceNormal;
-  out vec3 surfaceToCamera;
-
-  float pi = 3.141592653;
-
-  vec3 create_perp (in vec3 axis)
-  {
-    vec3 u = vec3(0.0, 0.0, 1.0);
-    vec3 v = vec3(0.0, 1.0, 0.0);
-    vec3 res =  cross(u, axis);
-    if (length(res) == 0.0)
-    {
-      res = cross (v, axis);
-    }
-    return res;
-  }
-
-  void main()
-  {
-
-    vec3 v1 = gl_in[0].gl_Position.xyz;
-    vec3 v2 = gl_in[1].gl_Position.xyz;
-    vec3 axis = normalize(v2 - v1);
-    vec3 perp_x = create_perp (axis);
-    vec3 perp_y = cross (axis, perp_x);
-    float step = 2.0 * pi / float(quality - 1);
-    for(int i=0; i<quality; i++)
-    {
-      float a = i * step;
-      float ca = cos(a);
-      float sa = sin(a);
-
-      vec3 normal = normalize(ca*perp_x + sa*perp_y);
-      vec3 p1 = v1 + radius * normal;
-      vec3 p2 = v2 + radius * normal;
-
-      surfaceNormal =  mat3(m_view) * normal;
-      gl_Position = mvp * vec4(p1, 1.0);
-
-      surfacePosition = vec3(m_view * vec4(p1, 1.0));
-      surfaceToCamera = normalize (- surfacePosition);
-      surfaceColor = vertCol[0];
-      EmitVertex();
-
-      gl_Position = mvp * vec4 (p2, 1.0);
-      surfacePosition = vec3(m_view * vec4(p2, 1.0));
-      surfaceToCamera = normalize (- surfacePosition);
-      surfaceColor = vertCol[1];
-      EmitVertex();
-    }
-    EndPrimitive();
-  }
-);
-
-const GLchar * string_vertex = GLSL(
-  uniform mat4 mvp;
-  uniform mat4 un_view;
-  uniform mat4 text_proj;
-  uniform vec4 viewp;
-  uniform vec4 pos_shift;
-  in vec2 vert;
-  in vec2 tcoord;
-  in vec3 offset;
-  out float angle;
-
-  out vec2 text_coords;
-  mat4 translate_this (in vec3 coord)
-  {
-    mat4 translate;
-    translate[0] = vec4(1.0, 0.0, 0.0, 0.0);
-    translate[1] = vec4(0.0, 1.0, 0.0, 0.0);
-    translate[2] = vec4(0.0, 0.0, 1.0, 0.0);
-    translate[3][0] = coord.x;
-    translate[3][1] = coord.y;
-    translate[3][2] = coord.z;
-    translate[3][3] = 1.0;
-
-    return translate;
-  }
-
-  vec4 project (in vec3 coord)
-  {
-    mat4 n_mvp = ((mvp * translate_this (coord)) * un_view) * translate_this (pos_shift.xyz);
-    vec4 res = n_mvp * vec4(vec3(0.0), 1.0);
-    if (res.w != 0.0)
-    {
-      res.w = 1.0 / res.w;
-      res.x = res.w * res.x + 1.0;
-      res.y = res.w * res.y + 1.0;
-      res.z = res.w * res.z + 1.0;
-      return vec4 (res.x*viewp.z+viewp.x, res.y*viewp.w+viewp.y, pos_shift.w*res.z, 1.0);
-    }
-    else
-    {
-      return vec4 (0.0, 0.0, -1.0, 0.0);
-    }
-  }
-
-  void main()
-  {
-    text_coords = tcoord;
-    vec4 pos = project (offset) + vec4(vert, 0.0, 1.0);
-    gl_Position = text_proj * pos;
-  }
-);
 
 const GLchar * angstrom_vertex = GLSL(
   uniform mat4 mvp;
@@ -2164,7 +2132,8 @@ const GLchar * string_color = GLSL(
   void main()
   {
     vec2 coords = text_coords;
-    fragment_color = vert_color * vec4(1.0, 1.0, 1.0, texture (tex, text_coords).r);
+    vec4 color = vert_color * vec4(1.0, 1.0, 1.0, texture (tex, text_coords).r);
+    fragment_color = vec4(color.rgb * color.a, color.a);
   }
 );
 
@@ -2177,7 +2146,8 @@ const GLchar * string_color_2d = GLSL(
   void main()
   {
     vec4 sampled = vec4(1.0, 1.0, 1.0, texture (tex, text_coords).r);
-    fragment_color = vert_color * sampled;
+    vec4 color = vert_color * sampled;
+    fragment_color = vec4(color.rgb * color.a, color.a);
   }
 );
 
