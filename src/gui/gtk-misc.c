@@ -227,14 +227,11 @@ void hide_the_widgets (GtkWidget * widg)
   {
     if (GTK_IS_WIDGET(widg))
     {
-      if (is_the_widget_visible(widg))
-      {
 #ifdef GTK4
-        gtk_widget_set_visible (widg, FALSE);
+      gtk_widget_set_visible (widg, FALSE);
 #else
-        gtk_widget_hide (widg);
+      gtk_widget_hide (widg);
 #endif
-      }
     }
   }
 }

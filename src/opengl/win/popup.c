@@ -712,6 +712,8 @@ G_MODULE_EXPORT void add_object (GSimpleAction * action, GVariant * parameter, g
 G_MODULE_EXPORT void add_object (GtkWidget * widg, gpointer data)
 #endif
 {
+  int i, j;
+  i = opengl_project -> natomes;
   prepare_atom_edition (data, FALSE);
   insert_search = allocate_atom_search (opengl_project -> id, INSERT, INSERT, 0);
   if (insert_this_object)
@@ -742,7 +744,6 @@ G_MODULE_EXPORT void add_object (GtkWidget * widg, gpointer data)
     tint ul = ulam_coord (opengl_project -> modelgl);
     opengl_project -> modelgl -> atom_win -> to_be_inserted[1] = duplicate_atomic_object (copied_object);
     atomic_object * object = opengl_project -> modelgl -> atom_win -> to_be_inserted[1];
-    int i;
     for (i=0; i<object -> atoms; i++)
     {
       object -> at_list[i].x += opengl_project -> modelgl -> insert_coords.x + object -> dim*ul.a;
@@ -754,7 +755,20 @@ G_MODULE_EXPORT void add_object (GtkWidget * widg, gpointer data)
     insert_search -> in_selection ++;
   }
   insert_object (3, data);
-  // HERE
+  if (! i && opengl_project -> natomes)
+  {
+    if (opengl_project -> modelgl -> anim -> last -> img -> style == SPACEFILL)
+    {
+      j = OGL_STYLES + opengl_project -> modelgl -> anim -> last -> img -> filled_type;
+      set_this_style (opengl_project -> modelgl, WIREFRAME);
+    }
+    else
+    {
+      j = opengl_project -> modelgl -> anim -> last -> img -> style;
+      set_this_style (opengl_project -> modelgl, OGL_STYLES);
+    }
+    set_this_style (opengl_project -> modelgl, j);
+  }
 }
 
 #ifdef GTK4

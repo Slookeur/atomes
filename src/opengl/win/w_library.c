@@ -1103,6 +1103,7 @@ G_MODULE_EXPORT void run_select_from_library (GtkDialog * lib, gint response_id,
 int select_from_library (gboolean visible, project * this_proj, atom_search * asearch)
 {
   int active = activep;
+  int nats = this_proj -> natomes;
   lib_visible = visible;
   GtkWidget * lib = dialogmodal ("Library", GTK_WINDOW((this_proj -> modelgl) ? this_proj -> modelgl -> win : MainWindow));
 #ifdef GTK3
@@ -1138,7 +1139,21 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
   inserted_from_lib = 0;
   run_this_gtk_dialog (lib, G_CALLBACK(run_select_from_library), asearch);
   active_project_changed (active);
-  // HERE
+  if (! nats && active_project -> natomes)
+  {
+    int i;
+    if (active_image -> style == SPACEFILL)
+    {
+      i = OGL_STYLES + active_image -> filled_type;
+      set_this_style (active_glwin, WIREFRAME);
+    }
+    else
+    {
+      i = active_image -> style;
+      set_this_style (active_glwin, OGL_STYLES);
+    }
+    set_this_style (active_glwin, i);
+  }
   if (sml_file_name != NULL) g_free (sml_file_name);
   if (mol_name != NULL) g_free (mol_name);
   if (lib_proj != NULL) close_project (lib_proj);
@@ -1163,6 +1178,7 @@ int insert_this_project_from_lib (int id, gboolean visible, project * this_proj,
   int family[6] = {0, 3, 9, 9, 15, 17};
   int molec[6] = {0, 8, 36, 21, 11, 0};
   int active = activep;
+  int nats = this_proj -> natomes;
   the_family = family[id];
   if (get_sml_files ())
   {
@@ -1175,7 +1191,21 @@ int insert_this_project_from_lib (int id, gboolean visible, project * this_proj,
     }
   }
   active_project_changed (active);
-  // HERE
+  if (! nats && active_project -> natomes)
+  {
+    int i;
+    if (active_image -> style == SPACEFILL)
+    {
+      i = OGL_STYLES + active_image -> filled_type;
+      set_this_style (active_glwin, WIREFRAME);
+    }
+    else
+    {
+      i = active_image -> style;
+      set_this_style (active_glwin, OGL_STYLES);
+    }
+    set_this_style (active_glwin, i);
+  }
   if (sml_file_name != NULL) g_free (sml_file_name);
   if (mol_name != NULL) g_free (mol_name);
   if (lib_proj != NULL) close_project (lib_proj);

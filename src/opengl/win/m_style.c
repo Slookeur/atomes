@@ -32,6 +32,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   void clean_atom_style (project * this_proj);
   void update_menus (glwin * view);
+  void set_this_style (glwin * view, int style);
 
   G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data);
   G_MODULE_EXPORT void change_style_radio (GSimpleAction * action, GVariant * parameter, gpointer data);
@@ -260,6 +261,39 @@ G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data)
   {
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)this_proj -> modelgl -> filled_styles[ft], TRUE);
   }*/
+}
+
+/*!
+  \fn void set_this_style (glwin * view, int style)
+
+  \brief set general style for atom(s) and bond(s)
+
+  \param view the target glwin
+  \param style the general style to apply
+*/
+void set_this_style (glwin * view, int style)
+{
+  if (get_project_by_id(view -> proj) -> natomes)
+  {
+#ifdef GTK4
+    int sty = (style < SPACEFILL) ? style : (style > OGL_STYLES) ? SPACEFILL + (style - OGL_STYLES) : style + FILLED_STYLES;
+    gchar * str = g_strdup_printf ("set-style.%d.0", style);
+    activate_glwin_action (str, "set-style", view);
+    g_free (str);
+#else
+    // GTK3 Menu Action To Check
+    if (style < OGL_STYLES)
+    {
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_styles[style], TRUE);
+      set_style (view -> ogl_styles[style], & view -> colorp[style][0]);
+    }
+    else
+    {
+      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> filled_styles[style-OGL_STYLES], TRUE);
+      set_style (view -> filled_styles[style-OGL_STYLES], & view -> colorp[style][0]);
+    }
+#endif
+  }
 }
 
 #ifdef GTK3

@@ -105,29 +105,16 @@ void printversion ()
 */
 void show_the_widgets (GtkWidget * widg)
 {
+  if (widg)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
 #ifdef GTK4
-  gtk_widget_set_visible (widg, TRUE);
+      gtk_widget_set_visible (widg, TRUE);
 #else
-  gtk_widget_show_all (widg);
+      gtk_widget_show_all (widg);
 #endif
-}
-
-/*!
-  \fn gboolean is_the_widget_visible (GtkWidget * widg)
-
-  \brief test if a GtkWidget exist, then return if it is visible or not
-
-  \param widg the GtkWidget
-*/
-gboolean is_the_widget_visible (GtkWidget * widg)
-{
-  if (GTK_IS_WIDGET(widg))
-  {
-    return gtk_widget_is_visible (widg);
-  }
-  else
-  {
-    return FALSE;
+    }
   }
 }
 
@@ -144,14 +131,11 @@ void hide_the_widgets (GtkWidget * widg)
   {
     if (GTK_IS_WIDGET(widg))
     {
-      if (is_the_widget_visible(widg))
-      {
 #ifdef GTK4
-        gtk_widget_set_visible (widg, FALSE);
+      gtk_widget_set_visible (widg, FALSE);
 #else
-        gtk_widget_hide (widg);
+      gtk_widget_hide (widg);
 #endif
-      }
     }
   }
 }

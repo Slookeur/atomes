@@ -28,6 +28,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 */
 
+extern void set_this_style (glwin * view, int style);
 extern void update_menus (glwin * view);
 extern void prep_model (int p);
 

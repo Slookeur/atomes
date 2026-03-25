@@ -232,7 +232,6 @@ GtkWidget * menu_bonds (glwin * view, int id, int at)
 
   GtkWidget * menub = gtk_menu_new ();
   i = view -> anim -> last -> img -> style;
-
   if (id == 0)
   {
     if (at == 0)
