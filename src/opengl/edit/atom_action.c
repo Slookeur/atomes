@@ -457,13 +457,16 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
   }
 
   // Clean curves data
-  for (i=0 ; i<NCALCS ; i++)
+  if (this_proj -> analysis)
   {
-    if (this_proj -> analysis)
+    for (i=0 ; i<NCALCS ; i++)
     {
-      this_proj -> analysis[i] -> calc_ok = FALSE;
-      hide_curves (this_proj, i);
-      erase_curves (this_proj, i);
+      if (this_proj -> analysis[i])
+      {
+        this_proj -> analysis[i] -> calc_ok = FALSE;
+        hide_curves (this_proj, i);
+        erase_curves (this_proj, i);
+      }
     }
   }
   if (this_proj -> modelgl -> rings)

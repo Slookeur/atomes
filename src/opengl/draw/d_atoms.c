@@ -314,7 +314,7 @@ float get_sphere_radius (int style, int sp, int ac, int sel)
   }
   else if (style == CYLINDERS)
   {
-    return plot -> radall[ac] + sel*0.1;
+    return plot -> radall[ac] + sel*0.05;
   }
   else
   {

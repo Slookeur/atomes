@@ -1185,10 +1185,10 @@ G_MODULE_EXPORT void on_qm_assistant_prepare (GtkAssistant * assistant, GtkWidge
   switch (i)
   {
     case 0:
-      if (is_the_widget_visible(qm_preview_but)) hide_the_widgets (qm_preview_but);
+      hide_the_widgets (qm_preview_but);
       break;
     default:
-      if (! is_the_widget_visible(qm_preview_but)) show_the_widgets (qm_preview_but);
+      show_the_widgets (qm_preview_but);
       break;
   }
 }

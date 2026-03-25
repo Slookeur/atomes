@@ -1313,16 +1313,14 @@ void setup_default_lights (project * this_proj, image * img)
     img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, img -> p_depth);
     img -> l_ghtning.spot[i].fix = default_lightning.spot[i].fix;
     img -> l_ghtning.spot[i].intensity = default_lightning.spot[i].intensity;
-    if (img -> p_depth <= 50.0)
-    {
-      // img -> l_ghtning.spot[i].intensity = v3_muls (img -> l_ghtning.spot[i].intensity, img -> p_depth/100.0);
-    }
     img -> l_ghtning.spot[i].attenuation = default_lightning.spot[i].attenuation;
     img -> l_ghtning.spot[i].direction = default_lightning.spot[i].direction;
-    img ->l_ghtning.spot[i].position = default_lightning.spot[i].position;
+    img -> l_ghtning.spot[i].position = default_lightning.spot[i].position;
     if (img -> l_ghtning.spot[i].type)
     {
       img -> l_ghtning.spot[i].position = v3_muls (img -> l_ghtning.spot[i].position, img -> p_depth);
+      img -> l_ghtning.spot[i].attenuation.y /= img -> p_depth;
+      img -> l_ghtning.spot[i].attenuation.z /= (img -> p_depth*img -> p_depth);
     }
   }
 }

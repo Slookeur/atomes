@@ -475,7 +475,7 @@ int save_preferences_to_xml_file ()
                               "Only search for ABAB chains",
                               "No homopolar bonds in the chains (A-A, B-B ...)",
                               "Only search for 1-(2)n-1 chains"};
-  gchar * xml_skt_leg[4] = {"Analysze all correlated δt steps",
+  gchar * xml_skt_leg[4] = {"Analyze all correlated δt steps",
                             "Number of analyzed δt steps",
                             "Number of analyzed q points",
                             "Number of frequency points"};
@@ -2207,7 +2207,7 @@ void set_atomes_defaults ()
   for (i=0; i<3; i++)
   {
     default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
-    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0) ?  0.5 : (i == 2) ? 0.1 : DEFAULT_SIZE;
   }
   for (i=0; i<6; i++)
   {

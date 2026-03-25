@@ -4074,10 +4074,10 @@ G_MODULE_EXPORT void on_assistant_prepare (GtkAssistant * assistant, GtkWidget *
   switch (i)
   {
     case 0:
-      // if (is_the_widget_visible(preview_but)) hide_the_widgets (preview_but);
+      // hide_the_widgets (preview_but);
       break;
     case 1:
-      // if (! is_the_widget_visible(preview_but)) show_the_widgets (preview_but);
+      // show_the_widgets (preview_but);
       break;
     case MAXDATC+MAXDATA+2:
       break;

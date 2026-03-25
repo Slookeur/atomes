@@ -287,8 +287,8 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
   {
     case 0:
       * axis = WIREFRAME;
-      if (is_the_widget_visible(the_axis -> radius_box)) hide_the_widgets (the_axis -> radius_box);
-      if (! is_the_widget_visible(the_axis -> width_box)) show_the_widgets (the_axis -> width_box);
+      hide_the_widgets (the_axis -> radius_box);
+      show_the_widgets (the_axis -> width_box);
       if (! preferences)
       {
 #ifdef GTK3
@@ -301,8 +301,8 @@ G_MODULE_EXPORT void set_axis_combo_style (GtkComboBox * box, gpointer data)
       break;
     case 1:
       * axis = CYLINDERS;
-      if (is_the_widget_visible(the_axis -> width_box)) hide_the_widgets (the_axis -> width_box);
-      if (! is_the_widget_visible(the_axis -> radius_box)) show_the_widgets (the_axis -> radius_box);
+      hide_the_widgets (the_axis -> width_box);
+      show_the_widgets (the_axis -> radius_box);
       if (! preferences)
       {
 #ifdef GTK3

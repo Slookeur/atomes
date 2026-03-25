@@ -754,6 +754,7 @@ G_MODULE_EXPORT void add_object (GtkWidget * widg, gpointer data)
     insert_search -> in_selection ++;
   }
   insert_object (3, data);
+  // HERE
 }
 
 #ifdef GTK4

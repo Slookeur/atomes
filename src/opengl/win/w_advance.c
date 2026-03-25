@@ -60,11 +60,11 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void set_light_fix (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void show_this_light (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void show_this_light (GtkToggleButton * but, gpointer data);
-  G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data);
-  G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void set_use_template_toggle (GtkCheckButton * but, gpointer data);
   G_MODULE_EXPORT void set_use_template_toggle (GtkToggleButton * but, gpointer data);
   G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_r_model (GtkComboBox * box, gpointer data);
+  G_MODULE_EXPORT void set_f_model (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void set_l_model (GtkComboBox * box, gpointer data);
   G_MODULE_EXPORT void update_mat_param (GtkEntry * res, gpointer data);
   G_MODULE_EXPORT void scale_param (GtkRange * range, gpointer data);
@@ -78,6 +78,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   GtkWidget * bdv_box (GtkWidget * box, char * lab, int size, float xalign);
   GtkWidget * GtkWidget * create_setting_pos (gchar * lab, int size, float xalign, int pid, int lid, float * values, opengl_edition * ogl_win);
   GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * the_light);
+  GtkWidget * rendering_fix (glwin * view);
+  GtkWidget * lightning_fix (glwin * view);
   GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
   GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 
@@ -175,7 +177,7 @@ GtkWidget * bdv_box (GtkWidget * box, char * lab, int size, float xalign)
   return hbox;
 }
 
-GtkWidget * quality_scale;
+GtkWidget * render_box;
 GtkWidget * d_close;
 int status;
 
@@ -439,14 +441,14 @@ void show_active_light_data (opengl_edition * ogl_win, int lid, int tid)
   Light * this_light = (preferences) ? & tmp_lightning.spot[lid] : & get_project_by_id(ogl_win -> proj) -> modelgl -> anim -> last -> img -> l_ghtning.spot[lid];
   this_light -> type = tid;
 
-  if (is_the_widget_visible(ogl_win -> advanced_light_box)) hide_the_widgets (ogl_win -> advanced_light_box);
+  hide_the_widgets (ogl_win -> advanced_light_box);
   widget_set_sensitive (ogl_win -> light_type, lid);
   if (this_light -> type) show_the_widgets (ogl_win -> advanced_light_box);
   int i;
   for (i=0; i<2; i++)
   {
-    if (is_the_widget_visible(ogl_win -> light_b_coord[i])) hide_the_widgets (ogl_win -> light_b_coord[i]);
-    if (is_the_widget_visible(ogl_win -> light_b_entry[i])) hide_the_widgets (ogl_win -> light_b_entry[i]);
+    hide_the_widgets (ogl_win -> light_b_coord[i]);
+    hide_the_widgets (ogl_win -> light_b_entry[i]);
   }
   if (this_light -> type)
   {
@@ -463,7 +465,7 @@ void show_active_light_data (opengl_edition * ogl_win, int lid, int tid)
   }
   if (! preferences)
   {
-    if (is_the_widget_visible(ogl_win -> light_show)) hide_the_widgets (ogl_win -> light_show);
+    hide_the_widgets (ogl_win -> light_show);
     if (this_light -> type) show_the_widgets (ogl_win -> light_show);
   }
 }
@@ -1002,51 +1004,14 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
   update_light_data (0, ogl_edit);
 
   append_comments (vbox, "<sup>*</sup>", "Note that light N°1 must be a directional light");
-  if (preferences) append_comments (vbox, "<sup>**</sup>", "Intensity and position will be corrected based on model depth");
-
+  if (preferences)
+  {
+    append_comments (vbox, "<sup>**</sup>", "Position and attenuation will be corrected based on model depth");
+  }
   return layout;
 }
 
 // ***************** MATERIAL ******************* //
-
-#ifdef GTK4
-/*!
-  \fn G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data)
-
-  \brief use or not OpenGL ray tracing shaders callback GTK4
-
-  \param but the GtkCheckButton sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkCheckButton * but, gpointer data)
-#else
-/*!
-  \fn G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data)
-
-  \brief use or not OpenGL ray tracing shaders callback GTK3
-
-  \param but the GtkToggleButton sending the signal
-  \param data the associated data pointer
-*/
-G_MODULE_EXPORT void set_use_ray_tracing_toggle (GtkToggleButton * but, gpointer data)
-#endif
-{
-  glwin * view;
-  int i = button_get_status ((GtkWidget *)but);
-  if (! preferences)
-  {
-    view = (glwin *)data;
-    view -> anim -> last -> img -> ray_tracing = i;
-    widget_set_sensitive (quality_scale, ! i);
-    view -> create_shaders[MAXIS] = TRUE;
-    view -> create_shaders[MDBOX] = TRUE;
-    init_default_shaders (view);
-  }
-  else
-  {
-    tmp_opengl[4] = i;
-  }
-}
 
 #ifdef GTK4
 /*!
@@ -1169,6 +1134,48 @@ G_MODULE_EXPORT void set_template (GtkComboBox * box, gpointer data)
     update_entry_double (GTK_ENTRY(ogl_edit -> entogl[0][2]), the_mat -> albedo.z);
   }
   if (! preferences) update (view);
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_r_model (GtkComboBox * box, gpointer data)
+
+  \brief change OpenGL rendering model
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_r_model (GtkComboBox * box, gpointer data)
+{
+  if (preferences)
+  {
+    tmp_opengl[4] = combo_get_active ((GtkWidget *)box);
+    widget_set_sensitive (render_box, ! tmp_opengl[4]);
+  }
+  else
+  {
+    glwin * view = (glwin *)data;
+    view -> anim -> last -> img -> ray_tracing = combo_get_active ((GtkWidget *)box);
+    view -> anim -> last -> img -> render = 0;
+    widget_set_sensitive (render_box, ! view -> anim -> last -> img -> ray_tracing);
+    init_default_shaders (view);
+    update (view);
+  }
+}
+
+/*!
+  \fn G_MODULE_EXPORT void set_f_model (GtkComboBox * box, gpointer data)
+
+  \brief change OpenGL filling model
+
+  \param box the GtkComboBox sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_f_model (GtkComboBox * box, gpointer data)
+{
+  glwin * view = (glwin *)data;
+  view -> anim -> last -> img -> render = combo_get_active ((GtkWidget *)box);
+  init_default_shaders (view);
+  update (view);
 }
 
 /*!
@@ -1307,9 +1314,54 @@ G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data)
 }
 
 /*!
-  \fn GtkWidget * lightning_box (glwin * view, Material this_material)
+  \fn GtkWidget * rendering_fix (glwin * view)
 
-  \brief create ligthning model combo box
+  \brief create rendering parameters
+
+  \param view the target glwin, if any
+*/
+GtkWidget * rendering_fix (glwin * view)
+{
+  GtkWidget * fix = gtk_fixed_new ();
+  GtkWidget * rmodel = create_combo ();
+  gtk_fixed_put (GTK_FIXED (fix), rmodel, 0, 10);
+  char * r_model[2] = {"3D objects", "Ray tracing"};
+  int i;
+  for (i=0; i<2; i++)
+  {
+    combo_text_append (rmodel, r_model[i]);
+  }
+  g_signal_connect (G_OBJECT (rmodel), "changed", G_CALLBACK(set_r_model), view);
+  gtk_widget_set_size_request (rmodel, 110, -1);
+  combo_set_active (rmodel, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4]);
+
+  render_box = gtk_fixed_new ();
+  gtk_fixed_put (GTK_FIXED (fix), render_box, 130, 0);
+  GtkWidget * quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 100, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
+  gtk_fixed_put (GTK_FIXED (render_box), quality_scale, 0, 0);
+  if (! preferences)
+  {
+    GtkWidget * fmodel = create_combo ();
+    gtk_fixed_put (GTK_FIXED (render_box), fmodel, 120, 10);
+    char * f_model[3] = {"Filled", "Lines", "Points"};
+    int i;
+    for (i=0; i<3; i++)
+    {
+      combo_text_append (fmodel, f_model[i]);
+    }
+    g_signal_connect (G_OBJECT (fmodel), "changed", G_CALLBACK(set_f_model), view);
+    gtk_widget_set_size_request (fmodel, 100, -1);
+    combo_set_active (fmodel, view -> anim -> last -> img -> render);
+  }
+  widget_set_sensitive (render_box, (view) ? ! view -> anim -> last -> img -> ray_tracing : ! tmp_opengl[4]);
+
+  return fix;
+}
+
+/*!
+  \fn GtkWidget * lightning_fix (glwin * view, Material this_material)
+
+  \brief create lightning model combo box
 
   \param view the target glwin, if any
   \param this_material the target material, if any
@@ -1349,11 +1401,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   GtkWidget * box, * hbox;
 
   box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, check_button ("<b>Ray tracing</b>", 100, 40, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4], G_CALLBACK(set_use_ray_tracing_toggle), view),
-                       FALSE, FALSE, 0);
-  quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 200, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, quality_scale, FALSE, FALSE, 0);
-  widget_set_sensitive (quality_scale, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, rendering_fix (view), FALSE, FALSE, 0);
 
   box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);

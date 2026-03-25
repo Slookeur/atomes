@@ -28,6 +28,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 */
 
+extern void update_menus (glwin * view);
 extern void prep_model (int p);
 
 extern void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, gchar * key, int mpop, int item_id,

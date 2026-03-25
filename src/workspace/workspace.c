@@ -132,15 +132,7 @@ void add_project (GtkTreeStore * store, int i)
 
   for (j=0; j<NCALCS; j++)
   {
-    append = FALSE;
-    if (this_proj -> analysis)
-    {
-      if (this_proj -> analysis[j])
-      {
-        if (! this_proj -> analysis[j] -> requires_md || this_proj -> steps > 1) append = TRUE;
-      }
-    }
-    if (append)
+    if (j < NCALCS-2 || get_project_by_id(i) -> steps > 1)
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
       gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, graph_name[j], 2, j, -1);

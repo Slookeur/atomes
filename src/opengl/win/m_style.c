@@ -102,7 +102,10 @@ void update_menus (glwin * view)
     for (j=0; j<6; j+=2)
     {
       hide_the_widgets (view -> ogl_bonds[j+8*i]);
-      if (j<4) hide_the_widgets (view -> ogl_atoms[4*i+j]);
+      if (j<4)
+      {
+        hide_the_widgets (view -> ogl_atoms[4*i+j]);
+      }
     }
   }
   switch (s)
@@ -151,10 +154,16 @@ void update_menus (glwin * view)
       for (i=0; i<2; i++)
       {
         show_the_widgets (view -> ogl_bonds[2+8*i]);
-        str = label_atpts (get_project_by_id(view -> proj), view, 2*i);
-        gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_atoms[4*i+1]), str);
-        g_free (str);
-        show_the_widgets (view -> ogl_atoms[4*i]);
+        if (view -> ogl_atoms[4*i+1])
+        {
+          if (GTK_IS_WIDGET(view -> ogl_atoms[4*i+1]))
+          {
+            str = label_atpts (get_project_by_id(view -> proj), view, 2*i);
+            gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_atoms[4*i+1]), str);
+            g_free (str);
+            show_the_widgets (view -> ogl_atoms[4*i]);
+          }
+        }
       }
       break;
   }
@@ -239,13 +248,7 @@ G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data)
       j = 1;
     }
 #ifdef GTK3
-    for (i=0; i<OGL_RENDERS; i++)
-    {
-      widget_set_sensitive (this_proj -> modelgl -> ogl_render[i], j);
-    }
     update_menus (this_proj -> modelgl);
-#else
-
 #endif
     init_default_shaders (this_proj -> modelgl);
   }

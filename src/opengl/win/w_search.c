@@ -907,43 +907,25 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
   {
     if (asearch -> todo_size >= GTK_LIMIT && ! asearch -> passivating && ! asearch -> mode)
     {
-      if (! is_the_widget_visible(asearch -> info[1]))
-      {
-        show_the_widgets (asearch -> info[1]);
-      }
-      if (is_the_widget_visible (asearch -> id_box))
-      {
-        hide_the_widgets (asearch -> id_box);
-      }
+      show_the_widgets (asearch -> info[1]);
+      hide_the_widgets (asearch -> id_box);
     }
     else
     {
-      if (is_the_widget_visible(asearch -> info[1]))
-      {
-        hide_the_widgets (asearch -> info[1]);
-      }
+      hide_the_widgets (asearch -> info[1]);
       if (asearch -> mode)
       {
-        if (is_the_widget_visible(asearch -> id_box))
-        {
-          hide_the_widgets (asearch -> id_box);
-        }
+        hide_the_widgets (asearch -> id_box);
       }
       else
       {
         if (asearch -> passivating || (filter > 2 && obj == 2))
         {
-          if (is_the_widget_visible (asearch -> id_box))
-          {
-            hide_the_widgets (asearch -> id_box);
-          }
+          hide_the_widgets (asearch -> id_box);
         }
         else
         {
-          if (! is_the_widget_visible (asearch -> id_box))
-          {
-            show_the_widgets (asearch -> id_box);
-          }
+          show_the_widgets (asearch -> id_box);
         }
       }
       int val = get_asearch_num_objects (asearch);
@@ -3892,21 +3874,21 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
     if ((! asearch -> mode && (asearch -> object == 1 || asearch -> object == 3)) || (asearch -> mode && asearch -> object))
     {
       if (! asearch -> mode) asearch -> passivating = TRUE;
-      if (is_the_widget_visible(asearch -> id_box)) hide_the_widgets (asearch -> id_box);
-      if (is_the_widget_visible(asearch -> info[1])) hide_the_widgets (asearch -> info[1]);
+      hide_the_widgets (asearch -> id_box);
+      hide_the_widgets (asearch -> info[1]);
     }
     else
     {
       asearch -> passivating = FALSE;
       if (((! asearch -> mode && asearch -> object == 2) || (asearch -> mode && asearch -> object)) && filter > 2)
       {
-        if (is_the_widget_visible(asearch -> id_box)) hide_the_widgets (asearch -> id_box);
-        if (is_the_widget_visible(asearch -> info[1])) hide_the_widgets (asearch -> info[1]);
+        hide_the_widgets (asearch -> id_box);
+        hide_the_widgets (asearch -> info[1]);
       }
       else
       {
-        if (! is_the_widget_visible(asearch -> id_box)) show_the_widgets (asearch -> id_box);
-        if (! is_the_widget_visible(asearch -> info[1])) show_the_widgets (asearch -> info[1]);
+        show_the_widgets (asearch -> id_box);
+        show_the_widgets (asearch -> info[1]);
       }
     }
   }
@@ -3916,8 +3898,8 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
     asearch -> object = combo_get_active ((GtkWidget *)box);
     filter = get_asearch_filter (asearch);
     object = (asearch -> object) ? 1 : 0;
-    if (is_the_widget_visible(asearch -> id_box)) hide_the_widgets (asearch -> id_box);
-    if (is_the_widget_visible(asearch -> info[1])) hide_the_widgets (asearch -> info[1]);
+    hide_the_widgets (asearch -> id_box);
+    hide_the_widgets (asearch -> info[1]);
   }
   if (was_object)
   {

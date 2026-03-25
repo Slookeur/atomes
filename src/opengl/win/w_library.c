@@ -271,6 +271,7 @@ gchar * family_dir[FAMILY]={"Misc",
 extern void gtk_window_change_gdk_visual (GtkWidget * win);
 #endif // G_OS_WIN32
 #endif // GTK3
+
 extern gboolean create_3d_model (int p, gboolean load);
 extern G_MODULE_EXPORT void on_realize (GtkGLArea * area, gpointer data);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
@@ -1137,6 +1138,7 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
   inserted_from_lib = 0;
   run_this_gtk_dialog (lib, G_CALLBACK(run_select_from_library), asearch);
   active_project_changed (active);
+  // HERE
   if (sml_file_name != NULL) g_free (sml_file_name);
   if (mol_name != NULL) g_free (mol_name);
   if (lib_proj != NULL) close_project (lib_proj);
@@ -1173,6 +1175,7 @@ int insert_this_project_from_lib (int id, gboolean visible, project * this_proj,
     }
   }
   active_project_changed (active);
+  // HERE
   if (sml_file_name != NULL) g_free (sml_file_name);
   if (mol_name != NULL) g_free (mol_name);
   if (lib_proj != NULL) close_project (lib_proj);

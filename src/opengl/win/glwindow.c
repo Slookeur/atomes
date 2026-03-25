@@ -72,7 +72,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void coord_properties (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void set_style (GtkWidget * widg, gpointer data);
-extern G_MODULE_EXPORT void set_render (GtkWidget * widg, gpointer data);
+extern void set_render (gpointer data);
 extern G_MODULE_EXPORT void set_mode (GtkWidget * widg, gpointer data);
 extern void set_sensitive_coord_menu (glwin * view, gboolean status);
 extern void set_color_map_sensitive (glwin * view);
@@ -339,7 +339,7 @@ void update_all_menus (glwin * view, int nats)
 #ifdef GTK3
   int i, j, k, l;
   i = view -> anim -> last -> img -> style;
-  j = (nats <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
+  j = (nats <= 10000) ? BALL_AND_STICK : DEFAULT_STYLE;
   if (i != j)
   {
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_styles[j], FALSE);
@@ -359,9 +359,7 @@ void update_all_menus (glwin * view, int nats)
   j = FILL;
   if (i != j)
   {
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_render[j], FALSE);
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_render[i], TRUE);
-    set_render (view -> ogl_render[i], & view -> colorp[i][0]);
+    set_render (& view -> colorp[i][0]);
   }
 
   update_menus (view);
@@ -491,7 +489,7 @@ void menu_items_opengl (GtkWidget * menu, glwin * view, int pop)
   GtkWidget * style = gtk3_menu_item (menu, "Style", IMG_FILE, (gpointer)PACKAGE_MOL, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, get_project_by_id(view -> proj) -> nspec);
   gtk_menu_item_set_submenu ((GtkMenuItem *)style, menu_style(view, pop));
   gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Color Scheme(s)", get_project_by_id(view -> proj) -> nspec, menu_map(view, pop)));
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Render", get_project_by_id(view -> proj) -> nspec, menu_render(view, pop)));
+  // gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Render", get_project_by_id(view -> proj) -> nspec, menu_render(view, pop)));
   gtk3_menu_item (menu, "Material And Light(s)", IMG_NONE, NULL, G_CALLBACK(opengl_advanced), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   gtk3_menu_item (menu, "Render Image", IMG_FILE, (gpointer)PACKAGE_IMG, G_CALLBACK(render_gl_image), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
 }

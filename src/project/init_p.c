@@ -73,9 +73,12 @@ void init_curves_and_calc (project * this_proj)
   {
     for (i=0; i<NCALCS; i++)
     {
-      this_proj -> analysis[i] -> avail_ok = FALSE;
-      this_proj -> analysis[i] -> init_ok = FALSE;
-      this_proj -> analysis[i] -> calc_ok = FALSE;
+      if (this_proj -> analysis[i])
+      {
+        this_proj -> analysis[i] -> avail_ok = FALSE;
+        this_proj -> analysis[i] -> init_ok = FALSE;
+        this_proj -> analysis[i] -> calc_ok = FALSE;
+      }
     }
   }
 }

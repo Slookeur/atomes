@@ -174,6 +174,25 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern void adjust_preferences_window ();
 
 /*!
+  \fn gboolean is_the_widget_visible (GtkWidget * widg)
+
+  \brief test if a GtkWidget exist, then return if it is visible or not
+
+  \param widg the GtkWidget
+*/
+gboolean is_the_widget_visible (GtkWidget * widg)
+{
+  if (GTK_IS_WIDGET(widg))
+  {
+    return gtk_widget_is_visible (widg);
+  }
+  else
+  {
+    return FALSE;
+  }
+}
+
+/*!
   \fn void show_the_widgets (GtkWidget * widg)
 
   \brief show GtkWidget
@@ -182,11 +201,17 @@ extern void adjust_preferences_window ();
 */
 void show_the_widgets (GtkWidget * widg)
 {
+  if (widg)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
 #ifdef GTK4
-  gtk_widget_set_visible (widg, TRUE);
+      gtk_widget_set_visible (widg, TRUE);
 #else
-  gtk_widget_show_all (widg);
+      gtk_widget_show_all (widg);
 #endif
+    }
+  }
 }
 
 /*!
@@ -198,11 +223,20 @@ void show_the_widgets (GtkWidget * widg)
 */
 void hide_the_widgets (GtkWidget * widg)
 {
+  if (widg)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
+      if (is_the_widget_visible(widg))
+      {
 #ifdef GTK4
-  gtk_widget_set_visible (widg, FALSE);
+        gtk_widget_set_visible (widg, FALSE);
 #else
-  gtk_widget_hide (widg);
+        gtk_widget_hide (widg);
 #endif
+      }
+    }
+  }
 }
 
 /*!
@@ -713,25 +747,6 @@ void gtk_label_align (GtkWidget * lab, float ax, float ay)
 {
   gtk_label_set_xalign (GTK_LABEL (lab), ax);
   gtk_label_set_yalign (GTK_LABEL (lab), ay);
-}
-
-/*!
-  \fn gboolean is_the_widget_visible (GtkWidget * widg)
-
-  \brief test if a GtkWidget exist, then return if it is visible or not
-
-  \param widg the GtkWidget
-*/
-gboolean is_the_widget_visible (GtkWidget * widg)
-{
-  if (GTK_IS_WIDGET(widg))
-  {
-    return gtk_widget_is_visible (widg);
-  }
-  else
-  {
-    return FALSE;
-  }
 }
 
 /*!
@@ -2187,25 +2202,16 @@ void provide_gtk_css (gchar * css)
 */
 GtkWidget * destroy_this_widget (GtkWidget * widg)
 {
+  hide_the_widgets (widg);
+#ifdef GTK3
   if (widg != NULL)
   {
     if (GTK_IS_WIDGET(widg))
     {
-      if (is_the_widget_visible(widg)) hide_the_widgets (widg);
-#ifdef GTK3
       gtk_widget_destroy (widg);
-#else
-      /* GtkWidget * wid = gtk_widget_get_parent (widg);
-      if (wid != NULL)
-      {
-        if (GTK_IS_WIDGET(wid))
-        {
-          gtk_widget_unparent (widg);
-        }
-      } */
-#endif
     }
   }
+#endif
   return NULL;
 }
 

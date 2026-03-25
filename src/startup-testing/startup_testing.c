@@ -113,22 +113,6 @@ void show_the_widgets (GtkWidget * widg)
 }
 
 /*!
-  \fn void hide_the_widgets (GtkWidget * widg)
-
-  \brief hide GtkWidget
-
-  \param widg the GtkWidget to show
-*/
-void hide_the_widgets (GtkWidget * widg)
-{
-#ifdef GTK4
-  gtk_widget_set_visible (widg, FALSE);
-#else
-  gtk_widget_hide (widg);
-#endif
-}
-
-/*!
   \fn gboolean is_the_widget_visible (GtkWidget * widg)
 
   \brief test if a GtkWidget exist, then return if it is visible or not
@@ -148,6 +132,31 @@ gboolean is_the_widget_visible (GtkWidget * widg)
 }
 
 /*!
+  \fn void hide_the_widgets (GtkWidget * widg)
+
+  \brief hide GtkWidget
+
+  \param widg the GtkWidget to show
+*/
+void hide_the_widgets (GtkWidget * widg)
+{
+  if (widg)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
+      if (is_the_widget_visible(widg))
+      {
+#ifdef GTK4
+        gtk_widget_set_visible (widg, FALSE);
+#else
+        gtk_widget_hide (widg);
+#endif
+      }
+    }
+  }
+}
+
+/*!
   \fn GtkWidget * destroy_this_widget (GtkWidget * widg)
 
   \brief destroy a GtkWidget
@@ -156,19 +165,18 @@ gboolean is_the_widget_visible (GtkWidget * widg)
 */
 GtkWidget * destroy_this_widget (GtkWidget * widg)
 {
+  hide_the_widgets (widg);
+#ifdef GTK3
   if (widg != NULL)
   {
     if (GTK_IS_WIDGET(widg))
     {
-      if (is_the_widget_visible(widg)) hide_the_widgets (widg);
-#ifdef GTK3
       gtk_widget_destroy (widg);
-#endif
     }
   }
+#endif // GTK3
   return NULL;
 }
-
 
 /*!
   \fn gboolean is_GLExtension_Supported (const char * extension)
