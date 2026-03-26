@@ -1086,6 +1086,12 @@ void render_this_shader (glsl_program * glsl, int ids)
       glActiveTexture (GL_TEXTURE0);
       glBindTexture (ogl_texture, glsl -> obj -> texture);
     }
+#ifdef GTK4
+    else
+    {
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+#endif
     if (glsl -> draw_instanced)
     {
       j = (glsl -> draw_type == GLSL_STRING) ? 4 : 3*(glsl -> draw_type+1);
@@ -1095,6 +1101,12 @@ void render_this_shader (glsl_program * glsl, int ids)
     {
       glDrawArrays (glsl -> vert_type, 0, glsl -> obj -> num_vertices);
     }
+#ifdef GTK4
+    if (glsl -> draw_type == GLSL_POINTS || glsl -> draw_type == GLSL_LINES)
+    {
+      glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
+#endif
   }
   else
   {

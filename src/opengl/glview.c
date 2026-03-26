@@ -1462,10 +1462,13 @@ void init_opengl ()
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #else
   // Mandatory with GTK4 to obtain an alpha channel similar to the GTK3 version
-  // However it affects the rendering without ligthning (ex: WIREFRAME) for large systems
+  // However it affects the rendering without lightening (ex: WIREFRAME)
+  // In that case it is de-activated at the rendering stage (and then re-activated)
+  // However this is just a trick and it requires further investigation
   glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 #endif
 
+  // glEnable (GL_POLYGON_OFFSET_LINE);
   glPolygonOffset (1.0, 1.0);
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 

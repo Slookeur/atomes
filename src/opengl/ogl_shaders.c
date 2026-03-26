@@ -939,12 +939,12 @@ const GLchar * full_color = GLSL(
 
     if (fog.mode > 0)
     {
-      vec3 col = Apply_fog(surfaceColor.xyz*color);
+      vec3 col = Apply_fog(surfaceColor.rgb*color);
       fragment_color = vec4 (col * alpha, alpha);
     }
     else
     {
-      fragment_color = vec4 ((surfaceColor.xyz*color) * alpha, alpha);
+      fragment_color = vec4 ((surfaceColor.rgb*color) * alpha, alpha);
     }
   }
 );
@@ -1812,7 +1812,7 @@ const GLchar * full_color_ray = GLSL(
 
       diffuse *= (ao * mat.ambient_occlusion);
       vec3 lit_color = pow(diffuse,vec3(1.0/mat.gamma));
-      color = surfaceColor.xyz*lit_color;
+      color = surfaceColor.rgb*lit_color;
       alpha = surfaceColor.w*mat.alpha;
     }
 
