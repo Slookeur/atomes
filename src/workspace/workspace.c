@@ -128,7 +128,6 @@ void add_project (GtkTreeStore * store, int i)
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
   gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
-  gboolean append;
 
   for (j=0; j<NCALCS; j++)
   {

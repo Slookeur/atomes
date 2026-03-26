@@ -177,7 +177,6 @@ GtkWidget * bdv_box (GtkWidget * box, char * lab, int size, float xalign)
   return hbox;
 }
 
-GtkWidget * render_box;
 GtkWidget * d_close;
 int status;
 
@@ -1149,14 +1148,14 @@ G_MODULE_EXPORT void set_r_model (GtkComboBox * box, gpointer data)
   if (preferences)
   {
     tmp_opengl[4] = combo_get_active ((GtkWidget *)box);
-    widget_set_sensitive (render_box, ! tmp_opengl[4]);
+    widget_set_sensitive (pref_ogl_edit -> render_fix, ! tmp_opengl[4]);
   }
   else
   {
     glwin * view = (glwin *)data;
     view -> anim -> last -> img -> ray_tracing = combo_get_active ((GtkWidget *)box);
     view -> anim -> last -> img -> render = 0;
-    widget_set_sensitive (render_box, ! view -> anim -> last -> img -> ray_tracing);
+    widget_set_sensitive (view -> opengl_win -> render_fix, ! view -> anim -> last -> img -> ray_tracing);
     init_default_shaders (view);
     update (view);
   }
@@ -1319,8 +1318,9 @@ G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data)
   \brief create rendering parameters
 
   \param view the target glwin, if any
+  \param ogl_edit the target OpenGL edition window
 */
-GtkWidget * rendering_fix (glwin * view)
+GtkWidget * rendering_fix (glwin * view, opengl_edition * ogl_edit)
 {
   GtkWidget * fix = gtk_fixed_new ();
   GtkWidget * rmodel = create_combo ();
@@ -1335,14 +1335,14 @@ GtkWidget * rendering_fix (glwin * view)
   gtk_widget_set_size_request (rmodel, 110, -1);
   combo_set_active (rmodel, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4]);
 
-  render_box = gtk_fixed_new ();
-  gtk_fixed_put (GTK_FIXED (fix), render_box, 130, 0);
+  ogl_edit -> render_fix = gtk_fixed_new ();
+  gtk_fixed_put (GTK_FIXED (fix), ogl_edit -> render_fix, 130, 0);
   GtkWidget * quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 100, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
-  gtk_fixed_put (GTK_FIXED (render_box), quality_scale, 0, 0);
+  gtk_fixed_put (GTK_FIXED (ogl_edit -> render_fix), quality_scale, 0, 0);
   if (! preferences)
   {
     GtkWidget * fmodel = create_combo ();
-    gtk_fixed_put (GTK_FIXED (render_box), fmodel, 120, 10);
+    gtk_fixed_put (GTK_FIXED (ogl_edit -> render_fix), fmodel, 120, 10);
     char * f_model[3] = {"Filled", "Lines", "Points"};
     int i;
     for (i=0; i<3; i++)
@@ -1353,7 +1353,7 @@ GtkWidget * rendering_fix (glwin * view)
     gtk_widget_set_size_request (fmodel, 100, -1);
     combo_set_active (fmodel, view -> anim -> last -> img -> render);
   }
-  widget_set_sensitive (render_box, (view) ? ! view -> anim -> last -> img -> ray_tracing : ! tmp_opengl[4]);
+  widget_set_sensitive (ogl_edit -> render_fix, (view) ? ! view -> anim -> last -> img -> ray_tracing : ! tmp_opengl[4]);
 
   return fix;
 }
@@ -1401,7 +1401,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   GtkWidget * box, * hbox;
 
   box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, rendering_fix (view), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, rendering_fix (view, ogl_edit), FALSE, FALSE, 0);
 
   box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);

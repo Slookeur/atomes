@@ -427,13 +427,16 @@ void window_encode (glwin * view, gboolean video)
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   gtk_widget_set_size_request (hbox, 300, -1);
-  if (video)
+  if (! view -> anim -> last -> img -> ray_tracing)
   {
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= recorded quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  }
-  else
-  {
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= on-screen quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    if (video)
+    {
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= recorded quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    }
+    else
+    {
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= on-screen quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    }
   }
   oglquality = 0;
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, spin_button (G_CALLBACK(set_video_opengl_spin), 0, 0, 1000, 1, 0, 100, NULL), FALSE, FALSE, 20);

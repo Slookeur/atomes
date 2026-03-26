@@ -832,6 +832,7 @@ struct opengl_edition
   GtkWidget * m_scale[5];
   GtkWidget * lights;
   GtkWidget * lights_box;
+  GtkWidget * render_fix;
 
   GtkWidget * basic[2];
   GtkWidget * base_ogl[2][5];
