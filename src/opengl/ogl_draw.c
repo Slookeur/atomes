@@ -582,10 +582,6 @@ void draw (glwin * view)
     // Gradient background
     draw_vertices (BACKG);
 
-    // We want to draw the elements by reverse order
-    // so that atoms will be last and and will appear on
-    // top of bonds and so on
-
     // Box
     draw_vertices (MDBOX);
 

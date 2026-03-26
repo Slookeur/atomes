@@ -3050,7 +3050,7 @@ GMenu * add_style_sub_menu (glwin * view, gchar * act, int aid, GCallback handle
   int i;
   for (i=0; i<OGL_STYLES; i++)
   {
-    append_opengl_item (view, menu, text_styles[i], actc, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+    append_opengl_item (view, menu, text_styles[i], actc, i, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
   }
   g_free (actc);
   return menu;
@@ -3869,6 +3869,19 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
 #endif
   gboolean go;
 
+ /* 0 = Select
+    1 = Unselect
+    2 = Label
+    3 = Unlabel
+    4 = Show
+    5 = Hide
+    6 = Style
+    7 = Color
+    8 = Edit as New Project"
+    9 = Remove
+   10 = Replace
+   11 = Copy
+ */
   for (i=0; i<12; i++)
   {
     go = TRUE;

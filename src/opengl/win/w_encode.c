@@ -437,9 +437,9 @@ void window_encode (glwin * view, gboolean video)
     {
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= on-screen quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, spin_button (G_CALLBACK(set_video_opengl_spin), 0, 0, 1000, 1, 0, 100, NULL), FALSE, FALSE, 20);
   }
   oglquality = 0;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, spin_button (G_CALLBACK(set_video_opengl_spin), 0, 0, 1000, 1, 0, 100, NULL), FALSE, FALSE, 20);
   if (video)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Progress: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
