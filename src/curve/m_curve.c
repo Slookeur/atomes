@@ -775,7 +775,7 @@ GtkWidget * curve_popup_menu (gpointer data)
   g_free (extrarid);
 #ifdef GTK4
   curve_pop_menu = gtk_popover_menu_new_from_model_full ((GMenuModel *)menu, GTK_POPOVER_MENU_NESTED);
-  gtk_widget_set_parent (curve_pop_menu,  this_curve -> window);
+  gtk_widget_set_parent (curve_pop_menu, this_curve -> window);
   gtk_widget_set_size_request (curve_pop_menu, -1, 305);
 #else
   curve_pop_menu = gtk_menu_new_from_model ((GMenuModel *)menu);

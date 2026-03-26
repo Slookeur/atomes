@@ -261,5 +261,6 @@ GtkWidget * work_menu (int p, int c)
     menu = gtk_popover_menu_new_from_model (G_MENU_MODEL(popup)); */
 #endif
   gtk_widget_insert_action_group (menu, "pop", G_ACTION_GROUP(action_popup));
+
   return menu;
 }

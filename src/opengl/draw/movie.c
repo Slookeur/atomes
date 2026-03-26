@@ -522,7 +522,7 @@ gboolean check_to_update_shaders (glwin * view, image * img_a, image * img_b, in
   int i, j, k;
   int stp = img_b -> step;
 
-  if (ogl_q == 0 && img_a -> quality != img_b -> quality)
+  if ((img_a -> ray_tracing != img_b -> ray_tracing) || (ogl_q == 0 && img_a -> quality != img_b -> quality))
   {
     view -> create_shaders[MDBOX] = TRUE;
     view -> create_shaders[MAXIS] = TRUE;

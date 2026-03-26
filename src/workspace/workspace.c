@@ -472,7 +472,7 @@ void workspace_menu (GtkWidget * tree, gpointer event, double x, double y)
 #ifdef GTK3
   pop_menu_at_pointer (menu, (GdkEvent *)event);
 #else
-  gtk_widget_set_parent (menu, MainWindow);
+  gtk_widget_set_parent (menu, tree);
   pop_menu_at_pointer (menu, x, y);
 #endif
 }

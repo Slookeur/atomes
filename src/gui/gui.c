@@ -417,6 +417,7 @@ G_MODULE_EXPORT void show_periodic_table (GtkWidget * widg, gpointer data)
 G_MODULE_EXPORT void atomes_menu_bar_action (GSimpleAction * action, GVariant * parameter, gpointer data)
 {
   gchar * name = g_strdup_printf ("%s", g_action_get_name(G_ACTION(action)));
+
   if (g_strcmp0 (name, "workspace.open") == 0)
   {
     on_open_save_activate (NULL, data);
