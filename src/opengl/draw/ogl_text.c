@@ -275,8 +275,8 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
                   GL_UNSIGNED_BYTE,
                   channels[i]);
 
-    glTexParameteri (ogl_texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri (ogl_texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (ogl_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri (ogl_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

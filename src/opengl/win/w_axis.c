@@ -234,6 +234,8 @@ void activate_pos_box (glwin * view, gboolean val)
 G_MODULE_EXPORT void set_axis_template (GtkComboBox * box, gpointer data)
 {
   int i = combo_get_active ((GtkWidget *)box);
+  // The next line is mandatory for GTK4
+  if (i < 0) return;
   glwin * view;
   if (preferences)
   {
