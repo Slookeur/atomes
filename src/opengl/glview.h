@@ -314,7 +314,7 @@ void reshape (glwin * view, int width, int height, gboolean use_ratio);
 void zoom (glwin * view, int delta);
 
 void init_opengl ();
-void init_camera (project * this_proj, gboolean get_depth);
+void init_camera (project * this_proj);
 
 #ifdef GTKGLAREA
   G_MODULE_EXPORT void on_realize (GtkGLArea * area, gpointer data);

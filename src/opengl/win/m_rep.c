@@ -245,7 +245,7 @@ G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data)
     glwin * view = (glwin *)data;
     i = view -> mode;
     view -> mode = ANALYZE;
-    init_camera (get_project_by_id(view -> proj), FALSE);
+    init_camera (get_project_by_id(view -> proj));
     view -> mode = i;
     update_labels (view);
     update (view);
@@ -376,6 +376,7 @@ G_MODULE_EXPORT void set_rep_combo (GtkComboBox * box, gpointer data)
     view = (glwin *)data;
     the_rep = view -> rep_win;
     view -> anim -> last -> img -> rep = rep;
+    update (view);
   }
   int i;
   for (i=1; i<3; i++)

@@ -47,7 +47,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 
-extern void init_camera (project * this_proj, int get_depth);
+extern void init_camera (project * this_proj);
 extern void setup_default_image (project * this_proj, image * img);
 extern void clean_atom_style (project * this_proj);
 extern void setup_default_species_parameters_for_image (project * this_proj, image * img);
@@ -182,7 +182,7 @@ void apply_default_parameters_to_project (project * this_proj)
       preferences = FALSE;
       setup_default_image (this_proj, img);
       preferences = TRUE;
-      init_camera (this_proj, FALSE);
+      init_camera (this_proj);
       setup_default_species_parameters_for_image (this_proj, img);
       clean_atom_style (this_proj);
       init_shaders (this_proj -> modelgl);

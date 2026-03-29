@@ -83,7 +83,7 @@ extern void gtk_window_change_gdk_visual (GtkWidget * win);
 #endif // GTK3
 extern gboolean create_3d_model (int p, gboolean load);
 extern G_MODULE_EXPORT void on_realize (GtkGLArea * area, gpointer data);
-extern void init_camera (project * this_proj, gboolean get_depth);
+extern void init_camera (project * this_proj);
 extern void alloc_proj_data (project * this_proj, int cid);
 extern int action_atoms_from_project (project * this_proj, atom_search * asearch, int status, gboolean visible);
 extern void to_insert_in_project (int stat, int orig, project * this_proj, atom_search * asearch, gboolean visible);

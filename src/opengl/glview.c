@@ -65,7 +65,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void glwin_button_event (double event_x, double event_y, guint event_button, guint event_type, guint32 event_time, gpointer data);
   void zoom (glwin * view, int delta);
   void rotate_x_y (glwin * view, double angle_x, double angle_y);
-  void init_camera (project * this_proj, int get_depth);
+  void init_camera (project * this_proj);
   void setup_default_species_parameters_for_image (project * this_proj, image * img);
   void setup_image_spec_data (project * this_proj, image * img);
   void setup_default_lights (project * this_proj, image * img);
@@ -1160,21 +1160,17 @@ GLdouble get_max_depth (GLdouble depth)
 }
 
 /*!
-  \fn void init_camera (project * this_proj, int get_depth)
+  \fn void init_camera (project * this_proj)
 
   \brief initialize the OpenGL camera settings
 
   \param this_proj the target project
-  \param get_depth estimate the OpenGL depth ? (1/0)
 */
-void init_camera (project * this_proj, int get_depth)
+void init_camera (project * this_proj)
 {
   glwin * view = this_proj -> modelgl;
-  if (get_depth)
-  {
-    view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
-    view -> anim -> last -> img -> m_depth = get_max_depth (view -> anim -> last -> img -> p_depth);
-  }
+  view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
+  view -> anim -> last -> img -> m_depth = get_max_depth (view -> anim -> last -> img -> p_depth);
   view -> anim -> last -> img -> gnear = default_rep.gnear;
   view -> anim -> last -> img -> gfar = view -> anim -> last -> img -> p_depth*2.0;
   view -> anim -> last -> img -> rotation_quaternion.w = 0.0;
@@ -1709,7 +1705,7 @@ void init_glwin (glwin * view)
   view -> anim -> first = snap;
   view -> anim -> last = snap;
   init_img (this_proj);
-  init_camera (this_proj, TRUE);
+  init_camera (this_proj);
 
   view -> mouseStatus = RELEASED;
   view -> mouseAction = ANALYZE;
