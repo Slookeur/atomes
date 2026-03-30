@@ -180,7 +180,7 @@ int selected_aspec;
 int selected_bspec;
 int is_selected;
 int is_labelled;
-int is_filled;
+
 atom_selection * bond_selection = NULL;
 
 tint atoid[CONTEXTACT][4];
@@ -253,7 +253,6 @@ G_MODULE_EXPORT void set_full_screen (GtkWidget * widg, gpointer data)
 int get_style (gchar * str)
 {
   int i;
-  is_filled = NONE;
 #ifdef GTK4
   i = strlen (str);
   return (int) string_to_double ((gpointer)g_strdup_printf ("%c", str[i-1]));
@@ -266,8 +265,7 @@ int get_style (gchar * str)
   {
     if (g_strcmp0 (text_filled[i], str) == 0)
     {
-      is_filled = i;
-      return SPACEFILL;
+      return OGL_STYLES + i;
     }
   }
 #endif
@@ -3047,10 +3045,22 @@ GMenu * add_style_sub_menu (glwin * view, gchar * act, int aid, GCallback handle
 {
   GMenu * menu = g_menu_new ();
   gchar * actc = g_strdup_printf ("%s-%d", act, aid);
-  int i;
+  int i, j;
   for (i=0; i<OGL_STYLES; i++)
   {
-    append_opengl_item (view, menu, text_styles[i], actc, i, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+    if (i != SPACEFILL)
+    {
+      append_opengl_item (view, menu, text_styles[i], actc, i, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+    }
+    else
+    {
+      GMenu * menuf = g_menu_new ();
+      for (j=0; j < FILLED_STYLES; j++)
+      {
+        append_opengl_item (view, menuf, text_filled[j], actc, j+OGL_STYLES, j+OGL_STYLES, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+      }
+      append_submenu (menu, text_styles[i], menuf);
+    }
   }
   g_free (actc);
   return menu;
@@ -3069,14 +3079,14 @@ void add_style_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
 {
   GtkWidget * menu = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)item, menu);
-  int i; //, j;
+  int i, j;
   for (i=0; i<OGL_STYLES; i++)
   {
-    //if (i != SPACEFILL)
+    if (i != SPACEFILL)
     {
       gtk3_menu_item (menu, text_styles[i], IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
     }
-    /* else
+    else
     {
       GtkWidget *widg = create_menu_item (FALSE, "Spacefilled");
       gtk_menu_shell_append ((GtkMenuShell *)menu, widg);
@@ -3086,36 +3096,9 @@ void add_style_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
       {
         gtk3_menu_item (menuf, text_filled[j], IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
       }
-    } */
+    }
   }
 }
-
-/*void add_style_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
-{
-  GtkWidget * menu = gtk_menu_new ();
-  GtkWidget * pmenu;
-  GtkWidget * sitem, * pitem;
-  gtk_menu_item_set_submenu ((GtkMenuItem *)item, menu);
-  int i, j;
-  for (i=0; i<OGL_STYLES; i++)
-  {
-    if (i != SPACEFILL)
-    {
-      sitem =  gtk3_menu_item (menu, text_stylesled[j], IMG_NONE, NULL, handler, data, FALSE, 0, 0, TRUE, TRUE, FALSE);
-    }
-    else
-    {
-      sitem = create_menu_item (FALSE, "Spacefilled");
-      gtk_menu_shell_append ((GtkMenuShell *)menu, sitem);
-      pmenu = gtk_menu_new ();
-      gtk_menu_item_set_submenu ((GtkMenuItem *)sitem, pmenu);
-      for (j=0; j < FILLED_STYLES; j++)
-      {
-        pitem = gtk3_menu_item (menu, text_filled[j], IMG_NONE, NULL, handler, data, FALSE, 0, 0, TRUE, TRUE, FALSE);
-      }
-    }
-  }
-}*/
 
 /*!
   \fn void add_edition_sub_menu (GtkWidget * item, GCallback handler, gpointer data)

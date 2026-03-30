@@ -687,8 +687,8 @@ int create_bond_lists (gboolean to_pick)
   int nshaders = 0;
   int **** nbonds;
   int **** ncaps;
-  int nbds[7];
-  int ncap[7];
+  int nbds[NUM_STYLES];
+  int ncap[NUM_STYLES];
   object_3d * cyl, * cap;
   int f, g, h, i, j, k, l, m;
 

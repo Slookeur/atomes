@@ -1554,7 +1554,6 @@ const GLchar * full_color_ray = GLSL(
   bool intersect_sphere(vec3 ro, vec3 rd, vec3 c, float r, out Hit hit)
   {
     vec3 oc = ro - c;
-
     vec3 cr = cross(rd, oc);
     float d2 = dot(cr, cr);
 

@@ -1021,7 +1021,7 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
       ColRGBA col = view -> anim -> last -> img -> spcolor[geo][0][j];
       col.alpha = 1.0;
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb,
-                           color_button (col, TRUE, 80, -1, G_CALLBACK(set_color_frag_mol), & view -> gcid[geo][j][0]),
+                           color_button (col, TRUE, 80, -1, G_CALLBACK(set_color_frag_mol), & view -> gcid[geo][j][geo]),
                            FALSE, FALSE, 5);
 
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb,

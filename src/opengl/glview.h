@@ -174,7 +174,7 @@ enum modes {
   CP2K_MM   = 8  /*!< 8 */
 };
 
-#define NUM_STYLES 7
+#define NUM_STYLES OGL_STYLES+FILLED_STYLES+1
 
 /*! \enum styles */
 enum styles {
@@ -271,6 +271,7 @@ extern int gColorID[3];
 extern int field_object;
 extern GLenum ogl_texture;
 
+extern int get_filled_id (int sid);
 extern gboolean create_bond (int ac, int bid, int ba, int bb, int sel, double length);
 extern void draw_cylinder_bond (atom a, atom b, int bid, int ci, int bi);
 extern void draw_cylinder_bond_to_pick (atom a, atom b, int bid);

@@ -304,7 +304,15 @@ object_3d * draw_billboard_quad ()
 */
 float get_sphere_radius (int style, int sp, int ac, int sel)
 {
-  if (style == WIREFRAME || style == PUNT)
+  if (style >= OGL_STYLES)
+  {
+    int fid = get_filled_id(style);
+    int k = (fid) ? 9 + fid : 2;
+    int l = (fid) ? 12 + fid : 7;
+    int m = (int)proj_gl -> chemistry -> chem_prop[CHEM_Z][sp];
+    return (default_o_at_rs[2+5*ac]) ? default_at_rs[2+5*ac] + sel*0.05 : get_radius (2+5*ac, fid, m, default_atomic_rad[(ac) ? l : k]) + sel*0.05;
+  }
+  else if (style == WIREFRAME || style == PUNT)
   {
     return plot -> pointrad[sp + ac*proj_sp] + sel*4.0;
   }
