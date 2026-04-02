@@ -1,0 +1,9 @@
+Extension atomes pour LibreOffice
+===================================
+Insérer et ouvrir des fichiers projet d'atomes (.apf) dans tout document LibreOffice.
+
+Fonctionnalités :
+  - Insérer un fichier atomes : génère un aperçu image via 'atomes --render-png'
+    et embarque le fichier .apf source dans le stockage ODF du document.
+  - Ouvrir un fichier embarqué via : menu atomes, menu contextuel (clic droit),
+    clic sur l'image insérée, ou double-clic.

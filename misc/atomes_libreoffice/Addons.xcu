@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oor:component-data
+  xmlns:oor="http://openoffice.org/2001/registry"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  oor:name="Addons"
+  oor:package="org.openoffice.Office">
+  <node oor:name="AddonUI">
+    <node oor:name="OfficeMenuBar">
+      <node oor:name="fr.ipcms.atomes.extension.menu" oor:op="replace">
+        <prop oor:name="Title" oor:type="xs:string">
+          <value xml:lang="fr">atomes</value>
+	  <value xml:lang="en">atomes</value>
+          <value>atomes</value>
+        </prop>
+        <node oor:name="Submenu">
+          <node oor:name="Element-001" oor:op="replace">
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="fr">Insérer un fichier</value>
+              <value xml:lang="en">Insert a file</value>
+              <value>Insert a file</value>
+            </prop>
+            <node oor:name="UserDefinedImages">
+              <prop oor:name="ImageSmallURL">
+                <value>%origin%/images/log_16.png</value>
+              </prop>
+              <prop oor:name="ImageBigURL">
+                <value>%origin%/images/log_26.png</value>
+              </prop>
+            </node>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>service:fr.ipcms.atomes.AtomesService?insert</value>
+            </prop>
+          </node>
+          <node oor:name="Element-002" oor:op="replace">
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="fr">Ouvrir un fichier</value>
+              <value xml:lang="en">Open a file</value>
+              <value>Open a file</value>
+            </prop>
+            <node oor:name="UserDefinedImages">
+              <prop oor:name="ImageSmallURL">
+                <value>%origin%/images/log_16.png</value>
+              </prop>
+              <prop oor:name="ImageBigURL">
+                <value>%origin%/images/log_26.png</value>
+              </prop>
+            </node>
+            <prop oor:name="URL" oor:type="xs:string">
+             <value>service:fr.ipcms.atomes.AtomesService?open</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

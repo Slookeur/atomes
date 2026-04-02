@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+  <identifier value="fr.ipcms.atomes.extension"/>
+  <version value="1.0"/>
+  <platform value="all"/>
+  <display-name>
+    <name lang="en">atomes Extension for LibreOffice</name>
+    <name lang="fr">Extension atomes pour LibreOffice</name>
+  </display-name>
+  <extension-description>
+    <src lang="en" xlink:href="pkg-description/desc_en.txt"/>
+    <src lang="fr" xlink:href="pkg-description/desc_fr.txt"/>
+  </extension-description>
+  <publisher>
+    <name xlink:href="https://www.ipcms.fr/sebastien-le-roux/"
+          lang="en">Dr. Sébastien Le Roux - IPCMS (CNRS / Université de Strasbourg)</name>
+    <name xlink:href="https://www.ipcms.fr/sebastien-le-roux/"
+          lang="fr">Dr. Sébastien Le Roux - IPCMS (CNRS / Strasbourg University)</name>
+  </publisher>
+  <icon>
+    <default xlink:href="icons/atomes.svg" />
+  </icon>
+</description>
