@@ -154,18 +154,17 @@ def _embed_file(doc, filepath, stored_name, replace=False):
         if replace and not exists:
             print(f"Fichier {stored_name} introuvable pour remplacement.")
             return False
+        
+        if not replace:
+          #unique_name = f"{uuid.uuid4().hex[:8]}_{stored_name}"
+          unique_name = stored_name
+          print(f"Nom unique généré : {unique_name}")
+        else:
+           unique_name = stored_name
 
-        if not replace and exists:
-          print(f"Fichier {stored_name} déjà existant, renommage.")
-          # Génère un nouveau nom unique
-          new_name = f"{stored_name}_{uuid.uuid4().hex[:8]}"
-          print(f"Nouveau nom : {new_name}")
-          stored_name = new_name
-          
-          return False
         # Ouverture du stream
         stream_mode = mode | ElementModes.TRUNCATE if exists else mode
-        stream = sub.openStreamElement(stored_name, stream_mode)
+        stream = sub.openStreamElement(unique_name, stream_mode)
         out = stream.getOutputStream()
 
         with open(filepath, "rb") as fh:
@@ -208,7 +207,9 @@ def _extract_file(doc, stored_name):
             for c in chunks:
                 tmp.write(c)
             return tmp.name
-    except Exception:
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return None
 
 def _list_embedded_files(doc):
@@ -334,7 +335,7 @@ def _open_embedded_file(doc, stored_name):
             height_twips = int(height * 1440 / 96)
             shape.Size = Size(width_twips, height_twips)
             # Update apf content in LibreOffice document
-            if not _embed_file(doc,tmp, stored_name, replace=True):
+            if not _embed_file(doc, tmp, stored_name, replace=True):
                 _show_message(doc, _("embed_failed"), _("error_title"), error=True)
             # Nettoie le fichier temporaire
             if os.path.exists(output_image):
@@ -497,6 +498,7 @@ def on_atomes_click(*args):
     shape = _get_selected_atomes_shape(doc)
     if shape:
         name = _stored_name(shape)
+        print ("stored_name= ",name)
         if name:
             _open_embedded_file(doc, name)
     return None
