@@ -93,17 +93,26 @@ G_MODULE_EXPORT void run_render_image (GtkNativeDialog * info, gint response_id,
 */
 G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpointer data)
 {
-  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
 #endif
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     video_options * iopts = (video_options *)data;
-    gchar * videofile = file_chooser_get_file_name (chooser);
+    GtkFileChooser * chooser;
+    gchar * videofile;
+    if (atomes_render_image)
+    {
+      videofile = g_strdup_printf ("%s", atomes_image_output);
+    }
+    else
+    {
+      chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
+      videofile = file_chooser_get_file_name (chooser);
 #ifdef GTK4
-    destroy_this_native_dialog (info);
+      destroy_this_native_dialog (info);
 #else
-    destroy_this_dialog (info);
+      destroy_this_dialog (info);
 #endif
+    }
     init_frame_buffer (iopts -> video_res[0], iopts -> video_res[1]);
     project * this_proj = get_project_by_id (iopts -> proj);
     glwin * view = this_proj -> modelgl;
@@ -134,14 +143,17 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
     }
     close_frame_buffer ();
     in_movie_encoding = FALSE;
-    if (iopts -> oglquality != 0) view -> anim -> last -> img -> quality = q;
-    for (i=0; i<NGLOBAL_SHADERS; i++)
+    if (! atomes_render_image)
     {
-      if (in_md_shaders (this_proj, i)) view -> n_shaders[i][step] = -1;
+      if (iopts -> oglquality != 0) view -> anim -> last -> img -> quality = q;
+      for (i=0; i<NGLOBAL_SHADERS; i++)
+      {
+        if (in_md_shaders (this_proj, i)) view -> n_shaders[i][step] = -1;
+      }
+      recreate_all_shaders (view);
+      reshape (view, x, y, TRUE);
+      update (view);
     }
-    recreate_all_shaders (view);
-    reshape (view, x, y, TRUE);
-    update (view);
   }
   else
   {

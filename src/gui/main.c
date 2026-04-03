@@ -32,7 +32,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  int test_this_arg (gchar * arg);
+  int test_this_arg (gchar * arg)
+  int search_for_arg (int argc, char *argv[], gchar * arg)
+  int test_all_args (int argc, char *argv[])
   int main (int argc, char *argv[]);
 
   gboolean destroy_func (gpointer user_data);
@@ -85,54 +87,32 @@ struct file_list * ftmp = NULL;
 gboolean with_workspace = FALSE;
 
 /*!
-  \fn int test_this_arg (gchar * arg)
-
-  \brief test an argument from the command line
-
-  \param arg the argument to test
-*/
-int test_this_arg (gchar * arg)
-{
-  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
-  int i, j;
-  i = strlen(arg);
-  gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<15; j++) if (g_strcmp0 (str, fext[j]) == 0) return j+1;
-  gchar * aext = g_strdup_printf ("%c%c%c%c", str[i-4], str[i-3], str[i-2], str[i-1]);
-  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
-  for (j=0; j<15; j++) if (g_strcmp0 (aext, eext[j]) == 0) return -(j+1);
-  g_free (str);
-  g_free (aext);
-  return 0;
-}
-
-/*!
-  \fn void printhelp()
+  \fn void print_help()
 
   \brief print basic help
 */
-void printhelp()
+void print_help()
 {
-  char * help    = "\nUsage: ATOMES [OPTION]\n"
-                   "       ATOMES [FILE]\n"
-                   "       ATOMES [OPTION] [FILE]\n"
-                   "       ATOMES [FILE1] [FILE2] ...\n"
-                   "       ATOMES [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
-                   "3D atomistic model analysis, creation/edition and post-processing tool\n\n"
+  char * help    = "\nUsage: atomes [OPTION]\n"
+                   "       atomes [FILE]\n"
+                   "       atomes [OPTION] [FILE]\n"
+                   "       atomes [FILE1] [FILE2] ...\n"
+                   "       atomes [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
+                   "3D atomic-scale models analysis, creation/edition and post-processing tool\n\n"
                    "options:\n"
                    "  -v, --version             version information\n"
                    "  -h, --help                display this help message\n\n"
                    "files, any number, in any order, in the following formats:\n\n"
-                   "  Atomes workspace file: .awf\n"
-                   "  Atomes prject file: .apf\n"
-                   "  XYZ coordinates file: .xyz\n"
-                   "  Chem3D coordinates file: .c3d\n"
-                   "  CPMD trajectory: .trj\n"
-                   "  VASP trajectory: .xdatcar\n"
-                   "  PDB coordinates: .pdb, .ent\n"
-                   "  Crystallographic Information File: .cif\n"
-                   "  DL-POLY history file: .hist\n"
-                   "  ISAACS project file: .ipf\n\n"
+                   "  atomes workspace file             : .awf\n"
+                   "  atomes project file               : .apf\n"
+                   "  XYZ coordinates file              : .xyz\n"
+                   "  Chem3D coordinates file           : .c3d\n"
+                   "  CPMD trajectory                   : .trj\n"
+                   "  VASP trajectory                   : .xdatcar\n"
+                   "  PDB coordinates                   : .pdb, .ent\n"
+                   "  Crystallographic Information File : .cif\n"
+                   "  DL-POLY history file              : .hist\n"
+                   "  ISAACS project file               : .ipf\n\n"
                    " alternatively specify the file format using:\n\n"
                    " -awf FILE\n"
                    " -apf FILE\n"
@@ -145,7 +125,15 @@ void printhelp()
                    " -hist FILE\n"
                    " -ipf FILE\n\n"
                    "ex:\n\n"
-                   " atomes -pdb this.f file.awf -cif that.f *.xyz\n";
+                   " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
+                   "simple image rendering (from atomes '.apf' project file):\n\n"
+                   "  --render-png              render image in PNG format\n"
+                   "  --render-jpg              render image in JPEG format\n"
+                   "  -o, --output [FILE]       image file name\n"
+                   "  --width  [XSIZE]          image width\n"
+                   "  --height [YSIZE]          image height\n\n"
+                   "ex:\n\n"
+                   " atomes --render-png --width 1920 --height 1024 --output image.png project.apf\n\n";
   char bug[20] = "\nReport a bug to <";
   char eh[4] = ">\n";
 
@@ -156,11 +144,11 @@ void printhelp()
 }
 
 /*!
-  \fn void printversion ()
+  \fn void print_version ()
 
   \brief print version information
 */
-void printversion ()
+void print_version ()
 {
   char scanid[80]="\n3D atomistic model analysis, creation/edition and post-processing tool\n";
   char bug[20] = "\nReport a bug to <";
@@ -232,6 +220,225 @@ void printversion ()
   printf ("%s", bug);
   printf ("%s", PACKAGE_BUGREPORT);
   printf ("%s\n", eh);
+}
+
+/*!
+  \fn int test_this_arg (gchar * arg)
+
+  \brief test an argument from the command line
+
+  \param arg the argument to test
+*/
+int test_this_arg (gchar * arg)
+{
+  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
+  int i, j;
+  i = strlen(arg);
+  gchar * str = g_ascii_strdown (arg, i);
+  for (j=0; j<15; j++) if (g_strcmp0 (str, fext[j]) == 0) return j+1;
+  gchar * aext = g_strdup_printf ("%c%c%c%c", str[i-4], str[i-3], str[i-2], str[i-1]);
+  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
+  for (j=0; j<15; j++) if (g_strcmp0 (aext, eext[j]) == 0) return -(j+1);
+  g_free (str);
+  g_free (aext);
+  return 0;
+}
+
+/*!
+  \fn int search_for_arg (int argc, char *argv[], gchar * arg)
+
+  \brief search command line argument for target argument
+
+  \param argc number of argument(s) on the command line
+  \param *argv[] list of argument(s) on the command line
+  \param arg the target argument to search for
+*/
+int search_for_arg (int argc, char *argv[], gchar * arg)
+{
+  int i, j;
+  gchar * str;
+  for (i=1; i<argc; i++)
+  {
+    j = strlen(argv[i]);
+    str = g_ascii_strdown (argv[i], j);
+    if (g_strcmp0 (str, arg) == 0) return i;
+  }
+  return 0;
+}
+
+/*!
+  \fn int test_all_args (int argc, char *argv[])
+
+  \brief test command line arguments
+
+  \param argc number of argument(s) on the command line
+  \param *argv[] list of argument(s) on the command line
+*/
+int test_all_args (int argc, char *argv[])
+{
+  char * key_args[6] = {"-h", "--help", "-v", "--version"};
+  char * img_args[2] = {"--render-png", "--render-jpg"};
+  char * out_args[2] = {"-o", "--output"};
+  char * pix_args[2] = {"--width", "--height"};
+  gchar * str, * ext;
+  int i, j, k, l, m, n;
+  atomes_from_libreoffice = search_for_arg (argc, argv, "--libreoffice") ? TRUE : FALSE;
+  if (atomes_from_libreoffice)
+  {
+    atomes_image_format = 0;
+    i = search_for_arg (argc, argv, "--output");
+    atomes_image_output = g_strdup_printf ("%s", argv[i+1]);
+    // Stuff should be disabled / enabled :
+    // - Opening options both for workspace and projects
+    // - If origin project then update content in LibreOffice
+    // - Import options
+    // - Saving of the origin project is mandatory
+  }
+  for (i=0; i<4; i++)
+  {
+    if (search_for_arg (argc, argv, key_args[i]))
+    {
+      if (i < 2)
+      {
+        print_help();
+      }
+      else
+      {
+        print_version();
+      }
+      return FALSE;
+    }
+  }
+  for (i=0; i<2; i++)
+  {
+    j = search_for_arg (argc, argv, img_args[i]);
+    if (j > 0)
+    {
+      k = 0;
+      for (l=0; l<2; l++)
+      {
+        k = search_for_arg (argc, argv, out_args[l]);
+        if (k) break;
+      }
+      if (! k || k == argc-1)
+      {
+        printf ("Error :: no output file specified to render image !\n");
+        return FALSE;
+      }
+      else if (argc > 4)
+      {
+        // There is a project to render if there is at least
+        // one more argument the command line: the project to render
+        // we need to find the project to render
+        for (m=1; m<argc; m++)
+        {
+          if (m != j && m != k && m != k+1)
+          {
+            n = strlen(argv[m]);
+            str = g_ascii_strdown (argv[m], n);
+            ext = g_strdup_printf ("%c%c%c%c", str[n-4], str[n-3], str[n-2], str[n-1]);
+            if (g_strcmp0 (ext, ".apf") == 0)
+            {
+              int x, y;
+              x = search_for_arg (argc, argv, pix_args[0]);
+              y = search_for_arg (argc, argv, pix_args[1]);
+              if (x && y && argc > 8)
+              {
+                // To have all parameters on the command line, including image,
+                // you need to have at least 8 arguments
+                double px, py;
+                px = string_to_double(argv[x+1]);
+                py = string_to_double(argv[y+1]);
+                if (px > 0.0 && py > 0.0)
+                {
+                  atomes_image_pixels = allocint(2);
+                  atomes_image_pixels[0] = (int)px;
+                  atomes_image_pixels[1] = (int)py;
+                }
+              }
+
+#ifdef DEBUG
+              printf ("Render image\n\t-> project= %s\n\t-> image format= %s\n\t-> output file= %s\n", argv[m], img_args[i], argv[k+1]);
+              if (atomes_image_pixels)
+              {
+                printf ("\t -> width  = %d\n", atomes_image_pixels[0]);
+                printf ("\t -> height = %d\n", atomes_image_pixels[1]);
+              }
+#endif
+              atomes_render_image = TRUE;
+              atomes_image_format = i;
+              atomes_image_output = g_strdup_printf ("%s", argv[k+1]);
+              flist = g_malloc0(sizeof*flist);
+              flist -> file_name = g_strdup_printf ("%s", argv[m]);
+              flist -> file_type = 2;
+              return TRUE;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (argc == 2)
+  {
+    i = test_this_arg (argv[1]);
+    if (i !=0)
+    {
+      flist = g_malloc0(sizeof*flist);
+      flist -> file_name = g_strdup_printf ("%s", argv[1]);
+      flist -> file_type = -i;
+      if (flist -> file_type == 1) with_workspace = TRUE;
+    }
+  }
+  else
+  {
+    i=0;
+    for (j=1; j<argc; j++)
+    {
+      k = test_this_arg (argv[j]);
+      if (! (abs(k) == 1 && with_workspace))
+      {
+        if (k > 0 && j < argc-1)
+        {
+          if (! flist)
+          {
+            flist = g_malloc0(sizeof*flist);
+            ftmp = flist;
+          }
+          else
+          {
+            ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+            ftmp = ftmp -> next;
+          }
+          ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
+          ftmp -> file_type = k;
+          j ++;
+        }
+        else if (k < 0)
+        {
+          if (! flist)
+          {
+            flist = g_malloc0(sizeof*flist);
+            ftmp = flist;
+          }
+          else
+          {
+            ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+            ftmp = ftmp -> next;
+          }
+          ftmp -> file_name = g_strdup_printf ("%s", argv[j]);
+          ftmp -> file_type = -k;
+          if (atomes_from_libreoffice) projfile = g_strdup_printf ("%s", argv[j]);
+        }
+        if (abs(k) == 1) with_workspace = TRUE;
+      }
+      else if (k == 1)
+      {
+        j ++;
+      }
+    }
+  }
+  return TRUE;
 }
 
 /*!
@@ -518,17 +725,21 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
   gtkosx_application_ready (ProgOSX);
 #endif
 #ifdef DEBUG
-  printversion ();
+  print_version ();
 #endif // DEBUG
-  MainWindow = create_main_window (app);
-  GtkWidget * isplash = create_splash_window ();
-  if (isplash == NULL)
+
+  if (! atomes_render_image)
   {
-    g_print ("Impossible to load the splash screen\n");
-  }
-  else
-  {
-    g_timeout_add_seconds (1, destroy_func, isplash);
+    MainWindow = create_main_window (app);
+    GtkWidget * isplash = create_splash_window ();
+    if (isplash == NULL)
+    {
+      g_print ("Impossible to load the splash screen\n");
+    }
+    else
+    {
+      g_timeout_add_seconds (1, destroy_func, isplash);
+    }
   }
   if (flist)
   {
@@ -712,82 +923,13 @@ int main (int argc, char *argv[])
   PACKAGE_SGMI = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Monoclinic-I.png", NULL);
   PACKAGE_SGTC = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Triclinic.png", NULL);
 
-  int i, j, k;
   switch (argc)
   {
     case 1:
       RUNC=TRUE;
       break;
-    case 2:
-      if (g_strcmp0 (argv[1], "-h") == 0 || g_strcmp0 (argv[1], "--help") == 0)
-      {
-        printhelp();
-        RUNC=FALSE;
-      }
-      else if (g_strcmp0 (argv[1], "-v") == 0 || g_strcmp0 (argv[1], "--version") == 0)
-      {
-        printversion();
-        RUNC=FALSE;
-      }
-      else
-      {
-        RUNC=TRUE;
-        i = test_this_arg (argv[1]);
-        if (i !=0)
-        {
-          flist = g_malloc0(sizeof*flist);
-          flist -> file_name = g_strdup_printf ("%s", argv[1]);
-          flist -> file_type = -i;
-          if (flist -> file_type == 1) with_workspace = TRUE;
-        }
-      }
-      break;
     default:
-      RUNC=TRUE;
-      i=0;
-      for (j=1; j<argc; j++)
-      {
-        k = test_this_arg (argv[j]);
-        if (! (abs(k) == 1 && with_workspace))
-        {
-          if (k > 0 && j < argc-1)
-          {
-            if (! flist)
-            {
-              flist = g_malloc0(sizeof*flist);
-              ftmp = flist;
-            }
-            else
-            {
-              ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-              ftmp = ftmp -> next;
-            }
-            ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
-            ftmp -> file_type = k;
-            j ++;
-          }
-          else if (k < 0)
-          {
-            if (! flist)
-            {
-              flist = g_malloc0(sizeof*flist);
-              ftmp = flist;
-            }
-            else
-            {
-              ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-              ftmp = ftmp -> next;
-            }
-            ftmp -> file_name = g_strdup_printf ("%s", argv[j]);
-            ftmp -> file_type = -k;
-          }
-          if (abs(k) == 1) with_workspace = TRUE;
-        }
-        else if (k == 1)
-        {
-          j ++;
-        }
-      }
+      RUNC = test_all_args(argc, argv);
       break;
   }
 

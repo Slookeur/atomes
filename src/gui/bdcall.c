@@ -575,7 +575,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       }
       else
       {
-        if (active_glwin -> init) print_info (calculation_time(TRUE, active_project -> analysis[BND] -> calc_time), NULL, active_project -> analysis[BND] -> calc_buffer);
+        if (active_glwin -> init && ! atomes_render_image) print_info (calculation_time(TRUE, active_project -> analysis[BND] -> calc_time), NULL, active_project -> analysis[BND] -> calc_buffer);
         bonding = 1;
         if (frag_update)
         {
@@ -616,7 +616,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           // Using the unused RI calc_time slot to store Frag-mol calc time.
           active_project -> analysis[RIN] -> calc_time = get_calc_time (start_time, stop_time);
           active_project_changed (activep);
-          if (widg != NULL) show_the_widgets (curvetoolbox);
+          if (widg != NULL && ! atomes_render_image) show_the_widgets (curvetoolbox);
         }
       }
     }
@@ -641,7 +641,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
         }
         else
         {
-          if (widg != NULL) show_the_widgets (curvetoolbox);
+          if (widg != NULL && ! atomes_render_image) show_the_widgets (curvetoolbox);
           if (! active_project -> runc[0]) update_ang_view (active_project);
         }
       }
@@ -655,12 +655,12 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     active_glwin -> adv_bonding[1] = 0;
   }
   if (active_glwin && bonds_update) update_glwin_after_bonds (bonding, colm);
-  fill_tool_model ();
-  if (widg)
+  if (! atomes_render_image)
   {
-    show_the_widgets (curvetoolbox);
+    fill_tool_model ();
+    if (widg) show_the_widgets (curvetoolbox);
   }
-  else
+  if (! widg)
   {
     for (j=0; j<3; j++) active_project -> runc[j] = FALSE;
   }
@@ -775,7 +775,7 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
 void coordout_ (int * sid, double * sac, double ssac[active_project -> nspec], int * totgsa)
 {
   active_coord -> ntg[1][* sid] = * totgsa;
-  if (bonds_update) coordination_info (* sid, * sac, ssac);
+  if (bonds_update && ! atomes_render_image) coordination_info (* sid, * sac, ssac);
 }
 
 /*void wccp_out_ (double cp[5])
@@ -909,7 +909,6 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
   }
 }
 
-
 /*!
   \fn void update_angle_view (project * this_proj)
 
@@ -944,7 +943,7 @@ void update_angle_view (project * this_proj)
 void envout_ (int * sid, int * totgsa, int numgsa[* totgsa])
 {
   /* Send info for OpenGL */
-  if (bonds_update) env_info (* sid, * totgsa, numgsa);
+  if (bonds_update && ! atomes_render_image) env_info (* sid, * totgsa, numgsa);
 }
 
 void tetraout_ (int * sid, double eda[active_project -> nspec],
@@ -965,7 +964,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
     if (eda[i] != 0.0 || cda[i] != 0.0) print=TRUE;
   }
 
-  if (print && bonds_update)
+  if (print && bonds_update && ! atomes_render_image)
   {
     print_info ("\nNumber and proportion of tetrahedra links for ", "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info (exact_name(active_chem -> label[* sid]), textcolor(* sid), active_project -> analysis[BND] -> calc_buffer);

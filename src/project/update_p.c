@@ -204,7 +204,7 @@ int update_project ()
       cutoffsend ();
     }
   }
-  update_analysis_availability (active_project);
+  if (! atomes_render_image) update_analysis_availability (active_project);
 #ifdef DEBUG
   g_debug ("UPDATE_PROJECT: updated");
 #endif
@@ -221,8 +221,11 @@ int update_project ()
 void active_project_changed (int id)
 {
   char * errp = NULL;
-  if (id != inactep && inactep < nprojects && ! atomes_logo) clean_view ();
-  gtk_tree_store_clear (tool_model);
+  if (! atomes_render_image)
+  {
+    if (id != inactep && inactep < nprojects && ! atomes_logo) clean_view ();
+    gtk_tree_store_clear (tool_model);
+  }
   activep = id;
   active_project = get_project_by_id (id);
   active_chem = active_project -> chemistry;
@@ -259,22 +262,25 @@ void active_project_changed (int id)
   }
   else
   {
-    if (active_project -> analysis)
+    if (! atomes_render_image)
     {
-      prep_calc_actions ();
-      g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[0]));
-      if (active_cell -> npt)
+      if (active_project -> analysis)
       {
-        remove_action (edition_acts[1].action_name);
+        prep_calc_actions ();
+        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[0]));
+        if (active_cell -> npt)
+        {
+          remove_action (edition_acts[1].action_name);
+        }
+        else
+        {
+          g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[1]));
+        }
+        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
+        fill_tool_model ();
+        correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
+        correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
       }
-      else
-      {
-        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[1]));
-      }
-      g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
-      fill_tool_model ();
-      correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
-      correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
     }
     inactep = activep;
   }

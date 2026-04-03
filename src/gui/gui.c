@@ -837,12 +837,15 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
     append_menu_item (menu, "Edit Name", (const gchar *)str, NULL, NULL, IMG_STOCK, EDITA, FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
-  str = g_strdup_printf ("%s.project.new", act);
-  append_menu_item (menu, "New", (const gchar *)str, "<CTRL>N", NULL, IMG_STOCK, FNEW, FALSE, FALSE, FALSE, NULL);
-  g_free (str);
-  str = g_strdup_printf ("%s.project.open", act);
-  append_menu_item (menu, "Open", (const gchar *)str, "<CTRL>O", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
-  g_free (str);
+  if (! atomes_from_libreoffice)
+  {
+    str = g_strdup_printf ("%s.project.new", act);
+    append_menu_item (menu, "New", (const gchar *)str, "<CTRL>N", NULL, IMG_STOCK, FNEW, FALSE, FALSE, FALSE, NULL);
+    g_free (str);
+    str = g_strdup_printf ("%s.project.open", act);
+    append_menu_item (menu, "Open", (const gchar *)str, "<CTRL>O", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
+    g_free (str);
+  }
   if (! pop_up || proj > -1)
   {
     str = g_strdup_printf ("%s.project.save", act);
@@ -851,9 +854,12 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
     str = g_strdup_printf ("%s.project.save-as", act);
     append_menu_item (menu, "Save As", (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
     g_free (str);
-    str = g_strdup_printf ("%s.project.close", act);
-    append_menu_item (menu, "Close", (const gchar *)str, NULL, NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
-    g_free (str);
+    if (! atomes_from_libreoffice)
+    {
+      str = g_strdup_printf ("%s.project.close", act);
+      append_menu_item (menu, "Close", (const gchar *)str, NULL, NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
+      g_free (str);
+    }
     append_submenu (menu, "Export", port_section(act, pop_up, 0));
   }
   return menu;
@@ -938,11 +944,17 @@ GMenu * project_title (int pop_up, int proj)
 GMenu * create_workspace_menu (gchar * act, int pop_up, int proj, int calc)
 {
   GMenu * menu = g_menu_new ();
-  g_menu_append_section (menu, NULL, (GMenuModel*)workspace_title());
-  g_menu_append_section (menu, NULL, (GMenuModel*)workspace_section(act, pop_up));
+  if (! atomes_from_libreoffice)
+  {
+    g_menu_append_section (menu, NULL, (GMenuModel*)workspace_title());
+    g_menu_append_section (menu, NULL, (GMenuModel*)workspace_section(act, pop_up));
+  }
   g_menu_append_section (menu, NULL, (GMenuModel*)project_title(pop_up, proj));
   g_menu_append_section (menu, NULL, (GMenuModel*)project_section(act, pop_up, proj, calc));
-  g_menu_append_section (menu, NULL, (GMenuModel*)import_section(act));
+  if (! atomes_from_libreoffice)
+  {
+    g_menu_append_section (menu, NULL, (GMenuModel*)import_section(act));
+  }
   g_menu_append_section (menu, NULL, (GMenuModel*)quit_section(act));
   return menu;
 }
@@ -1003,7 +1015,7 @@ GMenu * create_help_menu ()
 {
   GMenu * menu = g_menu_new ();
   append_menu_item (menu, "Periodic Table", "app.help.periodic", "<CTRL>P", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Preferences", "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  if (! atomes_from_libreoffice) append_menu_item (menu, "Preferences", "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "Shortcuts", "app.help.shortcuts", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   append_menu_item (menu, "About", "app.help.about", "<CTRL>A", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   return menu;

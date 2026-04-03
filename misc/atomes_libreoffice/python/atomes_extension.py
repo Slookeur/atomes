@@ -11,6 +11,13 @@ Interactions :
   • Clic droit → Ouvrir avec atomes  (XContextMenuInterceptor)
   • Double-clic → Ouvre atomes       (XMouseClickHandler)
 """
+#
+# The following helps to traceback error, at any point, 
+# simply feed back the result to any AI assitant to get to the point
+# 
+# import traceback
+# traceback.print_exc()
+# 
 
 import os
 import subprocess
@@ -22,6 +29,12 @@ from com.sun.star.awt import XMouseClickHandler, Size
 from com.sun.star.embed import ElementModes
 from com.sun.star.ui import XContextMenuInterceptor
 from com.sun.star.ui.ContextMenuInterceptorAction import IGNORED, EXECUTE_MODIFIED
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+
 from atomes_i18n import _
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -116,22 +129,60 @@ def _stored_name(shape):
 # ODF storage
 # ══════════════════════════════════════════════════════════════════════
 
-def _embed_file(doc, filepath, stored_name):
+def _embed_file(doc, filepath, stored_name, replace=False):
+    """
+    Écrit un fichier dans le stockage ODF.
+    
+    - replace=False → création si absent (embed)
+    - replace=True  → remplace uniquement si existant
+    """
     try:
         root = doc.getDocumentStorage()
         mode = ElementModes.READWRITE
+
+        # Accès / création du sous-stockage
         if root.hasByName(ATOMES_STORAGE):
             sub = root.openStorageElement(ATOMES_STORAGE, mode)
         else:
+            if replace:
+                print("Storage inexistant, impossible de remplacer.")
+                return False
             sub = root.openStorageElement(ATOMES_STORAGE, mode)
-        stream = sub.openStreamElement(stored_name, mode | ElementModes.TRUNCATE)
-        out    = stream.getOutputStream()
+
+        exists = sub.hasByName(stored_name)
+        # Cas remplacement strict
+        if replace and not exists:
+            print(f"Fichier {stored_name} introuvable pour remplacement.")
+            return False
+
+        if not replace and exists:
+          print(f"Fichier {stored_name} déjà existant, renommage.")
+          # Génère un nouveau nom unique
+          new_name = f"{stored_name}_{uuid.uuid4().hex[:8]}"
+          print(f"Nouveau nom : {new_name}")
+          stored_name = new_name
+          
+          return False
+        # Ouverture du stream
+        stream_mode = mode | ElementModes.TRUNCATE if exists else mode
+        stream = sub.openStreamElement(stored_name, stream_mode)
+        out = stream.getOutputStream()
+
         with open(filepath, "rb") as fh:
             out.writeBytes(uno.ByteSequence(fh.read()))
+
         out.closeOutput()
-        sub.commit(); root.commit()
+
+        # Commit obligatoire
+        sub.commit()
+        root.commit()
+
+        action = "remplacé" if exists else "ajouté"
+        print(f"Fichier {stored_name} {action} avec succès.")
         return True
-    except Exception:
+
+    except Exception as e:
+        print(f"Erreur écriture fichier embarqué : {e}")
         return False
 
 def _extract_file(doc, stored_name):
@@ -200,18 +251,23 @@ class AtomesContextMenuInterceptor(unohelper.Base, XContextMenuInterceptor):
         self.doc = doc
 
     def notifyContextMenuExecute(self, event):
+        print("Interception du menu contextuel...")
         try:
-            if _get_selected_atomes_shape(self.doc) is None:
+            shape = _get_selected_atomes_shape(self.doc)
+            print(f"Objet sélectionné : {shape}")
+            if shape is None:
+                print("Aucun objet Atomes sélectionné.")
                 return IGNORED
             menu    = event.ActionTriggerContainer
-            trigger = _lo_ctx().ServiceManager.createInstance(
-                "com.sun.star.ui.ActionTrigger")
-            trigger.Text       = _("context_menu_open")
+            trigger = _lo_ctx().ServiceManager.createInstance("com.sun.star.ui.ActionTrigger")
+            trigger.Text = _("context_menu_open")
             trigger.CommandURL = (
-                "vnd.sun.star.script:atomes_extension$open_from_context_menu"
-                "?language=Python&location=user"
+                "vnd.sun.star.script:"
+                "atomes_extension.py$open_from_context_menu"
+                "?language=Python&location=share"
             )
             menu.insertByIndex(0, trigger)
+            print("Élément ajouté au menu contextuel.")
             return EXECUTE_MODIFIED
         except Exception:
             return IGNORED
@@ -220,20 +276,38 @@ class AtomesContextMenuInterceptor(unohelper.Base, XContextMenuInterceptor):
 def _register_handlers(doc):
     """Register session-level mouse + context-menu handlers (idempotent)."""
     if doc is None:
+        print("Document est None.")
         return
     try:
         key = doc.getURL() or str(id(doc))
         ctrl = doc.getCurrentController()
+        if ctrl is None:
+            print("Contrôleur introuvable.")
+            return
+        
+        if key in _ctx_interceptors:
+            return
+
+        i = AtomesContextMenuInterceptor(doc)
+        try:
+            if hasattr(ctrl, "addContextMenuInterceptor"):
+                ctrl.addContextMenuInterceptor(i)
+                _ctx_interceptors[key] = i
+                print("Intercepteur de menu contextuel enregistré.")
+            else:
+                print("Le contrôleur ne supporte pas addContextMenuInterceptor.")
+        except  Exception as e:
+                print(f"Erreur lors de l'ajout de l'intercepteur : {e}")
+                import traceback
+                traceback.print_exc()
+
         if key not in _mouse_handlers:
             h = AtomesMouseHandler(doc)
             ctrl.addMouseClickHandler(h)
             _mouse_handlers[key] = h
-        if key not in _ctx_interceptors:
-            i = AtomesContextMenuInterceptor(doc)
-            ctrl.addContextMenuInterceptor(i)
-            _ctx_interceptors[key] = i
-    except Exception:
-        pass
+
+    except Exception as e:
+       print(f"Erreur dans _register_handlers : {e}")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -246,7 +320,27 @@ def _open_embedded_file(doc, stored_name):
         _show_message(doc, _("open_atomes_failed"), _("error_title"), error=True)
         return
     try:
-        subprocess.Popen(["atomes", tmp])
+        # Génère un ID unique pour l'objet
+        shape = _get_selected_atomes_shape(doc)
+        uid = shape.Name.split("_")[-1] if shape else "unknown"
+        output_image = f"/tmp/atomes_update_{uid}.png"
+        result = subprocess.run(["atomes", "--libreoffice", "--output", output_image, tmp], capture_output=True)
+        if result.returncode == 0 and os.path.exists(output_image):
+            # Met à jour l'objet graphique avec la nouvelle image
+            shape.GraphicURL = uno.systemPathToFileUrl(output_image)
+            with Image.open(output_image) as img:
+                width, height = img.size
+            width_twips = int(width * 1440 / 96 )  # Approximation moyenne
+            height_twips = int(height * 1440 / 96)
+            shape.Size = Size(width_twips, height_twips)
+            # Update apf content in LibreOffice document
+            if not _embed_file(doc,tmp, stored_name, replace=True):
+                _show_message(doc, _("embed_failed"), _("error_title"), error=True)
+            # Nettoie le fichier temporaire
+            if os.path.exists(output_image):
+                os.unlink(output_image)
+        else:
+            _show_message(doc, _("update_failed"), _("error_title"), error=True)
     except Exception as e:
         _show_message(doc, f"{_('open_atomes_failed')}\n{e}", _("error_title"), error=True)
 
@@ -340,15 +434,21 @@ def insert_atomes_file(*args):
         draw_page = _get_draw_page(doc)
         shape     = doc.createInstance("com.sun.star.drawing.GraphicObjectShape")
         draw_page.add(shape)
+        shape.Size        = Size(6000, 6000)   # 6 cm × 6 cm default
         if png_path and os.path.exists(png_path):
             shape.GraphicURL = uno.systemPathToFileUrl(png_path)
-        shape.Size        = Size(6000, 6000)   # 6 cm × 6 cm default
+            if Image is not None:
+                with Image.open(png_path) as img:
+                    width, height = img.size
+                width_twips = int(width * 1440 / 96 )  # Approximation moyenne
+                height_twips = int(height * 1440 / 96)
+                shape.Size = Size(width_twips, height_twips)
         uid               = uuid.uuid4().hex[:12]
         shape.Name        = ATOMES_PREFIX + uid
         shape.Description = "AtomesFile:" + apf_basename
         shape.Title       = f"atomes — {apf_basename}"
         macro_url = ("vnd.sun.star.script:atomes_extension$on_atomes_click"
-                     "?language=Python&location=user")
+                     "?language=Python&location=share")
         try:
             shape.Events.replaceByName("OnClick", _event_props(macro_url))
         except Exception:
@@ -358,7 +458,7 @@ def insert_atomes_file(*args):
         return None
 
     # Embed .apf in ODF storage
-    if not _embed_file(doc, apf_path, apf_basename):
+    if not _embed_file(doc, apf_path, apf_basename, replace=False):
         _show_message(doc, _("embed_failed"), _("error_title"), error=True)
 
     # Register session handlers
@@ -392,6 +492,7 @@ def on_atomes_click(*args):
     """OnClick event callback on atomes shapes (second click)."""
     doc = _get_document()
     if doc is None:
+        print("Document est None.")
         return None
     shape = _get_selected_atomes_shape(doc)
     if shape:
@@ -406,9 +507,9 @@ def open_from_context_menu(*args):
     return on_atomes_click(*args)
 
 
-#g_exportedScripts = (
+g_exportedScripts = (
 #    insert_atomes_file,
 #    open_atomes_file,
-#    on_atomes_click,
-#    open_from_context_menu,
-#)
+    on_atomes_click,
+    open_from_context_menu,
+)

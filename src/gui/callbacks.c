@@ -79,6 +79,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "workspace.h"
 #include "glwindow.h"
 #include "glview.h"
+#include "movie.h"
 #include "atom_edit.h"
 #include "cell_edit.h"
 #include "readers.h"
@@ -102,6 +103,8 @@ char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar
                                     "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
 
 char ** las;
+
+extern G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpointer data);
 extern G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern const gchar * dfi[2];
@@ -110,17 +113,6 @@ extern int open_coord_file (gchar * filename, int fti);
 extern int open_history_file (gchar * filename);
 extern int open_cell_file (int format, gchar * filename);
 extern double get_z_from_periodic_table (gchar * lab);
-
-/*!
-  \fn void quit_gtk ()
-
-  \brief Leave the application
-*/
-void quit_gtk ()
-{
-  profree_ ();
-  g_application_quit (G_APPLICATION(AtomesApp));
-}
 
 /*!
   \fn G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
@@ -195,8 +187,11 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     else
     {
       get_project_by_id (pid) -> projfile = g_strdup_printf ("%s", pfile);
-      add_project_to_workspace ();
-      prep_calc_actions ();
+      if (! atomes_render_image)
+      {
+        add_project_to_workspace ();
+        prep_calc_actions ();
+      }
     }
   }
   else
@@ -218,6 +213,33 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     }
   }
   return j;
+}
+
+/*!
+  \fn void quit_gtk ()
+
+  \brief Leave the application
+*/
+void quit_gtk ()
+{
+  if (atomes_from_libreoffice)
+  {
+    // Update image for LibreOffice document
+    video_options * vopts = g_malloc0(sizeof*vopts);
+    vopts -> proj = activep;
+    vopts -> oglquality = 0;
+    vopts -> video_res = duplicate_int (2, active_glwin -> pixels);
+    vopts -> codec = 0;
+    atomes_render_image = TRUE;
+    run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
+    atomes_render_image = FALSE;
+    g_free (vopts);
+    FILE * fp = fopen (projfile, dfi[1]);
+    open_save (fp, 1, 1, 0, 0, NULL);
+    fclose (fp);
+  }
+  profree_ ();
+  g_application_quit (G_APPLICATION(AtomesApp));
 }
 
 /*!
@@ -670,7 +692,7 @@ void apply_project (gboolean showtools)
     initcutoffs (active_chem, active_project -> nspec);
   }
   prep_model (active_project -> id);
-  if (showtools) show_the_widgets (curvetoolbox);
+  if (showtools && ! atomes_render_image) show_the_widgets (curvetoolbox);
 }
 
 /*!
