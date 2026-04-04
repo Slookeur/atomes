@@ -1116,7 +1116,7 @@ void glwin_key_pressed (guint keyval, GdkModifierType state, gpointer data)
       }
       break;
     case GDK_KEY_n:
-      if (state & GDK_CONTROL_MASK) on_create_new_project (NULL, NULL);
+      if (state & GDK_CONTROL_MASK && ! atomes_from_libreoffice) on_create_new_project (NULL, NULL);
       break;
     case GDK_KEY_o:
       set_this_style (view, OGL_STYLES);
@@ -1322,6 +1322,33 @@ void gtk_window_change_gdk_visual (GtkWidget * win)
 #endif
 #endif
 
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT gboolean do_not_hide (GtkWindow * win, gpointer data)
+
+  \brief prevent to hide the OpenGL window in LibreOffice mode
+
+  \param win the GtkWindow sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean do_not_hide (GtkWindow * win, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT gboolean do_not_hide (GtkWidget * win, GdkEvent * event, gpointer data)
+
+  \brief revent to hide the OpenGL window in LibreOffice mode
+
+  \param win the GtkWindow sending the signal
+  \param event the GdkEvent triggering the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT gboolean do_not_hide (GtkWidget * win, GdkEvent * event, gpointer data)
+#endif
+{
+  return TRUE;
+}
+
 gboolean create_3d_model (int p, gboolean load)
 {
   project * this_proj = get_project_by_id (p);
@@ -1437,7 +1464,18 @@ gboolean create_3d_model (int p, gboolean load)
       g_signal_connect (G_OBJECT (this_proj -> modelgl -> win), "key-press-event", G_CALLBACK(on_key_pressed), this_proj -> modelgl);
 #endif
       g_signal_connect (G_OBJECT (this_proj -> modelgl -> win), "realize", G_CALLBACK(on_win_realize), this_proj -> modelgl);
-      add_gtk_close_event (this_proj -> modelgl -> win, G_CALLBACK(hide_this_window), NULL);
+      if (atomes_from_libreoffice)
+      {
+#ifdef GTK4
+        g_signal_connect (G_OBJECT (this_proj -> modelgl -> win), "close-request", G_CALLBACK(do_not_hide), NULL);
+#else
+        g_signal_connect (G_OBJECT (this_proj -> modelgl -> win), "delete-event", G_CALLBACK(do_not_hide), NULL);
+#endif
+      }
+      else
+      {
+        add_gtk_close_event (this_proj -> modelgl -> win, G_CALLBACK(hide_this_window), NULL);
+      }
     }
     g_signal_connect (G_OBJECT (this_proj -> modelgl -> plot), "realize", G_CALLBACK(on_realize), this_proj -> modelgl);
 #ifdef GTKGLAREA

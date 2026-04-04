@@ -137,7 +137,7 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
     fill_image (NULL, iopts -> video_res[0], iopts -> video_res[1], view);
     GError * error = NULL;
     gboolean res = gdk_pixbuf_savev (pixbuf, videofile, image_list[iopts -> codec], NULL, NULL, & error);
-    if (! res)
+    if (! res && ! atomes_from_libreoffice)
     {
       show_warning ("An error occurred when exporting an image\nyou might want to try again\nsorry for the trouble", view -> win);
     }

@@ -21,6 +21,7 @@ Interactions :
 
 import os
 import subprocess
+import traceback
 import tempfile
 import uuid
 import uno
@@ -37,10 +38,11 @@ except ImportError:
 
 from atomes_i18n import _
 
-# ── Constants ──────────────────────────────────────────────────────────────────
-EXTENSION_ID   = "fr.ipcms.atomes.extension"
-ATOMES_STORAGE = "AtomesFiles"
-ATOMES_PREFIX  = "AtomesFile_"
+# ── Constants ──────────────────────────────────────────────────────────
+EXTENSION_ID       = "fr.ipcms.atomes.extension"
+ATOMES_STORAGE     = "ObjectReplacements"
+ATOMES_PREFIX      = "AtomesFile_"
+ATOMES_DESCRIPTION = "AtomesFile:"
 
 # Session-level references (prevent GC)
 _mouse_handlers   = {}
@@ -53,18 +55,19 @@ _ctx_interceptors = {}
 def _lo_ctx():
     return uno.getComponentContext()
 
+
 def _get_extension_dir():
-    pip = _lo_ctx().ServiceManager.createInstance(
-        "com.sun.star.deployment.PackageInformationProvider")
+    pip = _lo_ctx().ServiceManager.createInstance("com.sun.star.deployment.PackageInformationProvider")
     return uno.fileUrlToSystemPath(pip.getPackageLocation(EXTENSION_ID))
+
 
 def _get_document():
     try:
-        desktop = _lo_ctx().ServiceManager.createInstance(
-            "com.sun.star.frame.Desktop")
+        desktop = _lo_ctx().ServiceManager.createInstance("com.sun.star.frame.Desktop")
         return desktop.getCurrentComponent()
     except Exception:
         return None
+
 
 def _get_draw_page(doc):
     if doc.supportsService("com.sun.star.text.TextDocument"):
@@ -77,32 +80,38 @@ def _get_draw_page(doc):
         return doc.getCurrentController().getCurrentPage()
     return doc.DrawPage
 
+
 def _show_message(doc, msg, title, error=False):
-    from com.sun.star.awt import MessageBoxType, MessageBoxButtons
+    from com.sun.star.awt.MessageBoxType import INFOBOX, ERRORBOX
+    from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK
     try:
         toolkit = _lo_ctx().ServiceManager.createInstance("com.sun.star.awt.Toolkit")
         frame   = doc.getCurrentController().getFrame() if doc else None
         peer    = frame.getContainerWindow() if frame else None
-        kind    = MessageBoxType.ERRORBOX if error else MessageBoxType.INFOBOX
-        box     = toolkit.createMessageBox(peer, kind, MessageBoxButtons.BUTTONS_OK, title, msg)
-        box.execute(); box.dispose()
-    except Exception:
+        kind    = ERRORBOX if error else INFOBOX
+        box     = toolkit.createMessageBox(peer, kind, BUTTONS_OK, title, msg)
+        box.execute() 
+        box.dispose()
+    except Exception as e:
+        print(f"Erreur dans _show_message : {e}")
+        traceback.print_exc()
         pass
+
 
 def _make_pv(name, value):
     pv = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
     pv.Name = name; pv.Value = value
     return pv
 
+
 def _event_props(macro_url):
     return (_make_pv("EventType", "Script"), _make_pv("Script", macro_url))
-
 
 # ══════════════════════════════════════════════════════════════════════
 # Shape selection helpers
 # ══════════════════════════════════════════════════════════════════════
 
-def _get_selected_atomes_shape(doc):
+def _get_selected_atomes_shape_from_selection(doc):
     try:
         sel = doc.getCurrentController().getSelection()
         if sel is None:
@@ -118,10 +127,24 @@ def _get_selected_atomes_shape(doc):
         pass
     return None
 
+def _get_selected_atomes_shape_from_description(doc, desc):
+    try:
+        draw_page = _get_draw_page(doc)
+        if draw_page is None:
+            return None
+        shape_desc = f"{ATOMES_DESCRIPTION}{desc}"
+        for i in range(draw_page.getCount()):
+            shape = draw_page.getByIndex(i)
+            if hasattr(shape, "Description") and shape.Description == shape_desc:
+                 return shape
+    except Exception:
+        pass
+    return None
+
 def _stored_name(shape):
     desc = getattr(shape, "Description", "") or ""
-    if desc.startswith("AtomesFile:"):
-        return desc[len("AtomesFile:"):]
+    if desc.startswith(ATOMES_DESCRIPTION):
+        return desc[len(ATOMES_DESCRIPTION):]
     return None
 
 
@@ -136,35 +159,28 @@ def _embed_file(doc, filepath, stored_name, replace=False):
     - replace=False → création si absent (embed)
     - replace=True  → remplace uniquement si existant
     """
-    try:
+    try:     
         root = doc.getDocumentStorage()
         mode = ElementModes.READWRITE
 
         # Accès / création du sous-stockage
         if root.hasByName(ATOMES_STORAGE):
-            sub = root.openStorageElement(ATOMES_STORAGE, mode)
+            atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
         else:
             if replace:
                 print("Storage inexistant, impossible de remplacer.")
                 return False
-            sub = root.openStorageElement(ATOMES_STORAGE, mode)
+            atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
 
-        exists = sub.hasByName(stored_name)
+        exists = atomes_storage.hasByName(stored_name)
         # Cas remplacement strict
         if replace and not exists:
             print(f"Fichier {stored_name} introuvable pour remplacement.")
             return False
-        
-        if not replace:
-          #unique_name = f"{uuid.uuid4().hex[:8]}_{stored_name}"
-          unique_name = stored_name
-          print(f"Nom unique généré : {unique_name}")
-        else:
-           unique_name = stored_name
 
         # Ouverture du stream
         stream_mode = mode | ElementModes.TRUNCATE if exists else mode
-        stream = sub.openStreamElement(unique_name, stream_mode)
+        stream = atomes_storage.openStreamElement(stored_name, stream_mode)
         out = stream.getOutputStream()
 
         with open(filepath, "rb") as fh:
@@ -173,8 +189,12 @@ def _embed_file(doc, filepath, stored_name, replace=False):
         out.closeOutput()
 
         # Commit obligatoire
-        sub.commit()
+        stream = None
+        atomes_storage.commit()
         root.commit()
+
+        if not root.hasByName(ATOMES_STORAGE):
+            raise RuntimeError("Storage not persisted")
 
         action = "remplacé" if exists else "ajouté"
         print(f"Fichier {stored_name} {action} avec succès.")
@@ -184,16 +204,35 @@ def _embed_file(doc, filepath, stored_name, replace=False):
         print(f"Erreur écriture fichier embarqué : {e}")
         return False
 
-def _extract_file(doc, stored_name):
+def _resolve_apf_from_shape(shape):
+    name = shape.Name or ""
+
+    if not name.startswith(ATOMES_PREFIX):
+        return None
+
+    obj_id = name.split("_", 1)[1]
+    print(f"resolve :: {obj_id}")
+
+    return f"{ATOMES_STORAGE}/{obj_id}"
+
+def _extract_atomes_file(doc, stored_name):
     try:
         root = doc.getDocumentStorage()
+        mode = ElementModes.READ
+        print("Got Storage")
+        print("Root after reload:", list(root.getElementNames()))
         if not root.hasByName(ATOMES_STORAGE):
+            print("No ATOMES_STORAGE")
             return None
-        sub = root.openStorageElement(ATOMES_STORAGE, ElementModes.READ)
-        if not sub.hasByName(stored_name):
+        print("Looking for storage:", ATOMES_STORAGE)
+        print("Root elements:", list(root.getElementNames()))
+        atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
+        if not atomes_storage.hasByName(stored_name):
             return None
-        stream  = sub.openStreamElement(stored_name, ElementModes.READ)
+        stream  = atomes_storage.openStreamElement(stored_name, mode)
         inp     = stream.getInputStream()
+        print("Looking for file:", stored_name)
+        print("Available files:", list(atomes_storage.getElementNames()))
         chunks  = []
         buf_ref = uno.ByteSequence(b"\x00" * 65536)
         while True:
@@ -202,8 +241,7 @@ def _extract_file(doc, stored_name):
                 break
             chunks.append(bytes(chunk))
         inp.closeInput()
-        ext = os.path.splitext(stored_name)[1]
-        with tempfile.NamedTemporaryFile(suffix=ext, delete=False, prefix="atomes_") as tmp:
+        with tempfile.NamedTemporaryFile(suffix=".apf", delete=False) as tmp:
             for c in chunks:
                 tmp.write(c)
             return tmp.name
@@ -217,8 +255,8 @@ def _list_embedded_files(doc):
         root = doc.getDocumentStorage()
         if not root.hasByName(ATOMES_STORAGE):
             return []
-        sub = root.openStorageElement(ATOMES_STORAGE, ElementModes.READ)
-        return [n for n in sub.getElementNames() if n.endswith(".apf")]
+        atomes_storage = root.openStorageElement(ATOMES_STORAGE, ElementModes.READ)
+        return [n for n in atomes_storage.getElementNames() if n.endswith(".apf")]
     except Exception:
         return []
 
@@ -234,12 +272,7 @@ class AtomesMouseHandler(unohelper.Base, XMouseClickHandler):
 
     def mousePressed(self, event):
         if event.ClickCount == 2:
-            shape = _get_selected_atomes_shape(self.doc)
-            if shape is not None:
-                name = _stored_name(shape)
-                if name:
-                    _open_embedded_file(self.doc, name)
-                    return True   # consume — prevents image-edit mode
+            return on_atomes_click()
         return False
 
     def mouseReleased(self, event):
@@ -254,7 +287,7 @@ class AtomesContextMenuInterceptor(unohelper.Base, XContextMenuInterceptor):
     def notifyContextMenuExecute(self, event):
         print("Interception du menu contextuel...")
         try:
-            shape = _get_selected_atomes_shape(self.doc)
+            shape = _get_selected_atomes_shape_from_selection(self.doc)
             print(f"Objet sélectionné : {shape}")
             if shape is None:
                 print("Aucun objet Atomes sélectionné.")
@@ -262,11 +295,7 @@ class AtomesContextMenuInterceptor(unohelper.Base, XContextMenuInterceptor):
             menu    = event.ActionTriggerContainer
             trigger = _lo_ctx().ServiceManager.createInstance("com.sun.star.ui.ActionTrigger")
             trigger.Text = _("context_menu_open")
-            trigger.CommandURL = (
-                "vnd.sun.star.script:"
-                "atomes_extension.py$open_from_context_menu"
-                "?language=Python&location=share"
-            )
+            trigger.CommandURL = ("vnd.sun.star.script:atomes_extension.py$open_from_context_menu?language=Python&location=share")
             menu.insertByIndex(0, trigger)
             print("Élément ajouté au menu contextuel.")
             return EXECUTE_MODIFIED
@@ -277,7 +306,6 @@ class AtomesContextMenuInterceptor(unohelper.Base, XContextMenuInterceptor):
 def _register_handlers(doc):
     """Register session-level mouse + context-menu handlers (idempotent)."""
     if doc is None:
-        print("Document est None.")
         return
     try:
         key = doc.getURL() or str(id(doc))
@@ -285,21 +313,19 @@ def _register_handlers(doc):
         if ctrl is None:
             print("Contrôleur introuvable.")
             return
-        
-        if key in _ctx_interceptors:
-            return
 
-        i = AtomesContextMenuInterceptor(doc)
-        try:
-            if hasattr(ctrl, "addContextMenuInterceptor"):
-                ctrl.addContextMenuInterceptor(i)
-                _ctx_interceptors[key] = i
-                print("Intercepteur de menu contextuel enregistré.")
-            else:
-                print("Le contrôleur ne supporte pas addContextMenuInterceptor.")
-        except  Exception as e:
+        if key not in _ctx_interceptors:
+            i = AtomesContextMenuInterceptor(doc)
+            try:
+                if hasattr(ctrl, "addContextMenuInterceptor"):
+                    ctrl.addContextMenuInterceptor(i)
+                    _ctx_interceptors[key] = i
+                    print("Intercepteur de menu contextuel enregistré.")
+                else:
+                    print("Le contrôleur ne supporte pas addContextMenuInterceptor.")
+                    traceback.print_exc()
+            except  Exception as e:
                 print(f"Erreur lors de l'ajout de l'intercepteur : {e}")
-                import traceback
                 traceback.print_exc()
 
         if key not in _mouse_handlers:
@@ -309,37 +335,50 @@ def _register_handlers(doc):
 
     except Exception as e:
        print(f"Erreur dans _register_handlers : {e}")
+       traceback.print_exc()
 
 
 # ══════════════════════════════════════════════════════════════════════
 # Core: open an embedded file
 # ══════════════════════════════════════════════════════════════════════
 
-def _open_embedded_file(doc, stored_name):
-    tmp = _extract_file(doc, stored_name)
+def _open_embedded_file(doc, stored_name, on_click):
+    if not stored_name:
+        _show_message(doc, _("invalid_file_name"), _("error_title"), error=True)
+        return
+    tmp = _extract_atomes_file(doc, stored_name)
     if tmp is None:
-        _show_message(doc, _("open_atomes_failed"), _("error_title"), error=True)
+        _show_message(doc, f"{_('file_not_found')}:\n{stored_name}", _("error_title"), error=True)
         return
     try:
         # Génère un ID unique pour l'objet
-        shape = _get_selected_atomes_shape(doc)
+        if on_click:
+            shape = _get_selected_atomes_shape_from_selection(doc)
+        else:
+            shape = _get_selected_atomes_shape_from_description(doc, stored_name)
         uid = shape.Name.split("_")[-1] if shape else "unknown"
         output_image = f"/tmp/atomes_update_{uid}.png"
-        result = subprocess.run(["atomes", "--libreoffice", "--output", output_image, tmp], capture_output=True)
-        if result.returncode == 0 and os.path.exists(output_image):
-            # Met à jour l'objet graphique avec la nouvelle image
-            shape.GraphicURL = uno.systemPathToFileUrl(output_image)
-            with Image.open(output_image) as img:
-                width, height = img.size
-            width_twips = int(width * 1440 / 96 )  # Approximation moyenne
-            height_twips = int(height * 1440 / 96)
-            shape.Size = Size(width_twips, height_twips)
+        result = subprocess.run(["atomes", "--libreoffice", "--output", output_image, tmp], capture_output=True, text=True)
+        #print(f"result.returncode= {result.returncode}")
+        #print(f"Sortie d'atomes : {result.stdout}")
+        #print(f"Erreur d'atomes : {result.stderr}")
+        if result.returncode == 0: 
+            if os.path.exists(output_image):
+                # Met à jour l'objet graphique avec la nouvelle image
+                shape.GraphicURL = uno.systemPathToFileUrl(output_image)
+                with Image.open(output_image) as img:
+                    width, height = img.size
+                width_twips = int(width * 1440 / 96 )  # Approximation moyenne
+                height_twips = int(height * 1440 / 96)
+                shape.Size = Size(width_twips, height_twips)
+                # Nettoie le fichier temporaire
+                if os.path.exists(output_image):
+                    os.unlink(output_image)
+            else:
+                _show_message(doc, _("image_update_failed"), _("error_title"), error=False)
             # Update apf content in LibreOffice document
             if not _embed_file(doc, tmp, stored_name, replace=True):
                 _show_message(doc, _("embed_failed"), _("error_title"), error=True)
-            # Nettoie le fichier temporaire
-            if os.path.exists(output_image):
-                os.unlink(output_image)
         else:
             _show_message(doc, _("update_failed"), _("error_title"), error=True)
     except Exception as e:
@@ -385,6 +424,7 @@ def _selection_dialog(files, doc):
         pass
     return files[0] if files else None
 
+
 # ══════════════════════════════════════════════════════════════════════
 # Exported macros
 # ══════════════════════════════════════════════════════════════════════
@@ -395,6 +435,7 @@ def insert_atomes_file(*args):
     if doc is None:
         return None
 
+    
     # File picker
     fp = _lo_ctx().ServiceManager.createInstance("com.sun.star.ui.dialogs.FilePicker")
     fp.setTitle(_("insert_title"))
@@ -406,11 +447,13 @@ def insert_atomes_file(*args):
     files = fp.getFiles()
     if not files:
         return None
+
     apf_path     = uno.fileUrlToSystemPath(files[0])
     apf_basename = os.path.basename(apf_path)
 
     # Render preview
     png_path = None; image_ok = False
+
     try:
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False, prefix="atomes_") as tmp:
             png_path = tmp.name
@@ -441,15 +484,18 @@ def insert_atomes_file(*args):
             if Image is not None:
                 with Image.open(png_path) as img:
                     width, height = img.size
-                width_twips = int(width * 1440 / 96 )  # Approximation moyenne
+                width_twips  = int(width * 1440 / 96 )  # Approximation moyenne
                 height_twips = int(height * 1440 / 96)
                 shape.Size = Size(width_twips, height_twips)
         uid               = uuid.uuid4().hex[:12]
-        shape.Name        = ATOMES_PREFIX + uid
-        shape.Description = "AtomesFile:" + apf_basename
+        # f{ATOMES
+        unique_name       = f"{uuid.uuid4().hex[:8]}_{apf_basename}"
+        shape.Name        = f"{ATOMES_PREFIX}{unique_name}"
+        package_url = f"vnd.sun.star.Package:ObjectReplacements/{unique_name}"
+        shape.Description = f"{ATOMES_DESCRIPTION}{package_url}"
         shape.Title       = f"atomes — {apf_basename}"
-        macro_url = ("vnd.sun.star.script:atomes_extension$on_atomes_click"
-                     "?language=Python&location=share")
+        shape.setPropertyValue("Hyperlink", f"vnd.sun.star.Package:{unique_name}")
+        macro_url = ("vnd.sun.star.script:atomes_extension.py$on_atomes_click?language=Python&location=share")
         try:
             shape.Events.replaceByName("OnClick", _event_props(macro_url))
         except Exception:
@@ -459,7 +505,7 @@ def insert_atomes_file(*args):
         return None
 
     # Embed .apf in ODF storage
-    if not _embed_file(doc, apf_path, apf_basename, replace=False):
+    if not _embed_file(doc, apf_path, unique_name, replace=False):
         _show_message(doc, _("embed_failed"), _("error_title"), error=True)
 
     # Register session handlers
@@ -478,30 +524,33 @@ def open_atomes_file(*args):
     doc = _get_document()
     if doc is None:
         return None
-    _register_handlers(doc)
     embedded = _list_embedded_files(doc)
     if not embedded:
-        _show_message(doc, _("no_atomes_file"), _("open_title"))
+        _show_message(doc, _("no_atomes_file"), _("open_title"), error=False)
         return None
     chosen = embedded[0] if len(embedded) == 1 else _selection_dialog(embedded, doc)
     if chosen:
-        _open_embedded_file(doc, chosen)
+        _open_embedded_file(doc, chosen, False)
     return None
 
 
 def on_atomes_click(*args):
-    """OnClick event callback on atomes shapes (second click)."""
-    doc = _get_document()
-    if doc is None:
-        print("Document est None.")
-        return None
-    shape = _get_selected_atomes_shape(doc)
-    if shape:
-        name = _stored_name(shape)
-        print ("stored_name= ",name)
-        if name:
-            _open_embedded_file(doc, name)
-    return None
+    """Mouse double click callback on atomes shapes."""
+    try:
+        doc = _get_document()
+        if doc is None:
+            return True
+        shape = _get_selected_atomes_shape_from_selection(doc)
+        if shape:
+#            name = _stored_name(shape)
+            name = _resolve_apf_from_shape(shape)
+            if name:
+                _open_embedded_file(doc, name, True)
+    except Exception as e:
+        print(f"Erreur dans on_atomes_click : {e}")
+        traceback.print_exc()
+
+    return True
 
 
 def open_from_context_menu(*args):
@@ -510,8 +559,8 @@ def open_from_context_menu(*args):
 
 
 g_exportedScripts = (
-#    insert_atomes_file,
-#    open_atomes_file,
+    insert_atomes_file,
+    open_atomes_file,
     on_atomes_click,
     open_from_context_menu,
 )
