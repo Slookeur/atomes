@@ -107,6 +107,31 @@ def _make_pv(name, value):
 def _event_props(macro_url):
     return (_make_pv("EventType", "Script"), _make_pv("Script", macro_url))
 
+def list_storage(storage, prefix=""):
+    try:
+        names = storage.getElementNames()
+        for name in names:
+            full_path = f"{prefix}{name}"
+            # print(full_path)
+
+            try:
+                if storage.isStorageElement(name):
+                    print(f"[DIR ] {full_path}/")
+                    sub = storage.openStorageElement(name, ElementModes.READ)
+                    list_storage(sub, full_path + "/")
+
+                elif storage.isStreamElement(name):
+                    print(f"[FILE] {full_path}")
+
+                else:
+                    print(f"[??? ] {full_path}")
+
+            except Exception:
+                pass
+    except Exception:
+        import traceback
+        traceback.print_exc()
+
 # ══════════════════════════════════════════════════════════════════════
 # Shape selection helpers
 # ══════════════════════════════════════════════════════════════════════
@@ -161,17 +186,18 @@ def _embed_file(doc, filepath, stored_name, replace=False):
     """
     try:     
         root = doc.getDocumentStorage()
+        list_storage(root)
         mode = ElementModes.READWRITE
 
         # Accès / création du sous-stockage
-        if root.hasByName(ATOMES_STORAGE):
-            atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
-        else:
+        if not root.hasByName(ATOMES_STORAGE):
             if replace:
                 print("Storage inexistant, impossible de remplacer.")
                 return False
-            atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
 
+        atomes_storage = root.openStorageElement(ATOMES_STORAGE, mode)
+
+        # apf_file_name = f"{ATOMES_STORAGE}/{stored_name}"
         exists = atomes_storage.hasByName(stored_name)
         # Cas remplacement strict
         if replace and not exists:
@@ -193,11 +219,9 @@ def _embed_file(doc, filepath, stored_name, replace=False):
         atomes_storage.commit()
         root.commit()
 
-        if not root.hasByName(ATOMES_STORAGE):
-            raise RuntimeError("Storage not persisted")
-
         action = "remplacé" if exists else "ajouté"
         print(f"Fichier {stored_name} {action} avec succès.")
+        list_storage(root)
         return True
 
     except Exception as e:
@@ -213,7 +237,8 @@ def _resolve_apf_from_shape(shape):
     obj_id = name.split("_", 1)[1]
     print(f"resolve :: {obj_id}")
 
-    return f"{ATOMES_STORAGE}/{obj_id}"
+#    return f"{ATOMES_STORAGE}/{obj_id}"
+    return obj_id
 
 def _extract_atomes_file(doc, stored_name):
     try:
@@ -231,6 +256,7 @@ def _extract_atomes_file(doc, stored_name):
             return None
         stream  = atomes_storage.openStreamElement(stored_name, mode)
         inp     = stream.getInputStream()
+        # apf_file_name = f"{ATOMES_STORAGE}/{stored_name}"
         print("Looking for file:", stored_name)
         print("Available files:", list(atomes_storage.getElementNames()))
         chunks  = []
