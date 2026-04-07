@@ -308,7 +308,6 @@ int open_project (FILE * fp, int wid)
 {
   int i, j, k;
   gchar * version;
-  int * render_pix = NULL;
 
   version = read_this_string (fp);
   if (! version) return ERROR_PROJECT;
@@ -426,7 +425,7 @@ int open_project (FILE * fp, int wid)
   if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
-  if (atomes_render_image) render_pix = duplicate_int (2, active_project -> tmp_pixels);
+  if (atomes_render_image  && ! atomes_image_pixels) atomes_image_pixels = duplicate_int (2, active_project -> tmp_pixels);
   if (! version_2_9_and_above)
   {
     // Temporary buffers again
@@ -686,17 +685,6 @@ int open_project (FILE * fp, int wid)
       // GTK3 Menu Action To Check
       set_color_map_sensitive (active_glwin);
 #endif
-      if (atomes_render_image)
-      {
-        video_options * vopts = g_malloc0(sizeof*vopts);
-        vopts -> proj = activep;
-        vopts -> oglquality = 0;
-        vopts -> video_res = (atomes_image_pixels) ? duplicate_int (2, atomes_image_pixels) : duplicate_int (2, render_pix);
-        for (i=0; i<2; i++) active_glwin -> pixels[i] = vopts -> video_res[i];
-        vopts -> codec = atomes_image_format;
-        run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
-        g_free (vopts);
-      }
       return OK;
     }
     return OK;

@@ -183,6 +183,7 @@ gboolean cif_use_symmetry_positions = FALSE;
 gboolean atomes_from_libreoffice = FALSE;
 gboolean atomes_render_image = FALSE;
 int atomes_image_format = -1;
+int atomes_image_style = -1;
 int * atomes_image_pixels = NULL;
 gchar * atomes_image_output = NULL;
 

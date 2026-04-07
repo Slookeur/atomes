@@ -453,6 +453,7 @@ extern gboolean cif_use_symmetry_positions;
 extern gboolean atomes_from_libreoffice;
 extern gboolean atomes_render_image;
 extern int atomes_image_format;
+extern int atomes_image_style;
 extern int * atomes_image_pixels;
 extern gchar * atomes_image_output;
 

@@ -171,14 +171,14 @@ INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRE
 
 ifeq ($(MAKECMDGOALS),atomes)
   FCFLAGS = -O2 -cpp
-  CFLAGS = -O2
+  CFLAGS = -O2 -std=gnu99
   LDFLAGS = $(LIBS) $(LDFLGS)
   DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS) -DNEW_ANA
 endif
 
 ifeq ($(MAKECMDGOALS),debug)
   FCFLAGS = -fno-second-underscore -O0 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all
-  CFLAGS = -O0 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all -Wduplicated-cond
+  CFLAGS = -O0 -std=gnu99 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all -Wduplicated-cond
   LDFLAGS = $(LIBS) $(LDFLGS) -pg
   DEFS = -DHAVE_CONFIG_H -DDEBUG $(DGTK) $(DOS) -DNEW_ANA
 endif
@@ -318,7 +318,6 @@ OBJ_FIELD = \
 #	$(OBJ)oplsaap.o \
 #	$(OBJ)oplsaar.o \
 #	$(OBJ)pcff.o
-
 
 OBJ_CPMD = \
 	$(OBJ)cpmd_print.o \

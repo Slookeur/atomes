@@ -32,9 +32,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  int test_this_ext (int len, gchar * arg);
   int test_this_arg (gchar * arg)
-  int search_for_arg (int argc, char *argv[], gchar * arg)
-  int test_all_args (int argc, char *argv[])
+  int parse_command_line (int argc, char *argv[])
   int main (int argc, char *argv[]);
 
   gboolean destroy_func (gpointer user_data);
@@ -52,6 +52,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 */
 
+#include <getopt.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/avutil.h>
 #include <libavformat/avformat.h>
@@ -64,6 +65,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "project.h"
 #include "workspace.h"
+#include "glview.h"
 
 #ifdef G_OS_WIN32
 #define APP_EXTENSION ".exe"
@@ -114,26 +116,27 @@ void print_help()
                    "  DL-POLY history file              : .hist\n"
                    "  ISAACS project file               : .ipf\n\n"
                    " alternatively specify the file format using:\n\n"
-                   " -awf FILE\n"
-                   " -apf FILE\n"
-                   " -xyz FILE\n"
-                   " -c3d FILE\n"
-                   " -trj FILE\n"
-                   " -xdatcar FILE\n"
-                   " -pdb FILE, or, -ent FILE\n"
-                   " -cif FILE\n"
-                   " -hist FILE\n"
-                   " -ipf FILE\n\n"
+                   " -awf [FILE]\n"
+                   " -apf [FILE]\n"
+                   " -xyz [FILE]\n"
+                   " -c3d [FILE]\n"
+                   " -trj [FILE]\n"
+                   " -xdatcar [FILE]\n"
+                   " -pdb [FILE], or, -ent [FILE]\n"
+                   " -cif [FILE]\n"
+                   " -hist [FILE]\n"
+                   " -ipf [FILE]\n\n"
                    "ex:\n\n"
                    " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
-                   "simple image rendering (from atomes '.apf' project file):\n\n"
-                   "  --render-png              render image in PNG format\n"
-                   "  --render-jpg              render image in JPEG format\n"
-                   "  -o, --output [FILE]       image file name\n"
-                   "  --width  [XSIZE]          image width\n"
-                   "  --height [YSIZE]          image height\n\n"
+                   "direct image rendering from the commande line:\n\n"
+                   "  -p, --render-png          render image in PNG format\n"
+                   "  -j, --render-jpg          render image in JPEG format\n"
+                   "  -o, --output=[FILE]       image file name\n"
+                   "  -W, --width=[XSIZE]       image width\n"
+                   "  -H, --height=[YSIZE]      image height\n"
+                   "  -s, --style=[STYLE]       rendering style\n\n"
                    "ex:\n\n"
-                   " atomes --render-png --width 1920 --height 1024 --output image.png project.apf\n\n";
+                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n\n";
   char bug[20] = "\nReport a bug to <";
   char eh[4] = ">\n";
 
@@ -223,6 +226,28 @@ void print_version ()
 }
 
 /*!
+  \fn int test_this_ext (int len, gchar * arg)
+
+  \brief test extension of an argument from the command line
+
+  \param len argument string length
+  \param arg the argument to test
+*/
+int test_this_ext (int len, gchar * arg)
+{
+  int i;
+  gchar * aext = g_strdup_printf ("%c%c%c%c", arg[len-4], arg[len-3], arg[len-2], arg[len-1]);
+  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
+  for (i=0; i<15; i++) if (g_strcmp0 (aext, eext[i]) == 0)
+  {
+    g_free (aext);
+    return -(i+1);
+  }
+  g_free (aext);
+  return 0;
+}
+
+/*!
   \fn int test_this_arg (gchar * arg)
 
   \brief test an argument from the command line
@@ -235,147 +260,180 @@ int test_this_arg (gchar * arg)
   int i, j;
   i = strlen(arg);
   gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<15; j++) if (g_strcmp0 (str, fext[j]) == 0) return j+1;
-  gchar * aext = g_strdup_printf ("%c%c%c%c", str[i-4], str[i-3], str[i-2], str[i-1]);
-  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
-  for (j=0; j<15; j++) if (g_strcmp0 (aext, eext[j]) == 0) return -(j+1);
-  g_free (str);
-  g_free (aext);
-  return 0;
-}
-
-/*!
-  \fn int search_for_arg (int argc, char *argv[], gchar * arg)
-
-  \brief search command line argument for target argument
-
-  \param argc number of argument(s) on the command line
-  \param *argv[] list of argument(s) on the command line
-  \param arg the target argument to search for
-*/
-int search_for_arg (int argc, char *argv[], gchar * arg)
-{
-  int i, j;
-  gchar * str;
-  for (i=1; i<argc; i++)
+  for (j=0; j<15; j++)
   {
-    j = strlen(argv[i]);
-    str = g_ascii_strdown (argv[i], j);
-    if (g_strcmp0 (str, arg) == 0) return i;
+    if (g_strcmp0 (str, fext[j]) == 0)
+    {
+      g_free (str);
+      return j+1;
+    }
   }
-  return 0;
+  j = test_this_ext (i, str);
+  g_free (str);
+  return (j) ? j : 0;
 }
 
 /*!
-  \fn int test_all_args (int argc, char *argv[])
+  \fn gboolean is_string_in_string_list (gchar * string, gchar ** list)
+
+  \brief check if a string is in a list of strings
+
+  \param string the string to search for
+  \param list the string list
+*/
+gboolean is_string_in_string_list (gchar * string, gchar ** list)
+{
+  if (string != NULL)
+  {
+    while (* list != NULL)
+    {
+      if (g_strcmp0(* list, string) == 0)
+      {
+        return TRUE;
+      }
+      list ++;
+    }
+  }
+  return FALSE;
+}
+
+/*!
+  \fn int get_style_from_string (gchar * style_string)
+
+  \brief retrieve atomes style ID from string
+
+  \param style_string the style keyword from the command line
+*/
+int get_style_from_string (gchar * style_string)
+{
+  gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks",
+                         "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
+                         "ball_and_sticks", "balls_and_sticks", "balls_and_stick", "ball_and_stick",
+                         "b&s", "b_and_s", NULL};
+  gchar * wi_styles[] = {"wireframe", "wireframes", NULL};
+  gchar * co_styles[] = {"covalent_radius", "covalent", NULL};
+  gchar * io_styles[] = {"ionic_radius", "ionic", NULL};
+  gchar * vw_styles[] = {"vdw_radius", "van_der_waals_radius", "van_der_waals", "vdw_radius", "vdw", NULL};
+  gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_radius", NULL};
+  gchar * sp_styles[] = {"sphere", "spheres", NULL};
+  gchar * cy_styles[] = {"cylinder", "cylinders", NULL};
+  gchar * do_styles[] = {"dot", "dots", NULL};
+  if (is_string_in_string_list(style_string, bs_styles)) return BALL_AND_STICK;
+  if (is_string_in_string_list(style_string, wi_styles)) return WIREFRAME;
+  if (is_string_in_string_list(style_string, co_styles)) return OGL_STYLES;
+  if (is_string_in_string_list(style_string, io_styles)) return OGL_STYLES+1;
+  if (is_string_in_string_list(style_string, vw_styles)) return OGL_STYLES+2;
+  if (is_string_in_string_list(style_string, cr_styles)) return OGL_STYLES+3;
+  if (is_string_in_string_list(style_string, sp_styles)) return SPHERES;
+  if (is_string_in_string_list(style_string, cy_styles)) return CYLINDERS;
+  if (is_string_in_string_list(style_string, do_styles)) return PUNT;
+  return NONE;
+}
+
+/*!
+  \fn int parse_command_line (int argc, char *argv[])
 
   \brief test command line arguments
 
   \param argc number of argument(s) on the command line
   \param *argv[] list of argument(s) on the command line
 */
-int test_all_args (int argc, char *argv[])
+int parse_command_line (int argc, char *argv[])
 {
-  char * key_args[6] = {"-h", "--help", "-v", "--version"};
-  char * img_args[2] = {"--render-png", "--render-jpg"};
-  char * out_args[2] = {"-o", "--output"};
-  char * pix_args[2] = {"--width", "--height"};
-  gchar * str, * ext;
-  int i, j, k, l, m, n;
-  atomes_from_libreoffice = search_for_arg (argc, argv, "--libreoffice") ? TRUE : FALSE;
-  if (atomes_from_libreoffice)
-  {
-    atomes_image_format = 0;
-    i = search_for_arg (argc, argv, "--output");
-    atomes_image_output = g_strdup_printf ("%s", argv[i+1]);
-    // Stuff should be disabled / enabled :
-    // - Opening options both for workspace and projects
-    // - If origin project then update content in LibreOffice
-    // - Import options
-    // - Saving of the origin project is mandatory
-  }
-  for (i=0; i<4; i++)
-  {
-    if (search_for_arg (argc, argv, key_args[i]))
-    {
-      if (i < 2)
-      {
-        print_help();
-      }
-      else
-      {
-        print_version();
-      }
-      return FALSE;
-    }
-  }
-  for (i=0; i<2; i++)
-  {
-    j = search_for_arg (argc, argv, img_args[i]);
-    if (j > 0)
-    {
-      k = 0;
-      for (l=0; l<2; l++)
-      {
-        k = search_for_arg (argc, argv, out_args[l]);
-        if (k) break;
-      }
-      if (! k || k == argc-1)
-      {
-        printf ("Error :: no output file specified to render image !\n");
-        return FALSE;
-      }
-      else if (argc > 4)
-      {
-        // There is a project to render if there is at least
-        // one more argument the command line: the project to render
-        // we need to find the project to render
-        for (m=1; m<argc; m++)
-        {
-          if (m != j && m != k && m != k+1)
-          {
-            n = strlen(argv[m]);
-            str = g_ascii_strdown (argv[m], n);
-            ext = g_strdup_printf ("%c%c%c%c", str[n-4], str[n-3], str[n-2], str[n-1]);
-            if (g_strcmp0 (ext, ".apf") == 0)
-            {
-              int x, y;
-              x = search_for_arg (argc, argv, pix_args[0]);
-              y = search_for_arg (argc, argv, pix_args[1]);
-              if (x && y && argc > 8)
-              {
-                // To have all parameters on the command line, including image,
-                // you need to have at least 8 arguments
-                double px, py;
-                px = string_to_double(argv[x+1]);
-                py = string_to_double(argv[y+1]);
-                if (px > 0.0 && py > 0.0)
-                {
-                  atomes_image_pixels = allocint(2);
-                  atomes_image_pixels[0] = (int)px;
-                  atomes_image_pixels[1] = (int)py;
-                }
-              }
+  struct option atomes_options[] = {{"help", no_argument, 0, 'h'},
+                                    {"version", no_argument, 0, 'v'},
+                                    {"libreoffice", no_argument, 0, 'l'},
+                                    {"render-png", no_argument, 0, 'p'},
+                                    {"render-jpg", no_argument, 0, 'j'},
+                                    {"width", required_argument, 0, 'W'},
+                                    {"height", required_argument, 0, 'H'},
+                                    {"output", required_argument, 0, 'o'},
+                                    {"style", required_argument, 0, 's'},
+                                    {0, 0, 0, 0}};
+  int opt;
+  int index = -1;
+  int i, j, k;
+  gchar * image_x = NULL;
+  gchar * image_y = NULL;
+  int img_opt = 0;
 
-#ifdef DEBUG
-              printf ("Render image\n\t-> project= %s\n\t-> image format= %s\n\t-> output file= %s\n", argv[m], img_args[i], argv[k+1]);
-              if (atomes_image_pixels)
-              {
-                printf ("\t -> width  = %d\n", atomes_image_pixels[0]);
-                printf ("\t -> height = %d\n", atomes_image_pixels[1]);
-              }
-#endif
-              atomes_render_image = TRUE;
-              atomes_image_format = i;
-              atomes_image_output = g_strdup_printf ("%s", argv[k+1]);
-              flist = g_malloc0(sizeof*flist);
-              flist -> file_name = g_strdup_printf ("%s", argv[m]);
-              flist -> file_type = 2;
-              return TRUE;
-            }
-          }
+  while ((opt = getopt_long(argc, argv, "hvlpjW:H:o:s:", atomes_options, & index)) != -1)
+  {
+    switch (opt)
+    {
+      case 'h':
+        print_help();
+        return FALSE;
+        break;
+      case 'v':
+        print_version();
+        return FALSE;
+        break;
+      case 'l':
+        atomes_from_libreoffice = TRUE;
+        atomes_image_format = 0;
+        break;
+      case 'p':
+        atomes_render_image = TRUE;
+        atomes_image_format = 0;
+        img_opt ++;
+        break;
+      case 'j':
+        atomes_render_image = TRUE;
+        atomes_image_format = 1;
+        img_opt ++;
+        break;
+      case 'o':
+        atomes_image_output = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        break;
+      case 'W':
+        image_x = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'H':
+        image_y = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 's':
+        atomes_image_style = get_style_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+    }
+    index = -1;
+  }
+  if (atomes_render_image)
+  {
+    if (! atomes_image_output) atomes_image_output = g_strdup_printf ("%s", (atomes_image_format) ? "image.jpg" : "image.png");
+    if (argc == img_opt + 2)
+    {
+      if (image_x || image_y)
+      {
+        atomes_image_pixels = allocint(2);
+        int pix;
+        if (image_x)
+        {
+          pix = (int) string_to_double(image_x);
+          if (pix > 0) atomes_image_pixels[0] = pix;
+        }
+        if (image_y)
+        {
+          pix = (int) string_to_double(image_y);
+          if (pix > 0) atomes_image_pixels[1] = pix;
         }
       }
+      flist = g_malloc0(sizeof*flist);
+      k = test_this_arg (argv[optind]);
+      flist -> file_name = g_strdup_printf ("%s", argv[optind]);
+      flist -> file_type = -k;
+      return TRUE;
+    }
+    else
+    {
+      return FALSE;
     }
   }
 
@@ -393,7 +451,7 @@ int test_all_args (int argc, char *argv[])
   else
   {
     i=0;
-    for (j=1; j<argc; j++)
+    for (j=optind; j<argc; j++)
     {
       k = test_this_arg (argv[j]);
       if (! (abs(k) == 1 && with_workspace))
@@ -926,10 +984,10 @@ int main (int argc, char *argv[])
   switch (argc)
   {
     case 1:
-      RUNC=TRUE;
+      RUNC = TRUE;
       break;
     default:
-      RUNC = test_all_args(argc, argv);
+      RUNC = parse_command_line (argc, argv);
       break;
   }
 

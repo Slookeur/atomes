@@ -79,7 +79,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "workspace.h"
 #include "glwindow.h"
 #include "glview.h"
-#include "movie.h"
 #include "atom_edit.h"
 #include "cell_edit.h"
 #include "readers.h"
@@ -104,7 +103,7 @@ char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar
 
 char ** las;
 
-extern G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpointer data);
+extern void simple_image_render();
 extern G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern const gchar * dfi[2];
@@ -192,6 +191,10 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
         add_project_to_workspace ();
         prep_calc_actions ();
       }
+      else
+      {
+        simple_image_render ();
+      }
     }
   }
   else
@@ -225,15 +228,10 @@ void quit_gtk ()
   if (atomes_from_libreoffice)
   {
     // Update image for LibreOffice document
-    video_options * vopts = g_malloc0(sizeof*vopts);
-    vopts -> proj = activep;
-    vopts -> oglquality = 0;
-    vopts -> video_res = duplicate_int (2, active_glwin -> pixels);
-    vopts -> codec = 0;
     atomes_render_image = TRUE;
-    run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
+    simple_image_render();
     atomes_render_image = FALSE;
-    g_free (vopts);
+    // Mandatory saving of the project file
     FILE * fp = fopen (projfile, dfi[1]);
     open_save (fp, 1, 1, 0, 0, NULL);
     fclose (fp);
@@ -1487,28 +1485,35 @@ void open_this_coordinate_file (int format, gchar * proj_name)
     chemistry_ ();
     apply_project (TRUE);
     active_project_changed (activep);
-    if ((format == 9 || format == 10 || format == 11) && active_cell -> has_a_box)
+    if (atomes_render_image)
     {
-#ifdef GTK3
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_rep[0], TRUE);
-      set_rep (active_glwin -> ogl_rep[0], & active_glwin -> colorp[0][0]);
-      gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_clones[0], TRUE);
-      widget_set_sensitive (active_glwin -> ogl_clones[0], active_glwin -> allbonds[1]);
-      show_hide_clones (active_glwin -> ogl_clones[0], active_glwin);
-#endif
-      shift_it (vec3 (0.0, 0.0, 0.0), 1, activep);
-      active_glwin -> wrapped = TRUE;
+      simple_image_render();
     }
-    add_project_to_workspace ();
-    if ((format == 9 || format == 10) && cif_use_symmetry_positions)
+    else
     {
-      gchar * file_name = g_strdup_printf ("%s", active_project -> coordfile);
-      gchar * proj_name = g_strdup_printf ("%s - symmetry position(s)", active_project -> name);
-      init_project (TRUE);
-      active_project -> coordfile = g_strdup_printf ("%s", file_name);
-      g_free (file_name);
-      open_this_coordinate_file (11, proj_name);
-      g_free (proj_name);
+      if ((format == 9 || format == 10 || format == 11) && active_cell -> has_a_box)
+      {
+#ifdef GTK3
+        gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_rep[0], TRUE);
+        set_rep (active_glwin -> ogl_rep[0], & active_glwin -> colorp[0][0]);
+        gtk_check_menu_item_set_active ((GtkCheckMenuItem *)active_glwin -> ogl_clones[0], TRUE);
+        widget_set_sensitive (active_glwin -> ogl_clones[0], active_glwin -> allbonds[1]);
+        show_hide_clones (active_glwin -> ogl_clones[0], active_glwin);
+#endif
+        shift_it (vec3 (0.0, 0.0, 0.0), 1, activep);
+        active_glwin -> wrapped = TRUE;
+      }
+      add_project_to_workspace ();
+      if ((format == 9 || format == 10) && cif_use_symmetry_positions)
+      {
+        gchar * file_name = g_strdup_printf ("%s", active_project -> coordfile);
+        gchar * proj_name = g_strdup_printf ("%s - symmetry position(s)", active_project -> name);
+        init_project (TRUE);
+        active_project -> coordfile = g_strdup_printf ("%s", file_name);
+        g_free (file_name);
+        open_this_coordinate_file (11, proj_name);
+        g_free (proj_name);
+      }
     }
   }
   else
