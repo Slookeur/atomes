@@ -347,7 +347,8 @@ gchar * replace_markup (char * init, char * key, char * rep)
   if (rep) newlen = strlen(rep);
 
   // Is key in init
-  if (!(p = strstr(init, key))) return init;
+  p = strstr(init, key);
+  if (! p) return init;
   buffer = g_malloc0((inilen+newlen-oldlen+1)*sizeof*buffer);
 
   strncpy (buffer + strlen(buffer), init, p - init);

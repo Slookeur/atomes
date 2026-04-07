@@ -425,7 +425,7 @@ int open_project (FILE * fp, int wid)
   if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
   if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
-  if (atomes_render_image  && ! atomes_image_pixels) atomes_image_pixels = duplicate_int (2, active_project -> tmp_pixels);
+  if (atomes_render_image  && ! render_image_pixels) render_image_pixels = duplicate_int (2, active_project -> tmp_pixels);
   if (! version_2_9_and_above)
   {
     // Temporary buffers again

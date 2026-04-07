@@ -56,6 +56,10 @@ extern GLXPixmap glpixmap;
 #endif
 extern GdkPixbuf * pixbuf;
 
+extern void fill_image (VideoStream * vs, int width, int height, glwin * view);
+extern void init_frame_buffer (int x, int y);
+extern void close_frame_buffer ();
+
 char * image_name[IMAGE_FORMATS] = {"PNG",
                                     "JPG/JPEG",
                                     "TIFF",
@@ -66,9 +70,16 @@ char * image_list[IMAGE_FORMATS] = {"png",
                                     "tiff",
                                     "bmp"};
 
-extern void fill_image (VideoStream * vs, int width, int height, glwin * view);
-extern void init_frame_buffer (int x, int y);
-extern void close_frame_buffer ();
+int render_image_format = NONE;
+int render_image_style = NONE;
+int render_image_axis = NONE;
+int render_image_box = NONE;
+int render_image_rep = NONE;
+// int render_image_back = ;
+int render_image_acolor = NONE;
+int render_image_pcolor = NONE;
+int * render_image_pixels = NULL;
+gchar * render_image_output = NULL;
 
 #ifdef GTK4
 /*!
@@ -103,7 +114,7 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
     gchar * videofile;
     if (atomes_render_image)
     {
-      videofile = g_strdup_printf ("%s", atomes_image_output);
+      videofile = g_strdup_printf ("%s", render_image_output);
     }
     else
     {
@@ -221,20 +232,20 @@ void simple_image_render ()
   video_options * vopts = g_malloc0(sizeof*vopts);
   vopts -> proj = activep;
   vopts -> oglquality = 0;
-  vopts -> video_res = duplicate_int (2, atomes_image_pixels);
+  vopts -> video_res = duplicate_int (2, render_image_pixels);
   int h, i, j, k, l, m;
   for (i=0; i<2; i++) active_glwin -> pixels[i] = vopts -> video_res[i];
-  vopts -> codec = atomes_image_format;
-  if (atomes_image_style != NONE)
+  vopts -> codec = render_image_format;
+  if (render_image_style != NONE)
   {
-    if (atomes_image_style < OGL_STYLES)
+    if (render_image_style < OGL_STYLES)
     {
-      active_glwin -> anim -> last -> img -> style = atomes_image_style;
+      active_glwin -> anim -> last -> img -> style = render_image_style;
     }
     else
     {
       active_glwin -> anim -> last -> img -> style = SPACEFILL;
-      h = atomes_image_style - OGL_STYLES;
+      h = render_image_style - OGL_STYLES;
       active_glwin -> anim -> last -> img -> filled_type = h;
       j = active_project -> nspec;
       k = (h) ? 9 + h : 2;
@@ -246,6 +257,31 @@ void simple_image_render ()
         active_glwin -> anim -> last -> img -> atomicrad[i+j] = (default_o_at_rs[7]) ? default_at_rs[7] : get_radius (7, h, m, default_atomic_rad[l]);
       }
     }
+  }
+  if (render_image_rep != NONE) active_glwin -> anim -> last -> img -> rep = render_image_rep;
+  if (render_image_box != NONE)
+  {
+    if (active_glwin -> anim -> last -> img -> abc)
+    {
+      active_glwin -> anim -> last -> img -> abc -> box = render_image_box;
+    }
+  }
+  if (render_image_axis != NONE)
+  {
+    if (active_glwin -> anim -> last -> img -> xyz)
+    {
+      active_glwin -> anim -> last -> img -> xyz -> axis = render_image_axis;
+    }
+  }
+  if (render_image_acolor != NONE)
+  {
+    active_glwin -> anim -> last -> img -> color_map[0] = render_image_acolor;
+  }
+  if (render_image_pcolor != NONE)
+  {
+    // This also trigger to render polyhedra
+    active_glwin -> anim -> last -> img -> color_map[1] = render_image_pcolor;
+
   }
   run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
   g_free (vopts);

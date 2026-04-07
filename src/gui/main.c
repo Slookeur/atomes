@@ -33,7 +33,10 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   int test_this_ext (int len, gchar * arg);
-  int test_this_arg (gchar * arg)
+  int test_this_arg (gchar * arg);
+  int get_box_axis_from_string (gchar * box_axis_string);
+  int get_rep_from_string (gchar * rep_string);
+  int get_color_map_from_string (gchar * col_string);
   int parse_command_line (int argc, char *argv[])
   int main (int argc, char *argv[]);
 
@@ -53,10 +56,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 */
 
 #include <getopt.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
 #include "version.h"
 #include "global.h"
 #include "bind.h"
@@ -66,6 +65,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "project.h"
 #include "workspace.h"
 #include "glview.h"
+#include "movie.h"
 
 #ifdef G_OS_WIN32
 #define APP_EXTENSION ".exe"
@@ -87,6 +87,20 @@ struct file_list {
 struct file_list * flist = NULL;
 struct file_list * ftmp = NULL;
 gboolean with_workspace = FALSE;
+
+gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks",
+                       "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
+                       "ball_and_sticks", "balls_and_sticks", "balls_and_stick", "ball_and_stick",
+                       "ballsandsticks", "ballsandstick", "ballanddsticks", "ballandstick",
+                       "b&s", "b_and_s", "bs", NULL};
+gchar * wi_styles[] = {"wireframe", "wireframes", "wires", "wire", "wi", "w", NULL};
+gchar * co_styles[] = {"covalent_radius", "covalent", "cov_rad", "cov", "co", "cr", NULL};
+gchar * io_styles[] = {"ionic_radius", "ionic_rad", "ionic", "ion", "ir", NULL};
+gchar * vw_styles[] = {"vdw_radius", "van_der_waals_radius", "van_der_waals", "vdw_radius", "vdw_rad", "vdw", "vr", NULL};
+gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_radius", "cryst", "crystal_rad", "cr", NULL};
+gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", NULL};
+gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", NULL};
+gchar * do_styles[] = {"dot", "dots", "d", NULL};
 
 /*!
   \fn void print_help()
@@ -128,15 +142,22 @@ void print_help()
                    " -ipf [FILE]\n\n"
                    "ex:\n\n"
                    " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
-                   "direct image rendering from the commande line:\n\n"
-                   "  -p, --render-png          render image in PNG format\n"
-                   "  -j, --render-jpg          render image in JPEG format\n"
-                   "  -o, --output=[FILE]       image file name\n"
-                   "  -W, --width=[XSIZE]       image width\n"
-                   "  -H, --height=[YSIZE]      image height\n"
-                   "  -s, --style=[STYLE]       rendering style\n\n"
+                   "Image rendering from the command line:\n\n"
+                   "Usage: atomes [IMAGE_OPTIONS]"
+                   "  -p, --png, --render-png    render image in PNG format\n"
+                   "  -j, --jpg, --render-jpg    render image in JPEG format\n"
+                   "  -o, --output=[FILE]        image file name\n"
+                   "  -W, --width=[XSIZE]        image width\n"
+                   "  -H, --height=[YSIZE]       image height\n"
+                   "  -s, --style=[STYLE]        rendering style\n"
+                   "  -r, --rep=[REP]            representation type\n"
+                   "  -b, --box=[STYLE]          box style\n"
+                   "  -a, --axis=[STYLE]         axis style\n"
+                   "  -e, --acolor=[MAP]         atoms and bonds color map\n"
+                   "  -t, --pcolor=[MAP]         ployhedra color map\n\n"
                    "ex:\n\n"
-                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n\n";
+                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n
+                   " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n";
   char bug[20] = "\nReport a bug to <";
   char eh[4] = ">\n";
 
@@ -300,24 +321,12 @@ gboolean is_string_in_string_list (gchar * string, gchar ** list)
 /*!
   \fn int get_style_from_string (gchar * style_string)
 
-  \brief retrieve atomes style ID from string
+  \brief retrieve style from command line string
 
-  \param style_string the style keyword from the command line
+  \param style_string the style keyword from command line
 */
 int get_style_from_string (gchar * style_string)
 {
-  gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks",
-                         "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
-                         "ball_and_sticks", "balls_and_sticks", "balls_and_stick", "ball_and_stick",
-                         "b&s", "b_and_s", NULL};
-  gchar * wi_styles[] = {"wireframe", "wireframes", NULL};
-  gchar * co_styles[] = {"covalent_radius", "covalent", NULL};
-  gchar * io_styles[] = {"ionic_radius", "ionic", NULL};
-  gchar * vw_styles[] = {"vdw_radius", "van_der_waals_radius", "van_der_waals", "vdw_radius", "vdw", NULL};
-  gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_radius", NULL};
-  gchar * sp_styles[] = {"sphere", "spheres", NULL};
-  gchar * cy_styles[] = {"cylinder", "cylinders", NULL};
-  gchar * do_styles[] = {"dot", "dots", NULL};
   if (is_string_in_string_list(style_string, bs_styles)) return BALL_AND_STICK;
   if (is_string_in_string_list(style_string, wi_styles)) return WIREFRAME;
   if (is_string_in_string_list(style_string, co_styles)) return OGL_STYLES;
@@ -327,6 +336,58 @@ int get_style_from_string (gchar * style_string)
   if (is_string_in_string_list(style_string, sp_styles)) return SPHERES;
   if (is_string_in_string_list(style_string, cy_styles)) return CYLINDERS;
   if (is_string_in_string_list(style_string, do_styles)) return PUNT;
+  return NONE;
+}
+
+/*!
+  \fn int get_box_axis_from_string (gchar * box_axis_string)
+
+  \brief retrieve box or axis style from command line string
+
+  \param box_axis_string the axis keyword from command line
+*/
+int get_box_axis_from_string (gchar * box_axis_string)
+{
+  if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
+  if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
+  return NONE;
+}
+
+/*!
+  \fn int get_rep_from_string (gchar * rep_string)
+
+  \brief retrieve representation style from command line string
+
+  \param rep_string the representation keyword from command line
+*/
+int get_rep_from_string (gchar * rep_string)
+{
+  gchar * ortho_keys[] = {"orthographic", "ortho", "o", "0", NULL};
+  gchar * persp_keys[] = {"perspective", "persp", "p", "1", NULL};
+  if (is_string_in_string_list(rep_string, ortho_keys)) return ORTHOGRAPHIC;
+  if (is_string_in_string_list(rep_string, persp_keys)) return PERSPECTIVE;
+  return NONE;
+}
+
+/*!
+  \fn int get_color_map_string (gchar * col_string)
+
+  \brief retrieve color map from command line string
+
+  \param col_string the color map keyword from command line
+*/
+int get_color_map_from_string (gchar * col_string)
+{
+  gchar * sp_keys[] = {"species", "spec", "sp", "0", NULL};
+  gchar * pt_keys[] = {"total_coordinations", "total_coordination", "total", "tc", "t", "1", NULL};
+  gchar * pc_keys[] = {"partial_coordinations", "partial_coordinations", "partial", "pc", "p", "2", NULL};
+  gchar * fg_keys[] = {"fragments", "fragment", "frag", "fg", "f", "3", NULL};
+  gchar * mo_keys[] = {"molecules", "molecule", "mol", "mo", "m", "4", NULL};
+  if (is_string_in_string_list(col_string, sp_keys)) return 0;
+  if (is_string_in_string_list(col_string, pt_keys)) return 1;
+  if (is_string_in_string_list(col_string, pc_keys)) return 2;
+  if (is_string_in_string_list(col_string, fg_keys)) return 3;
+  if (is_string_in_string_list(col_string, mo_keys)) return 4;
   return NONE;
 }
 
@@ -344,11 +405,20 @@ int parse_command_line (int argc, char *argv[])
                                     {"version", no_argument, 0, 'v'},
                                     {"libreoffice", no_argument, 0, 'l'},
                                     {"render-png", no_argument, 0, 'p'},
+                                    {"png", no_argument, 0, 'p'},
                                     {"render-jpg", no_argument, 0, 'j'},
+                                    {"jpg", no_argument, 0, 'j'},
                                     {"width", required_argument, 0, 'W'},
                                     {"height", required_argument, 0, 'H'},
                                     {"output", required_argument, 0, 'o'},
                                     {"style", required_argument, 0, 's'},
+                                    {"atoms", required_argument, 0, 'e'},
+                                    {"poly", required_argument, 0, 't'},
+                                    // {"back", required_argument, 0, 'B'},
+                                    {"axis", required_argument, 0, 'a'},
+                                    {"box", required_argument, 0, 'b'},
+                                    {"rep", required_argument, 0, 'r'},
+                                    // {"debug", no_argument, 0, 'd'},
                                     {0, 0, 0, 0}};
   int opt;
   int index = -1;
@@ -357,7 +427,10 @@ int parse_command_line (int argc, char *argv[])
   gchar * image_y = NULL;
   int img_opt = 0;
 
-  while ((opt = getopt_long(argc, argv, "hvlpjW:H:o:s:", atomes_options, & index)) != -1)
+  // Letter follow by : means that the command requires an argument
+  // No letter if the option is only in long format, ex : --width
+  // If the long name is empty the command is only in short format
+  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:", atomes_options, & index)) != -1)
   {
     switch (opt)
     {
@@ -369,23 +442,34 @@ int parse_command_line (int argc, char *argv[])
         print_version();
         return FALSE;
         break;
+      case 'e':
+        render_image_acolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 't':
+        render_image_pcolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
       case 'l':
         atomes_from_libreoffice = TRUE;
-        atomes_image_format = 0;
+        render_image_format = 0;
         break;
       case 'p':
         atomes_render_image = TRUE;
-        atomes_image_format = 0;
+        render_image_format = 0;
         img_opt ++;
         break;
       case 'j':
         atomes_render_image = TRUE;
-        atomes_image_format = 1;
+        render_image_format = 1;
         img_opt ++;
         break;
       case 'o':
-        atomes_image_output = g_strdup_printf ("%s", optarg);
+        render_image_output = g_strdup_printf ("%s", optarg);
         img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
         break;
       case 'W':
         image_x = g_strdup_printf ("%s", optarg);
@@ -398,7 +482,22 @@ int parse_command_line (int argc, char *argv[])
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 's':
-        atomes_image_style = get_style_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        render_image_style = get_style_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'a':
+        render_image_axis = get_box_axis_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'b':
+        render_image_box = get_box_axis_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'r':
+        render_image_rep = get_rep_from_string (g_ascii_strdown(optarg,strlen(optarg)));
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
@@ -407,22 +506,22 @@ int parse_command_line (int argc, char *argv[])
   }
   if (atomes_render_image)
   {
-    if (! atomes_image_output) atomes_image_output = g_strdup_printf ("%s", (atomes_image_format) ? "image.jpg" : "image.png");
+    if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");
     if (argc == img_opt + 2)
     {
       if (image_x || image_y)
       {
-        atomes_image_pixels = allocint(2);
+        render_image_pixels = allocint(2);
         int pix;
         if (image_x)
         {
           pix = (int) string_to_double(image_x);
-          if (pix > 0) atomes_image_pixels[0] = pix;
+          if (pix > 0) render_image_pixels[0] = pix;
         }
         if (image_y)
         {
           pix = (int) string_to_double(image_y);
-          if (pix > 0) atomes_image_pixels[1] = pix;
+          if (pix > 0) render_image_pixels[1] = pix;
         }
       }
       flist = g_malloc0(sizeof*flist);

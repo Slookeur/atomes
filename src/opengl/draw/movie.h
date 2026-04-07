@@ -71,4 +71,17 @@ struct video_options
 
 extern void render_image (glwin * view, video_options * iopts);
 extern void save_movie (glwin * view, video_options * vopts);
+
+// Image rendering options from the command line
+extern int render_image_format;
+extern int render_image_style;
+extern int render_image_axis;
+extern int render_image_box;
+extern int render_image_rep;
+// extern int render_image_back;
+extern int render_image_acolor;
+extern int render_image_pcolor;
+extern int * render_image_pixels;
+extern gchar * render_image_output;
+
 #endif
