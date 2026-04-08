@@ -239,7 +239,7 @@ void simple_image_render ()
   video_options * vopts = g_malloc0(sizeof*vopts);
   vopts -> proj = activep;
   vopts -> oglquality = 0;
-  vopts -> video_res = duplicate_int (2, render_image_pixels);
+  vopts -> video_res = duplicate_int (2, (atomes_from_libreoffice) ? active_glwin -> pixels : render_image_pixels);
   int h, i, j, k, l, m;
   for (i=0; i<2; i++) active_glwin -> pixels[i] = vopts -> video_res[i];
   vopts -> codec = render_image_format;
@@ -328,5 +328,5 @@ void simple_image_render ()
   }
   run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
   g_free (vopts);
-  to_close_this_project (0, active_project);
+  if (! atomes_from_libreoffice) to_close_this_project (0, active_project);
 }

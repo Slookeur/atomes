@@ -674,7 +674,7 @@ int parse_command_line (int argc, char *argv[])
     }
     index = -1;
   }
-
+  if (atomes_from_libreoffice) atomes_render_image = FALSE;
   if (atomes_render_image)
   {
     if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");

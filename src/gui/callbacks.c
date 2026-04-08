@@ -235,6 +235,7 @@ void quit_gtk ()
     FILE * fp = fopen (projfile, dfi[1]);
     open_save (fp, 1, 1, 0, 0, NULL);
     fclose (fp);
+    to_close_this_project (0, active_project);
   }
   profree_ ();
   g_application_quit (G_APPLICATION(AtomesApp));

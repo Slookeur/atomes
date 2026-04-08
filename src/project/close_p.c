@@ -219,7 +219,7 @@ void close_project (project * to_close)
     }
   }
   if (! atomes_render_image) clean_view ();
-  g_debug ("CLOSE_PROJECT: so far so good");
+
   if (nprojects == 1 && ! atomes_render_image)
   {
     prep_calc_actions ();
@@ -255,7 +255,7 @@ void close_project (project * to_close)
   }
   g_free (to_close);
   nprojects --;
-  g_debug ("CLOSE_PROJECT: so far so good nprojects= %d", nprojects);
+
   if (nprojects)
   {
     project * this_proj = workzone.first;
@@ -359,7 +359,7 @@ void to_close_this_project (int to_activate, project * this_proj)
   {
     activate_project (NULL, GINT_TO_POINTER(to_activate));
   }
-  else if (! atomes_render_image)
+  else if (! atomes_render_image || atomes_from_libreoffice)
   {
     remove_edition_and_analyze_actions ();
     active_project = NULL;
