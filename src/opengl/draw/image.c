@@ -245,83 +245,83 @@ void simple_image_render ()
   {
     if (render_image_style < OGL_STYLES)
     {
-      active_glwin -> anim -> last -> img -> style = render_image_style;
+      active_image -> style = render_image_style;
     }
     else
     {
-      active_glwin -> anim -> last -> img -> style = SPACEFILL;
+      active_image -> style = SPACEFILL;
       h = render_image_style - OGL_STYLES;
-      active_glwin -> anim -> last -> img -> filled_type = h;
+      active_image  -> filled_type = h;
       j = active_project -> nspec;
       k = (h) ? 9 + h : 2;
       l = (h) ? 12 + h : 7;
       for (i=0; i<j; i++)
       {
         m = (int)active_project -> chemistry -> chem_prop[CHEM_Z][i];
-        active_glwin -> anim -> last -> img -> atomicrad[i] = (default_o_at_rs[2]) ? default_at_rs[2] : get_radius (2, h, m, default_atomic_rad[k]);
-        active_glwin -> anim -> last -> img -> atomicrad[i+j] = (default_o_at_rs[7]) ? default_at_rs[7] : get_radius (7, h, m, default_atomic_rad[l]);
+        active_image -> atomicrad[i] = (default_o_at_rs[2]) ? default_at_rs[2] : get_radius (2, h, m, default_atomic_rad[k]);
+        active_image -> atomicrad[i+j] = (default_o_at_rs[7]) ? default_at_rs[7] : get_radius (7, h, m, default_atomic_rad[l]);
       }
     }
   }
-  if (render_image_rep != NONE) active_glwin -> anim -> last -> img -> rep = render_image_rep;
+  if (render_image_rep != NONE) active_image -> rep = render_image_rep;
   if (render_image_box != NONE)
   {
-    if (active_glwin -> anim -> last -> img -> abc)
+    if (active_image -> abc)
     {
-      active_glwin -> anim -> last -> img -> abc -> box = render_image_box;
+      active_image -> abc -> box = render_image_box;
     }
     if (render_image_box_color)
     {
-      active_glwin -> anim -> last -> img -> abc -> color = * render_image_box_color;
+      active_image -> abc -> color = * render_image_box_color;
     }
   }
   if (render_image_axis != NONE)
   {
-    if (active_glwin -> anim -> last -> img -> xyz)
+    if (active_image -> xyz)
     {
-      active_glwin -> anim -> last -> img -> xyz -> axis = render_image_axis;
+      active_image -> xyz -> axis = render_image_axis;
     }
   }
   if (render_image_acolor != NONE)
   {
-    active_glwin -> anim -> last -> img -> color_map[0] = render_image_acolor;
+    active_image -> color_map[0] = render_image_acolor;
   }
   if (render_image_pcolor != NONE)
   {
     // This also trigger to render polyhedra
-    active_glwin -> anim -> last -> img -> color_map[1] = render_image_pcolor;
+    active_image -> color_map[1] = render_image_pcolor;
     i = (render_image_pcolor == 2) ? 1 : 0;
     for (j=0; j<active_coord -> totcoord[i]; j++)
     {
-      active_glwin -> anim -> last -> img -> show_poly[i][j] = TRUE;
+      active_image -> show_poly[i][j] = TRUE;
     }
   }
   if (render_image_back_grad != NONE)
   {
-    active_glwin -> anim -> last -> img -> back -> gradient = render_image_back_grad;
+    active_image -> back -> gradient = render_image_back_grad;
   }
   if (render_image_back_color)
   {
-    active_glwin -> anim -> last -> img -> back -> gradient = 0;
-    active_glwin -> anim -> last -> img -> back -> color = * render_image_back_color;
+    active_image -> back -> gradient = 0;
+    active_image -> back -> color = * render_image_back_color;
   }
   if (render_image_back_dir != NONE)
   {
-    if ((active_glwin -> anim -> last -> img -> back -> gradient == 1 && render_image_back_dir < 5)
-     || (active_glwin -> anim -> last -> img -> back -> gradient == 2 && render_image_back_dir < 8))
+    if ((active_image -> back -> gradient == 1 && render_image_back_dir < 5)
+     || (active_image -> back -> gradient == 2 && render_image_back_dir < 8))
     {
-      active_glwin -> anim -> last -> img -> back -> direction = render_image_back_dir;
+      active_image -> back -> direction = render_image_back_dir;
     }
   }
   if (render_image_back_pos != NONE)
   {
-    active_glwin -> anim -> last -> img -> back -> position = render_image_back_pos;
+    active_image -> back -> position = render_image_back_pos;
   }
   for (i=0; i<2; i++)
   {
     if (render_image_grad_color[i])
     {
-      active_glwin -> anim -> last -> img -> back -> gradient_color[i] = * render_image_grad_color[i];
+      active_image -> back -> gradient_color[i] = * render_image_grad_color[i];
     }
   }
   run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);

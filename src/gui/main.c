@@ -43,7 +43,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   int parse_command_line (int argc, char *argv[])
   int main (int argc, char *argv[]);
 
-  ColRGBA * get_color_from_string (gchar * color_string);
+  ColRGBA * get_color_from_hexa_string (gchar * color_string);
 
   gboolean destroy_func (gpointer user_data);
 
@@ -413,71 +413,26 @@ int get_color_map_from_string (gchar * col_string)
 }
 
 /*!
-  \fn ColRGBA * get_color_from_string (gchar * color_string)
+  \fn ColRGBA * get_color_from_hexa_string (gchar * color_string)
 
   \brief convert Hexadecimal string to ColRGBA
 
   \param color_string the color keyword from command line
 */
-ColRGBA * get_color_from_string (gchar * color_string)
+ColRGBA * get_color_from_hexa_string (gchar * color_string)
 {
+   ColRGBA * col = NULL;
   const char * color = color_string;
   // Ignorer le '#' si présent au début
-  ColRGBA * col = NULL;
   if (color_string[0] == '#') color = color_string + 1;
   size_t len = strlen(color);
-  int rgb[3] = {0}; // Tableau pour r, g, b
-  char c0, c1;
-  int val;
-  int i;
-  if (len == 3)
+  if (len == 3 || len == 6)
   {
-    // Cas : #RGB ou RGB (format court)
-    for (i = 0; i < 3; i++)
-    {
-      c0 = color[i];
-      // Convertir une lettre hexadécimale en valeur numérique
-      if (isdigit(c0))
-      {
-        rgb[i] = c0 - '0';
-      }
-      else if (isxdigit(c0))
-      {
-        rgb[i] = (c0 | 32) - 'a' + 10; // Conversion en base 16
-      }
-      else
-      {
-        return NULL; // Invalide
-      }
-    }
-    // Mettre à l'échelle : 0-15 -> 0-255
+    // Valid chain
     col = g_malloc0(sizeof*col);
-    col -> red   = (rgb[0] * 16 + rgb[0])/255.0;
-    col -> green = (rgb[1] * 16 + rgb[1])/255.0;
-    col -> blue  = (rgb[2] * 16 + rgb[2])/255.0;
-    col -> alpha = 1.0;
-  }
-  else if (len == 6)
-  {
-    // Cas : #RRGGBB ou RRGGBB (format long)
-    for (i=0; i<3; i++)
-    {
-      c0 = color[i * 2];
-      c1 = color[i * 2 + 1];
-      // Convertir chaque paire de lettres hexadécimales en valeur numérique
-      if (!isxdigit(c0) || !isxdigit(c1))
-      {
-        return NULL; // Invalide
-      }
-      val = (c0 | 32) - 'a' + 10;    // Conversion de la première lettre
-      val = val << 4;                // Décalage de 4 bits pour la deuxième lettre
-      val += (c1 | 32) - 'a' + 10;   // Ajout de la valeur de la deuxième lettre
-      rgb[i] = val;
-    }
-    col = g_malloc0(sizeof*col);
-    col -> red   = rgb[0] / 255.0;
-    col -> green = rgb[1] / 255.0;
-    col -> blue  = rgb[2] / 255.0;
+    col -> red   = strtol(color + 0, NULL, 16) / 255.0;
+    col -> green = strtol(color + len/3, NULL, 16) / 255.0;
+    col -> blue  = strtol(color + 2*len/3, NULL, 16) / 255.0;
     col -> alpha = 1.0;
   }
   return col;
@@ -497,7 +452,7 @@ int get_gradient_from_string (gchar * grad_string)
   gchar * ci_keys[] = {"circular", "circ", "ci", "c", "2", NULL};
   if (is_string_in_string_list(grad_string, no_keys)) return 0;
   if (is_string_in_string_list(grad_string, li_keys)) return 1;
-  if (is_string_in_string_list(grad_string, co_keys)) return 2;
+  if (is_string_in_string_list(grad_string, ci_keys)) return 2;
   return NONE;
 }
 
@@ -674,12 +629,12 @@ int parse_command_line (int argc, char *argv[])
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 'C':
-        render_image_box_color = get_color_from_string (optarg);
+        render_image_box_color = get_color_from_hexa_string (optarg);
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 'B':
-        render_image_back_color = get_color_from_string (optarg);
+        render_image_back_color = get_color_from_hexa_string (optarg);
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
@@ -698,17 +653,17 @@ int parse_command_line (int argc, char *argv[])
         break;
       case 'P':
         double v = string_to_double(optarg);
-        render_image_back_pos = (v >= 0.0 && v <= 1.0) ? 1.0 - v : NONE;
+        render_image_back_pos = (v >= 0.0 && v <= 1.0) ? v : NONE;
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 'U':
-        render_image_grad_color[0] = get_color_from_string (optarg);
+        render_image_grad_color[0] = get_color_from_hexa_string (optarg);
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 'V':
-        render_image_grad_color[1] = get_color_from_string (optarg);
+        render_image_grad_color[1] = get_color_from_hexa_string (optarg);
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
@@ -742,6 +697,7 @@ int parse_command_line (int argc, char *argv[])
       return FALSE;
     }
   }
+
   for (i=optind; i<argc; i++)
   {
     j = test_this_arg (argv[i]);
@@ -772,7 +728,7 @@ int parse_command_line (int argc, char *argv[])
     }
   }
 
-  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? TRUE : FALSE;
+  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? FALSE : TRUE;
 }
 
 /*!
