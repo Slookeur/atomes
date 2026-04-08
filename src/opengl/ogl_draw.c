@@ -536,7 +536,7 @@ void draw (glwin * view)
     if (wingl -> create_shaders[SELEC] && wingl -> n_shaders[SELEC][step] < 0) wingl -> n_shaders[SELEC][step] = create_selection_lists ();
     if (wingl -> create_shaders[POLYS] && wingl -> n_shaders[POLYS][step] < 0) create_poly_lists ();
     if (wingl -> create_shaders[RINGS] && wingl -> n_shaders[RINGS][step] < 0) create_ring_lists ();
-    if (wingl -> create_shaders[PICKS]) wingl -> n_shaders[PICKS][0] = create_pick_lists ();
+    if (wingl -> create_shaders[PICKS] && ! atomes_render_image) wingl -> n_shaders[PICKS][0] = create_pick_lists ();
     if (wingl -> create_shaders[SLABS]) create_slab_lists (proj_gl);
     if (wingl -> create_shaders[VOLMS] && wingl -> n_shaders[VOLMS][step] < 0) create_volumes_lists ();
     if (wingl -> create_shaders[LABEL]) wingl -> n_shaders[LABEL][0] = create_label_lists ();
