@@ -308,7 +308,6 @@ struct background
                          1 = top to bottom \n
                          2 = bottom right to top left \n
                          3 = top right to bottom left \n
-                         4 = center \n
                        If circular: \n
                          0 = right to left \n
                          1 = left to right \n

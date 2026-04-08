@@ -75,9 +75,14 @@ int render_image_style = NONE;
 int render_image_axis = NONE;
 int render_image_box = NONE;
 int render_image_rep = NONE;
-// int render_image_back = ;
 int render_image_acolor = NONE;
 int render_image_pcolor = NONE;
+ColRGBA * render_image_back_color = NULL;
+int render_image_back_grad = NONE;
+int render_image_back_dir = NONE;
+float render_image_back_pos = NONE;
+ColRGBA * render_image_grad_color[2];
+ColRGBA * render_image_box_color = NULL;
 int * render_image_pixels = NULL;
 gchar * render_image_output = NULL;
 
@@ -265,6 +270,10 @@ void simple_image_render ()
     {
       active_glwin -> anim -> last -> img -> abc -> box = render_image_box;
     }
+    if (render_image_box_color)
+    {
+      active_glwin -> anim -> last -> img -> abc -> color = * render_image_box_color;
+    }
   }
   if (render_image_axis != NONE)
   {
@@ -281,7 +290,39 @@ void simple_image_render ()
   {
     // This also trigger to render polyhedra
     active_glwin -> anim -> last -> img -> color_map[1] = render_image_pcolor;
-
+    i = (render_image_pcolor == 2) ? 1 : 0;
+    for (j=0; j<active_coord -> totcoord[i]; j++)
+    {
+      active_glwin -> anim -> last -> img -> show_poly[i][j] = TRUE;
+    }
+  }
+  if (render_image_back_grad != NONE)
+  {
+    active_glwin -> anim -> last -> img -> back -> gradient = render_image_back_grad;
+  }
+  if (render_image_back_color)
+  {
+    active_glwin -> anim -> last -> img -> back -> gradient = 0;
+    active_glwin -> anim -> last -> img -> back -> color = * render_image_back_color;
+  }
+  if (render_image_back_dir != NONE)
+  {
+    if ((active_glwin -> anim -> last -> img -> back -> gradient == 1 && render_image_back_dir < 5)
+     || (active_glwin -> anim -> last -> img -> back -> gradient == 2 && render_image_back_dir < 8))
+    {
+      active_glwin -> anim -> last -> img -> back -> direction = render_image_back_dir;
+    }
+  }
+  if (render_image_back_pos != NONE)
+  {
+    active_glwin -> anim -> last -> img -> back -> position = render_image_back_pos;
+  }
+  for (i=0; i<2; i++)
+  {
+    if (render_image_grad_color[i])
+    {
+      active_glwin -> anim -> last -> img -> back -> gradient_color[i] = * render_image_grad_color[i];
+    }
   }
   run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
   g_free (vopts);

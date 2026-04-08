@@ -34,11 +34,16 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   int test_this_ext (int len, gchar * arg);
   int test_this_arg (gchar * arg);
-  int get_box_axis_from_string (gchar * box_axis_string);
+  int get_style_from_string (gchar * style_string);
   int get_rep_from_string (gchar * rep_string);
+  int get_box_axis_from_string (gchar * box_axis_string);
   int get_color_map_from_string (gchar * col_string);
+  int get_gradient_from_string (gchar * grad_string);
+  int check_for_atomes_file_options (int start, int end, char *argv[]);
   int parse_command_line (int argc, char *argv[])
   int main (int argc, char *argv[]);
+
+  ColRGBA * get_color_from_string (gchar * color_string);
 
   gboolean destroy_func (gpointer user_data);
 
@@ -53,9 +58,17 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   GtkWidget * create_splash_window ();
 
+*
+* Notes:
+*
+
+  LLM tools (Le Chat) were used at few occasions to prepare some sections of this file, including:
+    - To write of the function to convert hexadecimal chain to color
+
 */
 
 #include <getopt.h>
+#include <ctype.h>
 #include "version.h"
 #include "global.h"
 #include "bind.h"
@@ -92,14 +105,14 @@ gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks
                        "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
                        "ball_and_sticks", "balls_and_sticks", "balls_and_stick", "ball_and_stick",
                        "ballsandsticks", "ballsandstick", "ballanddsticks", "ballandstick",
-                       "b&s", "b_and_s", "bs", NULL};
+                       "b&s", "b_and_s", "bs", "b", NULL};
 gchar * wi_styles[] = {"wireframe", "wireframes", "wires", "wire", "wi", "w", NULL};
 gchar * co_styles[] = {"covalent_radius", "covalent", "cov_rad", "cov", "co", "cr", NULL};
 gchar * io_styles[] = {"ionic_radius", "ionic_rad", "ionic", "ion", "ir", NULL};
 gchar * vw_styles[] = {"vdw_radius", "van_der_waals_radius", "van_der_waals", "vdw_radius", "vdw_rad", "vdw", "vr", NULL};
 gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_radius", "cryst", "crystal_rad", "cr", NULL};
-gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", NULL};
-gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", NULL};
+gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", "S", NULL};
+gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", "c", NULL};
 gchar * do_styles[] = {"dot", "dots", "d", NULL};
 
 /*!
@@ -154,9 +167,17 @@ void print_help()
                    "  -b, --box=[STYLE]          box style\n"
                    "  -a, --axis=[STYLE]         axis style\n"
                    "  -e, --acolor=[MAP]         atoms and bonds color map\n"
-                   "  -t, --pcolor=[MAP]         ployhedra color map\n\n"
+                   "  -t, --pcolor=[MAP]         ployhedra color map\n"
+                   "  -C, --box_color=[COLOR]    box color\n"
+                   "  -G, --back_grad=[GRAD]     background gradient type\n"
+                   "  -B, --back_color=[COLOR]   background color\n"
+                   "  -D, --back_dir=[DIR]       background direction\n"
+                   "  -P, --back_pos=[POS]       colors mixed position\n"
+                   "  -U, --grad_col_a=[COL]     gradient initial color\n"
+                   "  -V, --grad_col_b=[COL]     gradient final color\n\n"
+
                    "ex:\n\n"
-                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n
+                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
                    " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n";
   char bug[20] = "\nReport a bug to <";
   char eh[4] = ">\n";
@@ -340,20 +361,6 @@ int get_style_from_string (gchar * style_string)
 }
 
 /*!
-  \fn int get_box_axis_from_string (gchar * box_axis_string)
-
-  \brief retrieve box or axis style from command line string
-
-  \param box_axis_string the axis keyword from command line
-*/
-int get_box_axis_from_string (gchar * box_axis_string)
-{
-  if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
-  if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
-  return NONE;
-}
-
-/*!
   \fn int get_rep_from_string (gchar * rep_string)
 
   \brief retrieve representation style from command line string
@@ -370,7 +377,21 @@ int get_rep_from_string (gchar * rep_string)
 }
 
 /*!
-  \fn int get_color_map_string (gchar * col_string)
+  \fn int get_box_axis_from_string (gchar * box_axis_string)
+
+  \brief retrieve box or axis style from command line string
+
+  \param box_axis_string the axis keyword from command line
+*/
+int get_box_axis_from_string (gchar * box_axis_string)
+{
+  if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
+  if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
+  return NONE;
+}
+
+/*!
+  \fn int get_color_map_from_string (gchar * col_string)
 
   \brief retrieve color map from command line string
 
@@ -379,8 +400,8 @@ int get_rep_from_string (gchar * rep_string)
 int get_color_map_from_string (gchar * col_string)
 {
   gchar * sp_keys[] = {"species", "spec", "sp", "0", NULL};
-  gchar * pt_keys[] = {"total_coordinations", "total_coordination", "total", "tc", "t", "1", NULL};
-  gchar * pc_keys[] = {"partial_coordinations", "partial_coordinations", "partial", "pc", "p", "2", NULL};
+  gchar * pt_keys[] = {"total_coordinations", "total_coordination", "total_coord", "total", "tc", "t", "1", NULL};
+  gchar * pc_keys[] = {"partial_coordinations", "partial_coordination", "partial_coord", "partial", "pc", "p", "2", NULL};
   gchar * fg_keys[] = {"fragments", "fragment", "frag", "fg", "f", "3", NULL};
   gchar * mo_keys[] = {"molecules", "molecule", "mol", "mo", "m", "4", NULL};
   if (is_string_in_string_list(col_string, sp_keys)) return 0;
@@ -389,6 +410,144 @@ int get_color_map_from_string (gchar * col_string)
   if (is_string_in_string_list(col_string, fg_keys)) return 3;
   if (is_string_in_string_list(col_string, mo_keys)) return 4;
   return NONE;
+}
+
+/*!
+  \fn ColRGBA * get_color_from_string (gchar * color_string)
+
+  \brief convert Hexadecimal string to ColRGBA
+
+  \param color_string the color keyword from command line
+*/
+ColRGBA * get_color_from_string (gchar * color_string)
+{
+  const char * color = color_string;
+  // Ignorer le '#' si présent au début
+  ColRGBA * col = NULL;
+  if (color_string[0] == '#') color = color_string + 1;
+  size_t len = strlen(color);
+  int rgb[3] = {0}; // Tableau pour r, g, b
+  char c0, c1;
+  int val;
+  int i;
+  if (len == 3)
+  {
+    // Cas : #RGB ou RGB (format court)
+    for (i = 0; i < 3; i++)
+    {
+      c0 = color[i];
+      // Convertir une lettre hexadécimale en valeur numérique
+      if (isdigit(c0))
+      {
+        rgb[i] = c0 - '0';
+      }
+      else if (isxdigit(c0))
+      {
+        rgb[i] = (c0 | 32) - 'a' + 10; // Conversion en base 16
+      }
+      else
+      {
+        return NULL; // Invalide
+      }
+    }
+    // Mettre à l'échelle : 0-15 -> 0-255
+    col = g_malloc0(sizeof*col);
+    col -> red   = (rgb[0] * 16 + rgb[0])/255.0;
+    col -> green = (rgb[1] * 16 + rgb[1])/255.0;
+    col -> blue  = (rgb[2] * 16 + rgb[2])/255.0;
+    col -> alpha = 1.0;
+  }
+  else if (len == 6)
+  {
+    // Cas : #RRGGBB ou RRGGBB (format long)
+    for (i=0; i<3; i++)
+    {
+      c0 = color[i * 2];
+      c1 = color[i * 2 + 1];
+      // Convertir chaque paire de lettres hexadécimales en valeur numérique
+      if (!isxdigit(c0) || !isxdigit(c1))
+      {
+        return NULL; // Invalide
+      }
+      val = (c0 | 32) - 'a' + 10;    // Conversion de la première lettre
+      val = val << 4;                // Décalage de 4 bits pour la deuxième lettre
+      val += (c1 | 32) - 'a' + 10;   // Ajout de la valeur de la deuxième lettre
+      rgb[i] = val;
+    }
+    col = g_malloc0(sizeof*col);
+    col -> red   = rgb[0] / 255.0;
+    col -> green = rgb[1] / 255.0;
+    col -> blue  = rgb[2] / 255.0;
+    col -> alpha = 1.0;
+  }
+  return col;
+}
+
+/*!
+  \fn int get_gradient_from_string (gchar * grad_string)
+
+  \brief retrieve background gradient from command line string
+
+  \param grad_string the color map keyword from command line
+*/
+int get_gradient_from_string (gchar * grad_string)
+{
+  gchar * no_keys[] = {"none", "no", "n", "0", NULL};
+  gchar * li_keys[] = {"linear", "lin", "li", "l", "1", NULL};
+  gchar * ci_keys[] = {"circular", "circ", "ci", "c", "2", NULL};
+  if (is_string_in_string_list(grad_string, no_keys)) return 0;
+  if (is_string_in_string_list(grad_string, li_keys)) return 1;
+  if (is_string_in_string_list(grad_string, co_keys)) return 2;
+  return NONE;
+}
+
+/*!
+  \fn int check_for_atomes_file_options (int start, int end, char *argv[])
+
+  \brief retrieve the list of files to read from the command line
+         leave out all other options
+
+  \param start starting position on the command line
+  \param end ending position on the command line
+  \param *argv[] list of argument(s) on the command line
+*/
+int check_for_atomes_file_options (int start, int end, char *argv[])
+{
+  int i, j, k;
+  i=0;
+  for (j=start; j<end; j++)
+  {
+    k = test_this_arg (argv[j]);
+    if (! (abs(k) == 1 && with_workspace))
+    {
+      if (k > 0 && j < end-1)
+      {
+        if (! flist)
+        {
+          flist = g_malloc0(sizeof*flist);
+          ftmp = flist;
+        }
+        else
+        {
+          ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+          ftmp = ftmp -> next;
+        }
+        ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
+        ftmp -> file_type = k;
+        argv[j] = argv[j+1] = g_strdup_printf (" ");
+        j ++;
+        i ++;
+      }
+      if (abs(k) == 1) with_workspace = TRUE;
+    }
+    else if (k == 1)
+    {
+      // Other workspaces are ignored
+      argv[j] = argv[j+1] = g_strdup_printf (" ");
+      j ++;
+    }
+  }
+  return i;
 }
 
 /*!
@@ -414,23 +573,36 @@ int parse_command_line (int argc, char *argv[])
                                     {"style", required_argument, 0, 's'},
                                     {"atoms", required_argument, 0, 'e'},
                                     {"poly", required_argument, 0, 't'},
-                                    // {"back", required_argument, 0, 'B'},
                                     {"axis", required_argument, 0, 'a'},
                                     {"box", required_argument, 0, 'b'},
+                                    {"box_color", required_argument, 0, 'C'},
+                                    {"back_color", required_argument, 0, 'B'},
+                                    {"back_grad", required_argument, 0, 'G'},
+                                    {"back_dir", required_argument, 0, 'D'},
+                                    {"back_pos", required_argument, 0, 'P'},
+                                    {"grad_col_a", required_argument, 0, 'U'},
+                                    {"grad_col_b", required_argument, 0, 'V'},
                                     {"rep", required_argument, 0, 'r'},
                                     // {"debug", no_argument, 0, 'd'},
                                     {0, 0, 0, 0}};
   int opt;
   int index = -1;
-  int i, j, k;
+  int i, j;
   gchar * image_x = NULL;
   gchar * image_y = NULL;
   int img_opt = 0;
 
-  // Letter follow by : means that the command requires an argument
-  // No letter if the option is only in long format, ex : --width
-  // If the long name is empty the command is only in short format
-  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:", atomes_options, & index)) != -1)
+  for (i=0; i<2; i++) render_image_grad_color[i] = NULL;
+  /* We want to parse the command line using GNU getopt, but then
+     some options that are atomes specific and not GNU getopt compatible
+     might disappear, to prevent that it is mandatory to prepare
+     the information to be given to GNU getopt */
+  int files_to_read = check_for_atomes_file_options (1, argc, argv);
+
+  /* Letter follow by : means that the command requires an argument
+     No letter if the option is only in long format, ex : --width
+     If the long name is empty the command is only in short format */
+  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
   {
     switch (opt)
     {
@@ -501,9 +673,49 @@ int parse_command_line (int argc, char *argv[])
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
+      case 'C':
+        render_image_box_color = get_color_from_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'B':
+        render_image_back_color = get_color_from_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'G':
+        render_image_back_grad = get_gradient_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'D':
+        if (isdigit(optarg[0]))
+        {
+          render_image_back_dir = ((optarg[0] - '0') < 9) ? optarg[0] - '0' : NONE;
+        }
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'P':
+        double v = string_to_double(optarg);
+        render_image_back_pos = (v >= 0.0 && v <= 1.0) ? 1.0 - v : NONE;
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'U':
+        render_image_grad_color[0] = get_color_from_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'V':
+        render_image_grad_color[1] = get_color_from_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
     }
     index = -1;
   }
+
   if (atomes_render_image)
   {
     if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");
@@ -524,78 +736,43 @@ int parse_command_line (int argc, char *argv[])
           if (pix > 0) render_image_pixels[1] = pix;
         }
       }
-      flist = g_malloc0(sizeof*flist);
-      k = test_this_arg (argv[optind]);
-      flist -> file_name = g_strdup_printf ("%s", argv[optind]);
-      flist -> file_type = -k;
-      return TRUE;
     }
     else
     {
       return FALSE;
     }
   }
+  for (i=optind; i<argc; i++)
+  {
+    j = test_this_arg (argv[i]);
+    if (! (abs(j) == 1 && with_workspace))
+    {
+      if (j < 0)
+      {
+        if (! flist)
+        {
+          flist = g_malloc0(sizeof*flist);
+          ftmp = flist;
+        }
+        else
+        {
+          ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+          ftmp = ftmp -> next;
+        }
+        ftmp -> file_name = g_strdup_printf ("%s", argv[i]);
+        ftmp -> file_type = -j;
+        files_to_read ++;
+        if (atomes_from_libreoffice) projfile = g_strdup_printf ("%s", argv[i]);
+      }
+    }
+    else if (j == -1)
+    {
+      // Other workspace are ignored
+      i ++;
+    }
+  }
 
-  if (argc == 2)
-  {
-    i = test_this_arg (argv[1]);
-    if (i !=0)
-    {
-      flist = g_malloc0(sizeof*flist);
-      flist -> file_name = g_strdup_printf ("%s", argv[1]);
-      flist -> file_type = -i;
-      if (flist -> file_type == 1) with_workspace = TRUE;
-    }
-  }
-  else
-  {
-    i=0;
-    for (j=optind; j<argc; j++)
-    {
-      k = test_this_arg (argv[j]);
-      if (! (abs(k) == 1 && with_workspace))
-      {
-        if (k > 0 && j < argc-1)
-        {
-          if (! flist)
-          {
-            flist = g_malloc0(sizeof*flist);
-            ftmp = flist;
-          }
-          else
-          {
-            ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-            ftmp = ftmp -> next;
-          }
-          ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
-          ftmp -> file_type = k;
-          j ++;
-        }
-        else if (k < 0)
-        {
-          if (! flist)
-          {
-            flist = g_malloc0(sizeof*flist);
-            ftmp = flist;
-          }
-          else
-          {
-            ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-            ftmp = ftmp -> next;
-          }
-          ftmp -> file_name = g_strdup_printf ("%s", argv[j]);
-          ftmp -> file_type = -k;
-          if (atomes_from_libreoffice) projfile = g_strdup_printf ("%s", argv[j]);
-        }
-        if (abs(k) == 1) with_workspace = TRUE;
-      }
-      else if (k == 1)
-      {
-        j ++;
-      }
-    }
-  }
-  return TRUE;
+  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? TRUE : FALSE;
 }
 
 /*!

@@ -78,9 +78,14 @@ extern int render_image_style;
 extern int render_image_axis;
 extern int render_image_box;
 extern int render_image_rep;
-// extern int render_image_back;
 extern int render_image_acolor;
 extern int render_image_pcolor;
+extern ColRGBA * render_image_back_color;
+extern int render_image_back_grad;
+extern int render_image_back_dir;
+extern float render_image_back_pos;
+extern ColRGBA * render_image_grad_color[2];
+extern ColRGBA * render_image_box_color;
 extern int * render_image_pixels;
 extern gchar * render_image_output;
 
