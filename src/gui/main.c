@@ -571,11 +571,15 @@ int parse_command_line (int argc, char *argv[])
         break;
       case 'e':
         render_image_acolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        trigger_fragment_analysis = (render_image_acolor > 2) ? TRUE : FALSE;
+        trigger_molecule_analysis = (render_image_acolor > 3) ? TRUE : FALSE;
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 't':
         render_image_pcolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        trigger_fragment_analysis = (render_image_pcolor > 2) ? TRUE : FALSE;
+        trigger_molecule_analysis = (render_image_pcolor > 3) ? TRUE : FALSE;
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;

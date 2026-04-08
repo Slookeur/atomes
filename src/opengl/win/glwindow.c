@@ -68,6 +68,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "initcoord.h"
 #include "submenus.h"
 #include "color_box.h"
+#include "movie.h"
 
 extern G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void coord_properties (GtkWidget * widg, gpointer data);
@@ -1527,13 +1528,13 @@ void prep_model (int p)
       {
         adv_bonding[0] = (active_project -> natomes > ATOM_LIMIT) ? 0 : tmp_adv_bonding[0];
         adv_bonding[1] = (active_project -> steps > STEP_LIMIT) ? 0 : tmp_adv_bonding[1];
-        frag_update = (active_project -> natomes > ATOM_LIMIT) ? 0 : 1;
-        mol_update = (frag_update) ? ((active_project -> steps > STEP_LIMIT) ? 0 : 1) : 0;
+        frag_update = (active_project -> natomes > ATOM_LIMIT || trigger_fragment_analysis) ? 0 : 1;
+        mol_update = (trigger_molecule_analysis) ? 1 : (frag_update) ? ((active_project -> steps > STEP_LIMIT) ? 0 : 1) : 0;
       }
       else
       {
-        frag_update = (force_mol) ? 1 : (active_project -> natomes > ATOM_LIMIT) ? 0 : 1;
-        mol_update = (force_mol) ? 1 : (frag_update) ? ((active_project -> steps > STEP_LIMIT) ? 0 : 1) : 0;
+        frag_update = (force_mol || trigger_fragment_analysis) ? 1 : (active_project -> natomes > ATOM_LIMIT) ? 0 : 1;
+        mol_update = (force_mol || trigger_molecule_analysis) ? 1 : (frag_update) ? ((active_project -> steps > STEP_LIMIT) ? 0 : 1) : 0;
         adv_bonding[0] = adv_bonding[1] = TRUE;
       }
       if (active_project -> natomes && adv_bonding[0] && adv_bonding[1])

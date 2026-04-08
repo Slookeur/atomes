@@ -80,6 +80,8 @@ extern int render_image_box;
 extern int render_image_rep;
 extern int render_image_acolor;
 extern int render_image_pcolor;
+extern gboolean trigger_fragment_analysis;
+extern gboolean trigger_molecule_analysis;
 extern ColRGBA * render_image_back_color;
 extern int render_image_back_grad;
 extern int render_image_back_dir;
