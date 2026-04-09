@@ -417,23 +417,54 @@ int get_color_map_from_string (gchar * col_string)
 
   \brief convert Hexadecimal string to ColRGBA
 
-  \param color_string the color keyword from command line
+  \param color_string the color keyword from command line (formats: #RGB, RGB, #RGBA, RGBA, #RRGGBB, RRGGBB, #RRGGBBAA, RRGGBBAA).
 */
 ColRGBA * get_color_from_hexa_string (gchar * color_string)
 {
    ColRGBA * col = NULL;
   const char * color = color_string;
   // Ignorer le '#' si présent au début
-  if (color_string[0] == '#') color = color_string + 1;
+  if (color[0] == '#') color ++;
+
   size_t len = strlen(color);
-  if (len == 3 || len == 6)
+  if (len != 3 && len != 4 && len != 6 && len != 8)
   {
-    // Valid chain
-    col = g_malloc0(sizeof*col);
-    col -> red   = strtol(color + 0, NULL, 16) / 255.0;
-    col -> green = strtol(color + len/3, NULL, 16) / 255.0;
-    col -> blue  = strtol(color + 2*len/3, NULL, 16) / 255.0;
-    col -> alpha = 1.0;
+    // longueur de chaîne incompatible
+    return NULL;
+  }
+  // Format long ?
+  int is_long = (len == 6 || len == 8) ? TRUE : FALSE;
+  float ratio = (is_long) ? 255.0 : 15.0;
+  int incr = (is_long) ? 2 : 1;
+  col = g_malloc0(sizeof*col);
+  col -> alpha = 1.0;
+  char buf[3] = {0}; // pour les caractères à examiner
+  // Format court (#RGB ou #RGBA)
+  buf[incr] = '\0';
+  buf[0] = color[0];
+  if (is_long) buf[1] = color[1];
+  col->red = strtol(buf, NULL, 16) / ratio;
+  buf[0] = color[incr];
+  if (is_long) buf[1] = color[incr+1];
+  col->green = strtol(buf, NULL, 16) / ratio;
+  buf[0] = color[2*incr];
+  if (is_long) buf[1] = color[2*incr+1];
+  col->blue = strtol(buf, NULL, 16) / ratio;
+  if (len == 4 || len == 8)
+  {
+    buf[0] = color[3*incr];
+    if (is_long) buf[1] = color[3*incr+1];
+    col->alpha = strtol(buf, NULL, 16) / ratio;
+  }
+
+  // Safety net
+  if (col -> red < 0.0 || col -> red > 1.0 ||
+      col -> green < 0.0 || col -> green > 1.0 ||
+      col -> blue < 0.0 || col -> blue > 1.0 ||
+      col -> alpha < 0.0 || col -> alpha > 1.0)
+  {
+    g_free(col);
+    return NULL;
   }
   return col;
 }
