@@ -34,6 +34,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #define PROJECT_H_
 
 extern gboolean reading_project;
+extern atomes_error * project_error;
 
 #define IODEBUG FALSE
 

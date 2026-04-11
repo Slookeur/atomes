@@ -1527,9 +1527,9 @@ void prep_model (int p)
       if (reading_input)
       {
         adv_bonding[0] = (active_project -> natomes > ATOM_LIMIT) ? 0 : tmp_adv_bonding[0];
-        adv_bonding[1] = (active_project -> steps > STEP_LIMIT) ? 0 : tmp_adv_bonding[1];
+        adv_bonding[1] = (active_project -> steps > reading_step_limit) ? 0 : tmp_adv_bonding[1];
         frag_update = (active_project -> natomes > ATOM_LIMIT || trigger_fragment_analysis) ? 0 : 1;
-        mol_update = (trigger_molecule_analysis) ? 1 : (frag_update) ? ((active_project -> steps > STEP_LIMIT) ? 0 : 1) : 0;
+        mol_update = (trigger_molecule_analysis) ? 1 : (frag_update) ? ((active_project -> steps > reading_step_limit) ? 0 : 1) : 0;
       }
       else
       {

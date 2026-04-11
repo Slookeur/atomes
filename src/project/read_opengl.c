@@ -61,11 +61,11 @@ extern gboolean version_2_9_and_above;
 */
 int read_atom_a (FILE * fp, project * this_proj, int s, int a)
 {
-  if (fread (& this_proj -> atoms[s][a].id, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& this_proj -> atoms[s][a].sp, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& this_proj -> atoms[s][a].x, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& this_proj -> atoms[s][a].y, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& this_proj -> atoms[s][a].z, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& this_proj -> atoms[s][a].id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_A);
+  if (fread (& this_proj -> atoms[s][a].sp, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_A);
+  if (fread (& this_proj -> atoms[s][a].x, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_A);
+  if (fread (& this_proj -> atoms[s][a].y, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_A);
+  if (fread (& this_proj -> atoms[s][a].z, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_A);
   //g_debug ("Reading:: step= %d, at= %d, sp[%d]= %d, x[%d]= %f, y[%d]= %f, z[%d]= %f",
   //         s, a+1, a, this_proj -> atoms[s][a].sp, a, this_proj -> atoms[s][a].x, a, this_proj -> atoms[s][a].y, a, this_proj -> atoms[s][a].z);
   return OK;
@@ -83,9 +83,9 @@ int read_atom_a (FILE * fp, project * this_proj, int s, int a)
 */
 int read_atom_b (FILE * fp, project * this_proj, int s, int a)
 {
-  if (fread (this_proj -> atoms[s][a].show, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
-  if (fread (this_proj -> atoms[s][a].label, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
-  if (fread (& this_proj -> atoms[s][a].style, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (this_proj -> atoms[s][a].show, sizeof(gboolean), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_B);
+  if (fread (this_proj -> atoms[s][a].label, sizeof(gboolean), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_B);
+  if (fread (& this_proj -> atoms[s][a].style, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ATOM_B);
   int i, j, k, l, m;
   int * rings_ij;
   if (this_proj -> modelgl -> rings)
@@ -168,7 +168,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
   int * tmpcoo, * tmpcoord;
   if (! type)
   {
-    if (fread (& view -> ring_max[rid], sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& view -> ring_max[rid], sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_RINGS);
     if (view -> ring_max[rid])
     {
       view -> num_rings[rid] = allocdint (steps, size);
@@ -177,7 +177,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
       tmpcoo = allocint (size);
       for (i=0; i<steps; i++)
       {
-        if (fread (view -> num_rings[rid][i], sizeof(int), size, fp) != size) return ERROR_RW;
+        if (fread (view -> num_rings[rid][i], sizeof(int), size, fp) != size) return signal_error (__FILE__, __func__, __LINE__, ERROR_RINGS);
         view -> all_rings[rid][i] = g_malloc0(size*sizeof*view -> all_rings[rid][i]);
         view -> show_rpoly[rid][i] = g_malloc0(size*sizeof*view -> show_rpoly[rid][i]);
         for (j=0; j<size; j++)
@@ -187,10 +187,10 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
           {
             view -> all_rings[rid][i][j] = allocdint (view -> num_rings[rid][i][j], j+1);
             view -> show_rpoly[rid][i][j] = allocbool (view -> num_rings[rid][i][j]);
-            if (fread (view -> show_rpoly[rid][i][j], sizeof(int), view -> num_rings[rid][i][j], fp) != view -> num_rings[rid][i][j]) return ERROR_RW;
+            if (fread (view -> show_rpoly[rid][i][j], sizeof(int), view -> num_rings[rid][i][j], fp) != view -> num_rings[rid][i][j]) return signal_error (__FILE__, __func__, __LINE__, ERROR_RINGS);
             for (k=0; k<view -> num_rings[rid][i][j]; k++)
             {
-              if (fread (view -> all_rings[rid][i][j][k], sizeof(int), j+1, fp) != j+1) return ERROR_RW;
+              if (fread (view -> all_rings[rid][i][j][k], sizeof(int), j+1, fp) != j+1) return signal_error (__FILE__, __func__, __LINE__, ERROR_RINGS);
             }
           }
         }
@@ -224,7 +224,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
   }
   else
   {
-    if (fread (& view -> chain_max, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& view -> chain_max, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_CHAINS);
     if (view -> chain_max)
     {
       view -> num_chains = allocdint (steps, size);
@@ -232,7 +232,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
       tmpcoo = allocint (size);
       for (i=0; i<steps; i++)
       {
-        if (fread (view -> num_chains[i], sizeof(int), size, fp) != size) return ERROR_RW;
+        if (fread (view -> num_chains[i], sizeof(int), size, fp) != size) return signal_error (__FILE__, __func__, __LINE__, ERROR_CHAINS);
         view -> all_chains[i] = g_malloc0(size*sizeof*view -> all_chains[i]);
         for (j=0; j<size; j++)
         {
@@ -242,7 +242,7 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
             view -> all_chains[i][j] = allocdint (view -> num_chains[i][j], j+1);
             for (k=0; k<view -> num_chains[i][j]; k++)
             {
-              if (fread (view -> all_chains[i][j][k], sizeof(int), j+1, fp) != j+1) return ERROR_RW;
+              if (fread (view -> all_chains[i][j][k], sizeof(int), j+1, fp) != j+1) return signal_error (__FILE__, __func__, __LINE__, ERROR_CHAINS);
             }
           }
         }
@@ -286,15 +286,15 @@ int read_rings_chains_data (FILE * fp, glwin * view, int type, int rid, int size
 */
 int read_this_image_label (FILE * fp, screen_label * label)
 {
-  if (fread (& label -> position, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& label -> render, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& label -> scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& label -> shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
-  if (fread (& label -> n_colors, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& label -> position, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& label -> render, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& label -> scale, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& label -> shift, sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& label -> n_colors, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (label -> n_colors)
   {
     label -> color = g_malloc0(label -> n_colors*sizeof*label -> color);
-    if (fread (label -> color, sizeof(ColRGBA), label -> n_colors, fp) != label -> n_colors) return ERROR_RW;
+    if (fread (label -> color, sizeof(ColRGBA), label -> n_colors, fp) != label -> n_colors) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
   else if (label -> color)
   {
@@ -302,7 +302,7 @@ int read_this_image_label (FILE * fp, screen_label * label)
     label -> color = NULL;
   }
   label -> font = read_this_string (fp);
-  if (label -> font == NULL) return ERROR_RW;
+  if (label -> font == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   return OK;
 }
 
@@ -316,11 +316,11 @@ int read_this_image_label (FILE * fp, screen_label * label)
 */
 int read_this_box (FILE * fp, box * abc)
 {
-  if (fread (& abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-  if (fread (abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+  if (fread (& abc -> box, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& abc -> rad, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& abc -> line, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& abc -> color, sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (abc -> extra_cell, sizeof(int), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   return OK;
 }
 
@@ -334,35 +334,35 @@ int read_this_box (FILE * fp, box * abc)
 */
 int read_this_axis (FILE * fp, axis * xyz)
 {
-  if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> axis, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& xyz -> rad, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& xyz -> line, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (! version_2_9_and_above)
   {
     xyz -> color = g_malloc0(sizeof*xyz -> color);
-    if (fread (& xyz  -> color[0], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    if (fread (& xyz  -> color[0], sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     g_free (xyz -> color);
     xyz -> color = NULL;
   }
-  if (fread (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
-  if (fread (xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+  if (fread (& xyz -> t_pos, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& xyz -> length, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (xyz -> c_pos, sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   gboolean val;
   int i;
-  if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (fread (& val, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (val)
   {
     xyz -> color = g_malloc0(3*sizeof*xyz -> color);
     for (i=0; i<3; i++)
     {
-      if (fread (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+      if (fread (& xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
   }
-  if (fread (& xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& xyz -> labels, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   for (i=0; i<3; i++)
   {
     xyz -> title[i] = read_this_string (fp);
-    if (xyz -> title[i] == NULL) return ERROR_RW;
+    if (xyz -> title[i] == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
   return OK;
 }
@@ -386,77 +386,77 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   duplicate_background_data (img -> back, & default_background);
   if (version_2_8_and_above)
   {
-    if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> back -> gradient, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     if (img -> back -> gradient)
     {
-      if (fread (& img -> back -> direction, sizeof(int), 1, fp) != 1) return ERROR_RW;
-      if (fread (& img -> back -> position, sizeof(float), 1, fp) != 1) return ERROR_RW;
-      if (fread (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return ERROR_RW;
+      if (fread (& img -> back -> direction, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+      if (fread (& img -> back -> position, sizeof(float), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+      if (fread (img -> back -> gradient_color, sizeof(ColRGBA), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
     else
     {
-      if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+      if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
   }
   else
   {
     img -> back -> gradient = 0;
     img -> back -> position = 0.5;
-    if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> back -> color, sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
-  if (fread (img -> color_map, sizeof(int), 2, fp) != 2) return ERROR_RW;
+  if (fread (img -> color_map, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (img -> color_map[0] > ATOM_MAPS-1)
   {
     img -> color_map[0] -= 10;
-    if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     this_proj -> modelgl -> custom_map = allocate_color_map (j, this_proj);
     this_proj -> modelgl -> custom_map -> points = j;
-    if (fread (& this_proj -> modelgl -> custom_map -> cmax, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& this_proj -> modelgl -> custom_map -> cmin, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& this_proj -> modelgl -> custom_map -> cmax, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& this_proj -> modelgl -> custom_map -> cmin, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     this_proj -> modelgl -> custom_map -> positions = allocfloat (j);
     this_proj -> modelgl -> custom_map -> values = g_malloc0(j*sizeof*this_proj -> modelgl -> custom_map -> values);
-    if (fread (this_proj -> modelgl -> custom_map -> positions, sizeof(float), j, fp) != j) return ERROR_RW;
-    if (fread (this_proj -> modelgl -> custom_map -> values, sizeof(ColRGBA), j, fp) != j) return ERROR_RW;
+    if (fread (this_proj -> modelgl -> custom_map -> positions, sizeof(float), j, fp) != j) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (this_proj -> modelgl -> custom_map -> values, sizeof(ColRGBA), j, fp) != j) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     j = this_proj -> steps*this_proj -> natomes;
     for (i=0; i<this_proj -> steps; i++)
     {
-      if (fread (this_proj -> modelgl -> custom_map -> data[i], sizeof(float), this_proj -> natomes, fp) != this_proj -> natomes) return ERROR_RW;
+      if (fread (this_proj -> modelgl -> custom_map -> data[i], sizeof(float), this_proj -> natomes, fp) != this_proj -> natomes) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
     setup_custom_color_map (NULL, this_proj, FALSE);
   }
 
-  if (fread (& img -> cloned_poly, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> at_color, sizeof(ColRGBA), sid*2, fp) != sid*2) return ERROR_RW;
-  if (fread (img -> sphererad, sizeof(double), sid*2, fp) != sid*2) return ERROR_RW;
-  if (fread (img -> pointrad, sizeof(double), sid*2, fp) != sid*2) return ERROR_RW;
-  if (fread (img -> atomicrad, sizeof(double), sid*2, fp) != sid*2) return ERROR_RW;
+  if (fread (& img -> cloned_poly, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> at_color, sizeof(ColRGBA), sid*2, fp) != sid*2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> sphererad, sizeof(double), sid*2, fp) != sid*2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> pointrad, sizeof(double), sid*2, fp) != sid*2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> atomicrad, sizeof(double), sid*2, fp) != sid*2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
   for (i=0; i<sid*2; i++)
   {
-    if (fread (img -> bondrad[i], sizeof(double), 2*sid, fp) != 2*sid) return ERROR_RW;
-    if (fread (img -> linerad[i], sizeof(double), 2*sid, fp) != 2*sid) return ERROR_RW;
+    if (fread (img -> bondrad[i], sizeof(double), 2*sid, fp) != 2*sid) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> linerad[i], sizeof(double), 2*sid, fp) != 2*sid) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
-  if (fread (img -> radall, sizeof(double), 2, fp) != 2) return ERROR_RW;
-  if (fread (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (fread (img -> radall, sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> draw_clones, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (! version_2_8_and_above)
   {
     for (i=0; i<5; i++)
     {
-      if (fread (& img -> labels[i].position, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& img -> labels[i].position, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
     for (i=0; i<5; i++)
     {
-      if (fread (& img -> labels[i].render, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& img -> labels[i].render, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
     for (i=0; i<5; i++)
     {
-      if (fread (& img -> labels[i].scale, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& img -> labels[i].scale, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
-    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     for (i=0; i<5; i++)
     {
-      if (fread (img -> labels[i].shift, sizeof(double), 3, fp) != 3) return ERROR_RW;
-      if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+      if (fread (img -> labels[i].shift, sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+      if (fread (& val, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       if (val)
       {
         if (i < 2)
@@ -475,7 +475,7 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
         img -> labels[i].color = g_malloc0(j*sizeof*img -> labels[i].color);
         for (k=0; k<j; k++)
         {
-          if (fread (& img -> labels[i].color[k], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+          if (fread (& img -> labels[i].color[k], sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         }
       }
       else
@@ -488,92 +488,104 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
         }
       }
       img -> labels[i].font = read_this_string (fp);
-      if (img -> labels[i].font == NULL) return ERROR_RW;
+      if (img -> labels[i].font == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
 
-    if (fread (& img -> mtilt[0], sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> mtilt[0], sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     img -> mtilt[1] = img -> mtilt[0];
-    if (fread (& img -> mpattern[0], sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> mpattern[0], sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     img -> mpattern[1] = img -> mpattern[0];
-    if (fread (& img -> mfactor[0], sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> mfactor[0], sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     img -> mfactor[1] = img -> mfactor[0];
-    if (fread (& img -> mwidth[0], sizeof(double), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> mwidth[0], sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     img -> mwidth[1] = img -> mwidth[0];
   }
   else
   {
     for (i=0; i<5; i++)
     {
-      if (read_this_image_label (fp, & img -> labels[i])) return ERROR_RW;
+      if (read_this_image_label (fp, & img -> labels[i]) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_IMAGE;
+      }
     }
-    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return ERROR_RW;
-    if (fread (img -> mtilt, sizeof(gboolean), 2, fp) != 2) return ERROR_RW;
-    if (fread (img -> mpattern, sizeof(int), 2, fp) != 2) return ERROR_RW;
-    if (fread (img -> mfactor, sizeof(int), 2, fp) != 2) return ERROR_RW;
-    if (fread (img -> mwidth, sizeof(double), 2, fp) != 2) return ERROR_RW;
+    if (fread (img -> acl_format, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> mtilt, sizeof(gboolean), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> mpattern, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> mfactor, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> mwidth, sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
   }
-  if (fread (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return ERROR_RW;
+  if (fread (& img -> m_is_pressed, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
   // Model box and axis
   if (! version_2_8_and_above)
   {
-    if (fread (& img -> abc -> box, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> xyz -> axis, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> abc -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> xyz -> rad, sizeof(double), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> abc -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> xyz -> line, sizeof(double), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> abc -> color, sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
-    if (fread (img -> abc -> extra_cell, sizeof(int), 3, fp) != 3) return ERROR_RW;
+    if (fread (& img -> abc -> box, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> xyz -> axis, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> abc -> rad, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> xyz -> rad, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> abc -> line, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> xyz -> line, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> abc -> color, sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> abc -> extra_cell, sizeof(int), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     // Axis
-    if (fread (& img -> xyz -> t_pos, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> xyz -> length, sizeof(double), 1, fp) != 1) return ERROR_RW;
-    if (fread (img -> xyz -> c_pos, sizeof(double), 3, fp) != 3) return ERROR_RW;
+    if (fread (& img -> xyz -> t_pos, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> xyz -> length, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (img -> xyz -> c_pos, sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
-    if (fread (& val, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+    if (fread (& val, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     if (val)
     {
       img -> xyz -> color = g_malloc0(3*sizeof*img -> xyz -> color);
       for (i=0; i<3; i++)
       {
-        if (fread (& img -> xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return ERROR_RW;
+        if (fread (& img -> xyz -> color[i], sizeof(ColRGBA), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       }
     }
-    if (fread (& img -> xyz -> labels, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> xyz -> labels, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     for (i=0; i<3; i++)
     {
       img -> xyz -> title[i] = read_this_string (fp);
-      if (img -> xyz -> title[i] == NULL) return ERROR_RW;
+      if (img -> xyz -> title[i] == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     }
   }
   else
   {
     // Model box
-    if (read_this_box (fp, img -> abc)) return ERROR_RW;
+    if (read_this_box (fp, img -> abc) != OK)
+    {
+      update_error_trace (__FILE__, __func__, __LINE__-2);
+      return ERROR_IMAGE;
+    }
     // Axis
-    if (read_this_axis (fp, img -> xyz)) return ERROR_RW;
+    if (read_this_axis (fp, img -> xyz) != OK)
+    {
+      update_error_trace (__FILE__, __func__, __LINE__-2);
+      return ERROR_IMAGE;
+    }
   }
   // OpenGL
-  if (fread (& img -> p_depth, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gnear, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gfar, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gleft, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gright, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gtop, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> gbottom, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> rotation_quaternion, sizeof(vec4_t), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> rotation_mode, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> zoom, sizeof(GLdouble), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> c_shift, sizeof(GLdouble), 2, fp) != 2) return ERROR_RW;
-  if (fread (& img -> style, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> quality, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
+  if (fread (& img -> p_depth, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gnear, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gfar, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gleft, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gright, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gtop, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> gbottom, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> rotation_quaternion, sizeof(vec4_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> rotation_mode, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> zoom, sizeof(GLdouble), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> c_shift, sizeof(GLdouble), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> style, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> quality, sizeof(GLint), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (version_2_9_and_above)
   {
-    if (fread (& img -> ray_tracing, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> ray_tracing, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
-  if (fread (& img -> render, sizeof(GLint), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& img -> render, sizeof(GLint), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (img -> l_ghtning.spot != NULL)
   {
     g_free (img -> l_ghtning.spot);
@@ -582,27 +594,27 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   img -> l_ghtning.spot = g_malloc0(img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fread (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-    if (fread (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+    if (fread (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
-  if (fread (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
-  if (fread (img -> m_terial.param, sizeof(GLfloat), 6, fp) != 6) return ERROR_RW;
-  if (fread (& img -> f_g.mode, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> f_g.based, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> f_g.density, sizeof(float), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> f_g.depth, sizeof(float), 2, fp) != 2) return ERROR_RW;
-  if (fread (& img -> f_g.color, sizeof(vec3_t), 1, fp) != 1) return ERROR_RW;
+  if (fread (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (img -> m_terial.param, sizeof(GLfloat), 6, fp) != 6) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> f_g.mode, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> f_g.based, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> f_g.density, sizeof(float), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> f_g.depth, sizeof(float), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> f_g.color, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
-  if (fread (& img -> filled_type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> step, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fread (& img -> rep, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& img -> filled_type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> step, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+  if (fread (& img -> rep, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
 
   for (i=0; i<4; i++)
   {
@@ -610,41 +622,47 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     {
       for (j=0; j<sid; j++)
       {
-        if (fread (img -> spcolor[i][j], sizeof(ColRGBA), this_proj -> coord -> ntg[i][j], fp) != this_proj -> coord -> ntg[i][j]) return ERROR_RW;
+        if (fread (img -> spcolor[i][j], sizeof(ColRGBA), this_proj -> coord -> ntg[i][j], fp) != this_proj -> coord -> ntg[i][j]) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       }
     }
     else
     {
-      if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       if (j)
       {
         if (j != this_proj -> coord -> totcoord[i])
         {
-          g_warning ("READING OPENGL:: this should not happen !\n i= %d, totcoord[i]= %d, j= %d", i, this_proj -> coord -> totcoord[i], j);
-          return ERROR_RW;
+          return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         }
-        if (fread (img -> spcolor[i][0], sizeof(ColRGBA), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return ERROR_RW;
+        if (fread (img -> spcolor[i][0], sizeof(ColRGBA), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       }
     }
   }
   active_glwin = this_proj -> modelgl;
   active_image = this_proj -> modelgl -> anim -> last -> img;
   active_coord = this_proj -> coord;
-  if (fread (& this_proj -> modelgl -> rings, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (fread (& this_proj -> modelgl -> rings, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (this_proj -> modelgl -> rings)
   {
     for (i=0; i<5; i++)
     {
-      if (read_rings_chains_data (fp, this_proj -> modelgl, 0, i, this_proj -> rsparam[i][1], this_proj -> steps) != OK) return ERROR_RINGS;
+      if (read_rings_chains_data (fp, this_proj -> modelgl, 0, i, this_proj -> rsparam[i][1], this_proj -> steps) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_RINGS;
+      }
     }
   }
-  if (fread (& this_proj -> modelgl -> chains, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
+  if (fread (& this_proj -> modelgl -> chains, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (this_proj -> modelgl -> chains)
   {
-     if (read_rings_chains_data (fp, this_proj -> modelgl, 1, 0, this_proj -> csparam[5], this_proj -> steps) != OK) return ERROR_CHAINS;
+    if (read_rings_chains_data (fp, this_proj -> modelgl, 1, 0, this_proj -> csparam[5], this_proj -> steps) != OK)
+    {
+      update_error_trace (__FILE__, __func__, __LINE__-2);
+      return ERROR_CHAINS;
+    }
   }
-
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (i)
   {
     this_proj -> modelgl -> create_shaders[VOLMS] = TRUE;
@@ -653,23 +671,23 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
     {
       this_proj -> modelgl -> atoms_volume[i] = allocdouble (this_proj -> steps);
       this_proj -> modelgl -> atoms_ppvolume[i] = allocdouble (this_proj -> steps);
-      if (fread (this_proj -> modelgl -> atoms_volume[i], sizeof(double), this_proj -> steps, fp) != this_proj -> steps) return ERROR_RW;
-      if (fread (this_proj -> modelgl -> atoms_ppvolume[i], sizeof(double), this_proj -> steps, fp) != this_proj -> steps) return ERROR_RW;
+      if (fread (this_proj -> modelgl -> atoms_volume[i], sizeof(double), this_proj -> steps, fp) != this_proj -> steps) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+      if (fread (this_proj -> modelgl -> atoms_ppvolume[i], sizeof(double), this_proj -> steps, fp) != this_proj -> steps) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       this_proj -> modelgl -> volume_box[i] = allocddouble (this_proj -> steps, 9);
       for (j=0; j<this_proj -> steps; j++)
       {
-        if (fread (this_proj -> modelgl -> volume_box[i][j], sizeof(double), 9, fp) != 9) return ERROR_RW;
+        if (fread (this_proj -> modelgl -> volume_box[i][j], sizeof(double), 9, fp) != 9) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       }
     }
-    if (fread (this_proj -> modelgl -> comp_vol, sizeof(gboolean), FILLED_STYLES, fp) != FILLED_STYLES) return ERROR_RW;
-    if (fread (active_image -> show_vol, sizeof(gboolean), FILLED_STYLES, fp) != FILLED_STYLES) return ERROR_RW;
-    if (fread (active_image -> vol_col, sizeof(ColRGBA), FILLED_STYLES, fp) != FILLED_STYLES) return ERROR_RW;
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (this_proj -> modelgl -> comp_vol, sizeof(gboolean), FILLED_STYLES, fp) != FILLED_STYLES) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (active_image -> show_vol, sizeof(gboolean), FILLED_STYLES, fp) != FILLED_STYLES) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (active_image -> vol_col, sizeof(ColRGBA), FILLED_STYLES, fp) != FILLED_STYLES) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     if (i)
     {
       for (j=0; j<FILLED_STYLES; j++)
       {
-        if (fread (& k, sizeof(int), 1, fp) != 1) return ERROR_RW;
+        if (fread (& k, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         if (k)
         {
           this_proj -> modelgl -> frag_mol_volume[0][j] = allocddouble (this_proj -> steps, i);
@@ -679,23 +697,23 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
           this_proj -> modelgl -> frag_box[j] = alloctdouble (this_proj -> steps, i, 9);
           for (l=0; l<k; l++)
           {
-            if (fread (& m, sizeof(int), 1, fp) != 1) return ERROR_RW;
-            if (fread (& n, sizeof(int), 1, fp) != 1) return ERROR_RW;
-            if (fread (& this_proj -> modelgl -> frag_mol_ppvolume[0][j][m][n], sizeof(double), 1, fp) != 1) return ERROR_RW;
-            if (fread (this_proj -> modelgl -> frag_box[j][m][n], sizeof(double), 9, fp) != 9) return ERROR_RW;
+            if (fread (& m, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+            if (fread (& n, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+            if (fread (& this_proj -> modelgl -> frag_mol_ppvolume[0][j][m][n], sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+            if (fread (this_proj -> modelgl -> frag_box[j][m][n], sizeof(double), 9, fp) != 9) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
             this_proj -> modelgl -> fm_comp_vol[0][j][m][n] = TRUE;
           }
           active_image -> fm_vol_col[0][j] = g_malloc0(i*sizeof*active_image -> fm_vol_col[0][j]);
-          if (fread (active_image -> fm_show_vol[0][j], sizeof(gboolean), i, fp) != i) return ERROR_RW;
-          if (fread (active_image -> fm_vol_col[0][j], sizeof(ColRGBA), i, fp) != i) return ERROR_RW;
+          if (fread (active_image -> fm_show_vol[0][j], sizeof(gboolean), i, fp) != i) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+          if (fread (active_image -> fm_vol_col[0][j], sizeof(ColRGBA), i, fp) != i) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         }
       }
-      if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
       if (i)
       {
         for (j=0; j<FILLED_STYLES; j++)
         {
-          if (fread (& k, sizeof(int), 1, fp) != 1) return ERROR_RW;
+          if (fread (& k, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
           if (k)
           {
             this_proj -> modelgl -> frag_mol_volume[1][j] = allocddouble (this_proj -> steps, i);
@@ -704,14 +722,14 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
             active_image -> fm_show_vol[1][j] = allocbool (i);
             for (l=0; l<k; l++)
             {
-              if (fread (& m, sizeof(int), 1, fp) != 1) return ERROR_RW;
-              if (fread (& n, sizeof(int), 1, fp) != 1) return ERROR_RW;
-              if (fread (& this_proj -> modelgl -> frag_mol_ppvolume[1][j][m][n], sizeof(double), 1, fp) != 1) return ERROR_RW;
+              if (fread (& m, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+              if (fread (& n, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+              if (fread (& this_proj -> modelgl -> frag_mol_ppvolume[1][j][m][n], sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
               this_proj -> modelgl -> fm_comp_vol[1][j][m][n] = TRUE;
             }
-            if (fread (active_image -> fm_show_vol[1][j], sizeof(gboolean), i, fp) != i) return ERROR_RW;
+            if (fread (active_image -> fm_show_vol[1][j], sizeof(gboolean), i, fp) != i) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
             active_image -> fm_vol_col[1][j] = g_malloc0(i*sizeof*active_image -> fm_vol_col[1][j]);
-            if (fread (active_image -> fm_vol_col[1][j], sizeof(ColRGBA), i, fp) != i) return ERROR_RW;
+            if (fread (active_image -> fm_vol_col[1][j], sizeof(ColRGBA), i, fp) != i) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
           }
         }
       }
@@ -722,33 +740,37 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   {
     for (j=0; j< this_proj -> natomes; j++)
     {
-      if (read_atom_b (fp, this_proj, i, j) != OK) return ERROR_ATOM_B;
+      if (read_atom_b (fp, this_proj, i, j) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_ATOM_B;
+      }
     }
   }
   // Finally selection lists, bonds, angles and dihedrals
   for (i=0; i<2; i++)
   {
-    if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
     if (j)
     {
       for (k=0; k<j; k++)
       {
-        if (fread (& l, sizeof(int), 1, fp) != 1) return ERROR_RW;
+        if (fread (& l, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         process_selected_atom (this_proj, this_proj -> modelgl, l, 0, 0, i);
       }
       update_all_selections (this_proj -> modelgl, i);
       if (img -> selected[i] -> selected >= 2 && img -> selected[i] -> selected <= 20)
       {
         j = num_bonds (img -> selected[i] -> selected);
-        if (fread (img -> selected[i] -> selected_bonds, sizeof(int), j, fp) != j) return ERROR_RW;
+        if (fread (img -> selected[i] -> selected_bonds, sizeof(int), j, fp) != j) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
         if (img -> selected[i] -> selected >= 3)
         {
           j = num_angles (img -> selected[i] -> selected);
-          if (fread (img -> selected[i] -> selected_angles, sizeof(int), j, fp) != j) return ERROR_RW;
+          if (fread (img -> selected[i] -> selected_angles, sizeof(int), j, fp) != j) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
           if (img -> selected[i] -> selected >= 4 && img -> selected[i] -> selected <= 10)
           {
             j = num_dihedrals (img -> selected[i] -> selected);
-            if (fread (img -> selected[i] -> selected_dihedrals, sizeof(int), j, fp) != j) return ERROR_RW;
+            if (fread (img -> selected[i] -> selected_dihedrals, sizeof(int), j, fp) != j) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
           }
         }
       }

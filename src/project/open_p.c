@@ -239,41 +239,41 @@ void alloc_proj_data (project * this_proj, int cid)
 int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 {
   int i, j;
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
   if (i != this_analysis -> aid)
   {
     // This is not supposed to happen
-    return ERROR_ANA;
+    return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
   }
   this_analysis -> name = read_this_string (fp);
-  if (! this_analysis -> name) return ERROR_ANA;
-  if (fread (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> min, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> max, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> fact, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fread (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (! this_analysis -> name) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> min, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> max, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> fact, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fread (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
   if (this_analysis -> graph_res)
   {
-    if (fread (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (fread (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+    if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     if (i != this_analysis -> c_sets)
     {
       // This is not supposed to happen
-      return ERROR_ANA;
+      return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     }
-    if (fread (this_analysis -> compat_id, sizeof(int), this_analysis -> c_sets, fp) != this_analysis -> c_sets) return ERROR_ANA;
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (fread (this_analysis -> compat_id, sizeof(int), this_analysis -> c_sets, fp) != this_analysis -> c_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+    if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     if (i)
     {
       this_analysis -> x_title = read_this_string (fp);
-      if (! this_analysis -> x_title) return ERROR_ANA;
+      if (! this_analysis -> x_title) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     }
-    if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     if (i)
     {
       initcnames (this_proj, this_analysis -> aid);
@@ -282,7 +282,7 @@ int read_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
         // g_debug ("Reading :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
         if (read_project_curve (fp, wid, this_proj -> id) != OK)
         {
-          // error
+          update_error_trace (__FILE__, __func__, __LINE__-2);
           // g_debug ("Error :: analysis= %s, aid= %d, j= %d", this_analysis -> name, this_analysis -> aid, j);
           return ERROR_CURVE;
         }
@@ -310,7 +310,7 @@ int open_project (FILE * fp, int wid)
   gchar * version;
 
   version = read_this_string (fp);
-  if (! version) return ERROR_PROJECT;
+  if (! version) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
 
   version_2_6_and_above = FALSE;
   version_2_7_and_above = FALSE;
@@ -343,6 +343,7 @@ int open_project (FILE * fp, int wid)
   }
   // End version related tests
 
+  reading_step_limit = (version_2_9_and_above) ? STEP_LIMIT : STEP_LIMIT*10;
   // Temporary buffers for version compatibility < 2.9
   gboolean * tmp_avail, * tmp_init, * tmp_calc;
   int * tmp_num_delta;
@@ -357,25 +358,25 @@ int open_project (FILE * fp, int wid)
 
   // After that we read the data
   active_project -> name = read_this_string (fp);
-  if (active_project -> name == NULL) return ERROR_PROJECT;
+  if (active_project -> name == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
 #ifdef DEBUG
   g_debug ("OPEN_PROJECT: Project name= %s",active_project -> name);
 #endif
-  if (fread (& active_project -> tfile, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fread (& active_project -> tfile, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (active_project -> tfile > -1)
   {
     active_project -> coordfile = read_this_string (fp);
-    if (active_project -> coordfile == NULL) return ERROR_PROJECT;
+    if (active_project -> coordfile == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (i > -1)
   {
     active_project -> bondfile = read_this_string (fp);
-    if (active_project -> bondfile == NULL) return ERROR_PROJECT;
+    if (active_project -> bondfile == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   if (version_2_9_and_above)
   {
-    if (fread (& calcs_to_read, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fread (& calcs_to_read, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   else
   {
@@ -385,18 +386,18 @@ int open_project (FILE * fp, int wid)
     tmp_avail = allocbool (calcs_to_read);
     tmp_init = allocbool (calcs_to_read);
     tmp_calc = allocbool (calcs_to_read);
-    if (fread (tmp_avail, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-    if (fread (tmp_init, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-    if (fread (tmp_calc, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_avail, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (tmp_init, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (tmp_calc, sizeof(gboolean), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_project -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_cell -> pbc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_cell -> frac, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_cell -> ltype,  sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& i,  sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (i > 1 && i != active_project -> steps) return ERROR_PROJECT;
+  if (fread (& active_project -> nspec, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_project -> natomes, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_project -> steps, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_cell -> pbc, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_cell -> frac, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_cell -> ltype,  sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& i,  sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (i > 1 && i != active_project -> steps) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (i > 1) active_cell -> npt = TRUE;
   active_cell -> box = g_malloc0(i*sizeof*active_cell -> box);
   active_box = & active_cell -> box[0];
@@ -404,84 +405,84 @@ int open_project (FILE * fp, int wid)
   {
     for (k=0; k<3; k++)
     {
-      if (fread (active_cell -> box[j].vect[k],  sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
+      if (fread (active_cell -> box[j].vect[k],  sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
-    if (fread (active_cell -> box[j].param[0],  sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
-    if (fread (active_cell -> box[j].param[1],  sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
+    if (fread (active_cell -> box[j].param[0],  sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (active_cell -> box[j].param[1],  sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& active_cell -> crystal, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fread (& active_cell -> crystal, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (active_cell -> crystal && i)
   {
     active_cell -> sp_group = g_malloc0(sizeof*active_cell -> sp_group);
     active_cell -> sp_group -> id = i;
     active_cell -> sp_group -> bravais = read_this_string (fp);
-    if (! active_cell -> sp_group -> bravais) return ERROR_PROJECT;
+    if (! active_cell -> sp_group -> bravais) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     active_cell -> sp_group -> hms = read_this_string (fp);
-    if (! active_cell -> sp_group -> hms) return ERROR_PROJECT;
+    if (! active_cell -> sp_group -> hms) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     active_cell -> sp_group -> setting = read_this_string (fp);
-    if (! active_cell -> sp_group -> setting) return ERROR_PROJECT;
+    if (! active_cell -> sp_group -> setting) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+  if (fread (& active_project -> run, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (& active_project -> initgl, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (active_project -> tmp_pixels, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (atomes_render_image  && ! render_image_pixels) render_image_pixels = duplicate_int (2, active_project -> tmp_pixels);
   if (! version_2_9_and_above)
   {
     // Temporary buffers again
     tmp_num_delta = allocint (calcs_to_read);
     tmp_delta = allocdouble (calcs_to_read);
-    if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-    if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_num_delta, sizeof(int), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (tmp_delta, sizeof(double), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   else
   {
     // Analysis data for k-points sampling
     for (i=0; i<2; i++)
     {
-      if (fread (active_project -> sk_advanced[i], sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+      if (fread (active_project -> sk_advanced[i], sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
   }
-  if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+  if (fread (active_project -> rsearch, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   for (i=0; i<5; i++)
   {
-    if (fread (active_project -> rsparam[i], sizeof(int), 6, fp) != 6) return ERROR_PROJECT;
-    if (fread (active_project -> rsdata[i], sizeof(double), 5, fp) != 5) return ERROR_PROJECT;
+    if (fread (active_project -> rsparam[i], sizeof(int), 6, fp) != 6) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (active_project -> rsdata[i], sizeof(double), 5, fp) != 5) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& active_project -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
-  if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+  if (fread (& active_project -> csearch, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (active_project -> csparam, sizeof(int), 7, fp) != 7) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fread (active_project -> csdata, sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (! version_2_9_and_above)
   {
     // Temporary buffers again
     tmp_min = allocdouble (calcs_to_read);
     tmp_max = allocdouble (calcs_to_read);
-    if (fread (tmp_min, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
-    if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return ERROR_PROJECT;
+    if (fread (tmp_min, sizeof(double), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (tmp_max, sizeof(double), calcs_to_read, fp) != calcs_to_read) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fread (& active_project -> tunit, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (version_2_9_and_above)
   {
     if (active_project -> steps)
     {
-      if (fread (& active_project -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-      if (fread (& active_project -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+      if (fread (& active_project -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+      if (fread (& active_project -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (! active_project -> skt_all_sets)
       {
-        if (fread (& active_project -> skt_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+        if (fread (& active_project -> skt_n_data_sets, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
         if (active_project -> skt_n_data_sets)
         {
           active_project -> skt_step_id = allocint (active_project -> skt_n_data_sets);
-          if (fread (active_project -> skt_step_id, sizeof(int), active_project -> skt_n_data_sets, fp) != active_project -> skt_n_data_sets) return ERROR_PROJECT;
+          if (fread (active_project -> skt_step_id, sizeof(int), active_project -> skt_n_data_sets, fp) != active_project -> skt_n_data_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
         }
       }
-      if (fread (& active_project -> sqw_n_data_sets, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (fread (& active_project -> sqw_n_data_sets, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (active_project -> sqw_n_data_sets)
       {
         active_project -> sqw_q_id = allocdouble (active_project -> sqw_n_data_sets);
-        if (fread (active_project -> sqw_q_id, sizeof(double), active_project -> sqw_n_data_sets, fp) != active_project -> sqw_n_data_sets) return ERROR_PROJECT;
+        if (fread (active_project -> sqw_q_id, sizeof(double), active_project -> sqw_n_data_sets, fp) != active_project -> sqw_n_data_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       }
-      if (fread (& active_project -> sqw_freq, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (fread (& active_project -> sqw_freq, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
   }
   if (active_project -> natomes != 0 && active_project -> nspec != 0)
@@ -493,19 +494,19 @@ int open_project (FILE * fp, int wid)
       for (i=0; i<active_project -> nspec; i++)
       {
         active_chem -> label[i] = read_this_string (fp);
-        if (! active_chem -> label[i]) return ERROR_PROJECT;
+        if (! active_chem -> label[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
         active_chem -> element[i] = read_this_string (fp);
-        if (! active_chem -> element[i]) return ERROR_PROJECT;
+        if (! active_chem -> element[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       }
     }
-    if (fread (active_chem -> nsps, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
-    if (fread (active_chem -> formula, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
+    if (fread (active_chem -> nsps, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fread (active_chem -> formula, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     j = 0;
     for (i=0; i<active_project -> nspec; i++) j+= active_chem -> nsps[i];
-    if (j != active_project -> natomes) return ERROR_PROJECT;
+    if (j != active_project -> natomes) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     for (i=0; i<CHEM_PARAMS; i++)
     {
-      if (fread (active_chem -> chem_prop[i], sizeof(double), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
+      if (fread (active_chem -> chem_prop[i], sizeof(double), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
     if (! version_2_7_and_above)
     {
@@ -514,16 +515,20 @@ int open_project (FILE * fp, int wid)
         active_chem -> chem_prop[CHEM_X][i] = active_chem -> chem_prop[CHEM_Z][i];
       }
     }
-    if (fread (& active_chem -> grtotcutoff, sizeof(double), 1, fp) != 1) return ERROR_PROJECT;
+    if (fread (& active_chem -> grtotcutoff, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     for ( i = 0 ; i < active_project -> nspec ; i ++ )
     {
-      if (fread (active_chem -> cutoffs[i], sizeof(double), active_project -> nspec, fp) != active_project -> nspec) return ERROR_PROJECT;
+      if (fread (active_chem -> cutoffs[i], sizeof(double), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
     for (i=0; i<active_project -> steps; i++)
     {
       for (j=0; j< active_project -> natomes; j++)
       {
-        if (read_atom_a (fp, active_project, i, j) != OK) return ERROR_ATOM_A;
+        if (read_atom_a (fp, active_project, i, j) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_ATOM_A;
+        }
       }
     }
     init_box_calc ();
@@ -551,10 +556,10 @@ int open_project (FILE * fp, int wid)
           {
             if (active_project -> analysis[i])
             {
-              j = read_analysis (fp, active_project, active_project -> analysis[i], wid);
-              if (j != OK)
+              if (read_analysis (fp, active_project, active_project -> analysis[i], wid) != OK)
               {
-                return j;
+                update_error_trace (__FILE__, __func__, __LINE__-2);
+                return ERROR_ANA;
               }
             }
           }
@@ -585,14 +590,14 @@ int open_project (FILE * fp, int wid)
           g_free (tmp_num_delta);
           g_free (tmp_min);
           g_free (tmp_max);
-          if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+          if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
 #ifdef DEBUG
           g_debug ("\n**********************************************\n curves to read= %d\n**********************************************\n", i);
 #endif
           if (i != 0)
           {
             j = 0;
-            if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+            if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
             if (j)
             {
               active_project -> analysis[SPH] -> numc = j;
@@ -602,14 +607,14 @@ int open_project (FILE * fp, int wid)
               for (k=0; k<j; k++)
               {
                 active_project -> analysis[SPH] -> curves[k] -> name = read_this_string (fp);
-                if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return ERROR_PROJECT;
+                if (active_project -> analysis[SPH] -> curves[k] -> name == NULL) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
               }
             }
             for (j=0; j<i; j++)
             {
               if (read_project_curve (fp, wid, activep) != OK)
               {
-                // error
+                update_error_trace (__FILE__, __func__, __LINE__-2);
                 return ERROR_CURVE;
               }
             }
@@ -619,7 +624,7 @@ int open_project (FILE * fp, int wid)
       }
       else
       {
-        return ERROR_PROJECT;
+        return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       }
     }
   }
@@ -631,55 +636,84 @@ int open_project (FILE * fp, int wid)
 #ifdef DEBUG
   // debugioproj (active_project, "READ INIT");
 #endif
-  if (update_project() == 1)
+  if (update_project() != 1)
+  {
+    update_error_trace (__FILE__, __func__, __LINE__-3);
+    return ERROR_UPDATE;
+  }
+  else
   {
     if (active_project -> initgl)
     {
       gboolean tmp_bonding;
-      if (fread (& tmp_bonding, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
-      if (fread (tmp_adv_bonding, sizeof(gboolean), 2, fp) != 2) return ERROR_PROJECT;
+      if (fread (& tmp_bonding, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+      if (fread (tmp_adv_bonding, sizeof(gboolean), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       apply_project (TRUE);
       if (! atomes_render_image) fill_tool_model ();
       int tmpcoord[10];
-      if (fread (tmpcoord, sizeof(int), 10, fp) != 10) return ERROR_PROJECT;
+      if (fread (tmpcoord, sizeof(int), 10, fp) != 10) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (active_glwin -> bonding)
       {
-        for (i=0; i<2; i++) if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return ERROR_PROJECT;
+        for (i=0; i<2; i++) if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
         for (i=2; i<4; i++)
         {
           if (active_glwin -> adv_bonding[i-2])
           {
-            if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return ERROR_PROJECT;
+            if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
           }
         }
       }
       for (i=0; i<10; i++) active_project -> coord -> totcoord[i] = tmpcoord[i];
       // Read molecule info
-      if ((active_project -> natomes > ATOM_LIMIT || active_project -> steps > STEP_LIMIT) && tmp_adv_bonding[1])
+      if ((active_project -> natomes > ATOM_LIMIT || active_project -> steps > reading_step_limit) && tmp_adv_bonding[1])
       {
-        if (read_mol (fp) != OK) return ERROR_MOL;
+        if (read_mol (fp) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_MOL;
+        }
       }
       for (i=0; i<2; i++) active_glwin -> adv_bonding[i] = tmp_adv_bonding[i];
       active_glwin -> bonding = tmp_bonding;
 
-      if (read_bonding (fp) != OK) return ERROR_COORD;
-      i = read_opengl_image (fp, active_project, active_glwin -> anim -> last -> img, active_project -> nspec);
-      if (i != OK) return i;
+      if (read_bonding (fp) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_COORD;
+      }
 
-      i = read_dlp_field_data (fp, active_project);
-      if (i != OK) return i;
-      i = read_lmp_field_data (fp, active_project);
-      if (i != OK) return i;
+      if (read_opengl_image (fp, active_project, active_glwin -> anim -> last -> img, active_project -> nspec) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_IMAGE;
+      }
+
+      if (read_dlp_field_data (fp, active_project) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_FIELD;
+      }
+      if (read_lmp_field_data (fp, active_project) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_FIELD;
+      }
 
       for (i=0; i<2; i++)
       {
-        j = read_cpmd_data (fp, i, active_project);
-        if (j != OK) return j;
+        if (read_cpmd_data (fp, i, active_project) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_QM;
+        }
       }
       for (i=0; i<2; i++)
       {
-        j = read_cp2k_data (fp, i, active_project);
-        if (j != OK) return j;
+        if (read_cp2k_data (fp, i, active_project) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_QM;
+        }
       }
 #ifdef GTK3
       // GTK3 Menu Action To Check
@@ -688,9 +722,5 @@ int open_project (FILE * fp, int wid)
       return OK;
     }
     return OK;
-  }
-  else
-  {
-    return ERROR_UPDATE;
   }
 }

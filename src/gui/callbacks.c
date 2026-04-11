@@ -32,6 +32,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  int signal_error (gchar * file, gchar * func, int error_line, int error_id);
   int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile);
   int open_save_workspace (FILE * fp, int act);
   int prep_chem_data ();
@@ -40,6 +41,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   int open_coordinate_file (int id);
 
   void quit_gtk ();
+  void update_error_trace (gchar * file, gchar * func, int trace_line);
   void open_this_proj (gpointer data, gpointer user_data);
   void run_project ();
   void apply_project (gboolean showtools);
@@ -150,6 +152,84 @@ G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
 
 gboolean save = TRUE;
 
+atomes_error * project_error = NULL;
+atomes_error_signal errors_messages[] = {{ ERROR_RW,      "I/O error"},
+                                         { ERROR_PROJECT, "project information"},
+                                         { ERROR_CURVE,   "curve(s) information"},
+                                         { ERROR_IMAGE,   "OpenGL information"},
+                                         { ERROR_ATOM_A,  "atom's data - A"},
+                                         { ERROR_ATOM_B,  "atom's data - B"},
+                                         { ERROR_UPDATE,  "updating project"},
+                                         { ERROR_NO_WAY,  "this should not happen"},
+                                         { ERROR_COORD,   "coordination data"},
+                                         { ERROR_RINGS,   "ring(s) data"},
+                                         { ERROR_CHAINS,  "chain(s) data"},
+                                         { ERROR_MOL,     "molecule(s) data"},
+                                         { ERROR_ANA,     "analysis data"},
+                                         { ERROR_QM,      "ab-initio data"},
+                                         { ERROR_FIELD,   "classical data"}};
+
+/*!
+  \fn int signal_error (gchar * file, gchar * func, int error_line, int error_id)
+
+  \brief store atomes files I/O error information
+
+  \param file the file where the error occured
+  \param func the function where the error occured
+  \param error_line the line at witch the error occured
+  \param error_id the error ID
+*/
+int signal_error (const char * file, const char * func, int error_line, int error_id)
+{
+  project_error -> error_file = g_strdup_printf("%s", file);
+  project_error -> error_func = g_strdup_printf("%s", func);
+  project_error -> error_line = error_line;
+  project_error -> error_signal = errors_messages[error_id-1];
+  return error_line;
+}
+
+/*!
+  \fn void update_error_trace (gchar * file, gchar * func, int trace_line)
+
+  \brief update atomes files I/O error traceback
+
+  \param file the file where the call was made
+  \param func the function the call was made to
+  \param error_line the line at witch the call was made
+*/
+void update_error_trace (const char * file, const char * func, int trace_line)
+{
+  if (project_error -> trace_id)
+  {
+    int i;
+    gchar * tmp_trace = g_strdup_printf ("%s\n", project_error -> error_trace);
+    for (i=0; i<project_error -> trace_id+1; i++)
+    {
+      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
+    }
+    tmp_trace = g_strdup_printf ("%sFile: %s\n", tmp_trace, file);
+    for (i=0; i<project_error -> trace_id+1; i++)
+    {
+      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
+    }
+    tmp_trace = g_strdup_printf ("%sFunction: %s()\n", tmp_trace, func);
+    for (i=0; i<project_error -> trace_id+1; i++)
+    {
+      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
+    }
+    tmp_trace = g_strdup_printf ("%sLine: %d\n", tmp_trace, trace_line);
+
+    g_free (project_error -> error_trace);
+    project_error -> error_trace = g_strdup_printf ("%s", tmp_trace);
+    g_free (tmp_trace);
+  }
+  else
+  {
+    project_error -> error_trace = g_strdup_printf("\t\tFile: %s\n\t\tFunction: %s()\n\t\tLine : %d", file, func, trace_line);
+  }
+  project_error -> trace_id ++;
+}
+
 /*!
   \fn int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
 
@@ -165,22 +245,14 @@ gboolean save = TRUE;
 int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
 {
   int j;
-  gchar * err;
-
+  project_error = g_malloc0(sizeof*project_error);
   if (act == 0)
   {
     reading_input = TRUE;
     j = open_project (fp, wid);
     reading_input = FALSE;
-    if (j != 0)
+    if (j != OK)
     {
-      // error at read
-      if (pfile != NULL)
-      {
-        err = g_strdup_printf ("Impossible to open project file: \n%s\nError code: %d\n", pfile, j);
-        show_error (err, 0, MainWindow);
-        g_free (err);
-      }
       to_close_this_project (aid, active_project);
     }
     else
@@ -200,21 +272,38 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
   else
   {
     j = save_project (fp, get_project_by_id(pid), wid);
-    if (j != 0)
-    {
-      // error at write
-      if (pfile != NULL)
-      {
-        err = g_strdup_printf ("Impossible to save project file:\n%s\nError code: %d\n", pfile, j);
-        show_error (err, 0, MainWindow);
-        g_free (err);
-      }
-    }
-    else
+    if (j == OK)
     {
       if (pfile != NULL) get_project_by_id(pid) -> projfile = g_strdup_printf ("%s", pfile);
     }
   }
+  if (j != OK)
+  {
+    if (pfile != NULL)
+    {
+      gchar * err;
+      err = g_strdup_printf ("Impossible to %s project file: \n\n"
+                             "\t\t%s\n\n"
+                             "\tError %s %s, at:\n"
+                             "\t\tFile: <b>%s</b>\n"
+                             "\t\tFunction: <b>%s()</b>\n"
+                             "\t\tLine: <b>%d</b>\n\n"
+                             "\tBacktrace:\n%s\t\t →\t\t <i>call to </i><b>%s()</b>\n",
+                             (! act) ? "open" : "save",
+                             pfile,
+                             (! act) ? "reading" : "saving",
+                             project_error -> error_signal.message,
+                             project_error -> error_file,
+                             project_error -> error_func,
+                             project_error -> error_line,
+                             project_error -> error_trace,
+                             project_error -> error_func);
+      show_error (err, 0, MainWindow);
+      g_free (err);
+    }
+  }
+  g_free (project_error);
+  project_error = NULL;
   return j;
 }
 

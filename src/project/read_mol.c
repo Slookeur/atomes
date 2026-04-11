@@ -69,17 +69,17 @@ int read_atom_m (FILE * fp, int s, int a)
 */
 int read_this_mol (FILE * fp, molecule * tmp)
 {
-  if (fread (& tmp -> id, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> md, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> multiplicity, sizeof(int), 1, fp) != 1) return 0;
-  if (! tmp -> multiplicity) return 0;
+  if (fread (& tmp -> id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> md, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> multiplicity, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (! tmp -> multiplicity) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
   tmp -> fragments = allocint (tmp -> multiplicity);
-  if (fread (tmp -> fragments, sizeof(int), tmp -> multiplicity, fp) != tmp -> multiplicity) return 0;
-  if (fread (& tmp -> natoms, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> nspec, sizeof(int), 1, fp) != 1) return 0;
+  if (fread (tmp -> fragments, sizeof(int), tmp -> multiplicity, fp) != tmp -> multiplicity) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> natoms, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> nspec, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
   tmp -> species = allocint (active_project -> nspec);
-  if (fread (tmp -> species, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return 0;
-  return 1;
+  if (fread (tmp -> species, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  return OK;
 }
 
 /*!
@@ -92,13 +92,13 @@ int read_this_mol (FILE * fp, molecule * tmp)
 int read_mol (FILE * fp)
 {
   int i, j;
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_MOL;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
   if (! i) return OK;
   active_project -> modelfc = g_malloc0(sizeof*active_project -> modelfc);
   for (i=1; i<4; i++)
   {
-    if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_MOL;
-    if (i == 1 && j != active_coord -> totcoord[1]) return ERROR_MOL;
+    if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+    if (i == 1 && j != active_coord -> totcoord[1]) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
     if (i > 1) active_coord -> totcoord[i] = j;
   }
   active_project -> modelfc -> mol_by_step = allocint (active_project -> steps);
@@ -114,14 +114,22 @@ int read_mol (FILE * fp)
   {
     for (j=0; j<active_project -> modelfc -> mol_by_step[i]; j++)
     {
-      if (! read_this_mol(fp, & active_project -> modelfc -> mols[i][j])) return ERROR_MOL;
+      if (read_this_mol(fp, & active_project -> modelfc -> mols[i][j]) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_MOL;
+      }
     }
   }
   for (i=0; i<active_project -> steps; i++)
   {
     for (j=0; j< active_project -> natomes; j++)
     {
-      if (read_atom_m (fp, i, j) != OK) return ERROR_MOL;
+      if (read_atom_m (fp, i, j) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_MOL;
+      }
     }
   }
 

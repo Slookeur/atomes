@@ -86,28 +86,28 @@ int save_this_string (FILE * fp, gchar * string)
 int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analysis, int wid)
 {
   int i, j;
-  if (fwrite (& this_analysis -> aid, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-  if (save_this_string (fp, this_analysis -> name) != OK) return ERROR_ANA;
-  if (fwrite (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> min, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> max, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> fact, sizeof(double), 1, fp) != 1) return ERROR_ANA;
-  if (fwrite (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return ERROR_ANA;
+  if (fwrite (& this_analysis -> aid, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (save_this_string (fp, this_analysis -> name) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> avail_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> init_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> calc_ok, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> requires_md, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> num_delta, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> delta, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> min, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> max, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> fact, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+  if (fwrite (& this_analysis -> graph_res, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
   if (this_analysis -> graph_res)
   {
-    if (fwrite (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-    if (fwrite (& this_analysis -> c_sets, sizeof(int), 1, fp) != 1) return ERROR_ANA;
-    if (fwrite (this_analysis -> compat_id, sizeof(int), this_analysis -> c_sets, fp) != this_analysis -> c_sets) return ERROR_ANA;
+    if (fwrite (& this_analysis -> numc, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+    if (fwrite (& this_analysis -> c_sets, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
+    if (fwrite (this_analysis -> compat_id, sizeof(int), this_analysis -> c_sets, fp) != this_analysis -> c_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     i = (this_analysis -> x_title) ? 1 : 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     if (this_analysis -> x_title)
     {
-      if (save_this_string (fp, this_analysis -> x_title) != OK) return ERROR_ANA;
+      if (save_this_string (fp, this_analysis -> x_title) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     }
     if (this_analysis -> curves)
     {
@@ -116,14 +116,18 @@ int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
       {
         if (this_analysis -> curves[j] -> ndata) i ++;
       }
-      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
       if (i)
       {
         for (j=0; j<this_analysis -> numc; j++)
         {
           if (this_analysis -> curves[j] -> ndata)
           {
-            if (save_project_curve (fp, this_proj, wid, this_analysis -> aid, j) != OK) return ERROR_CURVE;
+            if (save_project_curve (fp, this_proj, wid, this_analysis -> aid, j) != OK)
+            {
+              update_error_trace (__FILE__, __func__, __LINE__-2);
+              return ERROR_CURVE;
+            }
           }
         }
       }
@@ -131,7 +135,7 @@ int save_analysis (FILE * fp, project * this_proj, atomes_analysis * this_analys
     else
     {
       i = 0;
-      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_ANA;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_ANA);
     }
   }
   return OK;
@@ -158,122 +162,131 @@ int save_project (FILE * fp, project * this_proj, int wid)
   if (save_this_string (fp, ver) != OK)
   {
     g_free (ver);
-    return ERROR_PROJECT;
+    return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   g_free (ver);
-  if (save_this_string (fp, this_proj -> name) != OK) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> tfile, sizeof(this_proj -> tfile), 1, fp) != 1) return ERROR_PROJECT;
+  if (save_this_string (fp, this_proj -> name) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> tfile, sizeof(this_proj -> tfile), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (this_proj -> tfile > -1)
   {
-    if (save_this_string (fp, this_proj -> coordfile) != OK) return ERROR_PROJECT;
+    if (save_this_string (fp, this_proj -> coordfile) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   if (this_proj -> bondfile != NULL)
   {
-    if (save_this_string (fp, this_proj -> bondfile) != OK) return ERROR_PROJECT;
+    if (save_this_string (fp, this_proj -> bondfile) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   else
   {
     i = -1;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   //Note: we now save the number of analysis available at this version of the project file
   i = NCALCS;
-  if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> nspec, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> natomes, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> steps, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> cell.pbc, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> cell.frac, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> cell.ltype, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> nspec, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> natomes, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> steps, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> cell.pbc, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> cell.frac, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> cell.ltype, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   i = (this_proj -> cell.npt) ? this_proj -> steps : 1;
-  if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   for (j=0; j<i; j++)
   {
     for (k=0; k<3; k++)
     {
-      if (fwrite (this_proj -> cell.box[j].vect[k], sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
+      if (fwrite (this_proj -> cell.box[j].vect[k], sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
-    if (fwrite (this_proj -> cell.box[j].param[0], sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
-    if (fwrite (this_proj -> cell.box[j].param[1], sizeof(double), 3, fp) != 3) return ERROR_PROJECT;
+    if (fwrite (this_proj -> cell.box[j].param[0], sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fwrite (this_proj -> cell.box[j].param[1], sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fwrite (& this_proj -> cell.crystal, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_proj -> cell.crystal, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (this_proj -> cell.sp_group)
   {
-    if (fwrite (& this_proj -> cell.sp_group -> id, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-    if (save_this_string (fp, this_proj -> cell.sp_group -> bravais) != OK) return ERROR_PROJECT;
-    if (save_this_string (fp, this_proj -> cell.sp_group -> hms) != OK) return ERROR_PROJECT;
-    if (save_this_string (fp, this_proj -> cell.sp_group -> setting) != OK) return ERROR_PROJECT;
+    if (fwrite (& this_proj -> cell.sp_group -> id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (save_this_string (fp, this_proj -> cell.sp_group -> bravais) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (save_this_string (fp, this_proj -> cell.sp_group -> hms) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (save_this_string (fp, this_proj -> cell.sp_group -> setting) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   else
   {
     i = 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
 
-  if (fwrite (& this_proj -> run, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (& this_proj -> initgl, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (this_proj -> modelgl -> pixels, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+  if (fwrite (& this_proj -> run, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (& this_proj -> initgl, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (this_proj -> modelgl -> pixels, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   // Analysis data for k-points sampling
   for (i=0; i<2; i++)
   {
-    if (fwrite (this_proj -> sk_advanced[i], sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+    if (fwrite (this_proj -> sk_advanced[i], sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
   // Next lines are calculation data related to rings and chains statistics
-  if (fwrite (this_proj -> rsearch, sizeof(int), 2, fp) != 2) return ERROR_PROJECT;
+  if (fwrite (this_proj -> rsearch, sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   for (i=0; i<5; i++)
   {
-    if (fwrite (this_proj -> rsparam[i], sizeof(int), 6, fp) != 6) return ERROR_PROJECT;
-    if (fwrite (this_proj -> rsdata[i], sizeof(double), 5, fp) != 5) return ERROR_PROJECT;
+    if (fwrite (this_proj -> rsparam[i], sizeof(int), 6, fp) != 6) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fwrite (this_proj -> rsdata[i], sizeof(double), 5, fp) != 5) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (fwrite (& this_proj -> csearch, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-  if (fwrite (this_proj -> csparam, sizeof(int), 7, fp) != 7) return ERROR_PROJECT;
-  if (fwrite (this_proj -> csdata, sizeof(double), 2, fp) != 2) return ERROR_PROJECT;
+  if (fwrite (& this_proj -> csearch, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (this_proj -> csparam, sizeof(int), 7, fp) != 7) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  if (fwrite (this_proj -> csdata, sizeof(double), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   // Time unit for dynamical calculations, delta t and steps are stored in MSD analysis
-  if (fwrite (& this_proj -> tunit, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+  if (fwrite (& this_proj -> tunit, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   if (this_proj -> steps)
   {
-    if (fwrite (& this_proj -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
-    if (fwrite (& this_proj -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& this_proj -> skt_corr_threshold, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fwrite (& this_proj -> skt_all_sets, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     if (! this_proj -> skt_all_sets)
     {
       i = (this_proj -> skt_step_id) ? this_proj -> skt_n_data_sets : 0;
-      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (i)
       {
-        if (fwrite (this_proj -> skt_step_id, sizeof(int), this_proj -> skt_n_data_sets, fp) != this_proj -> skt_n_data_sets) return ERROR_PROJECT;
+        if (fwrite (this_proj -> skt_step_id, sizeof(int), this_proj -> skt_n_data_sets, fp) != this_proj -> skt_n_data_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       }
     }
     i = (this_proj -> sqw_q_id) ? this_proj -> sqw_n_data_sets : 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     if (i)
     {
-      if (fwrite (this_proj -> sqw_q_id, sizeof(double), this_proj -> sqw_n_data_sets, fp) != this_proj -> sqw_n_data_sets) return ERROR_PROJECT;
+      if (fwrite (this_proj -> sqw_q_id, sizeof(double), this_proj -> sqw_n_data_sets, fp) != this_proj -> sqw_n_data_sets) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
-    if (fwrite (& this_proj -> sqw_freq, sizeof(int), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& this_proj -> sqw_freq, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
   }
-  if (this_proj -> natomes != 0 && this_proj -> nspec != 0)
+  if (this_proj -> natomes == 0 || this_proj -> nspec == 0)
+  {
+    // error
+    return signal_error (__FILE__, __func__, __LINE__, ERROR_NO_WAY);
+  }
+  else
   {
     for (i=0; i<this_proj -> nspec; i++)
     {
-      if (save_this_string (fp, this_proj -> chemistry -> label[i]) != OK) return ERROR_PROJECT;
-      if (save_this_string (fp, this_proj -> chemistry -> element[i]) != OK) return ERROR_PROJECT;
+      if (save_this_string (fp, this_proj -> chemistry -> label[i]) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+      if (save_this_string (fp, this_proj -> chemistry -> element[i]) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
-    if (fwrite (this_proj -> chemistry -> nsps, sizeof(int), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_PROJECT;
-    if (fwrite (this_proj -> chemistry -> formula, sizeof(int), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_PROJECT;
+    if (fwrite (this_proj -> chemistry -> nsps, sizeof(int), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+    if (fwrite (this_proj -> chemistry -> formula, sizeof(int), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     for (i=0; i<CHEM_PARAMS; i++)
     {
-      if (fwrite (this_proj -> chemistry -> chem_prop[i], sizeof(double), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_PROJECT;
+      if (fwrite (this_proj -> chemistry -> chem_prop[i], sizeof(double), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
-    if (fwrite (& this_proj -> chemistry -> grtotcutoff, sizeof(double), 1, fp) != 1) return ERROR_PROJECT;
+    if (fwrite (& this_proj -> chemistry -> grtotcutoff, sizeof(double), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     for (i=0; i<this_proj -> nspec; i++)
     {
-      if (fwrite (this_proj -> chemistry -> cutoffs[i], sizeof(double), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_PROJECT;
+      if (fwrite (this_proj -> chemistry -> cutoffs[i], sizeof(double), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
     for (i=0; i<this_proj -> steps; i++)
     {
       for (j=0; j<this_proj -> natomes; j++)
       {
-        if (save_atom_a (fp, this_proj, i, j) != OK) return ERROR_ATOM_A;
+        if (save_atom_a (fp, this_proj, i, j) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_ATOM_A;
+        }
       }
     }
     if (this_proj -> run)
@@ -284,8 +297,11 @@ int save_project (FILE * fp, project * this_proj, int wid)
         {
           if (this_proj -> analysis[i])
           {
-            j = save_analysis (fp, this_proj, this_proj -> analysis[i], wid);
-            if (j != OK) return j;
+            if (save_analysis (fp, this_proj, this_proj -> analysis[i], wid) != OK)
+            {
+              update_error_trace (__FILE__, __func__, __LINE__-2);
+              return ERROR_ANA;
+            }
           }
         }
       }
@@ -297,36 +313,54 @@ int save_project (FILE * fp, project * this_proj, int wid)
         // Save molecule
         if ((this_proj -> natomes > ATOM_LIMIT || this_proj -> steps > STEP_LIMIT) && this_proj -> modelgl -> adv_bonding[1])
         {
-          if (save_mol (fp, this_proj) != OK) return ERROR_MOL;
+          if (save_mol (fp, this_proj) != OK)
+          {
+            update_error_trace (__FILE__, __func__, __LINE__-2);
+            return ERROR_MOL;
+          }
         }
         // saving bonding info
-        if (save_bonding (fp, this_proj) != OK) return ERROR_COORD;
+        if (save_bonding (fp, this_proj) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_COORD;
+        }
         // saving glwin info
-        i = save_opengl_image (fp, this_proj, this_proj -> modelgl -> anim -> last -> img, this_proj -> nspec);
-        if (i != OK) return i;
+        if (save_opengl_image (fp, this_proj, this_proj -> modelgl -> anim -> last -> img, this_proj -> nspec) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_IMAGE;
+        }
 
-        i = save_dlp_field_data (fp, this_proj);
-        if (i != OK) return i;
-        i = save_lmp_field_data (fp, this_proj);
-        if (i != OK) return i;
+        if (save_dlp_field_data (fp, this_proj) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_FIELD;
+        }
+        if (save_lmp_field_data (fp, this_proj) != OK)
+        {
+          update_error_trace (__FILE__, __func__, __LINE__-2);
+          return ERROR_FIELD;
+        }
 
         for (i=0; i<2; i++)
         {
-          j = save_cpmd_data (fp, i, this_proj);
-          if (j != OK) return j;
+          if (save_cpmd_data (fp, i, this_proj) != OK)
+          {
+            update_error_trace (__FILE__, __func__, __LINE__-2);
+            return ERROR_QM;
+          }
         }
         for (i=0; i<2; i++)
         {
-          j = save_cp2k_data (fp, i, this_proj);
-          if (j != OK) return j;
+          if (save_cp2k_data (fp, i, this_proj) != OK)
+          {
+            update_error_trace (__FILE__, __func__, __LINE__-2);
+            return ERROR_QM;
+          }
         }
       }
     }
-  }
-  else
-  {
-    // error
-    return ERROR_NO_WAY;
   }
 #ifdef DEBUG
 //  debugioproj (this_proj, "WRITE");

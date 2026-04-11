@@ -50,12 +50,12 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 */
 int save_thermo (FILE * fp, thermostat * thermo)
 {
-  if (fwrite (& thermo -> id, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& thermo -> type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& thermo -> sys, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& thermo -> show, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (thermo -> params, sizeof(double), 4, fp) != 4) return ERROR_RW;
-  if (fwrite (& thermo -> natoms, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& thermo -> id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& thermo -> type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& thermo -> sys, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& thermo -> show, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (thermo -> params, sizeof(double), 4, fp) != 4) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& thermo -> natoms, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   return OK;
 }
 
@@ -72,26 +72,26 @@ int save_thermo (FILE * fp, thermostat * thermo)
 int save_fixed_atoms (FILE * fp, int fixatoms, int * fixlist, int ** fixcoord)
 {
   int i;
-  if (fwrite (& fixatoms, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& fixatoms, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   if (fixatoms)
   {
     if (fixlist)
     {
-      if (fwrite (fixlist, sizeof(int), fixatoms, fp) != fixatoms) return ERROR_RW;
+      if (fwrite (fixlist, sizeof(int), fixatoms, fp) != fixatoms) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     }
     else
     {
       i = 0;
-      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     }
     if (fixcoord)
     {
-      for (i=0; i<fixatoms; i++) if (fwrite (fixcoord[i], sizeof(int), 3, fp) != 3) return ERROR_RW;
+      for (i=0; i<fixatoms; i++) if (fwrite (fixcoord[i], sizeof(int), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     }
     else
     {
       i = 0;
-      if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     }
   }
   return OK;
@@ -112,58 +112,67 @@ int save_cpmd_data (FILE * fp, int cid, project * this_proj)
   if (this_proj -> cpmd_input[cid] == NULL)
   {
     i = 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     return OK;
   }
   i = 1;
-  if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& this_proj -> cpmd_input[cid] -> calc_type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (this_proj -> cpmd_input[cid] -> default_opts, sizeof(double), 17, fp) != 17) return ERROR_RW;
-  if (fwrite (this_proj -> cpmd_input[cid] -> calc_opts, sizeof(double), 24, fp) != 24) return ERROR_RW;
-  if (fwrite (& this_proj -> cpmd_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& this_proj -> cpmd_input[cid] -> calc_type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (this_proj -> cpmd_input[cid] -> default_opts, sizeof(double), 17, fp) != 17) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (this_proj -> cpmd_input[cid] -> calc_opts, sizeof(double), 24, fp) != 24) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& this_proj -> cpmd_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   if (this_proj -> cpmd_input[cid] -> thermostats)
   {
     thermostat * thermo = this_proj -> cpmd_input[cid] -> ions_thermostat;
     i = 0;
     while (thermo)
     {
-      if (save_thermo (fp, thermo) != OK) return ERROR_RW;
+      if (save_thermo (fp, thermo) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_QM;
+      }
       i ++;
       thermo = thermo -> next;
     }
     i = (this_proj -> cpmd_input[cid] -> elec_thermostat) ? 1 : 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     if (this_proj -> cpmd_input[cid] -> elec_thermostat)
     {
-      if (save_thermo (fp, this_proj -> cpmd_input[cid] -> elec_thermostat) != OK) return ERROR_RW;
+      if (save_thermo (fp, this_proj -> cpmd_input[cid] -> elec_thermostat) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_QM;
+      }
     }
   }
   if (save_fixed_atoms (fp, this_proj -> cpmd_input[cid] -> fixat, this_proj -> cpmd_input[cid] -> fixlist, this_proj -> cpmd_input[cid] -> fixcoord) != OK)
   {
-    return ERROR_RW;
+    update_error_trace (__FILE__, __func__, __LINE__-2);
+    return ERROR_QM;
   }
-  if (fwrite (& this_proj -> cpmd_input[cid] -> dummies, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& this_proj -> cpmd_input[cid] -> dummies, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   if (this_proj -> cpmd_input[cid] -> dummies)
   {
     dummy_atom * dummy = this_proj -> cpmd_input[cid] -> dummy;
     while (dummy)
     {
-      if (fwrite (& dummy -> id, sizeof(int), 1, fp) != 1) return ERROR_RW;
-      if (fwrite (& dummy -> type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-      if (fwrite (& dummy -> show, sizeof(gboolean), 1, fp) != 1) return ERROR_RW;
-      if (fwrite (dummy -> xyz, sizeof(double), 3, fp) != 3) return ERROR_RW;
-      if (fwrite (dummy -> coord, sizeof(int), 4, fp) != 4) return ERROR_RW;
-      if (fwrite (& dummy -> natoms, sizeof(int), 1, fp) != 1) return ERROR_RW;
+      if (fwrite (& dummy -> id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+      if (fwrite (& dummy -> type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+      if (fwrite (& dummy -> show, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+      if (fwrite (dummy -> xyz, sizeof(double), 3, fp) != 3) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+      if (fwrite (dummy -> coord, sizeof(int), 4, fp) != 4) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+      if (fwrite (& dummy -> natoms, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
       if (dummy -> natoms)
       {
-        if (fwrite (dummy -> list, sizeof(int), dummy -> natoms, fp) != dummy -> natoms) return ERROR_RW;
+        if (fwrite (dummy -> list, sizeof(int), dummy -> natoms, fp) != dummy -> natoms) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
       }
       dummy = dummy -> next;
     }
   }
   for (i=0; i<this_proj -> nspec; i++)
   {
-    if (fwrite (this_proj -> cpmd_input[cid] -> pp[i], sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fwrite (this_proj -> cpmd_input[cid] -> pp[i], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   }
   return save_this_string (fp, this_proj -> cpmd_input[cid] -> info);
 }
@@ -183,24 +192,28 @@ int save_cp2k_data (FILE * fp, int cid, project * this_proj)
   if (this_proj -> cp2k_input[cid] == NULL)
   {
     i = 0;
-    if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
+    if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     return OK;
   }
   i = 1;
-  if (fwrite (& i, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (& this_proj -> cp2k_input[cid] -> input_type, sizeof(int), 1, fp) != 1) return ERROR_RW;
-  if (fwrite (this_proj -> cp2k_input[cid] -> opts, sizeof(double), 42, fp) != 42) return ERROR_RW;
+  if (fwrite (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (& this_proj -> cp2k_input[cid] -> input_type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
+  if (fwrite (this_proj -> cp2k_input[cid] -> opts, sizeof(double), 42, fp) != 42) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   for (i=0; i<3; i++)
   {
-    if (fwrite (this_proj -> cp2k_input[cid] -> extra_opts[i], sizeof(double), 4, fp) != 4) return ERROR_RW;
+    if (fwrite (this_proj -> cp2k_input[cid] -> extra_opts[i], sizeof(double), 4, fp) != 4) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   }
-  if (fwrite (& this_proj -> cp2k_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return ERROR_RW;
+  if (fwrite (& this_proj -> cp2k_input[cid] -> thermostats, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   if (this_proj -> cp2k_input[cid] -> thermostats)
   {
     thermostat * thermo = this_proj -> cp2k_input[cid] -> ions_thermostat;
     while (thermo)
     {
-      if (save_thermo (fp, thermo) != OK) return ERROR_RW;
+      if (save_thermo (fp, thermo) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_QM;
+      }
       thermo = thermo -> next;
     }
   }
@@ -208,20 +221,21 @@ int save_cp2k_data (FILE * fp, int cid, project * this_proj)
   {
     if (save_fixed_atoms (fp, this_proj -> cp2k_input[cid] -> fixat[i], this_proj -> cp2k_input[cid] -> fixlist[i], this_proj -> cp2k_input[cid] -> fixcoord[i]) != OK)
     {
-      return ERROR_RW;
+      update_error_trace (__FILE__, __func__, __LINE__-2);
+      return ERROR_QM;
     }
   }
   for (i=0; i<this_proj -> nspec; i++)
   {
-    if (fwrite (this_proj -> cp2k_input[cid] -> spec_data[i], sizeof(int), 2, fp) != 2) return ERROR_RW;
+    if (fwrite (this_proj -> cp2k_input[cid] -> spec_data[i], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     for (j=0; j<2; j++)
     {
-      if (save_this_string (fp, this_proj -> cp2k_input[cid] -> spec_files[i][j]) != OK) return ERROR_RW;
+      if (save_this_string (fp, this_proj -> cp2k_input[cid] -> spec_files[i][j]) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
     }
   }
   for (i=0; i<5; i++)
   {
-    if (save_this_string (fp, this_proj -> cp2k_input[cid] -> files[i]) != OK) return ERROR_RW;
+    if (save_this_string (fp, this_proj -> cp2k_input[cid] -> files[i]) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_QM);
   }
   return save_this_string (fp, this_proj -> cp2k_input[cid] -> info);
 }

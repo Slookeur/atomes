@@ -303,6 +303,8 @@ enum ImageFormats {
 #define ERROR_CHAINS 11
 #define ERROR_MOL    12
 #define ERROR_ANA    13
+#define ERROR_QM     14
+#define ERROR_FIELD  15
 
 /*!< \def CHEM_PARAMS
   \brief number of chemical parameters
@@ -429,6 +431,7 @@ extern int statusval;
 extern int atomes_visual;
 extern int dialog_id;
 
+extern int reading_step_limit;
 extern int bonds_update;
 extern int frag_update;
 extern int mol_update;
@@ -487,8 +490,35 @@ extern GdkPixbuf * OGLC;
 extern GdkPixbuf * RUN;
 extern tint cut_sel;
 
-// Data structures
 #define LINE_SIZE 160
+
+// Data structures
+
+/*! \typedef atomes_error_signal
+
+  \brief atomes_error_signal data structure
+ */
+typedef struct atomes_error_signal atomes_error_signal;
+struct atomes_error_signal
+{
+  int id;
+  gchar * message;
+};
+
+/*! \typedef atomes_error
+
+  \brief atomes_error information data structure
+ */
+typedef struct atomes_error atomes_error;
+struct atomes_error
+{
+  atomes_error_signal error_signal;
+  gchar * error_file;
+  gchar * error_func;
+  int error_line;
+  int trace_id;
+  gchar * error_trace;
+};
 
 /*! \typedef line_node */
 typedef struct line_node line_node;
@@ -1348,6 +1378,9 @@ extern gchar * calculation_time (gboolean modelv, double ctime);
 
 extern int get_widget_width (GtkWidget * widg);
 extern int get_widget_height (GtkWidget * widg);
+
+extern int signal_error (const char * file, const char * func, int error_line, int error_id);
+extern void update_error_trace (const char * file, const char * func, int trace_line);
 
 typedef struct {
   GCallback handler;

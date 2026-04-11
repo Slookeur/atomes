@@ -57,7 +57,8 @@ int read_bonding (FILE * fp)
   coord -> species = active_project -> nspec;
   image * img = active_glwin -> anim -> last -> img;
   gboolean read_bond = FALSE;
-  if (! active_glwin -> bonding || ! active_glwin -> adv_bonding[1] || active_project -> natomes > ATOM_LIMIT || active_project -> steps > STEP_LIMIT)
+
+  if (! active_glwin -> bonding || ! active_glwin -> adv_bonding[1] || active_project -> natomes > ATOM_LIMIT || active_project -> steps > reading_step_limit)
   {
     read_bond = TRUE;
   }
@@ -69,15 +70,15 @@ int read_bonding (FILE * fp)
     {
       for (j=0; j<active_project -> natomes; j++)
       {
-        if (fread (active_project -> atoms[i][j].coord, sizeof(int), 5, fp) != 5) return ERROR_COORD;
-        if (fread (& active_project -> atoms[i][j].numv, sizeof(int), 1, fp) != 1) return ERROR_COORD;
+        if (fread (active_project -> atoms[i][j].coord, sizeof(int), 5, fp) != 5) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+        if (fread (& active_project -> atoms[i][j].numv, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         if (active_project -> atoms[i][j].numv)
         {
           active_project -> atoms[i][j].vois = allocint (active_project -> atoms[i][j].numv);
-          if (fread (active_project -> atoms[i][j].vois, sizeof(int), active_project -> atoms[i][j].numv, fp) != active_project -> atoms[i][j].numv) return ERROR_COORD;
+          if (fread (active_project -> atoms[i][j].vois, sizeof(int), active_project -> atoms[i][j].numv, fp) != active_project -> atoms[i][j].numv) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         }
       }
-      if (fread (active_glwin -> bonds[i], sizeof(int), 2, fp) != 2) return ERROR_COORD;
+      if (fread (active_glwin -> bonds[i], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       active_glwin -> bondid[i] = g_malloc0(2*sizeof*active_glwin -> bondid[i]);
       for (j=0; j<2; j++)
       {
@@ -88,7 +89,7 @@ int read_bonding (FILE * fp)
           if (j) active_glwin -> clones[i] = g_malloc0(active_glwin -> bonds[i][1]*sizeof*active_glwin -> clones[i]);
           for (k=0; k<active_glwin -> bonds[i][j]; k++)
           {
-            if (fread (active_glwin -> bondid[i][j][k], sizeof(int), 2, fp) != 2) return ERROR_COORD;
+            if (fread (active_glwin -> bondid[i][j][k], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
             if (j)
             {
               l = active_glwin -> bondid[i][j][k][0];
@@ -106,20 +107,20 @@ int read_bonding (FILE * fp)
     for (i=0; i<2; i++)
     {
       coord -> ntg[i] = allocint (coord -> species);
-      if (fread (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
+      if (fread (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       coord -> geolist[i] = g_malloc0(coord -> species*sizeof*coord -> geolist[i]);
       if (i == 1) coord -> partial_geo = g_malloc0(coord -> species*sizeof*coord -> partial_geo);
       for (j=0; j<coord -> species; j++)
       {
         coord -> geolist[i][j] = g_malloc0(coord -> ntg[i][j]*sizeof*coord -> geolist[i][j]);
-        if (fread (coord -> geolist[i][j], sizeof(int), coord -> ntg[i][j], fp) != coord -> ntg[i][j]) return ERROR_COORD;
+        if (fread (coord -> geolist[i][j], sizeof(int), coord -> ntg[i][j], fp) != coord -> ntg[i][j]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         if (i == 1)
         {
           coord -> partial_geo[j] = g_malloc0(coord -> ntg[i][j]*sizeof*coord -> partial_geo[j]);
           for (k=0; k<coord -> ntg[i][j]; k++)
           {
             coord -> partial_geo[j][k] = g_malloc0(coord -> species*sizeof*coord -> partial_geo[j][k]);
-            if (fread (coord -> partial_geo[j][k], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
+            if (fread (coord -> partial_geo[j][k], sizeof(int), coord -> species, fp) != coord -> species) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
           }
         }
       }
@@ -138,13 +139,13 @@ int read_bonding (FILE * fp)
 
   for (i=0; i<10; i++)
   {
-    if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_COORD;
-    if (i < 2 && active_glwin -> bonding && j != active_project -> coord -> totcoord[i]) return ERROR_COORD;
-    if (i > 1 && i < 4 && active_glwin -> adv_bonding[i-2] && j != active_project -> coord -> totcoord[i]) return ERROR_COORD;
+    if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+    if (i < 2 && active_glwin -> bonding && j != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+    if (i > 1 && i < 4 && active_glwin -> adv_bonding[i-2] && j != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
     if (i < 2)
     {
-      if (fread (img -> show_atom[i], sizeof(gboolean), active_project -> nspec, fp) != active_project -> nspec) return ERROR_COORD;
-      if (fread (img -> show_label[i], sizeof(gboolean), active_project -> nspec, fp) != active_project -> nspec) return ERROR_COORD;
+      if (fread (img -> show_atom[i], sizeof(gboolean), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+      if (fread (img -> show_label[i], sizeof(gboolean), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
     }
 
     if (active_project -> coord -> totcoord[i])
@@ -158,8 +159,7 @@ int read_bonding (FILE * fp)
       }
     }
   }
-
-  if (! active_glwin -> bonding || ! active_glwin -> adv_bonding[1] || active_project -> natomes > ATOM_LIMIT || active_project -> steps > STEP_LIMIT)
+  if (! active_glwin -> bonding || ! active_glwin -> adv_bonding[1] || active_project -> natomes > ATOM_LIMIT || active_project -> steps > reading_step_limit)
   {
     gboolean * showfrag = duplicate_bool (active_project -> coord -> totcoord[2], img -> show_coord[2]);
     gboolean * showcoord[2];

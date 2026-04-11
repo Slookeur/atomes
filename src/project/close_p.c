@@ -186,9 +186,16 @@ void close_project (project * to_close)
     g_free (to_close -> modelgl);
     if (to_close -> modelfc)
     {
-      for (i=0; i< to_close -> steps; i++)
+      if (to_close -> modelfc -> mols)
       {
-        g_free (to_close -> modelfc -> mols[i]);
+        for (i=0; i< to_close -> steps; i++)
+        {
+          if (to_close -> modelfc -> mols[i])
+          {
+            g_free (to_close -> modelfc -> mols[i]);
+          }
+        }
+        g_free (to_close -> modelfc -> mols);
       }
     }
   }

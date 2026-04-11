@@ -582,6 +582,18 @@ GtkWidget * message_dialogmodal (gchar * message, gchar * title, GtkMessageType 
     win = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, mtype, buttons, NULL);
   }
   gtk_message_dialog_set_markup (GTK_MESSAGE_DIALOG (win), message);
+
+  GtkWidget * content_area = gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(win));
+  GtkWidget * label;
+#ifdef GTK4
+  label = gtk_widget_get_first_child(content_area);
+#else
+  GList * children = gtk_container_get_children(GTK_CONTAINER(content_area));
+  label = GTK_WIDGET(children -> data);
+  g_list_free(children);
+#endif
+  gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+
   gtk_window_set_title (GTK_WINDOW(win), title);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
 #ifdef GTK3

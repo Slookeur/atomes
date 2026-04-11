@@ -158,6 +158,7 @@ int atomes_visual = 1; // OpenGL visual: 1 = GTK default, 0 = X11 default (GTK3 
 // Loop Id for the dialogs
 int dialog_id = -1;
 
+int reading_step_limit;
 int bonds_update = 0;
 int frag_update = 0;
 int mol_update = 0;
