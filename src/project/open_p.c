@@ -343,6 +343,7 @@ int open_project (FILE * fp, int wid)
   }
   // End version related tests
 
+  // Ensure file compatibility with STEP_LIMIT for atomes version <1.3.0
   reading_step_limit = (version_2_9_and_above) ? STEP_LIMIT : STEP_LIMIT*10;
   // Temporary buffers for version compatibility < 2.9
   gboolean * tmp_avail, * tmp_init, * tmp_calc;

@@ -205,9 +205,9 @@ void update_error_trace (const char * file, const char * func, int trace_line)
     gchar * tmp_trace = g_strdup_printf ("%s\n", project_error -> error_trace);
     for (i=0; i<project_error -> trace_id+1; i++)
     {
-      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
+      tmp_trace = g_strdup_printf ("%s\n<span font_desc=\"monospace 10\">", tmp_trace);
     }
-    tmp_trace = g_strdup_printf ("%sFile: %s\n", tmp_trace, file);
+    tmp_trace = g_strdup_printf ("%sFile    : %s\n", tmp_trace, file);
     for (i=0; i<project_error -> trace_id+1; i++)
     {
       tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
@@ -217,7 +217,7 @@ void update_error_trace (const char * file, const char * func, int trace_line)
     {
       tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
     }
-    tmp_trace = g_strdup_printf ("%sLine: %d\n", tmp_trace, trace_line);
+    tmp_trace = g_strdup_printf ("%sLine    : %d</span>\n", tmp_trace, trace_line);
 
     g_free (project_error -> error_trace);
     project_error -> error_trace = g_strdup_printf ("%s", tmp_trace);
@@ -225,7 +225,10 @@ void update_error_trace (const char * file, const char * func, int trace_line)
   }
   else
   {
-    project_error -> error_trace = g_strdup_printf("\t\tFile: %s\n\t\tFunction: %s()\n\t\tLine : %d", file, func, trace_line);
+    project_error -> error_trace = g_strdup_printf("<span font_desc=\"monospace 10\">"
+                                                   "\t\tFile    : %s\n"
+                                                   "\t\tFunction: %s()\n"
+                                                   "\t\tLine    : %d</span>", file, func, trace_line);
   }
   project_error -> trace_id ++;
 }
@@ -281,24 +284,14 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
   {
     if (pfile != NULL)
     {
-      gchar * err;
-      err = g_strdup_printf ("Impossible to %s project file: \n\n"
-                             "\t\t%s\n\n"
-                             "\tError %s %s, at:\n"
-                             "\t\tFile: <b>%s</b>\n"
-                             "\t\tFunction: <b>%s()</b>\n"
-                             "\t\tLine: <b>%d</b>\n\n"
-                             "\tBacktrace:\n%s\t\t →\t\t <i>call to </i><b>%s()</b>\n",
-                             (! act) ? "open" : "save",
-                             pfile,
-                             (! act) ? "reading" : "saving",
-                             project_error -> error_signal.message,
-                             project_error -> error_file,
-                             project_error -> error_func,
-                             project_error -> error_line,
-                             project_error -> error_trace,
-                             project_error -> error_func);
-      show_error (err, 0, MainWindow);
+      gchar * err = g_strdup_printf ("Impossible to %s project file: \n\n"
+                                     "\t\t%s\n\n"
+                                     "\tError %s %s\n\n",
+                                     (! act) ? "open" : "save",
+                                     pfile,
+                                     (! act) ? "reading" : "saving",
+                                     project_error -> error_signal.message);
+      show_error_with_trace (err, project_error, act, 0, MainWindow);
       g_free (err);
     }
   }

@@ -48,6 +48,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void show_warning (char * warning, GtkWidget * win);
   void show_warning_ (char * warning, char * sub, char * tab);
   void show_error (char * error, int val, GtkWidget * win);
+  void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win);
   void show_error_ (char * error, char * sub, char * tab);
   void init_data_ (int * nats, int * nspc, int * stps, int * cid);
   void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer);
@@ -290,7 +291,7 @@ void show_warning_ (char * warning, char * sub, char * tab)
 
   \brief show error message
 
-  \param error Message
+  \param error the error message
   \param val Add contact info (1) or not (0)
   \param win Parent GtkWidget, if any
 */
@@ -310,6 +311,48 @@ void show_error (char * error, int val, GtkWidget * win)
   g_warning ("%s", etot);
   run_this_gtk_dialog (dialog, G_CALLBACK(run_destroy_dialog), NULL);
   g_free (etot);
+}
+
+/*!
+  \fn void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win)
+
+  \brief show error message
+
+  \param error the error message
+  \param back_trace Backtrace of the error
+  \param act runtime action
+  \param val Add contact info (1) or not (0)
+  \param win Parent GtkWidget, if any
+*/
+void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win)
+{
+  GtkWidget * dialog = message_dialogmodal (error, "Error", GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
+  GtkWidget * exp_trace = create_expander ("Details", NULL);
+  gchar * trace = g_strdup_printf ("\tError %s %s, at:\n"
+                                   "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
+                                   "\t\tFunction: <b>%s()</b>\n"
+                                   "\t\tLine    : <b>%d</b></span>\n\n"
+                                   "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n",
+                                   (! act) ? "reading" : "saving",
+                                   this_error -> error_signal.message,
+                                   this_error -> error_file,
+                                   this_error -> error_func,
+                                   this_error -> error_line,
+                                   this_error -> error_trace,
+                                   this_error -> error_func);
+  GtkWidget * trace_label = markup_label (trace, -1, -1, 0.0, 0.5);
+  gtk_label_set_selectable(GTK_LABEL(trace_label), TRUE);
+  g_free (trace);
+  add_container_child (CONTAINER_EXP, exp_trace, trace_label);
+  GtkWidget * content_area = gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog));
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, content_area, exp_trace, FALSE, FALSE, 0);
+  if (! val)
+  {
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, content_area, markup_label (ifbug, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  }
+  show_web (dialog, val);
+  g_warning ("%s", error);
+  run_this_gtk_dialog (dialog, G_CALLBACK(run_destroy_dialog), NULL);
 }
 
 /*!

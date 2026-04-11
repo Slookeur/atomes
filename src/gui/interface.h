@@ -37,6 +37,7 @@ void show_info_ (double * valdij);
 void show_warning (char * warning, GtkWidget * win);
 void show_warning_ (char * warning, char * sub, char * tab);
 void show_error (char * error, int val, GtkWidget * win);
+void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win);
 void show_error_ (char * error, char * sub, char * tab);
 gboolean ask_yes_no (gchar * title, gchar * text, int type, GtkWidget * widg);
 gchar * exact_name (gchar * name);
