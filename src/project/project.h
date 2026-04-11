@@ -33,6 +33,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
+extern float project_file_version;
 extern gboolean reading_project;
 extern atomes_error * project_error;
 

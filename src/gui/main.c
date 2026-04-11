@@ -504,9 +504,9 @@ int check_for_atomes_file_options (int start, int end, char *argv[])
   for (j=start; j<end; j++)
   {
     k = test_this_arg (argv[j]);
-    if (! (abs(k) == 1 && with_workspace))
+    if (k > 0 && j < end-1)
     {
-      if (k > 0 && j < end-1)
+      if (! (k == 1 && with_workspace))
       {
         if (! flist)
         {
@@ -523,14 +523,8 @@ int check_for_atomes_file_options (int start, int end, char *argv[])
         argv[j] = argv[j+1] = g_strdup_printf (" ");
         j ++;
         i ++;
+        if (k == 1) with_workspace = TRUE;
       }
-      if (abs(k) == 1) with_workspace = TRUE;
-    }
-    else if (k == 1)
-    {
-      // Other workspaces are ignored
-      argv[j] = argv[j+1] = g_strdup_printf (" ");
-      j ++;
     }
   }
   return i;
@@ -584,6 +578,7 @@ int parse_command_line (int argc, char *argv[])
      might disappear, to prevent that it is mandatory to prepare
      the information to be given to GNU getopt */
   int files_to_read = check_for_atomes_file_options (1, argc, argv);
+  g_debug ("files_to_read= %d", files_to_read);
 
   /* Letter follow by : means that the command requires an argument
      No letter if the option is only in long format, ex : --width
@@ -733,10 +728,12 @@ int parse_command_line (int argc, char *argv[])
     }
   }
 
+  g_debug ("optind= %d, argc= %d", optind, argc);
   for (i=optind; i<argc; i++)
   {
     j = test_this_arg (argv[i]);
-    if (! (abs(j) == 1 && with_workspace))
+    g_debug ("i= %d, j= %d, with_workspace= %d", i, j, with_workspace);
+    if (! (j == -1 && with_workspace))
     {
       if (j < 0)
       {
@@ -754,12 +751,8 @@ int parse_command_line (int argc, char *argv[])
         ftmp -> file_type = -j;
         files_to_read ++;
         if (atomes_from_libreoffice) projfile = g_strdup_printf ("%s", argv[i]);
+        if (j == -1) with_workspace = TRUE;
       }
-    }
-    else if (j == -1)
-    {
-      // Other workspace are ignored
-      i ++;
     }
   }
 

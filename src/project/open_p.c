@@ -71,6 +71,7 @@ extern void add_curve_widgets (project * this_proj, int rid);
 
 extern G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpointer data);
 
+float project_file_version;
 gboolean version_2_5_and_bellow;
 gboolean version_2_6_and_above;
 gboolean version_2_7_and_above;
@@ -312,12 +313,18 @@ int open_project (FILE * fp, int wid)
   version = read_this_string (fp);
   if (! version) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
 
+  project_file_version = 0.0;
+  if (sscanf(version, "%*[^0-9]%f", & project_file_version) != 1)
+  {
+    return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+  }
   version_2_6_and_above = FALSE;
   version_2_7_and_above = FALSE;
   version_2_8_and_above = FALSE;
   version_2_9_and_above = FALSE;
 
   int calcs_to_read;
+
   // Start version related tests
   if (g_strcmp0(version, "%\n% project file v-2.6\n%\n") == 0)
   {

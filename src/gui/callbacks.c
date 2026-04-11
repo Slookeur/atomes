@@ -286,11 +286,13 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     {
       gchar * err = g_strdup_printf ("Impossible to %s project file: \n\n"
                                      "\t\t%s\n\n"
-                                     "\tError %s %s\n\n",
+                                     "\tError %s %s\n"
+                                     "\tProject file version: <b>%1.1f</b>\n",
                                      (! act) ? "open" : "save",
                                      pfile,
                                      (! act) ? "reading" : "saving",
-                                     project_error -> error_signal.message);
+                                     project_error -> error_signal.message,
+                                     project_file_version);
       show_error_with_trace (err, project_error, act, 0, MainWindow);
       g_free (err);
     }

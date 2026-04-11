@@ -328,18 +328,34 @@ void show_error_with_trace (gchar * error, atomes_error * this_error, int act, i
 {
   GtkWidget * dialog = message_dialogmodal (error, "Error", GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
   GtkWidget * exp_trace = create_expander ("Details", NULL);
-  gchar * trace = g_strdup_printf ("\tError %s %s, at:\n"
-                                   "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
-                                   "\t\tFunction: <b>%s()</b>\n"
-                                   "\t\tLine    : <b>%d</b></span>\n\n"
-                                   "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n",
-                                   (! act) ? "reading" : "saving",
-                                   this_error -> error_signal.message,
-                                   this_error -> error_file,
-                                   this_error -> error_func,
-                                   this_error -> error_line,
-                                   this_error -> error_trace,
-                                   this_error -> error_func);
+  gchar * trace;
+  if (this_error -> error_trace)
+  {
+    trace = g_strdup_printf ("\n\tError %s %s, at:\n"
+                             "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
+                             "\t\tFunction: <b>%s()</b>\n"
+                             "\t\tLine    : <b>%d</b></span>\n\n"
+                             "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n",
+                             (! act) ? "reading" : "saving",
+                             this_error -> error_signal.message,
+                             this_error -> error_file,
+                             this_error -> error_func,
+                             this_error -> error_line,
+                             this_error -> error_trace,
+                             this_error -> error_func);
+  }
+  else
+  {
+    trace = g_strdup_printf ("\n\tError %s %s, at:\n"
+                             "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
+                             "\t\tFunction: <b>%s()</b>\n"
+                             "\t\tLine    : <b>%d</b></span>\n",
+                             (! act) ? "reading" : "saving",
+                             this_error -> error_signal.message,
+                             this_error -> error_file,
+                             this_error -> error_func,
+                             this_error -> error_line);
+  }
   GtkWidget * trace_label = markup_label (trace, -1, -1, 0.0, 0.5);
   gtk_label_set_selectable(GTK_LABEL(trace_label), TRUE);
   g_free (trace);
