@@ -195,7 +195,7 @@ void print_help()
 */
 void print_version ()
 {
-  char scanid[80]="\n3D atomistic model analysis, creation/edition and post-processing tool\n";
+  char scanid[80]="\n3D atomic scale model analysis, creation/edition and post-processing tool\n";
   char bug[20] = "\nReport a bug to <";
   char eh[4] = ">\n";
 
@@ -578,7 +578,6 @@ int parse_command_line (int argc, char *argv[])
      might disappear, to prevent that it is mandatory to prepare
      the information to be given to GNU getopt */
   int files_to_read = check_for_atomes_file_options (1, argc, argv);
-  g_debug ("files_to_read= %d", files_to_read);
 
   /* Letter follow by : means that the command requires an argument
      No letter if the option is only in long format, ex : --width
@@ -728,11 +727,9 @@ int parse_command_line (int argc, char *argv[])
     }
   }
 
-  g_debug ("optind= %d, argc= %d", optind, argc);
   for (i=optind; i<argc; i++)
   {
     j = test_this_arg (argv[i]);
-    g_debug ("i= %d, j= %d, with_workspace= %d", i, j, with_workspace);
     if (! (j == -1 && with_workspace))
     {
       if (j < 0)

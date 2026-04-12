@@ -177,9 +177,9 @@ void init_ang (project * this_proj)
       for ( k = 0 ; k < this_proj -> nspec ; k++ )
       {
         this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Angles [%s-%s-%s]",
-                                                                           active_chem -> label[i],
-                                                                           active_chem -> label[j],
-                                                                           active_chem -> label[k]);
+                                                                          active_chem -> label[i],
+                                                                          active_chem -> label[j],
+                                                                          active_chem -> label[k]);
         h=h+1;
       }
     }
@@ -192,9 +192,9 @@ void init_ang (project * this_proj)
       {
         for ( l = 0 ; l < this_proj -> nspec ; l++ )
         {
-        this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Dihedral [%s-%s-%s-%s]",
-                                                                           active_chem -> label[i], active_chem -> label[j],
-                                                                           active_chem -> label[k], active_chem -> label[l]);
+          this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Dihedral [%s-%s-%s-%s]",
+                                                                            active_chem -> label[i], active_chem -> label[j],
+                                                                            active_chem -> label[k], active_chem -> label[l]);
           h=h+1;
         }
       }

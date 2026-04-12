@@ -72,7 +72,6 @@ extern DataLayout * curve_default_layout (project * pid, int rid, int cid);
 extern GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int groups, int shortcut_by_group[groups],
                                      gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[]);
 int ** extrarid;
-// gchar * curve_act[3]={"edit", "add", "rem"};
 
 gchar * curve_section_names[]={ "Curve window"};
 int curve_group_by_section[] = { 2 };

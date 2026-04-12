@@ -468,7 +468,7 @@ int get_different_atoms ()
 void print_lammps_mass (GtkTextBuffer * buf)
 {
   gchar * str;
-  print_info ("\nMasses\n\n", "bold", buf);
+  print_info ("\nMass\n\n", "bold", buf);
   tmp_fat = all_at;
   while (tmp_fat)
   {

@@ -833,7 +833,7 @@ int field_a[MAXDATA] = {  0,   0,   0,   0,   0,   0,   0,   1,   1,   1,   1,  
 
 gchar * ctitle[MAXDATA][12] ={{"Id", "Name", "Multiplicity", "Chemistry", "Atom(s)", "Species", "Viz. 3D", "Viz. Atom num."},                           // Molecule(s)
                               {"Id", "Name", "Element", "Mass", "Charge", "Frozen", "Atom(s)", "Viz. 3D"},                                              // Atom(s)
-                              {"Id", "Core Id", "Shell", "Masse", "Charge", "k2 (1)", "k4 (2)", "Viz. 3D", "Use (3)"},                                  // Core-shell unit(s)
+                              {"Id", "Core Id", "Shell", "Mass", "Charge", "k2 (1)", "k4 (2)", "Viz. 3D", "Use (3)"},                                  // Core-shell unit(s)
                               {"Id", "At.1 Id", "At.2 Id", "Length [Å]", "av. d [Å] (1)", "Viz. 3D", "Use (2)"},                                        // Constraint(s)
                               {"Id", "Length [Å]", "av. d12 [Å] (1)", "Unit Id", "At. Id", "Weight (2)", "Viz. 3D", "Use (3)"},                         // Mean force potential(s)
                               {"Id", "Atom(s) in unit", "List of atom(s)", "Viz. 3D", "Use(1)"},                                                        // Rigid unit(s)
@@ -4730,14 +4730,14 @@ void create_classical_force_field (int p, int f)
   {
     field_i_prep[0] = check_button ("\tPrepare the CONTROL file to describe the calculation",
                                     -1, 40, tmp_field -> prepare_file[0], G_CALLBACK(select_field_action), GINT_TO_POINTER(0));
-    field_i_prep[1] = check_button ("\tPrepare the FIELD and CONFIG files to describe the force field and the atomistic model",
+    field_i_prep[1] = check_button ("\tPrepare the FIELD and CONFIG files to describe the force field and the atomic scale model",
                                     -1, 40, tmp_field -> prepare_file[1], G_CALLBACK(select_field_action), GINT_TO_POINTER(1));
   }
   else
   {
     field_i_prep[0] = check_button ("\tPrepare the LAMMPS Input to describe the calculation",
                                     -1, 40, tmp_field -> prepare_file[0], G_CALLBACK(select_field_action), GINT_TO_POINTER(0));
-    field_i_prep[1] = check_button ("\tPrepare the LAMMPS Atom file to describe the force field and the atomistic model",
+    field_i_prep[1] = check_button ("\tPrepare the LAMMPS Atom file to describe the force field and the atomic scale model",
                                     -1, 40, tmp_field -> prepare_file[1], G_CALLBACK(select_field_action), GINT_TO_POINTER(1));
   }
   for (i=0; i<2; i++)
