@@ -64,7 +64,7 @@ void prep_calc_actions ()
   for (i=0; i<NCALCS-1; i++)
   {
     str = g_strdup_printf ("analyze.%d", i);
-    if (! active_project -> analysis)
+    if (! active_project || ! active_project -> analysis)
     {
       remove_action (str);
     }

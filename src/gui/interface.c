@@ -432,7 +432,7 @@ gboolean ask_yes_no (gchar * title, gchar * text, int type, GtkWidget * widg)
 */
 gchar * exact_name (gchar * name)
 {
-  return substitute_string (name, " ", NULL);
+  return g_strdup_printf("%s", substitute_string (name, " ", NULL));
 }
 
 /*!
@@ -869,7 +869,6 @@ void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer)
 {
   GtkTextIter bEnd;
   GtkTextTag * tag;
-
   gtk_text_buffer_get_end_iter (buffer, &bEnd);
   if (stag != NULL)
   {
@@ -1022,7 +1021,7 @@ void send_chem_info_ (int prop[active_project -> nspec])
 gchar * env_name (project * this_proj, int g, int s, int f, GtkTextBuffer * buffer)
 {
   int l, m;
-  gchar * spec = exact_name(this_proj -> chemistry -> label[s]);
+  gchar * spec = g_strdup_printf ("%s", exact_name(this_proj -> chemistry -> label[s]));
   gchar * stra;
   gchar * strb;
 

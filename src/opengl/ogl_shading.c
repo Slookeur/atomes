@@ -166,7 +166,9 @@ void allocate_instances (object_3d * object)
 */
 void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string)
 {
-  lightning[LIGHT_INFO+MATERIAL_DATA+FOG_DATA+LIGHT_DATA*j+k] = glGetUniformLocation (id, g_strdup_printf ("AllLights[%d].%s", j, string));
+  gchar * light_string = g_strdup_printf ("AllLights[%d].%s", j, string);
+  lightning[LIGHT_INFO+MATERIAL_DATA+FOG_DATA+LIGHT_DATA*j+k] = glGetUniformLocation (id, light_string);
+  g_free (light_string);
 }
 
 /*!

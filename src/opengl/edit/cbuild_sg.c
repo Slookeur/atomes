@@ -532,6 +532,7 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
   xmlNodePtr the_setting, the_point;
   xmlNodePtr sp_node, ps_node, pp_node;
   xmlAttrPtr s_node, p_node;
+  xmlChar * content;
   int val;
   int j, k;
   node = findnode (racine -> children, "settings");
@@ -544,7 +545,9 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
     if (num_node == NULL) return 0;
     if (g_strcmp0 ("num",(char *)s_node -> name) == 0)
     {
-      val = (int) string_to_double ((gpointer)xmlNodeGetContent(num_node));
+      content = xmlNodeGetContent(num_node);
+      val = (int) string_to_double ((gpointer)content);
+      xmlFree (content);
     }
     s_node = s_node -> next;
   }
@@ -564,26 +567,28 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
       {
         the_setting = s_node -> children;
         if (the_setting == NULL) return 0;
+        content = xmlNodeGetContent(the_setting);
         if (g_strcmp0 ("name",(char *)s_node -> name) == 0)
         {
-          spg -> settings[j].name = g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_setting));
+          spg -> settings[j].name = g_strdup_printf ("%s", content);
         }
         else if (g_strcmp0 ("origin",(char *)s_node -> name) == 0)
         {
-          spg -> settings[j].origin = (int)string_to_double ((gpointer)xmlNodeGetContent(the_setting));
+          spg -> settings[j].origin = (int) string_to_double ((gpointer)content);
         }
         else if (g_strcmp0 ("x",(char *)s_node -> name) == 0)
         {
-          spg -> settings[j].pos[0] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_setting));
+          spg -> settings[j].pos[0] = g_strdup_printf ("%s", content);
         }
         else if (g_strcmp0 ("y",(char *)s_node -> name) == 0)
         {
-          spg -> settings[j].pos[1] =  g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_setting));
+          spg -> settings[j].pos[1] =  g_strdup_printf ("%s", content);
         }
         else if (g_strcmp0 ("z",(char *)s_node -> name) == 0)
         {
-          spg -> settings[j].pos[2] =  g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_setting));
+          spg -> settings[j].pos[2] =  g_strdup_printf ("%s", content);
         }
+        xmlFree (content);
         s_node = s_node -> next;
       }
       ps_node = findnode (sp_node -> children, "points");
@@ -597,7 +602,9 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
           if (num_node == NULL) return 0;
           if (g_strcmp0 ("num",(char *)p_node -> name) == 0)
           {
-            val = (int) string_to_double ((gpointer)xmlNodeGetContent(num_node));
+            content = xmlNodeGetContent(num_node);
+            val = (int) string_to_double ((gpointer)content);
+            xmlFree (content);
           }
           p_node = p_node -> next;
         }
@@ -618,18 +625,20 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
             {
               the_point = s_node -> children;
               if (the_point == NULL) return 0;
+              content = xmlNodeGetContent(the_point);
               if (g_strcmp0 ("x",(char *)s_node -> name) == 0)
               {
-                spg -> settings[j].points[k][0] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_point));
+                spg -> settings[j].points[k][0] = g_strdup_printf ("%s", content);
               }
               else if (g_strcmp0 ("y",(char *)s_node -> name) == 0)
               {
-                spg -> settings[j].points[k][1] =  g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_point));
+                spg -> settings[j].points[k][1] =  g_strdup_printf ("%s", content);
               }
               else if (g_strcmp0 ("z",(char *)s_node -> name) == 0)
               {
-                spg -> settings[j].points[k][2] =  g_strdup_printf ("%s", (char *)xmlNodeGetContent(the_point));
+                spg -> settings[j].points[k][2] =  g_strdup_printf ("%s", content);
               }
+              xmlFree (content);
               s_node = s_node -> next;
             }
             k ++;
@@ -659,6 +668,7 @@ space_group * read_sg_xml_file (const char * filetoread)
   xmlNodePtr cp_node, wp_node, wc_node;
   xmlNodePtr the_wyck, the_pos;
   xmlAttrPtr c_node, w_node, p_node;
+  xmlChar * content;
 
   space_group * spg = g_malloc0(sizeof*spg);
   reader = xmlReaderForFile(filetoread, NULL, 0);
@@ -675,19 +685,27 @@ space_group * read_sg_xml_file (const char * filetoread)
     spg = g_malloc0(sizeof*spg);
     node = findnode (racine -> children, "space-group");
     if (node == NULL) return clean_sgl_data (doc, reader);
-    spg -> name = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(node));
+    content = xmlNodeGetContent(node);
+    spg -> name = g_strdup_printf ("%s", content);
+    xmlFree (content);
 
     node = findnode (racine -> children, "sg-num");
     if (node == NULL) return clean_sgl_data (doc, reader);
-    spg -> id = (int) string_to_double ((gpointer)xmlNodeGetContent(node));
+    content = xmlNodeGetContent(node);
+    spg -> id = (int) string_to_double ((gpointer)content);
+    xmlFree (content);
 
     node = findnode (racine -> children, "hm-symbol");
     if (node == NULL) return clean_sgl_data (doc, reader);
-    spg -> hms = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(node));
+    content = xmlNodeGetContent(node);
+    spg -> hms = g_strdup_printf ("%s", content);
+    xmlFree (content);
 
     node = findnode (racine -> children, "bravais");
     if (node == NULL) return clean_sgl_data (doc, reader);
-    spg -> bravais = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(node));
+    content = xmlNodeGetContent(node);
+    spg -> bravais = g_strdup_printf ("%s", content);
+    xmlFree (content);
 
     // Settings
     if (!get_this_group_data (spg, racine)) return clean_sgl_data (doc, reader);
@@ -702,7 +720,9 @@ space_group * read_sg_xml_file (const char * filetoread)
       if (num_node == NULL) return clean_sgl_data (doc, reader);
       if (g_strcmp0 ("num",(char *)c_node -> name) == 0)
       {
-        spg -> numw = (int) string_to_double ((gpointer)xmlNodeGetContent(num_node));
+        content = xmlNodeGetContent(num_node);
+        spg -> numw = (int) string_to_double ((gpointer)content);
+        xmlFree (content);
       }
       c_node = c_node -> next;
     }
@@ -721,18 +741,20 @@ space_group * read_sg_xml_file (const char * filetoread)
         {
           the_wyck = w_node -> children;
           if (the_wyck == NULL) return clean_sgl_data (doc, reader);
+          content = xmlNodeGetContent(the_wyck);
           if (g_strcmp0 ("mul",(char *)w_node -> name) == 0)
           {
-            spg -> wyckoff[i].multi = (int)string_to_double ((gpointer)xmlNodeGetContent(the_wyck));
+            spg -> wyckoff[i].multi = (int)string_to_double ((gpointer)content);
           }
           else if (g_strcmp0 ("let",(char *)w_node -> name) == 0)
           {
-            spg -> wyckoff[i].let = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(the_wyck));
+            spg -> wyckoff[i].let = g_strdup_printf ("%s", content);
           }
           else if (g_strcmp0 ("site",(char *)w_node -> name) == 0)
           {
-            spg -> wyckoff[i].site = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(the_wyck));
+            spg -> wyckoff[i].site = g_strdup_printf ("%s", content);
           }
+          xmlFree (content);
           w_node = w_node -> next;
         }
         spg -> wyckoff[i].pos = g_malloc0(spg -> wyckoff[i].multi*sizeof*spg -> wyckoff[i].pos);
@@ -750,18 +772,20 @@ space_group * read_sg_xml_file (const char * filetoread)
             {
               the_pos = p_node -> children;
               if (the_pos == NULL) return clean_sgl_data (doc, reader);
+              content = xmlNodeGetContent(the_pos);
               if (g_strcmp0 ("x",(char *)p_node -> name) == 0)
               {
-                spg -> wyckoff[i].pos[j][0] = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(the_pos));
+                spg -> wyckoff[i].pos[j][0] = g_strdup_printf ("%s", content);
               }
               else if (g_strcmp0 ("y",(char *)p_node -> name) == 0)
               {
-                spg -> wyckoff[i].pos[j][1] =  g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(the_pos));
+                spg -> wyckoff[i].pos[j][1] =  g_strdup_printf ("%s", content);
               }
               else if (g_strcmp0 ("z",(char *)p_node -> name) == 0)
               {
-                spg -> wyckoff[i].pos[j][2] =  g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(the_pos));
+                spg -> wyckoff[i].pos[j][2] =  g_strdup_printf ("%s", content);
               }
+              xmlFree (content);
               p_node = p_node -> next;
             }
             j ++;

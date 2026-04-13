@@ -359,7 +359,7 @@ void setup_all_selected_bond_vertices (int sty, int cap, int bi, int at, int sb,
 int atoms[NUM_STYLES][2];
 int bonds[NUM_STYLES][2], caps[NUM_STYLES][2];
 int npbds[NUM_STYLES][2], npcps[NUM_STYLES][2];
-int *** nbonds[NUM_STYLES][2];
+int *** sbonds[NUM_STYLES][2];
 
 /*!
   \fn void prepare_selected (int style, gboolean cylinder, int clone, int type)
@@ -400,7 +400,7 @@ void prepare_selected (int style, gboolean cylinder, int clone, int type)
       {
         for (j=0; j<proj_sp; j++)
         {
-          nbonds[style][type][i][sel -> sp][j] += find_selected_bond_vertices (style-1, sel -> id, j, i, type, 0);
+          sbonds[style][type][i][sel -> sp][j] += find_selected_bond_vertices (style-1, sel -> id, j, i, type, 0);
         }
       }
       sel = sel -> next;
@@ -411,8 +411,8 @@ void prepare_selected (int style, gboolean cylinder, int clone, int type)
       {
         for (j=0; j<proj_sp; j++)
         {
-          npbds[style][type] += nbonds[style][type][h][i][j];
-          npcps[style][type] += (nbonds[style][type][h][i][j]) ? 1 : 0;
+          npbds[style][type] += sbonds[style][type][h][i][j];
+          npcps[style][type] += (sbonds[style][type][h][i][j]) ? 1 : 0;
         }
       }
     }
@@ -461,7 +461,7 @@ void prepare_picked (int style, gboolean cylinder, int clone, int type)
         {
           for (j=0; j<proj_sp; j++)
           {
-            nbonds[style][type][h][proj_gl -> atoms[0][i].sp][j] += find_selected_bond_vertices (style-1, i, j, h, type, 0);
+            sbonds[style][type][h][proj_gl -> atoms[0][i].sp][j] += find_selected_bond_vertices (style-1, i, j, h, type, 0);
           }
         }
       }
@@ -472,8 +472,8 @@ void prepare_picked (int style, gboolean cylinder, int clone, int type)
       {
         for (j=0; j<proj_sp; j++)
         {
-          npbds[style][type] += nbonds[style][type][h][i][j];
-          npcps[style][type] += (nbonds[style][type][h][i][j]) ? 1 : 0;
+          npbds[style][type] += sbonds[style][type][h][i][j];
+          npcps[style][type] += (sbonds[style][type][h][i][j]) ? 1 : 0;
         }
       }
     }
@@ -553,11 +553,11 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
       {
         for (j=0; j<proj_sp; j++)
         {
-          if (nbonds[style][type][h][i][j])
+          if (sbonds[style][type][h][i][j])
           {
             cyl = g_malloc0(sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
-            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
+            cyl -> num_vertices = sbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
             nbs = 0;
             sel = plot -> selected[type] -> first;
@@ -650,11 +650,11 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
       {
         for (j=0; j<proj_sp; j++)
         {
-          if (nbonds[style][type][h][i][j])
+          if (sbonds[style][type][h][i][j])
           {
             cyl = g_malloc0(sizeof*cyl);
             cyl -> vert_buffer_size = LINE_BUFF_SIZE;
-            cyl -> num_vertices = nbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
+            cyl -> num_vertices = sbonds[style][type][h][i][j] * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
             cyl -> vertices = allocfloat (cyl -> vert_buffer_size*cyl -> num_vertices);
             nbs = 0;
             for (k=0; k<proj_at; k++)
@@ -688,7 +688,7 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
 */
 int prepare_selection_shaders (int style, int shaders, int clone, int type, gboolean do_bonds)
 {
-  int j;
+  int i,j;
   int nshaders = 0;
   atom_in_selection * sel;
   gboolean doit;
@@ -788,7 +788,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
   {
     wingl -> ogl_glsl[SELEC][step][shaders+nshaders] = init_shader_program (SELEC, GLSL_POINTS, point_vertex, NULL, point_color, GL_POINTS, 4, 1, FALSE, atos);
   }
-  //g_free (atos);
+
   nshaders ++;
   // Bonds
   if (do_bonds)
@@ -804,7 +804,24 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
       {
         nshaders += render_picked (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders+nshaders);
       }
-      g_free (nbonds[style][type]);
+      if (sbonds[style][type])
+      {
+        for (i=0; i<2; i++)
+        {
+          if (sbonds[style][type][i])
+          {
+            for (j=0; j<proj_sp; j++)
+            {
+              g_free (sbonds[style][type][i][j]);
+              sbonds[style][type][i][j] = NULL;
+            }
+            g_free (sbonds[style][type][i]);
+            sbonds[style][type][i] = NULL;
+          }
+        }
+        g_free (sbonds[style][type]);
+        sbonds[style][type] = NULL;
+      }
     }
   }
   return nshaders;
@@ -887,6 +904,7 @@ int create_selection_lists ()
   i = (plot -> draw_clones) ? 2 : 1;
   j = 2;
   int nshaders = 0;
+
   for (k=0; k<j; k++)
   {
     if (plot -> selected[k] -> selected > 0 || (! k && wingl -> picked > 0))
@@ -900,7 +918,7 @@ int create_selection_lists ()
         nshaders += (atoms[h][k]) ? 1 : 0;
         if (do_bonds)
         {
-          nbonds[h][k] = alloctint (i, proj_sp, proj_sp);
+          sbonds[h][k] = alloctint (i, proj_sp, proj_sp);
           if ((! h && (plot -> style == BALL_AND_STICK || plot -> style == CYLINDERS)) || h-1 == BALL_AND_STICK || h-1 == CYLINDERS) cylinder = TRUE;
           if (plot -> selected[k] -> selected > 0)
           {
@@ -915,6 +933,7 @@ int create_selection_lists ()
       }
     }
   }
+
   if (! nshaders) return 0;
   wingl -> ogl_glsl[SELEC][step] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[SELEC][step]);
   h = 0;
@@ -933,6 +952,7 @@ int create_selection_lists ()
       }
     }
   }
+
   return nshaders;
 }
 

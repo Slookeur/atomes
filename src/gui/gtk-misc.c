@@ -1026,43 +1026,43 @@ void setup_text_tags (GtkTextBuffer * buffer)
   tag = gtk_text_tag_new ("sans");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "family", "sans", NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* Monospace font */
   tag = gtk_text_tag_new ("monospace");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "family", "monospace", NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* Default Font size */
   tag = gtk_text_tag_new ("default-size");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <u> */
   tag = gtk_text_tag_new ("underline");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "underline", PANGO_UNDERLINE_SINGLE, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <uu> */
   tag = gtk_text_tag_new ("underline_double");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "underline", PANGO_UNDERLINE_DOUBLE, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <i> italic */
   tag = gtk_text_tag_new ("italic");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "style", PANGO_STYLE_ITALIC, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <b> bold */
   tag = gtk_text_tag_new ("bold");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
    /* <b> bold italic */
   tag = gtk_text_tag_new ("bold_italic");
@@ -1070,19 +1070,19 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "style", PANGO_STYLE_ITALIC,
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <sup> superscript */
   tag = gtk_text_tag_new ("sup");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "scale", .6, "rise", 6000, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* <sub> subscript */
   tag = gtk_text_tag_new ("sub");
   g_object_set (tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "scale", .6, "rise", -6000, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* justify-left */
   tag = gtk_text_tag_new("justify-left");
@@ -1100,7 +1100,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
   tag = gtk_text_tag_new("justify-right");
   g_object_set(tag, "justification", GTK_JUSTIFY_RIGHT, NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* heading */
   tag = gtk_text_tag_new("heading");
@@ -1110,67 +1110,67 @@ void setup_text_tags (GtkTextBuffer * buffer)
                     "justification", GTK_JUSTIFY_CENTER,
                     "underline", PANGO_UNDERLINE_DOUBLE, NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* red font */
   tag = gtk_text_tag_new("red");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "red", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* orange font */
   tag = gtk_text_tag_new("orange");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "orange", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
    /* yellow font */
   tag = gtk_text_tag_new("yellow");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "yellow2", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
    /* green font */
   tag = gtk_text_tag_new("green");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "green", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* light green font */
   tag = gtk_text_tag_new("light_green");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "light green", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* cyan font */
   tag = gtk_text_tag_new("cyan");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "cyan", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* blue font */
   tag = gtk_text_tag_new("blue");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "blue", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* pink font */
   tag = gtk_text_tag_new("pink");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "pink", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* violet font */
   tag = gtk_text_tag_new("violet");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "foreground", "dark violet", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* grey background */
   tag = gtk_text_tag_new("grey_back");
   g_object_set(tag, "size", DEFAULT_FONT_SIZE * PANGO_SCALE, "background", "lightgrey", NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold grey background */
   tag = gtk_text_tag_new("bold_grey_back");
@@ -1178,7 +1178,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                     "background", "lightgrey",
                     "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add(textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold red font */
   tag = gtk_text_tag_new ("bold_red");
@@ -1186,7 +1186,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "foreground", "red",
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold blue font */
   tag = gtk_text_tag_new ("bold_blue");
@@ -1194,7 +1194,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "foreground", "blue",
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold green font */
   tag = gtk_text_tag_new ("bold_green");
@@ -1202,7 +1202,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "foreground", "green",
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold orange font */
   tag = gtk_text_tag_new ("bold_orange");
@@ -1210,7 +1210,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "foreground", "orange",
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* bold pink font */
   tag = gtk_text_tag_new ("bold_pink");
@@ -1218,7 +1218,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "foreground", "pink",
                      "weight", PANGO_WEIGHT_BOLD, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
   /* subscript italic*/
   tag = gtk_text_tag_new ("sub_italic");
@@ -1226,7 +1226,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "style", PANGO_STYLE_ITALIC,
                      "scale", .6, "rise", -6000, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
    /* subscript bold */
   tag = gtk_text_tag_new ("sub_bold");
@@ -1234,7 +1234,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "weight", PANGO_WEIGHT_BOLD,
                      "scale", .6, "rise", -6000, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 
    /* superscript bold */
   tag = gtk_text_tag_new ("sup_bold");
@@ -1242,7 +1242,7 @@ void setup_text_tags (GtkTextBuffer * buffer)
                      "weight", PANGO_WEIGHT_BOLD,
                      "scale", .6, "rise", 6000, NULL);
   gtk_text_tag_table_add (textags, tag);
-  g_object_unref (tag);
+  g_clear_object (& tag);
 }
 
 /*!
@@ -2199,7 +2199,7 @@ void provide_gtk_css (gchar * css)
                                              GTK_STYLE_PROVIDER(provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 #endif
-  g_object_unref (provider);
+  g_clear_object (& provider);
 }
 
 /*!
@@ -2253,7 +2253,7 @@ void destroy_this_dialog (GtkDialog * dialog)
 void destroy_this_native_dialog (GtkNativeDialog * dialog)
 {
   gtk_native_dialog_destroy (dialog);
-  g_object_unref (dialog);
+  g_clear_object (& dialog);
   g_main_loop_quit (Event_loop[dialog_id]);
   g_main_loop_unref (Event_loop[dialog_id]);
   dialog_id --;

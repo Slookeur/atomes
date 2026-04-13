@@ -339,26 +339,27 @@ int clean_xml_data (xmlDoc * doc, xmlTextReaderPtr reader)
 */
 gchar * replace_markup (char * init, char * key, char * rep)
 {
-  char * buffer = NULL;
+  gchar * buffer = NULL;
   char * p = NULL;
   int inilen = strlen(init);
   int oldlen = strlen(key);
-  int newlen = 0;
-  if (rep) newlen = strlen(rep);
+  int newlen = (rep) ? strlen(rep) : 0;
 
   // Is key in init
   p = strstr(init, key);
-  if (! p) return init;
-  buffer = g_malloc0((inilen+newlen-oldlen+1)*sizeof*buffer);
+  if (! p) return g_strdup(init);
 
-  strncpy (buffer + strlen(buffer), init, p - init);
-  if (rep)
-  {
-    sprintf (buffer + strlen(buffer), "%s", rep);
-    //strcpy (buffer + strlen(buffer), rep);
-  }
-  sprintf (buffer + strlen(buffer), "%s", p + oldlen);
-  //strcpy (buffer + strlen(buffer), p + oldlen);
+  buffer = g_malloc0 ((inilen+newlen-oldlen+1)*sizeof*buffer);
+  buffer[0] = '\0';
+
+  // Copy what is before the pattern
+  strncat(buffer, init, p - init);
+
+  // Replace
+  if (rep) strcat(buffer, rep);
+
+  // Add the rest of the key
+  strcat(buffer, p+oldlen);
   return buffer;
 }
 
@@ -422,6 +423,7 @@ int sml_preview (const char * filetoread)
   xmlNodePtr n_node, at_node, sp_node, coord_node;
   xmlNodePtr spec_node, lab_node, lot_node, pbc_node;
   xmlAttrPtr xspec;
+  xmlChar * content;
 
   if (lib_proj != NULL) close_project (lib_proj);
   init_project (TRUE);
@@ -435,12 +437,16 @@ int sml_preview (const char * filetoread)
   if (name_node == NULL) return clean_xml_data (doc, reader);
   n_node = findnode (name_node -> children, "library-name");
   if (n_node == NULL) return clean_xml_data (doc, reader);
-  lib_proj -> name = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(n_node));
+  content = xmlNodeGetContent(n_node);
+  lib_proj -> name = g_strdup_printf ("%s", content);
+  xmlFree (content);
   lib_proj -> name = check_xml_string (lib_proj -> name);
   n_node = findnode (name_node -> children, "iupac-name");
   if (n_node == NULL) return clean_xml_data (doc, reader);
   o_names = 0;
-  other_name[0] = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(n_node));
+  content = xmlNodeGetContent(n_node);
+  other_name[0] = g_strdup_printf ("%s", content);
+  xmlFree (content);
   o_names ++;
   n_node = findnode (name_node -> children, "other-names");
   if (n_node == NULL) return clean_xml_data (doc, reader);
@@ -449,7 +455,9 @@ int sml_preview (const char * filetoread)
   {
     if (name_node -> type == XML_ELEMENT_NODE)
     {
-      other_name[o_names] = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(name_node));
+      content = xmlNodeGetContent(name_node);
+      other_name[o_names] = g_strdup_printf ("%s", content);
+      xmlFree (content);
       o_names ++;
     }
   }
@@ -457,13 +465,17 @@ int sml_preview (const char * filetoread)
   if (chem_node == NULL) return clean_xml_data (doc, reader);
   at_node = findnode (chem_node -> children, "atoms");
   if (at_node == NULL) return clean_xml_data (doc, reader);
-  lib_proj -> natomes = (int)string_to_double ((gpointer)xmlNodeGetContent(at_node));
+  content = xmlNodeGetContent(at_node);
+  lib_proj -> natomes = (int)string_to_double ((gpointer)content);
+  xmlFree (content);
 
   sp_node = findnode (chem_node -> children, "species");
   if (sp_node == NULL) return clean_xml_data (doc, reader);
   spec_node = sp_node -> properties -> children;
   if (spec_node == NULL) return clean_xml_data (doc, reader);
-  lib_proj -> nspec = (int)string_to_double ((gpointer)xmlNodeGetContent(spec_node));
+  content = xmlNodeGetContent(spec_node);
+  lib_proj -> nspec = (int)string_to_double ((gpointer)content);
+  xmlFree (content);
   if (lib_proj -> natomes < 1 || lib_proj -> nspec < 1) return clean_xml_data (doc, reader);
   alloc_proj_data (lib_proj, 1);
   lab_node = sp_node -> children;
@@ -473,7 +485,9 @@ int sml_preview (const char * filetoread)
   {
     lab_node = findnode (lab_node, "label");
     if (lab_node == NULL) return clean_xml_data (doc, reader);
-    lib_proj -> chemistry -> label[i] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(lab_node));
+    content = xmlNodeGetContent(lab_node);
+    lib_proj -> chemistry -> label[i] = g_strdup_printf ("%s", content);
+    xmlFree (content);
     xspec = lab_node -> properties;
     if (xspec == NULL) return clean_xml_data (doc, reader);
     while (xspec)
@@ -482,7 +496,9 @@ int sml_preview (const char * filetoread)
       if (lot_node == NULL) return clean_xml_data (doc, reader);
       if (g_strcmp0 ("num",(char *)xspec -> name) == 0)
       {
-        lib_proj -> chemistry -> nsps[i] = (int)string_to_double ((gpointer)xmlNodeGetContent(lot_node));
+        content = xmlNodeGetContent(lot_node);
+        lib_proj -> chemistry -> nsps[i] = (int)string_to_double ((gpointer)content);
+        xmlFree (content);
         lib_proj -> chemistry -> chem_prop[CHEM_Z][i] = get_z_from_periodic_table (lib_proj -> chemistry -> label[i]);
         k = (int)lib_proj -> chemistry -> chem_prop[CHEM_Z][i];
         lib_proj -> chemistry -> chem_prop[CHEM_M][i] = periodic_table_info[k].M;
@@ -508,23 +524,25 @@ int sml_preview (const char * filetoread)
     {
       lot_node = xspec -> children;
       if (lot_node == NULL) return clean_xml_data (doc, reader);
+      content = xmlNodeGetContent(lot_node);
       if (g_strcmp0 ("x",(char *)xspec -> name) == 0)
       {
-        lib_proj -> atoms[0][i].x = string_to_double ((gpointer)xmlNodeGetContent(lot_node));
+        lib_proj -> atoms[0][i].x = string_to_double ((gpointer)content);
       }
       else if (g_strcmp0 ("y",(char *)xspec -> name) == 0)
       {
-        lib_proj -> atoms[0][i].y = string_to_double ((gpointer)xmlNodeGetContent(lot_node));
+        lib_proj -> atoms[0][i].y = string_to_double ((gpointer)content);
       }
       else if (g_strcmp0 ("z",(char *)xspec -> name) == 0)
       {
-        lib_proj -> atoms[0][i].z = string_to_double ((gpointer)xmlNodeGetContent(lot_node));
+        lib_proj -> atoms[0][i].z = string_to_double ((gpointer)content);
       }
       else if (g_strcmp0 ("sp",(char *)xspec -> name) == 0)
       {
-        lib_proj -> atoms[0][i].sp = (int)string_to_double ((gpointer)xmlNodeGetContent(lot_node));
+        lib_proj -> atoms[0][i].sp = (int)string_to_double ((gpointer)content);
         lib_proj -> atoms[0][i].show[0] = TRUE;
       }
+      xmlFree (content);
       xspec = xspec -> next;
     }
     coord_node = coord_node -> next;
@@ -578,9 +596,11 @@ gchar * open_sml_file (const char * filetoread, int fam)
     cdata = xmlNodeGetContent(node);
     if (g_strcmp0 ((gchar *)cdata, family_list[fam]) != 0)
     {
+      xmlFree (cdata);
       clean_xml_data (doc, reader);
       return NULL;
     }
+    xmlFree (cdata);
     node = findnode (racine -> children, "names");
     if (node == NULL)
     {

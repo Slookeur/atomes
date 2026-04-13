@@ -282,6 +282,8 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glBindTexture (ogl_texture, 0);
   }
+  for (i=0; i<2; i++) g_free (channels[i]);
+  g_free (rawbitmap);
   return new_string;
 }
 
@@ -321,6 +323,7 @@ object_3d * gl_pango_render_layout (PangoLayout * layout, GLenum texture, int id
   bitmap.pixel_mode = ft_pixel_mode_grays;
   pango_ft2_render_layout (& bitmap, layout, PANGO_PIXELS (-prect.x)+OUTLINE_WIDTH, OUTLINE_WIDTH);
   pixels = paint_bitmap (vec4(1.0,0.0,0.0,0.0), 1.0, cwidth, cheight, bitmap.buffer);
+  g_free (bitmap.buffer);
   if (! plot -> labels[id].render)
   {
     new_string = g_malloc0(sizeof*new_string);
@@ -510,8 +513,8 @@ void render_string (int glsl, int id, screen_string * this_string)
     free_object_3d (string_to_render);
   }
   pango_font_description_free (pfont);
-  g_object_unref (G_OBJECT(pcontext));
-  g_object_unref (G_OBJECT(playout));
+  g_clear_object (& pcontext);
+  g_clear_object (& playout);
 }
 
 /*!

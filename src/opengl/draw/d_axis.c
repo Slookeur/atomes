@@ -250,10 +250,10 @@ void prepare_axis_data (float * vert_a, float * vert_b, float * vert_c)
     }
     else
     {
-      setup_cylinder_vertice (vert_a, a, b, pcol, axis_radius, 1.0, 0.0, axis_radius, 0.0);
+      setup_cylinder_vertice (vert_a, a, b, pcol, axis_radius, 1.0, 0.0, (plot -> ray_tracing) ? axis_radius : 0.0, 0.0);
       c = vec3((i==0)? axis_size : 0.0, (i==1)? axis_size : 0.0, (i==2)? axis_size : 0.0);
       nbs --;
-      setup_cylinder_vertice (vert_b, c, b, pcol, axis_radius+arrow_base, 1.0, 0.0, axis_radius, 0.0);
+      setup_cylinder_vertice (vert_b, c, b, pcol, axis_radius+arrow_base, 1.0, 0.0, (plot -> ray_tracing) ? axis_radius : 0.0, 0.0);
       nbs --;
       setup_cap_vertice (vert_c, c, b, pcol, axis_radius+arrow_base, 1.0, FALSE);
     }
@@ -297,7 +297,7 @@ int create_axis_lists ()
       axis_b = draw_billboard_quad ();
       axis_b -> inst_buffer_size = CYLI_BUFF_SIZE + 2;
       axis_c = draw_billboard_quad ();
-      axis_c -> inst_buffer_size = CAPS_BUFF_SIZE;
+      axis_c -> inst_buffer_size = CAPS_BUFF_SIZE + 2;
       axis_d = draw_billboard_quad ();
       axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
     }

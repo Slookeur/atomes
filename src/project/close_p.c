@@ -101,15 +101,17 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
     to_clow -> color_to_pick = NULL;
   }
 #ifdef GTK3
-  for (i=0; i<10; i++)
+  for (i=0; i<2; i++)
   {
-    k = (i > 2) ? 1 : nspec;
-    for (j = 0; j < 2; j++)
+    g_free (to_clow -> ogl_box_axis[i]);
+    for (j=0; j<10; j++)
     {
-      g_free (to_clow -> oglmv[j][i]);
-      if (i < 9)
+      if (to_clow -> ogl_geom[i][j]) g_free (to_clow -> ogl_geom[i][j]);
+      if (to_clow -> oglmv[i][j]) g_free (to_clow -> oglmv[i][j]);
+      if (j < 9)
       {
-        g_free (to_clow -> oglmc[j][i]);
+        if (to_clow -> ogl_poly[i][j]) g_free (to_clow -> ogl_poly[i][j]);
+        if (to_clow -> oglmc[i][j]) g_free (to_clow -> oglmc[i][j]);
       }
     }
   }
@@ -307,28 +309,14 @@ void close_project (project * to_close)
           }
           g_free (to_close -> analysis[i]);
         }
+        g_free (to_close -> analysis);
       }
     }
   }
   if (! atomes_render_image) clean_view ();
   g_free (to_close -> projfile);
 
-  if (nprojects == 1 && ! atomes_render_image)
-  {
-    prep_calc_actions ();
-    workzone.first = NULL;
-    workzone.last = NULL;
-    activep = -1;
-    correct_this_window_title (MainWindow, g_strdup_printf ("%s", PACKAGE));
-    correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes"));
-    if (workspacefile != NULL)
-    {
-      g_free (workspacefile);
-      workspacefile = NULL;
-    }
-    newspace = TRUE;
-  }
-  else if (nprojects > 1)
+  if (nprojects > 1)
   {
     if (to_close == workzone.first)
     {
@@ -345,6 +333,24 @@ void close_project (project * to_close)
       to_close -> prev -> next = to_close -> next;
       to_close -> next -> prev = to_close -> prev;
     }
+  }
+  else if (! atomes_render_image)
+  {
+    active_project = NULL;
+    prep_calc_actions ();
+    g_free (workzone.first);
+    workzone.first = NULL;
+    g_free (workzone.last);
+    workzone.last = NULL;
+    activep = -1;
+    correct_this_window_title (MainWindow, g_strdup_printf ("%s", PACKAGE));
+    correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes"));
+    if (workspacefile != NULL)
+    {
+      g_free (workspacefile);
+      workspacefile = NULL;
+    }
+    newspace = TRUE;
   }
   g_free (to_close);
   nprojects --;
@@ -434,6 +440,7 @@ void close_project (project * to_close)
       if (this_proj -> next != NULL) this_proj = this_proj -> next;
     }
   }
+
   if (! atomes_render_image) update_insert_combos ();
 }
 

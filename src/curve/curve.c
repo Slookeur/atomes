@@ -561,15 +561,36 @@ void erase_curves (project * this_proj, int c)
       {
         if (this_proj -> analysis[c] -> curves[i] -> data[j])
         {
-          free (this_proj -> analysis[c] -> curves[i] -> data[j]);
+          g_free (this_proj -> analysis[c] -> curves[i] -> data[j]);
           this_proj -> analysis[c] -> curves[i] -> data[j] = NULL;
         }
+        if (this_proj -> analysis[c] -> curves[i] -> axis_title[j])
+        {
+          g_free (this_proj -> analysis[c] -> curves[i] -> axis_title[j]);
+        }
+        g_free (this_proj -> analysis[c] -> curves[i] -> labels_font[j]);
+        this_proj -> analysis[c] -> curves[i] -> labels_font[j] = NULL;
+        g_free (this_proj -> analysis[c] -> curves[i] -> axis_title_font[j]);
+        this_proj -> analysis[c] -> curves[i] -> axis_title_font[j] = NULL;
       }
       if (this_proj -> analysis[c] -> curves[i] -> name)
       {
         g_free (this_proj -> analysis[c] -> curves[i] -> name);
         this_proj -> analysis[c] -> curves[i] -> name = NULL;
       }
+      if (this_proj -> analysis[c] -> curves[i] -> title)
+      {
+        g_free (this_proj -> analysis[c] -> curves[i] -> title);
+        this_proj -> analysis[c] -> curves[i] -> title = NULL;
+      }
+      if (this_proj -> analysis[c] -> curves[i] -> title_font)
+      {
+        g_free (this_proj -> analysis[c] -> curves[i] -> title_font);
+        this_proj -> analysis[c] -> curves[i] -> title_font = NULL;
+      }
+      g_free (this_proj -> analysis[c] -> curves[i] -> legend_font);
+      g_free (this_proj -> analysis[c] -> curves[i] -> layout);
+      g_free (this_proj -> analysis[c] -> curves[i] -> extrac);
       g_free (this_proj -> analysis[c] -> curves[i]);
       this_proj -> analysis[c] -> curves[i] = NULL;
     }

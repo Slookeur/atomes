@@ -694,7 +694,7 @@ GMenuItem * create_gmenu_item (const gchar * label, const gchar * action, const 
       if (gicon)
       {
         g_menu_item_set_icon (item, gicon);
-        g_object_unref (gicon);
+        g_clear_object (& gicon);
       }
     }
 #endif
@@ -747,7 +747,7 @@ void append_menu_item (GMenu * menu, const gchar * label, const gchar * action, 
 {
   GMenuItem * item = create_gmenu_item (label, action, accel, custom, format, icon, check, status, radio, rstatus);
   g_menu_append_item (menu, item);
-  g_object_unref (item);
+  g_clear_object (& item);
 }
 
 /*!
@@ -1153,7 +1153,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   /*GtkBuilder * builder = gtk_builder_new_from_file ("menus/main.ui");
   GMenuModel * model = G_MENU_MODEL (gtk_builder_get_object (builder, "atomes_menu_bar"));
   gtk_application_set_menubar (GTK_APPLICATION(atomes), G_MENU_MODEL(model));
-  g_object_unref (model);*/
+  g_clear_object (& model);*/
   gtk_application_set_menubar (GTK_APPLICATION(atomes), G_MENU_MODEL(atomes_menu_bar()));
   gtk_application_window_set_show_menubar (GTK_APPLICATION_WINDOW(window), TRUE);
 

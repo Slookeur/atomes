@@ -43,7 +43,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   float get_radius (int object, int col, int z, element_radius * rad_list);
 
-  double xml_string_to_double (gchar * content);
+  double xml_string_to_double (xmlChar * content);
 
   G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEventButton * event, gpointer data);
 
@@ -1234,19 +1234,19 @@ int save_preferences_to_xml_file ()
 int label_id;
 
 /*!
-  \fn double xml_string_to_double (gchar * content)
+  \fn double xml_string_to_double (xmlChar * content)
 
   \brief convert XML string to double
 
   \param content the string to convert
 */
-double xml_string_to_double (gchar * content)
+double xml_string_to_double (xmlChar * content)
 {
-  return (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
+  return (g_strcmp0((const char *)content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
 }
 
 /*!
-  \fn void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
+  \fn void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 
   \brief set default parameter
 
@@ -1259,7 +1259,7 @@ double xml_string_to_double (gchar * content)
   \param end final value, if any, -1.0 otherwise
   \param col color to set, if any
 */
-void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
+void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 {
   element_radius * tmp_rad;
   element_color * tmp_col;
@@ -1678,15 +1678,15 @@ void read_parameter (xmlNodePtr parameter_node)
   gboolean set_r, set_g, set_b, set_a;
   gboolean set_alpha, set_beta;
   ColRGBA col;
-  gchar * key;
-  gchar * content;
+  gchar * key = NULL;
+  xmlChar * content, * p_cont;
   int id;
   dint bond;
   float start, end;
   vec3_t vec;
   while (parameter_node)
   {
-    content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+    content = xmlNodeGetContent(parameter_node);
     p_details = parameter_node -> properties;
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
@@ -1699,69 +1699,71 @@ void read_parameter (xmlNodePtr parameter_node)
       p_node = p_details -> children;
       if (p_node)
       {
+        p_cont = xmlNodeGetContent(p_node);
         if (g_strcmp0("key",(char *)p_details -> name) == 0)
         {
-          key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+          key = g_strdup_printf ("%s", p_cont);
           set_codevar = TRUE;
         }
         else if (g_strcmp0("id",(char *)p_details -> name) == 0)
         {
-          id = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          id = (int) string_to_double ((gpointer)p_cont);
           set_id = TRUE;
         }
         else if (g_strcmp0("α",(char *)p_details -> name) == 0)
         {
-          bond.a = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          bond.a = (int) string_to_double ((gpointer)p_cont);
           set_alpha = TRUE;
         }
         else if (g_strcmp0("β",(char *)p_details -> name) == 0)
         {
-          bond.b = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          bond.b = (int) string_to_double ((gpointer)p_cont);
           set_beta = TRUE;
         }
         else if (g_strcmp0("x",(char *)p_details -> name) == 0)
         {
-          vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.x = string_to_double ((gpointer)p_cont);
           set_x = TRUE;
         }
         else if (g_strcmp0("y",(char *)p_details -> name) == 0)
         {
-          vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.y = string_to_double ((gpointer)p_cont);
           set_y = TRUE;
         }
         else if (g_strcmp0("z",(char *)p_details -> name) == 0)
         {
-          vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.z = string_to_double ((gpointer)p_cont);
           set_z = TRUE;
         }
         else if (g_strcmp0("start",(char *)p_details -> name) == 0)
         {
-          start = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          start = string_to_double ((gpointer)p_cont);
         }
         else if (g_strcmp0("end",(char *)p_details -> name) == 0)
         {
-          end = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          end = string_to_double ((gpointer)p_cont);
         }
         else if (g_strcmp0("red",(char *)p_details -> name) == 0)
         {
-          col.red = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.red = string_to_double ((gpointer)p_cont);
           set_r = TRUE;
         }
         else if (g_strcmp0("green",(char *)p_details -> name) == 0)
         {
-          col.green = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.green = string_to_double ((gpointer)p_cont);
           set_g = TRUE;
         }
         else if (g_strcmp0("blue",(char *)p_details -> name) == 0)
         {
-          col.blue = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.blue = string_to_double ((gpointer)p_cont);
           set_b = TRUE;
         }
         else if (g_strcmp0("alpha",(char *)p_details -> name) == 0)
         {
-          col.alpha = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.alpha = string_to_double ((gpointer)p_cont);
           set_a = TRUE;
         }
+        xmlFree (p_cont);
       }
       p_details = p_details -> next;
     }
@@ -1771,7 +1773,8 @@ void read_parameter (xmlNodePtr parameter_node)
       // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
       set_parameter (content, key, id, (set_alpha && set_beta) ? & bond : NULL, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
     }
-    g_free (content);
+    if (key) g_free (key);
+    xmlFree (content);
     parameter_node = parameter_node -> next;
     parameter_node = findnode (parameter_node, "parameter");
   }
@@ -1789,12 +1792,12 @@ void read_light (xmlNodePtr light_node)
   xmlNodePtr l_node, p_node;
   xmlNodePtr parameter_node;
   xmlAttrPtr l_details, p_details;
-  gchar * key;
+  gchar * key = NULL;
   int lid;
   gboolean set_codevar;
   gboolean set_lid = FALSE;
   gboolean set_x, set_y, set_z;
-  gchar * content;
+  xmlChar * content, * p_cont;
   vec3_t vec;
   l_details = light_node -> properties;
   while (l_details)
@@ -1804,7 +1807,9 @@ void read_light (xmlNodePtr light_node)
     {
       if (g_strcmp0("id",(char *)l_details -> name) == 0)
       {
-        lid = (int) string_to_double ((gpointer)xmlNodeGetContent(l_node));
+        content = xmlNodeGetContent(l_node);
+        lid = (int) string_to_double ((gpointer)content);
+        xmlFree (content);
         set_lid = TRUE;
       }
     }
@@ -1817,33 +1822,35 @@ void read_light (xmlNodePtr light_node)
     set_x = set_y = set_z = FALSE;
     while (parameter_node)
     {
-      content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+      content = xmlNodeGetContent(parameter_node);
       p_details = parameter_node -> properties;
       while (p_details)
       {
         p_node = p_details -> children;
         if (p_node)
         {
+          p_cont = xmlNodeGetContent(p_node);
           if (g_strcmp0("key",(char *)p_details -> name) == 0)
           {
-            key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+            key = g_strdup_printf ("%s", p_cont);
             set_codevar = TRUE;
           }
           else if (g_strcmp0("x",(char *)p_details -> name) == 0)
           {
-            vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.x = string_to_double ((gpointer)p_cont);
             set_x = TRUE;
           }
           else if (g_strcmp0("y",(char *)p_details -> name) == 0)
           {
-            vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.y = string_to_double ((gpointer)p_cont);
             set_y = TRUE;
           }
           else if (g_strcmp0("z",(char *)p_details -> name) == 0)
           {
-            vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.z = string_to_double ((gpointer)p_cont);
             set_z = TRUE;
           }
+          xmlFree (p_cont);
         }
         p_details = p_details -> next;
       }
@@ -1851,7 +1858,8 @@ void read_light (xmlNodePtr light_node)
       {
         set_parameter (content, key, lid, NULL, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0, NULL);
       }
-      g_free (content);
+      if (key) g_free (key);
+      xmlFree (content);
       parameter_node = parameter_node -> next;
       parameter_node = findnode (parameter_node, "parameter");
     }
@@ -3428,7 +3436,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     }
     gtk_tree_view_append_column(GTK_TREE_VIEW(pref_tree), pref_col[i]);
   }
-  g_object_unref (pref_model);
+  g_clear_object (& pref_model);
   pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
   gtk_tree_selection_set_mode (pref_select, GTK_SELECTION_SINGLE);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(pref_tree));
@@ -3815,7 +3823,7 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Style</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
   combo = gtk_combo_box_new_with_model (model);
-  g_object_unref (model);
+  g_clear_object (& model);
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);

@@ -2379,6 +2379,7 @@ gchar * open_field_file (int field)
   xmlNodePtr n_node, m_node, o_node;
   field_data * ff_data;
   xmlAttrPtr prop;
+  xmlChar * content;
   const xmlChar fml[7]="ff-xml";
   gchar * data_nodes[11]={"atoms", "bonds-h", "bonds-q", "bonds-m", "angles-h", "angles-q",
                           "dihedrals-c", "dihedrals-ccc", "impropers", "inversions", "non-bonded"};
@@ -2440,7 +2441,9 @@ gchar * open_field_file (int field)
       clean_this_field_data (doc, reader);
       return NULL;
     }
-    force_field_name = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(f_node));
+    content = xmlNodeGetContent(f_node);
+    force_field_name = g_strdup_printf ("%s", content);
+    xmlFree (content);
     f_node = findnode (racine -> children, "units");
     if (f_node == NULL)
     {
@@ -2448,7 +2451,9 @@ gchar * open_field_file (int field)
       clean_this_field_data (doc, reader);
       return NULL;
     }
-    str = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(f_node));
+    content = xmlNodeGetContent(f_node);
+    str = g_strdup_printf ("%s", content);
+    xmlFree (content);
     for (i=0; i<4;i++)
     {
       if (g_strcmp0 (str, fnames[activef][0][i]) == 0)
@@ -2483,7 +2488,9 @@ gchar * open_field_file (int field)
         clean_this_field_data (doc, reader);
         return NULL;
       }
-      ff_objects[i] = (int)string_to_double ((gpointer)xmlNodeGetContent(m_node));
+      content = xmlNodeGetContent(m_node);
+      ff_objects[i] = (int)string_to_double ((gpointer)content);
+      xmlFree (content);
       if (ff_objects[i] < 0)
       {
         g_warning ("Error reading FF file %s, ff-data, ff_objects[%d] = %d < 0 ?!", filetoread, i, ff_objects[i]);
@@ -2508,18 +2515,20 @@ gchar * open_field_file (int field)
             clean_this_field_data (doc, reader);
             return NULL;
           }
+          content = xmlNodeGetContent(o_node);
           if (g_strcmp0 ("dim",(char *)prop -> name) == 0)
           {
-            ff_dim[i] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_dim[i] = (int) string_to_double ((gpointer)content);
           }
           /*else if (g_strcmp0 ("info",(char *)prop -> name) == 0)
           {
-            ff_info[i] = (int)string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_info[i] = (int)string_to_double ((gpointer)content);
           }*/
           else if (g_strcmp0 ("pot",(char *)prop -> name) == 0)
           {
-            ff_key[i-1] = (int)string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_key[i-1] = (int)string_to_double ((gpointer)content);
           }
+          xmlFree (content);
           prop = prop -> next;
         }
       }
@@ -2621,24 +2630,25 @@ gchar * open_field_file (int field)
               clean_this_field_data (doc, reader);
               return NULL;
             }
+            content = xmlNodeGetContent(o_node);
             switch (i)
             {
               case 0:
                 if (g_strcmp0 ("label",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][0] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][0] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("mass",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][1] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][1] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("key",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][2] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][2] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("info",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][3] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][3] = g_strdup_printf ("%s", content);
                 }
                 else
                 {
@@ -2650,39 +2660,39 @@ gchar * open_field_file (int field)
               default:
                 if (g_strcmp0 ("a",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][0] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][0] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("b",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][1] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][1] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("c",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][2] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][2] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("d",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][3] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][3] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_a",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][0] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][0] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_b",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][1] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][1] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_c",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][2] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][2] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_d",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][3] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][3] = (int) string_to_double ((gpointer)content);
                 }
                 else if (i > 0 && g_strcmp0 ("info",(char *)prop -> name) == 0)
                 {
-                  ff_data -> info[j] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_data -> info[j] = g_strdup_printf ("%s", content);
                   setinfo = TRUE;
                 }
                 else
@@ -2692,32 +2702,33 @@ gchar * open_field_file (int field)
                     // Non-bonded: 12-6: E_i, R_i, E_14, R_14
                     if (g_strcmp0 ("Ei",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Ri",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Eii",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Rii",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("A",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("B",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else
                     {
                       g_warning ("Error reading FF file %s, i= %d, j= %d, unexpected node ?! node name= %s", filetoread, i, j, (char *)prop -> name);
                       clean_this_field_data (doc, reader);
+                      xmlFree (content);
                       return NULL;
                     }
                   }
@@ -2733,51 +2744,52 @@ gchar * open_field_file (int field)
                     // Inversion: Harm: K, Phi_0
                     if (g_strcmp0 ("K",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("R_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Theta_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Phi_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("KK",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("KKK",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Kub",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("S_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("n",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("D",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Alpha",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else
                     {
                       g_warning ("Error reading FF file %s, i= %d, j= %d, unexpected node ?! node name= %s", filetoread, i, j, (char *)prop -> name);
+                      xmlFree (content);
                       clean_this_field_data (doc, reader);
                       return NULL;
                     }
@@ -2785,6 +2797,7 @@ gchar * open_field_file (int field)
                 }
                 break;
             }
+            xmlFree (content);
             prop = prop -> next;
           }
           n_node = n_node -> next;

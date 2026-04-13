@@ -538,9 +538,9 @@ GtkWidget * create_workspace_tree ()
 
   worktree = destroy_this_widget (worktree);
   workstore = gtk_tree_store_new (3, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
-  fill_workspace (workstore);
   worktree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(workstore));
-  g_object_unref (workstore);
+  fill_workspace (workstore);
+  g_clear_object (& workstore);
 
 
   col = gtk_tree_view_column_new ();

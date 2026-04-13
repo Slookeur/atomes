@@ -606,6 +606,7 @@ int setprop (xmlNodePtr pnode)
     idn = pspec -> children;
     data = xmlNodeGetContent(idn);
     res = get_spec_from_data(data);
+    xmlFree (data);
     if (res < 0)
     {
       res=6;
@@ -621,61 +622,70 @@ int setprop (xmlNodePtr pnode)
     data = xmlNodeGetContent(ptn);
     if (g_strcmp0 (exact_name((char *)data), active_chem -> element[res]) != 0)
     {
+      xmlFree (data);
       res=6;
       goto pend;
     }
+    xmlFree (data);
     ptn = findnode(ptnode, "z");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     if ((int)active_chem -> chem_prop[CHEM_Z][res] != (int)string_to_double ((gpointer)data))
     {
+      xmlFree (data);
       res=6;
       goto pend;
     }
+    xmlFree (data);
     ptn = findnode(ptnode, "mass");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_M][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "rad");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     // val = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "radius");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_R][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "nscatt");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_N][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "xscatt");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_X][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptnode = ptnode -> parent;
     ptnode = ptnode -> next;
   }
@@ -1075,6 +1085,7 @@ int setpbc (xmlNodePtr pbcnode)
   {
     active_cell -> pbc = 1;
   }
+  xmlFree (data);
   bnode=findnode(pnode, "fractional");
   if (bnode == NULL)
   {
@@ -1085,6 +1096,7 @@ int setpbc (xmlNodePtr pbcnode)
   active_cell -> frac = 0;
   if (g_strcmp0 ((char *)data, (char *)"TRUE") == 0)
   {
+    xmlFree (data);
     bnode=findnode(pnode, "fractype");
     if (bnode == NULL)
     {
@@ -1094,6 +1106,7 @@ int setpbc (xmlNodePtr pbcnode)
     data = xmlNodeGetContent(bnode);
     //val=string_to_double ((gpointer)data);
     //j = val;
+    xmlFree (data);
     active_cell -> frac = 1;
   }
   pbc=0;
@@ -1128,6 +1141,7 @@ int setcutoffs (xmlNodePtr cutnode)
   }
   data = xmlNodeGetContent(cn);
   val=string_to_double ((gpointer)data);
+  xmlFree (data);
   active_chem -> grtotcutoff = val;
   cn = findnode(cnode, "partials");
   if (cn == NULL)
@@ -1153,10 +1167,11 @@ int setcutoffs (xmlNodePtr cutnode)
         goto cend;
       }
       data = xmlNodeGetContent(cn);
-      val=string_to_double ((gpointer)data);
+      val = string_to_double ((gpointer)data);
+      xmlFree (data);
       active_chem -> cutoffs[i][j] = val;
       g_free (ncut);
-      ncut=NULL;
+      ncut = NULL;
     }
   }
   cut=0;
@@ -1191,6 +1206,7 @@ int settime(xmlNodePtr timenode)
   data = xmlNodeGetContent(tn);
   //val = string_to_double ((gpointer)data);
   //delta_t = val;
+  xmlFree (data);
   tn = findnode(tnode, "unit");
   if (tn == NULL)
   {
@@ -1203,6 +1219,7 @@ int settime(xmlNodePtr timenode)
   {
     if (g_strcmp0 ((char *)data, g_strdup_printf ("t [%s]", untime[i])) == 0) j=i;
   }
+  xmlFree (data);
   if (j == -1)
   {
     tps=10;
@@ -1218,6 +1235,7 @@ int settime(xmlNodePtr timenode)
     data = xmlNodeGetContent(tn);
     //val = string_to_double ((gpointer)data);
     //ndtbs = val;
+    xmlFree (data);
   }
   tps=0;
 
@@ -1281,11 +1299,14 @@ int check_xml (const char * filetocheck)
         node = findnode(node, "file");
         if (node == NULL)
         {
+          xmlFree (cdata);
           res=3;
           goto end;
         }
         cfichier = xmlNodeGetContent(node);
         res= testopening((char *)cdata, (char *)cfichier);
+        xmlFree (cdata);
+        xmlFree (cfichier);
         if (res != 0)
         {
           goto end;
@@ -1365,7 +1386,7 @@ int check_xml (const char * filetocheck)
             res=3;
             goto end;
           }
-          cdata=xmlNodeGetContent(node);
+          cdata = xmlNodeGetContent(node);
           if (g_strcmp0 ((char *)cdata, (char *)"TRUE") == 0)
           {
             active_project -> run = 1;
@@ -1374,6 +1395,7 @@ int check_xml (const char * filetocheck)
           {
             active_project -> run = 0;
           }
+          xmlFree (cdata);
         }
       }
     }
