@@ -823,7 +823,7 @@ void adjust_so_combo (builder_edition * cbuilder)
 {
   GtkTreeModel * model = so_combo_tree (cbuilder -> cell.sp_group);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> so_combo), model);
-  g_object_unref ( model);
+  g_object_unref (model);
   combo_set_active (cbuilder -> so_combo, 0);
   combo_set_markup (cbuilder -> so_combo);
   widget_set_sensitive (cbuilder -> so_combo, cbuilder -> cell.sp_group -> nums-1);
@@ -912,7 +912,7 @@ void adjust_sg_combo (builder_edition * cbuilder, int cs, int bl)
 {
   GtkTreeModel * model = sg_combo_tree (cs, bl);
   gtk_combo_box_set_model (GTK_COMBO_BOX(cbuilder -> sg_combo), model);
-  g_object_unref ( model);
+  g_object_unref (model);
   combo_set_active (cbuilder -> sg_combo, 0);
   combo_set_markup (cbuilder -> sg_combo);
   adjust_lattice_parameters (cbuilder);
@@ -1339,7 +1339,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> sg_box, markup_label("Space group:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   GtkTreeModel * model = sg_combo_tree (0, 0);
   cbuilder -> sg_combo = gtk_combo_box_new_with_model (model);
-  g_object_unref ( model);
+  g_object_unref (model);
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (cbuilder -> sg_combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (cbuilder -> sg_combo), renderer, "text", 0, NULL);
@@ -1354,7 +1354,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> so_box, markup_label("Settings:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   model = so_combo_tree (cbuilder -> cell.sp_group);
   cbuilder -> so_combo = gtk_combo_box_new_with_model (model);
-  g_object_unref ( model);
+  g_object_unref (model);
   renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (cbuilder -> so_combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (cbuilder -> so_combo), renderer, "text", 0, NULL);
@@ -1383,7 +1383,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   cbuilder -> lattice_box = create_vbox (BSEP);
   GtkTreeModel * lmodel = la_combo_tree ();
   cbuilder -> la_combo = gtk_combo_box_new_with_model (lmodel);
-  g_object_unref ( lmodel);
+  g_object_unref (lmodel);
   renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (cbuilder -> la_combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (cbuilder -> la_combo), renderer, "text", 0, NULL);

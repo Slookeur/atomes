@@ -540,7 +540,7 @@ GMenu * menu_show_coord (glwin * view, int popm, int id, int mid)
       }
     }
     append_submenu (menu, this_proj -> chemistry -> label[i], menus);
-    g_object_unref ( menus);
+    g_object_unref (menus);
   }
   return menu;
 }
@@ -636,7 +636,7 @@ GMenu * menu_show_rings (glwin * view, int popm, int id, int mid)
     g_free (stra);
     g_free (strb);
   }
-  if (! mid) g_object_unref ( menus);
+  if (! mid) g_object_unref (menus);
   return menu;
 }
 

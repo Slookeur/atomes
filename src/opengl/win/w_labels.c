@@ -819,7 +819,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
       gtk_list_store_set (store, & iter, 0, gdk_pixbuf_new_from_file (dots[i], NULL), -1);
     }
     lstyle = gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
-    g_object_unref ( store);
+    g_object_unref (store);
     GtkCellRenderer * renderer;
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(lstyle), renderer, FALSE );

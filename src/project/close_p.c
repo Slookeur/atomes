@@ -100,6 +100,7 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
     g_free (to_clow -> color_to_pick);
     to_clow -> color_to_pick = NULL;
   }
+
 #ifdef GTK3
   for (i=0; i<2; i++)
   {
@@ -116,6 +117,7 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
     }
   }
 #endif
+
   for (i=0; i<steps; i++)
   {
     if (to_clow -> bondid[i])
@@ -135,8 +137,10 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
     }
     if (to_clow -> clones[i]) g_free(to_clow -> clones[i]);
   }
+
   if (to_clow -> bondid) g_free(to_clow -> bondid);
   if (to_clow -> clones) g_free(to_clow -> clones);
+
   for (i=0; i<NUM_COLORS; i++)
   {
     g_free (to_clow -> colorp[i]);
@@ -290,9 +294,9 @@ void close_project (project * to_close)
 
   if (to_close -> run)
   {
-    for (i=0 ; i<NCALCS ; i++)
+    if (to_close -> analysis)
     {
-      if (to_close -> analysis)
+      for (i=0 ; i<NCALCS ; i++)
       {
         if (to_close -> analysis[i])
         {
@@ -309,10 +313,11 @@ void close_project (project * to_close)
           }
           g_free (to_close -> analysis[i]);
         }
-        g_free (to_close -> analysis);
       }
+      g_free (to_close -> analysis);
     }
   }
+
   if (! atomes_render_image) clean_view ();
   g_free (to_close -> projfile);
 
@@ -336,11 +341,9 @@ void close_project (project * to_close)
   }
   else if (! atomes_render_image)
   {
-    active_project = NULL;
-    prep_calc_actions ();
-    g_free (workzone.first);
+    // if (workzone.first) g_free (workzone.first);
     workzone.first = NULL;
-    g_free (workzone.last);
+    // if (workzone.last) g_free (workzone.last);
     workzone.last = NULL;
     activep = -1;
     correct_this_window_title (MainWindow, g_strdup_printf ("%s", PACKAGE));
@@ -440,7 +443,7 @@ void close_project (project * to_close)
       if (this_proj -> next != NULL) this_proj = this_proj -> next;
     }
   }
-
+  g_debug ("so clos 5");
   if (! atomes_render_image) update_insert_combos ();
 }
 

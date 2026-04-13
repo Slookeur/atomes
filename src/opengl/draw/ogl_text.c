@@ -513,9 +513,9 @@ void render_string (int glsl, int id, screen_string * this_string)
     free_object_3d (string_to_render);
   }
   pango_font_description_free (pfont);
-  // g_object_unref ( pcontext);
+  // g_object_unref (pcontext);
   g_clear_object (& pcontext);
-  // g_object_unref ( playout);
+  // g_object_unref (playout);
   g_clear_object (& playout);
 }
 

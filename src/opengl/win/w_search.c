@@ -3624,7 +3624,7 @@ GtkWidget * create_atoms_tree (atom_search * asearch, project * this_proj, int n
       atom_cell[i] = gtk_cell_renderer_combo_new ();
       GtkTreeModel * model = replace_combo_tree (FALSE, this_proj -> id);
       g_object_set (atom_cell[i], "model", model, "text-column", 0, "has-entry", FALSE, "editable", TRUE, NULL);
-      g_object_unref ( model);
+      g_object_unref (model);
       g_signal_connect (G_OBJECT(atom_cell[i]), "editing-started", G_CALLBACK(markup_action_renderer), & asearch -> pointer[i-4]);
       g_signal_connect (G_OBJECT(atom_cell[i]), "changed", G_CALLBACK(changed_action_renderer), & asearch -> pointer[i-4]);
     }

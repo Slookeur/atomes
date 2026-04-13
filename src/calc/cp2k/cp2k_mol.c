@@ -312,7 +312,7 @@ void cp2k_fix_molecule ()
                                            3, old_fixed[i][1],
                                            4, old_fixed[i][2], -1);
   }
-  g_object_unref ( add_model);
+  g_object_unref (add_model);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(frag_tree));
 
   i = ((qm_coord -> totcoord[2]+1)*35 < 500) ? (qm_coord -> totcoord[2]+1)*35 : 500;

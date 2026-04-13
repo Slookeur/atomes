@@ -513,7 +513,7 @@ void remove_nose_thermostat (int num_to_remove)
     if (thermo -> next != NULL) thermo = thermo -> next;
   }
   num_cpmd_objects = get_num_thermo();
-  g_object_unref ( remove_model);
+  g_object_unref (remove_model);
   i = ((num_cpmd_objects+1)*40 < 500) ? (num_cpmd_objects+1)*40 : 500;
   GtkWidget * scrollsets = create_scroll (dialog_get_content_area (rthermo), 450, i, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, scrollsets, remove_tree);
@@ -1314,7 +1314,7 @@ void select_atom_from_model (int therm)
   fill_thermo_atom_model (the_therm);
   init_default_shaders (qm_view);
   num_cpmd_objects = l;
-  g_object_unref ( add_model);
+  g_object_unref (add_model);
   i = ((qm_proj -> nspec + l)*37 < 500) ? (qm_proj -> nspec + l)*37 : 500;
   //GtkWidget * scrollsets = create_scroll (NULL, -1, -1, GTK_SHADOW_ETCHED_IN, 0);
   GtkWidget * scrollsets = create_scroll (dialog_get_content_area (amol), 320, i, GTK_SHADOW_ETCHED_IN);

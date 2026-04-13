@@ -1391,7 +1391,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
                   gtk_text_buffer_set_modified (buffer, FALSE);
                   result = g_file_set_contents (filename, text, -1, & err);
                   g_free (text);
-                  g_object_unref ( buffer);
+                  g_object_unref (buffer);
                   if (! result && err)
                   {
                     show_error (g_strdup_printf ("Error while saving input file: %s\n Error: %s", filename, err -> message), 0, qm_assistant);
@@ -1415,7 +1415,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
           gtk_text_buffer_set_modified (buffer, FALSE);
           result = g_file_set_contents (filename, text, -1, & err);
           g_free (text);
-          g_object_unref ( buffer);
+          g_object_unref (buffer);
           if (! result && err)
           {
             /* error saving file, show message to user */
@@ -1445,7 +1445,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
               break;
             }
             g_free (filename);
-            g_object_unref ( buffer);
+            g_object_unref (buffer);
           }
         }
       }

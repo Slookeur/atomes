@@ -928,7 +928,7 @@ GtkWidget * setview (project * this_proj, int b, int c)
       gtk_tree_view_column_set_min_width (datacol[i], 100);
     }
   }
-  g_object_unref ( datamodel);
+  g_object_unref (datamodel);
   dataselect = gtk_tree_view_get_selection (GTK_TREE_VIEW(dataview));
   gtk_tree_selection_set_mode (dataselect, GTK_SELECTION_MULTIPLE);
 #ifdef GTK3

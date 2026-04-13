@@ -491,7 +491,7 @@ void remove_dummy (int num_to_remove)
     if (dumm -> next != NULL) dumm = dumm -> next;
   }
   num_cpmd_objects = tmp_cpmd -> dummies;
-  g_object_unref ( remove_model);
+  g_object_unref (remove_model);
 
   i = ((tmp_cpmd -> dummies+1)*40 < 500) ? (tmp_cpmd -> dummies+1)*40 : 500;
   GtkWidget * scrollsets = create_scroll (dialog_get_content_area (rdummy), 450, i, GTK_SHADOW_ETCHED_IN);

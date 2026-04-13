@@ -517,7 +517,7 @@ G_MODULE_EXPORT void add_molecule_to_field (GSimpleAction * action, GVariant * p
     gtk_tree_store_set (add_model, & iter, 0, tmp_fmol -> fragments[i] + 1, 1, 0, -1);
     new_mol[i] = -1;
   }
-  g_object_unref ( add_model);
+  g_object_unref (add_model);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(add_tree));
 
   i = ((tmp_fmol -> multi+1)*35 < 500) ? (tmp_fmol -> multi+1)*35 : 500;
@@ -811,7 +811,7 @@ G_MODULE_EXPORT void remove_molecule_from_field (GSimpleAction * action, GVarian
     if (tmp_fmol -> next != NULL) tmp_fmol = tmp_fmol -> next;
   }
   num_field_objects = tmp_field -> molecules;
-  g_object_unref ( remove_model);
+  g_object_unref (remove_model);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(remove_tree));
 
   i = ((j+1)*40 < 500) ? (j+1)*40 : 500;

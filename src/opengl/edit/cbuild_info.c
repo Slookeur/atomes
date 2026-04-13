@@ -377,7 +377,7 @@ GtkWidget * create_wyckoff_tree (space_group * spg)
     if (!i) gtk_tree_view_column_set_visible (wcol[i], FALSE);
   }
   fill_wyckoff_model (wmodel, spg);
-  g_object_unref ( wmodel);
+  g_object_unref (wmodel);
   return wtree;
 }
 
@@ -573,7 +573,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   {
     GtkTreeModel * model = so_combo_tree (spg);
     GtkWidget *  sbox = gtk_combo_box_new_with_model (model);
-    g_object_unref ( model);
+    g_object_unref (model);
     GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (sbox), renderer, TRUE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (sbox), renderer, "text", 0, NULL);

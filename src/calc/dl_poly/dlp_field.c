@@ -2801,7 +2801,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
   int i, j, k, l;
   i = GPOINTER_TO_INT (data);
   str = pop_info (i, row_id);
-  if (field_pop_actions) g_object_unref ( field_pop_actions);
+  if (field_pop_actions) g_object_unref (field_pop_actions);
   field_pop_actions = g_simple_action_group_new ();
   GMenu * fmenu = g_menu_new ();
   GMenu * fmenus;
@@ -2811,7 +2811,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
     append_field_item (fmenus, str, "pop", i, NULL, IMG_NONE, NULL, FALSE, NULL, NULL, FALSE, FALSE, FALSE, TRUE);
     g_free (str);
     g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-    g_object_unref ( fmenus);
+    g_object_unref (fmenus);
   }
   if (actel > 0)
   {
@@ -2822,7 +2822,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
       append_field_item (fmenus, str, "edit-fp", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(edit_field_prop), data, FALSE, FALSE, FALSE, TRUE);
       g_free (str);
       g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-      g_object_unref ( fmenus);
+      g_object_unref (fmenus);
     }
     switch (i)
     {
@@ -2832,7 +2832,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           fmenus = g_menu_new ();
           append_field_item (fmenus, "Add New Molecule", "add-mol", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(add_molecule_to_field), data, FALSE, FALSE, FALSE, TRUE);
           g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-          g_object_unref ( fmenus);
+          g_object_unref (fmenus);
         }
         if (tmp_field -> molecules > tmp_coord -> totcoord[3]
             && tmp_fmol -> mol -> multiplicity > 1
@@ -2843,7 +2843,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           append_field_item (fmenus, str, "rem-mol", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(remove_molecule_from_field), data, FALSE, FALSE, FALSE, TRUE);
           g_free (str);
           g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-          g_object_unref ( fmenus);
+          g_object_unref (fmenus);
         }
         break;
       default:
@@ -2858,7 +2858,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
             str = g_strdup_printf ("Created New Field Atom From %s Atom(s)", tmp_fat -> name);
             append_field_item (fmenus, str, "add-fat", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_select_atom_id_from_fied_molecule), GINT_TO_POINTER(0), FALSE, FALSE, FALSE, TRUE);
             g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-            g_object_unref ( fmenus);
+            g_object_unref (fmenus);
           }
           l = 0;
           tmp_fbt = tmp_fmol -> first_atom;
@@ -2874,7 +2874,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
             append_field_item (fmenus, str, "rem-fat", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(remove_atom_from_field_molecule), (gpointer *)tmp_fat, FALSE, FALSE, FALSE, TRUE);
             g_free (str);
             g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-            g_object_unref ( fmenus);
+            g_object_unref (fmenus);
           }
         }
         str = pop_remove (i);
@@ -2890,7 +2890,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
     append_field_item (fmenus, str, "add-prop", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(add_field_prop), data, FALSE, FALSE, FALSE, TRUE);
     g_free (str);
     g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
-    g_object_unref ( fmenus);
+    g_object_unref (fmenus);
   }
 #ifdef GTK4
   menu = gtk_popover_menu_new_from_model_full ((GMenuModel *)fmenu, GTK_POPOVER_MENU_NESTED);
@@ -3563,7 +3563,7 @@ GtkWidget * create_field_tree (int f)
                                           "editable", TRUE, NULL);
       g_signal_connect (G_OBJECT(field_renderer[f][i]), "changed", G_CALLBACK(changed_field_key_renderer), GINT_TO_POINTER(f));
       field_col[f][i] = gtk_tree_view_column_new_with_attributes (ctitle[f][i], field_renderer[f][i], "text", i, NULL);
-      g_object_unref ( list_store_combo);
+      g_object_unref (list_store_combo);
       combox = TRUE;
     }
     else if (combox)
@@ -3659,7 +3659,7 @@ GtkWidget * create_field_tree (int f)
   }
 
   fill_field_model (field_model[f], f, 0);
-  g_object_unref ( field_model[f]);
+  g_object_unref (field_model[f]);
   GtkTreeSelection * fieldselect = gtk_tree_view_get_selection (GTK_TREE_VIEW(field_tree[f]));
   gtk_tree_selection_set_mode (fieldselect, GTK_SELECTION_SINGLE);
 #ifdef GTK4
@@ -4578,7 +4578,7 @@ G_MODULE_EXPORT void run_on_assistant_apply (GtkDialog * info, gint response_id,
           gtk_text_buffer_set_modified (buffer, FALSE);
           result = g_file_set_contents (filename, text, -1, & err);
           g_free (text);
-          g_object_unref ( buffer);
+          g_object_unref (buffer);
           if (! result && err)
           {
             show_error (g_strdup_printf ("Error while saving input file: %s\n Error: %s", filename, err -> message), 0, field_assistant);

@@ -788,7 +788,7 @@ G_MODULE_EXPORT void remove_atom_from_field_molecule (GSimpleAction * action, GV
     }
     if (tmp_fat -> next != NULL) tmp_fat = tmp_fat -> next;
   }
-  g_object_unref ( remove_model);
+  g_object_unref (remove_model);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(remove_tree));
 
   i = ((j+1)*40 < 500) ? (j+1)*40 : 500;

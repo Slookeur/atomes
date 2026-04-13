@@ -1542,7 +1542,7 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
       }
     }
   }
-  g_object_unref ( add_model);
+  g_object_unref (add_model);
 
   if (active_sel < 2)
   {

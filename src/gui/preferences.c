@@ -3436,7 +3436,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     }
     gtk_tree_view_append_column(GTK_TREE_VIEW(pref_tree), pref_col[i]);
   }
-  g_object_unref ( pref_model);
+  g_object_unref (pref_model);
   pref_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(pref_tree));
   gtk_tree_selection_set_mode (pref_select, GTK_SELECTION_SINGLE);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(pref_tree));
@@ -3823,7 +3823,7 @@ GtkWidget * opengl_preferences ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Style</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
   combo = gtk_combo_box_new_with_model (model);
-  g_object_unref ( model);
+  g_object_unref (model);
   GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 0, NULL);

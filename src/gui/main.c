@@ -1087,7 +1087,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
     silent_input = FALSE;
   }
 #ifdef MAC_INTEGRATION
-  g_object_unref ( ProgOSX);
+  g_object_unref (ProgOSX);
 #endif
 }
 
@@ -1139,10 +1139,10 @@ int check_opengl_rendering ()
 #ifdef DEBUG
   g_debug ("Exit status of atomes_startup_testing = %d", res);
 #endif
-  g_object_unref ( proc);
+  g_object_unref (proc);
 #ifndef CODEBLOCKS
 #ifndef OSX
-  g_object_unref ( proc_launch);
+  g_object_unref (proc_launch);
 #endif
 #endif
   g_free (proc_path);
@@ -1314,7 +1314,7 @@ int main (int argc, char *argv[])
     g_application_register (G_APPLICATION(AtomesApp), NULL, & error);
     g_signal_connect (G_OBJECT(AtomesApp), "activate", G_CALLBACK(run_program), NULL);
     int status = g_application_run (G_APPLICATION (AtomesApp), 0, NULL);
-    g_object_unref ( AtomesApp);
+    g_object_unref (AtomesApp);
     return status;
   }
   return 0;

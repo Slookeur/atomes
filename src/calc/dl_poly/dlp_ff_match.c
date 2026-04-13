@@ -944,7 +944,7 @@ GtkWidget * create_update_tree ()
       prop_to_up = global_render_tree ();
       g_object_set (update_renderer[i], "model", prop_to_up, "text-column", 0, "has-entry", FALSE, "editable", TRUE, NULL);
       gtk_tree_model_filter_set_visible_func ((GtkTreeModelFilter *)prop_to_up, (GtkTreeModelFilterVisibleFunc)G_CALLBACK(update_rend), GTK_TREE_VIEW(update_tree), NULL);
-      g_object_unref ( prop_to_up);
+      g_object_unref (prop_to_up);
       g_signal_connect (G_OBJECT(update_renderer[i]), "editing-started", G_CALLBACK(markup_action_renderer), NULL);
       g_signal_connect (G_OBJECT(update_renderer[i]), "changed", G_CALLBACK(changed_update_renderer), NULL);
       update_col[i] = gtk_tree_view_column_new_with_attributes (str, update_renderer[i], "text", i, NULL);
@@ -970,7 +970,7 @@ GtkWidget * create_update_tree ()
   }
   for (i=0; i<9; i++) tmp_res[i] = NULL;
   fill_update_model (update_model);
-  g_object_unref ( update_model);
+  g_object_unref (update_model);
   GtkTreeSelection * update_select = gtk_tree_view_get_selection (GTK_TREE_VIEW(update_tree));
   gtk_tree_selection_set_mode (update_select, GTK_SELECTION_SINGLE);
 #ifdef GTK4

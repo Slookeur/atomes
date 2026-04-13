@@ -314,7 +314,7 @@ GtkWidget * create_projects_tree (curve_edition * cedit, gpointer data)
     if (i == 0 || i > 2) gtk_tree_view_column_set_visible (projcol[i], FALSE);
   }
   fill_proj_model (cedit, projmodel, data);
-  g_object_unref ( projmodel);
+  g_object_unref (projmodel);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(cedit -> projtree));
   return cedit -> projtree;
 }
