@@ -443,7 +443,7 @@ void close_project (project * to_close)
       if (this_proj -> next != NULL) this_proj = this_proj -> next;
     }
   }
-  g_debug ("so clos 5");
+
   if (! atomes_render_image) update_insert_combos ();
 }
 
