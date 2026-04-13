@@ -856,7 +856,7 @@ GtkWidget * create_org_list (gpointer data)
     }
   }
   fill_org_model (orglist, data);
-  g_clear_object (& orglist);
+  g_object_unref (orglist);
   g_signal_connect (G_OBJECT(orgmodel), "row-deleted", G_CALLBACK(move_back_front), data);
   gtk_tree_view_expand_all (GTK_TREE_VIEW(cedit -> orgtree));
   gtk_tree_view_set_activate_on_single_click (GTK_TREE_VIEW(cedit -> orgtree), TRUE);
