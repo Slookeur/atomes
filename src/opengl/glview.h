@@ -334,6 +334,7 @@ extern angle angle_3d (cell_info * cell, int mdstep, atom * at, atom * bt, atom 
 extern angle dihedral_3d (cell_info * cell, int mdstep, atom * at, atom * bt, atom * ct, atom * dt);
 
 extern atom * duplicate_atom (atom * at);
+extern atom * free_atom (atom * at);
 extern void at_shift (atom * at, float * shift);
 extern void at_unshift (atom * at, float * shift);
 extern int check_label_numbers (project * this_proj, int types);
@@ -348,6 +349,7 @@ extern void cleaning_shaders (glwin * view, int shader);
 extern void init_default_shaders (glwin * view);
 extern void init_shaders(glwin * view);
 
+extern object_3d * free_object_3d (object_3d * obj);
 extern glsl_program * init_shader_program (int object, int object_id,
                                            const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                            GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj);

@@ -173,6 +173,7 @@ int read_bonding (FILE * fp)
     active_project -> coord -> cmax = coord -> cmax;
     active_project -> coord -> cmin = coord -> cmin;
     new_coord_menus (active_project, coord, active_project -> nspec, 0, showcoord, showpoly, showfrag, TRUE, TRUE);
+    g_free (coord);
   }
 
   return OK;

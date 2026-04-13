@@ -354,13 +354,11 @@ int create_box_lists (int b_step)
     const GLchar * vs_sph = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
     const GLchar * fs_box = (plot -> ray_tracing) ? full_color_ray : full_color;
     wingl -> ogl_glsl[MDBOX][b_step][0] = init_shader_program (MDBOX, GLSL_SPHERES, vs_sph, NULL, fs_box, GL_TRIANGLE_STRIP, 4, 1, TRUE, box_a);
-    g_free (box_a);
     // Cylinders
     const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
     int narray_cyl = plot -> ray_tracing ? 8 : 6;
     wingl -> ogl_glsl[MDBOX][b_step][1] = init_shader_program (MDBOX, GLSL_CYLINDERS, vs_cyl, NULL, fs_box, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, box_b);
   }
-  g_free (box_b);
   plot -> ray_tracing  = saved_tracing;
   return shaders;
 }
@@ -465,7 +463,6 @@ void prepare_cuboid (vec3_t position, int id)
     l ++;
   }
   wingl -> ogl_glsl[LIGHT][0][id] = init_shader_program (LIGHT, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, FALSE, light);
-  g_free (light);
 }
 
 /*!
@@ -595,7 +592,6 @@ double draw_cuboid (gboolean draw, int SHADID, int shadnum, mat4_t rot, vec3_t c
       }
     }
     wingl -> ogl_glsl[SHADID][(SHADID == SLABS) ? 0 : step][shadnum] = init_shader_program (SHADID, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, slab);
-    g_free (slab);
   }
   return cvol;
 }
@@ -786,7 +782,6 @@ void cylinder_slab (mat4_t rot)
     const GLchar * fs_slc = (plot -> ray_tracing) ? full_color_ray : full_color;
     int narray_cyl = plot -> ray_tracing ? 8 : 6;
     wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_CYLINDERS, vs_slc, NULL, fs_slc, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, slab);
-    g_free (slab);
     nbs = 0;
     for (i=0; i<plot -> abc -> extra_cell[0]+1; i++)
     {
@@ -809,7 +804,6 @@ void cylinder_slab (mat4_t rot)
     const GLchar * vs_slcp = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
     GLenum prim_slcp = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
     wingl -> ogl_glsl[SLABS][0][1] = init_shader_program (SLABS, GLSL_CAPS, vs_slcp, NULL, fs_slc, prim_slcp, 5, 1, TRUE, slab_cap);
-    g_free (slab_cap);
   }
   wingl -> cell_win -> slab_vol = pi*pow(wingl -> cell_win -> cparam[13], 2)*wingl -> cell_win -> cparam[12];
   for (i=0; i<proj_gl -> nspec; i++) wingl -> cell_win -> slab_lot[i] = 0;
@@ -876,7 +870,6 @@ void spherical_slab ()
     const GLchar * vs_sls = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
     const GLchar * fs_sls = (plot -> ray_tracing) ? full_color_ray : full_color;
     wingl -> ogl_glsl[SLABS][0][0] = init_shader_program (SLABS, GLSL_SPHERES, vs_sls, NULL, fs_sls, GL_TRIANGLE_STRIP, 4, 1, TRUE, slab);
-    g_free (slab);
   }
   wingl -> cell_win -> slab_vol = (4.0*pi/3.0)*(pow(wingl -> cell_win -> cparam[14], 3));
   vec3_t cat = vec3 (wingl -> cell_win -> cparam[6], wingl -> cell_win -> cparam[7], wingl -> cell_win -> cparam[8]);

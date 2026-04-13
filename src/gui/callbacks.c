@@ -321,6 +321,11 @@ void quit_gtk ()
     fclose (fp);
     to_close_this_project (0, active_project);
   }
+  else
+  {
+    int i;
+    for (i=nprojects-1; i>=0; i--) to_close_this_project (i, get_project_by_id(i));
+  }
   profree_ ();
   g_application_quit (G_APPLICATION(AtomesApp));
 }

@@ -1526,7 +1526,7 @@ int get_space_group_from_hm (gchar * hmk)
 {
   int i;
   gchar * str;
-  gchar * hm = g_strdup_printf ("%s", replace_markup (hmk, "S", NULL));
+  gchar * hm = replace_markup (hmk, "S", NULL);
   for (i=0; i<230; i++)
   {
     str = substitute_string (hmsymbols[i], " ", NULL);

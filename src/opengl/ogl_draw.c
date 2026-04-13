@@ -43,7 +43,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void draw (glwin * view);
 
   screen_string * duplicate_screen_string (screen_string * old_s);
+
   atom * duplicate_atom (atom * at);
+  atom * free_atom (atom * at);
 
   image * duplicate_image (image * old_img);
 
@@ -467,6 +469,20 @@ atom * duplicate_atom (atom * at)
   bt -> faid = at -> faid;
   if (bt -> numv) bt -> vois = duplicate_int (bt -> numv, at -> vois);
   return bt;
+}
+
+/*!
+  \fn atom * free_atom (atom * at)
+
+  \brief free an atom data structure
+
+  \param at the target atom data structure to free
+*/
+atom * free_atom (atom * at)
+{
+  if (at -> vois) g_free (at -> vois);
+  g_free (at);
+  return NULL;
 }
 
 /*!

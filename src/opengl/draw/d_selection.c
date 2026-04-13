@@ -266,8 +266,8 @@ void prepare_selected_bond (int sty, int cap, int bi, int pi, atom * at, atom * 
     tmp_a -> y -= d.y;
     tmp_a -> z -= d.z;
     setup_this_bond (sty, FALSE, TRUE, cap, bi, pi, tmp_b, tmp_a, 0.5, vertices);
-    g_free (tmp_a);
-    g_free (tmp_b);
+    tmp_a = free_atom (tmp_a);
+    tmp_b = free_atom (tmp_b);
 
     tmp_a = duplicate_atom (bt);
     tmp_b = duplicate_atom (bt);
@@ -280,8 +280,8 @@ void prepare_selected_bond (int sty, int cap, int bi, int pi, atom * at, atom * 
     tmp_a -> y += d.y;
     tmp_a -> z += d.z;
     setup_this_bond (sty, FALSE, TRUE, cap, bi, pi, tmp_a, tmp_b, 0.5, vertices);
-    g_free (tmp_a);
-    g_free (tmp_b);
+    tmp_a = free_atom (tmp_a);
+    tmp_b = free_atom (tmp_b);
   }
 }
 
@@ -536,14 +536,12 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
     const GLchar * fs_sel     = (plot -> ray_tracing) ? full_color_ray : full_color;
     int narray_sel = plot -> ray_tracing ? 8 : 6;
     wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, vs_sel_cyl, NULL, fs_sel, GL_TRIANGLE_STRIP, narray_sel, 1, cylinder, cyl);
-    g_free (cyl);
     if (caps)
     {
       l ++;
       const GLchar * vs_sel_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
       GLenum prim_sel_cap = plot -> ray_tracing ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
       wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, vs_sel_cap, NULL, fs_sel, prim_sel_cap, 5, 1, cylinder, cap);
-      g_free (cap);
     }
   }
   else
@@ -573,7 +571,6 @@ int render_selected (int style, gboolean cylinder, int caps, int bonds, int ncap
             }
             wingl -> ogl_glsl[SELEC][step][shader+l] = init_shader_program (SELEC, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, cylinder, cyl);
             wingl -> ogl_glsl[SELEC][step][shader+l] -> line_width = get_bond_radius (style, h, i+proj_sp*h, j+proj_sp*h, TRUE);
-            g_free (cyl);
             l++;
           }
         }
@@ -636,14 +633,12 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
     const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
     const GLchar * fs_cyl = (plot -> ray_tracing) ? full_color_ray : full_color;
     wingl -> ogl_glsl[SELEC][step][shader] = init_shader_program (SELEC, GLSL_CYLINDERS, vs_cyl, NULL, fs_cyl, GL_TRIANGLE_STRIP, 6, 1, cylinder, cyl);
-    g_free (cyl);
     if (caps)
     {
       l ++;
       const GLchar * vs_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
       GLenum prim_cap = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
       wingl -> ogl_glsl[SELEC][step][shader+1] = init_shader_program (SELEC, GLSL_CAPS, vs_cap, NULL, fs_cyl, prim_cap, 5, 1, cylinder, cap);
-      g_free (cap);
     }
   }
   else
@@ -671,7 +666,6 @@ int render_picked (int style, gboolean cylinder, int caps, int bonds, int ncaps,
             }
             wingl -> ogl_glsl[SELEC][step][shader+l] = init_shader_program (SELEC, GLSL_LINES, line_vertex, NULL, line_color, GL_LINES, 2, 1, cylinder, cyl);
             wingl -> ogl_glsl[SELEC][step][shader+l] -> line_width = get_bond_radius (style, h, i+proj_sp*h, j+proj_sp*h, TRUE);
-            g_free (cyl);
             l++;
           }
         }
@@ -794,8 +788,7 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
   {
     wingl -> ogl_glsl[SELEC][step][shaders+nshaders] = init_shader_program (SELEC, GLSL_POINTS, point_vertex, NULL, point_color, GL_POINTS, 4, 1, FALSE, atos);
   }
-  g_free (atos);
-  atos = NULL;
+  //g_free (atos);
   nshaders ++;
   // Bonds
   if (do_bonds)

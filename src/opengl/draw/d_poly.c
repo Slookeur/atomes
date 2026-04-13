@@ -725,7 +725,6 @@ void create_poly_lists ()
           g_free (npoly[i]);
         }
         wingl -> ogl_glsl[POLYS][step][0] = init_shader_program (POLYS, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, poly);
-        g_free (poly);
       }
     }
   }

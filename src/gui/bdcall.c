@@ -357,7 +357,6 @@ void prep_ogl_bonds ()
     active_coord -> totcoord[3] = 0;
     active_glwin -> adv_bonding[1] = FALSE;
   }
-
 }
 
 /*!
@@ -522,6 +521,31 @@ void update_glwin_after_bonds (int bonding, int * colm)
 }
 
 /*!
+  \fn int update_voisj_and_contj ()
+
+  \brief update FORTRAN CONTJ and VOISJ for the active project
+*/
+int update_voisj_and_contj ()
+{
+  int i, j, k;
+
+  if (! alloc_contj_voisj_ (& active_project -> natomes, & active_project -> steps)) return 0;
+
+  for (i=0; i<active_project -> steps; i++)
+  {
+    for (j=0; j<active_project -> natomes; j++)
+    {
+      read_contj_ (& j, & i, & active_project -> atoms[i][j].numv);
+      for (k=0; k<active_project -> atoms[i][j].numv; k++)
+      {
+        read_voisj_ (& j, & i, & k, & active_project -> atoms[i][j].vois[k]);
+      }
+    }
+  }
+  return 1;
+}
+
+/*!
   \fn G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
 
   \brief compute bonding properties
@@ -534,6 +558,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
   int j, k, l, m;
   int statusb = 0;
   int bonding = 0;
+  int err_update = 1;
   int * colm = NULL;
 
   // intitialize_this_analysis (active_project, BND);
@@ -547,9 +572,30 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
     prep_ogl_bonds ();
   }
   cutoffsend ();
-  if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 1);
+  if (! active_project -> dmtx)
+  {
+    active_project -> dmtx = run_distance_matrix (widg, 0, 1);
+  }
+  else
+  {
+    err_update = update_voisj_and_contj ();
+  }
 
-  if (active_project -> dmtx)
+  if (! active_project -> dmtx)
+  {
+    show_error ("The nearest neighbors table calculation has failed", 0, (widg) ? widg : MainWindow);
+    bonding = 0;
+    active_glwin -> adv_bonding[0] = 0;
+    active_glwin -> adv_bonding[1] = 0;
+  }
+  else if (! err_update)
+  {
+    show_error ("Impossible to update FORTRAN data", 0, (widg) ? widg : MainWindow);
+    bonding = 0;
+    active_glwin -> adv_bonding[0] = 0;
+    active_glwin -> adv_bonding[1] = 0;
+  }
+  else
   {
     //if (bonding && active_project -> steps > 1) statusb = 1;
     if (bonds_update || active_project -> runc[0] || active_project -> runc[2])
@@ -647,13 +693,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       }
     }
   }
-  else
-  {
-    show_error ("The nearest neighbors table calculation has failed", 0, (widg) ? widg : MainWindow);
-    bonding = 0;
-    active_glwin -> adv_bonding[0] = 0;
-    active_glwin -> adv_bonding[1] = 0;
-  }
+
   if (active_glwin && bonds_update) update_glwin_after_bonds (bonding, colm);
   if (! atomes_render_image)
   {
@@ -664,6 +704,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
   {
     for (j=0; j<3; j++) active_project -> runc[j] = FALSE;
   }
+  free_contj_voisj_ ();
   bonds_update = frag_update = mol_update = 0;
 }
 

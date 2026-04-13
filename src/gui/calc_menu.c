@@ -94,7 +94,6 @@ extern G_MODULE_EXPORT void on_calc_gq_released (GtkWidget * widg, gpointer data
 extern G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_skt_released (GtkWidget * widg, gpointer data);
-extern gboolean toggled_rings;
 extern G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data);
 extern G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
@@ -526,7 +525,6 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
   int i;
   gboolean status;
   status = button_get_status ((GtkWidget *)but);
-  toggled_rings = TRUE;
   switch (search_type)
   {
     case 0:
@@ -605,7 +603,7 @@ void calc_rings (GtkWidget * vbox)
                  "<sub>[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>"};
   gchar * list_node[(preferences) ? 2 : active_project -> nspec+1];
   int i, j, k;
-  toggled_rings = FALSE;
+
   if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[0], 5, defs, 0), FALSE, FALSE, 5);
 
   list_node[0] = g_strdup_printf ("All");
@@ -2001,7 +1999,6 @@ G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, g
             //show_the_widgets (spinner);
             //gtk_spinner_start (GTK_SPINNER(spinner));
             on_calc_rings_released (calc_win, NULL);
-            toggled_rings = FALSE;
             //gtk_spinner_stop (GTK_SPINNER(spinner));
             //hide_the_widgets (spinner);
           }

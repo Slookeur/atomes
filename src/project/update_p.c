@@ -188,7 +188,6 @@ int update_project ()
     }
     if (active_project -> run)
     {
-      active_project -> dmtx = FALSE;
       j = (active_cell -> npt) ? active_project -> steps : 1;
       for (i=0; i<j; i++)
       {

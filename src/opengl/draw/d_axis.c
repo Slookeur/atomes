@@ -371,11 +371,7 @@ int create_axis_lists ()
     // Cones Caps
     GLenum prim_cap = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
     wingl -> ogl_glsl[MAXIS][0][3] = init_shader_program (MAXIS, GLSL_CAPS, vs_cap, NULL, fs_all, prim_cap, 5, 1, TRUE, axis_c);
-    g_free (axis_c);
-    g_free (axis_d);
   }
-  g_free (axis_a);
-  g_free (axis_b);
   plot -> ray_tracing = saved_tracing;
   return nshaders;
 }

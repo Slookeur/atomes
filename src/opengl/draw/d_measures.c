@@ -629,7 +629,6 @@ void prepare_measure_shaders (int mode)
       }
       wingl -> ogl_glsl[MEASU][mode][0] -> line_width = plot -> mwidth[mode];
       nshaders ++;
-      g_free (measure);
 
       // The angles
       if (plot -> selected[mode] -> selected > 2)
@@ -650,7 +649,6 @@ void prepare_measure_shaders (int mode)
         }
         wingl -> ogl_glsl[MEASU][mode][1] -> line_width = plot -> mwidth[mode];
         nshaders ++;
-        g_free (measure);
       }
     }
      // When all labels are found we render the text if any

@@ -33,6 +33,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   void update_insert_combos ();
+  void free_glwin (glwin * to_clow, int steps, int nspec);
   void close_project (project * to_close);
 
   void to_close_this_project (int to_activate, project * this_proj);
@@ -83,6 +84,151 @@ void update_insert_combos ()
 }
 
 /*!
+  \fn void free_glwin (glwin * to_clow, int steps, int nspec)
+
+  \brief free all memory related to a gliwn data structure
+
+  \param to_clow the target gliwn to free
+  \param steps the number of steps
+  \param nspec the number of chemical species
+*/
+void free_glwin (glwin * to_clow, int steps, int nspec)
+{
+  int i, j, k;
+  if (to_clow -> color_to_pick != NULL)
+  {
+    g_free (to_clow -> color_to_pick);
+    to_clow -> color_to_pick = NULL;
+  }
+#ifdef GTK3
+  for (i=0; i<10; i++)
+  {
+    k = (i > 2) ? 1 : nspec;
+    for (j = 0; j < 2; j++)
+    {
+      g_free (to_clow -> oglmv[j][i]);
+      if (i < 9)
+      {
+        g_free (to_clow -> oglmc[j][i]);
+      }
+    }
+  }
+#endif
+  for (i=0; i<steps; i++)
+  {
+    if (to_clow -> bondid[i])
+    {
+      for (j=0; j<2; j++)
+      {
+        if (to_clow -> bondid[i][j])
+        {
+          for (k=0; k<to_clow -> allbonds[j]; k++)
+          {
+             if (to_clow -> bondid[i][j][k]) g_free(to_clow -> bondid[i][j][k]);
+          }
+          g_free(to_clow -> bondid[i][j]);
+        }
+      }
+      g_free(to_clow -> bondid[i]);
+    }
+    if (to_clow -> clones[i]) g_free(to_clow -> clones[i]);
+  }
+  if (to_clow -> bondid) g_free(to_clow -> bondid);
+  if (to_clow -> clones) g_free(to_clow -> clones);
+  for (i=0; i<NUM_COLORS; i++)
+  {
+    g_free (to_clow -> colorp[i]);
+  }
+  if (to_clow -> rep_win)
+  {
+    to_clow -> rep_win -> win = destroy_this_widget (to_clow -> rep_win -> win);
+    g_free (to_clow -> rep_win);
+  }
+  if (to_clow -> gradient_win)
+  {
+    to_clow -> gradient_win -> win = destroy_this_widget (to_clow -> gradient_win -> win);
+    g_free (to_clow -> gradient_win);
+  }
+  if (to_clow -> box_win)
+  {
+    to_clow -> box_win -> win = destroy_this_widget (to_clow -> box_win -> win);
+    g_free (to_clow -> box_win);
+  }
+  if (to_clow -> axis_win)
+  {
+    to_clow -> axis_win -> win = destroy_this_widget (to_clow -> axis_win -> win);
+    g_free (to_clow -> axis_win);
+  }
+  if (to_clow -> measure_win)
+  {
+    to_clow -> measure_win -> win = destroy_this_widget (to_clow -> measure_win -> win);
+    g_free (to_clow -> measure_win);
+  }
+  if (to_clow -> volume_win)
+  {
+    to_clow -> volume_win -> win = destroy_this_widget (to_clow -> volume_win -> win);
+    g_free (to_clow -> volume_win);
+  }
+  if (to_clow -> player)
+  {
+    to_clow -> player -> win = destroy_this_widget (to_clow -> player -> win);
+    g_free (to_clow -> player);
+  }
+  // Stop the spinning if any
+  spin_stop (NULL, to_clow);
+  if (to_clow -> spiner)
+  {
+    to_clow -> spiner -> win = destroy_this_widget (to_clow -> spiner -> win);
+    g_free (to_clow -> spiner);
+  }
+  if (to_clow -> rec)
+  {
+    to_clow -> rec -> win = destroy_this_widget (to_clow -> rec -> win);
+    g_free (to_clow -> rec);
+  }
+  if (to_clow -> atom_win)
+  {
+    to_clow -> atom_win -> win = destroy_this_widget (to_clow -> atom_win -> win);
+    g_free (to_clow -> atom_win);
+  }
+  if (to_clow -> cell_win)
+  {
+    to_clow -> cell_win -> win = destroy_this_widget (to_clow -> cell_win -> win);
+    g_free (to_clow -> cell_win);
+  }
+  if (to_clow -> builder_win)
+  {
+    to_clow -> builder_win -> win = destroy_this_widget (to_clow -> builder_win -> win);
+    g_free (to_clow -> builder_win);
+  }
+  if (to_clow -> coord_win)
+  {
+    to_clow -> coord_win -> win = destroy_this_widget (to_clow -> coord_win -> win);
+    g_free (to_clow -> coord_win);
+  }
+  for (i=0; i<2; i++)
+  {
+   if (to_clow -> model_win[i])
+    {
+      to_clow -> model_win[i] -> win = destroy_this_widget (to_clow -> model_win[i] -> win);
+      g_free (to_clow -> model_win[i]);
+    }
+  }
+  if (to_clow -> opengl_win)
+  {
+    to_clow -> opengl_win -> win = destroy_this_widget (to_clow -> opengl_win -> win);
+    g_free (to_clow -> opengl_win);
+  }
+  to_clow -> win = destroy_this_widget (to_clow -> win);
+  for (i=0; i<NGLOBAL_SHADERS; i++)
+  {
+    cleaning_shaders (to_clow, i);
+    g_free (to_clow -> ogl_glsl[i]);
+  }
+  g_free (to_clow);
+}
+
+/*!
   \fn void close_project (project * to_close)
 
   \brief close a project
@@ -97,93 +243,19 @@ void close_project (project * to_close)
   g_debug ("CLOSE_PROJECT: proj to close= %d", to_close -> id);
   g_debug ("CLOSE_PROJECT: nprojects    = %d", nprojects);
   g_debug ("CLOSE_PROJECT: activep      = %d", activep);
+  if (to_close -> pixels)
+  {
+    for (i=0; i<active_project -> pix[0]*active_project -> pix[1]*active_project -> pix[2]; i++)
+    {
+      g_free (to_close -> pixels[i]);
+    }
+    g_free (to_close -> pixels);
+  }
 #endif
 
   if (to_close -> modelgl)
   {
-    if (to_close -> modelgl -> rep_win)
-    {
-      to_close -> modelgl -> rep_win -> win = destroy_this_widget (to_close -> modelgl -> rep_win -> win);
-      g_free (to_close -> modelgl -> rep_win);
-    }
-    if (to_close -> modelgl -> gradient_win)
-    {
-      to_close -> modelgl -> gradient_win -> win = destroy_this_widget (to_close -> modelgl -> gradient_win -> win);
-      g_free (to_close -> modelgl -> gradient_win);
-    }
-    if (to_close -> modelgl -> box_win)
-    {
-      to_close -> modelgl -> box_win -> win = destroy_this_widget (to_close -> modelgl -> box_win -> win);
-      g_free (to_close -> modelgl -> box_win);
-    }
-    if (to_close -> modelgl -> axis_win)
-    {
-      to_close -> modelgl -> axis_win -> win = destroy_this_widget (to_close -> modelgl -> axis_win -> win);
-      g_free (to_close -> modelgl -> axis_win);
-    }
-    if (to_close -> modelgl -> measure_win)
-    {
-      to_close -> modelgl -> measure_win -> win = destroy_this_widget (to_close -> modelgl -> measure_win -> win);
-      g_free (to_close -> modelgl -> measure_win);
-    }
-    if (to_close -> modelgl -> volume_win)
-    {
-      to_close -> modelgl -> volume_win -> win = destroy_this_widget (to_close -> modelgl -> volume_win -> win);
-      g_free (to_close -> modelgl -> volume_win);
-    }
-    if (to_close -> modelgl -> player)
-    {
-      to_close -> modelgl -> player -> win = destroy_this_widget (to_close -> modelgl -> player -> win);
-      g_free (to_close -> modelgl -> player);
-    }
-    // Stop the spinning if any
-    spin_stop (NULL, to_close -> modelgl);
-    if (to_close -> modelgl -> spiner)
-    {
-      to_close -> modelgl -> spiner -> win = destroy_this_widget (to_close -> modelgl -> spiner -> win);
-      g_free (to_close -> modelgl -> spiner);
-    }
-    if (to_close -> modelgl -> rec)
-    {
-      to_close -> modelgl -> rec -> win = destroy_this_widget (to_close -> modelgl -> rec -> win);
-      g_free (to_close -> modelgl -> rec);
-    }
-    if (to_close -> modelgl -> atom_win)
-    {
-      to_close -> modelgl -> atom_win -> win = destroy_this_widget (to_close -> modelgl -> atom_win -> win);
-      g_free (to_close -> modelgl -> atom_win);
-    }
-    if (to_close -> modelgl -> cell_win)
-    {
-      to_close -> modelgl -> cell_win -> win = destroy_this_widget (to_close -> modelgl -> cell_win -> win);
-      g_free (to_close -> modelgl -> cell_win);
-    }
-    if (to_close -> modelgl -> builder_win)
-    {
-      to_close -> modelgl -> builder_win -> win = destroy_this_widget (to_close -> modelgl -> builder_win -> win);
-      g_free (to_close -> modelgl -> builder_win);
-    }
-    if (to_close -> modelgl -> coord_win)
-    {
-      to_close -> modelgl -> coord_win -> win = destroy_this_widget (to_close -> modelgl -> coord_win -> win);
-      g_free (to_close -> modelgl -> coord_win);
-    }
-    for (i=0; i<2; i++)
-    {
-     if (to_close -> modelgl -> model_win[i])
-      {
-        to_close -> modelgl -> model_win[i] -> win = destroy_this_widget (to_close -> modelgl -> model_win[i] -> win);
-        g_free (to_close -> modelgl -> model_win[i]);
-      }
-    }
-    if (to_close -> modelgl -> opengl_win)
-    {
-      to_close -> modelgl -> opengl_win -> win = destroy_this_widget (to_close -> modelgl -> opengl_win -> win);
-      g_free (to_close -> modelgl -> opengl_win);
-    }
-    to_close -> modelgl -> win = destroy_this_widget (to_close -> modelgl -> win);
-    for (i=0; i<NGLOBAL_SHADERS; i++) cleaning_shaders (to_close -> modelgl, i);
-    g_free (to_close -> modelgl);
+    free_glwin (to_close -> modelgl, to_close -> steps, to_close -> nspec);
     if (to_close -> modelfc)
     {
       if (to_close -> modelfc -> mols)
@@ -203,10 +275,17 @@ void close_project (project * to_close)
   {
     for (i=0; i<to_close -> steps; i++)
     {
+      for (j=0; j<to_close -> natomes; j++)
+      {
+        g_free (to_close -> atoms[i][j].vois);
+      }
       if (to_close -> atoms[i]) g_free (to_close -> atoms[i]);
     }
     g_free (to_close -> atoms);
   }
+  if (to_close -> cell.box) g_free (to_close -> cell.box);
+  if (to_close -> cell.sp_group) g_free (to_close -> cell.sp_group);
+
   if (to_close -> run)
   {
     for (i=0 ; i<NCALCS ; i++)
@@ -216,16 +295,23 @@ void close_project (project * to_close)
         if (to_close -> analysis[i])
         {
           to_close -> analysis[i] -> calc_ok = FALSE;
+          if (to_close -> analysis[i] -> name) g_free (to_close -> analysis[i] -> name);
+          if (to_close -> analysis[i] -> x_title) g_free (to_close -> analysis[i] -> x_title);
+          if (to_close -> analysis[i] -> compat_id) g_free (to_close -> analysis[i] -> compat_id);
           if (to_close -> analysis[i] -> curves)
           {
             hide_curves (to_close, i);
             erase_curves (to_close, i);
+            g_free (to_close -> analysis[i] -> idcc);
+            g_free (to_close -> analysis[i] -> curves);
           }
+          g_free (to_close -> analysis[i]);
         }
       }
     }
   }
   if (! atomes_render_image) clean_view ();
+  g_free (to_close -> projfile);
 
   if (nprojects == 1 && ! atomes_render_image)
   {

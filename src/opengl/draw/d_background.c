@@ -65,5 +65,4 @@ void create_background_lists ()
       wingl -> ogl_glsl[BACKG][0][0] = init_shader_program (BACKG, GLSL_BACK, background_vertex, NULL, background_circular, GL_TRIANGLE_STRIP, 1, 5, FALSE, back);
       break;
   }
-  g_free (back);
 }

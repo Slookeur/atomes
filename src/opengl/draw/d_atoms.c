@@ -304,21 +304,22 @@ object_3d * draw_billboard_quad ()
 */
 float get_sphere_radius (int style, int sp, int ac, int sel)
 {
+  int spec = (sp > proj_sp-1) ? sp - proj_sp : sp;
   if (style >= OGL_STYLES)
   {
     int fid = get_filled_id(style);
     int k = (fid) ? 9 + fid : 2;
     int l = (fid) ? 12 + fid : 7;
-    int m = (int)proj_gl -> chemistry -> chem_prop[CHEM_Z][sp];
+    int m = (int)proj_gl -> chemistry -> chem_prop[CHEM_Z][spec];
     return (default_o_at_rs[2+5*ac]) ? default_at_rs[2+5*ac] + sel*0.05 : get_radius (2+5*ac, fid, m, default_atomic_rad[(ac) ? l : k]) + sel*0.05;
   }
   else if (style == WIREFRAME || style == PUNT)
   {
-    return plot -> pointrad[sp + ac*proj_sp] + sel*4.0;
+    return plot -> pointrad[spec + ac*proj_sp] + sel*4.0;
   }
   else if (style == SPACEFILL)
   {
-    return plot -> atomicrad[sp + ac*proj_sp] + sel*0.05;
+    return plot -> atomicrad[spec + ac*proj_sp] + sel*0.05;
   }
   else if (style == CYLINDERS)
   {
@@ -326,7 +327,7 @@ float get_sphere_radius (int style, int sp, int ac, int sel)
   }
   else
   {
-    return plot -> sphererad[sp + ac*proj_sp] + sel*0.05;
+    return plot -> sphererad[spec + ac*proj_sp] + sel*0.05;
   }
 }
 
@@ -467,7 +468,7 @@ void setup_atom_vertices (int style, gboolean to_pick, float * vertices)
     {
       setup_this_atom (style, to_pick, 0, tmp_a, 0, vertices, 1.0);
     }
-    g_free (tmp_a);
+    tmp_a = free_atom (tmp_a);
   }
 }
 
@@ -504,7 +505,7 @@ void prepare_clone (int style, gboolean to_pick, int picked, atom at, atom bt, f
   {
     setup_this_atom (style, to_pick, picked, tmp_a, 1, vertices, 0.5);
   }
-  g_free (tmp_a);
+  tmp_a = free_atom (tmp_a);
 }
 
 /*!
@@ -716,7 +717,6 @@ void create_atom_lists (gboolean to_pick)
         {
           wingl -> ogl_glsl[PICKS][0][0] = init_shader_program (PICKS, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, FALSE, atos);
         }
-        g_free (atos);
         k ++;
       }
       if (to_pick) break;

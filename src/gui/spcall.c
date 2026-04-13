@@ -46,6 +46,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 extern void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
+extern int update_voisj_and_contj ();
 
 /*!
   \fn void init_sph (project * this_proj, int opening)
@@ -188,10 +189,25 @@ void update_spherical_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
 {
   int i, j, k, l, m;
+  int err_update = 1;
   if (! active_project -> analysis[SPH] -> init_ok) init_sph (active_project, 0);
-  if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 0, 0);
-
-  if (active_project -> dmtx)
+  if (! active_project -> dmtx)
+  {
+    active_project -> dmtx = run_distance_matrix (widg, 0, 0);
+  }
+  else
+  {
+    err_update = update_voisj_and_contj ();
+  }
+  if (! err_update)
+  {
+    show_error ("Impossible to update FORTRAN data", 0, (widg) ? widg : MainWindow);
+  }
+  else if (! active_project -> dmtx)
+  {
+    show_error ("The nearest neighbors table calculation has failed", 0, widg);
+  }
+  else
   {
     clean_curves_data (SPH, 0, active_project -> analysis[SPH] -> numc);
     prepostcalc (widg, FALSE, SPH, 0, opac);
@@ -226,9 +242,6 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
       show_the_widgets (curvetoolbox);
     }
   }
-  else
-  {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
-  }
+  free_contj_voisj_ ();
   fill_tool_model ();
 }

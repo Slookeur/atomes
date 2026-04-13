@@ -401,6 +401,7 @@ GtkWidget * label_atoms_submenu (glwin * view, int id, int at)
                         G_CALLBACK(show_hide_labels),
                         & view -> colorp[at][i]);
     }
+    g_free (str);
   }
   if (at == 0 || id == 1)
   {

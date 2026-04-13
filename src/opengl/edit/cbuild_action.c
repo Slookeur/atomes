@@ -103,7 +103,7 @@ double get_val_from_setting (gchar * pos, gchar * sval)
       ksym = g_strdup_printf ("%s%s", sym[i], pos);
       if (strstr(sval, ksym))
       {
-        tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, ksym, NULL));
+        tmp_pos = replace_markup (tmp_pos, ksym, NULL);
         g_free (ksym);
         ksym = NULL;
         if (! strlen(tmp_pos))
@@ -116,7 +116,7 @@ double get_val_from_setting (gchar * pos, gchar * sval)
       g_free (ksym);
       ksym = NULL;
     }
-    tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, pos, NULL));
+    tmp_pos = replace_markup (tmp_pos, pos, NULL);
     if (! strlen(tmp_pos))
     {
       g_free (tmp_pos);
@@ -482,7 +482,7 @@ double get_val_from_wyckoff (gchar * pos, gchar * wval)
       ksym = g_strdup_printf ("%s%s", sym[i], pos);
       if (strstr(wval, ksym))
       {
-        tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, ksym, NULL));
+        tmp_pos = replace_markup (tmp_pos, ksym, NULL);
         g_free (ksym);
         ksym = NULL;
         if (! strlen(tmp_pos))
@@ -495,7 +495,7 @@ double get_val_from_wyckoff (gchar * pos, gchar * wval)
       g_free (ksym);
       ksym = NULL;
     }
-    tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, pos, NULL));
+    tmp_pos = replace_markup (tmp_pos, pos, NULL);
     if (! strlen(tmp_pos))
     {
       g_free (tmp_pos);

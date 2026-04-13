@@ -143,6 +143,20 @@ extern int rundmtx_ (int *,
                      int *,
                      int *);
 
+extern void free_contj_voisj_ ();
+
+extern void read_contj_ (int *,
+                         int *,
+                         int *);
+
+extern void read_voisj_ (int *,
+                         int *,
+                         int *,
+                         int *);
+
+extern int alloc_contj_voisj_ (int *,
+                               int *);
+
 extern int bonding_ (int *,
                      int *,
                      int *,

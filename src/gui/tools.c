@@ -70,12 +70,16 @@ GtkWidget * tool_scroll = NULL;
 */
 gchar * prepare_for_title (gchar * init)
 {
-  gchar * str = g_strdup_printf ("%s", substitute_string (init, "<sub>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</sub>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "<sup>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</sup>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "<i>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</i>", NULL));
+  gchar * str = substitute_string (init, "<sub>", NULL);
+  str = substitute_string (str, "</sub>", NULL);
+  str = substitute_string (str, "<sup>", NULL);
+  str = substitute_string (str, "</sup>", NULL);
+  str = substitute_string (str, "<i>", NULL);
+  str = substitute_string (str, "</i>", NULL);
+  str = substitute_string (str, "<b>", NULL);
+  str = substitute_string (str, "</b>", NULL);
+  str = substitute_string (str, "<u>", NULL);
+  str = substitute_string (str, "</u>", NULL);
   return str;
 }
 

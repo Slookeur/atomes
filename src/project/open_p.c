@@ -112,7 +112,7 @@ gchar * read_this_string (FILE * fp)
   if (fread (& i, sizeof(int), 1, fp) != 1) return NULL;
   if (i > 0)
   {
-    gchar * str = g_strdup_printf ("%s", read_string (i, fp));
+    gchar * str = read_string (i, fp);
     return str;
   }
   return NULL;

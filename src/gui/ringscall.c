@@ -65,13 +65,13 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 extern GtkWidget * prep_rings_menu (glwin * view, int id);
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
+extern int update_voisj_and_contj ();
 extern void clean_coord_window (project * this_proj);
 #ifdef GTK3
 extern G_MODULE_EXPORT void show_hide_poly (GtkWidget * widg, gpointer data);
 #else
 extern G_MODULE_EXPORT void show_hide_poly (GSimpleAction * action, GVariant * parameter, gpointer data);
 #endif
-gboolean toggled_rings;
 
 /*!
   \fn void init_ring (project * this_proj)
@@ -428,26 +428,24 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
   int search = active_project -> rsearch[0];
   int i, j, k;
 
-  if (toggled_rings) active_project -> dmtx = FALSE;
-
 #ifdef DEBUG
   g_debug ("Calc rings !");
   g_debug (" - rings definition: %d", search);
   if (active_project -> rsparam[search][2]) g_debug (" - only ABAB rings !");
   if (active_project -> rsparam[search][3]) g_debug (" - no homopolar bonds in rings !");
   if (active_project -> rsparam[search][4]) g_debug (" - no homopolar bonds at all !");
-  g_debug (" - dmtx= %d", active_project -> dmtx);
 #endif
 
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
   if (! active_project -> analysis[RIN] -> init_ok) init_ring (active_project);
   active_project -> rsparam[search][5] = 0;
-  if (! active_project -> dmtx || active_project -> rsparam[search][4] || (search > 2 && active_cell -> pbc))
+
+  if (! run_distance_matrix (widg, search+1, 0))
   {
-    active_project -> dmtx = run_distance_matrix (widg, search+1, 0);
+    show_error ("The nearest neighbors table calculation has failed", 0, widg);
   }
-  if (active_project -> dmtx)
+  else
   {
     i = search;
     j = 4*(active_project -> nspec + 1) * i;
@@ -510,10 +508,7 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
       }
     }
   }
-  else
-  {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
-  }
+
   active_glwin -> rings = FALSE;
   for (i=0; i<5; i++)
   {
@@ -531,7 +526,7 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
   update_menu_bar (active_glwin);
 #endif
   fill_tool_model ();
-  if (search > 2 && active_cell -> pbc) active_project -> dmtx = FALSE;
+  free_contj_voisj_ ();
 }
 
 /*!

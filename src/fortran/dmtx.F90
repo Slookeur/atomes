@@ -435,7 +435,7 @@ enddo
 NBX = GETNBX (NAN, NS)
 
 if (PBC) then
-  NNA=NBX**3*NAN
+  NNA = NBX**3*NAN
 else
   NNA = NAN
 endif
@@ -837,6 +837,9 @@ if (DOATOMS) then
     002 continue
     !$OMP END PARALLEL
 
+    do RB=1, abc
+      if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
+    enddo
     if (allocated(THEPIX)) deallocate(THEPIX)
     if (allocated(ATPIX)) deallocate(ATPIX)
     if (.not.DISTMTX) then
@@ -1509,6 +1512,9 @@ else
   !$OMP END DO NOWAIT
 
   006 continue
+  do RB=1, abc
+    if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
+  enddo
   if (allocated(THEPIX)) deallocate(THEPIX)
 
   !$OMP END PARALLEL

@@ -507,7 +507,7 @@ void render_string (int glsl, int id, screen_string * this_string)
         wingl -> ogl_glsl[glsl][shid][j+1] -> col = duplicate_color(1, & (this_string -> col));
       }
     }
-    g_free (string_to_render);
+    free_object_3d (string_to_render);
   }
   pango_font_description_free (pfont);
   g_object_unref (G_OBJECT(pcontext));

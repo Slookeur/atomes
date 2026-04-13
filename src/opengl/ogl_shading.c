@@ -63,6 +63,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void render_this_shader (glsl_program * glsl, int ids);
   void draw_vertices (int id);
 
+  glsl_program * free_this_glsl_program (glsl_program * glsl);
   glsl_program * init_shader_program (int object, int object_id,
                                       const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                       GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj);
@@ -569,6 +570,40 @@ object_3d * duplicate_object_3d (object_3d * old_obj)
 }
 
 /*!
+  \fn object_3d * free_object_3d (object_3d * obj)
+
+  \brief free the memory allocated to create an object_3d data structure
+
+  \param obj the target object_3d data structure to free
+*/
+object_3d * free_object_3d (object_3d * obj)
+{
+  if (obj -> vertices) g_free (obj -> vertices);
+  if (obj -> indices) g_free (obj -> indices);
+  if (obj -> instances) g_free (obj -> instances);
+  g_free (obj);
+  return NULL;
+}
+
+/*!
+  \fn glsl_program * free_this_glsl_program (glsl_program * glsl)
+
+  \brief free memory allocated to create a glsl program
+
+  \param glsl the target glsl program
+*/
+glsl_program * free_this_glsl_program (glsl_program * glsl)
+{
+  if (glsl -> array_pointer) g_free (glsl -> array_pointer);
+  if (glsl -> uniform_loc) g_free (glsl -> uniform_loc);
+  if (glsl -> light_uniform) g_free (glsl -> light_uniform);
+  if (glsl -> vbo) g_free (glsl -> vbo);
+  glsl -> obj = free_object_3d (glsl -> obj);
+  g_free (glsl);
+  return NULL;
+}
+
+/*!
   \fn glsl_program * init_shader_program (int object, int object_id,
                                           const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                           GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
@@ -627,6 +662,7 @@ glsl_program * init_shader_program (int object, int object_id,
   if (lightning) glsl -> light_uniform = glsl_add_lights (glsl);
 
   glsl -> obj = duplicate_object_3d (obj);
+  if (glsl -> draw_type != GLSL_STRING) obj = free_object_3d (obj);
 
   glsl -> draw_instanced = FALSE;
 
@@ -753,11 +789,12 @@ void re_create_md_shaders (int nshaders, int shaders[nshaders], project * this_p
 */
 void cleaning_shaders (glwin * view, int shader)
 {
-  int i = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? step : 0;
+  int i, j, k;
+  i = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? step : 0;
   if (view -> ogl_glsl[shader][i] != NULL)
   {
-    g_free (view -> ogl_glsl[shader][i]);
-    view -> ogl_glsl[shader][i] = NULL;
+    j = view -> n_shaders[shader][i];
+    for (k=0; k<j; k++) view -> ogl_glsl[shader][i][k] = free_this_glsl_program (view -> ogl_glsl[shader][i][k]);
   }
   view -> n_shaders[shader][i] = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? -1 : 0;
 }

@@ -892,38 +892,37 @@ void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer)
 */
 gchar * textcolor (int i)
 {
-  gchar * col = NULL;
   switch (i - i * (i / 9))
   {
     case 0:
-      col = g_strdup_printf ("red");
+      return "red";
       break;
     case 1:
-      col = g_strdup_printf ("blue");
+      return "blue";
       break;
     case 2:
-      col = g_strdup_printf ("cyan");
+      return "cyan";
       break;
     case 3:
-      col = g_strdup_printf ("green");
+      return "green";
       break;
     case 4:
-      col = g_strdup_printf ("light_green");
+      return "light_green";
       break;
     case 5:
-      col = g_strdup_printf ("yellow");
+      return "yellow";
       break;
     case 6:
-      col = g_strdup_printf ("orange");
+      return "orange";
       break;
     case 7:
-      col = g_strdup_printf ("violet");
+      return "violet";
       break;
     case 8:
-      col = g_strdup_printf ("pink");
+      return "pink";
       break;
   }
-  return col;
+  return NULL;
 }
 
 /*!

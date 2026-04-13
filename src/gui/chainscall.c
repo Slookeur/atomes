@@ -57,6 +57,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "submenus.h"
 
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
+extern int update_voisj_and_contj ();
 extern void clean_coord_window (project * this_proj);
 
 /*!
@@ -309,9 +310,11 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
 
   if (! active_project -> analysis[CHA] -> init_ok) init_chain (active_project);
   active_project -> csparam[6] = 0;
-  if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 6, 0);
-
-  if (active_project -> dmtx)
+  if (! run_distance_matrix (widg, 6, 0))
+  {
+    show_error ("The nearest neighbors table calculation has failed", 0, widg);
+  }
+  else
   {
     clean_curves_data (CHA, 0, active_project -> analysis[CHA] -> numc);
     clean_chains_data (active_glwin);
@@ -355,10 +358,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
       j = 0;
     }
   }
-  else
-  {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
-  }
+
   if (j == 1)
   {
     active_project -> csparam[6] = 1;
@@ -369,6 +369,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   show_the_widgets (curvetoolbox);
   clean_coord_window (active_project);
   fill_tool_model ();
+  free_contj_voisj_ ();
 #ifdef GTK3
   update_chains_menus (active_glwin);
 #endif

@@ -359,7 +359,7 @@ gchar * replace_markup (char * init, char * key, char * rep)
   }
   sprintf (buffer + strlen(buffer), "%s", p + oldlen);
   //strcpy (buffer + strlen(buffer), p + oldlen);
-  return g_strdup_printf ("%s", buffer);
+  return buffer;
 }
 
 /*!
@@ -374,14 +374,14 @@ gchar * replace_markup (char * init, char * key, char * rep)
 gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif)
 {
   gchar * str_a, * str_b;
-  str_a = g_strdup_printf ("%s", replace_markup (init, o_motif, n_motif));
+  str_a = replace_markup (init, o_motif, n_motif);
   str_b = g_strdup_printf ("%s", init);
   while (g_strcmp0 (str_a, str_b))
   {
     g_free (str_b);
     str_b = g_strdup_printf ("%s", str_a);
     g_free (str_a);
-    str_a = g_strdup_printf ("%s", replace_markup (str_b, o_motif, n_motif));
+    str_a = replace_markup (str_b, o_motif, n_motif);
   }
   g_free (str_b);
   return str_a;
