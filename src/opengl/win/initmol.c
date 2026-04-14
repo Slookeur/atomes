@@ -412,7 +412,6 @@ int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_
   {
     p_data[val_a+i] = table_b[i];
   }
-  g_free (table_a);
   return p_data;
 }
 
@@ -426,25 +425,62 @@ int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_
 void free_search_molecule_data (search_molecule * smol)
 {
   int i, j;
-  g_free (smol -> atoms);
-  if (smol -> nbonds)
+  if (smol -> atoms)
   {
-    for (i=0; i<active_coord -> totcoord[1]; i++) g_free (smol -> pbonds[i]);
-    g_free (smol -> pbonds);
+    g_free (smol -> atoms);
+    smol -> atoms = NULL;
   }
-  if (smol -> nangles)
+  if (smol -> pbonds)
   {
     for (i=0; i<active_coord -> totcoord[1]; i++)
     {
-      for (j=0; j<active_coord -> totcoord[1]; j++) g_free (smol -> pangles[i][j]);
-      g_free (smol -> pangles[i]);
+      if (smol -> pbonds[i])
+      {
+        g_free (smol -> pbonds[i]);
+        smol -> pbonds[i] = NULL;
+      }
+    }
+    g_free (smol -> pbonds);
+    smol -> pbonds = NULL;
+  }
+  if (smol -> pangles)
+  {
+    for (i=0; i<active_coord -> totcoord[1]; i++)
+    {
+      if (smol -> pangles[i])
+      {
+        for (j=0; j<active_coord -> totcoord[1]; j++)
+        {
+          if (smol -> pangles[i][j])
+          {
+            g_free (smol -> pangles[i][j]);
+            smol -> pangles[i][j] = NULL;
+          }
+        }
+        g_free (smol -> pangles[i]);
+        smol -> pangles[i] = NULL;
+      }
     }
     g_free (smol -> pangles);
+    smol -> pangles = NULL;
   }
-  for (i=0; i<active_project -> nspec; i++) g_free (smol -> lgeo[i]);
-  g_free (smol -> lgeo);
+  if (smol -> lgeo)
+  {
+    for (i=0; i<active_project -> nspec; i++)
+    {
+      if (smol -> lgeo[i])
+      {
+        g_free (smol -> lgeo[i]);
+        smol -> lgeo[i] = NULL;
+      }
+    }
+    g_free (smol -> lgeo);
+    smol -> lgeo = NULL;
+  }
   g_free (smol -> species);
+  smol -> species = NULL;
   g_free (smol -> fragments);
+  smol -> fragments = NULL;
 }
 
 /*!
@@ -461,6 +497,7 @@ void setup_molecules_ (int * stepid)
   search_molecule * first_mol = NULL;
   search_molecule * tmp_mol;
   gboolean add_it;
+  int * tmp_data;
   i = * stepid -1;
   j = 0;
   for (k=0; k<active_project -> modelfc -> mol_by_step[i]; k++)
@@ -472,10 +509,14 @@ void setup_molecules_ (int * stepid)
     {
       if (are_identical_molecules (mtmp_at, mtmp_bt))
       {
-        mtmp_at -> fragments = merge_mol_data (mtmp_at -> multiplicity, mtmp_bt -> multiplicity,
-                                               mtmp_at -> fragments, mtmp_bt -> fragments);
-        mtmp_at -> atoms = merge_mol_data (mtmp_at -> natoms*mtmp_at -> multiplicity, mtmp_bt -> natoms*mtmp_bt -> multiplicity,
-                                           mtmp_at -> atoms, mtmp_bt -> atoms);
+        tmp_data = merge_mol_data (mtmp_at -> multiplicity, mtmp_bt -> multiplicity, mtmp_at -> fragments, mtmp_bt -> fragments);
+        g_free (mtmp_at -> fragments);
+        mtmp_at -> fragments = duplicate_int (mtmp_at -> multiplicity+mtmp_bt -> multiplicity, tmp_data);
+        g_free (tmp_data);
+        tmp_data = merge_mol_data (mtmp_at -> natoms*mtmp_at -> multiplicity, mtmp_bt -> natoms*mtmp_bt -> multiplicity, mtmp_at -> atoms, mtmp_bt -> atoms);
+        g_free (mtmp_at -> atoms);
+        mtmp_at -> atoms = duplicate_int (mtmp_at -> multiplicity+mtmp_bt -> multiplicity, tmp_data);
+        g_free (tmp_data);
         mtmp_at -> multiplicity ++;
         add_it = FALSE;
         break;
@@ -514,15 +555,23 @@ void setup_molecules_ (int * stepid)
     }
     duplicate_molecule (& active_project -> modelfc -> mols[i][k], tmp_mol);
     active_project -> modelfc -> mols[i][k].id = k;
-    free_search_molecule_data (tmp_mol);
     if (k < j-1) tmp_mol = tmp_mol -> next;
   }
-  while (tmp_mol -> prev)
+  tmp_mol = first_mol;
+  while (tmp_mol)
   {
-    tmp_mol = tmp_mol -> prev;
-    g_free (tmp_mol -> next);
+    free_search_molecule_data (tmp_mol);
+    if (tmp_mol -> next)
+    {
+      tmp_mol = tmp_mol -> next;
+      g_free (tmp_mol -> prev);
+    }
+    else
+    {
+      g_free (tmp_mol);
+      tmp_mol = NULL;
+    }
   }
-  g_free (first_mol);
 }
 
 /*!

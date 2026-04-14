@@ -1939,7 +1939,6 @@ void read_preferences_from_xml_file ()
   xmlTextReaderPtr reader;
   xmlNodePtr racine;
   xmlNodePtr node, p_node, l_node, c_node;
-  const xmlChar aml[22]="atomes_preferences-xml";
   int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
@@ -1950,7 +1949,7 @@ void read_preferences_from_xml_file ()
       racine = xmlDocGetRootElement (doc);
       if (racine)
       {
-        if (g_strcmp0 ((char *)(racine -> name), (char *)aml) == 0)
+        if (g_strcmp0 ((char *)(racine -> name), "atomes_preferences-xml") == 0)
         {
           node = findnode(racine -> children, "analysis");
           if (node)
