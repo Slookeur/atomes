@@ -223,7 +223,7 @@ void show_the_widgets (GtkWidget * widg)
 */
 void hide_the_widgets (GtkWidget * widg)
 {
-  if (widg)
+  if (widg != NULL)
   {
     if (GTK_IS_WIDGET(widg))
     {

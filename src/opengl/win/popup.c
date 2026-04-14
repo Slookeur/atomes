@@ -4045,7 +4045,7 @@ void analyze_menu_attach_color_palettes (glwin * view, GtkWidget * menu)
   https://gitlab.gnome.org/GNOME/gtk/-/issues/5955
   */
   int i, j, k, l, m;
-  gchar * str;
+  gchar * str,  * env;
   project * this_proj = get_project_by_id (view -> proj);
   // Box
   if (! gtk_popover_menu_add_child ((GtkPopoverMenu *)menu, color_palette (view, -1, -1, -1), "set-box-color.0"))
@@ -4081,7 +4081,9 @@ void analyze_menu_attach_color_palettes (glwin * view, GtkWidget * menu)
           }
           if (i)
           {
-            str = g_strdup_printf ("set-%s-c.%d", exact_name (env_name (this_proj, k, j, 1, NULL)), m);
+            env = env_name (this_proj, k, j, 1, NULL);
+            str = g_strdup_printf ("set-%s-c.%d", exact_name (env), m);
+            g_free (env);
           }
           else
           {

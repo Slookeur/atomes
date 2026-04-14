@@ -138,7 +138,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include <errno.h>
 #endif
 
-extern void apply_default_parameters_to_project (project * this_proj);
+extern void apply_default_parameters_to_project (project * this_proj, gboolean with_analysis);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void edit_bonds (GtkWidget * vbox);
@@ -168,6 +168,9 @@ extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern float mat_min_max[5][2];
 extern gchar * ogl_settings[3][10];
+extern GtkWidget * omega_max_hbox;
+extern GtkWidget * omega_max_info;
+extern GtkWidget * skt_all_info;
 
 GtkWidget * dyna_entry[2][2];
 GtkWidget * dyna_combo[2];
@@ -2126,7 +2129,7 @@ void set_atomes_defaults ()
   int i, j;
   // Analysis preferences
 
-  default_totcut = 0.0;
+  default_totcut = 2.0;
   if (default_bond_cutoff) g_free (default_bond_cutoff);
   default_bond_cutoff = NULL;
   default_num_delta[GDR] = 1000;
@@ -3915,12 +3918,12 @@ G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
   update_omega_max ();
 }
 
-GtkWidget * all_cut_box;
+GtkWidget * all_cut_box = NULL;
 GtkWidget * cut_combo[2];
 GtkWidget * pcut_box[2];
-GtkWidget * tcut_entry;
-GtkWidget * tcut_box;
-GtkWidget * cut_comments;
+GtkWidget * tcut_entry = NULL;
+GtkWidget * tcut_box = NULL;
+GtkWidget * cut_comments = NULL;
 bond_cutoff * cut_list;
 
 /*!
@@ -4003,13 +4006,7 @@ void add_cut_box ()
   GtkWidget * entry;
 
   int i;
-  for (i=0; i<2; i++)
-  {
-    if (pcut_box[i])
-    {
-     pcut_box[i] = destroy_this_widget(pcut_box[i]);
-    }
-  }
+  for (i=0; i<2; i++) pcut_box[i] = NULL;
   pcut_box[0] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, pcut_box[0], FALSE, FALSE, 10);
   if (cut_list)
@@ -4643,14 +4640,83 @@ gboolean * up_project;
 */
 G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data)
 {
-  int i;
+  int i, j, k, l;
+  float * tmpcut;
+  gboolean update_bonds;
   switch (response_id)
   {
     case GTK_RESPONSE_OK:
       // To write apply to opened projects
       for (i=0; i<nprojects; i++)
       {
-        if (up_project[i]) apply_default_parameters_to_project (get_project_by_id(i));
+        if (up_project[i])
+        {
+          project * this_proj = get_project_by_id(i);
+          if (up_project[i+nprojects])
+          {
+            update_bonds = FALSE;
+            l =  this_proj -> nspec * this_proj -> nspec;
+            tmpcut = allocfloat(l);
+            l = 0;
+            for (j=0; j<this_proj -> nspec; j++)
+            {
+              for (k=0; k<this_proj -> nspec; k++, l++)
+              {
+                tmpcut[l] = this_proj -> chemistry -> cutoffs[j][k];
+              }
+            }
+            if (this_proj -> chemistry -> grtotcutoff != default_totcut) update_bonds = TRUE;
+          }
+          apply_default_parameters_to_project (this_proj, up_project[i+nprojects]);
+          if (up_project[i+nprojects])
+          {
+            for (j=0; j<this_proj -> nspec; j++)
+            {
+              for (k=0; k<this_proj -> nspec; k++, l++)
+              {
+                if (this_proj -> chemistry -> cutoffs[j][k] != tmpcut[l]) update_bonds = TRUE;
+              }
+            }
+            if (update_bonds)
+            {
+              if (this_proj -> modelgl -> rings)
+              {
+                this_proj -> modelgl -> rings = FALSE;
+                for (j=0; j<5; j++)
+                {
+                  clean_rings_data (j, this_proj -> modelgl);
+#ifdef GTK3
+                  update_rings_menus (this_proj -> modelgl);
+#endif
+                }
+              }
+              if (this_proj -> modelgl -> chains)
+              {
+                clean_chains_data (this_proj -> modelgl);
+#ifdef GTK3
+                update_chains_menus (this_proj -> modelgl);
+#endif
+              }
+              bonds_update = 1;
+              frag_update = (this_proj -> natomes > ATOM_LIMIT) ? 0 : 1;
+              mol_update = (frag_update) ? ((this_proj -> steps > STEP_LIMIT) ? 0 : 1) : 0;
+              this_proj -> runc[0] = FALSE;
+              this_proj -> dmtx = FALSE;
+              if (this_proj -> id != activep)
+              {
+                k = activep;
+                active_project_changed (this_proj -> id);
+                on_calc_bonds_released (NULL, NULL);
+                active_project_changed (k);
+              }
+              else
+              {
+                update_project ();
+                on_calc_bonds_released (NULL, NULL);
+              }
+            }
+          }
+        }
       }
       break;
     default:
@@ -4807,12 +4873,13 @@ void save_preferences ()
      GtkWidget * proj_sel = message_dialogmodal ("Project selection", "Select to apply preferences", GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);
      GtkWidget * vbox = dialog_get_content_area (proj_sel);
      GtkWidget * hbox;
-     up_project = allocbool (nprojects);
+     up_project = allocbool (nprojects*2);
      for (i=0; i<nprojects; i++)
      {
        hbox = create_hbox (BSEP);
        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (get_project_by_id(i) -> name, 200, -1, FALSE, G_CALLBACK(toggled_select_project), GINT_TO_POINTER(i)), FALSE, FALSE, 40);
+       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Including analysis parameters and cutoffs ...", -1, -1, FALSE, G_CALLBACK(toggled_select_project), GINT_TO_POINTER(i+nprojects)), FALSE, FALSE, 20);
      }
      run_this_gtk_dialog (proj_sel, G_CALLBACK(update_projects), NULL);
     }
@@ -4916,6 +4983,9 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       }
       break;
     default:
+      omega_max_hbox = destroy_this_widget (omega_max_hbox);
+      omega_max_info = destroy_this_widget (omega_max_info);
+      skt_all_info = destroy_this_widget (skt_all_info);
       destroy_this_dialog (edit_prefs);
       preferences = FALSE;
       clean_all_tmp ();

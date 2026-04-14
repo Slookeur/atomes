@@ -144,12 +144,14 @@ G_MODULE_EXPORT void toggled_show_hide_coord (GtkToggleButton * widg, gpointer d
     {
 #ifdef GTK4
       gchar * name;
-      gchar * str;
+      gchar * str, * env;
       if (g < 2)
       {
         if (g)
         {
-          str = exact_name (env_name (this_proj, c, s, 1, NULL));
+          env = env_name (this_proj, c, s, 1, NULL);
+          str = exact_name (env);
+          g_free (env);
         }
         else
         {
@@ -308,13 +310,15 @@ G_MODULE_EXPORT void toggled_show_hide_poly (GtkToggleButton * widg, gpointer da
 #ifdef GTK4
   if (k != this_proj -> modelgl -> anim -> last -> img -> show_poly[g][j])
   {
-    gchar * str;
+    gchar * str, * env;
     gchar * name;
     if (g < 2)
     {
       if (g)
       {
-        str = exact_name (env_name (this_proj, c, s, 1, NULL));
+        env = env_name (this_proj, c, s, 1, NULL);
+        str = exact_name (env);
+        g_free (env);
       }
       else
       {
@@ -527,7 +531,7 @@ GtkWidget * coord_tab (glwin * view, int geo, int poly)
 {
   int i, j, k, l, m, n;
   int p = view -> proj;
-  gchar * str;
+  gchar * str, * env;
   GtkWidget * wb;
   GtkWidget * but;
   gchar * col[15] = {" ", "<b>Color</b>", "<b>Show</b>", "<b>Label</b>", "<b>Pick</b>", "<b>Alpha</b>",
@@ -621,7 +625,9 @@ GtkWidget * coord_tab (glwin * view, int geo, int poly)
           }
           else if (geo == 1)
           {
-            str = exact_name(env_name (this_proj, j, i, 1, NULL));
+            env = env_name (this_proj, j, i, 1, NULL);
+            str = exact_name(env);
+            g_free (env);
           }
           else
           {

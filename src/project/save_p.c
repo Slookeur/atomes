@@ -309,7 +309,9 @@ int save_project (FILE * fp, project * this_proj, int wid)
       {
         if (fwrite (& this_proj -> modelgl -> bonding, sizeof(gboolean), 1, fp) != 1) return ERROR_COORD;
         if (fwrite (this_proj -> modelgl -> adv_bonding, sizeof(gboolean), 2, fp) != 2) return ERROR_COORD;
+        // for (i=0; i<10; i++) g_debug ("SAVING :: i= %d,  this_proj -> coord -> totcoord[%d]= %d", i, i, this_proj -> coord -> totcoord[i]);
         if (fwrite (this_proj -> coord -> totcoord, sizeof(int), 10, fp) != 10) return ERROR_COORD;
+
         // Save molecule
         if ((this_proj -> natomes > ATOM_LIMIT || this_proj -> steps > STEP_LIMIT) && this_proj -> modelgl -> adv_bonding[1])
         {

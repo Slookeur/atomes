@@ -59,6 +59,7 @@ extern int update_voisj_and_contj ();
 void init_sph (project * this_proj, int opening)
 {
   int i, j, k;
+  gchar * env;
   if (! opening)
   {
     this_proj -> analysis[SPH] -> numc = this_proj -> nspec;
@@ -83,9 +84,11 @@ void init_sph (project * this_proj, int opening)
     {
       for (j=0 ; j < this_proj -> coord -> ntg[1][i]; j++)
       {
+        env = env_name (this_proj, j, i, 1, NULL);
         this_proj -> analysis[SPH] -> curves[j+k] -> name = g_strdup_printf("Q(l) %s (l=0 -> %d)",
-                                                                            exact_name(env_name (this_proj, j, i, 1, NULL)),
+                                                                            exact_name(env),
                                                                             this_proj -> analysis[SPH] -> num_delta);
+        g_free (env);
       }
       k += this_proj -> coord -> ntg[1][i]+1;
     }

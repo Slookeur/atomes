@@ -1449,7 +1449,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   }
   float values[] = {the_mat -> albedo.x, the_mat -> albedo.y, the_mat -> albedo.z};
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (ogl_settings[0][0], 130, -1, 0, 0, values, ogl_edit), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (ogl_settings[0][0], 130, -1, 0, 0, values, ogl_edit), FALSE, FALSE, 10);
   show_the_widgets (layout);
   widget_set_sensitive (ogl_edit -> templates, the_mat -> predefine);
   widget_set_sensitive (ogl_edit -> param_mat, ! the_mat -> predefine);
@@ -1766,12 +1766,13 @@ G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data)
 #endif
     GtkWidget * vbox = create_vbox (5);
     add_container_child (CONTAINER_WIN, view -> opengl_win -> win, vbox);
-#ifdef GTK4
-    gtk_widget_set_size_request (vbox, 580, 670);
-#else
-    gtk_widget_set_size_request (vbox, 580, 650);
-#endif
+
     GtkWidget * notebook = gtk_notebook_new ();
+#ifdef GTK4
+    gtk_widget_set_size_request (notebook, 580, 670);
+#else
+    gtk_widget_set_size_request (notebook, 580, 670);
+#endif
     show_the_widgets (notebook);
 #ifdef GTK4
    gtk_widget_set_vexpand (notebook, TRUE);

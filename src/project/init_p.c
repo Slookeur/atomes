@@ -31,7 +31,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   void init_curves_and_calc (project * this_proj);
-  void apply_analysis_default_parameters_to_project (project * this_proj);
+  void apply_analysis_default_parameters_to_project (project * this_proj, gboolean with_analysis);
   void apply_default_parameters_to_project (project * this_proj);
   void init_project (gboolean alloc_box);
 
@@ -137,42 +137,78 @@ void apply_analysis_default_parameters_to_project (project * this_proj)
 }
 
 /*!
-  \fn void apply_default_parameters_to_project (project * this_proj)
+  \fn void apply_default_parameters_to_project (project * this_proj, gboolean with_analysis)
 
   \brief apply default parameters to project
 
   \param this_proj the target project
 */
-void apply_default_parameters_to_project (project * this_proj)
+void apply_default_parameters_to_project (project * this_proj, gboolean with_analysis)
 {
-  // Calc parameters
-  if (this_proj -> chemistry)
+  int i, j, k, l;
+  if (with_analysis)
   {
-    this_proj -> chemistry -> grtotcutoff = default_totcut;
+    // Calc parameters
+    if (this_proj -> chemistry)
+    {
+      this_proj -> chemistry -> grtotcutoff = default_totcut;
+      bond_cutoff * cut = default_bond_cutoff;
+      gboolean cupdate = FALSE;
+      while (cut)
+      {
+        i = cut -> Z[0];
+        j = cut -> Z[1];
+        for (k=0; k<this_proj -> nspec; k++)
+        {
+          if ((int)this_proj -> chemistry -> chem_prop[CHEM_Z][k] == i)
+          {
+            cupdate = TRUE;
+            break;
+          }
+        }
+        if (cupdate)
+        {
+          cupdate = FALSE;
+          for (l=0; l<this_proj -> nspec; l++)
+          {
+            if ((int)this_proj -> chemistry -> chem_prop[CHEM_Z][l] == j)
+            {
+              cupdate = TRUE;
+              break;
+            }
+          }
+        }
+        if (cupdate)
+        {
+          this_proj -> chemistry -> cutoffs[k][l] = this_proj -> chemistry -> cutoffs[l][k] = cut -> cutoff;
+        }
+        cut = cut -> next;
+      }
+      if (this_proj -> analysis)
+      {
+        apply_analysis_default_parameters_to_project (this_proj);
+      }
+    }
+    // Other analysis parameters
+
+    for (i=0; i<5; i++)
+    {
+      this_proj -> rsparam[i][0] = default_rsparam[1];
+      this_proj -> rsparam[i][1] = default_rsparam[2];
+      for (j=2; j<5; j++) this_proj -> rsparam[i][j] = default_rsparam[j+2];
+    }
+    this_proj -> rsearch[0] = default_rsparam[0];
+    this_proj -> rsearch[1] = default_rsparam[3];
+    this_proj -> csparam[0] = default_csparam[0];
+    for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
+    this_proj -> csparam[5] = default_csparam[1];
+    this_proj -> csearch = default_csparam[2];
+    this_proj -> tunit = default_delta_t[1];
+    this_proj -> skt_all_sets = default_skt_sets;
+    this_proj -> skt_n_data_sets = default_skt_n_sets;
+    this_proj -> sqw_n_data_sets = default_sqw_n_sets;
+    this_proj -> sqw_freq = default_sqw_freq;
   }
-  if (this_proj -> analysis)
-  {
-    apply_analysis_default_parameters_to_project (this_proj);
-  }
-  // Other analysis parameters
-  int i, j;
-  for (i=0; i<5; i++)
-  {
-    this_proj -> rsparam[i][0] = default_rsparam[1];
-    this_proj -> rsparam[i][1] = default_rsparam[2];
-    for (j=2; j<5; j++) this_proj -> rsparam[i][j] = default_rsparam[j+2];
-  }
-  this_proj -> rsearch[0] = default_rsparam[0];
-  this_proj -> rsearch[1] = default_rsparam[3];
-  this_proj -> csparam[0] = default_csparam[0];
-  for (i=1; i<4; i++) this_proj -> csparam[i]= default_csparam[i+2];
-  this_proj -> csparam[5] = default_csparam[1];
-  this_proj -> csearch = default_csparam[2];
-  this_proj -> tunit = default_delta_t[1];
-  this_proj -> skt_all_sets = default_skt_sets;
-  this_proj -> skt_n_data_sets = default_skt_n_sets;
-  this_proj -> sqw_n_data_sets = default_sqw_n_sets;
-  this_proj -> sqw_freq = default_sqw_freq;
 
   if (this_proj -> modelgl)
   {
@@ -234,7 +270,7 @@ void init_project (gboolean alloc_box)
   activep = nprojects - 1;
   new_proj -> id = activep;
   new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
-  apply_default_parameters_to_project (new_proj);
+  apply_default_parameters_to_project (new_proj, TRUE);
   new_proj -> tfile = -1;
   new_proj -> newproj = TRUE;
   new_proj -> steps = 1;

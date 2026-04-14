@@ -720,6 +720,7 @@ void append_submenu (GMenu * menu, const gchar * label, GMenu * submenu)
   g_menu_item_set_attribute (item, "use-markup", "s", "TRUE", NULL);
   g_menu_item_set_submenu (item, (GMenuModel *)submenu);
   g_menu_append_item (menu, item);
+  g_object_unref (item);
 }
 
 /*!

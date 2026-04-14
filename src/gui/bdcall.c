@@ -294,7 +294,6 @@ void cutoffsend ()
 
   if (active_chem -> cutoffs == NULL)
   {
-    // g_debug ("alloc cuttofs !!!");
     active_chem -> cutoffs = allocddouble (active_project -> nspec, active_project -> nspec);
   }
   for ( i=0; i < active_project -> nspec; i++)
@@ -882,6 +881,7 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
 {
   int i, j, k;
   int natpg[totgsa];
+  gchar * env;
   gchar * str, * spr, * snr;
   int tgsa;
 
@@ -921,9 +921,11 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
       natpg[i] += k;
     }
     print_info ("\t", NULL, active_project -> analysis[BND] -> calc_buffer);
-    spr = g_strdup_printf ("%s", env_name (active_project, i, sp, 1, active_project -> analysis[BND] -> calc_buffer));
+    spr = env_name (active_project, i, sp, 1, active_project -> analysis[BND] -> calc_buffer);
     g_free (spr);
-    spr = g_strdup_printf ("%s", exact_name(env_name (active_project, i, sp, 0, NULL)));
+    env = env_name (active_project, i, sp, 0, NULL);
+    spr = g_strdup_printf ("%s", exact_name(env));
+    g_free (env);
     k = 12 - strlen (spr);
     g_free (spr);
     for (j=0; j<k; j++) print_info (" ", NULL, active_project -> analysis[BND] -> calc_buffer);

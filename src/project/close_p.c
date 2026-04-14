@@ -33,7 +33,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   void update_insert_combos ();
-  void free_glwin (glwin * to_clow, int steps, int nspec);
+  void free_glwin (project * to_close, glwin * to_clow);
   void close_project (project * to_close);
 
   void to_close_this_project (int to_activate, project * this_proj);
@@ -84,15 +84,14 @@ void update_insert_combos ()
 }
 
 /*!
-  \fn void free_glwin (glwin * to_clow, int steps, int nspec)
+  \fn void free_glwin (project * to_close, glwin * to_clow)
 
   \brief free all memory related to a gliwn data structure
 
+  \param to_close the target project
   \param to_clow the target gliwn to free
-  \param steps the number of steps
-  \param nspec the number of chemical species
 */
-void free_glwin (glwin * to_clow, int steps, int nspec)
+void free_glwin (project * to_close, glwin * to_clow)
 {
   int i, j, k;
   if (to_clow -> color_to_pick != NULL)
@@ -117,8 +116,21 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
     }
   }
 #endif
-
-  for (i=0; i<steps; i++)
+  for (i=0; i<10; i++)
+  {
+    if (to_clow -> gcid[i])
+    {
+      for (j=0; j < to_close -> coord -> totcoord[i]; j++)
+      {
+        if (to_clow -> gcid[i][j])
+        {
+          g_free (to_clow -> gcid[i][j]);
+        }
+      }
+      g_free (to_clow -> gcid[i]);
+    }
+  }
+  for (i=0; i<to_close -> steps; i++)
   {
     if (to_clow -> bondid[i])
     {
@@ -126,7 +138,7 @@ void free_glwin (glwin * to_clow, int steps, int nspec)
       {
         if (to_clow -> bondid[i][j])
         {
-          for (k=0; k<to_clow -> allbonds[j]; k++)
+          for (k=0; k<to_clow ->  bonds[i][j]; k++)
           {
              if (to_clow -> bondid[i][j][k]) g_free(to_clow -> bondid[i][j][k]);
           }
@@ -261,7 +273,7 @@ void close_project (project * to_close)
 
   if (to_close -> modelgl)
   {
-    free_glwin (to_close -> modelgl, to_close -> steps, to_close -> nspec);
+    free_glwin (to_close, to_close -> modelgl);
     if (to_close -> modelfc)
     {
       if (to_close -> modelfc -> mols)
@@ -270,6 +282,8 @@ void close_project (project * to_close)
         {
           if (to_close -> modelfc -> mols[i])
           {
+            g_free (to_close -> modelfc -> mols[i] -> fragments);
+            g_free (to_close -> modelfc -> mols[i] -> species);
             g_free (to_close -> modelfc -> mols[i]);
           }
         }

@@ -344,7 +344,7 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
   int i, j, k, l, m, n, o;
 #ifdef GTK3
   // GTK3 Menu Action To Check
-  gchar * str;
+  gchar * str, * env;
   GtkWidget * spm;
   GtkWidget * menupv;
   GtkWidget * menuc;
@@ -431,7 +431,9 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
     {
       if (* id)
       {
-        str = exact_name(env_name (active_project, n, * sp, 1, NULL));
+        env = env_name (active_project, n, * sp, 1, NULL);
+        str = exact_name (env);
+        g_free (env);
         spm = create_menu_item_from_widget (markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, FALSE);
       }
       else

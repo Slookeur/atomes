@@ -160,7 +160,7 @@ void update_omega_max ()
 {
   gchar * freq_unit[5]={" THz", " THz", " MHz", " KHz", " Hz"};
   gchar * str;
-  omega_max_info = destroy_this_widget(omega_max_info);
+  omega_max_info = destroy_this_widget (omega_max_info);
   double delt = (preferences) ? tmp_delta_t[0]: active_project -> analysis[MSD] -> delta;
   int num_delt = (preferences) ? tmp_num_delta[MSD-2] : active_project -> analysis[MSD] -> num_delta;
   int t_unit = (preferences) ? (int)tmp_delta_t[1] : active_project -> tunit;
@@ -1066,8 +1066,8 @@ GtkWidget * hbox_note (int i, double val)
   return hbox;
 }
 
-GtkWidget * avbox;
-GtkWidget * smbox;
+GtkWidget * avbox = NULL;
+GtkWidget * smbox = NULL;
 dint skadv[2];
 int avsize;
 
@@ -1508,7 +1508,7 @@ void calc_gr_sq (GtkWidget * box, int id)
   add_smoothing_options (id, vbox);
 }
 
-GtkWidget * skt_all_info;
+GtkWidget * skt_all_info = NULL;
 GtkWidget * sktqw_vbox[2];
 GtkWidget * sktqw_delta[2];
 GtkWidget * t_q_vbox[2];
@@ -1716,7 +1716,7 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
       {
         active_project -> skt_corr_threshold = v;
         gchar * str = g_strdup_printf ("%d calculation results in total !", active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
-        skt_all_info = destroy_this_widget(skt_all_info);
+        skt_all_info = destroy_this_widget (skt_all_info);
         skt_all_info = markup_label (str, -1, -1, 0.5, 0.5);
         g_free (str);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, skt_res_info, skt_all_info, FALSE, FALSE, 5);
@@ -2028,10 +2028,16 @@ G_MODULE_EXPORT void run_on_calc_activate (GtkDialog * dial, gint response_id, g
     default:
       frag_update = mol_update = 0;
       for (i=0; i<3; i++) active_project -> runc[i] = FALSE;
+      if (id == SKT-1)
+      {
+        omega_max_info = destroy_this_widget (omega_max_info);
+        omega_max_hbox = destroy_this_widget (omega_max_hbox);
+        skt_all_info = destroy_this_widget (skt_all_info);
+      }
+      avbox = destroy_this_widget (avbox);
       destroy_this_dialog (dial);
       calc_win = destroy_this_widget (calc_win);
-      avbox = NULL;
-      omega_max_hbox = destroy_this_widget (omega_max_hbox);
+      break;
   }
 }
 

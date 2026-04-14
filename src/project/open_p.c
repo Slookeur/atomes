@@ -662,16 +662,17 @@ int open_project (FILE * fp, int wid)
       if (fread (tmpcoord, sizeof(int), 10, fp) != 10) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (active_glwin -> bonding)
       {
-        for (i=0; i<2; i++) if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+        // for (i=0; i<10; i++) g_debug ("READING :: i= %d, tmpcoord[%d]= %d, active_coord -> totcoord[%d]= %d", i, i, tmpcoord[i], i, active_coord -> totcoord[i]);
+        for (i=0; i<2; i++) if (tmpcoord[i] != active_coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
         for (i=2; i<4; i++)
         {
           if (active_glwin -> adv_bonding[i-2])
           {
-            if (tmpcoord[i] != active_project -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
+            if (tmpcoord[i] != active_coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
           }
         }
       }
-      for (i=0; i<10; i++) active_project -> coord -> totcoord[i] = tmpcoord[i];
+      for (i=0; i<10; i++) active_coord -> totcoord[i] = tmpcoord[i];
       // Read molecule info
       if ((active_project -> natomes > ATOM_LIMIT || active_project -> steps > reading_step_limit) && tmp_adv_bonding[1])
       {

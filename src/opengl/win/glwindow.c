@@ -393,7 +393,7 @@ void update_all_menus (glwin * view, int nats)
     k = j*j;
     l = (view -> anim -> last -> img -> xyz -> axis == WIREFRAME) ? CYLINDERS : WIREFRAME;
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][0], TRUE);
-    set_box_axis_style (view -> ogl_box_axis[i][0], & view -> colorp[0][1]);
+    set_box_axis_style (view -> ogl_box_axis[1][0], & view -> colorp[0][1]);
     view -> anim -> last -> img -> xyz -> axis = l;
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *)view -> ogl_box_axis[1][j], TRUE);
     set_box_axis_style (view -> ogl_box_axis[1][j], & view -> colorp[k][1]);

@@ -678,7 +678,7 @@ G_MODULE_EXPORT void window_color_coord (GtkWidget * widg, gpointer data)
 #endif
 {
   qint * cid = (qint *)data;
-  gchar * str;
+  gchar * str, * env;
   int c, g, s;
   project * this_proj = get_project_by_id(cid -> a);
   s = cid -> b;
@@ -691,8 +691,10 @@ G_MODULE_EXPORT void window_color_coord (GtkWidget * widg, gpointer data)
       this_proj -> coord -> geolist[0][s][c]);
       break;
     case 1:
+      env = env_name (this_proj, c, s, 1, NULL);
       str = g_strdup_printf ("%s - %s coordination sphere color", this_proj -> chemistry -> label[s],
-                             prepare_for_title(exact_name(env_name (this_proj, c, s, 1, NULL))));
+                             prepare_for_title(exact_name(env)));
+      g_free (env);
       break;
     case 2:
       str = g_strdup_printf ("Fragment N°%d color", c);
