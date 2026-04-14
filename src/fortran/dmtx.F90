@@ -129,6 +129,7 @@ DOUBLE PRECISION :: MPSIZE
 DOUBLE PRECISION :: NEW_MPSIZE
 DOUBLE PRECISION :: TARGETDP
 DOUBLE PRECISION :: RHONUM
+INTEGER :: MEMOID
 
 if (.not.PBC) then
   do PIA=1, 3
@@ -232,8 +233,29 @@ do TPIXD=1, ADAPT_CUT
 enddo
 
 #ifdef DEBUG
+
   write (6, '("NBX= ",i10)') GETNBX
   write (6, '("isize:: x= ",I4,", y= ",I4,", z= ",I4)') isize(1), isize(2), isize(3)
+  MEMOID = GUESS_GRID_MEMORY_SIZE(isize(1)*isize(2)*isize(3))
+  write (6, '("Estimated memory required to store the entire pixel grid in Mb : ",f15.10)') MEMOID/1000000.0d0
+  write (6, '("Estimated memory required to store the entire pixel grid in Mo : ",f15.10)') MEMOID/8000000.0d0
+
+  CONTAINS
+
+     INTEGER FUNCTION GUESS_GRID_MEMORY_SIZE (abc)
+
+       INTEGER, INTENT(IN) :: abc
+
+       allocate(THEPIX(1), STAT=ERR)
+       allocate(THEPIX(1)%ATOM_ID(50), STAT=ERR)
+
+       GUESS_GRID_MEMORY_SIZE = storage_size(THEPIX)*abc
+
+       deallocate(THEPIX(1)%ATOM_ID)
+       deallocate(THEPIX)
+
+     END FUNCTION
+
 #endif
 
 END FUNCTION

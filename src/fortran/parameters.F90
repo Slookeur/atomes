@@ -644,7 +644,7 @@ END TYPE RING                                                      !
 TYPE PIXEL                                                         !
   INTEGER :: NEIGHBOR                                              !   Pixel structure definition
   INTEGER :: ATOMS                                                 !
-  INTEGER, DIMENSION(:), ALLOCATABLE :: ATOM_ID                    ! Note: MAXN*10 vs. ALL for Angles
+  INTEGER, DIMENSION(:), ALLOCATABLE :: ATOM_ID                    !
   LOGICAL :: TOCHECK                                               !
   LOGICAL :: CHECKED                                               !
   INTEGER, DIMENSION(27) :: IDNEIGH                                !
