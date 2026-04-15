@@ -288,6 +288,10 @@ image * duplicate_image (image * old_img)
 
   new_img -> back = g_malloc0(sizeof*new_img -> back);
   duplicate_background_data (new_img -> back, old_img -> back);
+  new_img -> xyz = g_malloc0(sizeof*new_img -> xyz);
+  duplicate_axis_data (new_img -> xyz, old_img -> xyz);
+  new_img -> abc = g_malloc0(sizeof*new_img -> abc);
+  duplicate_box_data (new_img -> abc, old_img -> abc);
   j = proj_gl -> nspec;
   for (i=0; i<2; i++)
   {
@@ -329,16 +333,6 @@ image * duplicate_image (image * old_img)
     new_img -> at_data[i].pick[0] = proj_gl -> atoms[step][i].pick[0];
     new_img -> at_data[i].cloned = proj_gl -> atoms[step][i].cloned;
     new_img -> at_data[i].style = proj_gl -> atoms[step][i].style;
-  }
-
-  for (i=0; i<3; i++)
-  {
-    new_img -> xyz -> title[i] = g_strdup_printf ("%s", old_img -> xyz -> title[i]);
-  }
-  new_img -> xyz -> color = NULL;
-  if (old_img -> xyz -> color != NULL)
-  {
-    new_img -> xyz -> color = duplicate_color (3, old_img -> xyz -> color);
   }
 
   for (i=0; i<5; i++) duplicate_screen_label (& new_img -> labels[i], & old_img -> labels[i]);

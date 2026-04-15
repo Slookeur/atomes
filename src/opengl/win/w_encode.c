@@ -249,11 +249,11 @@ image * clean_image (project * to_clean, image * to_cli)
     g_free (to_cli -> atomicrad);
     to_cli -> atomicrad = NULL;
   }
-  for (i=0; i<10; i++)
+  for (i=0; i<9; i++)
   {
     if (to_cli -> spcolor[i])
     {
-      for (j=0; j< to_clean -> coord -> totcoord[i]; j++)
+      for (j=0; j<((i < 2) ? to_clean -> nspec : 1); j++)
       {
         if (to_cli -> spcolor[i][j])
         {
@@ -265,15 +265,18 @@ image * clean_image (project * to_clean, image * to_cli)
       to_cli -> spcolor[i] = NULL;
     }
   }
-  for (i=0; i<FILLED_STYLES; i++)
+  for (i=0; i<2; i++)
   {
-    if (to_cli -> fm_show_vol[2][FILLED_STYLES])
+    for (j=0; j<FILLED_STYLES; j++)
     {
-      g_free (to_cli -> fm_show_vol[2][FILLED_STYLES]);
-    }
-    if (to_cli -> fm_vol_col[2][FILLED_STYLES])
-    {
-      g_free (to_cli -> fm_vol_col[2][FILLED_STYLES]);
+      if (to_cli -> fm_show_vol[i][j])
+      {
+        g_free (to_cli -> fm_show_vol[i][j]);
+      }
+      if (to_cli -> fm_vol_col[i][j])
+      {
+        g_free (to_cli -> fm_vol_col[i][j]);
+      }
     }
   }
   for (i=0; i<5; i++)
@@ -317,8 +320,8 @@ void clean_animation (project * proj, glwin * view)
   for (i=0; i < view -> anim -> frames-1; i++)
   {
     del = shot;
-    shot = shot -> next;
     shot -> img = clean_image (proj, shot -> img);
+    shot = shot -> next;
     g_free (del);
   }
   view -> anim -> first = view -> anim -> last = shot;
