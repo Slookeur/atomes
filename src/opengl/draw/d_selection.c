@@ -804,9 +804,9 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
       {
         nshaders += render_picked (style, cylinder, caps[style][type], npbds[style][type], npcps[style][type], type, clone, shaders+nshaders);
       }
-      if (sbonds[style][type])
+      if (do_bonds)
       {
-        for (i=0; i<2; i++)
+        for (i=0; i<((plot -> draw_clones) ? 2 : 1); i++)
         {
           if (sbonds[style][type][i])
           {
@@ -819,8 +819,11 @@ int prepare_selection_shaders (int style, int shaders, int clone, int type, gboo
             sbonds[style][type][i] = NULL;
           }
         }
-        g_free (sbonds[style][type]);
-        sbonds[style][type] = NULL;
+        if (sbonds[style][type])
+        {
+          g_free (sbonds[style][type]);
+          sbonds[style][type] = NULL;
+        }
       }
     }
   }
@@ -929,6 +932,10 @@ int create_selection_lists ()
             prepare_picked (h, cylinder, i, k);
           }
           nshaders += bonds[h][k] + caps[h][k];
+        }
+        else
+        {
+          sbonds[h][k] = NULL;
         }
       }
     }

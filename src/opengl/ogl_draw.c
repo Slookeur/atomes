@@ -170,7 +170,7 @@ screen_string * duplicate_screen_string (screen_string * old_s)
   int i;
   for (i=0; i<3; i++) new_s -> shift[i] = old_s -> shift[i];
   new_s -> num_instances = old_s -> num_instances;
-  new_s -> instances = duplicate_float (old_s -> num_instances*4, old_s -> instances);
+  new_s -> instances = duplicate_float (old_s -> num_instances, old_s -> instances);
   new_s -> prev = NULL;
   new_s -> last = NULL;
   return new_s;
