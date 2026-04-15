@@ -246,8 +246,8 @@ enddo
 
        INTEGER, INTENT(IN) :: abc
 
-       allocate(THEPIX(1), STAT=ERR)
-       allocate(THEPIX(1)%ATOM_ID(50), STAT=ERR)
+       allocate(THEPIX(1))
+       allocate(THEPIX(1)%ATOM_ID(50))
 
        GUESS_GRID_MEMORY_SIZE = storage_size(THEPIX)*abc
 

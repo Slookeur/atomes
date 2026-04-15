@@ -113,6 +113,7 @@ if (ERR .ne. 0) then
   alloc_data = 0
   goto 001
 endif
+
 if (allocated(LOT)) deallocate(LOT)
 allocate(LOT(NA), STAT=ERR)
 if (ERR .ne. 0) then

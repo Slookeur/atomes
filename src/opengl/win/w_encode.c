@@ -30,6 +30,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  image * clean_image (project * to_clean, image * to_cli);
+
   void clean_animation (glwin * view);
   void set_encoding_widget_sensitivity (gboolean video, int sensitivity);
   void window_encode (glwin * view, gboolean video);
@@ -177,13 +179,137 @@ G_MODULE_EXPORT void set_video_bitrate (GtkEntry * res, gpointer data)
 }
 
 /*!
-  \fn void clean_animation (glwin * view)
+  \fn image * clean_image (project * to_clean, image * to_cli)
+
+  \brief free all memory related to an image data structure
+
+  \param to_clean the target project
+  \param to_cli the target image to free
+*/
+image * clean_image (project * to_clean, image * to_cli)
+{
+  int i, j;
+
+  if (to_cli -> xyz)
+  {
+    g_free (to_cli -> xyz);
+    to_cli -> xyz = NULL;
+  }
+  if (to_cli -> abc)
+  {
+    g_free (to_cli -> abc);
+    to_cli -> abc = NULL;
+  }
+  for (i=0; i<2; i++)
+  {
+    if (to_cli -> show_atom[i])
+    {
+      g_free (to_cli -> show_atom[i]);
+      to_cli -> show_atom[i] = NULL;
+    }
+    if (to_cli -> show_label[i])
+    {
+      g_free (to_cli -> show_label[i]);
+      to_cli -> show_label[i] = NULL;
+    }
+  }
+  for (i=0; i<9; i++)
+  {
+    if (to_cli -> show_poly[i])
+    {
+      g_free (to_cli -> show_poly[i]);
+      to_cli -> show_poly[i] = NULL;
+    }
+  }
+  for (i=0; i<10; i++)
+  {
+    if (to_cli -> show_coord[i])
+    {
+      g_free (to_cli -> show_coord[i]);
+      to_cli -> show_coord[i] = NULL;
+    }
+  }
+  if (to_cli -> at_color)
+  {
+    g_free (to_cli -> at_color);
+    to_cli -> at_color = NULL;
+  }
+  if (to_cli -> sphererad)
+  {
+    g_free (to_cli -> sphererad);
+    to_cli -> sphererad =NULL;
+  }
+  if (to_cli -> pointrad)
+  {
+    g_free (to_cli -> pointrad);
+    to_cli -> pointrad = NULL;
+  }
+  if (to_cli -> atomicrad)
+  {
+    g_free (to_cli -> atomicrad);
+    to_cli -> atomicrad = NULL;
+  }
+  for (i=0; i<10; i++)
+  {
+    if (to_cli -> spcolor[i])
+    {
+      for (j=0; j< to_clean -> coord -> totcoord[i]; j++)
+      {
+        if (to_cli -> spcolor[i][j])
+        {
+          g_free (to_cli -> spcolor[i][j]);
+          to_cli -> spcolor[i][j] = NULL;
+        }
+      }
+      g_free (to_cli -> spcolor[i]);
+      to_cli -> spcolor[i] = NULL;
+    }
+  }
+  for (i=0; i<FILLED_STYLES; i++)
+  {
+    if (to_cli -> fm_show_vol[2][FILLED_STYLES])
+    {
+      g_free (to_cli -> fm_show_vol[2][FILLED_STYLES]);
+    }
+    if (to_cli -> fm_vol_col[2][FILLED_STYLES])
+    {
+      g_free (to_cli -> fm_vol_col[2][FILLED_STYLES]);
+    }
+  }
+  for (i=0; i<5; i++)
+  {
+    if (to_cli -> i_rings[i] != NULL)
+    {
+      for (j=0; j<to_cli -> i_rings[i][0][0]; j++)
+      {
+        if (to_cli -> i_rings[i][j])
+        {
+          g_free (to_cli -> i_rings[i][j]);
+          to_cli -> i_rings[i][j] = NULL;
+        }
+      }
+      g_free (to_cli -> i_rings[i]);
+      to_cli -> i_rings[i] = NULL;
+    }
+  }
+  if (to_cli -> at_data)
+  {
+    g_free (to_cli -> at_data);
+    to_cli -> at_data = NULL;
+  }
+  g_free (to_cli);
+  return NULL;
+}
+
+/*!
+  \fn void clean_animation (project * proj, glwin * view)
 
   \brief clean saved animation data
 
+  \param proj the target project
   \param view the target glwin
 */
-void clean_animation (glwin * view)
+void clean_animation (project * proj, glwin * view)
 {
   int i;
   snapshot * shot = view -> anim -> first;
@@ -192,18 +318,11 @@ void clean_animation (glwin * view)
   {
     del = shot;
     shot = shot -> next;
+    shot -> img = clean_image (proj, shot -> img);
     g_free (del);
   }
   view -> anim -> first = view -> anim -> last = shot;
   view -> anim -> frames = 0;
-  for (i=0; i<5; i++)
-  {
-    if (view -> anim -> last -> img -> i_rings[i] != NULL)
-    {
-      g_free (view -> anim -> last -> img -> i_rings[i]);
-      view -> anim -> last -> img -> i_rings[i] = NULL;
-    }
-  }
 }
 
 GtkWidget * resf;
@@ -465,7 +584,7 @@ void window_encode (glwin * view, gboolean video)
   view -> stop = TRUE;
   encode_video = video;
   run_this_gtk_dialog (win, G_CALLBACK(run_window_encode), view);
-  clean_animation (view);
+  clean_animation (get_project_by_id(view -> proj), view);
   update (view);
   if (view -> spin[2] || view -> spin[3])
   {

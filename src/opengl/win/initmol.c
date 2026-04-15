@@ -394,10 +394,10 @@ gboolean are_identical_molecules (search_molecule * mol_a, search_molecule * mol
 
   \brief merge molecule a and molecule b data
 
-  \param val_a multiplicity for molecule a
-  \param val_b multiplicity for molecule b
-  \param table_a the list of molecular fragment(s) for molecule a
-  \param table_b the list of molecular fragment(s) for molecule b
+  \param val_a multiplicity, or multiplicity x atoms, for molecule a
+  \param val_b multiplicity, or multiplicity x atoms, for molecule b
+  \param table_a the list of molecular fragment(s) or atoms for molecule a
+  \param table_b the list of molecular fragment(s) or atoms for molecule b
 */
 int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_b])
 {
@@ -504,18 +504,20 @@ void setup_molecules_ (int * stepid)
   {
     mtmp_bt = & in_calc_mol[i][k];
     add_it = TRUE;
-    mtmp_at = first_mol;
+    mtmp_at = (first_mol) ? first_mol : NULL;
     while (mtmp_at)
     {
       if (are_identical_molecules (mtmp_at, mtmp_bt))
       {
         tmp_data = merge_mol_data (mtmp_at -> multiplicity, mtmp_bt -> multiplicity, mtmp_at -> fragments, mtmp_bt -> fragments);
         g_free (mtmp_at -> fragments);
+        mtmp_at -> fragments = NULL;
         mtmp_at -> fragments = duplicate_int (mtmp_at -> multiplicity+mtmp_bt -> multiplicity, tmp_data);
         g_free (tmp_data);
         tmp_data = merge_mol_data (mtmp_at -> natoms*mtmp_at -> multiplicity, mtmp_bt -> natoms*mtmp_bt -> multiplicity, mtmp_at -> atoms, mtmp_bt -> atoms);
         g_free (mtmp_at -> atoms);
-        mtmp_at -> atoms = duplicate_int (mtmp_at -> multiplicity+mtmp_bt -> multiplicity, tmp_data);
+        mtmp_at -> atoms = NULL;
+        mtmp_at -> atoms = duplicate_int (mtmp_at -> natoms*mtmp_at -> multiplicity+mtmp_bt -> natoms*mtmp_bt -> multiplicity, tmp_data);
         g_free (tmp_data);
         mtmp_at -> multiplicity ++;
         add_it = FALSE;
@@ -535,10 +537,14 @@ void setup_molecules_ (int * stepid)
       else
       {
         first_mol = duplicate_search_molecule (mtmp_bt);
+        mtmp_at = first_mol;
       }
       j ++;
     }
-    free_search_molecule_data (mtmp_bt);
+  }
+  for (k=0; k<active_project -> modelfc -> mol_by_step[i]; k++)
+  {
+    free_search_molecule_data (& in_calc_mol[i][k]);
   }
   g_free (in_calc_mol[i]);
   in_calc_mol[i] = NULL;

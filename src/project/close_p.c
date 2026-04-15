@@ -32,8 +32,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  glwin * free_glwin (project * to_close, glwin * to_clow);
+
   void update_insert_combos ();
-  void free_glwin (project * to_close, glwin * to_clow);
   void close_project (project * to_close);
 
   void to_close_this_project (int to_activate, project * this_proj);
@@ -53,6 +54,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern GtkTreeStore * tool_model;
 extern GtkTreeModel * replace_combo_tree (gboolean insert, int proj);
 extern G_MODULE_EXPORT void spin_stop (GtkButton * but, gpointer data);
+extern void clean_animation (project * proj, glwin * view);
+extern void free_glwin_spec_data (project * this_proj, int spec);
 
 /*!
   \fn void update_insert_combos ()
@@ -84,14 +87,14 @@ void update_insert_combos ()
 }
 
 /*!
-  \fn void free_glwin (project * to_close, glwin * to_clow)
+  \fn glwin * free_glwin (project * to_close, glwin * to_clow)
 
   \brief free all memory related to a gliwn data structure
 
   \param to_close the target project
   \param to_clow the target gliwn to free
 */
-void free_glwin (project * to_close, glwin * to_clow)
+glwin * free_glwin (project * to_close, glwin * to_clow)
 {
   int i, j, k;
   if (to_clow -> color_to_pick != NULL)
@@ -153,10 +156,8 @@ void free_glwin (project * to_close, glwin * to_clow)
   if (to_clow -> bondid) g_free(to_clow -> bondid);
   if (to_clow -> clones) g_free(to_clow -> clones);
 
-  for (i=0; i<NUM_COLORS; i++)
-  {
-    g_free (to_clow -> colorp[i]);
-  }
+  free_glwin_spec_data (to_close, to_close -> nspec);
+
   if (to_clow -> rep_win)
   {
     to_clow -> rep_win -> win = destroy_this_widget (to_clow -> rep_win -> win);
@@ -243,7 +244,9 @@ void free_glwin (project * to_close, glwin * to_clow)
     cleaning_shaders (to_clow, i);
     g_free (to_clow -> ogl_glsl[i]);
   }
+  clean_animation (to_close, to_clow);
   g_free (to_clow);
+  return NULL;
 }
 
 /*!
@@ -273,7 +276,7 @@ void close_project (project * to_close)
 
   if (to_close -> modelgl)
   {
-    free_glwin (to_close, to_close -> modelgl);
+    to_close -> modelgl = free_glwin (to_close, to_close -> modelgl);
     if (to_close -> modelfc)
     {
       if (to_close -> modelfc -> mols)

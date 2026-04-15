@@ -40,5 +40,9 @@ if (allocated(ATOMID)) deallocate(ATOMID)
 if (allocated(MASS)) deallocate(MASS)
 if (allocated(RVDW)) deallocate(RVDW)
 if (allocated(Xi)) deallocate(Xi)
+if (allocated(Gr_CUT)) deallocate(Gr_CUT)
+if (allocated(NSCATTL)) deallocate(NSCATTL)
+if (allocated(XSCATTL)) deallocate(XSCATTL)
+
 
 END SUBROUTINE

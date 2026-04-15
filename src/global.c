@@ -221,25 +221,6 @@ GdkPixbuf * RUN = NULL;
 // Basic utility functions
 
 /*!
-  \fn int StringLength (char * str)
-
-  \brief return the length of a string
-
-  \param str string to measure
-* /
-int StringLength (char * str)
-{
-  int na, nb;
-  char c;
-
-  for (na = 0; (c = * str) != '\0'; ++ str, na ++);
-  -- str;
-  for (nb = na; (c = * str) == ' '; -- str, nb --);
-  return nb;
-}
-*/
-
-/*!
   \fn gboolean * allocbool (int  val)
 
   \brief allocate a gboolean * pointer
