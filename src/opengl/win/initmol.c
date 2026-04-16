@@ -122,8 +122,14 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
   new_mol -> nspec = old_mol -> nspec;
   new_mol -> species = duplicate_int (active_project -> nspec, old_mol -> species);
   int j, k;
-  new_mol -> pbonds = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
-  new_mol -> pangles = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
+  if (old_mol -> natoms > 1)
+  {
+    new_mol -> pbonds = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
+    if (old_mol -> natoms > 2)
+    {
+      new_mol -> pangles = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
+    }
+  }
   if (old_mol -> atoms)
   {
     new_mol -> atoms = duplicate_int (old_mol -> natoms*old_mol -> multiplicity, old_mol -> atoms);
@@ -266,7 +272,7 @@ void update_mol_details (search_molecule * mol, int sp, int cp)
   {
     j = active_coord -> partial_geo[sp][cp][i];
     mol -> nbonds += j;
-    if (j)
+    if (j && mol -> natoms > 2)
     {
       for (k=0; k<active_project -> nspec; k++)
       {
@@ -304,8 +310,14 @@ void send_mol_details_ (int * stp, int * mol, int * ats, int * sps, int spec_in_
   tmp_mol -> fragments[0] = * mol - 1;
   tmp_mol -> natoms = * ats;
   tmp_mol -> lgeo = allocdint (active_project -> nspec, active_coord -> totcoord[1]);
-  tmp_mol -> pbonds = allocdint (active_coord -> totcoord[1], active_coord -> totcoord[1]);
-  tmp_mol -> pangles = alloctint (active_coord -> totcoord[1], active_coord -> totcoord[1], active_coord -> totcoord[1]);
+  if (tmp_mol -> natoms > 1)
+  {
+    tmp_mol -> pbonds = allocdint (active_coord -> totcoord[1], active_coord -> totcoord[1]);
+    if (tmp_mol -> natoms > 2)
+    {
+      tmp_mol -> pangles = alloctint (active_coord -> totcoord[1], active_coord -> totcoord[1], active_coord -> totcoord[1]);
+    }
+  }
   tmp_mol -> atoms = duplicate_int (* ats, atom_in_mol);
   for (i=0; i< * ats; i++)
   {

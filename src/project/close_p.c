@@ -285,8 +285,11 @@ void close_project (project * to_close)
         {
           if (to_close -> modelfc -> mols[i])
           {
-            g_free (to_close -> modelfc -> mols[i] -> fragments);
-            g_free (to_close -> modelfc -> mols[i] -> species);
+            for (j=0; j<to_close -> modelfc -> mol_by_step[i]; j++)
+            {
+               g_free (to_close -> modelfc -> mols[i][j].fragments);
+               g_free (to_close -> modelfc -> mols[i][j].species);
+            }
             g_free (to_close -> modelfc -> mols[i]);
           }
         }
