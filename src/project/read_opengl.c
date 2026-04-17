@@ -594,14 +594,15 @@ int read_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   img -> l_ghtning.spot = g_malloc0(img -> l_ghtning.lights*sizeof*img -> l_ghtning.spot);
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fread (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fread (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    img -> l_ghtning.spot[i] = g_malloc0(sizeof*img -> l_ghtning.spot[i]);
+    if (fread (& img -> l_ghtning.spot[i] -> type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> fix, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> show, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> position, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> direction, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> intensity, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> attenuation, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fread (& img -> l_ghtning.spot[i] -> spot_data, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
   if (fread (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (fread (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);

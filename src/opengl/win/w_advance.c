@@ -83,9 +83,9 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
   GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog);
 
-  Light init_light_source (int type, float size);
-  Light copy_light_source (Light old_sp);
-  Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+  Light * init_light_source (int type, float size);
+  Light * copy_light_source (Light * old_sp);
+  Light ** copy_light_sources (int dima, int dimb, Light ** old_sp);
 
 */
 
@@ -334,70 +334,70 @@ void print_light_source (Light source, int i)
 */
 
 /*!
-  \fn Light init_light_source (int type, float size)
+  \fn Light * init_light_source (int type, float size)
 
   \brief initialize a light source
 
   \param type the type of light
   \param size system size
 */
-Light init_light_source (int type, float size)
+Light * init_light_source (int type, float size)
 {
-  Light new_light;
-  new_light.type = type;
-  new_light.fix = (type != 1) ? 0 : 1;
-  new_light.show = 0;
-  new_light.intensity = vec3(0.0, 0.0, 0.0);
-  new_light.direction = vec3(0.0, 0.0, 0.0);
-  new_light.position = vec3(0.0, 0.0, 0.0);
-  new_light.attenuation = vec3(0.0, 0.0, 0.0);
+  Light * new_light = g_malloc0(sizeof*new_light);
+  new_light -> type = type;
+  new_light -> fix = (type != 1) ? 0 : 1;
+  new_light -> show = 0;
+  new_light -> intensity = vec3(0.0, 0.0, 0.0);
+  new_light -> direction = vec3(0.0, 0.0, 0.0);
+  new_light -> position = vec3(0.0, 0.0, 0.0);
+  new_light -> attenuation = vec3(0.0, 0.0, 0.0);
   if (type == 0)
   {
-    new_light.intensity = vec3 (DEFAULT_INTENSITY, DEFAULT_INTENSITY, DEFAULT_INTENSITY);
-    new_light.position = vec3 (0.0, 0.0, 0.0);
-    new_light.direction = vec3 (0.5, 1.0, 0.7);
-    new_light.attenuation = vec3 (1.0, 0.0, 0.0);
+    new_light -> intensity = vec3 (DEFAULT_INTENSITY, DEFAULT_INTENSITY, DEFAULT_INTENSITY);
+    new_light -> position = vec3 (0.0, 0.0, 0.0);
+    new_light -> direction = vec3 (0.5, 1.0, 0.7);
+    new_light -> attenuation = vec3 (1.0, 0.0, 0.0);
   }
   else if (type == 1)
   {
-    new_light.intensity = vec3 (1.2, 1.1, 1.0);
-    new_light.position  = vec3 (0.0, 0.0, size * 0.8);
-    new_light.attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
+    new_light -> intensity = vec3 (1.2, 1.1, 1.0);
+    new_light -> position  = vec3 (0.0, 0.0, size * 0.8);
+    new_light -> attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
   }
   else
   {
-    new_light.intensity = vec3 (1.5, 1.4, 1.3);
-    new_light.position = vec3 (0.0, 0.0, size * 0.5); // Au centre
-    new_light.direction = vec3 (0.0, 0.0, -1.0);      // Vers le bas
-    new_light.attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
-    new_light.spot_data = vec3 (45.0, 5.0, 8.0);
+    new_light -> intensity = vec3 (1.5, 1.4, 1.3);
+    new_light -> position = vec3 (0.0, 0.0, size * 0.5); // Au centre
+    new_light -> direction = vec3 (0.0, 0.0, -1.0);      // Vers le bas
+    new_light -> attenuation = vec3 (1.0, 0.01 / size, 0.001 / (size * size));
+    new_light -> spot_data = vec3 (45.0, 5.0, 8.0);
   }
   return new_light;
 }
 
 /*!
-  \fn Light copy_light_source (Light old_sp)
+  \fn Light * copy_light_source (Light * old_sp)
 
   \brief create a copy of a light source
 
   \param old_sp the light source to copy
 */
-Light copy_light_source (Light old_sp)
+Light * copy_light_source (Light * old_sp)
 {
-  Light new_sp;
-  new_sp.type = old_sp.type;
-  new_sp.fix = old_sp.fix;
-  new_sp.show = old_sp.show;
-  new_sp.position = old_sp.position;
-  new_sp.direction = old_sp.direction;
-  new_sp.intensity = old_sp.intensity;
-  new_sp.attenuation = old_sp.attenuation;
-  new_sp.spot_data = old_sp.spot_data;
+  Light * new_sp = g_malloc0(sizeof*new_sp);
+  new_sp -> type = old_sp -> type;
+  new_sp -> fix = old_sp -> fix;
+  new_sp -> show = old_sp -> show;
+  new_sp -> position = old_sp -> position;
+  new_sp -> direction = old_sp -> direction;
+  new_sp -> intensity = old_sp -> intensity;
+  new_sp -> attenuation = old_sp -> attenuation;
+  new_sp -> spot_data = old_sp -> spot_data;
   return new_sp;
 }
 
 /*!
-  \fn Light * copy_light_sources (int dima, int dimb, Light * old_sp)
+  \fn Light ** copy_light_sources (int dima, int dimb, Light ** old_sp)
 
   \brief create a copy of a list of light sources
 
@@ -405,22 +405,14 @@ Light copy_light_source (Light old_sp)
   \param dimb old list size to duplicate
   \param old_sp old light sources
 */
-Light * copy_light_sources (int dima, int dimb, Light * old_sp)
+Light ** copy_light_sources (int dima, int dimb, Light ** old_sp)
 {
   int j;
-  Light * new_sp = g_malloc0(dima*sizeof * new_sp);
+  Light ** new_sp = g_malloc0(dima*sizeof * new_sp);
   for (j=0; j<dimb; j++)
   {
     //print_light_source (old_sp[j], j);
     new_sp[j] = copy_light_source (old_sp[j]);
-    /*new_sp[j].type = old_sp[j].type;
-    new_sp[j].fix = old_sp[j].fix;
-    new_sp[j].show = old_sp[j].show;
-    new_sp[j].position = old_sp[j].position;
-    new_sp[j].direction = old_sp[j].direction;
-    new_sp[j].intensity = old_sp[j].intensity;
-    new_sp[j].attenuation = old_sp[j].attenuation;
-    new_sp[j].spot_data = old_sp[j].spot_data;*/
     //print_light_source (new_sp[j], j);
   }
   return new_sp;
@@ -437,7 +429,7 @@ Light * copy_light_sources (int dima, int dimb, Light * old_sp)
 */
 void show_active_light_data (opengl_edition * ogl_win, int lid, int tid)
 {
-  Light * this_light = (preferences) ? & tmp_lightning.spot[lid] : & get_project_by_id(ogl_win -> proj) -> modelgl -> anim -> last -> img -> l_ghtning.spot[lid];
+  Light * this_light = (preferences) ? tmp_lightning.spot[lid] : get_project_by_id(ogl_win -> proj) -> modelgl -> anim -> last -> img -> l_ghtning.spot[lid];
   this_light -> type = tid;
 
   hide_the_widgets (ogl_win -> advanced_light_box);
@@ -479,15 +471,7 @@ void show_active_light_data (opengl_edition * ogl_win, int lid, int tid)
 */
 void update_light_data (int li, opengl_edition * ogl_win)
 {
-  Light * this_light;
-  if (! preferences)
-  {
-    this_light = & get_project_by_id(ogl_win -> proj) -> modelgl -> anim -> last -> img -> l_ghtning.spot[li];
-  }
-  else
-  {
-    this_light = & tmp_lightning.spot[li];
-  }
+  Light * this_light = (preferences) ? tmp_lightning.spot[li] : get_project_by_id(ogl_win -> proj) -> modelgl -> anim -> last -> img -> l_ghtning.spot[li];
   combo_set_active (ogl_win -> light_type, this_light -> type);
   combo_set_active (ogl_win -> light_fix, this_light -> fix);
   show_active_light_data (ogl_win, li, this_light -> type);
@@ -579,7 +563,7 @@ void add_remove_lights (int val, gpointer data)
   }
 
   i = this_lightning -> lights;
-  Light * old_spots;
+  Light ** old_spots;
   if (val > i)
   {
 #ifdef DEBUG
@@ -672,7 +656,7 @@ G_MODULE_EXPORT void update_light_param (GtkEntry * res, gpointer data)
   if (ogl_edit)
   {
     int li = combo_get_active (ogl_edit-> lights);
-    Light * this_light = (preferences) ? & tmp_lightning.spot[li] : & view -> anim -> last -> img -> l_ghtning.spot[li];
+    Light * this_light = (preferences) ? tmp_lightning.spot[li] : view -> anim -> last -> img -> l_ghtning.spot[li];
     const gchar * m = entry_get_text (res);
     double v = string_to_double ((gpointer)m);
     switch (lid -> b)
@@ -774,16 +758,16 @@ G_MODULE_EXPORT void set_object_pos (GtkEntry * res, gpointer data)
     switch (id -> b)
     {
       case 1:
-        set_data_pos (& the_lightning -> spot[li].position, id -> c, v);
+        set_data_pos (& the_lightning -> spot[li] -> position, id -> c, v);
         break;
       case 2:
-        set_data_pos (& the_lightning -> spot[li].direction, id -> c, v);
+        set_data_pos (& the_lightning -> spot[li] -> direction, id -> c, v);
         break;
       case 3:
-        set_data_pos (& the_lightning -> spot[li].intensity, id -> c, v);
+        set_data_pos (& the_lightning -> spot[li] -> intensity, id -> c, v);
         break;
     }
-    if (the_lightning -> spot[li].show && ! preferences) view -> create_shaders[LIGHT] = TRUE;
+    if (the_lightning -> spot[li] -> show && ! preferences) view -> create_shaders[LIGHT] = TRUE;
   }
   if (edit_ogl) update_entry_double (res, v);
   if (! preferences) update (view);
@@ -828,7 +812,7 @@ G_MODULE_EXPORT void set_light_fix (GtkComboBox * box, gpointer data)
     ogl_ligthning = & tmp_lightning;
   }
   int li = combo_get_active (ogl_win -> lights);
-  ogl_ligthning -> spot[li].fix = combo_get_active ((GtkWidget *)box);
+  ogl_ligthning -> spot[li] -> fix = combo_get_active ((GtkWidget *)box);
   if (! preferences)
   {
     view -> create_shaders[LIGHT] = TRUE;
@@ -861,7 +845,7 @@ G_MODULE_EXPORT void show_this_light (GtkToggleButton * but, gpointer data)
   opengl_edition * ogl_win = (opengl_edition *)data;
   glwin * view = get_project_by_id(ogl_win -> proj) -> modelgl;
   int li = combo_get_active (ogl_win -> lights);
-  view -> anim -> last -> img -> l_ghtning.spot[li].show = button_get_status ((GtkWidget *)but);
+  view -> anim -> last -> img -> l_ghtning.spot[li] -> show = button_get_status ((GtkWidget *)but);
   view -> create_shaders[LIGHT] = TRUE;
   update (view);
 }

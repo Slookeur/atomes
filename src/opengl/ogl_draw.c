@@ -58,7 +58,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include <time.h>
 
 extern ColRGBA init_color (int id, int numid);
-extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+extern Light ** copy_light_sources (int dima, int dimb, Light ** old_sp);
 extern atom_selection * duplicate_ogl_selection (atom_selection * old_sel);
 double x, y, z;
 GLUquadricObj * quadric;

@@ -190,8 +190,20 @@ image * clean_image (project * to_clean, image * to_cli)
 {
   int i, j;
 
+  if (to_cli -> l_ghtning.spot)
+  {
+    for (i=0; i<to_cli -> l_ghtning.lights; i++)
+    {
+      g_free (to_cli -> l_ghtning.spot[i]);
+    }
+    g_free (to_cli -> l_ghtning.spot);
+  }
   if (to_cli -> xyz)
   {
+    for (i=0; i<3; i++)
+    {
+      if (to_cli -> xyz -> title[i]) g_free (to_cli -> xyz -> title[i]);
+    }
     g_free (to_cli -> xyz);
     to_cli -> xyz = NULL;
   }

@@ -198,7 +198,7 @@ typedef struct Lightning Lightning;
 struct Lightning
 {
   int lights;         /*!< The number of lights */
-  Light * spot;       /*!< The lights */
+  Light ** spot;      /*!< The lights */
 };
 
 /*! \typedef Material

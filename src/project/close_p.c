@@ -243,6 +243,7 @@ glwin * free_glwin (project * to_close, glwin * to_clow)
   {
     cleaning_shaders (to_clow, i);
     g_free (to_clow -> ogl_glsl[i]);
+    g_free (to_clow -> n_shaders[i]);
   }
   clean_animation (to_close, to_clow);
   g_free (to_clow);

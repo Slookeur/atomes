@@ -489,6 +489,7 @@ void init_menu_fragmol_ (int * id)
 #endif // DEBUG
   if (* id == 3)
   {
+    if (active_image -> show_coord[3]) g_free (active_image -> show_coord[3]);
     active_image -> show_coord[3] = allocbool (active_coord -> totcoord[3]);
 #ifdef GTK3
     // GTK3 Menu Action To Check
@@ -662,6 +663,11 @@ void init_opengl_coords (int id, int nt, int init)
   int k;
   active_coord -> species = active_project -> nspec;
   active_coord -> totcoord[id] = nt;
+  if (active_image -> show_coord[id])
+  {
+    g_free (active_image -> show_coord[id]);
+    active_image -> show_coord[id] = NULL;
+  }
   active_image -> show_coord[id] = allocbool (nt);
 #ifdef GTK3
   int i, j;

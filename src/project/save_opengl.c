@@ -312,14 +312,14 @@ int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid)
   if (fwrite (& img -> l_ghtning.lights, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    if (fwrite (& img -> l_ghtning.spot[i].type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].fix, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].show, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].position, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].direction, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].intensity, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].attenuation, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
-    if (fwrite (& img -> l_ghtning.spot[i].spot_data, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> type, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> fix, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> show, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> position, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> direction, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> intensity, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> attenuation, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
+    if (fwrite (& img -> l_ghtning.spot[i] -> spot_data, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   }
   if (fwrite (& img -> m_terial.predefine, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);
   if (fwrite (& img -> m_terial.albedo, sizeof(vec3_t), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_IMAGE);

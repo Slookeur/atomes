@@ -162,8 +162,8 @@ extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
-extern Light init_light_source (int type, float size);
-extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+extern Light * init_light_source (int type, float size);
+extern Light ** copy_light_sources (int dima, int dimb, Light ** old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern float mat_min_max[5][2];
@@ -693,32 +693,32 @@ int save_preferences_to_xml_file ()
     g_free (str);
     if (rc < 0) return 0;
 
-    str = g_strdup_printf ("%d", default_lightning.spot[i].type);
+    str = g_strdup_printf ("%d", default_lightning.spot[i] -> type);
     rc = xml_save_parameter_to_file (writer, xml_lightning_leg[0], "light.type", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
-    str = g_strdup_printf ("%d", default_lightning.spot[i].fix);
+    str = g_strdup_printf ("%d", default_lightning.spot[i] -> fix);
     rc = xml_save_parameter_to_file (writer, xml_lightning_leg[1], "light.fix", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
 
-    if (default_lightning.spot[i].type)
+    if (default_lightning.spot[i] -> type)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[2], "light.position", default_lightning.spot[i].position);
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[2], "light.position", default_lightning.spot[i] -> position);
       if (! rc) return rc;
     }
-    if (default_lightning.spot[i].type != 1)
+    if (default_lightning.spot[i] -> type != 1)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[3], "light.direction", default_lightning.spot[i].direction);
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[3], "light.direction", default_lightning.spot[i] -> direction);
       if (! rc) return rc;
     }
-    rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[4], "light.intensity", default_lightning.spot[i].intensity);
+    rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[4], "light.intensity", default_lightning.spot[i] -> intensity);
     if (! rc) return rc;
-    if (default_lightning.spot[i].type)
+    if (default_lightning.spot[i] -> type)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[5], "light.attenuation", default_lightning.spot[i].attenuation);
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[5], "light.attenuation", default_lightning.spot[i] -> attenuation);
       if (! rc) return rc;
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[6], "light.spot", default_lightning.spot[i].spot_data);
+      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[6], "light.spot", default_lightning.spot[i] -> spot_data);
       if (! rc) return rc;
     }
      rc = xmlTextWriterEndElement (writer);
@@ -1346,35 +1346,50 @@ void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t
   }
   else if (g_strcmp0(key, "default_lightning") == 0)
   {
-    default_lightning.lights = (int)xml_string_to_double(content);
+    int lights = (int)xml_string_to_double(content);
+    if (default_lightning.lights != lights)
+    {
+      int i;
+      for (i=0; i<default_lightning.lights; i++)
+      {
+        g_free (default_lightning.spot[i]);
+      }
+      g_free (default_lightning.spot);
+      default_lightning.lights = lights;
+      default_lightning.spot = g_malloc0 (default_lightning.lights*sizeof*default_lightning.spot);
+      for (i=0; i<default_lightning.lights; i++)
+      {
+        default_lightning.spot[i] = init_light_source ((i < 3) ? i : 1, 1.0);
+      }
+    }
   }
   else if (g_strcmp0(key, "light.type") == 0)
   {
-    default_lightning.spot[vid].type = (int)xml_string_to_double(content);
+    default_lightning.spot[vid] -> type = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.fix") == 0)
   {
-    default_lightning.spot[vid].fix = (int)xml_string_to_double(content);
+    default_lightning.spot[vid] -> fix = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.direction") == 0 && vect)
   {
-    default_lightning.spot[vid].direction = * vect;
+    default_lightning.spot[vid] -> direction = * vect;
   }
   else if (g_strcmp0(key, "light.position") == 0 && vect)
   {
-    default_lightning.spot[vid].position = * vect;
+    default_lightning.spot[vid] -> position = * vect;
   }
   else if (g_strcmp0(key, "light.intensity") == 0 && vect)
   {
-    default_lightning.spot[vid].intensity = * vect;
+    default_lightning.spot[vid] -> intensity = * vect;
   }
   else if (g_strcmp0(key, "light.attenuation") == 0 && vect)
   {
-    default_lightning.spot[vid].attenuation = * vect;
+    default_lightning.spot[vid] -> attenuation = * vect;
   }
   else if (g_strcmp0(key, "light.spot") == 0 && vect)
   {
-    default_lightning.spot[vid].spot_data = * vect;
+    default_lightning.spot[vid] -> spot_data = * vect;
   }
   else if (g_strcmp0(key, "fog.mode") == 0)
   {
@@ -2183,7 +2198,14 @@ void set_atomes_defaults ()
 
   // Lights
   default_lightning.lights = 3;
-  if (default_lightning.spot) g_free (default_lightning.spot);
+  if (default_lightning.spot)
+  {
+    for (i=0; i<default_lightning.lights; i++)
+    {
+      g_free (default_lightning.spot[i]);
+    }
+    g_free (default_lightning.spot);
+  }
   default_lightning.spot = g_malloc0(3*sizeof*default_lightning.spot);
   default_lightning.spot[0] = init_light_source (0, 1.0);
   default_lightning.spot[1] = init_light_source (1, 1.0);
@@ -4363,6 +4385,7 @@ GtkWidget * calc_preferences ()
 */
 void clean_all_tmp ()
 {
+  int i;
   if (tmp_num_delta)
   {
     g_free (tmp_num_delta);
@@ -4390,6 +4413,10 @@ void clean_all_tmp ()
   }
   if (tmp_lightning.spot)
   {
+    for (i=0; i<tmp_lightning.lights; i++)
+    {
+      g_free (tmp_lightning.spot[i]);
+    }
     g_free (tmp_lightning.spot);
     tmp_lightning.spot = NULL;
   }
@@ -4413,7 +4440,7 @@ void clean_all_tmp ()
     g_free (tmp_bd_rw);
     tmp_bd_rw = NULL;
   }
-  int i;
+
   for (i=0; i<16; i++)
   {
     if (tmp_atomic_rad[i])
@@ -4669,11 +4696,15 @@ G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gp
           apply_default_parameters_to_project (this_proj, up_project[i+nprojects]);
           if (up_project[i+nprojects])
           {
-            for (j=0; j<this_proj -> nspec; j++)
+            if (! update_bonds)
             {
-              for (k=0; k<this_proj -> nspec; k++, l++)
+              l = 0;
+              for (j=0; j<this_proj -> nspec; j++)
               {
-                if (this_proj -> chemistry -> cutoffs[j][k] != tmpcut[l]) update_bonds = TRUE;
+                for (k=0; k<this_proj -> nspec; k++, l++)
+                {
+                  if (this_proj -> chemistry -> cutoffs[j][k] != tmpcut[l]) update_bonds = TRUE;
+                }
               }
             }
             if (update_bonds)
@@ -4985,7 +5016,6 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       omega_max_hbox = destroy_this_widget (omega_max_hbox);
       omega_max_info = destroy_this_widget (omega_max_info);
       skt_all_info = destroy_this_widget (skt_all_info);
-      destroy_this_dialog (edit_prefs);
       preferences = FALSE;
       clean_all_tmp ();
       g_free (pref_pointer);
@@ -4998,7 +5028,9 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       pref_axis_win = NULL;
       if (pref_gradient_win) g_free (pref_gradient_win);
       pref_gradient_win = NULL;
-      preference_notebook = NULL;
+      preference_notebook = destroy_this_widget (preference_notebook);
+      destroy_this_dialog ((GtkDialog *)edit_prefs);
+      edit_prefs = NULL;
       break;
   }
 }

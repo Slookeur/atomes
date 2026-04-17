@@ -933,32 +933,32 @@ void set_lights_data (glsl_program * glsl)
   for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     k = j*LIGHT_DATA + LIGHT_INFO + MATERIAL_DATA + FOG_DATA;
-    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j].type);
-    if (plot -> l_ghtning.spot[j].fix == 0)
+    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j] -> type);
+    if (plot -> l_ghtning.spot[j] -> fix == 0)
     {
-      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].position);
+      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j] -> position);
     }
     else
     {
-      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].position);
+      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j] -> position);
     }
     glUniform3f (glsl -> light_uniform[k+1], l_pos.x, l_pos.y, l_pos.z);
-    if (plot -> l_ghtning.spot[j].fix == 0)
+    if (plot -> l_ghtning.spot[j] -> fix == 0)
     {
-      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j] -> direction);
     }
     else
     {
-      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j] -> direction);
     }
     glUniform3f (glsl -> light_uniform[k+2], l_dir.x, l_dir.y, l_dir.z);
-    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j].intensity.x, plot -> l_ghtning.spot[j].intensity.y, plot -> l_ghtning.spot[j].intensity.z);
-    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j].attenuation.x);
-    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j].attenuation.y);
-    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j].attenuation.z);
-    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j].spot_data.x*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
+    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j] -> intensity.x, plot -> l_ghtning.spot[j] -> intensity.y, plot -> l_ghtning.spot[j] -> intensity.z);
+    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j] -> attenuation.x);
+    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j] -> attenuation.y);
+    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j] -> attenuation.z);
+    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j] -> spot_data.x*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j] -> spot_data.y*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j] -> spot_data.z*pi/180.0));
   }
 }
 

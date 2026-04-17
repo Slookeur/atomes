@@ -477,7 +477,7 @@ void create_light_lists ()
   cleaning_shaders (wingl, LIGHT);
   for (i=0; i<plot -> l_ghtning.lights; i++)
   {
-    if (plot -> l_ghtning.spot[i].show) j++;
+    if (plot -> l_ghtning.spot[i] -> show) j++;
   }
   wingl -> n_shaders[LIGHT][0] = j;
   if (plot -> light_loc != NULL)
@@ -493,10 +493,10 @@ void create_light_lists ()
     j = 0;
     for (i=0; i<plot -> l_ghtning.lights; i++)
     {
-      if (plot -> l_ghtning.spot[i].show)
+      if (plot -> l_ghtning.spot[i] -> show)
       {
-        prepare_cuboid (plot -> l_ghtning.spot[i].position, j);
-        if (plot -> l_ghtning.spot[i].type > 0 && plot -> l_ghtning.spot[i].fix == 0) plot -> light_loc[j] = 1;
+        prepare_cuboid (plot -> l_ghtning.spot[i] -> position, j);
+        if (plot -> l_ghtning.spot[i] -> type > 0 && plot -> l_ghtning.spot[i] -> fix == 0) plot -> light_loc[j] = 1;
         j ++;
       }
     }

@@ -106,7 +106,7 @@ extern vec4_t old_rotation_quaternion;
 extern void process_the_hits (glwin * view, gint event_button, double ptx, double pty);
 extern void arc_ball_rotation (glwin * view, int x, int y);
 extern vec3_t get_arc_ball_vector (glwin * view, int x, int y);
-extern Light init_light_source (int type, float size);
+extern Light * init_light_source (int type, float size);
 extern void rotate_quat (project * this_proj, vec4_t q, int status, int axis);
 extern void translate (project * this_proj, int status, int axis, vec3_t trans);
 extern vec3_t get_bary (project * this_proj, int status);
@@ -345,11 +345,22 @@ void update_bonds_ (int * bd, int * stp,
   int i, j, k;
 
   active_glwin -> allbonds[* bd] += * bdim;
+  if (active_glwin -> bonds[* stp][* bd])
+  {
+    for (i=0; i<active_glwin -> bonds[* stp][* bd]; i++)
+    {
+      if (active_glwin -> bondid[* stp][* bd][i])
+      {
+        g_free (active_glwin -> bondid[* stp][* bd][i]);
+      }
+    }
+    g_free (active_glwin -> bondid[* stp][* bd]);
+    active_glwin -> bondid[* stp][* bd] = NULL;
+  }
   active_glwin -> bonds[* stp][* bd] = * bdim;
 
   if (* bdim > 0)
   {
-    active_glwin -> bondid[* stp][* bd] = NULL;
     active_glwin -> bondid[* stp][* bd] = allocdint (* bdim, 2);
     for (i=0; i< * bdim; i++)
     {
@@ -1306,17 +1317,17 @@ void setup_default_lights (project * this_proj, image * img)
   int i;
   for (i=0; i<img -> l_ghtning.lights; i++)
   {
-    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i].type, img -> p_depth);
-    img -> l_ghtning.spot[i].fix = default_lightning.spot[i].fix;
-    img -> l_ghtning.spot[i].intensity = default_lightning.spot[i].intensity;
-    img -> l_ghtning.spot[i].attenuation = default_lightning.spot[i].attenuation;
-    img -> l_ghtning.spot[i].direction = default_lightning.spot[i].direction;
-    img -> l_ghtning.spot[i].position = default_lightning.spot[i].position;
-    if (img -> l_ghtning.spot[i].type)
+    img -> l_ghtning.spot[i] = init_light_source (default_lightning.spot[i] -> type, img -> p_depth);
+    img -> l_ghtning.spot[i] -> fix = default_lightning.spot[i] -> fix;
+    img -> l_ghtning.spot[i] -> intensity = default_lightning.spot[i] -> intensity;
+    img -> l_ghtning.spot[i] -> attenuation = default_lightning.spot[i] -> attenuation;
+    img -> l_ghtning.spot[i] -> direction = default_lightning.spot[i] -> direction;
+    img -> l_ghtning.spot[i] -> position = default_lightning.spot[i] -> position;
+    if (img -> l_ghtning.spot[i] -> type)
     {
-      img -> l_ghtning.spot[i].position = v3_muls (img -> l_ghtning.spot[i].position, img -> p_depth);
-      img -> l_ghtning.spot[i].attenuation.y /= img -> p_depth;
-      img -> l_ghtning.spot[i].attenuation.z /= (img -> p_depth*img -> p_depth);
+      img -> l_ghtning.spot[i] -> position = v3_muls (img -> l_ghtning.spot[i] -> position, img -> p_depth);
+      img -> l_ghtning.spot[i] -> attenuation.y /= img -> p_depth;
+      img -> l_ghtning.spot[i] -> attenuation.z /= (img -> p_depth*img -> p_depth);
     }
   }
 }

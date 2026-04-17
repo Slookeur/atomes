@@ -1896,6 +1896,7 @@ void calc_sk_t (GtkWidget * box)
   entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(1));
   update_entry_int (GTK_ENTRY(entry), (preferences) ? tmp_sqw_freq : active_project -> sqw_freq);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
+  omega_max_hbox = destroy_this_widget(omega_max_hbox);
   omega_max_hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], omega_max_hbox, FALSE, FALSE, 5);
   update_omega_max ();
