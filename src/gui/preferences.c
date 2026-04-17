@@ -5013,8 +5013,8 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       }
       break;
     default:
-      omega_max_hbox = destroy_this_widget (omega_max_hbox);
       omega_max_info = destroy_this_widget (omega_max_info);
+      omega_max_hbox = destroy_this_widget (omega_max_hbox);
       skt_all_info = destroy_this_widget (skt_all_info);
       preferences = FALSE;
       clean_all_tmp ();
