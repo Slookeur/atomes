@@ -493,7 +493,11 @@ int open_project (FILE * fp, int wid)
       if (fread (& active_project -> sqw_freq, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
     }
   }
-  if (active_project -> natomes != 0 && active_project -> nspec != 0)
+  if (! active_project -> natomes || ! active_project -> nspec)
+  {
+    return signal_error (__FILE__, __func__, __LINE__-2, ERROR_NO_WAY);
+  }
+  else
   {
     alloc_proj_data (active_project, 1);
     active_chem = active_project -> chemistry;
@@ -635,11 +639,6 @@ int open_project (FILE * fp, int wid)
         return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       }
     }
-  }
-  else
-  {
-    // error
-    return ERROR_NO_WAY;
   }
 #ifdef DEBUG
   // debugioproj (active_project, "READ INIT");
