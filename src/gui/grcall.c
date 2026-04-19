@@ -66,14 +66,14 @@ int fitc = 0;
 void init_gr (project * this_proj, int rdf)
 {
   int i, j, k;
-  this_proj -> analysis[rdf] -> curves[0] -> name = g_strdup_printf ("g(r) neutrons");
-  this_proj -> analysis[rdf] -> curves[1] -> name = g_strdup_printf ("g(r) neutrons - smoothed");
-  this_proj -> analysis[rdf] -> curves[2] -> name = g_strdup_printf ("G(r) neutrons");
-  this_proj -> analysis[rdf] -> curves[3] -> name = g_strdup_printf ("G(r) neutrons - smoothed");
-  this_proj -> analysis[rdf] -> curves[4] -> name = g_strdup_printf ("D(r) neutrons");
-  this_proj -> analysis[rdf] -> curves[5] -> name = g_strdup_printf ("D(r) neutrons - smoothed");
-  this_proj -> analysis[rdf] -> curves[6] -> name = g_strdup_printf ("T(r) neutrons");
-  this_proj -> analysis[rdf] -> curves[7] -> name = g_strdup_printf ("T(r) neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[0] -> name = g_strdup_printf ("g(r) Neutrons");
+  this_proj -> analysis[rdf] -> curves[1] -> name = g_strdup_printf ("g(r) Neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[2] -> name = g_strdup_printf ("G(r) Neutrons");
+  this_proj -> analysis[rdf] -> curves[3] -> name = g_strdup_printf ("G(r) Neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[4] -> name = g_strdup_printf ("D(r) Neutrons");
+  this_proj -> analysis[rdf] -> curves[5] -> name = g_strdup_printf ("D(r) Neutrons - smoothed");
+  this_proj -> analysis[rdf] -> curves[6] -> name = g_strdup_printf ("T(r) Neutrons");
+  this_proj -> analysis[rdf] -> curves[7] -> name = g_strdup_printf ("T(r) Neutrons - smoothed");
   this_proj -> analysis[rdf] -> curves[8] -> name = g_strdup_printf ("g(r) X-rays");
   this_proj -> analysis[rdf] -> curves[9] -> name = g_strdup_printf ("g(r) X-rays - smoothed");
   this_proj -> analysis[rdf] -> curves[10] -> name = g_strdup_printf ("G(r) X-rays");
