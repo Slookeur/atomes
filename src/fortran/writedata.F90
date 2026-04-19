@@ -39,51 +39,51 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
   endif
   if (DEL .eq. 0) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] Neutrons"""
+      ylegend = """g(r) Neutrons"""
     else
-      ylegend = "g(r)[tot] Neutrons"
+      ylegend = "g(r) Neutrons"
     endif
   elseif (DEL .eq. 1) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] Neutrons - smoothed"""
+      ylegend = """g(r) Neutrons - smoothed"""
     else
-      ylegend = "g(r)[tot] Neutrons - smoothed"
+      ylegend = "g(r) Neutrons - smoothed"
     endif
   elseif (DEL .eq. 2) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] Neutrons"""
+      ylegend = """G(r) Neutrons"""
     else
-      ylegend = "G(r)[tot] Neutrons"
+      ylegend = "G(r) Neutrons"
     endif
   elseif (DEL .eq. 3) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] Neutrons - smoothed"""
+      ylegend = """G(r) Neutrons - smoothed"""
     else
-      ylegend = "G(r)[tot] Neutrons - smoothed"
+      ylegend = "G(r) Neutrons - smoothed"
     endif
   elseif (DEL .eq. 4) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] X-rays"""
+      ylegend = """g(r) X-rays"""
     else
-      ylegend = "g(r)[tot] X-rays"
+      ylegend = "g(r) X-rays"
     endif
   elseif (DEL .eq. 5) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] X-rays - smoothed"""
+      ylegend = """g(r) X-rays - smoothed"""
     else
-      ylegend = "g(r)[tot] X-rays - smoothed"
+      ylegend = "g(r) X-rays - smoothed"
     endif
   elseif (DEL .eq. 6) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] X-rays"""
+      ylegend = """G(r) X-rays"""
     else
-      ylegend = "G(r)[tot] X-rays"
+      ylegend = "G(r) X-rays"
     endif
   elseif (DEL .eq. 7) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] X-rays - smoothed"""
+      ylegend = """G(r) X-rays - smoothed"""
     else
-      ylegend = "G(r)[tot] X-rays - smoothed"
+      ylegend = "G(r) X-rays - smoothed"
     endif
   elseif (DEL .ge. 8) then
     DCL=7
