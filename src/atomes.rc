@@ -1,14 +1,14 @@
-/* This file is part of Atomes.
+/* This file is part of atomes.
 
-Atomes is free software: you can redistribute it and/or modify it under the terms
+atomes is free software: you can redistribute it and/or modify it under the terms
 of the GNU Affero General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Atomes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+atomes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License along with Atomes.
+You should have received a copy of the GNU Affero General Public License along with atomes.
 If not, see <https://www.gnu.org/licenses/> */
 
 #include <winver.h>
@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/> */
 ATOMES_ICON ICON "../misc/win/atomes.ico"
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    1,2,1
-PRODUCTVERSION 1,2,1
+FILEVERSION    1,3,0
+PRODUCTVERSION 1,3,0
 FILEOS         VOS_NT
 FILETYPE       VFT_APP
 BEGIN
@@ -27,12 +27,12 @@ BEGIN
 		BEGIN
 			VALUE "Comments", "atomes"
 			VALUE "CompanyName", "CNRS - IPCMS - DMO"
-			VALUE "FileDescription", "atomes 1.2.1"
-			VALUE "FileVersion", "1.2.1"
-			VALUE "LegalCopyright", "\251 2025 S\351bastien Le Roux"
+			VALUE "FileDescription", "atomes 1.3.0"
+			VALUE "FileVersion", "1.3.0"
+			VALUE "LegalCopyright", "\251 2026 S\351bastien Le Roux"
 			VALUE "OriginalFileName", "atomes.exe"
-			VALUE "ProductName", "atomes 1.2.1"
-			VALUE "ProductVersion", "1.2.1"
+			VALUE "ProductName", "atomes 1.3.0"
+			VALUE "ProductVersion", "1.3.0"
 		END
 	END
 	BLOCK "VarFileInfo"
