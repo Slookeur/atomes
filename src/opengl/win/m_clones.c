@@ -86,7 +86,7 @@ G_MODULE_EXPORT void show_hide_clones (GtkWidget * widg, gpointer data)
 /*!
   \fn GtkWidget * create_clone_widget (char * name, gboolean clone, GtkWidget * menu, glwin * view)
 
-  \brief create the 'Show/hide clone(s)' menu item GTK3
+  \brief create the 'Show/Hide clone(s)' menu item GTK3
 
   \param name label of the new menu item
   \param clone draw clones (1) or not (0)

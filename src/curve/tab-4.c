@@ -836,9 +836,9 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> npty[i], FALSE, FALSE, 0);
   }
 
-  cedit -> show_axis = check_button ("Show/hide axis (if min[axis] &lt; 0.0 &lt; max[axis])", 100, 30, FALSE, G_CALLBACK(set_axis), data);
+  cedit -> show_axis = check_button ("Show/Hide axis (if min[axis] &lt; 0.0 &lt; max[axis])", 100, 30, FALSE, G_CALLBACK(set_axis), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_axis, FALSE, FALSE, 3);
-  cedit -> show_grid = check_button ("Show/hide axis grid", 100, 30, FALSE, G_CALLBACK(set_grid), data);
+  cedit -> show_grid = check_button ("Show/Hide axis grid", 100, 30, FALSE, G_CALLBACK(set_grid), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_grid, FALSE, FALSE, 1);
 
 // Axis title

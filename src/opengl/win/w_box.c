@@ -390,7 +390,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   {
     ac = FALSE;
   }
-  the_box -> show_hide = check_button ("Show / hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
+  the_box -> show_hide = check_button ("Show/Hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> show_hide, FALSE, FALSE, 0);
   the_box -> box_data = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> box_data, TRUE, TRUE, 10);

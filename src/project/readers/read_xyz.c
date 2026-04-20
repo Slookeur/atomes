@@ -330,7 +330,7 @@ int open_xyz_file (int linec)
   if (! this_word)
   {
     add_reader_info ("Wrong file format - cannot find the number of atoms !", 0);
-    add_reader_info ("Wrong file format - the first line is corrupted !", 0);
+    add_reader_info ("Wrong file format - first line is corrupted !", 0);
     res = 2;
     goto end;
   }

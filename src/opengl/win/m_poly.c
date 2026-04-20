@@ -405,7 +405,7 @@ GMenu * menu_show_coord_poly (glwin * view, int popm, int id)
 /*!
   \fn GMenu * menu_show_rings_poly (glwin * view, int popm, int id)
 
-  \brief create the 'Rings(s) -> Show/Hide' subemnus - GTK4
+  \brief create the 'Ring(s) -> Show/Hide' subemnus - GTK4
 
   \param view the target glwin
   \param popm main app (0) or popup (1)
@@ -494,7 +494,7 @@ GMenu * menu_poly (glwin * view, int popm)
   append_submenu (menu, "Partial Coordination(s)", add_menu_poly (view, popm, 1));
   if (view -> rings)
   {
-    append_submenu (menu, "Rings(s)", menu_poly_rings (view, popm));
+    append_submenu (menu, "Ring(s)", menu_poly_rings (view, popm));
   }
   else
   {

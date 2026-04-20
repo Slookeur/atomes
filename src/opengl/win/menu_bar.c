@@ -206,7 +206,7 @@ GMenu * prepare_coord_menu (glwin * view, int popm)
   append_submenu (menu, "Polyhedra", menu_poly (view, popm));
   if (view -> rings)
   {
-    append_submenu (menu, "Rings(s)", menu_rings (view, popm));
+    append_submenu (menu, "Ring(s)", menu_rings (view, popm));
   }
   else
   {

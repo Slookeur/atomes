@@ -868,7 +868,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     {
       ac = FALSE;
     }
-    the_axis -> show_hide = check_button ("Show / hide axis", 100, 20, ac, G_CALLBACK(set_show_axis_toggle), data);
+    the_axis -> show_hide = check_button ("Show/Hide axis", 100, 20, ac, G_CALLBACK(set_show_axis_toggle), data);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_axis -> show_hide, FALSE, FALSE, 5);
 
     the_axis -> axis_data = create_vbox (BSEP);

@@ -410,7 +410,7 @@ GtkWidget * create_rings_tree (project * this_proj, int rid, gboolean fill_this)
   int i, j, k;
   GtkTreeViewColumn * rings_col[7];
   GtkCellRenderer * rings_cell[7];
-  gchar * ctitle[8]={"MD. step", "Ring(s) size", "Id.", "Show", "Poly.", "Label", "Pick", "Atoms"};
+  gchar * ctitle[8]={"MD step", "Ring(s) size", "Id.", "Show", "Poly.", "Label", "Pick", "Atoms"};
   gchar * ctype[8]={"text", "text", "text", "active", "active", "active", "active", "text"};
   GType col_type_ms[8]={G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
   GType col_type_ss[7]={G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};

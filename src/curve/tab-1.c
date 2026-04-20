@@ -631,7 +631,7 @@ GtkWidget * create_tab_1 (curve_edition * cedit, gpointer data)
 
 // Frame
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox,
-                       check_button ("Show/hide frame", -1, -1, this_curve -> show_frame, G_CALLBACK(set_show_frame), data),
+                       check_button ("Show/Hide frame", -1, -1, this_curve -> show_frame, G_CALLBACK(set_show_frame), data),
                        FALSE, FALSE, 10);
 
   cedit -> frame_box = create_vbox (BSEP);

@@ -807,7 +807,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b><u>Line(s):</u></b>", -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
     GtkWidget * hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Show / hide", -1, 40, mpattern+1, G_CALLBACK(enable_lines), measure_pointer), FALSE, FALSE, 30);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Show/Hide", -1, 40, mpattern+1, G_CALLBACK(enable_lines), measure_pointer), FALSE, FALSE, 30);
     line_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, line_box, TRUE, TRUE, 0);
     box = abox (line_box, "Pattern", 0);

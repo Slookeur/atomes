@@ -676,7 +676,7 @@ GtkWidget * create_map_tree (project * this_proj)
   int i, j, k;
   GtkTreeViewColumn * map_col[4];
   GtkCellRenderer * map_cell[4];
-  gchar * ctitle[4]={"MD. step", "Element", "Id.", "Value"};
+  gchar * ctitle[4]={"MD step", "Element", "Id.", "Value"};
   gchar * ctype[4]={"text", "text", "text", "text"};
   GType col_type[2][4]= {{G_TYPE_STRING, G_TYPE_INT, G_TYPE_FLOAT},
                         {G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_FLOAT}};

@@ -188,7 +188,7 @@ G_MODULE_EXPORT void create_about_dialog (GtkWidget * widg, gpointer data)
                              "Dr. Noël Jakse <noel.jakse@grenoble-inp.fr> : dynamic structure factor", NULL};
   const gchar * weblabel = "https://atomes.ipcms.fr";
   const gchar * comments = "Visualization, analyzis, creation/edition and post-processing of atomic scale models !";
-  const gchar * copyrights = "Copyright © 2025 \nDr. Sébastien Le Roux";
+  const gchar * copyrights = "Copyright © 2026 \nDr. Sébastien Le Roux";
 
   // gtk_about_dialog_set_url_hook (about_dialog_handle_url, NULL, NULL);
   // gtk_about_dialog_set_email_hook (about_dialog_handle_url, NULL, NULL);

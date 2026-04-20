@@ -324,7 +324,7 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, leghbox, legvbox, FALSE, FALSE, 10);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, legvbox,
-                      check_button ("Show/hide legend", -1, -1, this_curve -> show_legend, G_CALLBACK(show_data_legend), data),
+                      check_button ("Show/Hide legend", -1, -1, this_curve -> show_legend, G_CALLBACK(show_data_legend), data),
                       FALSE, TRUE, 5);
 
   legend_area = create_hbox (0);
@@ -353,7 +353,7 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   dhbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> legend_box, dhbox, FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, dhbox,
-                       check_button ("Show/hide legend box", -1, -1, this_curve -> show_legend_box, G_CALLBACK(show_data_legend_box), data),
+                       check_button ("Show/Hide legend box", -1, -1, this_curve -> show_legend_box, G_CALLBACK(show_data_legend_box), data),
                        FALSE, FALSE, 40);
 
   cedit -> legend_box_style = create_hbox (0);

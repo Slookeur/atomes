@@ -295,7 +295,7 @@ GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this)
   int i, j, k;
   GtkTreeViewColumn * chains_col[7];
   GtkCellRenderer * chains_cell[7];
-  gchar * ctitle[7]={"MD. step", "Chain(s) size", "Id.", "Show", "Label", "Pick", "Atoms"};
+  gchar * ctitle[7]={"MD step", "Chain(s) size", "Id.", "Show", "Label", "Pick", "Atoms"};
   gchar * ctype[7]={"text", "text", "text", "active", "active", "active", "text"};
   GType col_type_ms[7]={G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
   GType col_type_ss[6]={G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};

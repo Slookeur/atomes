@@ -1412,7 +1412,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   }
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (" Wrap all atoms in the unit cell after building", -1, -1, FALSE, G_CALLBACK(set_wr), (gpointer)cbuilder), FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (" Show/hide clones after building", -1, -1, FALSE, G_CALLBACK(set_shc), (gpointer)cbuilder), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (" Show/Hide clones after building", -1, -1, FALSE, G_CALLBACK(set_shc), (gpointer)cbuilder), FALSE, FALSE, 0);
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
