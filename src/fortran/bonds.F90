@@ -378,6 +378,21 @@ enddo
 call CLEAN_GEOM ()
 if (allocated(GESP)) deallocate(GESP)
 
+if (NSP .eq. 2) then
+  do i=1, NSP
+    do j=1, NSP
+      MAC(j)=MA_COUNT(i,j)
+    enddo
+    call warren_cowley_out (i-1, MAC)
+  enddo
+  do i=1, NSP
+    do j=1, NSP
+      MAC(j)=MA_COUNT(i,j)
+    enddo
+    call cargill_spaepen_out (i-1, MAC)
+  enddo
+endif
+
 if (adv .eq. 1) then
   if (.not.EESCS()) then
     bonding=0

@@ -47,6 +47,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void update_glwin_after_bonds (int bonding, int * colm);
   void coordination_info (int sp, double sac, double ssac[active_project -> nspec]);
   void coordout_ (int * sid, double * sac, double ssac[active_project -> nspec], int * totgsa);
+  void warren_cowley_out_ (int * spa, double ssac[active_project -> nspec]);
+  void cargill_spaepen_out_ (int * spa, double ssac[active_project -> nspec]);
   void env_info (int sp, int totgsa, int numgsa[totgsa]);
   void update_angle_view (project * this_proj);
   void envout_ (int * sid, int * totgsa, int numgsa[* totgsa]);
@@ -407,7 +409,9 @@ gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb)
   clock_gettime (CLOCK_MONOTONIC, & start_time);
   res = rundmtx_ (& i, & j, & k);
   clock_gettime (CLOCK_MONOTONIC, & stop_time);
+// #ifdef DEBUG
   g_print ("Time to calculate distance matrix: %s\n", calculation_time(FALSE, get_calc_time (start_time, stop_time)));
+// #endif
   return res;
 }
 
@@ -729,9 +733,8 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
   if (sp == 0)
   {
     print_info ("\n\nBond properties\n\n", "heading", active_project -> analysis[BND] -> calc_buffer);
-    print_info ("Existence of a bond between two atoms i (α) and j (β)\n"
-                "if the two following conditions are verified:\n\n"
-                "\t1) D", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("Existence of a bond between two atoms i (α) and j (β)\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("if the two following conditions are verified:\n\n\t1) D", "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("ij", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
     str = g_strdup_printf (" < first minimum of the total RDF (%9.5f Å )\n\t2) D", active_chem -> grtotcutoff);
     print_info (str, "italic", active_project -> analysis[BND] -> calc_buffer);
@@ -818,55 +821,79 @@ void coordout_ (int * sid, double * sac, double ssac[active_project -> nspec], i
   if (bonds_update && ! atomes_render_image) coordination_info (* sid, * sac, ssac);
 }
 
-/*void wccp_out_ (double cp[5])
-{
-  double x, y, z;
-  gchar * str;
+/*!
+  \fn void warren_cowley_out_ (int * spa, double ssac[active_project -> nspec])
 
-  print_info ("Warren-Cowley chemical order parameters:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+  \brief compute Warren-Cowley and Cargill-Spaepen chemical order parameters for binary systems
+
+  \param spa the target species
+  \param ssac partial coordination number(s) for the target species
+*/
+void warren_cowley_out_ (int * spa, double ssac[active_project -> nspec])
+{
+  gchar * str;
+  int id_a = * spa;
+  int id_b = ! id_a;
+  double x_b = ((double)active_chem -> nsps[id_b]) / active_project -> natomes;
+  double p_ab = ssac[id_b] / (ssac[0] + ssac[1]);
+  // Warren-Cowley for binary A x B 1-x systems
+  if (! id_a)
+  {
+    print_info ("\nWarren-Cowley chemical order parameters for A", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("B", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("1-x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (" binary systems:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+  }
   print_info ("\tα", NULL, active_project -> analysis[BND] -> calc_buffer);
-  print_info ("w", "sub", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
-  x = 0.0;
-  x += (cp[1] * active_chem -> nsps[0])/active_project -> natomes;
-  x += (cp[0] * active_chem -> nsps[1])/active_project -> natomes;
-  y = 1.0 - cp[2] / (cp[3] * x);
-  str = g_strdup_printf ("%f\n", y);
+  print_info ("l", "sub", active_project -> analysis[BND] -> calc_buffer);
+  print_info ("[", NULL, active_project -> analysis[BND] -> calc_buffer);
+  str = g_strdup_printf("%s", textcolor(id_a));
+  print_info (active_chem -> label[id_a], str, active_project -> analysis[BND] -> calc_buffer);
+  g_free (str);
+  print_info ("]=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
+  double wc_ab  = 1.0 - p_ab / x_b;
+  str = g_strdup_printf ("%f\n", wc_ab);
   print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
-  if ((cp[0] * active_chem -> nsps[0])/active_project -> natomes > (cp[1] * active_chem -> nsps[1])/active_project -> natomes)
+  g_free (str);
+}
+
+/*!
+  \fn void cargill_spaepen_out_ (int * spa, double ssac[active_project -> nspec])
+
+  \brief compute Cargill-Spaepen chemical order parameters for binary systems
+
+  \param spa the target species
+  \param ssac partial coordination number(s) for the target species
+*/
+void cargill_spaepen_out_ (int * spa, double ssac[active_project -> nspec])
+{
+  gchar * str;
+  int id_a = * spa;
+  int id_b = ! id_a;
+  double x_a = ((double)active_chem -> nsps[id_a]) / active_project -> natomes;
+  double x_b = ((double)active_chem -> nsps[id_b]) / active_project -> natomes;
+  double p_ab = ssac[id_b] / (ssac[0] + ssac[1]);
+  // Cargill-Spaepen for metal alloys, also A x B 1-x systems
+  if (! id_a)
   {
-    z = 1.0 - cp[0] / (active_chem -> nsps[1] /(active_project -> natomes * y));
-  }
-  else
-  {
-    z = 1.0 - cp[1] / (active_chem -> nsps[0] /(active_project -> natomes * y));
-  }
-  print_info ("\tα", NULL, active_project -> analysis[BND] -> calc_buffer);
-  print_info ("w", "sub", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("0", "sup", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
-  str = g_strdup_printf ("%f\n", y/z);
-  print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("Cargill-Spaepen chemical order parameters:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
-  // ρ
-  print_info ("\tη=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
-  x = cp[2] * cp[4] / (active_chem -> nsps[0]/active_project -> natomes * cp[0] * cp[1]) - 1.0;
-  str = g_strdup_printf ("%f\n", x);
-  print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
-  if ((cp[0] * active_chem -> nsps[0])/active_project -> natomes > (cp[1] * active_chem -> nsps[1])/active_project -> natomes)
-  {
-    z = ;
-  }
-  else
-  {
-    z = ;
+    print_info ("\nCargill-Spaepen chemical order parameters for A", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("B", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info ("1-x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (" binary systems:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
   }
   print_info ("\tη", NULL, active_project -> analysis[BND] -> calc_buffer);
-  print_info ("0", "sup", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
-  str = g_strdup_printf ("%f\n", y/z);
+  print_info ("[", NULL, active_project -> analysis[BND] -> calc_buffer);
+  str = g_strdup_printf("%s", textcolor(id_a));
+  print_info (active_chem -> label[id_a], str, active_project -> analysis[BND] -> calc_buffer);
+  g_free (str);
+  print_info ("]=\t", NULL, active_project -> analysis[BND] -> calc_buffer);
+  double cs_ab = (p_ab - x_b) / x_a;
+  str = g_strdup_printf ("%f\n", cs_ab);
   print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
-}*/
+  g_free (str);
+}
 
 /*!
   \fn void env_info (int sp, int totgsa, int numgsa[totgsa])

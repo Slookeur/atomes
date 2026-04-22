@@ -199,37 +199,35 @@ int signal_error (const char * file, const char * func, int error_line, int erro
 */
 void update_error_trace (const char * file, const char * func, int trace_line)
 {
+  gchar * intro = "<span font_desc=\"monospace 10\">\n";
+  gchar * file_part;
+  gchar * func_part;
+  gchar * line_part;
+  gchar * tab_part = NULL;
+  gchar * tmp_trace;
+  int i;
   if (project_error -> trace_id)
   {
-    int i;
-    gchar * tmp_trace = g_strdup_printf ("%s\n", project_error -> error_trace);
-    for (i=0; i<project_error -> trace_id+1; i++)
-    {
-      tmp_trace = g_strdup_printf ("%s\n<span font_desc=\"monospace 10\">", tmp_trace);
-    }
-    tmp_trace = g_strdup_printf ("%sFile    : %s\n", tmp_trace, file);
-    for (i=0; i<project_error -> trace_id+1; i++)
-    {
-      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
-    }
-    tmp_trace = g_strdup_printf ("%sFunction: %s()\n", tmp_trace, func);
-    for (i=0; i<project_error -> trace_id+1; i++)
-    {
-      tmp_trace = g_strdup_printf ("%s\t\t", tmp_trace);
-    }
-    tmp_trace = g_strdup_printf ("%sLine    : %d</span>\n", tmp_trace, trace_line);
-
+    tmp_trace = g_strdup_printf ("%s\n%s", project_error -> error_trace, intro);
     g_free (project_error -> error_trace);
-    project_error -> error_trace = g_strdup_printf ("%s", tmp_trace);
-    g_free (tmp_trace);
   }
   else
   {
-    project_error -> error_trace = g_strdup_printf("<span font_desc=\"monospace 10\">"
-                                                   "\t\tFile    : %s\n"
-                                                   "\t\tFunction: %s()\n"
-                                                   "\t\tLine    : %d</span>", file, func, trace_line);
+    tmp_trace = g_strdup_printf ("%s", intro);
   }
+  for (i=0; i<project_error -> trace_id+1; i++)
+  {
+    tab_part = (tab_part) ? g_strdup_printf ("%s\t\t", tab_part) : g_strdup_printf ("\t\t");
+  }
+  file_part = g_strdup_printf ("File    : %s\n", file);
+  func_part = g_strdup_printf ("Function: %s()\n", func);
+  line_part = g_strdup_printf ("Line    : %d</span>", trace_line);
+  project_error -> error_trace = g_strdup_printf ("%s%s%s%s%s%s%s", tmp_trace, tab_part, file_part, tab_part, func_part, tab_part, line_part);
+  g_free (tmp_trace);
+  g_free (tab_part);
+  g_free (file_part);
+  g_free (func_part);
+  g_free (line_part);
   project_error -> trace_id ++;
 }
 
@@ -450,7 +448,7 @@ G_MODULE_EXPORT void run_on_open_save_active (GtkDialog * info, gint response_id
   FILE * fp = NULL;
   gchar * err;
   gboolean io = FALSE;
-  const gchar * mess[2]={"reading","saving "};
+  const gchar * mess[2]={"reading","saving"};
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     if (osp.a == 0)
