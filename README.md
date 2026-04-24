@@ -5,7 +5,7 @@
 
 [atomes][atomes] is a Free (Open Source) cross-platform software licensed under the terms 
 of the Affero GPL v3+ license. 
-Atoms is a toolbox developed to analyze, to visualize and to create/edit three-dimensional atomistic models.
+***atomes*** is a toolbox developed to analyze, to visualize and to create/edit three-dimensional atomic scale models.
 It offers a workspace that allows to have many projects opened simultaneously.
 
 The different projects in the workspace can exchange data: analysis results, atomic coordinates ...
@@ -20,7 +20,7 @@ atomes offers a user-friendly assistant to help and guide the user step by step 
 
 ## Features
 
-  - Analysis of 3D atomistic model: neutron and x-rays diffraction, rings statistics, chain statistics, bond order, MSD ...
+  - Analysis of 3D atomic scale models: neutron and x-rays diffraction, rings statistics, chain statistics, bond order, MSD ...
   - Visualization: measures, coordination polyhedras, advanced coloring, advanced design
   - Edition: molecular library, crystal builder, cell edition, surface creation and passivation ...
   - MD input preparation: 
