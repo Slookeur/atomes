@@ -469,7 +469,7 @@ void add_to_column (gpointer data)
   GtkWidget * lab;
   gchar * str;
   qint * dat = (qint *)data;
-  wind = dialogmodal ("Add constant to column", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
+  wind = dialogmodal ("Add Constant to Column", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
   gtk_dialog_add_button (GTK_DIALOG (wind), "Apply", GTK_RESPONSE_APPLY);
   box = dialog_get_content_area (wind);
   hbox = create_hbox (0);

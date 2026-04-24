@@ -127,7 +127,7 @@ void update_chains_view (project * this_proj)
   else
   {
     nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
-    col = textcolor(j-1);
+    col = g_strdup_printf("%s", textcolor(j-1));
   }
   print_info ("\n\nChain statistics\n\n", "heading", this_proj -> analysis[CHA] -> calc_buffer);
 
@@ -316,7 +316,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   }
   else
   {
-    clean_curves_data (CHA, 0, active_project -> analysis[CHA] -> numc);
+    clean_curves_data (CHA, active_project -> csparam[0], active_project -> csparam[0]+1);
     clean_chains_data (active_glwin);
     active_glwin -> all_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> all_chains);
     active_glwin -> num_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> num_chains);

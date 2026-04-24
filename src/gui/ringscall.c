@@ -166,7 +166,7 @@ void update_rings_view (project * this_proj, int c)
   else
   {
     nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
-    col = textcolor(j-1);
+    col = g_strdup_printf("%s", textcolor(j-1));
   }
   print_info ("\n\nRing statistics\n\n", "heading", this_proj -> analysis[RIN] -> calc_buffer);
   str = g_strdup_printf ("\n%s rings analysis details:\n", rings_type[c]);

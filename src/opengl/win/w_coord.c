@@ -969,7 +969,7 @@ GtkWidget * create_frag_mol_search (project * this_proj, int geo)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(search_item[geo-2], 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
   entry = create_entry (G_CALLBACK(update_frag_mol_search), 100, 15, FALSE, & this_proj -> modelgl -> colorp[geo][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,entry, FALSE, FALSE, 0);
-  str = g_strdup_printf ("in [%d - %d]", 1, this_proj ->  coord -> totcoord[geo]);
+  str = g_strdup_printf ("&#x2208; [%d - %d]", 1, this_proj ->  coord -> totcoord[geo]);
   label = markup_label (str, 50, -1, 0.0, 0.5);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, label, FALSE, FALSE, 5);

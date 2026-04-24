@@ -75,7 +75,7 @@ const gchar * default_title (int ax, gpointer data)
     {
       if (cid < this_proj -> skt_sets)
       {
-        return g_strdup_printf ("q [Å<sup>-1</sup>]");
+        return g_strdup_printf ("q [&#xC5;<sup>-1</sup>]");
       }
       else
       {

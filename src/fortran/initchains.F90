@@ -133,8 +133,8 @@ if (TAMP .eq. 0.0) then
   goto 001
 endif
 
-l=0
-if (TLT .ne. NSP+1) l = l + TLT
+l=TLT
+if (TLT .eq. NSP+1) l = 0
 
 call save_curve (TAILLC, CTAB, l, IDCH)
 

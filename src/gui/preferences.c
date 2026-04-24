@@ -4287,7 +4287,7 @@ GtkWidget * calc_preferences ()
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
   gchar * default_delta_num_leg[NUM_DELTA] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
                                               "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
-                                              "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "Step(s) between configurations", "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"};
+                                              "<b>Spherical harmonics</b>: l<sub>max</sub> &#x2208; [2-40]", "Step(s) between configurations", "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"};
   gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
                      "use it to setup your own default parameters:"};
   gchar * m_list[4][2] = {{"Calculations", "most analysis options"},
@@ -4897,7 +4897,7 @@ void save_preferences ()
 
   if (nprojects)
   {
-    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    if (ask_yes_no("Apply to project(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
      // Select project here
      GtkWidget * proj_sel = message_dialogmodal ("Project selection", "Select to apply preferences", GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);

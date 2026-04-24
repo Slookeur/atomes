@@ -82,7 +82,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 extern void set_data_style (gpointer data);
 
-char * ctext[2] = {"x ∈ [0.0, 1.0]", "y ∈ [0.0, 1.0]"};
+char * ctext[2] = {"x &#x2208; [0.0, 1.0]", "y &#x2208; [0.0, 1.0]"};
 
 /*!
   \fn G_MODULE_EXPORT void set_window_size (GtkEntry * maj, gpointer data)

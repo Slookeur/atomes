@@ -62,39 +62,39 @@ void init_msd (project * this_proj)
   j = 0;
   for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(nac)[%s]", active_chem -> label[i]);
-    j=j+1;
-  }
-  for ( i = 0 ; i < this_proj -> nspec ; i++ )
-  {
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x)[%s]", active_chem -> label[i]);
-    j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y)[%s]", active_chem -> label[i]);
-    j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z)[%s]", active_chem -> label[i]);
-    j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy)[%s]", active_chem -> label[i]);
-    j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz)[%s]", active_chem -> label[i]);
-    j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(nac)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
   }
   for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(x/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(x)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(y/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(y)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(z/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(z)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xy/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xy)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(xz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xz)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
-    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("MSD(yz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(yz)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+  }
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
+  {
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(x/nac)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(y/nac)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(z/nac)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xy/nac)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xz/nac)[%s]", "MSD", active_chem -> label[i]);
+    j=j+1;
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(yz/nac)[%s]", "MSD", active_chem -> label[i]);
     j=j+1;
   }
   this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("Correction[x]");

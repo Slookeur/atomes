@@ -784,7 +784,7 @@ char * fvars_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{"E<sub>x</sub>", "E<sub>y</sub
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
-                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "ω<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
+                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "&omega;<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
                                                  {"i<sub>gid</sub><sup>A</sup>", "j<sub>gid</sub><sup>A</sup>", "k", "i<sub>gid</sub><sup>B</sup>", "j<sub>gid</sub><sup>B</sup>", "R<sub>0</sub>"}},
                                                 {{"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", " ", " ", " "},
                                                  {"A", "n", " ", " ", " ", " "},
@@ -797,7 +797,7 @@ char * fvars_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{"E<sub>x</sub>", "E<sub>y</sub
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
-                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "ω<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
+                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "&omega;<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
                                                  {"i<sub>gid</sub><sup>A</sup>", "j<sub>gid</sub><sup>A</sup>", "k", "i<sub>gid</sub><sup>B</sup>", "j<sub>gid</sub><sup>B</sup>", "R<sub>0</sub>"}}};
 
 int feunit_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{1, 1, 1, 0, 0, 0},

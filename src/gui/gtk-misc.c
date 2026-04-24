@@ -592,6 +592,7 @@ GtkWidget * message_dialogmodal (gchar * message, gchar * title, GtkMessageType 
   label = GTK_WIDGET(children -> data);
   g_list_free(children);
 #endif
+  gtk_label_set_use_markup (GTK_LABEL(label), TRUE);
   gtk_label_set_selectable(GTK_LABEL(label), TRUE);
 
   gtk_window_set_title (GTK_WINDOW(win), title);

@@ -743,7 +743,7 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 5);
       if (! i)
       {
-        str = g_strdup_printf ("<b>in [1-%d]</b>", tmp_proj -> natomes);
+        str = g_strdup_printf ("<b>∈ [1-%d]</b>", tmp_proj -> natomes);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
         g_free (str);
       }
@@ -943,7 +943,7 @@ G_MODULE_EXPORT void set_equi_param (GtkEntry * res, gpointer data)
     }
     else
     {
-      gchar * str = g_strdup_printf ("Minimization parameter must be in [ %f - %f ]",
+      gchar * str = g_strdup_printf ("Minimization parameter must ∈ [ %f - %f ]",
                                      equi_lim[0][(int)tmp_field -> equi_opts[j]], equi_lim[1][(int)tmp_field -> equi_opts[j]]);
       show_warning (str, field_assistant);
       g_free (str);
@@ -1579,7 +1579,7 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       else
       {
         show_warning ("The batch size or max. number of particles by batch\n"
-                      "must be in [1 - 10 000 000]", field_assistant);
+                      "must &#x2208; [1 - 10 000 000]", field_assistant);
       }
     }
     else if (i == 8 || i == 16)
@@ -1594,7 +1594,7 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       else
       {
         show_warning ("The buffer size or max. number of ASCII line records by batch\n"
-                      "must be in [100 - 100 000]", field_assistant);
+                      "must &#x2208; [100 - 100 000]", field_assistant);
       }
     }
     else if (i == 19 || i == 20 || i == 21)
@@ -1904,7 +1904,7 @@ G_MODULE_EXPORT void set_elec_param (GtkEntry * res, gpointer data)
         }
         else if (w < 1e-20 || w > 0.5)
         {
-          show_warning ("Precision must be in [10<sup>-20</sup> - 0.5]", field_assistant);
+          show_warning ("Precision must &#x2208; [10<sup>-20</sup> - 0.5]", field_assistant);
           w = tmp_field -> elec_opts[i] / pow (10, j);
         }
       }
@@ -1991,7 +1991,7 @@ GtkWidget * create_elec_param_box ()
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" x 10<sup>-</sup>", 5, -1, 0.0, 0.5), FALSE, FALSE, 0);
     pres_spin = spin_button (G_CALLBACK(adjust_precision), i, -20, -1, 1, 0, 15, NULL);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, pres_spin, FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("in [10<sup>-20</sup> - 0.5]", 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("&#x2208; [10<sup>-20</sup> - 0.5]", 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
   }
   else if (tmp_field -> elec_opts[5] == 3.0)
   {

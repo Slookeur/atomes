@@ -882,7 +882,7 @@ GtkWidget * frag_mol_volume_search (project * this_proj, int g)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(search_item[g-2], 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
   entry = create_entry (G_CALLBACK(update_vol_frag_mol_search), 100, 15, FALSE, & this_proj -> modelgl -> colorp[g][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,entry, FALSE, FALSE, 0);
-  str = g_strdup_printf ("in [%d - %d]", 1, this_proj ->  coord -> totcoord[g]);
+  str = g_strdup_printf ("&#x2208; [%d - %d]", 1, this_proj ->  coord -> totcoord[g]);
   label = markup_label (str, 50, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,label, FALSE, FALSE, 20);
   g_free (str);

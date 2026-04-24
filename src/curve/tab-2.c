@@ -477,7 +477,7 @@ G_MODULE_EXPORT void set_data_hist_opac (GtkEntry * entry, gpointer data)
   }
   else
   {
-    show_warning ("Bar opacity must be in [0.0 - 1.0]", this_curve -> window);
+    show_warning ("Bar opacity must &#x2208; [0.0 - 1.0]", this_curve -> window);
     if (i > 0)
     {
       update_entry_double (entry, get_extra_layout (data, i-1) -> hopac);

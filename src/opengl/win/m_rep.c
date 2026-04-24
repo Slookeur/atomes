@@ -559,15 +559,15 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
         if (i > 2 || i == 0)
         {
-          str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
+          str = g_strdup_printf ("&#x2208; [%.1f, %.1f]", smin[i], smax[i]);
         }
         else if (i == 1)
         {
-          str = g_strdup_printf ("in [<b>C</b>. depth, %.1f]", max_depth);
+          str = g_strdup_printf ("&#x2208; [<b>C</b>. depth, %.1f]", max_depth);
         }
         else
         {
-          str = (preferences) ? g_strdup_printf ("in [%.1f, <b>P</b>. depth<sup>*</sup>]", smin[i]) : g_strdup_printf ("in [%.1f, <b>P</b>. depth]", smin[i]);
+          str = (preferences) ? g_strdup_printf ("&#x2208; [%.1f, <b>P</b>. depth<sup>*</sup>]", smin[i]) : g_strdup_printf ("&#x2208; [%.1f, <b>P</b>. depth]", smin[i]);
         }
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
         g_free (str);

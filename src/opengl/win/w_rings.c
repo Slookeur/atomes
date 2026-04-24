@@ -856,7 +856,7 @@ G_MODULE_EXPORT void update_rings_search (GtkEntry * res, gpointer data)
       if (coord -> rst[rid] > 0)
       {
         update_entry_int(res, coord -> rst[rid]);
-        str = g_strdup_printf ("in [%d - %d]", get_rmin(this_proj, rid, coord -> rst[rid]),  get_rmax(this_proj, rid, coord -> rst[rid]));
+        str = g_strdup_printf ("&#x2208; [%d - %d]", get_rmin(this_proj, rid, coord -> rst[rid]),  get_rmax(this_proj, rid, coord -> rst[rid]));
         gtk_label_set_text (GTK_LABEL(coord -> rilab[rid][1]), str);
         g_free (str);
       }
@@ -893,7 +893,7 @@ G_MODULE_EXPORT void update_rings_search (GtkEntry * res, gpointer data)
       if (coord -> rsz[rid] > 0)
       {
         update_entry_int(res, coord -> rsz[rid]);
-        str = g_strdup_printf ("in [1 - %d]", this_proj -> modelgl -> num_rings[rid][coord -> rst[rid]-1][coord -> rsz[rid]-1]);
+        str = g_strdup_printf ("&#x2208; [1 - %d]", this_proj -> modelgl -> num_rings[rid][coord -> rst[rid]-1][coord -> rsz[rid]-1]);
         gtk_label_set_text (GTK_LABEL(coord -> rilab[rid][2]), str);
         g_free (str);
       }
@@ -967,13 +967,13 @@ GtkWidget * create_rings_search (project * this_proj, int rid)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,entry, FALSE, FALSE, 0);
     if (i==0)
     {
-      str = g_strdup_printf ("in [1 - %d]", this_proj -> steps);
+      str = g_strdup_printf ("&#x2208; [1 - %d]", this_proj -> steps);
       coord -> rilab[rid][i] = markup_label(str, 50, -1, 0.0, 0.5);
       g_free (str);
     }
     else if (i == 1)
     {
-      str = g_strdup_printf ("in [%d - %d]", get_rmin(this_proj, rid, coord -> rst[rid]),  get_rmax(this_proj, rid, coord -> rst[rid]));
+      str = g_strdup_printf ("&#x2208; [%d - %d]", get_rmin(this_proj, rid, coord -> rst[rid]),  get_rmax(this_proj, rid, coord -> rst[rid]));
       coord -> rilab[rid][i] = markup_label(str, 50, -1, 0.0, 0.5);
       g_free (str);
     }

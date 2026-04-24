@@ -43,11 +43,12 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 #include "global.h"
 #include "interface.h"
+#include "project.h"
 #include "curve.h"
 
-void save_to_file_ (int *, char *, int *, double *, double *, int *, int *, int *, double *, int *, int *, int *, int *, char *);
-void prep_file_ (int *, char *, int *, int *, int *, double *, int *, int *);
-void append_to_file_ (int *, double *, double *, double *, int *, int *, int *, int *, int *, int *, int *, char *);
+void save_to_file_ (int *, char *, int *, double *, double *, int *, int *, int *, double *, int *, int *, int *, int *, int *, char *);
+void prep_file_ (int *, char *, int *, int *, int *, int *, double *, int *, int *);
+void append_to_file_ (int *, double *, double *, double *, int *, int *, int *, int *, int *, int *, int *, int *, char *);
 
 GtkFileFilter * filter1, * filter2;
 
@@ -84,10 +85,10 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
   a = cd -> a;
   b = cd -> b;
   c = cd -> c;
-  double delta = get_project_by_id(a) -> analysis[b] -> delta;
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     project * this_proj = get_project_by_id(a);
+    double delta = this_proj -> analysis[b] -> delta;
     this_curve -> cfile = file_chooser_get_file_name (chooser);
     GtkFileFilter * tmp = gtk_file_chooser_get_filter (chooser);
     if (tmp == filter1)
@@ -100,8 +101,11 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
     }
     k = strlen (this_curve -> cfile);
     j = strlen (this_curve -> title);
+    // Get n
     if (this_curve -> extrac -> extras == 0)
     {
+      m = activep;
+      active_project_changed (a);
       save_to_file_ (& k, this_curve -> cfile,
                      & this_curve -> ndata,
                      this_curve -> data[0],
@@ -109,15 +113,15 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
                      & this_curve -> scale[0],
                      & this_curve -> scale[1],
                      & this_curve -> layout -> aspect,
-                     & delta, & b, & c, & l,
+                     & delta, & b, & c, & this_proj -> nspec, & l,
                      & j, this_curve -> title);
-
+      active_project_changed (m);
     }
     else
     {
       p = this_curve -> extrac -> extras + 1;
       m = 0;
-      prep_file_ (& k, this_curve -> cfile, & l,
+      prep_file_ (& k, this_curve -> cfile, & this_proj -> nspec, & l,
                   & this_curve -> scale[0],
                   & this_curve -> scale[1],
                   & delta, & b, & c);
@@ -126,7 +130,7 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
                        this_curve -> data[1],
                        & delta,
                        & this_curve -> layout -> aspect,
-                       & b, & c, & l, & m, & p,
+                       & b, & c, & this_proj -> nspec, & l, & m, & p,
                        & j, this_curve -> title);
       j = this_curve -> extrac -> extras;
       CurveExtra * ctmp = this_curve -> extrac -> first;
@@ -143,7 +147,7 @@ G_MODULE_EXPORT void run_write_curve (GtkDialog * info, gint response_id, gpoint
                          this_proj -> analysis[o] -> curves[n] -> data[1],
                          & this_proj -> analysis[o] -> delta,
                          & ctmp -> layout -> aspect,
-                         & o, & n, & l, & m, & p,
+                         & o, & n, & this_proj -> nspec, & l, & m, & p,
                          & j, this_proj -> analysis[o] -> curves[n] -> title);
         if (ctmp -> next) ctmp = ctmp -> next;
       }

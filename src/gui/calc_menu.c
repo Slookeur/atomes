@@ -294,7 +294,7 @@ void calc_sph (GtkWidget * vbox)
   GtkWidget * entry;
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  gchar * str = "Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> in [2-40]";
+  gchar * str = "Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> &#x2208; [2-40]";
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,  markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(SPH));
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SPH] -> num_delta);
@@ -932,7 +932,7 @@ gboolean test_sph ()
 {
   if (active_project -> analysis[SPH] -> num_delta < 2 || active_project -> analysis[SPH] -> num_delta > 40)
   {
-    show_warning ("You must specify a number <i>l<sub>max</sub></i> in [2-40]", calc_win);
+    show_warning ("You must specify a number <i>l<sub>max</sub></i> &#x2208; [2-40]", calc_win);
     return FALSE;
   }
   else
@@ -1367,8 +1367,8 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
 */
 void add_advanced_options (int skq, dint skadv[2], GtkWidget * vbox)
 {
-  gchar * adv_name[2]={"Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> [0.0-1.0]",
-                       "Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] in [Q<sub>min</sub>-Q<sub>max</sub>]"};
+  gchar * adv_name[2]={"Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> &#x2208; [0.0-1.0]",
+                       "Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] &#x2208; [Q<sub>min</sub>-Q<sub>max</sub>]"};
   GtkWidget * advanced_options = create_expander ("  Advanced options", NULL);
   gtk_widget_set_size_request (advanced_options, -1, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, advanced_options, FALSE, TRUE, 10);

@@ -526,7 +526,7 @@ gchar * cif_occupancies[3]={"Round up to lowest integer",
 gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
                             "\t\tConsider each configuration as a step in a chemical reaction:\n"
                             "\t\t\t- Atomic coordinates are sorted based on occupancy or disorder site\n"
-                            "\t\t\t- Each describeing the proportion of a reactant\n"
+                            "\t\t\t- Each describing the proportion of a reactant\n"
                             "\t\t\t- A super lattice is build to respect these proportions\n\n"
                             "\t<b>MD trajectory</b>\n"
                             "\t\tConsider the CIF file a MD trajectory\n\n"
@@ -628,7 +628,7 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   gtk_box_set_spacing (GTK_BOX(vbox), 15);
   hboxa = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hboxa, TRUE, TRUE, 0);
-  quest = gtk_label_new (lab);
+  quest = markup_label(lab, -1, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, quest, TRUE, TRUE, 0);
 
   if (id == 0 || id > 6)
@@ -1010,7 +1010,7 @@ void send_chem_info_ (int prop[active_project -> nspec])
 /*!
   \fn gchar * env_name (project * this_proj, int g, int s, int f, GtkTextBuffer * buffer)
 
-  \brief ouput the name of a coordination sphere
+  \brief output the name of a coordination sphere
 
   \param this_proj the target project
   \param g the coordination (0 = total, 1 = partial)
@@ -1102,9 +1102,9 @@ gchar * env_name (project * this_proj, int g, int s, int f, GtkTextBuffer * buff
 /*!
   \fn void update_after_calc (int calc)
 
-  \brief To update all curve plots in the workspace after a calculation
+  \brief update all curve plots in the workspace after a calculation
 
-  \param calc Analysis id
+  \param calc analysis id
 */
 void update_after_calc (int calc)
 {
