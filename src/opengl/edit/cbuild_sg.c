@@ -661,7 +661,6 @@ int get_this_group_data (space_group * spg,  xmlNodePtr racine)
 space_group * read_sg_xml_file (const char * filetoread)
 {
   int i, j;
-  const xmlChar sgl[8]="sg-xml";
   xmlDoc * doc;
   xmlTextReaderPtr reader;
   xmlNodePtr racine, node, num_node;
@@ -681,7 +680,7 @@ space_group * read_sg_xml_file (const char * filetoread)
     doc = xmlParseFile(filetoread);
     if (doc == NULL) return 0;
     racine = xmlDocGetRootElement(doc);
-    if (g_strcmp0 ((char *)(racine -> name), (char *)sgl) != 0) return clean_sgl_data (doc, reader);
+    if (g_strcmp0 ((char *)(racine -> name), "sg-xml") != 0) return clean_sgl_data (doc, reader);
     spg = g_malloc0(sizeof*spg);
     node = findnode (racine -> children, "space-group");
     if (node == NULL) return clean_sgl_data (doc, reader);

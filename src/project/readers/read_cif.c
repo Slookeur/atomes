@@ -2626,7 +2626,7 @@ int open_cif_file (int linec)
   if (cif_action && this_reader -> steps > 1)
   {
     // We need to select the step to work on
-    str = g_strdup_printf ("Select the configuration <i>c</i>, <i>c</c> &#x2208; [1- %d]", this_reader -> steps);
+    str = g_strdup_printf ("Select the configuration <i>c</i>, <i>c</i> &#x2208; [1- %d]", this_reader -> steps);
     cif_step = 0;
     while (! cif_step)
     {

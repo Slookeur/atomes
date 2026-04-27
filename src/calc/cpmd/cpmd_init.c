@@ -1223,7 +1223,8 @@ G_MODULE_EXPORT void show_qm_file_preview (GtkButton * but, gpointer data)
 {
   int i, j, k, c;
   c = GPOINTER_TO_INT(data);
-  gchar * ptitle[5] = {"CP2K input file", "forces.inc", "system.inc", "motion.inc", "coord.inc"};
+  gchar * ptitle[5] = {"CP2K input file",
+                       "forces.inc", "system.inc", "motion.inc", "coord.inc"};
   gchar * wtite[2] = {" input file preview", " input files preview"};
   gchar * str;
   GtkWidget * scrollsets;

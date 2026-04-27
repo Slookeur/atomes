@@ -1487,7 +1487,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                     {
                       build_res = 3;
                       if (ask_yes_no ("Inter-object distance(s) < 0.5 Ang. !",
-                                      "Inter-object distance(s) &lt; 0.5 Ang. !\n\n\t\tContinue and leave a single object at each position ?", GTK_MESSAGE_WARNING, widg))
+                                      "Inter-object distance(s) &lt; 0.5 &#xC5; !\n\n\t\tContinue and leave a single object at each position ?", GTK_MESSAGE_WARNING, widg))
                       {
                         crystal_dist_chk = FALSE;
                       }

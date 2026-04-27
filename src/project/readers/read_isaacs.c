@@ -111,9 +111,6 @@ int XmlwriterFilename (const char * uri)
   int i, j;
   xmlTextWriterPtr writer;
 
-  char isaacinfo[16] = " I.S.A.A.C.S. v";
-  char xmlinfo[11]=" XML file ";
-  const xmlChar intro[50]="";
   char * val;
   char * ncut;
   size_t lgt;
@@ -129,11 +126,7 @@ int XmlwriterFilename (const char * uri)
   rc = xmlTextWriterStartDocument(writer, NULL, MY_ENCODING, NULL);
   if (rc < 0) return 0;
 
-
-  strcpy((char *)intro, isaacinfo);
-  strcat((char *)intro, "1.0");
-  strcat((char *)intro, xmlinfo);
-  rc = xmlTextWriterWriteComment(writer, intro);
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" I.S.A.A.C.S. v1.0 XML file ");
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST "isaacs-xml");
   if (rc < 0) return 0;
@@ -1255,7 +1248,6 @@ int check_xml (const char * filetocheck)
   int res;
   xmlDoc * doc;
   xmlTextReaderPtr reader;
-  const xmlChar xisaacs[11]="isaacs-xml";
   xmlChar * cdata, * cfichier;
   xmlNodePtr racine, node;
   /*
@@ -1274,7 +1266,7 @@ int check_xml (const char * filetocheck)
     else
     {
       racine = xmlDocGetRootElement(doc);
-      if (g_strcmp0 ((char *)(racine->name), (char *)xisaacs) != 0)
+      if (g_strcmp0 ((char *)(racine->name), "isaacs-xml") != 0)
       {
         res=2;
         goto end;
@@ -1433,34 +1425,34 @@ gchar * open_xml (const char * filetoread)
   switch(oxml)
   {
     case 1:
-      return ("Impossible to open the Isaacs project file (XML) file\n");
+      return ("Impossible to open the ISAACS project file (XML) file\n");
       break;
     case 2:
-      return ("The file is not a valid Isaacs project file (XML) file\n");
+      return ("The file is not a valid ISAACS project file (XML) file\n");
       break;
     case 3:
-      return ("The Isaacs project file (XML) file is incomplete\n");
+      return ("The ISAACS project file (XML) file is incomplete\n");
       break;
     case 4:
-      return ("Problem(s) in the &lt;data&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;data&gt; section of the ISAACS project file (XML)\n");
       break;
     case 5:
-      return ("Problem(s) in the &lt;chemistry&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;chemistry&gt; section of the ISAACS project file (XML)\n");
       break;
     case 6:
-      return ("Problem(s) in the &lt;element&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;element&gt; section of the ISAACS project file (XML)\n");
       break;
     case 7:
-      return ("Problem(s) in the &lt;box&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;box&gt; section of the ISAACS project file (XML)\n");
       break;
     case 8:
-      return ("Problem(s) in the &lt;pbc&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;pbc&gt; section of the ISAACS project file (XML)\n");
       break;
     case 9:
-      return ("Problem(s) in the &lt;cutoffs&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;cutoffs&gt; section of the ISAACS project file (XML)\n");
       break;
     case 10:
-      return ("Problem(s) in the &lt;time-series&gt; section of the Isaacs project file (XML)\n");
+      return ("Problem(s) in the &lt;time-series&gt; section of the ISAACS project file (XML)\n");
       break;
     default:
       return NULL;

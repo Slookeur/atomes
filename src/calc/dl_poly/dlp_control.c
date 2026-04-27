@@ -722,7 +722,7 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
   gtk_box_set_homogeneous (GTK_BOX (vbox), TRUE);
   gchar * imp_info[4] = {"Index of the particle to impact: ", "Time step of impact:", "Energy of impact:", "Direction (from center of mass):"};
   gchar * imp_unit[2] = {"<b>n<sup>th</sup> step</b>", "<b>k eV</b>"};
-  gchar * imp_dir[3] = {"on x:", "on y:", "on z:"};
+
   for (i=0; i<4; i++)
   {
     hbox = create_hbox (5);
@@ -1593,8 +1593,7 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       }
       else
       {
-        show_warning ("The buffer size or max. number of ASCII line records by batch\n"
-                      "must &#x2208; [100 - 100 000]", field_assistant);
+        show_warning ("The buffer size or max. number of ASCII line records by batch\nmust &#x2208; [100 - 100 000]", field_assistant);
       }
     }
     else if (i == 19 || i == 20 || i == 21)

@@ -90,17 +90,13 @@ gchar * remove_text (int i, int j, gchar * str)
                               str, str);
       break;
     case -1:
-      return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\n"
-                              "and merged with the one of the selected molecule.",
-                              str);
+      return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\nand merged with the one of the selected molecule.", str);
       break;
     default:
       switch (j)
       {
         case -1:
-          return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\n"
-                                  "and merged with the one of molecule <b>%s</b>",
-                                  str, get_active_field_molecule(i) -> name);
+          return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\nand merged with the one of molecule <b>%s</b>", str, get_active_field_molecule(i) -> name);
           break;
         default:
           return g_strdup_printf ("The description of atom <b>%s</b> will be deleted\n"

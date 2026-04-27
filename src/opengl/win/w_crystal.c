@@ -538,7 +538,7 @@ void prepare_cif_list (int dba, int sym, int spg)
 #ifdef G_OS_WIN32
   data_xml = g_strdup_printf ("%s\\crystals\\%s_list.xml", PACKAGE_LIB_DIR, database_dir[dba]);
 #else
-  data_xml =  = g_strdup_printf ("%s/crystals/%s_list.xml", PACKAGE_LIB_DIR, database_dir[dba]);
+  data_xml = g_strdup_printf ("%s/crystals/%s_list.xml", PACKAGE_LIB_DIR, database_dir[dba]);
 #endif
   xmlDoc * doc;
   xmlTextReaderPtr reader;

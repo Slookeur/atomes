@@ -357,11 +357,11 @@ GtkWidget * prop_tab (glwin * view, int aoc)
   GtkWidget * but;
   GtkWidget * entry;
   project * this_proj = get_project_by_id(view -> proj);
-  gchar * col[5] = {"<b>Color</b>",
-                    "<b>Radius [Å]</b>",
-                    "<b>Show</b>",
-                    "<b>Label</b>",
-                    "<b>Size [pts]</b>"};
+  gchar * coln[5] = {"Color",
+                     "Radius [Å]",
+                     "Show",
+                     "Label",
+                     "Size [pts]"};
   int csize[5] = {60, 0, 25, 0, 0};
 
   GtkWidget * prop = create_layout (-1, -1);
@@ -375,12 +375,14 @@ GtkWidget * prop_tab (glwin * view, int aoc)
   {
     if (i == 1 && (k == WIREFRAME || k == PUNT))
     {
-      lab = markup_label(col[4], -1, -1, 0.0, 0.0);
+      str = g_strdup_printf ("<b>%s</b>", coln[4]);
     }
     else
     {
-      lab = markup_label (col[i], -1, -1, 0.0, 0.0);
+      str = g_strdup_printf ("<b>%s</b>", coln[i]);
     }
+    lab = markup_label(str, -1, -1, 0.0, 0.0);
+    g_free (str);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, prop_box, lab, FALSE, FALSE, csize[i]);
   }
   for (i=0; i< this_proj -> nspec; i++)

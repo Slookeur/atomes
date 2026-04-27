@@ -1015,7 +1015,8 @@ G_MODULE_EXPORT void select_input_type (GtkToggleButton * but, gpointer data)
 GtkWidget * file_info (int id)
 {
   GtkWidget * main_box;
-  gchar * filename[4] = {"CP2K main input file '*.inp'", "forces.inc", "system.inc", "motion.inc"};
+  gchar * filename[4] = {"CP2K main input file '*.inp'",
+                         "forces.inc", "system.inc", "motion.inc"};
   gchar * filetext[4] = {"<b>&amp;GLOBAL</b>\n...\n<b>&amp;END GLOBAL</b>\n\n<b>@INCLUDE</b> 'forces.inc'\n\n<b>@INCLUDE</b> 'motion.inc'",
                          "<b>&amp;FORCE_EVAL</b>\n...\n<b>@INCLUDE</b> 'system.inc'\n<b>&amp;END FORCE_EVAL</b>",
                          "<b>&amp;SUBSYS</b>\n...\n<b>&amp;END SUBSYS</b>",

@@ -2125,7 +2125,7 @@ void adjust_this_tree_branch (atom_search * asearch, project * this_proj, int oi
                 {
                   o += this_proj -> coord -> ntg[1][m];
                 }
-                 if (o == sid  && append (asearch, this_proj, l, n))
+                if (o == sid  && append (asearch, this_proj, l, n))
                 {
                   if (asearch -> action == RANMOVE)
                   {

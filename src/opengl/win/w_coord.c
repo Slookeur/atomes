@@ -534,10 +534,10 @@ GtkWidget * coord_tab (glwin * view, int geo, int poly)
   gchar * str, * env;
   GtkWidget * wb;
   GtkWidget * but;
-  gchar * col[15] = {" ", "<b>Color</b>", "<b>Show</b>", "<b>Label</b>", "<b>Pick</b>", "<b>Alpha</b>",
-                          "<b>Color <sup>*</sup></b>", "<b>Show <sup>**</sup></b>", "<b>Label <sup>**</sup></b>", "<b>Pick <sup>**</sup></b>",
-                          "<b>Ring(s) size</b>",
-                          "<b>Chain(s) size</b>", "<b>Show <sup>*</sup></b>", "<b>Label <sup>*</sup></b>", "<b>Pick <sup>*</sup></b>"};
+  gchar * coln[15] = {" ", "Color", "Show", "Label", "Pick", "Alpha",
+                           "Color <sup>*</sup>", "Show <sup>**</sup>", "Label <sup>**</sup>", "Pick <sup>**</sup>",
+                           "Ring(s) size",
+                           "Chain(s) size", "Show <sup>*</sup>", "Label <sup>*</sup>", "Pick <sup>*</sup>"};
   int scol[15] = {100, 70, 65, 40, 40, 150, 70, 75, 55, 55, 100, 100, 60, 50, 55};
   GtkWidget * box = create_vbox (BSEP);
   GtkWidget * coord = create_scroll (box, -1, -1, GTK_SHADOW_NONE);
@@ -590,7 +590,9 @@ GtkWidget * coord_tab (glwin * view, int geo, int poly)
     {
       j = i;
     }
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb, markup_label(col[j], scol[j], -1, 0.5, 0.5), FALSE, FALSE, 5);
+    str = g_strdup_printf ("<b>%s</b>", coln[j]);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb, markup_label(str, scol[j], -1, 0.5, 0.5), FALSE, FALSE, 5);
+    g_free (str);
   }
   k = 0;
   project * this_proj = get_project_by_id(p);
@@ -992,7 +994,7 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
   GtkWidget * wb;
   gchar * str;
   int scol[5] = {70, 70, 65, 40, 40};
-  gchar * col[5] = {"<b>Id</b>", "<b>Color</b>", "<b>Show</b>", "<b>Label</b>", "<b>Pick</b>"};
+  gchar * coln[5] = {"Id", "Color", "Show", "Label", "Pick"};
 
   GtkWidget * box = create_vbox (BSEP);
   GtkWidget * fragmol = create_scroll (box, -1, -1, GTK_SHADOW_NONE);
@@ -1013,7 +1015,9 @@ GtkWidget * fragmol_tab (glwin * view, int geo)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, wb, FALSE, TRUE, 0);
     for (j=0; j<5; j++)
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb, markup_label(col[j], scol[j], -1, 0.5, 0.5), FALSE, FALSE, 5);
+      str = g_strdup_printf ("<b>%s</b>", coln[j]);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, wb, markup_label(str, scol[j], -1, 0.5, 0.5), FALSE, FALSE, 5);
+      g_free (str);
     }
     for (j=0; j<i; j++)
     {

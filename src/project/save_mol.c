@@ -47,7 +47,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   int natoms;                             // Number of atoms
   int nspec;                              // Number of chemical species
   int * species;                          // Number of atom by species
-  atom ** atoms;                   // The list of all atoms
+  atom ** atoms;                          // The list of all atoms
   int nbonds;                             // Number of chemical bonds
   int ** pbonds;                          // Number of chemical bonds by geometries
   int nangles;                            // Number of bond angles

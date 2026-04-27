@@ -603,7 +603,7 @@ double string_to_double (gpointer string)
   double value = strtod ((char *)string, & endPtr);
   if (endPtr == (char *)string)
   {
-     g_print ("Error in string format: string = \"%s\" - value == %lf\n", endPtr, value);
+     g_warning ("Error in string format: string = \"%s\" - value == %lf\n", endPtr, value);
   }
   return value;
 }

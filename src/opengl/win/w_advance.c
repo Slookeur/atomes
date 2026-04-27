@@ -119,22 +119,22 @@ float mat_min_max[5][2] = {{0.0, 1.0},
                            {0.0, 10.0},
                            {0.0, 1.0}};
 
-gchar * ogl_settings[3][10] = {{"<u>Albedo:</u>",
-                                "<u>Metallic:</u>",
-                                "<u>Roughness:</u>",
-                                "<u>Ambient occlusion:</u>",
-                                "<u>Gamma correction:</u>",
-                                "<u>Opacity:</u>"},
-                               {"<u>Position:</u>",
-                                "<u>Direction:</u>",
-                                "<u>Intensity:</u>",
-                                "<u>Constant attenuation:</u>",
-                                "<u>Linear attenuation:</u>",
-                                "<u>Quadratic attenuation:</u>",
-                                "<u>Cone angle</u>",
-                                "<u>Inner cutoff:</u>",
-                                "<u>Outer cutoff:</u>",
-                                "<u>Type:</u>"},
+gchar * ogl_settings[3][10] = {{"Albedo",
+                                "Metallic",
+                                "Roughness",
+                                "Ambient occlusion",
+                                "Gamma correction",
+                                "Opacity"},
+                               {"Position",
+                                "Direction",
+                                "Intensity",
+                                "Constant attenuation",
+                                "Linear attenuation",
+                                "Quadratic attenuation",
+                                "Cone angle",
+                                "Inner cutoff",
+                                "Outer cutoff",
+                                "Type"},
                                {"<b>Fog color</b>"}};
 
 gchar * lpos[3] = {"x", "y", "z"};
@@ -948,15 +948,17 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
 
   float values[3] = {0.0, 0.0, 0.0};
   // Position
-  gchar * str = (preferences) ? g_strdup_printf ("%s <sup>**</sup>", ogl_settings[1][0]) : g_strdup_printf ("%s", ogl_settings[1][0]);
+  gchar * str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", ogl_settings[1][0]) : g_strdup_printf ("<u>%s:</u>", ogl_settings[1][0]);
   ogl_edit -> light_b_coord[0] = create_setting_pos (str, 130, 0.0, 1, 0, values, ogl_edit);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> light_b_coord[0], FALSE, FALSE, 0);
   // Direction
-  ogl_edit -> light_b_coord[1] = create_setting_pos (ogl_settings[1][1], 130, 0.0, 2, 1, values, ogl_edit);
+  str = g_strdup_printf ("<u>%s:</u>", ogl_settings[1][1]);
+  ogl_edit -> light_b_coord[1] = create_setting_pos (str, 130, 0.0, 2, 1, values, ogl_edit);
+  g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> light_b_coord[1], FALSE, FALSE, 0);
   // Intensity
-  str = (preferences) ? g_strdup_printf ("%s <sup>**</sup>", ogl_settings[1][2]) : g_strdup_printf ("%s", ogl_settings[1][2]);
+  str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", ogl_settings[1][2]) : g_strdup_printf ("<u>%s:</u>", ogl_settings[1][2]);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_setting_pos (str, 130, 0.0, 3, 2, values, ogl_edit), FALSE, FALSE, 0);
   g_free (str);
   hbox = create_hbox (BSEP);
@@ -976,7 +978,9 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
     for (j=0; j<3; j++)
     {
       ogl_edit -> light_entry[k] = create_entry (G_CALLBACK(update_light_param), 100, 15, FALSE, & ogl_edit -> pointer[k]);
-      lhbox = adv_box (ogl_edit -> light_b_entry[i], ogl_settings[1][k+3], 0, 170, 0.0);
+      str = g_strdup_printf ("<u>%s:</u>", ogl_settings[1][k+3]);
+      lhbox = adv_box (ogl_edit -> light_b_entry[i], str, 0, 170, 0.0);
+      g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lhbox, ogl_edit -> light_entry[k], FALSE, FALSE, 10);
       if (i == 1) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lhbox, gtk_label_new("°"), FALSE, FALSE, 0);
       k ++;
@@ -1384,10 +1388,14 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   int i;
   GtkWidget * box, * hbox;
 
-  box = adv_box (vbox, "<b>Quality</b> ", 5, 150, 0.0);
+  gchar * str = g_strdup_printf ("<b>%s</b> ", "Quality");
+  box = adv_box (vbox, str, 5, 150, 0.0);
+  g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, rendering_fix (view, ogl_edit), FALSE, FALSE, 0);
 
-  box = adv_box (vbox, "<b>Lightning model</b> ", 5, 150, 0.0);
+  str = g_strdup_printf ("<b>%s</b> ", "Lightning model");
+  box = adv_box (vbox, str, 5, 150, 0.0);
+  g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 20);
 
@@ -1396,7 +1404,9 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
                        FALSE, FALSE, 0);
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, markup_label ("<b>Templates</b>", 150, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  str = g_strdup_printf ("<b>%s</b> ", "Templates");
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, markup_label (str, 150, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  g_free (str);
   ogl_edit -> templates  = create_combo ();
   for (i=0; i<TEMPLATES; i++)
   {
@@ -1421,7 +1431,9 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   GtkWidget * m_fixed;
   for (i=0; i<5; i++)
   {
-    box = adv_box (ogl_edit -> param_mat, ogl_settings[0][i+1], 0, 130, 0.0);
+    str = g_strdup_printf ("<u>%s:</u>", ogl_settings[0][i+1]);
+    box = adv_box (ogl_edit -> param_mat, str, 0, 130, 0.0);
+    g_free (str);
     ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, the_mat -> param[i+1],
                                              GTK_POS_TOP, 3, 200, G_CALLBACK(scale_param), G_CALLBACK(scroll_scale_param), & ogl_edit -> pointer[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, ogl_edit -> m_scale[i], FALSE, FALSE, 10);
@@ -1432,8 +1444,9 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, m_fixed, FALSE, FALSE, 15);
   }
   float values[] = {the_mat -> albedo.x, the_mat -> albedo.y, the_mat -> albedo.z};
-
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (ogl_settings[0][0], 130, -1, 0, 0, values, ogl_edit), FALSE, FALSE, 10);
+  str = g_strdup_printf ("<u>%s:</u>", ogl_settings[0][0]);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (str, 130, -1, 0, 0, values, ogl_edit), FALSE, FALSE, 10);
+  g_free (str);
   show_the_widgets (layout);
   widget_set_sensitive (ogl_edit -> templates, the_mat -> predefine);
   widget_set_sensitive (ogl_edit -> param_mat, ! the_mat -> predefine);

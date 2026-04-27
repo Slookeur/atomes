@@ -183,7 +183,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
-  lightning[1] = glGetUniformLocation (glsl -> id, "m_proj");
+  lightning[1]  = glGetUniformLocation (glsl -> id, "m_proj");
   lightning[2]  = glGetUniformLocation (glsl -> id, "view_is_ortho");
   lightning[3]  = glGetUniformLocation (glsl -> id, "lights_on");
   lightning[4]  = glGetUniformLocation (glsl -> id, "mat.albedo");
@@ -192,8 +192,8 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   lightning[7]  = glGetUniformLocation (glsl -> id, "mat.ambient_occlusion");
   lightning[8]  = glGetUniformLocation (glsl -> id, "mat.gamma");
   lightning[9]  = glGetUniformLocation (glsl -> id, "mat.alpha");
-  lightning[10]  = glGetUniformLocation (glsl -> id, "fog.mode");
-  lightning[11]  = glGetUniformLocation (glsl -> id, "fog.based");
+  lightning[10] = glGetUniformLocation (glsl -> id, "fog.mode");
+  lightning[11] = glGetUniformLocation (glsl -> id, "fog.based");
   lightning[12] = glGetUniformLocation (glsl -> id, "fog.density");
   lightning[13] = glGetUniformLocation (glsl -> id, "fog.depth");
   lightning[14] = glGetUniformLocation (glsl -> id, "fog.color");
