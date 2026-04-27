@@ -128,7 +128,8 @@ gchar * cp2kfev[8][17] = {{"!\n"
                            "  METHOD QUICKSTEP\n"
                            "  &DFT\n"
                            "! First specify files that will be used thereafter \n"
-                           "    BASIS_SET_FILE_NAME ", "BASIS_FILE",
+                           "    BASIS_SET_FILE_NAME ",
+                           "BASIS_FILE",
                            "\n    POTENTIAL_FILE_NAME ", "PSEUDO_FILE",
                            "\n@IF ( ","USE_RESTART"," == TRUE )\n"
                            "    WFN_RESTART_FILE_NAME ","WAVE_FILE",
@@ -136,12 +137,17 @@ gchar * cp2kfev[8][17] = {{"!\n"
                            "    CHARGE ","CHARGE",
                            "\n! Going to the Multi-grids section\n"
                            "    &MGRID\n"
-                           "      CUTOFF ","CUTOFF","                      ! => Cutoff of the finest grid level\n"
-                           "      NGRIDS ","GRIDS","                       ! => Number of multigrids to use, default = 4\n"
+                           "      CUTOFF ",
+                           "CUTOFF",
+                           "                      ! => Cutoff of the finest grid level\n"
+                           "      NGRIDS ",
+                           "GRIDS",
+                           "                       ! => Number of multigrids to use, default = 4\n"
                            "    &END MGRID\n"
                            "! Going to the Quickstep Setup section\n"
                            "    &QS\n"
-                           "      METHOD ","QS_METHOD",
+                           "      METHOD ",
+                           "QS_METHOD",
                            "\n      EPS_DEFAULT 1.0E-12                   ! => Default value is 1.0E-10\n"
                            "      MAP_CONSISTENT TRUE                   ! => This is the default value\n"},
                           {"      EXTRAPOLATION_ORDER 3                 ! => This is the default value\n"
@@ -149,20 +155,29 @@ gchar * cp2kfev[8][17] = {{"!\n"
                           {"! Going to the Self Consistent Field section\n"
                            "    &SCF\n"
                            "! Maximum number of cycle\n"
-                           "      SCF_GUESS ","SCF_GUESS","                ! => Initial guess for the wave-function\n"
-                           "      MAX_SCF ","SCF_NCYCLES","                ! => Maximum number of SCF cycles\n"
-                           "      EPS_SCF ","SCF_NCONV","                  ! => Threshold for the SCF convergence\n"
+                           "      SCF_GUESS ",
+                           "SCF_GUESS",
+                           "                ! => Initial guess for the wave-function\n"
+                           "      MAX_SCF ","SCF_NCYCLES",
+                           "                ! => Maximum number of SCF cycles\n"
+                           "      EPS_SCF ","SCF_NCONV",
+                           "                  ! => Threshold for the SCF convergence\n"
                            "! If after the ${SCF_NCYCLES} first SCF steps no convergence has been reached\n"
                            "! more SCF cycles can be done updating the preconditioner. \n"
                            "! Detail information is then presented in the 'Outer' SCF section\n"
                            "      &OUTER_SCF\n"
-                           "        MAX_SCF ","SCF_OCYCLES","              ! => We update the preconditioner and start a new SCF cycle\n"
+                           "        MAX_SCF ",
+                           "SCF_OCYCLES",
+                           "              ! => We update the preconditioner and start a new SCF cycle\n"
                            "                                            !    up to ${SCF_NCYCLES} x ${SCF_OCYCLES} can be computed\n"
-                           "        EPS_SCF ","SCF_OCONV","                ! => Convergence threshold for the extra cycles\n"
+                           "        EPS_SCF ",
+                           "SCF_OCONV",
+                           "                ! => Convergence threshold for the extra cycles\n"
                            "      &END OUTER_SCF\n\n"
                            "! Going to the Orbital Transformation section\n"
                            "      &OT ON\n"
-                           "        MINIMIZER ","OT_MINI",
+                           "        MINIMIZER ",
+                           "OT_MINI",
                            "\n        PRECONDITIONER FULL_ALL             ! => Preconditioner for the minimization scheme,\n"
                            "                                            !    FULL_ALL is the most effective state selective\n"
                            "                                            !    preconditioner and is based on diagonalization\n"
@@ -182,11 +197,13 @@ gchar * cp2kfev[8][17] = {{"!\n"
                            "    &END SCF\n"
                            "! Going to the exchange-correlation section\n"
                            "    &XC\n"
-                           "      &XC_FUNCTIONAL ","FUNCTIONAL",
+                           "      &XC_FUNCTIONAL ",
+                           "FUNCTIONAL",
                            "\n      &END XC_FUNCTIONAL\n"},
                           {"    &END XC\n"},
                           {"! Spin polarized calculation\n"
-                           "    UKS ","SPIN_POLARIZED",
+                           "    UKS ",
+                           "SPIN_POLARIZED",
                            "\n    MULTIPLICITY ", "SPIN_MULTIPLICITY"},
                           {"  &END DFT\n"}};
 
@@ -297,7 +314,8 @@ gchar * cp2ksyst[3][3] = {{"!\n"
                            "!\n"
                            "&SUBSYS\n"
                            "  &CELL\n"
-                           "    PERIODIC ","PBC","\n"},
+                           "    PERIODIC ",
+                           "PBC","\n"},
                           {"\n  &END CELL\n"
                            "  &COORD","\n  &END COORD\n"
                           },
@@ -305,7 +323,8 @@ gchar * cp2ksyst[3][3] = {{"!\n"
                            "  &TOPOLOGY\n"
                            "! Using an XYZ file, coordinates are always Cartesian and in angstrom\n"
                            "    COORDINATE XYZ\n"
-                           "    COORD_FILE_NAME ","COORD_FILE",
+                           "    COORD_FILE_NAME ",
+                           "COORD_FILE",
                            "\n  &END TOPOLOGY\n"}};
 
 gchar * cp2klat[2][19] = {{"    ABC ","A"," ","B"," ","C",
@@ -322,9 +341,11 @@ gchar * cp2ksroks[3] = {"@SET ROKS                           ",
                         "@SET ROKS_SCALING                   ",
                         "@SET ROKS_SPIN_CONFIG               "};
 
-gchar * cp2kroks[7] = {"    ROKS ","ROKS","                            ! => Restricted Open Kohn-Sham calculation\n"
+gchar * cp2kroks[7] = {"    ROKS ","ROKS",
+                       "                            ! => Restricted Open Kohn-Sham calculation\n"
                        "    &LOW_SPIN_ROKS\n"
-                       "      ENERGY_SCALING ","ROKS_SCALING",
+                       "      ENERGY_SCALING ",
+                       "ROKS_SCALING",
                        "\n      SPIN_CONFIGURATION ", "ROKS_SPIN_CONFIG",
                        "\n    &END LOW_SPIN_ROKS\n"};
 
@@ -668,7 +689,8 @@ void print_subsys_cp2k (GtkTextBuffer * buffer)
               "! Atomic basis set and pseudo-potential must be provided for all chemical species\n"
               "! the exact sequences '${BASIS_FOR_*}' '${POTENTIAL_FOR_*}' appear\n"
               "! inside the files that contain respectively the basis sets and the pseudo-potentials\n"
-              "! in front of the name of the '*' element\n" , NULL, buffer);
+              "! in front of the name of the '*' element\n" ,
+              NULL, buffer);
   for (i=0; i<qm_proj -> nspec; i++)
   {
     str = g_strdup_printf ("  &KIND %s\n    BASIS_SET ", exact_name(qm_proj -> chemistry -> label[i]));
