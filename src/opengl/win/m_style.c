@@ -65,7 +65,7 @@ char * text_styles[OGL_STYLES] = {"Ball and stick",
 
 char * text_filled[FILLED_STYLES] = {"Covalent radius",
                                      "Ionic radius",
-                                     "van Der Waals radius",
+                                     "van der Waals radius",
                                      "In crystal radius"};
 
 /*!

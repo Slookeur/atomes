@@ -441,22 +441,22 @@ struct image
   gboolean show_vol[FILLED_STYLES];             /*!< Show (1) or hide (0) overall molecular volumes, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   ColRGBA vol_col[FILLED_STYLES];               /*!< Overall molecular volume colors, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   gboolean * fm_show_vol[2][FILLED_STYLES];     /*!< Show (1) or hide (0) isolated fragment(s) and molecule(s) volumes, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   ColRGBA * fm_vol_col[2][FILLED_STYLES];       /*!< Isolated fragment(s) and molecule(s) volume colors: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
 
   int rotation_mode;                            /*!< Not used anymore, should be removed */
@@ -471,7 +471,7 @@ struct image
   int filled_type;                              /*!< Spacefilled type, in: \n
                                                     0 = covalent radii, \n
                                                     1 = ionic radii, \n
-                                                    2 = van Der Waals radii, \n
+                                                    2 = van der Waals radii, \n
                                                     3 = in crystal radii */
   GLint quality;                                /*!< Quality of the rendering */
   GLint render;                                 /*!< OpenGL render type, in \n

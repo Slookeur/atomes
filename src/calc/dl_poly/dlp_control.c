@@ -674,7 +674,7 @@ G_MODULE_EXPORT void set_md_combo (GtkComboBox * box, gpointer data)
 }
 
 GtkWidget * impact_but;
-gchar * imp_dir[3] = {"on x:", "on y:", "on z:"};
+gchar * imp_dir[3] = {"x", "y", "z"};
 
 #ifdef GTK4
 /*!
@@ -749,7 +749,9 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       }
       else
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(imp_unit[i-1], 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
+        str = g_strdup_printf ("on %s:", imp_dir[i-1]);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
+        g_free (str);
       }
     }
     else
@@ -760,7 +762,9 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 50);
       for (j=0; j<3; j++)
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(imp_dir[j], 50, -1, 1.0, 0.5), FALSE, FALSE, 0);
+        str = g_strdup_printf ("on %s:", imp_dir[j]);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(str, 50, -1, 1.0, 0.5), FALSE, FALSE, 0);
+        g_free (str);
         entry = create_entry (G_CALLBACK(set_md_param), 100, 11, FALSE, GINT_TO_POINTER(j+17));
         update_entry_double (GTK_ENTRY(entry), tmp_field -> md_opts[j+17]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, entry, FALSE, FALSE, 5);
@@ -1579,7 +1583,8 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       else
       {
         show_warning ("The batch size or max. number of particles by batch\n"
-                      "must &#x2208; [1 - 10 000 000]", field_assistant);
+                      "must &#x2208; [1 - 10 000 000]",
+                      field_assistant);
       }
     }
     else if (i == 8 || i == 16)

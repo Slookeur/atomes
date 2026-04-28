@@ -1956,7 +1956,7 @@ void print_dlp_control (GtkTextBuffer * buf)
   if (tmp_field -> vdw_opts[0] == 1.0)
   {
     print_info ("\n# Non bonded short range interactions - type vdW", NULL, buf);
-    print_control_float (buf, tmp_field -> vdw_opts[1], "\n# van Der Waals short range cutoff = ", " Ang.", "rvdw               ");
+    print_control_float (buf, tmp_field -> vdw_opts[1], "\n# van der Waals short range cutoff = ", " Ang.", "rvdw               ");
     if (tmp_field -> vdw_opts[2] == 1.0)
     {
       print_control_string (buf, "direct", "\n# Enforce direct calculation of vdW interactions",

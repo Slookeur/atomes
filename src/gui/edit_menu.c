@@ -76,7 +76,7 @@ char * box_prop[2][3]={{"<b><i>a</i></b>", "<b><i>b</i></b>", "<b><i>c</i></b>"}
 char * chem_lab[CHEM_PARAMS+2]={"Atom:", "Element:",
                                 "Atomic number", "Atomic mass:", "Radius",
                                 "Neutrons scattering length:", "X-rays scattering length:"};
-char * chem_rad[4]={"Covalent", "Ionic", "van Der Waals", "In crystal"};
+char * chem_rad[4]={"Covalent", "Ionic", "van der Waals", "In crystal"};
 char * chem_unit[4]={" g/mol", " &#xC5;", " fm", " e.u"};
 char * edit_prop[4]={"Chemistry and physics", "Box and periodicity", "Bond cutoffs", "Lattice vectors"};
 char * vect_name[3]={"<i>a</i>", "<i>b</i>", "<i>c</i>"};

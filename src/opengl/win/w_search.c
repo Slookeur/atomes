@@ -2896,10 +2896,10 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
       switch (csearch -> action)
       {
         case REPLACE:
-          str = g_strdup_printf ("Replace %s randomly", obj[(object) ? filter : 0]);
+          str = g_strdup_printf ("%s %s randomly", "Replace", obj[(object) ? filter : 0]);
           break;
         case REMOVE:
-          str = g_strdup_printf ("Remove %s randomly", obj[(object) ? filter : 0]);
+          str = g_strdup_printf ("%s %s randomly", "Remove", obj[(object) ? filter : 0]);
           break;
         case RANMOVE:
           str = g_strdup_printf ("Maximum Mean Square Displacement");

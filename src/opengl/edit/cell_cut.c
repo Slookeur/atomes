@@ -226,7 +226,7 @@ GtkWidget * prepare_slab_box (int sid, project * this_proj)
                      "- Size of the slab: ",                // 9, 10, 11
                      "- Size of the slab: ",                // 12, 13
                      "- Size of the slab: ",                // 14
-                     "- Parallelepiped Angles: ",           // 15, 16, 17
+                     "- Parallelepiped angles: ",           // 15, 16, 17
                      "- Slab rotation: "};                  // 18, 19, 20
   GtkWidget * vbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(option[sid], 200, -1, 0.0, 0.5), FALSE, FALSE, 5);

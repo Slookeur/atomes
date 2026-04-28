@@ -145,7 +145,8 @@ G_MODULE_EXPORT void select_fixed_atom_confirm (GtkDialog * dialog, gint respons
       if (fix_frag[i] && ! old_fixed[i][0] && ! old_fixed[i][1] && ! old_fixed[i][2])
       {
         gchar * str = g_strdup_printf ("Fragment %d has been selected but no coordinates appear to be frozen !\n"
-                                       "Unselect fragment %d or select coordinate(s) to freeze !", i+1, i+1);
+                                       "Unselect fragment %d or select coordinate(s) to freeze !",
+                                       i+1, i+1);
         show_warning (str, qm_assistant);
         g_free (str);
         sel_and_conf = FALSE;

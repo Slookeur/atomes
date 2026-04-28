@@ -3425,7 +3425,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
   gchar * name[3] = {"Element", "Symbol", "Z"};
   gchar * g_name[3] = {"Radius", "Size", "Width"};
-  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4,5]"};
+  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van der Waals [3]", "Crystal [4,5]"};
   for (i=0; i<num_col; i++)
   {
     pref_cel[i] = gtk_cell_renderer_text_new();

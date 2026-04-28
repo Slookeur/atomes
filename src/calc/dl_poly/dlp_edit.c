@@ -1568,7 +1568,8 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
   {
     str = g_strdup_printf ("The atom(s) above will be described\n"
                            "in the force field using the parameters\n"
-                           "of the <b>%s</b> field atom.\n", tmp_fat -> name);
+                           "of the <b>%s</b> field atom.\n",
+                           tmp_fat -> name);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
@@ -2864,8 +2865,7 @@ void edit_parameters (int f, int id)
     else if (f == 3)
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("  <b>(1)</b> average distance between the 2 atoms\n"
-                             "\tas measured in the 3D model");
+      str = g_strdup_printf ("  <b>(1)</b> average distance between the 2 atoms\n\tas measured in the 3D model");
       lab = markup_label (str, 320, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2874,8 +2874,7 @@ void edit_parameters (int f, int id)
     else if (f == 4)
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("  <b>(1)</b> average distance between the barycenters\n"
-                             "\tof units 1 and 2 as measured in the model");
+      str = g_strdup_printf ("  <b>(1)</b> average distance between the barycenters\n\tof units 1 and 2 as measured in the model");
       lab = markup_label (str, 320, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);

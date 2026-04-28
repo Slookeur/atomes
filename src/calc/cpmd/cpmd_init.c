@@ -1472,21 +1472,24 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
         show_info ("The input files 'forces.inc', 'system.inc', 'motion.inc' and 'coord.inc'\n"
                    "as well as the files 'basis.inc' and 'pseudo.inc'\n"
                    "for the atomic basis set and peudo-potentials\n"
-                   "were saved in the same directory as the main input file.", 0, qm_assistant);
+                   "were saved in the same directory as the main input file.",
+                   0, qm_assistant);
       }
       else
       {
         show_info ("The input files 'forces.inc', 'system.inc', and 'coord.inc'\n"
                    "as well as the files 'basis.inc' and 'pseudo.inc'\n"
                    "for the atomic basis set and peudo-potentials\n"
-                   "were saved in the same directory as the main input file.", 0, qm_assistant);
+                   "were saved in the same directory as the main input file.",
+                   0, qm_assistant);
       }
     }
     else
     {
       show_info ("The files 'basis.inc' and 'pseudo.inc'\n"
                  "for the atomic basis set and peudo-potentials\n"
-                 "were saved in the same directory as the main input file.", 0, qm_assistant);
+                 "were saved in the same directory as the main input file.",
+                 0, qm_assistant);
     }
   }
 }
