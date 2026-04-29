@@ -151,7 +151,9 @@ void update_sq_view (project * this_proj, int sqk)
   print_info ("\n\n\t between ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
-  print_info (" and ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("and", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (" ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\n\t where ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
@@ -169,7 +171,9 @@ void update_sq_view (project * this_proj, int sqk)
   g_free (str);
   print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("\tand\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("and", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info ("\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info (" = ", "bold", this_proj -> analysis[sqk] -> calc_buffer);

@@ -836,7 +836,7 @@ gchar * ctitle[MAXDATA][12] ={{"Id", "Name", "Multiplicity", "Chemistry", "Atom(
                               {"Id", "Core Id", "Shell", "Mass", "Charge", "k2 (1)", "k4 (2)", "Viz. 3D", "Use (3)"},                                  // Core-shell unit(s)
                               {"Id", "At.1 Id", "At.2 Id", "Length [Å]", "av. d [Å] (1)", "Viz. 3D", "Use (2)"},                                        // Constraint(s)
                               {"Id", "Length [Å]", "av. d12 [Å] (1)", "Unit Id", "At. Id", "Weight (2)", "Viz. 3D", "Use (3)"},                         // Mean force potential(s)
-                              {"Id", "Atom(s) in unit", "List of atom(s)", "Viz. 3D", "Use(1)"},                                                        // Rigid unit(s)
+                              {"Id", "Atom(s) in unit", "List of atom(s)", "Viz. 3D", "Use (1)"},                                                        // Rigid unit(s)
                               {"Id", "Atom Id", "Viz. 3D", "Use (1)", "Potential"},                                                                     // Tethering potential(s)
                               {"Id", "At.1", "At.2", "Bond(s)", "av. d [Å] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},                                // Bond(s)
                               {"Id", "At.1", "At.2", "Bond restraint(s)", "av. d [Å] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},                      // Bond restraint(s)

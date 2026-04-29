@@ -143,7 +143,7 @@ shortcuts opengl_shortcuts[] = {
   { "Spheres", "change global style to spheres", GDK_KEY_s, "s" },
   { "Covalent radius", "change global style to cylinders", GDK_KEY_o, "o" },
   { "Ionic radius", "change global style to cylinders", GDK_KEY_i, "i" },
-  { "Van der Waals radius", "change global style to van der Waals radius", GDK_KEY_v, "v" },
+  { "van der Waals radius", "change global style to van der Waals radius", GDK_KEY_v, "v" },
   { "In crystal radius", "change global style to in crystal radius", GDK_KEY_r, "r" },
   { "Wireframe", "change global style to wireframe", GDK_KEY_w, "w" },
 //

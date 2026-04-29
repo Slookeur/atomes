@@ -76,7 +76,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> length;
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Axis length [ %f Å ]", v);
+      str = g_strdup_printf ("Axis length [ %f Å ]", v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][7]), str);
       g_free (str);
 #endif
@@ -93,7 +93,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("_Radius [ %f Å ]", v);
+        str = g_strdup_printf ("Radius [ %f Å ]", v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][6]), str);
         g_free (str);
 #endif
@@ -110,7 +110,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> xyz -> line = v;
         v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> line;
 #ifdef GTK3
-        str = g_strdup_printf ("_Width [ %f pts ]", v);
+        str = g_strdup_printf ("Width [ %f pts ]", v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][4]), str);
         g_free (str);
 #endif
@@ -131,7 +131,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> abc -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("_Radius [ %f Å ]", v);
+        str = g_strdup_printf ("Radius [ %f Å ]", v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][6]), str);
         g_free (str);
 #endif
@@ -149,7 +149,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> abc -> line;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("_Width [ %f pts ]", v);
+        str = g_strdup_printf ("Width [ %f pts ]", v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][4]), str);
         g_free (str);
 #endif

@@ -2231,7 +2231,7 @@ GtkWidget * create_vdws_box ()
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   gboolean val = (tmp_field -> vdw_opts[0] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button("Evaluate Van der Waals interactions", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button("Evaluate van der Waals interactions", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   vdw_box[0] = create_vbox(5);
@@ -2542,7 +2542,7 @@ GtkWidget * vbox_control (int f)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_overall_box(), FALSE, FALSE, 0);
       break;
     case 2:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Van der Waals (Non-bonded short range):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>van der Waals (Non-bonded short range):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_vdws_box(), FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Electrostatics (Non-bonded long range):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_electro_box(), FALSE, FALSE, 0);

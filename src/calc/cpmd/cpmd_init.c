@@ -120,7 +120,7 @@ gchar * cdescr[MAXDATAQM] = {"provides an informal description of the system and
 
 double default_cpmd_options[17] = {400.0, 0.0, 0.0, 4.0, 0.000001, 0.0, 0.0, 0.0, 0.0, 0.0, 70.0, 0.0, -1.0, 0.0, 0.0, 1.0, 1.0};
 
-gchar * default_opts[MAXDATAQM-1][NSECOP]= {{"Fictitious electronic mass:", "Local Spin Density", "Van der Walls interactions", " ", " ", " "},
+gchar * default_opts[MAXDATAQM-1][NSECOP]= {{"Fictitious electronic mass:", "Local Spin Density", "van der Walls interactions", " ", " ", " "},
                                             {"DFT functional:", "Density cutoff<sup>*</sup>:", " ", " ", " ", " "},
                                             {" ", " ", " ", " ", " ", " "},
                                             {" ", " ", " ", " ", " ", " "},

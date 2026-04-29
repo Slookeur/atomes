@@ -3585,13 +3585,13 @@ GtkWidget * style_tab (int style)
 {
   GtkWidget * vbox = create_vbox (BSEP);
   gchar * object[3]={"<b>Atom(s)</b>", "<b>Bond(s)</b>", "\t<u>Clone(s)</u>"};
-  gchar * ats[3]={"tom(s) ", "ot(s)", "phere(s)"};
-  gchar * ha_init[3]={"A", "D", "S"};
-  gchar * la_init[3]={"a", "d", "s"};
+  gchar * h_ats[3]={"Atom(s) ", "Dot(s)", "Sphere(s)"};
+  gchar * l_ats[3]={"atom(s) ", "dot(s)", "sphere(s)"};
+
   gchar * dim[3]={"radius", "size", "width"};
-  gchar * bts[3]={"ond(s)", "ireframe(s)", "ylinder(s)"};
-  gchar * hb_init[3]={"B", "W", "C"};
-  gchar * lb_init[3]={"b", "w", "c"};
+  gchar * h_bts[3]={"Bond(s)", "Wireframe(s)", "Cylinder(s)"};
+  gchar * l_bts[3]={"bond(s)", "wireframe(s)", "cylinder(s)"};
+
   int i;
   int bsid;
   int lid;
@@ -3615,11 +3615,11 @@ GtkWidget * style_tab (int style)
       adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
       if (! i)
       {
-        str = g_strdup_printf ("\t%s%s %s", ha_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
+        str = g_strdup_printf ("\t%s %s", h_ats[lid], dim[(lid != 1) ? 0 : 1]);
       }
       else
       {
-        str = g_strdup_printf ("\t\tClone %s%s %s", la_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
+        str = g_strdup_printf ("\t\tClone %s %s", l_ats[lid], dim[(lid != 1) ? 0 : 1]);
       }
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
@@ -3634,11 +3634,11 @@ GtkWidget * style_tab (int style)
       adv_box (vbox, object[i+1], 10-5*i, 120, 0.0);
       if (! i)
       {
-        str = g_strdup_printf ("\t%s%s %s", hb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
+        str = g_strdup_printf ("\t%s %s", h_bts[bsid], dim[(bsid != 1) ? 0 : 2]);
       }
       else
       {
-        str = g_strdup_printf ("\t\tClone %s%s %s", lb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
+        str = g_strdup_printf ("\t\tClone %s %s", l_bts[bsid], dim[(bsid != 1) ? 0 : 2]);
       }
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
@@ -5102,7 +5102,7 @@ void create_user_preferences_dialog ()
 G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
 {
   tint * oid = (tint *)data;
-  gchar * pstring[5]={"rendering", "box", "axis", "backgorund", "representation"};
+  gchar * pstring[5]={"rendering", "box", "axis", "background", "representation"};
   gchar * str = g_strdup_printf ("Set %s preferences as default preferences ?", pstring[oid -> b]);
   project * this_proj = get_project_by_id(oid -> a);
   if (ask_yes_no("Set model preferences as default ?", str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))

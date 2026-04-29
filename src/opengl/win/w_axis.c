@@ -124,7 +124,7 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Radius [ %f Å ]", v);
+      str = g_strdup_printf ("Radius [ %f Å ]", v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[1][6]), str);
       g_free (str);
 #endif
@@ -138,7 +138,7 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Width [ %f pts ]", v);
+      str = g_strdup_printf ("Width [ %f pts ]", v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[1][4]), str);
       g_free (str);
 #endif

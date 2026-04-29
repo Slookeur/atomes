@@ -1453,7 +1453,7 @@ void print_dlp_field (GtkTextBuffer * buf)
 
   // Non bonded
   gchar * nd_title[5] = {"VDW", "METAL", "TERSOFF", "TBP", "FBP"};
-  gchar * com_ndb[5] = {"Van der Walls pair", "metal", "Tersoff", "three-body", "four-body"};
+  gchar * com_ndb[5] = {"van der Walls pair", "metal", "Tersoff", "three-body", "four-body"};
   for (i=0; i<5; i++)
   {
     if (tmp_field -> afp[i+23])
@@ -1960,7 +1960,7 @@ void print_dlp_control (GtkTextBuffer * buf)
     if (tmp_field -> vdw_opts[2] == 1.0)
     {
       print_control_string (buf, "direct", "\n# Enforce direct calculation of vdW interactions",
-                          "\n# Do not work with system using tabulated potentials", "vdw                ");
+                                 "\n# Do not work with system using tabulated potentials", "vdw                ");
     }
     if (tmp_field -> vdw_opts[3] == 1.0)
     {
