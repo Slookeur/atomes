@@ -18,7 +18,7 @@
 !! @short Export curve data using data received from C
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 
-CHARACTER (LEN=35) FUNCTION ylegend (job, nleg, idl, snp)
+CHARACTER (LEN=36) FUNCTION ylegend (job, nleg, idl, snp)
 
 USE PARAMETERS
 
@@ -896,7 +896,7 @@ INTERFACE
     INTEGER, INTENT(IN) :: job, nleg, idl, snp
     DOUBLE PRECISION, INTENT(IN) :: cdc
   END FUNCTION
-  CHARACTER (LEN=35) FUNCTION ylegend (job, nleg, idl, snp)
+  CHARACTER (LEN=36) FUNCTION ylegend (job, nleg, idl, snp)
     INTEGER, INTENT(IN) :: job, nleg, idl, snp
   END FUNCTION
 END INTERFACE

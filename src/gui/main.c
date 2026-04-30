@@ -1049,7 +1049,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
     GtkWidget * isplash = create_splash_window ();
     if (isplash == NULL)
     {
-      g_print ("Impossible to load the splash screen\n");
+      g_warning ("Impossible to load the splash screen\n");
     }
     else
     {
