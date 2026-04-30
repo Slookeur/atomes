@@ -147,7 +147,7 @@ gchar * default_keywords[9][NDFT] = {{"SONLY", "LDA", "BONLY", "BP", "BLYP", "XL
                                      {"S", "P", "D", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                      {"S", "P", "D", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "}};
 
-gchar * default_text[9][NDFT] = {{"Slater exchange only", "Local Density Approximation","Becke 88", "Becke + Perdew", "Becke + Lee-Yang-Parr", "Extended B88+PW91+LYP88", "Perdew + Wang 91",
+gchar * default_text[9][NDFT] = {{"Slater exchange only", "Local Density Approximation", "Becke 88", "Becke + Perdew", "Becke + Lee-Yang-Parr", "Extended B88+PW91+LYP88", "Perdew + Wang 91",
                                   "Perdew + Burke-Ernzerhof", "PBE revised for solids", "Revised - PBE", "Hamprecht-Cohen-Tozer-Handy", "Optimized Becke 88", "Handy-Cohen + LYP",
                                   "Tao-Perdew-Staroverov-Scuseria", "Parameter-free PBE", "Becke one-parameter hybrid + LYP", "Becke three-parameters hybrid + LYP", "Extend hybrid + LYP",  "Heyd-Scuseria-Ernzerhof 06"},
                                  {"Box parameters (a,b,c and α,β,γ)", "Lattice vectors", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},

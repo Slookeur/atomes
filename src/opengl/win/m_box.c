@@ -318,7 +318,7 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   int i = (ab) ? view -> anim -> last -> img -> xyz -> axis : view -> anim -> last -> img -> abc -> box;
   if (id == 0)
   {
-    view -> ogl_box_axis[ab][0] = create_box_axis_menu ("Show/_Hide", i, i, menu_ab, & view -> colorp[0][ab]);
+    view -> ogl_box_axis[ab][0] = create_box_axis_menu ("Show/Hide", i, i, menu_ab, & view -> colorp[0][ab]);
   }
   else
   {
@@ -335,7 +335,7 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   {
     view -> ogl_box_axis[ab][1] = create_box_axis_menu (text_styles[1], i, 1, menus, & view -> colorp[1][ab]);
     view -> ogl_box_axis[ab][2] = create_box_axis_menu (text_styles[4], i, 4, menus, & view -> colorp[4][ab]);
-    view -> ogl_box_axis[ab][3] = create_menu_item (TRUE, "_Lines");
+    view -> ogl_box_axis[ab][3] = create_menu_item (TRUE, "Lines");
     gtk_menu_shell_append ((GtkMenuShell *)menu_ab, view -> ogl_box_axis[ab][3]);
     menul = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_box_axis[ab][3], menul);

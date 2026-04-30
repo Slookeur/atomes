@@ -113,11 +113,11 @@ G_MODULE_EXPORT void run_render_image (GtkNativeDialog * info, gint response_id,
 */
 G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpointer data)
 {
+  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
 #endif
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     video_options * iopts = (video_options *)data;
-    GtkFileChooser * chooser;
     gchar * videofile;
     if (atomes_render_image)
     {
@@ -125,7 +125,6 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
     }
     else
     {
-      chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
       videofile = file_chooser_get_file_name (chooser);
 #ifdef GTK4
       destroy_this_native_dialog (info);

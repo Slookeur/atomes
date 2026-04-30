@@ -642,7 +642,7 @@ void init_menurings_ (int * coo, int * ids, int * ngsp, int coordt[* ngsp], int 
       }
       g_free (str);
     }
-    allt = create_menu_item (TRUE, "_All");
+    allt = create_menu_item (TRUE, "All");
     g_signal_connect (G_OBJECT (allt), "activate", G_CALLBACK(coord_properties), & active_glwin -> colorp[* coo][1]);
     gtk_menu_shell_append ((GtkMenuShell *)active_glwin -> oglmc[i][* coo][0], allt);
   }

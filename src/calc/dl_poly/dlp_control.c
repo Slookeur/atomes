@@ -749,9 +749,7 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       }
       else
       {
-        str = g_strdup_printf ("on %s:", imp_dir[i-1]);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
-        g_free (str);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(imp_unit[i-1], 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
       }
     }
     else
@@ -1538,7 +1536,6 @@ GtkWidget * io_box[2];
 GtkWidget * io_pre;
 GtkWidget * misc_box;
 gchar * time_info[2]={"Set job time:", "Set job closure time:"};
-gchar * tps_info[2]={"run time:", "closure time:"};
 gchar * io_rw_m[4] = {"MPI I/O", "FORTRAN I/O", "Traditional master I/O", "netCDF I/O"};
 gchar * io_info[2] = {"<b>General Input/Output (I/O) read interface:</b>", "<b>General Input/Output (I/O) write interface:</b>"};
 gchar * io_para[4] = {"Reader count:", "Batch size:", "Buffer size:", "// error check"};
