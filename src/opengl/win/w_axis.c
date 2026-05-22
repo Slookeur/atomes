@@ -65,12 +65,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "preferences.h"
 
-#define AXIS_STYLES 2
 #define AXIS_TEMPLATES 5
-
-gchar * axis_symbols[3] = {"X", "Y", "Z"};
-gchar * axis_style[AXIS_STYLES] = {"Wireframe", "Cylinders"};
-gchar * al[3] = {"% of the window width", "% of the window height", "% of the window depth"};
 
 double axis_init_color[3][3] = {{0.0, 0.0, 1.0},{0.0, 1.0, 0.0},{1.0, 0.0, 0.0}};
 double axis_range[3][2] = {{0.0,100.0}, {0.0, 100.0}, {0.0, 100.0}};
@@ -124,7 +119,7 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("Radius [ %f Å ]", v);
+      str = g_strdup_printf (_("Radius [ %f Å ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[1][6]), str);
       g_free (str);
 #endif
@@ -138,7 +133,7 @@ G_MODULE_EXPORT void update_axis_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("Width [ %f pts ]", v);
+      str = g_strdup_printf (_("Width [ %f pts ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[1][4]), str);
       g_free (str);
 #endif
@@ -188,7 +183,7 @@ G_MODULE_EXPORT void update_axis_length (GtkEntry * res, gpointer data)
   {
 #ifdef GTK3
     // GTK3 Menu Action To Check
-    str = g_strdup_printf ("_Radius [ %f Å ]", v);
+    str = g_strdup_printf (_("_Radius [ %f Å ]"), v);
     gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[1][7]), str);
     g_free (str);
 #endif
@@ -845,7 +840,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     if (preferences)
     {
       the_axis -> win = create_vbox (BSEP);
-      adv_box (the_axis -> win, "<b>Axis settings</b>", 10, 120, 0.0);
+      adv_box (the_axis -> win, _("<b>Axis settings</b>"), 10, 120, 0.0);
       GtkWidget * hbox = create_hbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> win, hbox, FALSE, FALSE, 10);
@@ -853,7 +848,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     else
     {
       the_axis -> win = create_vbox (BSEP);
-      gchar * str = g_strdup_printf ("%s - axis settings", get_project_by_id(view -> proj)->name);
+      gchar * str = g_strdup_printf (_("%s - axis settings"), get_project_by_id(view -> proj)->name);
       the_axis -> win = create_win (str, view -> win, FALSE, FALSE);
       g_free (str);
       add_container_child (CONTAINER_WIN, the_axis -> win, vbox);
@@ -868,7 +863,7 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     {
       ac = FALSE;
     }
-    the_axis -> show_hide = check_button ("Show/Hide axis", 100, 20, ac, G_CALLBACK(set_show_axis_toggle), data);
+    the_axis -> show_hide = check_button (_("Show/Hide axis"), 100, 20, ac, G_CALLBACK(set_show_axis_toggle), data);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_axis -> show_hide, FALSE, FALSE, 5);
 
     the_axis -> axis_data = create_vbox (BSEP);
@@ -885,12 +880,16 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     {
       ac = FALSE;
     }
-    gchar * axis_template[AXIS_TEMPLATES] = {"Top Right Corner <sup>*</sup>", "Top Left Corner <sup>*</sup>", "Bottom Right Corner <sup>*</sup>", "Bottom Left Corner <sup>*</sup>", "Center <sup>**</sup>"};
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, pos_box, check_button ("Use template positions", 120, 30, ac, G_CALLBACK(use_axis_default_positions), data), FALSE, FALSE, 0);
+    gchar * axis_template[AXIS_TEMPLATES] = {i18n("Top Right Corner <sup>*</sup>"), 
+                                             i18n("Top Left Corner <sup>*</sup>"), 
+                                             i18n("Bottom Right Corner <sup>*</sup>"), 
+                                             i18n("Bottom Left Corner <sup>*</sup>"), 
+                                             i18n("Center <sup>**</sup>")};
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, pos_box, check_button (_("Use template positions"), 120, 30, ac, G_CALLBACK(use_axis_default_positions), data), FALSE, FALSE, 0);
     the_axis -> templates = create_combo ();
     for (i=0; i < AXIS_TEMPLATES; i++)
     {
-      combo_text_append (the_axis -> templates, axis_template[i]);
+      combo_text_append (the_axis -> templates, _(axis_template[i]));
     }
     combo_set_markup (the_axis -> templates);
     activate_pos_box (view, ac);
@@ -902,9 +901,11 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     GtkWidget * ax_name;
     the_axis -> axis_position_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, the_axis -> axis_position_box, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_position_box, markup_label("Please choose axis position:", -1, -1, 0.0, 0.5), FALSE, TRUE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_position_box, markup_label(_("Please choose axis position:"), -1, -1, 0.0, 0.5), FALSE, TRUE, 5);
 
     // use custom position
+    gchar * al[3] = {i18n("% of the window width"), i18n("% of the window height"), i18n("% of the window depth")};
+    gchar * axis_symbols[3] = {"X", "Y", "Z"};
     for (i=0; i<2; i++)
     {
       chbox = create_hbox (0);
@@ -918,23 +919,21 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
                                                        G_CALLBACK(scroll_set_axis_position), (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]),
                                                        FALSE, TRUE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_position_box, chbox, FALSE, TRUE, 5);
-      ax_name = gtk_label_new (al[i]);
+      ax_name = gtk_label_new (_(al[i]));
       gtk_label_align (ax_name, -1, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, chbox, ax_name, FALSE, TRUE, 0);
     }
     widget_set_sensitive (the_axis -> axis_position_box, ! ac);
 
-    box = abox (the_axis -> axis_data, "Length [&#xC5;] ", 0);
+    box = abox (the_axis -> axis_data, _("Length [&#xC5;] "), 0);
     the_axis -> length  = create_entry (G_CALLBACK(update_axis_length), 150, 10, FALSE, data);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_axis -> length, FALSE, FALSE, 0);
     update_entry_double (GTK_ENTRY(the_axis -> length), axis_length);
 
-    box = abox (the_axis -> axis_data, "Style ", 0);
+    box = abox (the_axis -> axis_data, _("Style "), 0);
     the_axis -> styles  = create_combo ();
-    for (i=0; i<AXIS_STYLES; i++)
-    {
-      combo_text_append (the_axis -> styles, axis_style[i]);
-    }
+    combo_text_append (the_axis -> styles, _("Wireframes"));
+    combo_text_append (the_axis -> styles, _("Cylinders"));
     if (axis_type == NONE) i = NONE;
     if (axis_type == WIREFRAME) i = 0;
     if (axis_type == CYLINDERS) i = 1;
@@ -943,11 +942,11 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     g_signal_connect (G_OBJECT (the_axis -> styles), "changed", G_CALLBACK(set_axis_combo_style), data);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_axis -> styles, FALSE, FALSE, 0);
 
-    the_axis -> width_box = abox (the_axis -> axis_data, "Line width [pts] ", 0);
+    the_axis -> width_box = abox (the_axis -> axis_data, _("Line width [pts] "), 0);
     the_axis -> width  = create_entry (G_CALLBACK(update_axis_parameter), 150, 10, FALSE, data);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_axis -> width_box, the_axis -> width, FALSE, FALSE, 0);
     update_entry_double (GTK_ENTRY(the_axis -> width), axis_line);
-    the_axis -> radius_box = abox (the_axis -> axis_data, "Cylinder radius [&#xC5;] ", 0);
+    the_axis -> radius_box = abox (the_axis -> axis_data, _("Cylinder radius [&#xC5;] "), 0);
     the_axis -> radius  = create_entry (G_CALLBACK(update_axis_parameter), 150, 10, FALSE, data);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_axis -> radius_box, the_axis -> radius, FALSE, FALSE, 0);
     update_entry_double (GTK_ENTRY(the_axis -> radius), axis_rad);
@@ -955,33 +954,33 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     // Labels
     GtkWidget * lab_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_axis -> axis_data, lab_box, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, lab_box, check_button ("Label axis", 100, 40, axis_labels, G_CALLBACK(set_axis_labels), data), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, lab_box, check_button (_("Label axis"), 100, 40, axis_labels, G_CALLBACK(set_axis_labels), data), FALSE, FALSE, 0);
 
     the_axis -> axis_label_box[0] = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, lab_box, the_axis -> axis_label_box[0], FALSE, FALSE, 0);
-    box = abox (the_axis -> axis_label_box[0], "Rendering ", 0);
+    box = abox (the_axis -> axis_label_box[0], _("Rendering "), 0);
     GtkWidget * config  = create_combo ();
-    combo_text_append (config, "Basic text");
-    combo_text_append (config, "Highlighted");
+    combo_text_append (config, _("Basic Text"));
+    combo_text_append (config, _("Highlighted"));
     combo_set_active (config, axis_label -> render);
     gtk_widget_set_size_request (config, 150, -1);
     g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 0);
-    box = abox (the_axis -> axis_label_box[0], "Font", 0);
+    box = abox (the_axis -> axis_label_box[0], _("Font"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                         font_button(axis_label -> font, 150, 30, G_CALLBACK(set_labels_font), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]),
                         FALSE, FALSE, 0);
     // Size / scale
-    box = abox (the_axis -> axis_label_box[0], "Size", 0);
+    box = abox (the_axis -> axis_label_box[0], _("Size"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                         check_button ("scale with zoom in/out", 150, -1, axis_label -> scale, G_CALLBACK(set_labels_scale), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]),
+                         check_button (_("Scale with zoom in/out"), 150, -1, axis_label -> scale, G_CALLBACK(set_labels_scale), (preferences) ? & pref_pointer[2] : & view -> colorp[2][0]),
                          FALSE, FALSE, 10);
 
     GtkWidget * lab_h_box = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, lab_box, lab_h_box, FALSE, FALSE, 0);
     the_axis -> axis_label_box[1] = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lab_h_box, the_axis -> axis_label_box[1], FALSE, FALSE, 0);
-    box = abox (the_axis -> axis_label_box[1], "Legends", 0);
+    box = abox (the_axis -> axis_label_box[1], _("Legends"), 0);
     GtkWidget * ax_title[3];
     for (i=0; i<3; i++)
     {
@@ -998,8 +997,8 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
     box = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, col_v_box, box, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label("<b>.</b>", 5, -1, 0.0, 0.25), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label("Colors", 50, 30, 0.0, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, check_button ("Use base colors", -1, -1, ac, G_CALLBACK(use_axis_default_colors), data), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label(_("Colors"), 50, 30, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, check_button (_("Use base colors"), -1, -1, ac, G_CALLBACK(use_axis_default_colors), data), FALSE, FALSE, 10);
 
     if (axis_color == NULL)
     {
@@ -1030,8 +1029,8 @@ G_MODULE_EXPORT void axis_advanced (GtkWidget * widg, gpointer data)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, col_v_box, chbox, FALSE, FALSE, 0);
     }
 
-    append_comments (the_axis -> axis_data, "<sup>*</sup>", "In front of the atomic model");
-    append_comments (the_axis -> axis_data, "<sup>**</sup>", "Inside the atomic model");
+    append_comments (the_axis -> axis_data, "<sup>*</sup>", _("In front of the atomic model"));
+    append_comments (the_axis -> axis_data, "<sup>**</sup>", _("Inside the atomic model"));
     if (! preferences)
     {
       add_global_option (vbox, & view -> colorp[2][0]);

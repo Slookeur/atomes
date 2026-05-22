@@ -566,4 +566,6 @@ extern field_data * ff_imp;
 extern field_data * ff_inv;
 extern field_data * ff_vdw;
 extern int ** extraz_id;
+
+extern gboolean dlp_to_translate (int fid, int obj, int key);
 #endif

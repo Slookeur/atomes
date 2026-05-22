@@ -616,7 +616,7 @@ GtkWidget * message_dialogmodal (gchar * message, gchar * title, GtkMessageType 
 GtkWidget * dialog_cancel_apply (gchar * title, GtkWidget * parent, gboolean resiz)
 {
   GtkWidget * dca = gtk_dialog_new_with_buttons (title, GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                 "Cancel", GTK_RESPONSE_CANCEL, "Apply", GTK_RESPONSE_APPLY, NULL);
+                                                 _("Cancel"), GTK_RESPONSE_CANCEL, _("Apply"), GTK_RESPONSE_APPLY, NULL);
   gtk_window_set_resizable (GTK_WINDOW(dca), resiz);
 #ifdef GTK3
   gtk_window_set_icon (GTK_WINDOW (dca), THETD);
@@ -1642,7 +1642,7 @@ GtkWidget * gtk3_menu_item (GtkWidget * menu, gchar * name,
 */
 GtkWidget * add_advanced_item (GtkWidget * menu, GCallback handler, gpointer data, gboolean accel, guint key, GdkModifierType mod)
 {
-  return gtk3_menu_item (menu, "Advanced", IMG_STOCK, (gpointer)DPROPERTIES, handler, data, accel, key, mod, FALSE, FALSE, FALSE);
+  return gtk3_menu_item (menu, _("Advanced"), IMG_STOCK, (gpointer)DPROPERTIES, handler, data, accel, key, mod, FALSE, FALSE, FALSE);
 }
 
 /*!
@@ -2342,7 +2342,7 @@ gboolean file_chooser_set_file_name (GtkFileChooser * chooser, gchar * filename)
   gboolean res = gtk_file_chooser_set_file (chooser, default_file_for_saving, NULL);
   if (! res)
   {
-    gchar * str = g_strdup_printf ("Impossible to locate file: %s", filename);
+    gchar * str = g_strdup_printf (_("Impossible to locate file: %s"), filename);
     show_error (str, 0, (GtkWidget *)chooser);
   }
   return res;
@@ -2377,7 +2377,7 @@ void file_chooser_set_current_folder (GtkFileChooser * chooser)
 */
 GtkFileChooserNative * create_file_chooser (const gchar * title, GtkWindow * parent, GtkFileChooserAction act, const gchar * act_name)
 {
-  return gtk_file_chooser_native_new (title, parent, act, act_name, "Cancel");
+  return gtk_file_chooser_native_new (title, parent, act, act_name, _("Cancel"));
 }
 #else
 /*!
@@ -2392,7 +2392,7 @@ GtkFileChooserNative * create_file_chooser (const gchar * title, GtkWindow * par
 */
 GtkWidget * create_file_chooser (const gchar * title, GtkWindow * parent, GtkFileChooserAction act, const gchar * act_name)
 {
-  return gtk_file_chooser_dialog_new (title, parent, act, "Cancel", GTK_RESPONSE_CANCEL, act_name, GTK_RESPONSE_ACCEPT, NULL);
+  return gtk_file_chooser_dialog_new (title, parent, act, _("Cancel"), GTK_RESPONSE_CANCEL, act_name, GTK_RESPONSE_ACCEPT, NULL);
 }
 #endif
 

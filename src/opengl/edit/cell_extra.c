@@ -86,7 +86,7 @@ GtkWidget * add_extra_cell_tab (glwin * view)
   layout_add_widget (layout, hbox, 50, 50);
   int i;
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("\tAdd extra cell(s):", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("\tAdd extra cell(s):"), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   GtkWidget * hhbox;
   gchar * str;
   for (i=0; i<3; i++)
@@ -100,7 +100,7 @@ GtkWidget * add_extra_cell_tab (glwin * view)
   }
   vbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 50);
-  view -> cell_win -> superbut = create_button ("Create super-cell", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(super_cell_but), view);
+  view -> cell_win -> superbut = create_button (_("Create super-cell"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(super_cell_but), view);
   sens_superbut (get_project_by_id(view -> proj));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, view -> cell_win -> superbut, FALSE, FALSE, 90);
   show_the_widgets (layout);

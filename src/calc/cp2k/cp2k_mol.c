@@ -144,8 +144,8 @@ G_MODULE_EXPORT void select_fixed_atom_confirm (GtkDialog * dialog, gint respons
     {
       if (fix_frag[i] && ! old_fixed[i][0] && ! old_fixed[i][1] && ! old_fixed[i][2])
       {
-        gchar * str = g_strdup_printf ("Fragment %d has been selected but no coordinates appear to be frozen !\n"
-                                       "Unselect fragment %d or select coordinate(s) to freeze !",
+        gchar * str = g_strdup_printf (_("Fragment %d has been selected but no coordinates appear to be frozen !\n"
+                                         "Unselect fragment %d or select coordinate(s) to freeze !"),
                                        i+1, i+1);
         show_warning (str, qm_assistant);
         g_free (str);
@@ -177,7 +177,7 @@ G_MODULE_EXPORT void run_cp2k_fix_molecule (GtkDialog * dial, gint response_id, 
       {
         if (a_frag > 1)
         {
-          str = g_strdup_printf ("Fragments N°%d", fix_frag[0]+1);
+          str = g_strdup_printf (_("Fragments N°%d"), fix_frag[0]+1);
           if (a_frag > 2)
           {
             for (i=1; i<a_frag-1; i++)
@@ -185,13 +185,13 @@ G_MODULE_EXPORT void run_cp2k_fix_molecule (GtkDialog * dial, gint response_id, 
               str = g_strdup_printf ("%s, %d", str, fix_frag[i]+1);
             }
           }
-          str = g_strdup_printf ("%s and %d have been selected !", str, fix_frag[a_frag-1]+1);
-          str = g_strdup_printf ("%s\nConfirm this choice and fix these fragments ?", str);
+          str = g_strdup_printf (_("%s and %d have been selected !"), str, fix_frag[a_frag-1]+1);
+          str = g_strdup_printf (_("%s\nConfirm this choice and fix these fragments ?"), str);
         }
         else
         {
-          str = g_strdup_printf ("Fragment N°%d has been selected !", fix_frag[0]+1);
-          str = g_strdup_printf ("%s\nConfirm this choice and fix this fragment ?", str);
+          str = g_strdup_printf (_("Fragment N°%d has been selected !"), fix_frag[0]+1);
+          str = g_strdup_printf (_("%s\nConfirm this choice and fix this fragment ?"), str);
         }
         field_question (str, G_CALLBACK(select_fixed_atom_confirm), NULL);
         g_free (str);
@@ -245,15 +245,15 @@ void cp2k_fix_molecule ()
 {
   int i, j, k;
   at_col = 0;
-  gchar * str = g_strdup_printf ("Please select the fragment(s) to fix");
+  gchar * str = g_strdup_printf (_("Please select the fragment(s) to fix"));
   GtkWidget * fmol = dialogmodal (str, GTK_WINDOW(qm_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(fmol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(fmol), _("Apply"), GTK_RESPONSE_APPLY);
   GtkWidget * frag_tree =  NULL;
   GtkTreeIter iter;
   GtkTreeViewColumn * frag_col[5];
   GtkCellRenderer * frag_cell[5];
-  gchar * frag_title[5] = {"Fragment", "Viz.3D & Select", "x", "y", "z"};
+  gchar * frag_title[5] = {i18n("Fragment"), i18n("Viz.3D & Select"), "x", "y", "z"};
   gchar * ctype[5]={"text", "active", "active", "active", "active"};
   GType col_type[5] = {G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN};
   add_model = gtk_tree_store_newv (5, col_type);
@@ -277,7 +277,7 @@ void cp2k_fix_molecule ()
         g_signal_connect (G_OBJECT(frag_cell[i]), "toggled", G_CALLBACK(cp2k_select_coord_id), GINT_TO_POINTER(j));
       }
     }
-    frag_col[i] = gtk_tree_view_column_new_with_attributes (frag_title[i], frag_cell[i], ctype[i], i, NULL);
+    frag_col[i] = gtk_tree_view_column_new_with_attributes ((i < 2) ? _(frag_title[i]) : frag_title[i], frag_cell[i], ctype[i], i, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(frag_tree), frag_col[i]);
     gtk_tree_view_column_set_alignment (frag_col[i], 0.5);
     if (i == 0)

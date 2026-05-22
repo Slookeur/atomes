@@ -178,16 +178,16 @@ G_MODULE_EXPORT void window_spinner (GtkWidget * widg, gpointer data)
   if (view -> spiner == NULL)
   {
     view -> spiner = g_malloc0(sizeof*view -> spiner);
-    gchar * str = g_strdup_printf ("%s - spin", prepare_for_title(get_project_by_id(view -> proj) -> name));
+    gchar * str = g_strdup_printf (_("%s - spin"), prepare_for_title(get_project_by_id(view -> proj) -> name));
     view -> spiner -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
     GtkWidget * table = gtk_grid_new ();
     add_container_child (CONTAINER_WIN, view -> spiner -> win, table);
-    view -> spiner -> right = create_button ("Right", IMG_STOCK, GO_RIGHT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[1][1]);
-    view -> spiner -> left = create_button ("Left", IMG_STOCK, GO_LEFT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[3][1]);
-    view -> spiner -> stop = create_button ("Stop", IMG_STOCK, MEDIA_STOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_stop), view);
-    view -> spiner -> up = create_button ("Up", IMG_STOCK, GO_UP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[3][0]);
-    view -> spiner -> down = create_button ("Down", IMG_STOCK, GO_DOWN, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[1][0]);
+    view -> spiner -> right = create_button (_("Right"), IMG_STOCK, GO_RIGHT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[1][1]);
+    view -> spiner -> left = create_button (_("Left"), IMG_STOCK, GO_LEFT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[3][1]);
+    view -> spiner -> stop = create_button (_("Stop"), IMG_STOCK, MEDIA_STOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_stop), view);
+    view -> spiner -> up = create_button (_("Up"), IMG_STOCK, GO_UP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[3][0]);
+    view -> spiner -> down = create_button (_("Down"), IMG_STOCK, GO_DOWN, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(spin_go), & view -> colorp[1][0]);
     gtk_grid_attach (GTK_GRID (table), view -> spiner -> right, 2,1,1,1);
     gtk_grid_attach (GTK_GRID (table), view -> spiner -> left, 0,1,1,1);
     gtk_grid_attach (GTK_GRID (table), view -> spiner -> stop, 1,1,1,1);

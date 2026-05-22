@@ -66,17 +66,17 @@ void workinfo (project * this_proj, int i)
   {
     case -4:
       this_proj -> text_buffer[0] = add_buffer (NULL, NULL, NULL);
-      print_info ("\n\nWorkspace information\n\n\n", "heading", this_proj -> text_buffer[0]);
+      print_info (_("\n\nWorkspace information\n\n\n"), "heading", this_proj -> text_buffer[0]);
       if (g_strcmp0(workspacefile, "(null)") == 0) workspacefile = NULL;
       if (workspacefile != NULL)
       {
-        print_info ("\tWorkspace file: ", "italic", this_proj -> text_buffer[0]);
+        print_info (_("\tWorkspace file: "), "italic", this_proj -> text_buffer[0]);
         print_info (workspacefile, NULL, this_proj -> text_buffer[0]);
       }
       str = g_strdup_printf ("\n\n\t%d", nprojects);
       print_info (str, "bold_red", this_proj -> text_buffer[0]);
       g_free (str);
-      print_info (" project(s) in workspace: ", NULL, this_proj -> text_buffer[0]);
+      print_info (_(" project(s) in workspace: "), NULL, this_proj -> text_buffer[0]);
       tmp_proj = workzone.first;
       for (j=0; j<nprojects; j++)
       {
@@ -84,7 +84,7 @@ void workinfo (project * this_proj, int i)
         print_info (prepare_for_title(tmp_proj -> name), "italic", this_proj -> text_buffer[0]);
         if (tmp_proj -> next != NULL) tmp_proj = tmp_proj -> next;
       }
-      print_info ("\n\n\tActive project: ", NULL, this_proj -> text_buffer[0]);
+      print_info (_("\n\n\tActive project: "), NULL, this_proj -> text_buffer[0]);
       print_info (prepare_for_title(active_project -> name), "bold_green", this_proj -> text_buffer[0]);
       break;
     case -3:

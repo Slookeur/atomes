@@ -312,15 +312,27 @@ image * duplicate_image (image * old_img)
     new_img -> linerad[i] = duplicate_double(2*j, old_img -> linerad[i]);
   }
 
-  for (i=0; i<9; i++)
+  for (i=0; i<10; i++)
   {
-    new_img -> show_coord[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_coord[i]);
-    if (i < 2 || i > 3) new_img -> show_poly[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_poly[i]);
-    k = (i < 2) ? proj_gl -> nspec : 1;
-    new_img -> spcolor[i] = g_malloc0(k*sizeof*new_img -> spcolor[i]);
-    for (j=0; j<k; j++)
+    if (old_img -> show_coord[i])
     {
-     new_img -> spcolor[i][j] = duplicate_color (coord_gl -> totcoord[i], old_img -> spcolor[i][j]);
+      new_img -> show_coord[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_coord[i]);
+    }
+    if (i < 2 || (i > 3 && i < 9))
+    {
+      if (old_img -> show_poly[i])
+      {
+        new_img -> show_poly[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_poly[i]);
+      }
+    }
+    k = (i < 2) ? proj_gl -> nspec : 1;
+    if (old_img -> spcolor[i])
+    {
+      new_img -> spcolor[i] = g_malloc0(k*sizeof*new_img -> spcolor[i]);
+      for (j=0; j<k; j++)
+      {
+       new_img -> spcolor[i][j] = duplicate_color (coord_gl -> totcoord[i], old_img -> spcolor[i][j]);
+      }
     }
   }
   new_img -> at_data = g_malloc0(proj_gl -> natomes*sizeof*new_img -> at_data);
@@ -407,8 +419,6 @@ void add_image ()
 {
   snapshot * nextsnap = g_malloc0(sizeof*nextsnap);
   nextsnap -> img = duplicate_image (plot);
-  nextsnap -> img -> id ++;
-
   // Now the pointers
   if (wingl -> anim -> frames == 0)
   {
@@ -416,7 +426,6 @@ void add_image ()
     wingl -> anim -> last = nextsnap;
     wingl -> anim -> last -> prev = NULL;
     wingl -> anim -> first = nextsnap;
-
   }
   else
   {
@@ -425,7 +434,7 @@ void add_image ()
     wingl -> anim -> last = wingl -> anim -> last -> next;
     wingl -> anim -> last -> img -> id = wingl -> anim -> frames;
   }
-  wingl -> anim -> frames += 1;
+  wingl -> anim -> frames ++;
 }
 
 extern void update_gl_pick_colors ();

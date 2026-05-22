@@ -449,7 +449,7 @@ void render_string (int glsl, int id, screen_string * this_string)
   string_to_render = gl_pango_render_layout (playout, ogl_texture, id, this_string);
   if (string_to_render == NULL)
   {
-    g_warning ("Error in text rendering : for some reason it is impossible to render\n - this string : '%s' \n - using this font: %s", this_string -> word, plot -> labels[id].font);
+    g_warning (_("Error in text rendering : for some reason it is impossible to render\n - this string : '%s' \n - using this font: %s"), this_string -> word, plot -> labels[id].font);
   }
   else
   {

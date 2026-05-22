@@ -172,23 +172,23 @@ void window_color (project * this_proj, glwin * view)
   GdkRGBA col;
   if (wc_cid == -2)
   {
-    str = g_strdup_printf ("Background color");
+    str = g_strdup_printf (_("Background color"));
     col = colrgba_togtkrgba (view -> anim -> last -> img -> back -> color);
   }
   else if (wc_cid == -1)
   {
-    str = g_strdup_printf ("Model box color");
+    str = g_strdup_printf (_("Model box color"));
     col = colrgba_togtkrgba (view -> anim -> last -> img -> abc -> color);
   }
   else
   {
     if (wc_cid < this_proj -> nspec)
     {
-      str = g_strdup_printf ("%s - atom(s) color", this_proj -> chemistry -> label[wc_cid]);
+      str = g_strdup_printf (_("%s - atom(s) color"), this_proj -> chemistry -> label[wc_cid]);
     }
     else
     {
-      str = g_strdup_printf ("%s* - clone(s) color", this_proj -> chemistry -> label[wc_cid-this_proj -> nspec]);
+      str = g_strdup_printf (_("%s* - clone(s) color"), this_proj -> chemistry -> label[wc_cid-this_proj -> nspec]);
     }
     col = colrgba_togtkrgba (view -> anim -> last -> img -> at_color[wc_cid]);
   }
@@ -466,31 +466,28 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   if (preferences)
   {
     the_gradient -> win = create_vbox (BSEP);
-    adv_box (the_gradient -> win, "<b>Background settings</b>", 5, 120, 0.0);
+    adv_box (the_gradient -> win, _("<b>Background settings</b>"), 5, 120, 0.0);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> win, hbox, FALSE, FALSE, 20);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
   }
   else
   {
-    gchar * str = g_strdup_printf ("%s - background settings", get_project_by_id(view -> proj)->name);
+    gchar * str = g_strdup_printf (_("%s - background settings"), get_project_by_id(view -> proj)->name);
     the_gradient -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
     add_container_child (CONTAINER_WIN, the_gradient -> win, vbox);
   }
   int i, j;
-  gchar * g_name[2] = {"Gradient type", "Gradient direction"};
-  gchar * g_type[3] = {"No gradient", "Linear", "Circular"};
-  gchar * g_direction[2][9] = {{"Top to bottom", "Right to left", "Bottom right to top left", "Top right to bottom left", "", "", "", "", ""},
-                               {"Right to left", "Left to right", "Top to bottom", "Bottom to top",
-                                "Bottom right to top left", "Bottom left to top right", "Top right to bottom left", "Top left to bottom right", "Center"}};
+  gchar * g_direction[2][9] = {{i18n("Top to Bottom"), i18n("Right to Left"), i18n("Bottom Right to Top Left"), i18n("Top Right to Bottom Left"), "", "", "", "", ""},
+                               {i18n("Right to Left"), i18n("Left to Right"), i18n("Top to Bottom"), i18n("Bottom to Top"),
+                                i18n("Bottom Right to Top Left"), i18n("Bottom Left to Top Right"), i18n("Top Right to Bottom Left"), i18n("Top Left to Bottom Right"), i18n("Center")}};
   int n_val[2] = {4, 9};
-  hbox = abox (vbox, g_name[0], 5);
+  hbox = abox (vbox, _("Gradient type"), 5);
   the_gradient -> g_box = create_combo ();
-  for (i=0; i<3; i++)
-  {
-    combo_text_append (the_gradient -> g_box, g_type[i]);
-  }
+  combo_text_append (the_gradient -> g_box, _("No Gradient"));
+  combo_text_append (the_gradient -> g_box, _("Linear"));
+  combo_text_append (the_gradient -> g_box, _("Circular"));
   combo_set_active (the_gradient -> g_box, back_gradient);
   gtk_widget_set_size_request (the_gradient -> g_box, 200, -1);
   g_signal_connect (G_OBJECT (the_gradient -> g_box), "changed", G_CALLBACK(set_gradient_parameter), (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]);
@@ -499,13 +496,13 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   the_gradient -> dir = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_gradient -> dir, FALSE, FALSE, 0);
 
-  hbox = abox (the_gradient -> dir, g_name[1], 5);
+  hbox = abox (the_gradient -> dir, _("Gradient direction"), 5);
   for (i=0; i<2; i++)
   {
     the_gradient -> d_box[i] = create_combo ();
     for (j=0; j<n_val[i]; j++)
     {
-      combo_text_append (the_gradient -> d_box[i], g_direction[i][j]);
+      combo_text_append (the_gradient -> d_box[i], _(g_direction[i][j]));
     }
     gtk_widget_set_size_request (the_gradient -> d_box[i], 200, -1);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_gradient -> d_box[i], FALSE, FALSE, 20);
@@ -520,36 +517,36 @@ G_MODULE_EXPORT void gradient_advanced (GtkWidget * widg, gpointer data)
   }
   the_gradient -> color_box[0] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_gradient -> color_box[0], FALSE, FALSE, 20);
-  abox (the_gradient -> color_box[0], "Background color", 5);
+  abox (the_gradient -> color_box[0], _("Background color"), 5);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> color_box[0], hbox, FALSE, FALSE, 5);
   vvbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
   hhbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label ("Single color", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (_("Single color"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   the_gradient -> col_but = color_button (back_color, FALSE, 100, -1, G_CALLBACK(set_gradient_color),  (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, the_gradient -> col_but, FALSE, FALSE, 0);
 
   the_gradient -> color_box[1] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_gradient -> color_box[1], FALSE, FALSE, 20);
-  abox (the_gradient -> color_box[1], "Gradient colors", 5);
+  abox (the_gradient -> color_box[1], _("Gradient colors"), 5);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, the_gradient -> color_box[1], hbox, FALSE, FALSE, 5);
   vvbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
-  gchar * c_name[2] = {"First color", "Second color"};
+  gchar * c_name[2] = {i18n("First color"), i18n("Second color")};
   for (i=0; i<2; i++)
   {
     hhbox = create_hbox (BSEP);
     // g_print ("col.r= %f, col.g= %f, col.b= %f\n", gradient_color[i].red, gradient_color[i].green, gradient_color[i].blue);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hhbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (c_name[i], 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label (_(c_name[i]), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
     the_gradient -> grad_but[i] = color_button (gradient_color[i], FALSE, 100, -1, G_CALLBACK(set_gradient_color), (preferences) ? & pref_pointer[i+1] : & view -> colorp[i+1][0]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, the_gradient -> grad_but[i], FALSE, FALSE, 0);
   }
 
-  the_gradient -> p_box = abox (the_gradient -> color_box[1], "Mixed position", 5);
+  the_gradient -> p_box = abox (the_gradient -> color_box[1], _("Mixed position"), 5);
   the_gradient -> p_scale = create_hscale (0.0, 1.0, 0.001, back_position, GTK_POS_TOP, 3, 150, G_CALLBACK(set_back_position), G_CALLBACK(scroll_set_back_position), (preferences) ? & pref_pointer[0] : & view -> colorp[0][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_gradient -> p_box, the_gradient -> p_scale, FALSE, FALSE, 20);
 
@@ -687,31 +684,31 @@ G_MODULE_EXPORT void window_color_coord (GtkWidget * widg, gpointer data)
   switch (g)
   {
     case 0:
-      str = g_strdup_printf ("%s atom(s) %d fold coordination sphere color", this_proj -> chemistry -> label[s],
+      str = g_strdup_printf (_("%s atom(s) %d fold coordination sphere color"), this_proj -> chemistry -> label[s],
       this_proj -> coord -> geolist[0][s][c]);
       break;
     case 1:
       env = env_name (this_proj, c, s, 1, NULL);
-      str = g_strdup_printf ("%s - %s coordination sphere color", this_proj -> chemistry -> label[s],
+      str = g_strdup_printf (_("%s - %s coordination sphere color"), this_proj -> chemistry -> label[s],
                              prepare_for_title(exact_name(env)));
       g_free (env);
       break;
     case 2:
-      str = g_strdup_printf ("Fragment N°%d color", c);
+      str = g_strdup_printf (_("Fragment N°%d color"), c);
       g = s;
       s = 0;
       break;
     case 3:
-      str = g_strdup_printf ("Molecule N°%d color", c);
+      str = g_strdup_printf (_("Molecule N°%d color"), c);
       g = s;
       s = 0;
       break;
     case 9:
-      str = g_strdup_printf ("%d atom chain(s) color", this_proj -> coord -> geolist[g][0][c]);
+      str = g_strdup_printf (_("%d atom chain(s) color"), this_proj -> coord -> geolist[g][0][c]);
       s = 0;
       break;
     default:
-      str = g_strdup_printf ("%s - %d atom ring(s) color", rings_type[s], this_proj -> coord -> geolist[g][0][c]);
+      str = g_strdup_printf (_("%s - %d atom ring(s) color"), _(rings_type[s]), this_proj -> coord -> geolist[g][0][c]);
       s = 0;
       break;
   }

@@ -163,13 +163,12 @@ void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, const g
 GMenu * prepare_opengl_menu (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Style", menu_style(view, popm));
-  GMenuItem * item = g_menu_item_new ("Color Scheme(s)", (get_project_by_id(view -> proj) -> nspec) ? NULL : "None");
+  append_submenu (menu, _("Style"), menu_style(view, popm));
+  GMenuItem * item = g_menu_item_new (_("Color Maps"), (get_project_by_id(view -> proj) -> nspec) ? NULL : "None");
   g_menu_item_set_submenu (item, (GMenuModel*)menu_map(view, popm));
   g_menu_append_item (menu, item);
-  // append_submenu (menu, "Render", menu_render(view, popm));
-  append_opengl_item (view, menu, "Material And Lights", "material", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_opengl_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
-  append_opengl_item (view, menu, "Render Image", "image", popm, popm, "<CTRL>I", IMG_FILE, PACKAGE_IMG, FALSE, G_CALLBACK(to_render_gl_image), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Material and Light(s)"), "material", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_opengl_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Render Image"), "image", popm, popm, "<CTRL>I", IMG_FILE, PACKAGE_IMG, FALSE, G_CALLBACK(to_render_gl_image), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -184,9 +183,9 @@ GMenu * prepare_opengl_menu (glwin * view, int popm)
 GMenu * prepare_model_menu (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Atom(s)", menu_atoms(view, popm, 0));
-  append_submenu (menu, "Bond(s)", menu_bonds(view, popm, 0));
-  append_submenu (menu, "Clone(s)", menu_clones(view, popm));
+  append_submenu (menu, _("Atom(s)"), menu_atoms(view, popm, 0));
+  append_submenu (menu, _("Bond(s)"), menu_bonds(view, popm, 0));
+  append_submenu (menu, _("Clone(s)"), menu_clones(view, popm));
   g_menu_append_item (menu, menu_box_axis (view, popm, 0));
   return menu;
 }
@@ -202,41 +201,41 @@ GMenu * prepare_model_menu (glwin * view, int popm)
 GMenu * prepare_coord_menu (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Coordination", menu_coord (view, popm));
-  append_submenu (menu, "Polyhedra", menu_poly (view, popm));
+  append_submenu (menu, _("Coordination"), menu_coord (view, popm));
+  append_submenu (menu, _("Polyhedra"), menu_poly (view, popm));
   if (view -> rings)
   {
-    append_submenu (menu, "Ring(s)", menu_rings (view, popm));
+    append_submenu (menu, _("Ring(s)"), menu_rings (view, popm));
   }
   else
   {
-    append_menu_item (menu, "Ring(s)", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Ring(s)"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
   if (view -> chains)
   {
-    append_submenu (menu, "Chain(s)", add_menu_coord (view, popm, 9));
+    append_submenu (menu, _("Chain(s)"), add_menu_coord (view, popm, 9));
   }
   else
   {
-    append_menu_item (menu, "Chain(s)", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Chain(s)"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
   if (view -> adv_bonding[0])
   {
-    append_submenu (menu, "Fragment(s)", add_menu_coord (view, popm, 2));
+    append_submenu (menu, _("Fragment(s)"), add_menu_coord (view, popm, 2));
   }
   else
   {
-    append_menu_item (menu, "Fragment(s)", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Fragment(s)"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
   if (view -> adv_bonding[1])
   {
-    append_submenu (menu, "Molecule(s)", add_menu_coord (view, popm, 3));
+    append_submenu (menu, _("Molecule(s)"), add_menu_coord (view, popm, 3));
   }
   else
   {
-    append_menu_item (menu, "Molecule(s)", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Molecule(s)"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
-  append_opengl_item (view, menu, "Advanced", "adv-all", popm, popm, "<CTRL>E", IMG_STOCK, (gpointer)DPROPERTIES, FALSE, G_CALLBACK(to_coord_properties), & view -> colorp[30][0], FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Advanced"), "adv-all", popm, popm, "<CTRL>E", IMG_STOCK, (gpointer)DPROPERTIES, FALSE, G_CALLBACK(to_coord_properties), & view -> colorp[30][0], FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -251,7 +250,7 @@ GMenu * prepare_coord_menu (glwin * view, int popm)
 GMenu * menu_shortcuts (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Shortcuts", "shortcuts", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Shortcuts"), "shortcuts", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -268,18 +267,18 @@ GMenu * opengl_menu_bar (glwin * view)
   append_submenu (menu, "OpenGL", prepare_opengl_menu(view, 0));
   if (get_project_by_id(view -> proj) -> natomes)
   {
-    append_submenu (menu, "Model", prepare_model_menu(view, 0));
-    append_submenu (menu, "Chemistry", prepare_coord_menu(view, 0));
+    append_submenu (menu, _("Model"), prepare_model_menu(view, 0));
+    append_submenu (menu, _("Chemistry"), prepare_coord_menu(view, 0));
   }
   else
   {
-    append_menu_item (menu, "Model", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
-    append_menu_item (menu, "Chemistry", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Model"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Chemistry"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
-  append_submenu (menu, "Tools", menu_tools(view, 0));
-  append_submenu (menu, "View", menu_view(view, 0));
-  append_submenu (menu, "Animate", menu_anim(view, 0));
-  append_submenu (menu, "Help", menu_shortcuts(view, 0));
+  append_submenu (menu, _("Tools"), menu_tools(view, 0));
+  append_submenu (menu, _("View"), menu_view(view, 0));
+  append_submenu (menu, _("Animate"), menu_anim(view, 0));
+  append_submenu (menu, _("Help"), menu_shortcuts(view, 0));
   return menu;
 }
 

@@ -21,12 +21,12 @@ GTKV = 3
 ifeq ($(GTKV),4)
   DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
   # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
-  IGTK = `pkg-config --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
-  LGTK = `pkg-config --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  IGTK = `pkgconf --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  LGTK = `pkgconf --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 else
   DGTK = -DGTK3 -DGTKGLAREA -DMENU_ICONS
-  IGTK = `pkg-config --cflags gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
-  LGTK = `pkg-config --libs gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  IGTK = `pkgconf --cflags gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  LGTK = `pkgconf --libs gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 endif
 
 # OpenMP
@@ -52,7 +52,7 @@ ifeq ($(LINUX),1)
   LIBS = $(LGTK) -lm -lgfortran
 
   DOS = -DLINUX
-  CPPFLAGS = -DCODEBLOCKS -DPACKAGE_PREFIX=\"./\" -DPACKAGE_LIBEXEC=\"./\"
+  CPPFLAGS = -DCODEBLOCKS -DPACKAGE_PREFIX=\"./\" -DPACKAGE_LIBEXEC=\"./\" -DPACKAGE_LOCALE=\"./locale\"
   LDFLGS = $(DOMP)
 
   RM = rm
@@ -61,6 +61,7 @@ ifeq ($(LINUX),1)
   CP = cp
   CPFLAGS = -f
   ECHO = echo
+	MSGFMT = msgfmt
 
   EXT =
 
@@ -164,6 +165,7 @@ GLEDIT = src/opengl/edit/
 FOR = src/fortran/
 OBJ = obj/
 BIN = bin/
+LOCALE = bin/locale
 
 INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
@@ -173,14 +175,14 @@ ifeq ($(MAKECMDGOALS),atomes)
   FCFLAGS = -O2 -cpp
   CFLAGS = -O2 -std=gnu99
   LDFLAGS = $(LIBS) $(LDFLGS)
-  DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS) -DNEW_ANA
+  DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS)
 endif
 
 ifeq ($(MAKECMDGOALS),debug)
   FCFLAGS = -fno-second-underscore -O0 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all
   CFLAGS = -O0 -std=gnu99 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all -Wduplicated-cond
   LDFLAGS = $(LIBS) $(LDFLGS) -pg
-  DEFS = -DHAVE_CONFIG_H -DDEBUG $(DGTK) $(DOS) -DNEW_ANA
+  DEFS = -DHAVE_CONFIG_H -DDEBUG $(DGTK) $(DOS)
 endif
 
 PROGRAM = atomes
@@ -480,9 +482,13 @@ endif
 
 # The rule to build the executable
 
-atomes: version ogl exe
+atomes: locale version ogl exe
 
-debug: version ogl exe
+debug: locale version ogl exe
+
+locale:
+	$(MSGFMT) $(LOCALE)/en/atomes-messages.po -o  $(LOCALE)/en/LC_MESSAGES/atomes.mo
+	$(MSGFMT) $(LOCALE)/fr/atomes-messages.po -o  $(LOCALE)/fr/LC_MESSAGES/atomes.mo
 
 version:
 	$(ECHO) "#define FC \""$(FC) $(FCVER)"\"" > src/version.h
@@ -558,7 +564,7 @@ cleanf:
 	$(RM) $(RMFLAGS) $(OBJ)*.mod
 
 clean_all:
-	$(RM) $(RMFLAGS) $(OBJECTS) *.mod $(OBJ)*.mod $(BIN)$(PROGRAM) $(OBJ)startup_testing.o $(BIN)$(OGL_TEST_PROG)
+	$(RM) $(RMFLAGS) $(OBJECTS) *.mod $(OBJ)*.mod $(BIN)$(PROGRAM) $(OBJ)startup_testing.o $(BIN)$(OGL_TEST_PROG) $(BIN)/locale/*/LC_MESSAGES/*.mo
 
 clean_win:
 	$(RM) $(RMFLAGS) $(OBJ)win_atomes.o

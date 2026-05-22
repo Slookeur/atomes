@@ -353,7 +353,7 @@ int test_lattice (builder_edition * cbuilder, cell_info * cif_cell)
     }
     if (! test_vol(box -> param, box -> vect))
     {
-      show_warning ("Please describe properly the lattice parameters", cbuilder -> win);
+      show_warning (_("Please describe properly the lattice parameters"), cbuilder -> win);
       return 0;
     }
     compute_lattice_properties (cell, 0);
@@ -1205,11 +1205,11 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
           {
             if (! crystal_crowded)
             {
-              str = g_strdup_printf ("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
-                                     "If you build the crystal the final structure is likely to be crowded !\n"
-                                     "Continue anyway ?", object -> name, object -> dim);
+              str = g_strdup_printf (_("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
+                                       "If you build the crystal the final structure is likely to be crowded !\n"
+                                       "Continue anyway ?"), object -> name, object -> dim);
               build_res = 2;
-              crystal_crowded = ask_yes_no("This object might be too big !" , str, GTK_MESSAGE_WARNING, widg);
+              crystal_crowded = ask_yes_no(_("This object might be too big !") , str, GTK_MESSAGE_WARNING, widg);
               if (! crystal_crowded)
               {
                 g_free (str);
@@ -1284,7 +1284,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       if (u+v > 1.0 || u+v < 0.0)
       {
         if (cdata) cdata = free_crystal_data (cdata);
-        show_warning ("Impossible to build crystal: check occupancy !", widg);
+        show_warning (_("Impossible to build crystal: check occupancy !"), widg);
         return 0;
       }
       else if (cdata -> overlapping && ! cdata -> with_holes)
@@ -1322,7 +1322,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                 }
                 if (u+v > 1.00001)
                 {
-                  show_warning ("Impossible to build crystal: site total occupancy > 1.0", widg);
+                  show_warning (_("Impossible to build crystal: site total occupancy > 1.0"), widg);
                   if (cdata) cdata = free_crystal_data (cdata);
                   return 0;
                 }
@@ -1354,7 +1354,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   if (m == cdata -> objects)
   {
     if (cdata) cdata = free_crystal_data (cdata);
-    show_warning ("Impossible to build crystal: empty site(s) only !", widg);
+    show_warning (_("Impossible to build crystal: empty site(s) only !"), widg);
     return 0;
   }
   gboolean new_proj = (this_proj -> natomes && visible) ? TRUE : FALSE;
@@ -1486,8 +1486,8 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                     if (crystal_dist_chk)
                     {
                       build_res = 3;
-                      if (ask_yes_no ("Inter-object distance(s) < 0.5 Ang. !",
-                                      "Inter-object distance(s) &lt; 0.5 &#xC5; !\n\n\t\tContinue and leave a single object at each position ?", GTK_MESSAGE_WARNING, widg))
+                      if (ask_yes_no (_("Inter-object distance(s) < 0.5 Ang. !"),
+                                      _("Inter-object distance(s) &lt; 0.5 &#xC5; !\n\n\t\tContinue and leave a single object at each position ?"), GTK_MESSAGE_WARNING, widg))
                       {
                         crystal_dist_chk = FALSE;
                       }
@@ -1721,7 +1721,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
 #endif
       }
       show_the_widgets (active_glwin -> win);
-      gtk_button_set_label (GTK_BUTTON(active_glwin -> builder_win -> pbut), "Build (new project)");
+      gtk_button_set_label (GTK_BUTTON(active_glwin -> builder_win -> pbut), _("Build (new project)"));
       if (active_glwin -> atom_win)
       {
         if (active_glwin -> atom_win -> win)
@@ -1766,12 +1766,12 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   active_cell -> sp_group = duplicate_space_group (sp_group);
   if (low_occ && crystal_low_warning)
   {
-    gchar * low_warning = "The crystal will be created however some objects might be missing,\n"
-                           "Occupancy is too low compared to the number of site(s) per cell.\n\n"
-                          "<b>To build a crystal matching the defined occupancy</b>:\n"
-                          "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
-                          "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
-                          "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.";
+    gchar * low_warning = _("The crystal will be created however some objects might be missing,\n"
+                            "Occupancy is too low compared to the number of site(s) per cell.\n\n"
+                            "<b>To build a crystal matching the defined occupancy</b>:\n"
+                            "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
+                            "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
+                            "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.");
     show_warning (low_warning, widg);
     crystal_low_warning = FALSE;
   }

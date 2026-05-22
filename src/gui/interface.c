@@ -114,11 +114,11 @@ GtkWidget * answer;
 #endif
 #endif
   {
-    gchar * uri = g_strdup_printf ("Failed to open link:\n%s", url);
+    gchar * uri = g_strdup_printf (_("Failed to open link:\n%s"), url);
     error_dialog = gtk_message_dialog_new (GTK_WINDOW (dialog),
                                            GTK_DIALOG_DESTROY_WITH_PARENT,
                                            GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
-                                           "Impossible to open link: ");
+                                           _("Impossible to open link: "));
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", uri);
     run_this_gtk_dialog (error_dialog, G_CALLBACK(run_destroy_dialog), NULL);
     g_free (uri);
@@ -136,15 +136,15 @@ GtkWidget * answer;
 GtkWidget * addweb (int id)
 {
   GtkWidget * web;
-  const gchar * contact = " Please contact me at:\n";
+  const gchar * contact = i18n(" Please contact me at:\n");
   const gchar * seb     = " Dr. Sébastien Le Roux ";
   GtkWidget * eseb;
   GtkWidget * vbox;
   GtkWidget * hbox;
-  const gchar * or = "\n Or check the website for information\n";
+  const gchar * or = i18n("\n Or check the website for information\n");
   if (id)
   {
-    web = gtk_link_button_new_with_label (ATOMES_URL, "Visit the project's website");
+    web = gtk_link_button_new_with_label (ATOMES_URL, _("Visit the project's website"));
   }
   gchar * mailto = g_strdup_printf ("mailo:%s", PACKAGE_BUGREPORT);
   gchar * mailsh = g_strdup_printf ("<%s>",PACKAGE_BUGREPORT);
@@ -152,14 +152,14 @@ GtkWidget * addweb (int id)
   g_free (mailto);
   g_free (mailsh);
   vbox = create_vbox (BSEP);
-  if (id) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (contact), FALSE, FALSE, 0);
+  if (id) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (_(contact)), FALSE, FALSE, 0);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (seb), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, eseb, FALSE, FALSE, 0);
   if (id)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (or), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (_(or)), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, web, FALSE, FALSE, 0);
   }
   return (vbox);
@@ -181,13 +181,14 @@ G_MODULE_EXPORT void create_about_dialog (GtkWidget * widg, gpointer data)
 #else
   GdkPixbuf * atomes_logo = gdk_pixbuf_new_from_file (PACKAGE_LAGPL, NULL);
 #endif
+  gchar * str;
   const gchar * authors[] = {"Dr. Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>",
                              "",
                              "Collaborations:",
                              "",
                              "Dr. Noël Jakse <noel.jakse@grenoble-inp.fr> : dynamic structure factor", NULL};
   const gchar * weblabel = "https://atomes.ipcms.fr";
-  const gchar * comments = "Visualization, analyzis, creation/edition and post-processing of atomic scale models !";
+  const gchar * comments = i18n("Visualization, analyzis, creation/edition and post-processing of atomic scale models !");
   const gchar * copyrights = "Copyright © 2026 \nDr. Sébastien Le Roux";
 
   // gtk_about_dialog_set_url_hook (about_dialog_handle_url, NULL, NULL);
@@ -196,10 +197,10 @@ G_MODULE_EXPORT void create_about_dialog (GtkWidget * widg, gpointer data)
   aboutdialog = gtk_about_dialog_new ();
   gtk_about_dialog_set_logo (GTK_ABOUT_DIALOG(aboutdialog), atomes_logo);
   gtk_about_dialog_set_version (GTK_ABOUT_DIALOG(aboutdialog), VERSION);
-  gchar * str = g_strdup_printf ("%s", PACKAGE);
+  str = g_strdup_printf ("%s", PACKAGE);
   gtk_about_dialog_set_program_name (GTK_ABOUT_DIALOG(aboutdialog), str);
   g_free (str);
-  gtk_about_dialog_set_comments (GTK_ABOUT_DIALOG(aboutdialog), comments);
+  gtk_about_dialog_set_comments (GTK_ABOUT_DIALOG(aboutdialog), _(comments));
   gtk_about_dialog_set_website (GTK_ABOUT_DIALOG(aboutdialog), g_strdup_printf("%s", ATOMES_URL));
   gtk_about_dialog_set_website_label (GTK_ABOUT_DIALOG(aboutdialog), weblabel);
   gtk_about_dialog_set_authors (GTK_ABOUT_DIALOG(aboutdialog), authors);
@@ -248,7 +249,7 @@ void show_info (char * information, int val, GtkWidget * win)
     info = g_strdup_printf ("%s", information);
   }
 
-  GtkWidget * dialog = message_dialogmodal (info, "Information", GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
+  GtkWidget * dialog = message_dialogmodal (info, _("Information"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
   if (val != 0) show_web (dialog, (val < 0) ? 0 : val);
   run_this_gtk_dialog (dialog, G_CALLBACK(run_destroy_dialog), NULL);
   g_free (info);
@@ -264,7 +265,7 @@ void show_info (char * information, int val, GtkWidget * win)
 */
 void show_warning (char * warning, GtkWidget * win)
 {
-  GtkWidget * dialog = message_dialogmodal (warning,  "Warning", GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, win);
+  GtkWidget * dialog = message_dialogmodal (warning,  _("Warning"), GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, win);
   run_this_gtk_dialog (dialog, G_CALLBACK(run_destroy_dialog), NULL);
 }
 
@@ -306,7 +307,7 @@ void show_error (char * error, int val, GtkWidget * win)
   {
     etot = g_strdup_printf ("%s\n%s", error, ifbug);
   }
-  GtkWidget * dialog = message_dialogmodal (etot, "Error", GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
+  GtkWidget * dialog = message_dialogmodal (etot, _("Error"), GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
   show_web (dialog, val);
   g_warning ("%s", etot);
   run_this_gtk_dialog (dialog, G_CALLBACK(run_destroy_dialog), NULL);
@@ -326,17 +327,17 @@ void show_error (char * error, int val, GtkWidget * win)
 */
 void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win)
 {
-  GtkWidget * dialog = message_dialogmodal (error, "Error", GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
-  GtkWidget * exp_trace = create_expander ("Details", NULL);
+  GtkWidget * dialog = message_dialogmodal (error, _("Error"), GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, win);
+  GtkWidget * exp_trace = create_expander (_("Details"), NULL);
   gchar * trace;
   if (this_error -> error_trace)
   {
-    trace = g_strdup_printf ("\n\tError %s %s, at:\n"
-                             "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
-                             "\t\tFunction: <b>%s()</b>\n"
-                             "\t\tLine    : <b>%d</b></span>\n\n"
-                             "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n",
-                             (! act) ? "reading" : "saving",
+    trace = g_strdup_printf (_("\n\tError %s %s, at:\n"
+                               "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
+                               "\t\tFunction: <b>%s()</b>\n"
+                               "\t\tLine    : <b>%d</b></span>\n\n"
+                               "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n"),
+                             (! act) ? _("reading") : _("saving"),
                              this_error -> error_signal.message,
                              this_error -> error_file,
                              this_error -> error_func,
@@ -346,11 +347,11 @@ void show_error_with_trace (gchar * error, atomes_error * this_error, int act, i
   }
   else
   {
-    trace = g_strdup_printf ("\n\tError %s %s, at:\n"
-                             "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
-                             "\t\tFunction: <b>%s()</b>\n"
-                             "\t\tLine    : <b>%d</b></span>\n",
-                             (! act) ? "reading" : "saving",
+    trace = g_strdup_printf (_("\n\tError %s %s, at:\n"
+                               "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
+                               "\t\tFunction: <b>%s()</b>\n"
+                               "\t\tLine    : <b>%d</b></span>\n"),
+                             (! act) ? _("reading") : _("saving"),
                              this_error -> error_signal.message,
                              this_error -> error_file,
                              this_error -> error_func,
@@ -445,7 +446,7 @@ gchar * exact_name (gchar * name)
 */
 GtkWidget * show_pop (char * pop, GtkWidget * pwin)
 {
-  GtkWidget * wpop = create_win ("Information", pwin, TRUE, FALSE);
+  GtkWidget * wpop = create_win (_("Information"), pwin, TRUE, FALSE);
   gtk_widget_set_size_request (wpop, 600, 80);
 #ifdef GTK3
   gtk_window_set_position (GTK_WINDOW (wpop), GTK_WIN_POS_CENTER);
@@ -481,7 +482,7 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWindow * widget, gpointer data)
 G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event, gpointer data)
 #endif
 {
-  if (ask_yes_no ("Leaving ?!", "Are you sure you want to quit ?", GTK_MESSAGE_QUESTION, MainWindow))
+  if (ask_yes_no (_("Leaving ?!"), _("Are you sure you want to quit ?"), GTK_MESSAGE_QUESTION, MainWindow))
   {
     quit_gtk ();
   }
@@ -501,29 +502,29 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event,
 */
 int dummy_ask_ (char * question)
 {
-  GtkWidget * dask = message_dialogmodal (question, "Parameter required", GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, MainWindow);
+  GtkWidget * dask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, MainWindow);
   run_this_gtk_dialog (dask, G_CALLBACK(run_yes_no), NULL);
   return (res_yes_no) ? 0 : -1;
 }
 
 extern  gchar * field_init[3];
-gchar * coord_type[3]={"Cartesian",
-                       "Atomic units",
-                       "Fractional"};
+gchar * coord_type[3]={i18n("Cartesian"),
+                       i18n("Atomic units"),
+                       i18n("Fractional")};
 gchar * npt_type[4]={"A\tB\tC\t&#x3B1;\t&#x3B2;\t&#x263;",
                      "A\tB\tC\n&#x3B1;\t&#x3B2;\t&#x263;",
                      "a<sub>x</sub>\ta<sub>y</sub>\ta<sub>z</sub>\tb<sub>x</sub>\tb<sub>y</sub>\tb<sub>z</sub>\tc<sub>x</sub>\tc<sub>y</sub>\tc<sub>z</sub>",
                      "a<sub>x</sub>\ta<sub>y</sub>\ta<sub>z</sub>\nb<sub>x</sub>\tb<sub>y</sub>\tb<sub>z</sub>\nc<sub>x</sub>\tc<sub>y</sub>\tc<sub>z</sub>"};
-gchar * npt_info[3]={"1 line by step, as many lines as MD steps",
-                     "2 lines by step, twice as many lines as MD steps",
-                     "3 lines by step, three times as many lines as MD steps"};
-gchar * cif_configurations[3]={"Single step chemical reaction",
-                               "MD trajectory",
-                               "Single configuration"};
-gchar * cif_occupancies[3]={"Round up to lowest integer",
-                            "Round up to highest integer",
-                            "Round up to nearest integer"};
-gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
+gchar * npt_info[3]={i18n("1 line by step, as many lines as MD steps"),
+                     i18n("2 lines by step, twice as many lines as MD steps"),
+                     i18n("3 lines by step, three times as many lines as MD steps")};
+gchar * cif_configurations[3]={i18n("Single step chemical reaction"),
+                               i18n("MD trajectory"),
+                               i18n("Single configuration")};
+gchar * cif_occupancies[3]={i18n("Round up to lowest integer"),
+                            i18n("Round up to highest integer"),
+                            i18n("Round up to nearest integer")};
+gchar * cif_config_legends={i18n("\t<b>Single step chemical reaction</b>\n"
                             "\t\tConsider each configuration as a step in a chemical reaction:\n"
                             "\t\t\t- Atomic coordinates are sorted based on occupancy or disorder site\n"
                             "\t\t\t- Each describing the proportion of a reactant\n"
@@ -532,17 +533,17 @@ gchar * cif_config_legends={"\t<b>Single step chemical reaction</b>\n"
                             "\t\tConsider the CIF file a MD trajectory\n\n"
                             "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
                             "\t<b>Single configuration </b>\n"
-                            "\t\tSelect a single configuration in the CIF file"};
-gchar * cif_config_leg={"\t<b>MD trajectory</b>\n"
+                            "\t\tSelect a single configuration in the CIF file")};
+gchar * cif_config_leg={i18n("\t<b>MD trajectory</b>\n"
                         "\t\tConsider the CIF file a MD trajectory\n\n"
                         "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
                         "\t<b>Single configuration </b>\n"
-                        "\t\tSelect a single configuration in the CIF file"};
-gchar * cif_occ[3]={"to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌋</b>",
-                    "to highest integer: <b>⌈</b>n<sub>sites</sub> x occupancy<b>⌉</b>",
-                    "to nearest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌉</b>"};
-gchar * cif_sites[2]={"with n<sub>sites</sub> = f(space group, crystalline positions)",
-                      "with n<sub>sites</sub> = f(symmetry positions, crystalline positions)"};
+                        "\t\tSelect a single configuration in the CIF file")};
+gchar * cif_occ[3]={i18n("to lowest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌋</b>"),
+                    i18n("to highest integer: <b>⌈</b>n<sub>sites</sub> x occupancy<b>⌉</b>"),
+                    i18n("to nearest integer: <b>⌊</b>n<sub>sites</sub> x occupancy<b>⌉</b>")};
+gchar * cif_sites[2]={i18n("with n<sub>sites</sub> = f(space group, crystalline positions)"),
+                      i18n("with n<sub>sites</sub> = f(symmetry positions, crystalline positions)")};
 
 GtkWidget * answer_info;
 
@@ -559,7 +560,7 @@ G_MODULE_EXPORT void on_answer_changed (GtkWidget * widg, gpointer data)
   int i, j;
   i = combo_get_active (widg);
   j = (! i || i == 2) ? 0 : (i == 1) ? 1 : 2;
-  gtk_label_set_text (GTK_LABEL(answer_info), npt_info[j]);
+  gtk_label_set_text (GTK_LABEL(answer_info), _(npt_info[j]));
 }
 
 int res_int;
@@ -623,7 +624,7 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   GtkWidget * hboxa;
   GtkWidget * quest;
   int i;
-  iask = message_dialogmodal (question, "Parameter Required", GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
+  iask = message_dialogmodal (question, _("Parameter Required"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
   vbox = dialog_get_content_area (iask);
   gtk_box_set_spacing (GTK_BOX(vbox), 15);
   hboxa = create_hbox (0);
@@ -646,23 +647,23 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
       switch (id)
       {
         case 1:
-          for (i=0; i<3; i++) combo_text_append (answer, coord_type[i]);
+          for (i=0; i<3; i++) combo_text_append (answer, _(coord_type[i]));
           break;
         case 2:
-          for (i=0; i<NCFORMATS; i++) combo_text_append (answer, coord_files[i]);
+          for (i=0; i<NCFORMATS; i++) combo_text_append (answer, _(coord_files[i]));
           break;
         case 3:
-          for (i=0; i<3; i++) combo_text_append (answer, cif_configurations[i]);
+          for (i=0; i<3; i++) combo_text_append (answer, _(cif_configurations[i]));
           break;
         case 4:
-          for (i=1; i<3; i++) combo_text_append (answer, cif_configurations[i]);
+          for (i=1; i<3; i++) combo_text_append (answer, _(cif_configurations[i]));
           break;
         case 5:
-          for (i=0; i<3; i++) combo_text_append (answer, cif_occupancies[i]);
+          for (i=0; i<3; i++) combo_text_append (answer, _(cif_occupancies[i]));
           break;
         default:
           // id < 0
-          for (i=0; i<3; i++) combo_text_append (answer, field_init[i]);
+          for (i=0; i<3; i++) combo_text_append (answer, _(field_init[i]));
           break;
       }
     }
@@ -673,7 +674,7 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
       for (i=0; i<4; i++)
       {
         gtk_tree_store_append (store, & iter, NULL);
-        gtk_tree_store_set (store, & iter, 0, npt_type[i], -1);
+        gtk_tree_store_set (store, & iter, 0, _(npt_type[i]), -1);
       }
       answer = gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
       GtkCellRenderer * renderer = gtk_cell_renderer_combo_new ();
@@ -686,27 +687,27 @@ int iask (char * question, char * lab, int id, GtkWidget * win)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, answer, FALSE, FALSE, 10);
   if (id == 3)
   {
-    answer_info = markup_label (cif_config_legends, 450, -1, 0.5, 0.5);
+    answer_info = markup_label (_(cif_config_legends), 450, -1, 0.5, 0.5);
   }
   if (id == 4)
   {
-    answer_info = markup_label (cif_config_leg, 450, -1, 0.5, 0.5);
+    answer_info = markup_label (_(cif_config_leg), 450, -1, 0.5, 0.5);
   }
   if (id == 5)
   {
-    gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
-                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.76⌋ = 8\n\n"
-                                   "\t<b>Highest integer: </b>\n"
-                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n\n"
-                                   "\t<b>Nearest integer: </b>\n"
-                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n\n"
-                                   "\t\t%s\n", cif_occ[0], cif_occ[1], cif_occ[2], cif_sites[cif_use_symmetry_positions]);
+    gchar * str = g_strdup_printf (_("\t<b>Lowest integer: </b>\n"
+                                     "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.76⌋ = 8\n\n"
+                                     "\t<b>Highest integer: </b>\n"
+                                     "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n\n"
+                                     "\t<b>Nearest integer: </b>\n"
+                                     "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n\n"
+                                     "\t\t%s\n"), _(cif_occ[0]), _(cif_occ[1]), _(cif_occ[2]), _(cif_sites[cif_use_symmetry_positions]));
     answer_info = markup_label (str, 450, -1, 0.5, 0.5);
     g_free (str);
   }
   if (id == 6)
   {
-    answer_info = markup_label (npt_info[0], -1, -1, 0.5, 0.5);
+    answer_info = markup_label (_(npt_info[0]), -1, -1, 0.5, 0.5);
     g_signal_connect(G_OBJECT(answer), "changed", G_CALLBACK(on_answer_changed), NULL);
   }
   if (id > 2 && id < 7) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, answer_info, FALSE, FALSE, 5);
@@ -773,7 +774,7 @@ gchar * cask (char * question,  char * lab, int id, char * old, GtkWidget * win)
   GtkWidget * hboxa;
   GtkWidget * quest;
   res_char = NULL;
-  cask = message_dialogmodal (question, "Parameter required", GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
+  cask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_OK, win);
   dialog_ask = dialog_get_content_area (cask);
   gtk_box_set_spacing (GTK_BOX(dialog_ask), 15);
 
@@ -1084,11 +1085,11 @@ gchar * env_name (project * this_proj, int g, int s, int f, GtkTextBuffer * buff
   }
   else
   {
-    strb = g_strdup_printf ("%s - isolated", spec);
+    strb = g_strdup_printf (_("%s - isolated"), spec);
     if (buffer != NULL)
     {
       print_info (spec, textcolor(s), buffer);
-      print_info (" - isolated", "bold", buffer);
+      print_info (_(" - isolated"), "bold", buffer);
     }
   }
   if (buffer != NULL)

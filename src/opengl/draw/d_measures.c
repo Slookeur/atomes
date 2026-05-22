@@ -93,7 +93,7 @@ void draw_angle_label (atom * at, atom * bt, atom * ct, int pi)
   gchar * str;
   if (real_theta.pbc)
   {
-    str = g_strdup_printf("%.1lf° (PBC)", real_theta.angle);
+    str = g_strdup_printf("%.1lf° (%s)", real_theta.angle, _("PBC"));
   }
   else
   {
@@ -450,7 +450,7 @@ void draw_bond_label (atom * at, atom * bt, int pi)
   gchar * str;
   if (dist.pbc)
   {
-    str = g_strdup_printf("%.3lf Å (PBC)", dist.length);
+    str = g_strdup_printf("%.3lf Å (%s)", dist.length, _("PBC"));
   }
   else
   {

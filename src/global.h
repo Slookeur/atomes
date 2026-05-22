@@ -42,12 +42,15 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 #define GLOBAL_H_
 
-#include <glib.h>
-#include <glib/gi18n.h>
+#define i18n(String) String
+
+#include <libintl.h>
 #include <locale.h>
 #ifdef OSX
 #include <xlocale.h>
 #endif
+#include <glib.h>
+#include <glib/gi18n.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -352,6 +355,7 @@ enum ImageFormats {
 #ifdef G_OS_WIN32
 extern gchar * PACKAGE_PREFIX;
 extern gchar * PACKAGE_LIBEXEC;
+extern gchar * PACKAGE_LOCALE;
 #endif
 extern gchar * PACKAGE_LIB_DIR;
 extern gchar * PACKAGE_IMP;

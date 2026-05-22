@@ -33,7 +33,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   gchar * cp2kbool (double opt);
 
   void print_cp2k_var (gchar * var, GtkTextBuffer * buffer);
-  void print_var_section (int num, gchar ** section, GtkTextBuffer * buffer);
+  void print_var_section (int num, gchar ** section, int i18p, int * i18pos, GtkTextBuffer * buffer);
   void print_thermostat_cp2k (int n_thermo, GtkTextBuffer * buffer);
   void print_motion_cp2k (int m, GtkTextBuffer * buffer);
   void print_coord_cp2k (GtkTextBuffer * buffer);
@@ -120,7 +120,7 @@ gchar * cp2krestart[7] = {"@IF ( ","USE_RESTART"," == TRUE )\n"
                           "  &END EXT_RESTART\n"
                           "@ENDIF\n"};
 
-gchar * cp2kfev[8][17] = {{"!\n"
+gchar * cp2kfev[8][17] = {{i18n("!\n"
                            "! Always a FORCE_EVAL section that describes\n"
                            "! the method to compute energy and forces\n"
                            "!\n"
@@ -128,57 +128,57 @@ gchar * cp2kfev[8][17] = {{"!\n"
                            "  METHOD QUICKSTEP\n"
                            "  &DFT\n"
                            "! First specify files that will be used thereafter \n"
-                           "    BASIS_SET_FILE_NAME ",
+                           "    BASIS_SET_FILE_NAME "),
                            "BASIS_FILE",
                            "\n    POTENTIAL_FILE_NAME ", "PSEUDO_FILE",
                            "\n@IF ( ","USE_RESTART"," == TRUE )\n"
                            "    WFN_RESTART_FILE_NAME ","WAVE_FILE",
                            "\n@ENDIF\n"
                            "    CHARGE ","CHARGE",
-                           "\n! Going to the Multi-grids section\n"
+                           i18n("\n! Going to the Multi-grids section\n"
                            "    &MGRID\n"
-                           "      CUTOFF ",
+                           "      CUTOFF "),
                            "CUTOFF",
-                           "                      ! => Cutoff of the finest grid level\n"
-                           "      NGRIDS ",
+                           i18n("                      ! => Cutoff of the finest grid level\n"
+                           "      NGRIDS "),
                            "GRIDS",
-                           "                       ! => Number of multigrids to use, default = 4\n"
+                           i18n("                       ! => Number of multigrids to use, default = 4\n"
                            "    &END MGRID\n"
                            "! Going to the Quickstep Setup section\n"
                            "    &QS\n"
-                           "      METHOD ",
+                           "      METHOD "),
                            "QS_METHOD",
-                           "\n      EPS_DEFAULT 1.0E-12                   ! => Default value is 1.0E-10\n"
-                           "      MAP_CONSISTENT TRUE                   ! => This is the default value\n"},
-                          {"      EXTRAPOLATION_ORDER 3                 ! => This is the default value\n"
-                           "    &END QS\n"},
-                          {"! Going to the Self Consistent Field section\n"
+                           i18n("\n      EPS_DEFAULT 1.0E-12                   ! => Default value is 1.0E-10\n"
+                           "      MAP_CONSISTENT TRUE                   ! => This is the default value\n")},
+                          {i18n("      EXTRAPOLATION_ORDER 3                 ! => This is the default value\n"
+                           "    &END QS\n")},
+                          {i18n("! Going to the Self Consistent Field section\n"
                            "    &SCF\n"
                            "! Maximum number of cycle\n"
-                           "      SCF_GUESS ",
+                           "      SCF_GUESS "),
                            "SCF_GUESS",
-                           "                ! => Initial guess for the wave-function\n"
-                           "      MAX_SCF ","SCF_NCYCLES",
-                           "                ! => Maximum number of SCF cycles\n"
-                           "      EPS_SCF ","SCF_NCONV",
-                           "                  ! => Threshold for the SCF convergence\n"
+                           i18n("                ! => Initial guess for the wave-function\n"
+                           "      MAX_SCF "),"SCF_NCYCLES",
+                           i18n("                ! => Maximum number of SCF cycles\n"
+                           "      EPS_SCF "),"SCF_NCONV",
+                           i18n("                  ! => Threshold for the SCF convergence\n"
                            "! If after the ${SCF_NCYCLES} first SCF steps no convergence has been reached\n"
                            "! more SCF cycles can be done updating the preconditioner. \n"
                            "! Detail information is then presented in the 'Outer' SCF section\n"
                            "      &OUTER_SCF\n"
-                           "        MAX_SCF ",
+                           "        MAX_SCF "),
                            "SCF_OCYCLES",
-                           "              ! => We update the preconditioner and start a new SCF cycle\n"
+                           i18n("              ! => We update the preconditioner and start a new SCF cycle\n"
                            "                                            !    up to ${SCF_NCYCLES} x ${SCF_OCYCLES} can be computed\n"
-                           "        EPS_SCF ",
+                           "        EPS_SCF "),
                            "SCF_OCONV",
-                           "                ! => Convergence threshold for the extra cycles\n"
+                           i18n("                ! => Convergence threshold for the extra cycles\n"
                            "      &END OUTER_SCF\n\n"
                            "! Going to the Orbital Transformation section\n"
                            "      &OT ON\n"
-                           "        MINIMIZER ",
+                           "        MINIMIZER "),
                            "OT_MINI",
-                           "\n        PRECONDITIONER FULL_ALL             ! => Preconditioner for the minimization scheme,\n"
+                           i18n("\n        PRECONDITIONER FULL_ALL             ! => Preconditioner for the minimization scheme,\n"
                            "                                            !    FULL_ALL is the most effective state selective\n"
                            "                                            !    preconditioner and is based on diagonalization\n"
                            "        ENERGY_GAP 0.001                    ! => Underestimated value of the Gap (HOMO-LUMO) in a.u.\n"
@@ -189,30 +189,30 @@ gchar * cp2kfev[8][17] = {{"!\n"
                            "        &RESTART\n"
                            "          LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n"
                            "          &EACH\n"
-                           "            QS_SCF 0                        ! => Never write restart file(s) during the SCF cycle\n"},
+                           "            QS_SCF 0                        ! => Never write restart file(s) during the SCF cycle\n")},
                           {"          &END EACH\n"
                            "          ADD_LAST NUMERIC\n"
                            "        &END RESTART\n"},
-                          {"      &END PRINT\n\n"
+                          {i18n("      &END PRINT\n\n"
                            "    &END SCF\n"
                            "! Going to the exchange-correlation section\n"
                            "    &XC\n"
-                           "      &XC_FUNCTIONAL ",
+                           "      &XC_FUNCTIONAL "),
                            "FUNCTIONAL",
                            "\n      &END XC_FUNCTIONAL\n"},
                           {"    &END XC\n"},
-                          {"! Spin polarized calculation\n"
-                           "    UKS ",
+                          {i18n("! Spin polarized calculation\n"
+                           "    UKS "),
                            "SPIN_POLARIZED",
                            "\n    MULTIPLICITY ", "SPIN_MULTIPLICITY"},
                           {"  &END DFT\n"}};
 
-gchar * qs_extrapo[2]={"      EXTRAPOLATION ASPC                    ! => ASPC recommended for MD, PS otherwise\n",
-                       "      EXTRAPOLATION PS                      ! => ASPC recommended for MD, PS otherwise\n"};
+gchar * qs_extrapo[2]={i18n("      EXTRAPOLATION ASPC                    ! => ASPC recommended for MD, PS otherwise\n"),
+                       i18n("      EXTRAPOLATION PS                      ! => ASPC recommended for MD, PS otherwise\n")};
 
-gchar * scf_wrestart[3][3]={{"JUST_ENERGY ","OUT_STEPS","        ! => Write restart file every ${OUT_STEPS} SCF steps\n"},
-                            {"GEO_OPT ","OUT_STEPS","            ! => Write restart file every ${OUT_STEPS} GEO_OPT steps\n"},
-                            {"MD ","OUT_STEPS","                 ! => Write restart file every ${OUT_STEPS} MD steps\n"}};
+gchar * scf_wrestart[3][3]={{"JUST_ENERGY ","OUT_STEPS",i18n("        ! => Write restart file every ${OUT_STEPS} SCF steps\n")},
+                            {"GEO_OPT ","OUT_STEPS",i18n("            ! => Write restart file every ${OUT_STEPS} GEO_OPT steps\n")},
+                            {"MD ","OUT_STEPS",i18n("                 ! => Write restart file every ${OUT_STEPS} MD steps\n")}};
 
 gchar * cp2kincludes[3] = {"forces.inc", "system.inc", "motion.inc"};
 
@@ -308,22 +308,22 @@ gchar * cp2kmotion[4][15] = {{"&MOTION\n\n"
                             "  &END PRINT\n"},
                            {"\n&END MOTION"}};
 
-gchar * cp2ksyst[3][3] = {{"!\n"
+gchar * cp2ksyst[3][3] = {{i18n("!\n"
                            "! Always a SUBSYS section that describes\n"
                            "! the chemistry and the periodicity of the system\n"
                            "!\n"
                            "&SUBSYS\n"
                            "  &CELL\n"
-                           "    PERIODIC ",
+                           "    PERIODIC "),
                            "PBC","\n"},
                           {"\n  &END CELL\n"
                            "  &COORD","\n  &END COORD\n"
                           },
-                          {"\n  &END CELL\n"
+                          {i18n("\n  &END CELL\n"
                            "  &TOPOLOGY\n"
                            "! Using an XYZ file, coordinates are always Cartesian and in angstrom\n"
                            "    COORDINATE XYZ\n"
-                           "    COORD_FILE_NAME ",
+                           "    COORD_FILE_NAME "),
                            "COORD_FILE",
                            "\n  &END TOPOLOGY\n"}};
 
@@ -342,9 +342,9 @@ gchar * cp2ksroks[3] = {"@SET ROKS                           ",
                         "@SET ROKS_SPIN_CONFIG               "};
 
 gchar * cp2kroks[7] = {"    ROKS ","ROKS",
-                       "                            ! => Restricted Open Kohn-Sham calculation\n"
+                       i18n("                            ! => Restricted Open Kohn-Sham calculation\n"
                        "    &LOW_SPIN_ROKS\n"
-                       "      ENERGY_SCALING ",
+                       "      ENERGY_SCALING "),
                        "ROKS_SCALING",
                        "\n      SPIN_CONFIGURATION ", "ROKS_SPIN_CONFIG",
                        "\n    &END LOW_SPIN_ROKS\n"};
@@ -401,17 +401,19 @@ void print_cp2k_var (gchar * var, GtkTextBuffer * buffer)
 }
 
 /*!
-  \fn void print_var_section (int num, gchar ** section, GtkTextBuffer * buffer)
+  \fn void print_var_section (int num, gchar ** section, int i18p, int * i18pos, GtkTextBuffer * buffer)
 
   \brief print CP2K input file variable section
 
   \param num the number of element(s) to print
   \param section the section text
+  \param i18p the number of parts to translate
+  \param i18pos the parts to translate
   \param buffer the GtkTextBuffer to print into
 */
-void print_var_section (int num, gchar ** section, GtkTextBuffer * buffer)
+void print_var_section (int num, gchar ** section,  int i18p, int * i18pos, GtkTextBuffer * buffer)
 {
-  int i;
+  int i, j;
   for (i=0; i<num; i++)
   {
     if (i%2)
@@ -420,7 +422,23 @@ void print_var_section (int num, gchar ** section, GtkTextBuffer * buffer)
     }
     else
     {
-      print_info (section[i], NULL, buffer);
+      if (i18pos)
+      {
+        gboolean do_translate = FALSE;
+        for (j=0; j<i18p; j++) 
+        {
+          if (i == i18pos[j])
+          {
+            do_translate = TRUE;
+            break;
+          }
+        }
+        print_info ((do_translate) ? _(section[i]) : section[i], NULL, buffer);
+      }
+      else
+      {
+        print_info (section[i], NULL, buffer);
+      }
     }
   }
 }
@@ -463,7 +481,7 @@ void print_thermostat_cp2k (int n_thermo, GtkTextBuffer * buffer)
   {
     if (n_thermo > 1)
     {
-      str = g_strdup_printf ("\n! Thermostat N°%d", i+1);
+      str = g_strdup_printf (_("\n! Thermostat N°%d"), i+1);
       print_info (str, NULL, buffer);
       g_free (str);
     }
@@ -539,19 +557,19 @@ void print_thermostat_cp2k (int n_thermo, GtkTextBuffer * buffer)
 */
 void print_motion_cp2k (int m, GtkTextBuffer * buffer)
 {
-  gchar * intro = "!\n"
-                  "! Always a MOTION section that describes\n"
-                  "! how to move the atoms\n"
-                  "!\n";
+  gchar * intro = _("!\n"
+                    "! Always a MOTION section that describes\n"
+                    "! how to move the atoms\n"
+                    "!\n");
   print_info (intro, NULL, buffer);
-  print_var_section ((m==0) ? 11 : 8, cp2kmotion[m], buffer);
+  print_var_section ((m==0) ? 11 : 8, cp2kmotion[m], 0, NULL, buffer);
   if (m)
   {
     if ((int)tmp_cp2k -> opts[CP2ENS] != 2 && (int)tmp_cp2k -> opts[CP2ENS] != 3)
     {
       if (tmp_cp2k -> ions_thermostat -> type) print_thermostat_cp2k (tmp_cp2k -> thermostats, buffer);
     }
-    print_var_section (15, cp2kmotion[m+1], buffer);
+    print_var_section (15, cp2kmotion[m+1], 0, NULL, buffer);
   }
 
   if ((int)tmp_cp2k -> opts[CP2CON])
@@ -631,7 +649,7 @@ void print_coord_cp2k (GtkTextBuffer * buffer)
   gchar * str;
   if (tmp_cp2k -> input_type)
   {
-    gchar * str = g_strdup_printf ("\t%d\n# This file was prepared using %s", qm_proj -> natomes, PACKAGE);
+    gchar * str = g_strdup_printf (_("\t%d\n# This file was prepared using %s"), qm_proj -> natomes, PACKAGE);
     print_info (str, NULL, buffer);
     g_free (str);
   }
@@ -671,9 +689,10 @@ void print_coord_cp2k (GtkTextBuffer * buffer)
 */
 void print_subsys_cp2k (GtkTextBuffer * buffer)
 {
-  print_var_section (3, cp2ksyst[0], buffer);
+  int totrans[] = {0};
+  print_var_section (3, cp2ksyst[0], 1, totrans, buffer);
   int i = ((int)tmp_cp2k -> opts[CP2LAT]) ? 19 : 14;
-  print_var_section (i, cp2klat[(int)tmp_cp2k -> opts[CP2LAT]], buffer);
+  print_var_section (i, cp2klat[(int)tmp_cp2k -> opts[CP2LAT]], 0, NULL, buffer);
   if (! tmp_cp2k -> input_type)
   {
     print_info (cp2ksyst[1][0], NULL, buffer);
@@ -682,14 +701,14 @@ void print_subsys_cp2k (GtkTextBuffer * buffer)
   }
   else
   {
-    print_var_section (3, cp2ksyst[2], buffer);
+    print_var_section (3, cp2ksyst[2], 1, totrans, buffer);
   }
   gchar * str;
-  print_info ("! What follow is tricky and tests are recommended\n"
-              "! Atomic basis set and pseudo-potential must be provided for all chemical species\n"
-              "! the exact sequences '${BASIS_FOR_*}' '${POTENTIAL_FOR_*}' appear\n"
-              "! inside the files that contain respectively the basis sets and the pseudo-potentials\n"
-              "! in front of the name of the '*' element\n" ,
+  print_info (_("! What follow is tricky and tests are recommended\n"
+                "! Atomic basis set and pseudo-potential must be provided for all chemical species\n"
+                "! the exact sequences '${BASIS_FOR_*}' '${POTENTIAL_FOR_*}' appear\n"
+                "! inside the files that contain respectively the basis sets and the pseudo-potentials\n"
+                "! in front of the name of the '*' element\n") ,
               NULL, buffer);
   for (i=0; i<qm_proj -> nspec; i++)
   {
@@ -722,11 +741,11 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
   int i, j, k, l;
   gchar * str;
   gboolean append;
-  gchar * fileinfo[5] = {"! This file contains the restart information:",
-                         "! This file contains the basis set(s):",
-                         "! This file contains the pseudo-potential(s):",
-                         "! This file contains the wave-function:",
-                         "! This file contains the atomic coordinates in XYZ format:"};
+  gchar * fileinfo[5] = {i18n("! This file contains the restart information:"),
+                         i18n("! This file contains the basis set(s):"),
+                         i18n("! This file contains the pseudo-potential(s):"),
+                         i18n("! This file contains the wave-function:"),
+                         i18n("! This file contains the atomic coordinates in XYZ format:")};
   l = 0;
   for (i=0; i<41; i++)
   {
@@ -824,7 +843,7 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
       print_info ("\n", NULL, buffer);
       for (j=0; j<4; j++)
       {
-        print_info (fileinfo[j], "bold_red", buffer);
+        print_info (_(fileinfo[j]), "bold_red", buffer);
         print_info ("\n", NULL, buffer);
         print_info (globopts[5+j], NULL, buffer);
         if (tmp_cp2k -> files[j] != NULL)
@@ -834,7 +853,7 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
         else
         {
           print_info ("None", "blue", buffer);
-          if ((tmp_cp2k -> opts[i] == 1.0 && (j==0 || j==3)) || (j==1 || j==2)) print_info ("\t\t! A file is required !", "bold_red", buffer);
+          if ((tmp_cp2k -> opts[i] == 1.0 && (j==0 || j==3)) || (j==1 || j==2)) print_info (_("\t\t! A file is required !"), "bold_red", buffer);
         }
         print_info ("\n", NULL, buffer);
       }
@@ -945,7 +964,7 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
       }
       if (tmp_cp2k -> input_type)
       {
-        print_info (fileinfo[4], "bold_red", buffer);
+        print_info (_(fileinfo[4]), "bold_red", buffer);
         print_info ("\n", NULL, buffer);
         print_info (globopts[37], NULL, buffer);
         print_info ("coord.inc", "blue", buffer);
@@ -964,7 +983,7 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
         else
         {
           print_info ("None", "blue", buffer);
-          print_info ("\t\t! A keyword is required !", "bold_red", buffer);
+          print_info (_("\t\t! A keyword is required !"), "bold_red", buffer);
         }
         print_info ("\n", NULL, buffer);
         str = g_strdup_printf ("@SET POTENTIAL_FOR_%s               ", exact_name(qm_proj -> chemistry -> label[j]));
@@ -978,7 +997,7 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
         else
         {
           print_info ("None", "blue", buffer);
-          print_info ("\t\t! A keyword is required !", "bold_red", buffer);
+          print_info (_("\t\t! A keyword is required !"), "bold_red", buffer);
         }
         print_info ("\n", NULL, buffer);
       }
@@ -997,13 +1016,13 @@ void print_variables_cp2k (GtkTextBuffer * buffer)
 void print_global_cp2k (GtkTextBuffer * buffer)
 {
   print_variables_cp2k (buffer);
-  print_var_section (9, cp2kglobal, buffer);
+  print_var_section (9, cp2kglobal, 0, NULL, buffer);
 
   if (tmp_cp2k -> input_type)
   {
     print_info ("\n", NULL, buffer);
     print_info ("!\n", NULL, buffer);
-    print_info ("! The mandatory FORCE_EVAL section include file\n", NULL, buffer);
+    print_info (_("! The mandatory FORCE_EVAL section include file\n"), NULL, buffer);
     print_info ("!\n", NULL, buffer);
     print_info ("@INCLUDE '", "bold", buffer);
     print_info (cp2kincludes[0], "red", buffer);
@@ -1012,7 +1031,7 @@ void print_global_cp2k (GtkTextBuffer * buffer)
     if (tmp_cp2k -> opts[CP2RUN] > 1.0 && tmp_cp2k -> opts[CP2RUN] < 4.0)
     {
       print_info ("!\n", NULL, buffer);
-      print_info ("! The mandatory MOTION section include file\n", NULL, buffer);
+      print_info (_("! The mandatory MOTION section include file\n"), NULL, buffer);
       print_info ("!\n", NULL, buffer);
       print_info ("@INCLUDE '", "bold", buffer);
       print_info (cp2kincludes[2], "red", buffer);
@@ -1044,19 +1063,20 @@ void print_cp2k_print (gchar * spaces, gchar * info, int i, int j, GtkTextBuffer
   print_info (info, NULL, buffer);
   print_info ("\n", NULL, buffer);
   print_info (spaces, NULL, buffer);
-  print_info ("  LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n", NULL, buffer);
+  print_info (_("  LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n"), NULL, buffer);
   print_info (spaces, NULL, buffer);
   print_info ("  &EACH\n", NULL, buffer);
   print_info (spaces, NULL, buffer);
   print_info ("    ", NULL, buffer);
-  print_var_section (3, scf_wrestart[i], buffer);
+  int totrans[] = {2};
+  print_var_section (3, scf_wrestart[i], 1, totrans, buffer);
   print_info (spaces, NULL, buffer);
   print_info ("  &END EACH\n", NULL, buffer);
   print_info (spaces, NULL, buffer);
   print_info ("  ADD_LAST NUMERIC\n", NULL, buffer);
   if (j)
   {
-    print_var_section (7, cp2kmocubes, buffer);
+    print_var_section (7, cp2kmocubes, 0, NULL, buffer);
   }
   print_info (spaces, NULL, buffer);
   print_info ("&END ", NULL, buffer);
@@ -1079,40 +1099,67 @@ void print_cp2k (int f, GtkTextBuffer * buffer)
   {
     case 0:
       print_global_cp2k (buffer);
-      if (tmp_cp2k -> input_type && (int)tmp_cp2k -> opts[CP2RES]) print_var_section (7, cp2krestart, buffer);
+      if (tmp_cp2k -> input_type && (int)tmp_cp2k -> opts[CP2RES]) print_var_section (7, cp2krestart, 0, NULL, buffer);
       break;
     case 1:
-      print_var_section (17, cp2kfev[0], buffer);
+      int * totrans = allocint (5);
+      totrans[0] = 0;
+      totrans[1] = 10;
+      totrans[2] = 12;
+      totrans[3] = 14;
+      totrans[4] = 16;
+      print_var_section (17, cp2kfev[0], 5, totrans, buffer);
+      g_free (totrans);
       i = ((int)tmp_cp2k -> opts[CP2RUN] == 3) ? 0 : 1;
-      print_info (qs_extrapo[i], NULL, buffer);
-      print_var_section (1, cp2kfev[1], buffer);
-
+      print_info (_(qs_extrapo[i]), NULL, buffer);
+      g_free (totrans);
+      totrans = allocint (1);
+      totrans[0] = 0;
+      print_var_section (1, cp2kfev[1], 1, totrans, buffer);
       i = ((int)tmp_cp2k -> opts[CP2RUN] == 2 || (int)tmp_cp2k -> opts[CP2RUN] == 3) ? (int)tmp_cp2k -> opts[CP2RUN] - 1 : 0;
-      if ((int)tmp_cp2k -> opts[CP2ROK]) print_var_section (7, cp2kroks, buffer);
+      if ((int)tmp_cp2k -> opts[CP2ROK])
+      {
+        totrans[0] = 1;
+        print_var_section (7, cp2kroks, 1, totrans, buffer);
+      }
+      g_free (totrans);
       if ((int)tmp_cp2k -> opts[CP2POR])
       {
         print_info ("    &PRINT\n", NULL, buffer);
         print_cp2k_print ("      ", "MO_CUBES", i, 1, buffer);
         print_info ("    &END PRINT\n", NULL, buffer);
       }
-
-      print_var_section (13, cp2kfev[2], buffer);
+      totrans = allocint (7);
+      totrans[0] = 0;
+      totrans[1] = 2;
+      totrans[2] = 3;
+      totrans[3] = 4;
+      totrans[4] = 6;
+      totrans[5] = 8;
+      totrans[6] = 10;
+      print_var_section (13, cp2kfev[2], 7, totrans, buffer);
+      g_free (totrans);
       print_info ("            ", NULL, buffer);
-      print_var_section (3, scf_wrestart[i], buffer);
-      print_var_section (1, cp2kfev[3], buffer);
+      totrans = allocint (1);
+      totrans[0] = 2;
+      print_var_section (3, scf_wrestart[i], 1, totrans, buffer);
+      g_free (totrans);
+      print_var_section (1, cp2kfev[3], 0, NULL, buffer);
       if ((int)tmp_cp2k -> opts[CP2PMU]) print_cp2k_print ("        ", "MULLIKEN", i, 0, buffer);
       if ((int)tmp_cp2k -> opts[CP2PLO]) print_cp2k_print ("        ", "LOWDIN", i, 0, buffer);
-      print_var_section (3, cp2kfev[4], buffer);
+      totrans[0] = 0;
+      print_var_section (3, cp2kfev[4], 1, totrans, buffer);
+      g_free (totrans);
       if ((int)tmp_cp2k -> opts[CP2VDW])
       {
-        print_var_section (3, cp2kvdw[0], buffer);
-        print_var_section ((int)tmp_cp2k -> extra_opts[0][0]*2+5, cp2kvdw[(int)tmp_cp2k -> extra_opts[0][0]+1], buffer);
-        print_var_section (1, cp2kvdw[3], buffer);
+        print_var_section (3, cp2kvdw[0], 0, NULL, buffer);
+        print_var_section ((int)tmp_cp2k -> extra_opts[0][0]*2+5, cp2kvdw[(int)tmp_cp2k -> extra_opts[0][0]+1], 0, NULL, buffer);
+        print_var_section (1, cp2kvdw[3], 0, NULL, buffer);
       }
       print_info (cp2kfev[5][0], NULL, buffer);
       if ((int)tmp_cp2k -> opts[CP2SPI])
       {
-        print_var_section (4, cp2kfev[6], buffer);
+        print_var_section (4, cp2kfev[6], 1, totrans, buffer);
         print_info ("\n", NULL, buffer);
       }
       print_info (cp2kfev[7][0], NULL, buffer);
@@ -1130,7 +1177,7 @@ void print_cp2k (int f, GtkTextBuffer * buffer)
       {
         print_info ("\n", NULL, buffer);
         print_info ("!\n", NULL, buffer);
-        print_info ("! The mandatory SUBSYS section include file\n", NULL, buffer);
+        print_info (_("! The mandatory SUBSYS section include file\n"), NULL, buffer);
         print_info ("!\n", NULL, buffer);
         print_info ("@INCLUDE '", "bold", buffer);
         print_info (cp2kincludes[1], "red", buffer);
@@ -1147,7 +1194,7 @@ void print_cp2k (int f, GtkTextBuffer * buffer)
         if ((int)tmp_cp2k -> opts[CP2RUN] != 2 && (int)tmp_cp2k -> opts[CP2RUN] != 3 && (int)tmp_cp2k -> opts[CP2RES])
         {
           print_info ("\n", NULL, buffer);
-          print_var_section (7, cp2krestart, buffer);
+          print_var_section (7, cp2krestart, 0, NULL, buffer);
         }
       }
       break;
@@ -1171,7 +1218,7 @@ void print_cp2k (int f, GtkTextBuffer * buffer)
         {
           print_motion_cp2k ((int)tmp_cp2k -> opts[CP2RUN]- 2, buffer);
         }
-        if (! tmp_cp2k -> input_type && (int)tmp_cp2k -> opts[CP2RES]) print_var_section (7, cp2krestart, buffer);
+        if (! tmp_cp2k -> input_type && (int)tmp_cp2k -> opts[CP2RES]) print_var_section (7, cp2krestart, 0, NULL, buffer);
       }
       break;
   }

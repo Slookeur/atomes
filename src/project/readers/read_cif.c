@@ -359,13 +359,13 @@ gboolean get_missing_object_from_user ()
 {
   cif_search = allocate_atom_search (activep, REPLACE, 0, this_reader -> object_to_insert);
   cif_object = NULL;
-  GtkWidget * info = dialogmodal ("Error while reading CIF file", GTK_WINDOW(MainWindow));
+  GtkWidget * info = dialogmodal (_("Error while reading CIF file"), GTK_WINDOW(MainWindow));
   GtkWidget * vbox, * hbox;
   gchar * str;
   vbox = dialog_get_content_area (info);
-  gchar * labpick = "<b>To continue and build the crystal according to the information of the CIF file\n"
-                    "it is required to provide a suitable value for each and every missing parameter(s).</b>"
-                    "\n\nPlease select an atom type for the following object(s):";
+  gchar * labpick = _("<b>To continue and build the crystal according to the information of the CIF file\n"
+                      "it is required to provide a suitable value for each and every missing parameter(s).</b>"
+                      "\n\nPlease select an atom type for the following object(s):");
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (labpick, 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
   img_cif = g_malloc0(this_reader -> object_to_insert*sizeof*img_cif);
   GtkWidget * but;
@@ -376,7 +376,7 @@ gboolean get_missing_object_from_user ()
   {
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-    str = g_strdup_printf ("Type N°%d:\t<b>%s</b>", i+1, this_reader -> label[i]);
+    str = g_strdup_printf (_("Type N°%d:\t<b>%s</b>"), i+1, this_reader -> label[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 150, -1, 0.0, 0.5), FALSE, FALSE, 20);
     g_free (str);
     img_cif[i] = stock_image (DELETEB);
@@ -393,7 +393,7 @@ gboolean get_missing_object_from_user ()
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, img_cif[i], FALSE, FALSE, 30);
   }
 
-  gchar * endpick = "In case of a molecule: insert an extra type of atom and run a substitution afterwards.";
+  gchar * endpick = _("In case of a molecule: insert an extra type of atom and run a substitution afterwards.");
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (endpick, 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
   run_this_gtk_dialog (info, G_CALLBACK(run_destroy_dialog), NULL);
   g_free (img_cif);
@@ -475,7 +475,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           {
             if (rec_val || all_ligne)
             {
-              str = g_strdup_printf ("Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n", keyw, i+1);
+              str = g_strdup_printf (_("Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"), keyw, i+1);
               add_reader_info (str, 0);
               g_free (str);
               g_free (str_w);
@@ -558,7 +558,7 @@ int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int lend, gchar ** c
           {
             if (rec_val || all_ligne)
             {
-              str = g_strdup_printf ("Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n", keyw, i+1);
+              str = g_strdup_printf (_("Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"), keyw, i+1);
               add_reader_info (str, 0);
               g_free (str);
               g_free (str_w);
@@ -766,9 +766,9 @@ int get_loop_line_for_key (int linec, int conf, gchar * key_a, gchar * key_b)
     {
       if (steps != this_reader -> steps)
       {
-        gchar * str = g_strdup_printf ("<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
-                                       "  -> keyword found= %d times\n"
-                                       "  -> configurations in CIF file= %d !\n", key_a, key_b, steps, this_reader -> steps);
+        gchar * str = g_strdup_printf (_("<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
+                                         "  -> keyword found= %d times\n"
+                                         "  -> configurations in CIF file= %d !\n"), key_a, key_b, steps, this_reader -> steps);
         add_reader_info (str, 0);
         g_free (str);
         g_free (line_numbers);
@@ -816,9 +816,9 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
     {
       if (steps != this_reader -> steps)
       {
-        str = g_strdup_printf ("<b>CIF retrieve value</b>: keyword: %s_%s\n"
-                               "  -> keyword found= %d times\n"
-                               "  -> configurations in CIF file= %d !\n", key_a, key_b, steps, this_reader -> steps);
+        str = g_strdup_printf (_("<b>CIF retrieved value</b>: keyword: %s_%s\n"
+                                 "  -> keyword found= %d times\n"
+                                 "  -> configurations in CIF file= %d !\n"), key_a, key_b, steps, this_reader -> steps);
         add_reader_info (str, 0);
         g_free (str);
         str = NULL;
@@ -853,8 +853,8 @@ gchar * cif_retrieve_value (int linec, int conf, gchar * key_a, gchar * key_b, g
 #ifdef DEBUG
     g_debug ("CIF:: retrieve:: keyword: %s_%s not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, conf, loop_pos[0], loop_pos[1]);
 #endif
-    str = g_strdup_printf ("<b>Key positions</b>: keyword: %s_%s\n"
-                           "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n", key_a, key_b, conf, loop_pos[0], loop_pos[1]);
+    str = g_strdup_printf (_("<b>Key positions</b>: keyword: %s_%s\n"
+                             "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n"), key_a, key_b, conf, loop_pos[0], loop_pos[1]);
     add_reader_info (str, 0);
     g_free (str);
     return NULL;
@@ -1153,7 +1153,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   }
   if (! i)
   {
-    add_reader_info ("<b>Atomic coordinates</b>: impossible to find atomic label(s) ...", 0);
+    add_reader_info (_("<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."), 0);
     return FALSE;
   }
   for (i=0; i<3; i++)
@@ -1165,7 +1165,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     }
     else
     {
-      str = g_strdup_printf ("<b>Atomic coordinates</b>: impossible to find '%s' ...", (this_reader -> cartesian) ? cartkeys[i] : frackeys[i]);
+      str = g_strdup_printf (_("<b>Atomic coordinates</b>: impossible to find '%s' ..."), (this_reader -> cartesian) ? cartkeys[i] : frackeys[i]);
       add_reader_info (str, 1);
       g_free (str);
       this_reader -> cartesian = FALSE;
@@ -1181,11 +1181,11 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
         cid[i+5] -= loop_line;
         if (i == 1 && this_reader -> rounding < 0)
         {
-          this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
+          this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
           if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
           if (! cif_use_symmetry_positions)
           {
-            str = g_strdup_printf ("Occupancy %s\n\t%s\n", cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
+            str = g_strdup_printf (_("Occupancy %s\n\t%s\n"), cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
             add_reader_info (str, 1);
             g_free (str);
           }
@@ -1200,9 +1200,9 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   if (conf && active_project -> steps > 1 && this_reader -> natomes != cif_atoms)
   {
     // Not the same number of atoms between each configuration
-    str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
-                           "  - configuration N°%d\t :: atoms= %d\n"
-                           "  - initialization      \t\t :: atoms= %d\n", conf, this_reader -> natomes, cif_atoms);
+    str = g_strdup_printf (_("<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
+                             "  - configuration N°%d\t :: atoms= %d\n"
+                             "  - initialization      \t\t :: atoms= %d\n"), conf, this_reader -> natomes, cif_atoms);
     add_reader_info (str, 0);
     g_free (str);
     return FALSE;
@@ -1262,9 +1262,9 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     if (this_reader -> nspec != cif_nspec)
     {
       // Not the same number of chemical species between each configuration
-      str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of chemical species changes !\n"
-                             "  - configuration N°%d\t :: species= %d\n"
-                             "  - initialization      \t\t :: species= %d\n", conf, this_reader -> nspec, cif_nspec);
+      str = g_strdup_printf (_("<b>Atomic coordinates</b>: the number of chemical species changes !\n"
+                               "  - configuration N°%d\t :: species= %d\n"
+                               "  - initialization      \t\t :: species= %d\n"), conf, this_reader -> nspec, cif_nspec);
       add_reader_info (str, 0);
       g_free (str);
       return FALSE;
@@ -1274,9 +1274,9 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
       if (tmp_nsps[i] != cif_nsps[i])
       {
         // Not the same number of atom(s) by chemical species between each configuration
-        str = g_strdup_printf ("<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
-                               "  - configuration N°%d\t :: atom(s)= %d\n"
-                               "  - initialization      \t\t :: atom(s)= %d\n", conf, i+1, this_reader -> nsps[i], cif_nsps[i]);
+        str = g_strdup_printf (_("<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
+                                 "  - configuration N°%d\t :: atom(s)= %d\n"
+                                 "  - initialization      \t\t :: atom(s)= %d\n"), conf, i+1, this_reader -> nsps[i], cif_nsps[i]);
         add_reader_info (str, 0);
         g_free (str);
         return FALSE;
@@ -1301,7 +1301,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
             v += this_reader -> occupancy[j];
             if (v > 1.00001)
             {
-              add_reader_info ("<b>Atomic coordinates</b>: a site was found to have an occupancy > 1.0 !\n", 0);
+              add_reader_info (_("<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"), 0);
               return FALSE;
             }
           }
@@ -1365,7 +1365,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     if (this_reader -> natomes%occupancies == 0 || this_reader -> natomes%disorders == 0)
     {
       // Atoms can be separated based on site occupancy or site disorder
-      // We can consider this as a chemical "reaction or trajectory"
+      // We can consider this as a chemical reaction or trajectory
       // As many lattices near by as occupancies or disorders
       new_occ = TRUE;
       for (i=0; i<occupancies; i++)
@@ -1376,7 +1376,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
           break;
         }
      }
-      // if (new_occ) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n", 1);
+      // if (new_occ) add_reader_info (_("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n"), 1);
       // g_debug ("min= %f, max= %f, max/min= %f", u, v, v/u);
       new_order = TRUE;
       for (i=0; i<disorders; i++)
@@ -1387,7 +1387,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
           break;
         }
       }
-      // if (new_order) add_reader_info ("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n", 1);
+      // if (new_order) add_reader_info (_("CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"), 1);
     }
   }
   return TRUE;
@@ -1654,8 +1654,8 @@ int get_setting_from_hm (gchar * hmk, int end)
           if (g_strcmp0(str, hmk) == 0)
           {
             g_free (str);
-            str = g_strdup_printf ("<b>Space group</b>: CIF file information could be inaccurate !\n"
-                                   " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n",
+            str = g_strdup_printf (_("<b>Space group</b>: CIF file information could be inaccurate !\n"
+                                     " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"),
                                    groups[this_reader -> lattice.sp_group -> id-1], hmk);
             add_reader_info (str, 1);
             g_free (str);
@@ -1667,8 +1667,8 @@ int get_setting_from_hm (gchar * hmk, int end)
           if (g_strcmp0(str, hmk) == 0 && this_reader -> lattice.sp_group -> settings[j].origin == end+1)
           {
             g_free (str);
-            str = g_strdup_printf ("<b>Space group</b>: CIF file information could be inaccurate !\n"
-                                   " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n",
+            str = g_strdup_printf (_("<b>Space group</b>: CIF file information could be inaccurate !\n"
+                                     " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"),
                                    groups[this_reader -> lattice.sp_group -> id-1], hmk);
             add_reader_info (str, 1);
             g_free (str);
@@ -1735,8 +1735,8 @@ int group_info_from_hm_key (int spg, gchar * key_hm)
           if (! j && this_reader -> setting < 0)
           {
             this_reader -> setting = 0;
-            str = g_strdup_printf ("<b>Space group</b>: CIF file information could be inaccurate !\n"
-                                   " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n",
+            str = g_strdup_printf (_("<b>Space group</b>: CIF file information could be inaccurate !\n"
+                                     " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"),
                                    groups[this_reader -> lattice.sp_group -> id-1], key_hm);
             add_reader_info (str, 1);
             g_free (str);
@@ -1759,8 +1759,8 @@ int group_info_from_hm_key (int spg, gchar * key_hm)
   g_free (hmk);
   if (! j && this_reader -> setting < 0)
   {
-    str = g_strdup_printf ("<b>Space group</b>: CIF file information could be inaccurate !\n"
-                           " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n",
+    str = g_strdup_printf (_("<b>Space group</b>: CIF file information could be inaccurate !\n"
+                             " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"),
                            groups[this_reader -> lattice.sp_group -> id-1], key_hm);
     add_reader_info (str, 1);
     g_free (str);
@@ -1793,7 +1793,7 @@ gboolean cif_get_cell_data (int linec, int conf)
     str = cif_retrieve_value (linec, conf, "_cell", cellkeys[j], TRUE, TRUE, TRUE);
     if (! str)
     {
-      str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[0][j]);
+      str = g_strdup_printf (_("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"), box_prop[0][j]);
       add_reader_info (str, 0);
       g_free (str);
       return FALSE;
@@ -1810,7 +1810,7 @@ gboolean cif_get_cell_data (int linec, int conf)
     str = cif_retrieve_value (linec, conf, "_cell", cellangs[j], TRUE, TRUE, TRUE);
     if (! str)
     {
-      str = g_strdup_printf ("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n", box_prop[1][j]);
+      str = g_strdup_printf (_("<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"), box_prop[1][j]);
       add_reader_info (str, 0);
       g_free (str);
       return FALSE;
@@ -1872,7 +1872,7 @@ int cif_get_space_group (int linec, int conf)
   }
   if (! hmkey && ! spg)
   {
-    add_reader_info ("<b>Space group</b>: no space group and no H-M symbol found !\n", 1);
+    add_reader_info (_("<b>Space group</b>: no space group and no H-M symbol found !\n"), 1);
     return FALSE;
   }
 #ifdef DEBUG
@@ -1888,15 +1888,15 @@ int cif_get_space_group (int linec, int conf)
     i = group_info_from_hm_key (spg, hmkey);
     if (! spg && ! i)
     {
-      add_reader_info ("<b>Space group</b>: no space group found, unknown H-M symbol !\n", 1);
+      add_reader_info (_("<b>Space group</b>: no space group found, unknown H-M symbol !\n"), 1);
 #ifdef DEBUG
       g_debug ("CIF:: No space group found, unknown H-M symbol !");
 #endif
     }
     else if (spg && ! i)
     {
-      str = g_strdup_printf ("<b>Space group</b>: space group and H-M symbol do not match !\n"
-                             " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n", groups[spg-1], hmkey);
+      str = g_strdup_printf (_("<b>Space group</b>: space group and H-M symbol do not match !\n"
+                               " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"), groups[spg-1], hmkey);
       add_reader_info (str, 1);
       g_free (str);
 #ifdef DEBUG
@@ -1950,7 +1950,7 @@ int cif_get_space_group (int linec, int conf)
               if (g_strcmp0(lat, str) == 0) l ++;
               if (l == k)
               {
-                if (j < this_reader -> setting) add_reader_info ("<b>Space group</b>: ambiguous space group setting !\n", 1);
+                if (j < this_reader -> setting) add_reader_info (_("<b>Space group</b>: ambiguous space group setting !\n"), 1);
                 this_reader -> setting = j;
                 break;
               }
@@ -1980,14 +1980,14 @@ int cif_get_space_group (int linec, int conf)
               {
                 if (j < this_reader -> setting || this_reader -> lattice.sp_group -> settings[j].origin != k)
                 {
-                  add_reader_info ("<b>Space group</b>: ambiguous space group setting !\n", 1);
+                  add_reader_info (_("<b>Space group</b>: ambiguous space group setting !\n"), 1);
                 }
                 this_reader -> setting = j;
                 l = 1;
                 break;
               }
             }
-            if (! l) add_reader_info ("<b>Space group</b>: ambiguous space group setting !\n", 1);
+            if (! l) add_reader_info (_("<b>Space group</b>: ambiguous space group setting !\n"), 1);
           }
           else if (i < 38)
           {
@@ -1997,7 +1997,7 @@ int cif_get_space_group (int linec, int conf)
               break;
             }
             j = i - 36;
-            if (j < this_reader -> setting) add_reader_info ("<b>Space group</b>: ambiguous space group setting !\n", 1);
+            if (j < this_reader -> setting) add_reader_info (_("<b>Space group</b>: ambiguous space group setting !\n"), 1);
             this_reader -> setting = j;
           }
           else
@@ -2008,7 +2008,7 @@ int cif_get_space_group (int linec, int conf)
               break;
             }
             j = i - 38;
-            if (j < this_reader -> setting) add_reader_info ("<b>Space group</b>: ambiguous space group setting !\n", 1);
+            if (j < this_reader -> setting) add_reader_info (_("<b>Space group</b>: ambiguous space group setting !\n"), 1);
             this_reader -> setting = j;
           }
         }
@@ -2044,11 +2044,11 @@ int cif_get_space_group (int linec, int conf)
       }
       if (correct_this)
       {
-        gchar * setc[2] = {"<b>hexagonal</b>", "<b>rhombohedral</b>"};
-        str = g_strdup_printf ("<b>Space group</b>: found trigonal space group N°%d-%s, %s setting\n"
-                               "but the lattice parameters were found in %s format ...\n"
-                               "\t ... the space group setting was modified accordingly !\n",
-                               spg, groups[spg-1], setc[this_reader -> setting], setc[! this_reader -> setting]);
+        gchar * setc[2] = {i18n("hexagonal"), i18n("rhombohedral")};
+        str = g_strdup_printf (_("<b>Space group</b>: found trigonal space group N°%d-%s, <b>%s</b> setting\n"
+                                 "but the lattice parameters were found in <b>%s</b> format ...\n"
+                                 "\t ... the space group setting was modified accordingly !\n"),
+                               spg, groups[spg-1], _(setc[this_reader -> setting]), _(setc[! this_reader -> setting]));
         add_reader_info (str, 1);
         g_free (str);
         this_reader -> setting = ! this_reader -> setting;
@@ -2059,8 +2059,8 @@ int cif_get_space_group (int linec, int conf)
     this_reader -> lattice.sp_group -> sid = this_reader -> setting;
     if (! test_lattice (NULL, & this_reader -> lattice))
     {
-      str = g_strdup_printf ("<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
-                             "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n");
+      str = g_strdup_printf (_("<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
+                               "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n"));
       add_reader_info (str, 0);
       g_free (str);
       res = -1;
@@ -2092,7 +2092,7 @@ int open_cif_configuration (int linec, int conf)
 #ifdef DEBUG
       g_debug ("CIF:: SP group changes between configuration:: conf= %d, saved_group= %d, new_group= %d", conf, saved_group, i);
 #endif
-      add_reader_info ("Space group changes between configurations !\n", 0);
+      add_reader_info (_("Space group changes between configurations !\n"), 0);
       return 3;
     }
     else if (i > 0)
@@ -2127,12 +2127,12 @@ int open_cif_configuration (int linec, int conf)
   {
     if (! cif_use_symmetry_positions && this_reader -> num_sym_pos)
     {
-      add_reader_info ("Symmetry position(s) in CIF file\n", 1);
+      add_reader_info (_("Symmetry position(s) in CIF file\n"), 1);
     }
   }
   if (cif_use_symmetry_positions && ! this_reader -> num_sym_pos)
   {
-    add_reader_info ("No symmetry position(s) in CIF file\n", 0);
+    add_reader_info (_("No symmetry position(s) in CIF file\n"), 0);
     return 3;
   }
   if (cif_get_atomic_coordinates (linec, conf))
@@ -2163,13 +2163,13 @@ int open_cif_configuration (int linec, int conf)
     res = 0;
     if (cif_use_symmetry_positions)
     {
-      gchar * str = g_strdup_printf ("<b>Building crystal using symmetry positions: </b> \n"
-                                     "  1) evaluate candidate atomic positions using data in CIF file: \n"
-                                     "     - symmetry positions\n"
-                                     "     - atomic coordinates + occupancy\n"
-                                     "  2) fill each candidate position using the associated occupancy: \n"
-                                     "     - occupancy %s\n"
-                                     "     - %s\n", cif_occ[this_reader -> rounding], cif_sites[1]);
+      gchar * str = g_strdup_printf (_("<b>Building crystal using symmetry positions: </b> \n"
+                                       "  1) evaluate candidate atomic positions using data in CIF file: \n"
+                                       "     - symmetry positions\n"
+                                       "     - atomic coordinates + occupancy\n"
+                                       "  2) fill each candidate position using the associated occupancy: \n"
+                                       "     - occupancy %s\n"
+                                       "     - %s\n"), cif_occ[this_reader -> rounding], cif_sites[1]);
       add_reader_info (str, 1);
       g_free (str);
       this_reader -> cartesian = TRUE;
@@ -2511,18 +2511,18 @@ int open_cif_configuration (int linec, int conf)
       g_free (tmp_spid);
       if (low_occ)
       {
-        add_reader_info ("The crystal will be created however some objects might be missing,\n"
-                         "Occupancy is too low compared to the number of site(s) per cell.\n\n"
-                         "<b>To build a crystal matching the defined occupancy</b>:\n"
-                         "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
-                         "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
-                         "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.\n\n", 1);
+        add_reader_info (_("The crystal will be created however some objects might be missing,\n"
+                           "Occupancy is too low compared to the number of site(s) per cell.\n\n"
+                           "<b>To build a crystal matching the defined occupancy</b>:\n"
+                           "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
+                           "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
+                           "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.\n\n"), 1);
       }
       if (dist_message)
       {
-        add_reader_info ("Object(s) at equivalent positions have been removed\n"
-                         "to ensure the consistency of the model\n"
-                         "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n ", 1);
+        add_reader_info (_("Object(s) at equivalent positions have been removed\n"
+                           "to ensure the consistency of the model\n"
+                           "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n "), 1);
       }
     }
   }
@@ -2567,14 +2567,14 @@ int open_cif_file (int linec)
   else
   {
     // How to treat occupancy
-    cif_occup = cif_get_value ("_atom_site", "occupancy", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+    cif_occup = cif_get_value ("_atom_site", _("occupancy"), 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occup)
     {
-      this_reader -> rounding = iask ("Please select how to handle occupancy", "Select how to handle occupancy", 5, MainWindow);
+      this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
       if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
       if (! cif_use_symmetry_positions)
       {
-        str = g_strdup_printf ("Occupancy %s\n\t%s\n", cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
+        str = g_strdup_printf (_("Occupancy %s\n\t%s\n"), cif_occ[this_reader -> rounding], cif_sites[cif_use_symmetry_positions]);
         add_reader_info (str, 1);
         g_free (str);
       }
@@ -2583,12 +2583,12 @@ int open_cif_file (int linec)
 
   if (this_reader -> steps > 1)
   {
-    str = g_strdup_printf ("It seems the CIF file contains <b>%d</b> distinct configurations\n", this_reader -> steps);
+    str = g_strdup_printf (_("It seems the CIF file contains <b>%d</b> distinct configurations\n"), this_reader -> steps);
     add_reader_info (str, 1);
     g_free (str);
     if (cif_use_symmetry_positions)
     {
-      str = g_strdup_printf ("Impossible to use symmetry positions with multiple configurations\n");
+      str = g_strdup_printf (_("Impossible to use symmetry positions with multiple configurations\n"));
       add_reader_info (str, 1);
       g_free (str);
     }
@@ -2599,7 +2599,7 @@ int open_cif_file (int linec)
     cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occup == this_reader -> steps && cif_occup == cif_site)
     {
-      add_reader_info ("This CIF file could be describing a trajectory or a chemical reaction.\n", 1);
+      add_reader_info (_("This CIF file could be describing a trajectory or a chemical reaction.\n"), 1);
       // This is where to ask what to do !
       // Read like a chemical reaction: read one configuration sort coordinates by occupancy
       // Read all as trajectory CIF file: forget about using occupancy to sort coordinates
@@ -2610,12 +2610,12 @@ int open_cif_file (int linec)
       /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
       this_reader -> chemical = ! cif_action;
       cif_action = (cif_action == 1) ? 0 : 1; */
-      cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 4, MainWindow);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
     }
     else
     {
-      add_reader_info ("This CIF file could be describing a trajectory.\n", 1);
-      cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 4, MainWindow);
+      add_reader_info (_("This CIF file could be describing a trajectory.\n"), 1);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
     }
   }
   else
@@ -2626,11 +2626,11 @@ int open_cif_file (int linec)
   if (cif_action && this_reader -> steps > 1)
   {
     // We need to select the step to work on
-    str = g_strdup_printf ("Select the configuration <i>c</i>, <i>c</i> &#x2208; [1- %d]", this_reader -> steps);
+    str = g_strdup_printf (_("Select the configuration <i>c</i>, <i>c</i> &#x2208; [1-%d]"), this_reader -> steps);
     cif_step = 0;
     while (! cif_step)
     {
-      cif_step = iask ("Please select the configuration to work on", str, 0, MainWindow);
+      cif_step = iask (_("Please select the configuration to work on"), str, 0, MainWindow);
       if (cif_step < 1 || cif_step > this_reader -> steps) cif_step = 0;
     }
     g_free (str);
@@ -2640,7 +2640,7 @@ int open_cif_file (int linec)
     active_project -> steps = 1;
     if (this_reader -> steps > 1)
     {
-      str = g_strdup_printf ("Working on configuration N°%d\n", cif_step);
+      str = g_strdup_printf (_("Working on configuration N°%d\n"), cif_step);
       add_reader_info (str, 1);
       g_free (str);
     }

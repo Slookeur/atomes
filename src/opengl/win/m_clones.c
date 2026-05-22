@@ -113,16 +113,16 @@ GtkWidget * menu_clones (glwin * view, int id)
   GtkWidget * menu = gtk_menu_new ();
   if (id == 0)
   {
-    view -> ogl_clones[0] = create_clone_widget ("Show/Hide", view -> anim -> last -> img -> draw_clones, menu, view);
+    view -> ogl_clones[0] = create_clone_widget (_("Show/Hide"), view -> anim -> last -> img -> draw_clones, menu, view);
   }
   else
   {
-    create_clone_widget ("Show/Hide", view -> anim -> last -> img -> draw_clones, menu, view);
+    create_clone_widget (_("Show/Hide"), view -> anim -> last -> img -> draw_clones, menu, view);
   }
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Atom(s)", TRUE, menu_atoms (view, id, 1)));
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Atom(s)"), TRUE, menu_atoms (view, id, 1)));
   if ((id == 0) || (view -> anim -> last -> img -> style != SPHERES && view -> anim -> last -> img -> style != PUNT))
   {
-    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Bond(s)", TRUE, menu_bonds (view, id, 1)));
+    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Bond(s)"), TRUE, menu_bonds (view, id, 1)));
   }
   return menu;
 }
@@ -180,12 +180,12 @@ G_MODULE_EXPORT void show_hide_clones (GSimpleAction * action, GVariant * parame
 GMenu * menu_clones (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Show/Hide", "show-clones", popm, popm, NULL, IMG_NONE, NULL, FALSE,
+  append_opengl_item (view, menu, _("Show/Hide"), "show-clones", popm, popm, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(show_hide_clones), (gpointer)view, TRUE, view -> anim -> last -> img -> draw_clones, FALSE, (view -> allbonds[1]) ? TRUE : FALSE);
-  append_submenu (menu, "Atom(s)", menu_atoms(view, popm, 1));
+  append_submenu (menu, _("Atom(s)"), menu_atoms(view, popm, 1));
   if (view -> anim -> last -> img -> style != SPHERES && view -> anim -> last -> img -> style != PUNT)
   {
-    append_submenu (menu, "Bonds(s)", menu_bonds(view, popm, 1));
+    append_submenu (menu, _("Bonds(s)"), menu_bonds(view, popm, 1));
   }
   return menu;
 }

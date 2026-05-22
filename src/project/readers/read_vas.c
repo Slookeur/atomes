@@ -164,7 +164,7 @@ int vas_get_atom_coordinates (int sli)
     {
       if (active_project -> atoms[i-1][j].sp != active_project -> atoms[i][j].sp)
       {
-        add_reader_info (g_strdup_printf ("Error - chemical species changes between steps %d and %d, for atom %d !", i, i+1, j+1), 0);
+        add_reader_info (g_strdup_printf (_("Error - chemical species changes between steps %d and %d, for atom %d !"), i, i+1, j+1), 0);
         return 2;
       }
     }
@@ -248,9 +248,9 @@ int open_vas_file (int linec)
     if ((linec - i)%(this_reader -> natomes + 1) == 0) j = i;
   }
   if (! j) return 2;
-  reader_info ("xdatcar", "Number of atoms", this_reader -> natomes);
+  reader_info ("xdatcar", _("Number of atoms"), this_reader -> natomes);
   active_project -> steps = (linec-j) / (this_reader -> natomes + 1);
-  reader_info ("xdatcar", "Number of steps", active_project -> steps);
+  reader_info ("xdatcar", _("Number of steps"), active_project -> steps);
   active_project -> natomes = this_reader -> natomes;
   return vas_get_atom_coordinates (j);
 }

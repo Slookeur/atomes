@@ -264,7 +264,7 @@ GtkWidget * poly_show_setup (int * sp, int id, int jd)
   }
   else
   {
-    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, "Show/Hide");
+    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, _("Show/Hide"));
   }
   gtk_menu_item_set_submenu ((GtkMenuItem *)active_glwin -> oglmpv[jd][id][* sp], menup);
   return menup;
@@ -480,10 +480,10 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
 void init_menu_fragmol_ (int * id)
 {
 #ifdef DEBUG
-  gchar * keyw[2] = {"fragment(s)", "molecule(s)"};
+  gchar * keyw[2] = {i18n("fragment(s)"), i18n("molecule(s)")};
   if (active_project -> steps > 1)
   {
-    gchar * str = g_strdup_printf ("Maximum number of %s per MD step: %d", keyw[* id -2], active_coord -> totcoord[* id]);
+    gchar * str = g_strdup_printf (_("Maximum number of %s per MD step: %d"), _(keyw[* id -2]), active_coord -> totcoord[* id]);
     g_debug ("%s", str);
   }
 #endif // DEBUG
@@ -531,11 +531,11 @@ void init_menu_fragmol_ (int * id)
       {
         if (* id == 2)
         {
-          str = g_strdup_printf ("Fragment N°%d", i+1);
+          str = g_strdup_printf (_("Fragment N°%d"), i+1);
         }
         else
         {
-          str = g_strdup_printf ("Molecule N°%d", i+1);
+          str = g_strdup_printf (_("Molecule N°%d"), i+1);
         }
         active_glwin -> ogl_geom[k][* id][i] = create_coord_menu (0, str, TRUE, active_glwin -> oglmv[k][* id][0], & active_glwin -> gcid[* id][i][* id]);
         spm = create_menu_item (TRUE, str);
@@ -642,7 +642,7 @@ void init_menurings_ (int * coo, int * ids, int * ngsp, int coordt[* ngsp], int 
       }
       g_free (str);
     }
-    allt = create_menu_item (TRUE, "All");
+    allt = create_menu_item (TRUE, _("All"));
     g_signal_connect (G_OBJECT (allt), "activate", G_CALLBACK(coord_properties), & active_glwin -> colorp[* coo][1]);
     gtk_menu_shell_append ((GtkMenuShell *)active_glwin -> oglmc[i][* coo][0], allt);
   }

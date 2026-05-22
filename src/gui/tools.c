@@ -130,10 +130,10 @@ void fill_tool_model ()
       gtk_tree_store_append (tool_model, & calc_level, NULL);
       img = GTK_IMAGE(gtk_image_new_from_file(graph_img[i]));
 #ifdef GTK4
-      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, img, 3, graph_name[i], -1);
+      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, img, 3, _(graph_name[i]), -1);
 #else
       GdkPixbuf * pix =  gtk_image_get_pixbuf(img);
-      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, pix, 3, graph_name[i], -1);
+      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, pix, 3, _(graph_name[i]), -1);
 #endif
 
       gtk_image_clear (img);
@@ -299,7 +299,7 @@ GtkWidget * create_tool_tree ()
 {
   GtkTreeViewColumn * tool_col[3];
   GtkCellRenderer * tool_cell[3];
-  gchar * ctitle[3]={"Logo", "Name", "Button"};
+  gchar * ctitle[3]={i18n("Logo"), i18n("Name"), i18n("Button")};
   gchar * ctype[3]={"pixbuf", "text", "active"};
   GType coltype[5]= {G_TYPE_INT, G_TYPE_INT, G_TYPE_OBJECT, G_TYPE_STRING, G_TYPE_BOOLEAN};
   tool_model = gtk_tree_store_newv (5, coltype);
@@ -321,7 +321,7 @@ GtkWidget * create_tool_tree ()
         g_signal_connect (G_OBJECT(tool_cell[i]), "toggled", G_CALLBACK(toggle_show_hide_curve), NULL);
         break;
     }
-    tool_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[i], tool_cell[i], ctype[i], i+2, NULL);
+    tool_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[i]), tool_cell[i], ctype[i], i+2, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(tool_tree), tool_col[i]);
     gtk_tree_view_column_set_alignment (tool_col[i], 0.5);
     // if (i == 1) gtk_tree_view_column_set_attributes (tool_col[i], tool_cell[i], "markup", 3, NULL);
@@ -339,7 +339,7 @@ GtkWidget * create_tool_tree ()
 GtkWidget * create_curve_tool_box ()
 {
   GtkWidget * ctbox;
-  ctbox = create_win ("Toolboxes", MainWindow, FALSE, FALSE);
+  ctbox = create_win (_("Toolboxes"), MainWindow, FALSE, FALSE);
 #ifdef GTK4
   gtk_widget_set_size_request (ctbox, 300, 210);
 #else

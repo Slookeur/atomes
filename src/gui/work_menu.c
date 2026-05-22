@@ -122,39 +122,38 @@ GtkWidget * this_work_menu (int p, int c)
   GtkWidget * menu;
   GtkWidget * port;
   GtkWidget * dmenu;
-  gchar * imp_str[2] = {"Import", "Export"};
   menu = gtk_menu_new ();
   GtkAccelGroup * accel_group = gtk_accel_group_new ();
   gtk_window_add_accel_group (GTK_WINDOW (MainWindow), accel_group);
   if (! atomes_from_libreoffice)
   {
-    widget_set_sensitive (gtk3_menu_item (menu, "Workspace", IMG_FILE, (gpointer)PACKAGE_TD, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE), 0);
+    widget_set_sensitive (gtk3_menu_item (menu, _("Workspace"), IMG_FILE, (gpointer)PACKAGE_TD, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE), 0);
     add_menu_separator (menu);
-    gtk3_menu_item (menu, "Open", IMG_STOCK, (gpointer)FOPEN, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(2), TRUE, GDK_KEY_w, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Save", IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(3), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Save As", IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(3), TRUE, GDK_KEY_s, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Close", IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_workspace), GINT_TO_POINTER(1), TRUE, GDK_KEY_c, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Open"), IMG_STOCK, (gpointer)FOPEN, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(2), TRUE, GDK_KEY_w, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save"), IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(3), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save As"), IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(3), TRUE, GDK_KEY_s, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Close"), IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_workspace), GINT_TO_POINTER(1), TRUE, GDK_KEY_c, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
     add_menu_separator (menu);
   }
   if (p == -1)
   {
-    widget_set_sensitive (gtk3_menu_item (menu, "Project(s)", IMG_FILE, (gpointer)PACKAGE_TD, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE), FALSE);
+    widget_set_sensitive (gtk3_menu_item (menu, _("Project(s)"), IMG_FILE, (gpointer)PACKAGE_TD, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE), FALSE);
     add_menu_separator (menu);
     if (! atomes_from_libreoffice)
     {
-      gtk3_menu_item (menu, "New", IMG_STOCK, (gpointer)FNEW, G_CALLBACK(on_create_new_project), NULL, TRUE, GDK_KEY_n, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
-      gtk3_menu_item (menu, "Open", IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(0), TRUE, GDK_KEY_o, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _("New"), IMG_STOCK, (gpointer)FNEW, G_CALLBACK(on_create_new_project), NULL, TRUE, GDK_KEY_n, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _("Open"), IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(0), TRUE, GDK_KEY_o, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
     }
-    gtk3_menu_item (menu, "Save", IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Save As", IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save"), IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save As"), IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
     if (! atomes_from_libreoffice)
     {
-      gtk3_menu_item (menu, "Close", IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_activate), GINT_TO_POINTER(activep), FALSE, 0, 0, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _("Close"), IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_activate), GINT_TO_POINTER(activep), FALSE, 0, 0, FALSE, FALSE, FALSE);
     }
-    port = gtk3_menu_item (menu, imp_str[1], IMG_FILE, (gpointer)PACKAGE_CON, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    port = gtk3_menu_item (menu, _("Export"), IMG_FILE, (gpointer)PACKAGE_CON, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
     dmenu = gtk_menu_new ();
-    gtk3_menu_item (dmenu, "ISAACS Project File '*.ipf'", IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (dmenu, "Atomic Coordinates", IMG_FILE, (gpointer)PACKAGE_CON, G_CALLBACK(on_coord_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("ISAACS Project File '*.ipf'"), IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("Atomic Coordinates"), IMG_FILE, (gpointer)PACKAGE_CON, G_CALLBACK(on_coord_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
     gtk_menu_item_set_submenu ((GtkMenuItem *)port, dmenu);
   }
   else
@@ -165,38 +164,38 @@ GtkWidget * this_work_menu (int p, int c)
     add_menu_separator (menu);
     if (p != activep)
     {
-      gtk3_menu_item (menu, "Make Active", IMG_STOCK, (gpointer)YES, G_CALLBACK(activate_project), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _("Make Active"), IMG_STOCK, (gpointer)YES, G_CALLBACK(activate_project), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
     }
     if (c > -1)
     {
-      gchar * str = g_strdup_printf ("Analyze: %s", graph_name[c]);
+      gchar * str = g_strdup_printf (_("Analyze: %s"), graph_name[c]);
       widget_set_sensitive (gtk3_menu_item (menu, str, IMG_FILE, (gpointer)graph_img[c], G_CALLBACK(compute_this_prop), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE), get_project_by_id(p) -> analysis[c] -> avail_ok);
       g_free (str);
     }
-    gtk3_menu_item (menu, "Edit Name", IMG_STOCK, (gpointer)EDITA, G_CALLBACK(change_project_name), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Save", IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Save As", IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Edit Name"), IMG_STOCK, (gpointer)EDITA, G_CALLBACK(change_project_name), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save"), IMG_STOCK, (gpointer)FSAVE, G_CALLBACK(on_open_save_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Save As"), IMG_STOCK, (gpointer)FSAVEAS, G_CALLBACK(on_save_as_activate), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
     if (! atomes_from_libreoffice)
     {
-      gtk3_menu_item (menu, "Close", IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_activate), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _("Close"), IMG_STOCK, (gpointer)FCLOSE, G_CALLBACK(on_close_activate), GINT_TO_POINTER(p), FALSE, 0, 0, FALSE, FALSE, FALSE);
     }
-    port = gtk3_menu_item (menu, imp_str[1], IMG_FILE, (gpointer)PACKAGE_CON, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    port = gtk3_menu_item (menu, _("Export"), IMG_FILE, (gpointer)PACKAGE_CON, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
     dmenu = gtk_menu_new ();
-    gtk3_menu_item (dmenu, "ISAACS Project File '*.ipf'", IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (dmenu, "Atomic Coordinates", IMG_FILE, (gpointer)PACKAGE_CON, G_CALLBACK(on_coord_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("ISAACS Project File '*.ipf'"), IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("Atomic Coordinates"), IMG_FILE, (gpointer)PACKAGE_CON, G_CALLBACK(on_coord_port), GINT_TO_POINTER(1), FALSE, 0, 0, FALSE, FALSE, FALSE);
     gtk_menu_item_set_submenu ((GtkMenuItem *)port, dmenu);
   }
   if (! atomes_from_libreoffice)
   {
     add_menu_separator (menu);
-    port = gtk3_menu_item (menu, imp_str[0], IMG_FILE, (gpointer)PACKAGE_IMP, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    port = gtk3_menu_item (menu, _("Import"), IMG_FILE, (gpointer)PACKAGE_IMP, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE);
     dmenu = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)port, dmenu);
-    gtk3_menu_item (dmenu, "ISAACS Project File '*.ipf'", IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(0), FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (dmenu, "Atomic Coordinates", IMG_FILE, (gpointer)PACKAGE_IMP, G_CALLBACK(on_coord_port), GINT_TO_POINTER(0), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("ISAACS Project File '*.ipf'"), IMG_FILE, (gpointer)PACKAGE_MOL, G_CALLBACK(on_isaacs_port), GINT_TO_POINTER(0), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (dmenu, _("Atomic Coordinates"), IMG_FILE, (gpointer)PACKAGE_IMP, G_CALLBACK(on_coord_port), GINT_TO_POINTER(0), FALSE, 0, 0, FALSE, FALSE, FALSE);
   }
   add_menu_separator (menu);
-  gtk3_menu_item (menu, "Quit", IMG_STOCK, (gpointer)FEXIT, G_CALLBACK(leaving_from_menu), NULL, TRUE, GDK_KEY_q, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Quit"), IMG_STOCK, (gpointer)FEXIT, G_CALLBACK(leaving_from_menu), NULL, TRUE, GDK_KEY_q, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   show_the_widgets (menu);
   return menu;
 }

@@ -265,11 +265,11 @@ void check_tree_for_this_search (project * this_proj, atom_search * asearch)
                 {
                   if (this_proj -> modelgl -> atom_win -> msd[k] > 0.0)
                   {
-                    str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd[k]);
+                    str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd[k]);
                   }
                   else
                   {
-                    str = g_strdup_printf ("Set MSD<sub>max</sub> for ...");
+                    str = g_strdup_printf (_("Set MSD<sub>max</sub> for ..."));
                   }
                   gtk_tree_store_set (asearch -> atom_model, & child, TOPIC+2, str, -1);
                   g_free (str);
@@ -283,11 +283,11 @@ void check_tree_for_this_search (project * this_proj, atom_search * asearch)
             {
               if (v > 0.0)
               {
-                str = g_strdup_printf ("For all: MSD<sub>max</sub>= %f", v);
+                str = g_strdup_printf (_("For all: MSD<sub>max</sub>= %f"), v);
               }
               else
               {
-                str = g_strdup_printf ("Set MSD<sub>max</sub> for all ...");
+                str = g_strdup_printf (_("Set MSD<sub>max</sub> for all ..."));
               }
               gtk_tree_store_set (asearch -> atom_model, & iter, TOPIC+2, str, -1);
               g_free (str);
@@ -383,11 +383,11 @@ void check_tree_for_this_search (project * this_proj, atom_search * asearch)
                 {
                   if (this_proj -> modelgl -> atom_win -> msd[k] > 0.0)
                   {
-                    str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd[k]);
+                    str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd[k]);
                   }
                   else
                   {
-                    str = g_strdup_printf ("Set MSD<sub>max</sub> for ...");
+                    str = g_strdup_printf (_("Set MSD<sub>max</sub> for ..."));
                   }
                   gtk_tree_store_set (asearch -> atom_model, & child, TOPIC+2, str, -1);
                   g_free (str);
@@ -410,22 +410,22 @@ void check_tree_for_this_search (project * this_proj, atom_search * asearch)
               {
                 if (filter > 2)
                 {
-                  str = g_strdup_printf ("For all: MSD<sub>max</sub>= %f", v);
+                  str = g_strdup_printf (_("For all: MSD<sub>max</sub>= %f"), v);
                 }
                 else
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub>= %f", v);
+                  str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), v);
                 }
               }
               else
               {
                 if (obj && filter > 2)
                 {
-                  str = g_strdup_printf ("Set MSD<sub>max</sub> for ...");
+                  str = g_strdup_printf (_("Set MSD<sub>max</sub> for ..."));
                 }
                 else
                 {
-                  str = g_strdup_printf ("Set MSD<sub>max</sub> for all ...");
+                  str = g_strdup_printf (_("Set MSD<sub>max</sub> for all ..."));
                 }
               }
               gtk_tree_store_set (asearch -> atom_model, & iter, TOPIC+2, str, -1);
@@ -648,7 +648,7 @@ void append_to_model (GtkTreeIter * atom_level, atom_search * asearch, gboolean 
   j = this_proj -> atoms[0][i].sp;
   str = g_strdup_printf ("%s<sub>%d</sub>", this_proj -> chemistry -> label[j], i+1);
   int aobj = get_asearch_object (asearch);
-  if (aobj == 2) str = g_strdup_printf ("%s + neighbor(s)", str);
+  if (aobj == 2) str = g_strdup_printf (_("%s + neighbor(s)"), str);
   gboolean is_clone = (asearch -> pointer[0].c == 1) ? 1 : 0;
   gtk_tree_store_set (asearch -> atom_model, atom_level, IDCOL, i+1, 1, " ", 2, str, TOLAB, this_proj -> atoms[step][i].label[is_clone], -1);
   g_free (str);
@@ -674,11 +674,11 @@ void append_to_model (GtkTreeIter * atom_level, atom_search * asearch, gboolean 
       l = (asearch -> todo[i] == 2 || asearch -> todo[i] == 3) ? 1 : 0;
       if (this_proj -> modelgl -> atom_win -> msd[i] > 0.0)
       {
-        str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd[i]);
+        str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd[i]);
       }
       else
       {
-        str = g_strdup_printf ("Set MSD<sub>max</sub> for ...");
+        str = g_strdup_printf (_("Set MSD<sub>max</sub> for ..."));
       }
       gtk_tree_store_set (asearch -> atom_model, atom_level, TOPIC, k, TOPIC+2, str, -1);
       if (is_object)
@@ -703,7 +703,7 @@ void append_to_model (GtkTreeIter * atom_level, atom_search * asearch, gboolean 
       if (asearch -> action == REPLACE)
       {
         object = get_atomic_object_by_origin (this_proj -> modelgl -> atom_win -> to_be_inserted[0], i, 0);
-        gtk_tree_store_set (asearch -> atom_model, atom_level, TOPIC+1, (object) ? object -> name : "Select ...", TOPIC+3, h, -1);
+        gtk_tree_store_set (asearch -> atom_model, atom_level, TOPIC+1, (object) ? object -> name : _("Select ..."), TOPIC+3, h, -1);
       }
       break;
   }
@@ -856,7 +856,7 @@ gchar * get_node_name (int node, atom_search * asearch, project * this_proj)
   }
   else if (filter == 1)
   {
-    str = (node) ? g_strdup_printf ("%d-fold", node) : g_strdup_printf ("Isolated");
+    str = (node) ? g_strdup_printf (_("%d-fold"), node) : g_strdup_printf (_("Isolated"));
   }
   else if (filter == 2)
   {
@@ -872,11 +872,11 @@ gchar * get_node_name (int node, atom_search * asearch, project * this_proj)
   }
   else if (filter == 3)
   {
-    str = g_strdup_printf ("Fragment N°%d", node+1);
+    str = g_strdup_printf (_("Fragment N°%d"), node+1);
   }
   else
   {
-    str = g_strdup_printf ("Molecule N°%d", node+1);
+    str = g_strdup_printf (_("Molecule N°%d"), node+1);
   }
   if (filter < 3 && asearch -> pointer[0].c == 1) str = g_strdup_printf ("%s<sup>*</sup>", str);
   return str;
@@ -996,7 +996,7 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
             // Improbable: more than 10 000 fragments or molecules
             // Note: so far the selection and the test case functions are not ready yet
             to_insert[0] = TRUE;
-            picked_names[0] = g_strdup_printf ("All %s(s)", (filter == 2) ? "fragment" : "molecule");
+            picked_names[0] = g_strdup_printf (_("All %s(s)"), (filter == 2) ? _("fragment") : _("molecule"));
             val = 1;
           }
           else
@@ -1037,7 +1037,7 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
       {
         if (filter == 3 && this_proj -> coord -> totcoord[2] > 1)
         {
-          str = g_strdup_printf ("Fragments");
+          str = g_strdup_printf (_("Fragments"));
           gtk_tree_store_append (asearch -> atom_model, & spec_level, NULL);
           if (asearch -> set_for_all > 0) asearch -> pick[0] = asearch -> set_for_all;
           gtk_tree_store_set (asearch -> atom_model, & spec_level, IDCOL, -1, 1, str, TOPIC, asearch -> pick[0], -1);
@@ -1050,13 +1050,13 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
           {
             if (picked_names[0])
             {
-              str = g_strdup_printf ("For all: %s", picked_names[0]);
+              str = g_strdup_printf (_("For all: %s"), picked_names[0]);
               gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, str, -1);
               g_free (str);
             }
             else
             {
-              gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, "Select for all ...", -1);
+              gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, _("Select for all ..."), -1);
             }
           }
         }
@@ -1066,7 +1066,7 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
           {
             if (this_proj -> modelfc -> mols[0][k].multiplicity > 1)
             {
-              str = g_strdup_printf ("Molecule N°%d", k+1);
+              str = g_strdup_printf (_("Molecule N°%d"), k+1);
               gtk_tree_store_append (asearch -> atom_model, & spec_level, NULL);
               if (asearch -> set_for_all > 0) asearch -> pick[k] = asearch -> set_for_all;
               gtk_tree_store_set (asearch -> atom_model, & spec_level, IDCOL, -(k+1), 1, str, TOPIC, asearch -> pick[k], -1);
@@ -1078,13 +1078,13 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
               {
                 if (picked_names[k])
                 {
-                  str = g_strdup_printf ("For all: %s", picked_names[k]);
+                  str = g_strdup_printf (_("For all: %s"), picked_names[k]);
                   gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, str, -1);
                   g_free (str);
                 }
                 else
                 {
-                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, "Select for all ...", -1);
+                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, _("Select for all ..."), -1);
                 }
               }
             }
@@ -1154,7 +1154,7 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
                 }
                 else
                 {
-                  str = g_strdup_printf ("For all: %s", picked_names[h]);
+                  str = g_strdup_printf (_("For all: %s"), picked_names[h]);
                 }
                 gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, str, -1);
                 g_free (str);
@@ -1163,11 +1163,11 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
               {
                 if (asearch -> mode || (obj && filter > 2))
                 {
-                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, "Select ...", -1);
+                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, _("Select ..."), -1);
                 }
                 else
                 {
-                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, "Select for all ...", -1);
+                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, _("Select for all ..."), -1);
                 }
               }
             }
@@ -1177,11 +1177,11 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
               {
                 if (obj && filter > 2)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd_all[h]);
+                  str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd_all[h]);
                 }
                 else
                 {
-                  str = g_strdup_printf ("For all: MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd_all[h]);
+                  str = g_strdup_printf (_("For all: MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd_all[h]);
                 }
                 gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, str, -1);
                 g_free (str);
@@ -1190,11 +1190,11 @@ void fill_atom_model (atom_search * asearch, project * this_proj)
               {
                 if (obj && filter > 2)
                 {
-                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, "Set MSD<sub>max</sub> for ...", -1);
+                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, _("Set MSD<sub>max</sub> for ..."), -1);
                 }
                 else
                 {
-                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, "Set MSD<sub>max</sub> for all ...", -1);
+                  gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, _("Set MSD<sub>max</sub> for all ..."), -1);
                 }
               }
             }
@@ -1577,11 +1577,11 @@ G_MODULE_EXPORT void add_atom (GtkButton * but, gpointer data)
         asearch -> int_b = m;
         if (asearch -> action == REPLACE)
         {
-          gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, "Select for all ...", -1);
+          gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+1, _("Select for all ..."), -1);
         }
         else if (asearch -> action == RANMOVE)
         {
-          str = g_strdup_printf  ("Set MSD<sub>max</sub> for all ...");
+          str = g_strdup_printf  (_("Set MSD<sub>max</sub> for all ..."));
           gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, str, -1);
           g_free (str);
         }
@@ -1640,7 +1640,7 @@ void re_populate_tree_search (atom_search * asearch)
           gtk_tree_store_set (asearch -> atom_model, & spec_level, IDCOL, asearch -> int_b, 1, str, -1);
           if (asearch -> action == RANMOVE)
           {
-            str = g_strdup_printf  ("Set MSD<sub>max</sub> for all ...");
+            str = g_strdup_printf  (_("Set MSD<sub>max</sub> for all ..."));
             gtk_tree_store_set (asearch -> atom_model, & spec_level, TOPIC+2, str, -1);
             g_free (str);
           }
@@ -2379,12 +2379,15 @@ int get_selected_object_id (gboolean visible, int p, gchar * str, atom_search * 
 {
   int i, j;
   gchar * word, * name;
+  gchar * cmp;
   for (i = 1; mol[i].type || mol[i].object; i++)
   {
     if (mol[i].object != NULL)
     {
-      if (g_strcmp0 (mol[i].object, str) == 0)
+      cmp = g_strdup_printf ("%s", (i == 9 || i == 13 || i == 16 || i == 17) ? _(mol[i].object) : mol[i].object);
+      if (g_strcmp0 (cmp, str) == 0)
       {
+        g_free (cmp);
         if (i < 9)
         {
           return (int) mol[i].Z;
@@ -2402,6 +2405,7 @@ int get_selected_object_id (gboolean visible, int p, gchar * str, atom_search * 
           return select_from_library (visible, get_project_by_id(p), asearch);
         }
       }
+      g_free (cmp);
     }
   }
   for (i=0; i<nprojects; i++)
@@ -2409,7 +2413,7 @@ int get_selected_object_id (gboolean visible, int p, gchar * str, atom_search * 
     name = g_strdup_printf ("%s (%d)", get_project_by_id(i) -> name, i+1);
     for (j=0; j<3; j++)
     {
-      word = g_strdup_printf ("%s in %s", action_atoms[j], name);
+      word = g_strdup_printf (_("%s in %s"), _(action_atoms[j]), name);
       if (g_strcmp0 (word, str) == 0)
       {
         g_free (word);
@@ -2424,11 +2428,11 @@ int get_selected_object_id (gboolean visible, int p, gchar * str, atom_search * 
     }
     g_free (name);
   }
-  if (g_strcmp0 ("Copied data", str) == 0)
+  if (g_strcmp0 (_("Copied data"), str) == 0)
   {
     return FROM_DATA;
   }
-  if (g_strcmp0 ("Empty position", str) == 0) return 120;
+  if (g_strcmp0 (_("Empty position"), str) == 0) return 120;
   return 0;
 }
 
@@ -2535,13 +2539,13 @@ G_MODULE_EXPORT void changed_action_renderer (GtkCellRendererCombo * combo, gcha
       {
         j = (asearch -> mode) ? h - 2 : abs(h) - 1;
         to_insert_in_project (i, j, this_proj, asearch, TRUE);
-        str = (asearch -> mode) ? g_strdup_printf ("%s", get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name) : g_strdup_printf ("For all: %s", get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name);
+        str = (asearch -> mode) ? g_strdup_printf ("%s", get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name) : g_strdup_printf (_("For all: %s"), get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name);
         gtk_tree_store_set (asearch -> atom_model, iter, TOPIC+1, str, -1);
         g_free (str);
       }
       else
       {
-        gtk_tree_store_set (asearch -> atom_model, iter, TOPIC+1, (h > 0) ? "Select ..." : "Select for all ...", -1);
+        gtk_tree_store_set (asearch -> atom_model, iter, TOPIC+1, (h > 0) ? _("Select ...") : _("Select for all ..."), -1);
       }
     }
     else
@@ -2563,7 +2567,7 @@ G_MODULE_EXPORT void changed_action_renderer (GtkCellRendererCombo * combo, gcha
               dothis =  gtk_tree_model_iter_next (GTK_TREE_MODEL(asearch -> atom_model), & child);
             }
           }
-          str = g_strdup_printf ("For all: %s", get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name);
+          str = g_strdup_printf (_("For all: %s"), get_atomic_object_by_origin(this_proj -> modelgl -> atom_win -> to_be_inserted[k], j, 0) -> name);
           gtk_tree_store_set (asearch -> atom_model, iter, TOPIC+1, str, -1);
           g_free (str);
         }
@@ -2576,20 +2580,20 @@ G_MODULE_EXPORT void changed_action_renderer (GtkCellRendererCombo * combo, gcha
       {
         if (! asearch -> passivating && this_proj -> natomes >= GTK_LIMIT)
         {
-          gtk_tree_store_set (asearch -> atom_model, iter, 5, "Select for all ...", -1);
+          gtk_tree_store_set (asearch -> atom_model, iter, 5, _("Select for all ..."), -1);
           if (gtk_tree_model_iter_children (GTK_TREE_MODEL(asearch -> atom_model), & child, iter))
           {
             dothis = TRUE;
             while (dothis)
             {
-              gtk_tree_store_set (asearch -> atom_model, & child, TOPIC+1, "Select ...", -1);
+              gtk_tree_store_set (asearch -> atom_model, & child, TOPIC+1, _("Select ..."), -1);
               dothis =  gtk_tree_model_iter_next (GTK_TREE_MODEL(asearch -> atom_model), & child);
             }
           }
         }
         else
         {
-          gtk_tree_store_set (asearch -> atom_model, iter, 5, "Select ...", -1);
+          gtk_tree_store_set (asearch -> atom_model, iter, 5, _("Select ..."), -1);
         }
       }
     }
@@ -2617,19 +2621,26 @@ GtkTreeModel * replace_combo_tree (gboolean insert, int proj)
   if (insert)
   {
     gtk_tree_store_append (store, & iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, "Select ...", -1);
+    gtk_tree_store_set (store, & iter, 0, _("Select ..."), -1);
   }
   for (i=0; mol[i].type || mol[i].object; i++)
   {
     if (mol[i].type)
     {
       gtk_tree_store_append (store, & iter, NULL);
-      gtk_tree_store_set (store, & iter, 0, mol[i].type, -1);
+      gtk_tree_store_set (store, & iter, 0, _(mol[i].type), -1);
     }
     else if (mol[i].object)
     {
       gtk_tree_store_append (store, & iter2, & iter);
-      gtk_tree_store_set (store, & iter2, 0, mol[i].object, -1);
+      if (i == 9 || i == 13 || i == 16 || i == 17)
+      {
+        gtk_tree_store_set (store, & iter2, 0, _(mol[i].object), -1);
+      }
+      else
+      {
+        gtk_tree_store_set (store, & iter2, 0, mol[i].object, -1);
+      }
     }
   }
   gboolean doit = FALSE;
@@ -2644,7 +2655,7 @@ GtkTreeModel * replace_combo_tree (gboolean insert, int proj)
   if (doit)
   {
     gtk_tree_store_append (store, & iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, "Import from project", -1);
+    gtk_tree_store_set (store, & iter, 0, _("Import From Project"), -1);
     for (i=0; i<nprojects; i++)
     {
       if (get_project_by_id(i) -> steps == 1 && get_project_by_id(i) -> natomes)
@@ -2655,7 +2666,7 @@ GtkTreeModel * replace_combo_tree (gboolean insert, int proj)
         for (j=0; j<3; j++)
         {
           gtk_tree_store_append (store, & iter3, & iter2);
-          word = g_strdup_printf ("%s in %s", action_atoms[j], name);
+          word = g_strdup_printf (_("%s in %s"), _(action_atoms[j]), name);
           gtk_tree_store_set (store, & iter3, 0, word, -1);
           g_free (word);
         }
@@ -2666,14 +2677,14 @@ GtkTreeModel * replace_combo_tree (gboolean insert, int proj)
   if (copied_object)
   {
     gtk_tree_store_append (store, &iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, "Copied data", -1);
+    gtk_tree_store_set (store, & iter, 0, _("Copied data"), -1);
   }
   if (get_project_by_id(proj) -> modelgl)
   {
     if (get_project_by_id(proj) -> modelgl -> builder_win)
     {
       gtk_tree_store_append (store, &iter, NULL);
-      gtk_tree_store_set (store, & iter, 0, "Empty position", -1);
+      gtk_tree_store_set (store, & iter, 0, _("Empty position"), -1);
     }
   }
   return GTK_TREE_MODEL (store);
@@ -2818,7 +2829,7 @@ G_MODULE_EXPORT void set_max_msd (GtkEntry * res, gpointer data)
   }
   else
   {
-    //show_error ("MSD<sub>max</sub> must be > 0.0 !", 1, this_proj -> modelgl -> atom_win -> win);
+    //show_error (_("MSD<sub>max</sub> must be > 0.0 !"), 1, this_proj -> modelgl -> atom_win -> win);
     if (ax > 0)
     {
       v = this_proj -> modelgl -> atom_win -> msd[ax-1];
@@ -2889,31 +2900,31 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
       gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
       gchar * str;
       atomic_object * iobj;
-      gchar * obj[5]={"atom(s)", "total coordination(s)", "partial coordination(s)", "in fragment", "in molecule"};
-      gchar * act[2]={"Replace", "Remove"};
+      gchar * obj[5]={_("atom(s)"), _("total coordination(s)"), _("partial coordination(s)"), _("in fragment"), _("in molecule")};
+      gchar * act[2]={_("Replace"), _("Remove")};
       int object = get_asearch_object (csearch);
       int filter = get_asearch_filter (csearch);
       switch (csearch -> action)
       {
         case REPLACE:
-          str = g_strdup_printf ("%s %s randomly", "Replace", obj[(object) ? filter : 0]);
+          str = g_strdup_printf (_("%s %s randomly"), _("Replace"), obj[(object) ? filter : 0]);
           break;
         case REMOVE:
-          str = g_strdup_printf ("%s %s randomly", "Remove", obj[(object) ? filter : 0]);
+          str = g_strdup_printf (_("%s %s randomly"), _("Remove"), obj[(object) ? filter : 0]);
           break;
         case RANMOVE:
-          str = g_strdup_printf ("Maximum Mean Square Displacement");
+          str = g_strdup_printf (_("Maximum Mean Square Displacement"));
           break;
         default:
           i = (csearch -> pointer[0].c == 5) ? 1 : 2;
           iobj = get_atomic_object_by_origin (this_proj -> modelgl -> atom_win -> to_be_inserted[i], 0, atom_to_edit+1);
           if (cid -> b - TOLAB)
           {
-            str = g_strdup_printf ("Site occupancy for %s", prepare_for_title(iobj -> name));
+            str = g_strdup_printf (_("Site occupancy for %s"), prepare_for_title(iobj -> name));
           }
           else
           {
-            str = g_strdup_printf ("Insert %s at", prepare_for_title(iobj -> name));
+            str = g_strdup_printf (_("Insert %s at"), prepare_for_title(iobj -> name));
           }
           break;
       }
@@ -2931,7 +2942,7 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
           if (cid -> b - TOLAB && csearch -> pointer[0].c == 7)
           {
             hbox = create_hbox (5);
-            str = g_strdup_printf ("Occupancy= ");
+            str = g_strdup_printf (_("Occupancy= "));
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
             g_free (str);
             entry = create_entry (G_CALLBACK(set_occupancy), 100, 15, FALSE, iobj);
@@ -2962,11 +2973,11 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
             j = this_proj -> atoms[0][atom_to_edit].sp;
             if (object)
             {
-              str = g_strdup_printf ("MSD<sub>max</sub> for %s<sub>%d</sub> + neighbors = ", this_proj -> chemistry -> label[j], atom_to_edit+1);
+              str = g_strdup_printf (_("MSD<sub>max</sub> for %s<sub>%d</sub> + neighbors = "), this_proj -> chemistry -> label[j], atom_to_edit+1);
             }
             else
             {
-              str = g_strdup_printf ("MSD<sub>max</sub> for %s<sub>%d</sub> = ", this_proj -> chemistry -> label[j], atom_to_edit+1);
+              str = g_strdup_printf (_("MSD<sub>max</sub> for %s<sub>%d</sub> = "), this_proj -> chemistry -> label[j], atom_to_edit+1);
             }
             update_entry_double (GTK_ENTRY(entry), this_proj -> modelgl -> atom_win -> msd[atom_to_edit]);
           }
@@ -2975,20 +2986,20 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
             switch (filter)
             {
               case 0:
-                str = g_strdup_printf ("MSD<sub>max</sub> for all %s atom(s) = ", this_proj -> chemistry -> label[-h-1]);
+                str = g_strdup_printf (_("MSD<sub>max</sub> for all %s atom(s) = "), this_proj -> chemistry -> label[-h-1]);
                 break;
               case 1:
                 if (-h-1 == 0)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for all isolated atom(s) = ");
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for all isolated atom(s) = "));
                 }
                 else if (object)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for all %d-fold atom(s) + neighbors = ", -h-1);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for all %d-fold atom(s) + neighbors = "), -h-1);
                 }
                 else
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for all %d-fold atom(s) = ", -h-1);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for all %d-fold atom(s) = "), -h-1);
                 }
                 break;
               case 2:
@@ -3004,31 +3015,31 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
                 nran = env_name(this_proj, i, j, 1, NULL);
                 if (object)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for all %s + neighbors = ", nran);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for all %s + neighbors = "), nran);
                 }
                 else
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for all %s = ", nran);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for all %s = "), nran);
                 }
                 break;
               case 3:
                 if (object)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for fragment N°%d = ", -h);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for fragment N°%d = "), -h);
                 }
                 else
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for the atom(s) in fragment N°%d = ", -h);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for the atom(s) in fragment N°%d = "), -h);
                 }
                 break;
               case 4:
                 if (object)
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for molecule N°%d = ", -h);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for molecule N°%d = "), -h);
                 }
                 else
                 {
-                  str = g_strdup_printf ("MSD<sub>max</sub> for the atom(s) in molecule N°%d = ", -h);
+                  str = g_strdup_printf (_("MSD<sub>max</sub> for the atom(s) in molecule N°%d = "), -h);
                 }
                 break;
             }
@@ -3066,11 +3077,11 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
               }
               if (-h-1 > 0)
               {
-                nran = g_strdup_printf ("%d-fold", -h-1);
+                nran = g_strdup_printf (_("%d-fold"), -h-1);
               }
               else
               {
-                nran = g_strdup_printf ("isolated");
+                nran = g_strdup_printf (_("isolated"));
               }
               break;
             case 2:
@@ -3115,7 +3126,7 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
                     if (this_proj -> atoms[0][k].pick[0] == csearch -> status || csearch -> status == 2) max_random ++;
                   }
                 }
-                nran = g_strdup_printf ("atom(s)");
+                nran = g_strdup_printf (_("atom(s)"));
               }
               break;
           }
@@ -3126,26 +3137,26 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
           {
             if (filter == 3)
             {
-              str = g_strdup_printf ("%s randomly <i>n</i> <b>fragment(s)</b> in all fragments, <i>n</i>=  ", act[csearch -> action - 3]);
+              str = g_strdup_printf (_("%s randomly <i>n</i> <b>fragment(s)</b> in all fragments, <i>n</i>=  "), act[csearch -> action - 3]);
             }
             else if (filter == 4)
             {
-               str = g_strdup_printf ("%s randomly <i>n</i> <b>fragment(s)</b> in molecule N°%d, <i>n</i>=  ", act[csearch -> action - 3], -h);
+               str = g_strdup_printf (_("%s randomly <i>n</i> <b>fragment(s)</b> in molecule N°%d, <i>n</i>=  "), act[csearch -> action - 3], -h);
             }
             else
             {
-              str = g_strdup_printf ("%s randomly <i>n</i> <b>%s</b> coordinations, <i>n</i>=  ", act[csearch -> action - 3], nran);
+              str = g_strdup_printf (_("%s randomly <i>n</i> <b>%s</b> coordinations, <i>n</i>=  "), act[csearch -> action - 3], nran);
             }
           }
           else
           {
             if (filter < 3)
             {
-              str = g_strdup_printf ("%s randomly <i>n</i> <b>%s</b> %s, <i>n</i>=  ", act[csearch -> action - 3], nran, obj[0]);
+              str = g_strdup_printf (_("%s randomly <i>n</i> <b>%s</b> %s, <i>n</i>=  "), act[csearch -> action - 3], nran, obj[0]);
             }
             else
             {
-              str = g_strdup_printf ("%s randomly <i>n</i> <b>%s</b> %s N°%d, <i>n</i>=  ", act[csearch -> action - 3], nran, obj[filter], -h);
+              str = g_strdup_printf (_("%s randomly <i>n</i> <b>%s</b> %s N°%d, <i>n</i>=  "), act[csearch -> action - 3], nran, obj[filter], -h);
             }
           }
           if (nran) g_free (nran);
@@ -3153,7 +3164,7 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 15);
           g_free (str);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-          str = g_strdup_printf (" with <i>n</i><sub>max</sub> = <b>%d</b>", max_random);
+          str = g_strdup_printf (_(" with <i>n</i><sub>max</sub> = <b>%d</b>"), max_random);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 50, -1, 0.0, 0.5), FALSE, FALSE, 15);
           g_free (str);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
@@ -3170,11 +3181,11 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
         {
           if (this_proj -> modelgl -> atom_win -> msd[atom_to_edit] > 0.0)
           {
-            str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd[atom_to_edit]);
+            str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd[atom_to_edit]);
           }
           else
           {
-            str = g_strdup_printf ("Set MSD<sub>max</sub> for ...");
+            str = g_strdup_printf (_("Set MSD<sub>max</sub> for ..."));
           }
           gtk_tree_store_set (csearch -> atom_model, & iter, TOPIC+2, str, -1);
           g_free (str);
@@ -3185,11 +3196,11 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
           {
             if (object && filter > 2)
             {
-              str = g_strdup_printf ("MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd_all[-h-1]);
+              str = g_strdup_printf (_("MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd_all[-h-1]);
             }
             else
             {
-              str = g_strdup_printf ("For all: MSD<sub>max</sub>= %f", this_proj -> modelgl -> atom_win -> msd_all[-h-1]);
+              str = g_strdup_printf (_("For all: MSD<sub>max</sub>= %f"), this_proj -> modelgl -> atom_win -> msd_all[-h-1]);
             }
             gtk_tree_store_set (csearch -> atom_model, & iter, TOPIC+2, str, -1);
             g_free (str);
@@ -3198,11 +3209,11 @@ void get_coord_iter_and_edit (gchar * path_string, gpointer data, GtkWidget * wi
           {
             if (object && filter > 2)
             {
-              gtk_tree_store_set (csearch -> atom_model, &iter, TOPIC+2, "Set MSD<sub>max</sub> for ...", -1);
+              gtk_tree_store_set (csearch -> atom_model, &iter, TOPIC+2, _("Set MSD<sub>max</sub> for ..."), -1);
             }
             else
             {
-              gtk_tree_store_set (csearch -> atom_model, & iter, TOPIC+2, "Set MSD<sub>max</sub> for all ...", -1);
+              gtk_tree_store_set (csearch -> atom_model, & iter, TOPIC+2, _("Set MSD<sub>max</sub> for all ..."), -1);
             }
           }
         }
@@ -3259,7 +3270,7 @@ G_MODULE_EXPORT void set_max_msd_for_all (GtkEntry * res, gpointer data)
   int i, j;
   if (v <= 0.0)
   {
-    // show_error ("MSD<sub>max</sub> must be > 0.0 !", 1, this_proj -> modelgl -> atom_win -> win);
+    // show_error (_("MSD<sub>max</sub> must be > 0.0 !"), 1, this_proj -> modelgl -> atom_win -> win);
     v = this_proj -> modelgl -> atom_win -> msd[0];
   }
   i = csearch -> todo_size;
@@ -3332,7 +3343,7 @@ G_MODULE_EXPORT void select_all_atoms (GtkTreeViewColumn * col, gpointer data)
     GtkWidget * win = gtk_dialog_new ();
     gtk_window_set_transient_for (GTK_WINDOW (win), GTK_WINDOW(this_proj -> modelgl -> atom_win -> win));
     gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
-    gchar * str = g_strdup_printf ("Maximum Mean Square Displacement");
+    gchar * str = g_strdup_printf (_("Maximum Mean Square Displacement"));
     gtk_window_set_title (GTK_WINDOW(win), str);
     g_free (str);
     gtk_window_set_modal (GTK_WINDOW (win), TRUE);
@@ -3340,7 +3351,7 @@ G_MODULE_EXPORT void select_all_atoms (GtkTreeViewColumn * col, gpointer data)
     GtkWidget * hbox = create_hbox (5);
     GtkWidget * entry = create_entry (G_CALLBACK(set_max_msd_for_all), 100, 15, FALSE, NULL);
     update_entry_double (GTK_ENTRY(entry), 0.0);
-    str = g_strdup_printf ("MSD<sub>max</sub> for all object(s) = ");
+    str = g_strdup_printf (_("MSD<sub>max</sub> for all objects = "));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 15);
     g_free (str);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
@@ -3563,12 +3574,12 @@ GtkWidget * create_atoms_tree (atom_search * asearch, project * this_proj, int n
   int i, j, k, l;
   GtkTreeViewColumn * atom_col[5];
   GtkCellRenderer * atom_cell[5];
-  gchar * ctitle[6][5]={{"Object", "Name", "Label", "Pick", " "},
-                        {"Object", "Name", "Label", "Move", " "},
-                        {"Object", "Name", "Label", "Replace", "By"},
-                        {"Object", "Name", "Label", "Remove", " "},
-                        {"Object", "Name", "Insert", "Position", "Occupancy"},
-                        {"Object", "Name", "Label", "Translate", "Max. MSD"}};
+  gchar * ctitle[6][5]={{i18n("Object"), i18n("Name"), i18n("Label"), i18n("Pick"), " "},
+                        {i18n("Object"), i18n("Name"), i18n("Label"), i18n("Move"), " "},
+                        {i18n("Object"), i18n("Name"), i18n("Label"), i18n("Replace"), i18n("By")},
+                        {i18n("Object"), i18n("Name"), i18n("Label"), i18n("Remove"), " "},
+                        {i18n("Object"), i18n("Name"), i18n("Insert"), i18n("Position"), i18n("Occupancy")},
+                        {i18n("Object"), i18n("Name"), i18n("Label"), i18n("Translate"), i18n("Max. MSD")}};
   gchar * ctype[3][5]={{"text", "text", "active", "active", "text"},
                        {"text", "text", "active", "text", "text"},
                        {"text", "text", "active", "active", "text"}};
@@ -3630,7 +3641,7 @@ GtkWidget * create_atoms_tree (atom_search * asearch, project * this_proj, int n
     }
     gtk_cell_renderer_set_fixed_size (atom_cell[i], -1, 25);
     l = (asearch -> action == RANMOVE && i == 4) ? i+1 : i;
-    atom_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[(asearch -> action < 2) ? 0 : asearch -> action - 1][i], atom_cell[i], ctype[k][i], l+1, NULL);
+    atom_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[(asearch -> action < 2) ? 0 : asearch -> action - 1][i]), atom_cell[i], ctype[k][i], l+1, NULL);
     if (toggle && ! asearch -> passivating)
     {
       gtk_tree_view_column_set_clickable (atom_col[i], TRUE);
@@ -3903,7 +3914,7 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
   }
   if (was_object)
   {
-    combo_text_prepend (asearch -> filter_box, "Chemical species");
+    combo_text_prepend (asearch -> filter_box, _("Chemical Species"));
     if (asearch -> action == RANMOVE)
     {
       rot_c = gtk_tree_view_get_column (GTK_TREE_VIEW(asearch -> atom_tree), 4);
@@ -3918,7 +3929,7 @@ G_MODULE_EXPORT void set_object_changed (GtkComboBox * box, gpointer data)
       GtkCellRenderer * rot = gtk_cell_renderer_toggle_new ();
       g_signal_connect (G_OBJECT(rot), "toggled", G_CALLBACK(select_atom), & asearch -> pointer[2]);
       int i = 5;
-      rot_c = gtk_tree_view_column_new_with_attributes ("Rotate", rot, "active", i, NULL);
+      rot_c = gtk_tree_view_column_new_with_attributes (_("Rotate"), rot, "active", i, NULL);
       gtk_tree_view_column_set_clickable (rot_c, TRUE);
       g_signal_connect (G_OBJECT(rot_c), "clicked", G_CALLBACK(select_all_atoms), & asearch -> pointer[2]);
       gtk_tree_view_column_set_alignment (rot_c, 0.5);
@@ -3944,7 +3955,7 @@ void add_random_column (atom_search * asearch)
   GtkCellRenderer * num = gtk_cell_renderer_text_new ();
   g_object_set (num, "editable", TRUE, NULL);
   g_signal_connect (G_OBJECT(num), "editing-started", G_CALLBACK(to_edit_coords), & asearch -> pointer[0]);
-  GtkTreeViewColumn * num_c = gtk_tree_view_column_new_with_attributes ("Number", num, "text", i, NULL);
+  GtkTreeViewColumn * num_c = gtk_tree_view_column_new_with_attributes (_("Number"), num, "text", i, NULL);
   gtk_tree_view_column_set_cell_data_func (num_c, num, search_set_visible, GINT_TO_POINTER(i), NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(asearch -> atom_tree), num_c);
 }
@@ -3986,16 +3997,16 @@ G_MODULE_EXPORT void set_search_mode (GtkComboBox * box, gpointer data)
       }
       else
       {
-        gtk_combo_box_text_insert ((GtkComboBoxText *)asearch -> object_box, 1, NULL, "Atom(s): all");
-        combo_text_append (asearch -> object_box, "Group of atoms: all");
+        gtk_combo_box_text_insert ((GtkComboBoxText *)asearch -> object_box, 1, NULL, _("Atom(s): All"));
+        combo_text_append (asearch -> object_box, _("Group of Atoms: All"));
       }
     }
   }
   else
   {
     gtk_combo_box_text_remove_all ((GtkComboBoxText *)asearch -> object_box);
-    combo_text_append (asearch -> object_box, "Atom(s)");
-    combo_text_append (asearch -> object_box, "Group of atoms");
+    combo_text_append (asearch -> object_box, _("Atom(s)"));
+    combo_text_append (asearch -> object_box, _("Group of Atoms"));
   }
 
   /*if (asearch -> filter_box)
@@ -4073,13 +4084,13 @@ GtkWidget * prepare_box_too_much (atom_search * asearch)
   GtkWidget * box;
   GtkWidget * widg;
   GtkWidget * too_box = create_vbox (BSEP);
-  widg = bbox (too_box, "\t Atom species: ");
+  widg = bbox (too_box, _("\t Atom species: "));
   gtk_widget_set_size_request (widg, 200, -1);
   asearch -> entry_a = create_entry (G_CALLBACK(set_atom), 90, 15, TRUE, asearch);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, widg, asearch -> entry_a, FALSE, FALSE, 0);
   asearch -> img_a = stock_image (DIAL_ERROR);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, widg, asearch -> img_a, FALSE, FALSE, 5);
-  widg = bbox (too_box, "\t Atom Id: ");
+  widg = bbox (too_box, _("\t Atom Id: "));
   gtk_widget_set_size_request (widg, 200, -1);
   asearch -> entry_b = create_entry (G_CALLBACK(set_id), 90, 15, TRUE, asearch);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, widg, asearch -> entry_b, FALSE, FALSE, 0);
@@ -4087,10 +4098,10 @@ GtkWidget * prepare_box_too_much (atom_search * asearch)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, widg, asearch -> img_b, FALSE, FALSE, 5);
   box = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, too_box, box, FALSE, FALSE, 5);
-  asearch -> but_a = create_button ("Add", IMG_NONE, NULL, 75, -1, GTK_RELIEF_NORMAL, G_CALLBACK(add_atom), asearch);
+  asearch -> but_a = create_button (_("Add"), IMG_NONE, NULL, 75, -1, GTK_RELIEF_NORMAL, G_CALLBACK(add_atom), asearch);
   widget_set_sensitive (asearch -> but_a, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, asearch -> but_a, FALSE, FALSE, 75);
-  asearch -> but_b = create_button ("Remove", IMG_NONE, NULL, 75, -1, GTK_RELIEF_NORMAL, G_CALLBACK(remove_atom), asearch);
+  asearch -> but_b = create_button (_("Remove"), IMG_NONE, NULL, 75, -1, GTK_RELIEF_NORMAL, G_CALLBACK(remove_atom), asearch);
   widget_set_sensitive (asearch -> but_b, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, asearch -> but_b, FALSE, FALSE, 0);
   return too_box;
@@ -4125,22 +4136,22 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], hbox, FALSE, FALSE, 2);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.5), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Search ", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Search "), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
     asearch -> object_box  = create_combo ();
-    combo_text_append (asearch -> object_box, "Atom(s)");
-    if (! i) combo_text_append (asearch -> object_box, "Atom(s): all");
-    combo_text_append (asearch -> object_box, "Group of atoms");
-    if (! i) combo_text_append (asearch -> object_box, "Group of atoms: all");
+    combo_text_append (asearch -> object_box, _("Atom(s)"));
+    if (! i) combo_text_append (asearch -> object_box, _("Atom(s): All"));
+    combo_text_append (asearch -> object_box, _("Group of Atoms"));
+    if (! i) combo_text_append (asearch -> object_box, _("Group of Atoms: All"));
     combo_set_active (asearch -> object_box, asearch -> object);
     asearch -> filter_box  = create_combo ();
-    gchar * filters[5]={"Chemical species", "Total coordination", "Partial coordination", "Fragment", "Molecule"};
-    for (j=0; j<3; j++) combo_text_append (asearch -> filter_box, filters[j]);
-    if (this_proj -> modelgl -> adv_bonding[0]) combo_text_append (asearch -> filter_box, filters[3]);
-    if (this_proj -> modelgl -> adv_bonding[1]) combo_text_append (asearch -> filter_box, filters[4]);
+    gchar * filters[5]={i18n("Chemical Species"), i18n("Total Coordination"), i18n("Partial Coordination"), i18n("Fragment"), i18n("Molecule")};
+    for (j=0; j<3; j++) combo_text_append (asearch -> filter_box, _(filters[j]));
+    if (this_proj -> modelgl -> adv_bonding[0]) combo_text_append (asearch -> filter_box, _(filters[3]));
+    if (this_proj -> modelgl -> adv_bonding[1]) combo_text_append (asearch -> filter_box, _(filters[4]));
     combo_set_active (asearch -> filter_box, asearch -> filter);
 
     asearch -> atom_box  = create_combo ();
-    combo_text_append (asearch -> atom_box, "All");
+    combo_text_append (asearch -> atom_box, _("All"));
     for (j=0; j<this_proj -> nspec; j++) combo_text_append (asearch -> atom_box, this_proj -> chemistry -> label[j]);
     combo_set_active (asearch -> atom_box, asearch -> spec);
 
@@ -4150,40 +4161,40 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     GtkWidget * entry = create_entry (G_CALLBACK(set_search_digit), 90, 15, TRUE, asearch);
     if (asearch -> action < 2)
     {
-      prep_search_box (asearch -> info[0], markup_label("For ", 100, -1, 0.0, 0.5), asearch -> object_box);
-      prep_search_box (asearch -> info[0], markup_label("Filter by ", 100, -1, 0.0, 0.5), asearch -> filter_box);
-      prep_search_box (asearch -> info[0], markup_label("Species ", 100, -1, 0.0, 0.5), asearch -> atom_box);
+      prep_search_box (asearch -> info[0], markup_label(_("For "), 100, -1, 0.0, 0.5), asearch -> object_box);
+      prep_search_box (asearch -> info[0], markup_label(_("Filter by "), 100, -1, 0.0, 0.5), asearch -> filter_box);
+      prep_search_box (asearch -> info[0], markup_label(_("Species "), 100, -1, 0.0, 0.5), asearch -> atom_box);
       asearch -> id_box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], asearch -> id_box, FALSE, FALSE, 0);
-      prep_search_box (asearch -> id_box, markup_label("Atom Id ", 100, -1, 0.0, 0.5), entry);
+      prep_search_box (asearch -> id_box, markup_label(_("Atom Id."), 100, -1, 0.0, 0.5), entry);
     }
     else
     {
       hbox = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[0], hbox, FALSE, FALSE, 5);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("For ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("For "), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> object_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Filter by ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Filter by "), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> filter_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Species ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Species "), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> atom_box, FALSE, FALSE, 0);
       asearch -> id_box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, asearch -> id_box, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, markup_label("Atom Id ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, markup_label(_("Atom Id "), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, asearch -> id_box, entry, FALSE, FALSE, 0);
     }
 
     // If more than 10 000 atoms:
     if (asearch -> action < 2)
     {
-      lab = markup_label("\t<b>The number of atoms in the model is too large</b>\n"
-                         "\t\t<b>to display and browse the entire list !</b>\n"
-                         "\t<b>You need to search for object(s) manually:</b>", -1, -1, 0.5, 0.5);
+      lab = markup_label(_("\t<b>The number of atoms in the model is too large</b>\n"
+                           "\t\t<b>to display and browse the entire list !</b>\n"
+                           "\t<b>You need to search for object(s) individually:</b>"), -1, -1, 0.5, 0.5);
     }
     else
     {
-      lab = markup_label("<b>The number of atoms in the model is too large to display and browse the entire list !</b>\n"
-                         "\t\t\t\t<b>You need to search for object(s) manually:</b>", -1, -1, 0.5, 0.5);
+      lab = markup_label(_("<b>The number of atoms in the model is too large to display and browse the entire list !</b>\n"
+                           "\t\t\t\t<b>You need to search for object(s) individually:</b>"), -1, -1, 0.5, 0.5);
     }
     add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[1], lab, FALSE, FALSE, 10);
     hbox = create_hbox (0);
@@ -4191,21 +4202,21 @@ GtkWidget * selection_tab (atom_search * asearch, int nats)
     /* vvbox = create_vbox (0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 80);
     cbox = create_combo ();
-    combo_text_append (cbox, "All objects");
-    combo_text_append (cbox, "Selection");
+    combo_text_append (cbox, _("All objects"));
+    combo_text_append (cbox, _("Selection"));
     g_signal_connect (G_OBJECT(cbox), "changed", G_CALLBACK(set_too_much_type), asearch);
     combo_set_active (cbox, asearch -> too_much);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, cbox, FALSE, FALSE, 30);
-    // asearch -> big_box = // Combo box with "All objects", "Selection" */
+    // asearch -> big_box = // Combo box with _("All objects"), _("Selection") */
     vvbox = create_vbox (0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 120);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, prepare_box_too_much (asearch), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, asearch -> info[1],
-                         markup_label("The search must be performed using species and/or ID.\n"
-                                      "Use the filters above to define the object(s) of the search", -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+                         markup_label(_("The search must be performed using species and/or Id.\n"
+                                        "Use the filters above to define the object(s) of the search"), -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
   }
 
-  abox (vbox, "Selection ", 2);
+  abox (vbox, _("Selection "), 2);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   GtkWidget * scrollsets = create_scroll (NULL, -1, -1, GTK_SHADOW_ETCHED_IN);

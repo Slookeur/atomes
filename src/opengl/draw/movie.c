@@ -314,7 +314,7 @@ static void write_video_frame (AVFormatContext * f_context, VideoStream * vs, in
   if (out_size != 0)
   {
     // "Error while encoding video frame"
-    g_warning ("Error in movie encoding : video frame - error : %s", av_err2str(out_size));
+    g_warning (_("Error in movie encoding : video frame - error : %s"), av_err2str(out_size));
   }
   // get_packet_defaults (& packet);
 #else
@@ -332,14 +332,14 @@ static void write_video_frame (AVFormatContext * f_context, VideoStream * vs, in
     if (out_size < 0)
     {
       // "Error while encoding video frame"
-      g_warning ("Error in movie encoding : video frame - error : %s", av_err2str (out_size));
+      g_warning (_("Error in movie encoding : video frame - error : %s"), av_err2str (out_size));
     }
     else
     {
       if (avcodec_receive_packet (vs -> cc, & packet) < 0)
       {
         // "Error while encoding video frame"
-         if (frame_id + 1 > frame_start) g_warning ("Error in movie encoding : video frame - warning : packet empty, ignoring frame= %d", frame_id);
+         if (frame_id + 1 > frame_start) g_warning (_("Error in movie encoding : video frame - warning : packet empty, ignoring frame= %d"), frame_id);
       }
       else
       {
@@ -351,7 +351,7 @@ static void write_video_frame (AVFormatContext * f_context, VideoStream * vs, in
         if (out_size != 0)
         {
           // "Error while encoding video frame"
-          g_warning ("Error in movie encoding : video frame - error : %s", av_err2str(out_size));
+          g_warning (_("Error in movie encoding : video frame - error : %s"), av_err2str(out_size));
         }
         av_packet_unref(& packet);
       }
@@ -399,12 +399,12 @@ AVCodecContext * add_codec_context (AVFormatContext * fc, const AVCodec * vc, vi
   if (! (vc = avcodec_find_encoder (codec_id[vopts -> codec])))
   {
     // Codec not found
-    g_warning ("Error in movie encoding : impossible to find codec %s", codec_name[vopts -> codec]);
+    g_warning (_("Error in movie encoding : impossible to find codec %s"), codec_name[vopts -> codec]);
     return NULL;
   }
   if (! (cc = avcodec_alloc_context3(vc)))
   {
-    g_warning ("Error in movie encoding : impossible to allocate encoding context");
+    g_warning (_("Error in movie encoding : impossible to allocate encoding context"));
     return NULL;
   }
   //g_debug ("Codec_id= %d", cc -> codec_id);
@@ -461,14 +461,14 @@ VideoStream * add_video_stream (AVFormatContext * fc, const AVCodec * vc, video_
 #endif
   if (! stream -> st)
   {
-    g_warning ("Error in movie encoding : impossible to allocate video stream");
+    g_warning (_("Error in movie encoding : impossible to allocate video stream"));
     return NULL;
   }
   stream -> st -> time_base = stream -> cc -> time_base;
   stream -> frame = alloc_video_frame (stream -> cc);
   if (stream -> frame == NULL)
   {
-    g_warning ("Error in movie encoding : impossible to allocate raw frame buffer");
+    g_warning (_("Error in movie encoding : impossible to allocate raw frame buffer"));
     return NULL;
   }
   return stream;
@@ -1025,14 +1025,14 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
 
   if (! (format_context = avformat_alloc_context()))
   {
-    g_warning ("Error in movie encoding : impossible to allocate AV format context");
+    g_warning (_("Error in movie encoding : impossible to allocate AV format context"));
     return FALSE;
   }
 
   // Guess the desired container format based on file extension
   if (! (format_context -> oformat = av_guess_format (NULL, videofile, NULL)))
   {
-    g_warning ("Error in movie encoding : impossible to guess container format : change file name");
+    g_warning (_("Error in movie encoding : impossible to guess container format : change file name"));
     return FALSE;
   }
 
@@ -1041,7 +1041,7 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
   video_stream = add_video_stream (format_context, video_codec, vopts);
   if (video_stream == NULL)
   {
-    g_warning ("Error in movie encoding : impossible to create video stream");
+    g_warning (_("Error in movie encoding : impossible to create video stream"));
     return FALSE;
   }
 
@@ -1049,7 +1049,7 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
   if ((error = avcodec_open2 (video_stream -> cc, video_codec, NULL)) < 0)
   {
     // Can not open codec
-    g_warning ("Error in movie encoding : impossible to open codec, error= %s", av_err2str(error));
+    g_warning (_("Error in movie encoding : impossible to open codec, error= %s"), av_err2str(error));
     return FALSE;
   }
 
@@ -1067,7 +1067,7 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
 #endif
   {
   // error impossible to open output file
-    g_warning ("Error in movie encoding : impossible to open video file '%s'", videofile);
+    g_warning (_("Error in movie encoding : impossible to open video file '%s'"), videofile);
     return FALSE;
   }
 
@@ -1077,7 +1077,7 @@ gboolean create_movie (glwin * view, video_options * vopts, gchar * videofile)
   if (av_set_parameters (av_format_context, NULL) < 0)
 #endif
   {
-    g_warning ("Error in movie encoding : impossible to write the AV format header");
+    g_warning (_("Error in movie encoding : impossible to write the AV format header"));
     return FALSE;
   }
 
@@ -1260,7 +1260,7 @@ G_MODULE_EXPORT void run_save_movie (GtkDialog * info, gint response_id, gpointe
     gboolean res = create_movie (view, vopts, videofile);
     if (! res)
     {
-      show_warning ("An error occurred when encoding movie\nyou might want to try again\nsorry for the trouble", view -> win);
+      show_warning (_("An error occurred when encoding movie\nyou might want to try again\nsorry for the trouble"), view -> win);
     }
     close_frame_buffer ();
     in_movie_encoding = FALSE;
@@ -1296,10 +1296,10 @@ void save_movie (glwin * view, video_options * vopts)
 #else
   GtkWidget * info;
 #endif
-  info = create_file_chooser ("Render Movie",
+  info = create_file_chooser (_("Render Movie"),
                               GTK_WINDOW(view -> win),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
-                              "Save");
+                              _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
   gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
@@ -1310,7 +1310,7 @@ void save_movie (glwin * view, video_options * vopts)
   g_free (str);
 
   filter = gtk_file_filter_new ();
-  str = g_strdup_printf ("%s file (*.%s)", codec_name[vopts -> codec], codec_list[vopts -> codec]);
+  str = g_strdup_printf (_("%s file (*.%s)"), codec_name[vopts -> codec], codec_list[vopts -> codec]);
   gtk_file_filter_set_name (GTK_FILE_FILTER(filter), str);
   g_free (str);
   str = g_strdup_printf ("*.%s",  codec_list[vopts -> codec]);

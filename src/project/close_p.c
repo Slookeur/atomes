@@ -368,7 +368,7 @@ void close_project (project * to_close)
     workzone.last = NULL;
     activep = -1;
     correct_this_window_title (MainWindow, g_strdup_printf ("%s", PACKAGE));
-    correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes"));
+    correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes")));
     if (workspacefile != NULL)
     {
       g_free (workspacefile);
@@ -481,7 +481,8 @@ void to_close_this_project (int to_activate, project * this_proj)
   if (nprojects > 0) close_project (this_proj);
   if (nprojects > 0)
   {
-    activate_project (NULL, GINT_TO_POINTER(to_activate));
+    int new_p = (to_activate >= nprojects) ? nprojects - 1 : to_activate;
+    activate_project (NULL, GINT_TO_POINTER(new_p));
   }
   else if (! atomes_render_image || atomes_from_libreoffice)
   {
@@ -522,6 +523,6 @@ G_MODULE_EXPORT void on_close_activate (GtkWidget * widg, gpointer cdata)
   }
   else
   {
-    show_warning ("No project to be closed", MainWindow);
+    show_warning (_("No project to be closed"), MainWindow);
   }
 }

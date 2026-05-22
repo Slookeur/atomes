@@ -111,7 +111,7 @@ G_MODULE_EXPORT void turn_bonding_on (GtkToggleButton * but, gpointer data)
 */
 GtkWidget * create_search_box (int aid, project * this_proj)
 {
-  gchar * appl[5] = {" Move atom(s)", " Replace atom(s)", " Remove atom(s)", " Insert atom(s)", " Move atom(s)"};
+  gchar * appl[5] = {i18n(" Move atom(s)"), i18n(" Replace atom(s)"), i18n(" Remove atom(s)"), i18n(" Insert atom(s)"), i18n(" Move atom(s)")};
   gchar * img[4]= {EDITA, LIST_REM, LIST_ADD, MEDIA_PLAY};
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
@@ -135,7 +135,7 @@ GtkWidget * create_search_box (int aid, project * this_proj)
     int j = (aid == 1) ? 0 : 1;
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    this_proj -> modelgl -> atom_win -> edition_but[j] = check_button("Extract/rebuild the object(s) to be moved, ie. cut/clean bonds with nearest neighbor(s)",
+    this_proj -> modelgl -> atom_win -> edition_but[j] = check_button(_("Extract/rebuild the object(s) to be moved, ie. cut/clean bonds with nearest neighbor(s)"),
                                                                        -1, 25, this_proj -> modelgl -> rebuild[0][j], G_CALLBACK(turn_rebuild_on), & this_proj -> modelgl -> colorp[0][j]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, this_proj -> modelgl -> atom_win -> edition_but[j], FALSE, FALSE, 50);
   }
@@ -143,7 +143,7 @@ GtkWidget * create_search_box (int aid, project * this_proj)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    widg = check_button("Recompute bonding information using bond cutoff(s)",
+    widg = check_button(_("Recompute bonding information using bond cutoffs"),
                         -1, 25, this_proj -> modelgl -> search_widg[aid+1] -> recompute_bonding, G_CALLBACK(turn_bonding_on),  this_proj -> modelgl -> search_widg[aid+1]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 50);
   }
@@ -154,10 +154,10 @@ GtkWidget * create_search_box (int aid, project * this_proj)
     GtkWidget * but;
     if (aid == 5)
     {
-      layout_add_widget (lay, markup_label("Repeat <i>n</i> times, <i>n</i>= ", 100, -1, 0.0, 0.5), 125, 25);
+      layout_add_widget (lay, markup_label(_("Repeat <i>n</i> times, <i>n</i>= "), 100, -1, 0.0, 0.5), 125, 25);
       layout_add_widget (lay, spin_button (G_CALLBACK(repeat_move), 1, 1, 1000, 1, 0, 100, this_proj), 275, 20);
     }
-    but = create_button (appl[aid-1], IMG_STOCK, img[aid-2], 100, 35, GTK_RELIEF_NORMAL, G_CALLBACK(take_action), & this_proj -> modelgl -> search_widg[aid+1] -> pointer[0]);
+    but = create_button (_(appl[aid-1]), IMG_STOCK, img[aid-2], 100, 35, GTK_RELIEF_NORMAL, G_CALLBACK(take_action), & this_proj -> modelgl -> search_widg[aid+1] -> pointer[0]);
     layout_add_widget (lay, but, 500, 20);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, lay, FALSE, FALSE, 0);
   }
@@ -223,7 +223,7 @@ GtkWidget * create_action_combo (int id, project * this_proj)
   {
     combo = create_combo ();
     int i;
-    for (i=0; i<3; i++) combo_text_append (combo, action_atoms[i]);
+    for (i=0; i<3; i++) combo_text_append (combo, _(action_atoms[i]));
     combo_set_active (combo, this_proj -> modelgl -> search_widg[id+2] -> status);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_atoms_for_action), & this_proj -> modelgl -> search_widg[id+2] -> pointer[0]);
   }
@@ -266,7 +266,7 @@ G_MODULE_EXPORT void expanding_atoms (GtkWidget * exp, gpointer data)
 */
 GtkWidget * action_tab (int aid, project * this_proj)
 {
-  gchar * action[7] = {"moved", "replaced", "removed", "inserted", "moved randomly", " ", "passivated"};
+  gchar * action[7] = {i18n("moved"), i18n("replaced"), i18n("removed"), i18n("inserted"), i18n("moved randomly"), " ", i18n("passivated")};
   GtkWidget * vbox = create_vbox (BSEP);
   atom_search * asearch = this_proj -> modelgl -> search_widg[aid+2];
   GtkWidget * hbox;
@@ -274,7 +274,7 @@ GtkWidget * action_tab (int aid, project * this_proj)
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-    gchar * str = g_strdup_printf ("<u>Select the object(s) to be %s in:</u> ", action[aid]);
+    gchar * str = g_strdup_printf (_("<u>Select the object(s) to be %s in:</u> "), _(action[aid]));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
     g_free (str);
     this_proj -> modelgl -> atom_win -> atom_combo[aid] = create_action_combo (aid, this_proj);
@@ -284,11 +284,11 @@ GtkWidget * action_tab (int aid, project * this_proj)
   GtkWidget * tbox = create_search_box (aid+1, this_proj);
   if (! aid)
   {
-    gchar * exp_name[3] = {"<b>Atom selection:</b>", "<b>Translate:</b>", "<b>Rotate:</b>"};
+    gchar * exp_name[3] = {i18n("<b>Atom selection:</b>"), i18n("<b>Translate:</b>"), i18n("<b>Rotate:</b>")};
     int i;
     for (i=0; i<3; i++)
     {
-      this_proj -> modelgl -> atom_win -> at_expand[i] = create_expander (exp_name[i], NULL);
+      this_proj -> modelgl -> atom_win -> at_expand[i] = create_expander (_(exp_name[i]), NULL);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, sbox, this_proj -> modelgl -> atom_win -> at_expand[i], TRUE, TRUE, 10);
       if (! i)
       {
@@ -310,15 +310,15 @@ GtkWidget * action_tab (int aid, project * this_proj)
     if (aid < 3)
     {
       asearch -> mode_box = create_combo ();
-      combo_text_append (asearch -> mode_box, "Normally");
-      combo_text_append (asearch -> mode_box, "Randomly");
+      combo_text_append (asearch -> mode_box, _("Normally"));
+      combo_text_append (asearch -> mode_box, _("Randomly"));
       combo_set_active (asearch -> mode_box, 0);
       g_signal_connect (G_OBJECT (asearch -> mode_box), "changed", G_CALLBACK(set_search_mode), asearch);
       GtkWidget * box = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, sbox, box, FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label("<b>.</b>", 5, -1, 0.0, 0.5), FALSE, FALSE, 10);
-      gchar * type_of[2]={"Replace: ", "Remove: "};
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label(type_of[aid-1], 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      gchar * type_of[2]={i18n("Replace: "), i18n("Remove: ")};
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, markup_label(_(type_of[aid-1]), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, asearch -> mode_box, FALSE, FALSE, 5);
     }
     add_box_child_start (GTK_ORIENTATION_VERTICAL, sbox, tbox, FALSE, FALSE, 0);
@@ -329,7 +329,7 @@ GtkWidget * action_tab (int aid, project * this_proj)
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                         check_button ("Reset transformation(s)", -1, 35, FALSE, G_CALLBACK(set_reset_transformation), & asearch -> pointer[0]),
+                         check_button (_("Reset transformation(s)"), -1, 35, FALSE, G_CALLBACK(set_reset_transformation), & asearch -> pointer[0]),
                          FALSE, FALSE, 10);
   }
   show_the_widgets (vbox);

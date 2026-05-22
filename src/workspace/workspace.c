@@ -86,12 +86,12 @@ GdkPixbuf * wpix = NULL;
 gchar * wchar = NULL;
 int projects_in_workspace = 0;
 
-char * work_menu_items[NITEMS] = {"Workspace                ",
-                                  "Settings                 ",
-                                  //"OpenGL - 3D            ",
-                                  "Visualization            ",
-                                  //"Calc. visualization    ",
-                                  "Analysis                 "};
+char * work_menu_items[NITEMS] = {i18n("Workspace                "),
+                                  i18n("Settings                 "),
+                                  //i18n("OpenGL - 3D            "),
+                                  i18n("Visualization            "),
+                                  //i18n("Calc. visualization    "),
+                                  i18n("Analysis                 ")};
 
 /*!
   \fn void add_project (GtkTreeStore * store, int i)
@@ -121,20 +121,20 @@ void add_project (GtkTreeStore * store, int i)
   prpath[i] = gtk_tree_model_get_path (GTK_TREE_MODEL(store), & piter[i]);
   g_free (tmp);
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, SETTING, 1, work_menu_items[1], 2, -3, -1);
+  gtk_tree_store_set (store, & steplevel, 0, SETTING, 1, _(work_menu_items[1]), 2, -3, -1);
   // OpenGL
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, OGLM, 1, work_menu_items[2], 2, -2, -1);
+  gtk_tree_store_set (store, & steplevel, 0, OGLM, 1, _(work_menu_items[2]), 2, -2, -1);
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
+  gtk_tree_store_set (store, & steplevel, 0, RUN, 1, _(work_menu_items[3]), 2, -1, -1);
 
   for (j=0; j<NCALCS; j++)
   {
     if (j < NCALCS-2 || get_project_by_id(i) -> steps > 1)
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
-      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, graph_name[j], 2, j, -1);
+      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, _(graph_name[j]), 2, j, -1);
     }
   }
   gtk_tree_view_expand_to_path (GTK_TREE_VIEW(worktree), gtk_tree_model_get_path(GTK_TREE_MODEL(store), & worklevel));
@@ -153,7 +153,7 @@ static void fill_workspace (GtkTreeStore * store)
   int i;
 
   gtk_tree_store_append (store, & worklevel, NULL);
-  gtk_tree_store_set (store, & worklevel, 0, THETD, 1, work_menu_items[0], 2, -4, -1);
+  gtk_tree_store_set (store, & worklevel, 0, THETD, 1, _(work_menu_items[0]), 2, -4, -1);
 
   if (piter != NULL) g_free (piter);
   if (prpath != NULL) g_free (prpath);
@@ -346,9 +346,9 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
   int i, j, k;
   gchar * tmp;
   i = GPOINTER_TO_INT (edata);
-  tmp = g_strdup_printf ("Please enter a new name for project N°%d", i);
+  tmp = g_strdup_printf (_("Please enter a new name for project N°%d"), i);
   project * this_proj = get_project_by_id(i);
-  tmp = cask(tmp, "Project name", i, this_proj -> name, MainWindow);
+  tmp = cask(tmp, _("Project name"), i, this_proj -> name, MainWindow);
   if (tmp != NULL)
   {
     this_proj -> name = g_strdup_printf ("%s", tmp);
@@ -365,56 +365,56 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     {
       if (this_proj -> modelgl -> win  != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> win, g_strdup_printf ("%s - 3D view - [%s mode]", tmp_title, mode_name[this_proj -> modelgl -> mode]));
+        correct_this_window_title (this_proj -> modelgl -> win, g_strdup_printf (_("%s - 3D view - [%s mode]"), tmp_title, _(mode_name[this_proj -> modelgl -> mode])));
       }
-      gchar * win_title[2]={"Atom(s) configuration", "Clone(s) configuration"};
+      gchar * win_title[2]={i18n("Atom(s) configuration"), i18n("Clone(s) configuration")};
       for (j=0; j<2; j++)
       {
         if (this_proj -> modelgl -> model_win[j] != NULL)
         {
-          correct_this_window_title (this_proj -> modelgl -> model_win[j] -> win, g_strdup_printf ("%s - %s", win_title[j], tmp_title));
+          correct_this_window_title (this_proj -> modelgl -> model_win[j] -> win, g_strdup_printf ("%s - %s", _(win_title[j]), tmp_title));
         }
       }
       if (this_proj -> modelgl -> coord_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> coord_win -> win, g_strdup_printf ("Environments configuration - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> coord_win -> win, g_strdup_printf (_("Environments configuration - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> atom_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> atom_win -> win, g_strdup_printf ("Model edition - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> atom_win -> win, g_strdup_printf (_("Model edition - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> cell_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> cell_win -> win, g_strdup_printf ("Cell edition - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> cell_win -> win, g_strdup_printf (_("Cell edition - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> opengl_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> opengl_win -> win, g_strdup_printf ("OpenGL material aspect and light settings - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> opengl_win -> win, g_strdup_printf (_("OpenGL material aspect and light settings - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> spiner != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> spiner -> win, g_strdup_printf ("%s - spin", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> spiner -> win, g_strdup_printf (_("%s - spin"), tmp_title));
       }
       if (this_proj -> modelgl -> player != NULL)
       {
         j = this_proj -> modelgl -> anim -> last -> img -> step;
-        correct_this_window_title (this_proj -> modelgl -> player -> win, g_strdup_printf ("%s - player - step %d", tmp_title, j));
+        correct_this_window_title (this_proj -> modelgl -> player -> win, g_strdup_printf (_("%s - player - step %d"), tmp_title, j));
       }
       if (this_proj -> modelgl -> measure_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> measure_win -> win, g_strdup_printf ("%s - measures", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> measure_win -> win, g_strdup_printf (_("%s - measures"), tmp_title));
       }
       if (this_proj -> modelgl -> gradient_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> gradient_win -> win, g_strdup_printf ("%s - background settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> gradient_win -> win, g_strdup_printf (_("%s - background settings"), tmp_title));
       }
       if (this_proj -> modelgl -> box_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> box_win -> win, g_strdup_printf ("%s - box settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> box_win -> win, g_strdup_printf (_("%s - box settings"), tmp_title));
       }
       if (this_proj -> modelgl -> axis_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> axis_win -> win, g_strdup_printf ("%s - axis settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> axis_win -> win, g_strdup_printf (_("%s - axis settings"), tmp_title));
       }
       if (this_proj -> modelgl -> rep_win != NULL)
       {
@@ -438,7 +438,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     if (activep == i)
     {
       correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title(active_project -> name)));
-      correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
+      correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
     }
   }
 }

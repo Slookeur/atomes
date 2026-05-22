@@ -120,7 +120,7 @@ G_MODULE_EXPORT void set_axis_min (GtkEntry * res, gpointer data)
     }
     else
     {
-      show_warning ("Axis min must be < to axis max", this_curve -> window);
+      show_warning (_("Axis min must be < to axis max"), this_curve -> window);
     }
     update_entry_double (res, this_curve -> axmin[i]);
     update_curve (data);
@@ -147,7 +147,7 @@ G_MODULE_EXPORT void set_axis_max (GtkEntry * res, gpointer data)
   }
   else
   {
-    show_warning ("Axis max must be > to axis min", this_curve -> window);
+    show_warning (_("Axis max must be > to axis min"), this_curve -> window);
   }
   update_entry_double (res, this_curve -> axmax[i]);
   update_curve (data);
@@ -176,7 +176,7 @@ G_MODULE_EXPORT void set_max_div (GtkEntry * maj, gpointer data)
   }
   else
   {
-    show_warning ("Major tick must be > 0.0", this_curve -> window);
+    show_warning (_("Major tick must be > 0.0"), this_curve -> window);
   }
   update_entry_double (maj, this_curve -> majt[i]);
 }
@@ -700,10 +700,10 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 #endif
   GtkWidget * ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("<b>Select axis:</b>", 175, -1, 1.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("<b>Select axis:</b>"), 175, -1, 1.0, 0.5), FALSE, FALSE, 0);
   cedit -> axischoice = create_combo ();
-  combo_text_append (cedit -> axischoice, "X axis");
-  combo_text_append (cedit -> axischoice, "Y axis");
+  combo_text_append (cedit -> axischoice, _("X axis"));
+  combo_text_append (cedit -> axischoice, _("Y axis"));
   combo_set_active (cedit -> axischoice, 0);
   gtk_widget_set_size_request (cedit -> axischoice, 80, 35);
   g_signal_connect (G_OBJECT(cedit -> axischoice), "changed", G_CALLBACK(update_axis), data);
@@ -713,38 +713,38 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox,  markup_label("Scale type:", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox,  markup_label(_("Scale type:"), 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
   cedit -> scale_box = create_combo ();
-  combo_text_append (cedit -> scale_box, "Linear");
+  combo_text_append (cedit -> scale_box, _("Linear"));
   combo_text_append (cedit -> scale_box, "Log");
   combo_set_active (cedit -> scale_box, this_curve -> scale[0]);
   gtk_widget_set_size_request (cedit -> scale_box, 80, -1);
   cedit -> handler_id = g_signal_connect (G_OBJECT(cedit -> scale_box), "changed", G_CALLBACK(set_scale), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> scale_box, FALSE, FALSE, 0);
-  cedit -> auto_scale = create_button ("Autoscale axis", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_autoscale), data);
+  cedit -> auto_scale = create_button (_("Autoscale axis"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_autoscale), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> auto_scale, FALSE, FALSE, 30);
 
 // Axis min and max
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Min:", 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("Min:"), 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
   cedit -> vmin = create_entry (G_CALLBACK(set_axis_min), 100, 15, FALSE, data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> vmin, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Max:", 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("Max:"), 30, -1, 0.5, 0.5), FALSE, FALSE, 20);
   cedit -> vmax = create_entry (G_CALLBACK(set_axis_max), 100, 15, FALSE, data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> vmax, FALSE, FALSE, 0);
 
 // Major ticks spacing
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 1);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Major ticks spacing:", 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("Major ticks spacing:"), 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
   cedit -> majt = create_entry (G_CALLBACK(set_max_div), 100, 15, FALSE, data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> majt, FALSE, FALSE, 0);
 
 // Number of minors ticks
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 1);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("Number of minor ticks:", 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("Number of minor ticks:"), 160, -1, 0.0, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
     cedit -> nmi[i] = spin_button (G_CALLBACK(set_min_div_spin), (double)this_curve -> mint[i]-1.0, 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
@@ -754,35 +754,35 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 // Ticks ...
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("<u>Tick marks:</u>", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("<u>Tick marks:</u>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
 
 // ... position ...
-  ahbox = abox (axisbox, "Location:", 1);
+  ahbox = abox (axisbox, _("Location:"), 1);
   cedit -> ticks_inout_box = create_combo ();
-  combo_text_append (cedit -> ticks_inout_box, "In");
-  combo_text_append (cedit -> ticks_inout_box, "Out");
+  combo_text_append (cedit -> ticks_inout_box, _("In"));
+  combo_text_append (cedit -> ticks_inout_box, _("Out"));
   gtk_widget_set_size_request (cedit -> ticks_inout_box, 60, -1);
   g_signal_connect (G_OBJECT(cedit -> ticks_inout_box), "changed", G_CALLBACK(set_io_ticks), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> ticks_inout_box, FALSE, FALSE, 3);
 
   cedit -> ticks_pos_box = create_combo ();
-  combo_text_append (cedit -> ticks_pos_box, "Normal");
-  combo_text_append (cedit -> ticks_pos_box, "Opposite");
-  combo_text_append (cedit -> ticks_pos_box, "Both");
-  combo_text_append (cedit -> ticks_pos_box, "None");
+  combo_text_append (cedit -> ticks_pos_box, _("Normal"));
+  combo_text_append (cedit -> ticks_pos_box, _("Opposite"));
+  combo_text_append (cedit -> ticks_pos_box, _("Both"));
+  combo_text_append (cedit -> ticks_pos_box, _("None"));
   gtk_widget_set_size_request (cedit -> ticks_pos_box, 100, -1);
   g_signal_connect (G_OBJECT(cedit -> ticks_pos_box), "changed", G_CALLBACK(set_pos_ticks), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> ticks_pos_box, FALSE, FALSE, 3);
 
 //  ... sizes ...
 
-  ahbox = abox (axisbox, "Major ticks size:", 1);
+  ahbox = abox (axisbox, _("Major ticks size:"), 1);
   for (i=0; i<2; i++)
   {
     cedit -> mats[i] = spin_button (G_CALLBACK(set_ticks_size_major_spin), (double)this_curve -> majt_size[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> mats[i], FALSE, FALSE, 0);
   }
-  ahbox = abox (axisbox, "Minor ticks size:", 1);
+  ahbox = abox (axisbox, _("Minor ticks size:"), 1);
   for (i=0; i<2; i++)
   {
     cedit -> mits[i] = spin_button (G_CALLBACK(set_ticks_size_minor_spin), (double)this_curve -> mint_size[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
@@ -792,21 +792,21 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 // Ticks labels ...
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("<u>Tick labels:</u>", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label(_("<u>Tick labels:</u>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
 
 // ... position ...
-  ahbox = abox (axisbox, "Location:", 1);
+  ahbox = abox (axisbox, _("Location:"), 1);
   cedit -> labels_pos_box = create_combo ();
-  combo_text_append (cedit -> labels_pos_box, "Normal");
-  combo_text_append (cedit -> labels_pos_box, "Opposite");
-  combo_text_append (cedit -> labels_pos_box, "Both");
-  combo_text_append (cedit -> labels_pos_box, "None");
+  combo_text_append (cedit -> labels_pos_box, _("Normal"));
+  combo_text_append (cedit -> labels_pos_box, _("Opposite"));
+  combo_text_append (cedit -> labels_pos_box, _("Both"));
+  combo_text_append (cedit -> labels_pos_box, _("None"));
   gtk_widget_set_size_request (cedit -> labels_pos_box, 150, -1);
   g_signal_connect (G_OBJECT(cedit -> labels_pos_box), "changed", G_CALLBACK(set_pos_labels), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> labels_pos_box, FALSE, FALSE, 0);
 
 // ... significant digits ...
-  ahbox = abox (axisbox, "Significant digits:", 1);
+  ahbox = abox (axisbox, _("Significant digits:"), 1);
   for (i=0; i<2; i++)
   {
     cedit -> ndi[i] = spin_button (G_CALLBACK(set_lab_digit_spin), (double)this_curve -> labels_digit[i], 0.0, 100.0, 1.0, 0, 50, & cedit -> dataxe[i]);
@@ -815,14 +815,14 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
 
 // ... font ...
   cedit -> ticks_labels_font = font_button (this_curve -> labels_font[0], 150, 35, G_CALLBACK(set_ticks_labels_font), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 1), cedit -> ticks_labels_font, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, _("Font:"), 1), cedit -> ticks_labels_font, FALSE, FALSE, 5);
 
 // ... angle ..
   cedit -> ticks_labels_angle = create_hscale (-180.0, 180.0, 1.0, 0.0, GTK_POS_LEFT, 0, 150, G_CALLBACK(set_ticks_angle), G_CALLBACK(scroll_set_ticks_angle), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Angle:", 1), cedit -> ticks_labels_angle, FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, _("Angle:"), 1), cedit -> ticks_labels_angle, FALSE, FALSE, 5);
 
 // ...distance to axis
-  ahbox = abox (axisbox, "Position: ", 1);
+  ahbox = abox (axisbox, _("Position: "), 1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("x:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {
@@ -836,24 +836,24 @@ GtkWidget * create_tab_4 (curve_edition * cedit, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> npty[i], FALSE, FALSE, 0);
   }
 
-  cedit -> show_axis = check_button ("Show/Hide axis (if min[axis] &lt; 0.0 &lt; max[axis])", 100, 30, FALSE, G_CALLBACK(set_axis), data);
+  cedit -> show_axis = check_button (_("Show/Hide axis (if min[axis] &lt; 0.0 &lt; max[axis])"), 100, 30, FALSE, G_CALLBACK(set_axis), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_axis, FALSE, FALSE, 3);
-  cedit -> show_grid = check_button ("Show/Hide axis grid", 100, 30, FALSE, G_CALLBACK(set_grid), data);
+  cedit -> show_grid = check_button (_("Show/Hide axis grid"), 100, 30, FALSE, G_CALLBACK(set_grid), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, cedit -> show_grid, FALSE, FALSE, 1);
 
 // Axis title
   ahbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, axisbox, ahbox, FALSE, FALSE,3);
-  cedit -> axis_default_title = check_button ("Use default axis title", 175, -1, FALSE, G_CALLBACK(to_axis_title), data);
+  cedit -> axis_default_title = check_button (_("Use default axis title"), 175, -1, FALSE, G_CALLBACK(to_axis_title), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> axis_default_title, FALSE, FALSE, 0);
   cedit -> axis_title = create_entry (G_CALLBACK(set_axis_legend), 150, 15, FALSE, data);
   gtk_entry_set_alignment (GTK_ENTRY(cedit -> axis_title), 0.0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, cedit -> axis_title, FALSE, FALSE, 0);
 
   cedit -> axis_title_font = font_button (this_curve -> axis_title_font[0], 150, 35, G_CALLBACK(set_axis_title_font), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, "Font:", 3), cedit -> axis_title_font, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (axisbox, _("Font:"), 3), cedit -> axis_title_font, FALSE, FALSE, 0);
 
-  ahbox = abox (axisbox, "Position: ", 3);
+  ahbox = abox (axisbox, _("Position: "), 3);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label("x:", -1, -1, 0.9, 0.5), FALSE, FALSE, 10);
   for (i=0; i<2; i++)
   {

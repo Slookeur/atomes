@@ -158,7 +158,7 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
     gboolean res = gdk_pixbuf_savev (pixbuf, videofile, image_list[iopts -> codec], NULL, NULL, & error);
     if (! res && ! atomes_from_libreoffice)
     {
-      show_warning ("An error occurred when exporting an image\nyou might want to try again\nsorry for the trouble", view -> win);
+      show_warning (_("An error occurred when exporting an image\nyou might want to try again\nsorry for the trouble"), view -> win);
     }
     close_frame_buffer ();
     in_movie_encoding = FALSE;
@@ -201,10 +201,10 @@ void render_image (glwin * view, video_options * iopts)
 #else
   GtkWidget * info;
 #endif
-  info = create_file_chooser ("Render Image",
+  info = create_file_chooser (_("Render Image"),
                               GTK_WINDOW(view -> win),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
-                              "Save");
+                              _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
   gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
@@ -214,7 +214,7 @@ void render_image (glwin * view, video_options * iopts)
   gtk_file_chooser_set_current_name (chooser, str);
   g_free (str);
   filter = gtk_file_filter_new ();
-  str = g_strdup_printf ("%s file (*.%s)", image_name[iopts -> codec], image_list[iopts -> codec]);
+  str = g_strdup_printf (_("%s file (*.%s)"), image_name[iopts -> codec], image_list[iopts -> codec]);
   gtk_file_filter_set_name (GTK_FILE_FILTER(filter), str);
   g_free (str);
   str = g_strdup_printf ("*.%s", image_list[iopts -> codec]);

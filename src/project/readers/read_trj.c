@@ -176,7 +176,7 @@ int trj_get_atom_coordinates ()
     {
       if (active_project -> atoms[i-1][j].sp != active_project -> atoms[i][j].sp)
       {
-        add_reader_info (g_strdup_printf ("Error - chemical species changes between steps %d and %d, for atom %d !", i, i+1, j+1), 0);
+        add_reader_info (g_strdup_printf (_("Error - chemical species changes between steps %d and %d, for atom %d !"), i, i+1, j+1), 0);
         return 2;
       }
     }
@@ -249,9 +249,9 @@ int trj_get_atom_coordinates ()
 int open_trj_file (int linec)
 {
   if (linec%(this_reader -> natomes) != 0) return 2;
-  reader_info ("trj", "Number of atoms", this_reader -> natomes);
+  reader_info ("trj", _("Number of atoms"), this_reader -> natomes);
   active_project -> steps = linec / this_reader -> natomes;
-  reader_info ("trj", "Number of steps", active_project -> steps);
+  reader_info ("trj", _("Number of steps"), active_project -> steps);
   active_project -> natomes = this_reader -> natomes;
   return trj_get_atom_coordinates ();
 }

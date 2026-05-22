@@ -122,70 +122,64 @@ gchar * do_styles[] = {"dot", "dots", "d", NULL};
 */
 void print_help()
 {
-  char * help    = "\nUsage: atomes [OPTION]\n"
-                   "       atomes [FILE]\n"
-                   "       atomes [OPTION] [FILE]\n"
-                   "       atomes [FILE1] [FILE2] ...\n"
-                   "       atomes [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
-                   "3D atomic-scale models analysis, creation/edition and post-processing tool\n\n"
-                   "options:\n"
-                   "  -v, --version             version information\n"
-                   "  -h, --help                display this help message\n\n"
-                   "files, any number, in any order, in the following formats:\n\n"
-                   "  atomes workspace file             : .awf\n"
-                   "  atomes project file               : .apf\n"
-                   "  XYZ coordinates file              : .xyz\n"
-                   "  Chem3D coordinates file           : .c3d\n"
-                   "  CPMD trajectory                   : .trj\n"
-                   "  VASP trajectory                   : .xdatcar\n"
-                   "  PDB coordinates                   : .pdb, .ent\n"
-                   "  Crystallographic Information File : .cif\n"
-                   "  DL-POLY history file              : .hist\n"
-                   "  ISAACS project file               : .ipf\n\n"
-                   " alternatively specify the file format using:\n\n"
-                   " -awf [FILE]\n"
-                   " -apf [FILE]\n"
-                   " -xyz [FILE]\n"
-                   " -c3d [FILE]\n"
-                   " -trj [FILE]\n"
-                   " -xdatcar [FILE]\n"
-                   " -pdb [FILE], or, -ent [FILE]\n"
-                   " -cif [FILE]\n"
-                   " -hist [FILE]\n"
-                   " -ipf [FILE]\n\n"
-                   "ex:\n\n"
-                   " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
-                   "Image rendering from the command line:\n\n"
-                   "Usage: atomes [IMAGE_OPTIONS]"
-                   "  -p, --png, --render-png    render image in PNG format\n"
-                   "  -j, --jpg, --render-jpg    render image in JPEG format\n"
-                   "  -o, --output=[FILE]        image file name\n"
-                   "  -W, --width=[XSIZE]        image width\n"
-                   "  -H, --height=[YSIZE]       image height\n"
-                   "  -s, --style=[STYLE]        rendering style\n"
-                   "  -r, --rep=[REP]            representation type\n"
-                   "  -b, --box=[STYLE]          box style\n"
-                   "  -a, --axis=[STYLE]         axis style\n"
-                   "  -e, --acolor=[MAP]         atoms and bonds color map\n"
-                   "  -t, --pcolor=[MAP]         ployhedra color map\n"
-                   "  -C, --box_color=[COLOR]    box color\n"
-                   "  -G, --back_grad=[GRAD]     background gradient type\n"
-                   "  -B, --back_color=[COLOR]   background color\n"
-                   "  -D, --back_dir=[DIR]       background direction\n"
-                   "  -P, --back_pos=[POS]       colors mixed position\n"
-                   "  -U, --grad_col_a=[COL]     gradient initial color\n"
-                   "  -V, --grad_col_b=[COL]     gradient final color\n\n"
-
-                   "ex:\n\n"
-                   " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
-                   " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n";
-  char bug[20] = "\nReport a bug to <";
-  char eh[4] = ">\n";
-
-  printf("%s", help);
-  printf("%s", bug);
-  printf("%s", PACKAGE_BUGREPORT);
-  printf("%s\n", eh);
+  printf (_("\nUsage: atomes [OPTION]\n"
+            "       atomes [FILE]\n"
+            "       atomes [OPTION] [FILE]\n"
+            "       atomes [FILE1] [FILE2] ...\n"
+            "       atomes [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
+            "3D atomic-scale models analysis, creation/edition and post-processing tool\n\n"
+            "options:\n"
+            "  -v, --version             version information\n"
+            "  -h, --help                display this help message\n\n"
+            "files, any number, in any order, in the following formats:\n\n"
+            "  atomes workspace file             : .awf\n"
+            "  atomes project file               : .apf\n"
+            "  XYZ coordinates file              : .xyz\n"
+            "  Chem3D coordinates file           : .c3d\n"
+            "  CPMD trajectory                   : .trj\n"
+            "  VASP trajectory                   : .xdatcar\n"
+            "  PDB coordinates                   : .pdb, .ent\n"
+            "  Crystallographic Information File : .cif\n"
+            "  DL-POLY history file              : .hist\n"
+            "  ISAACS project file               : .ipf\n\n"
+            " alternatively specify the file format using:\n\n"
+            " -awf [FILE]\n"
+            " -apf [FILE]\n"
+            " -xyz [FILE]\n"
+            " -c3d [FILE]\n"
+            " -trj [FILE]\n"
+            " -xdatcar [FILE]\n"
+            " -pdb [FILE], or, -ent [FILE]\n"
+            " -cif [FILE]\n"
+            " -hist [FILE]\n"
+            " -ipf [FILE]\n\n"
+            "ex:\n\n"
+            " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
+            "Image rendering from the command line:\n\n"
+            "Usage: atomes [IMAGE_OPTIONS]\n"
+            "  -p, --png, --render-png    render image in PNG format\n"
+            "  -j, --jpg, --render-jpg    render image in JPEG format\n"
+            "  -o, --output=[FILE]        image file name\n"
+            "  -W, --width=[XSIZE]        image width\n"
+            "  -H, --height=[YSIZE]       image height\n"
+            "  -s, --style=[STYLE]        rendering style\n"
+            "  -r, --rep=[REP]            representation type\n"
+            "  -b, --box=[STYLE]          box style\n"
+            "  -a, --axis=[STYLE]         axis style\n"
+            "  -e, --acolor=[MAP]         atoms and bonds color map\n"
+            "  -t, --pcolor=[MAP]         ployhedra color map\n"
+            "  -C, --box_color=[COLOR]    box color\n"
+            "  -G, --back_grad=[GRAD]     background gradient type\n"
+            "  -B, --back_color=[COLOR]   background color\n"
+            "  -D, --back_dir=[DIR]       background gradient direction\n"
+            "  -P, --back_pos=[POS]       colors mixed position\n"
+            "  -U, --grad_col_a=[COL]     gradient initial color\n"
+            "  -V, --grad_col_b=[COL]     gradient final color\n\n"
+            "ex:\n\n"
+            " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
+            " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"));
+  printf ("%s", _("\nReport a bug to <"));
+  printf ("%s>\n\n", PACKAGE_BUGREPORT);
 }
 
 /*!
@@ -195,11 +189,7 @@ void print_help()
 */
 void print_version ()
 {
-  char scanid[80]="\n3D atomic scale model analysis, creation/edition and post-processing tool\n";
-  char bug[20] = "\nReport a bug to <";
-  char eh[4] = ">\n";
-
-  printf ("%s", scanid);
+  printf ("%s", _("\n3D atomic scale model analysis, creation/edition and post-processing tool\n"));
   printf ("\n%s version         : %s\n", PACKAGE, VERSION);
   printf ("\nGTK+ version           : %1d.%1d.%1d\n",
           GTK_MAJOR_VERSION,
@@ -262,9 +252,8 @@ void print_version ()
   printf ("C     Compiler         : %s\n", CC);
   printf ("C     Compiler flags   : %s\n", CFLAGS);
 
-  printf ("%s", bug);
-  printf ("%s", PACKAGE_BUGREPORT);
-  printf ("%s\n", eh);
+  printf ("%s", _("\nReport a bug to <"));
+  printf ("%s>\n\n", PACKAGE_BUGREPORT);
 }
 
 /*!
@@ -839,7 +828,7 @@ void read_this_file (int file_type, gchar * this_file)
     int i = open_save_workspace (fp, 0);
     if (i != 0)
     {
-      gchar * err = g_strdup_printf ("Error while reading workspace file\n%s\nError code: %d\n", this_file, i);
+      gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\nError code: %d\n"), this_file, i);
       show_error (err, 0, MainWindow);
       g_free (err);
     }
@@ -1013,6 +1002,10 @@ void open_this_data_file (int file_type, gchar * file_name)
 */
 G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
 {
+  /* GTK re-initializes the locale during startup (gtk_init calls setlocale(LC_ALL, "")),
+     which overrides the LC_NUMERIC = "C" set in main(). We must enforce it again here
+     to ensure floating-point parsing/formatting always uses the English (dot) convention. */
+  setlocale (LC_NUMERIC, "C");
   GtkSettings * default_settings = gtk_settings_get_default ();
 /*
 #ifndef G_OS_WIN32
@@ -1049,7 +1042,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
     GtkWidget * isplash = create_splash_window ();
     if (isplash == NULL)
     {
-      g_warning ("Impossible to load the splash screen\n");
+      g_warning (_("Impossible to load the splash screen\n"));
     }
     else
     {
@@ -1151,13 +1144,13 @@ int check_opengl_rendering ()
   switch (res)
   {
     case 1:
-      ogl_info = g_strdup_printf ("Fatal error on OpenGL initialization: trying to adjust environment !");
+      ogl_info = g_strdup_printf (_("Fatal error on OpenGL initialization: trying to adjust environment !"));
       break;
     case -2:
-      ogl_info = g_strdup_printf ("Impossible to initialize the OpenGL 3D rendering !");
+      ogl_info = g_strdup_printf (_("Impossible to initialize the OpenGL 3D rendering !"));
       break;
     case -1:
-      ogl_info = g_strdup_printf ("GDK visual must be modified to initialize the OpenGL context !");
+      ogl_info = g_strdup_printf (_("GDK visual must be modified to initialize the OpenGL context !"));
       break;
     default:
       break;
@@ -1185,6 +1178,7 @@ int main (int argc, char *argv[])
 
 #ifdef G_OS_WIN32
   PACKAGE_PREFIX = g_win32_get_package_installation_directory_of_module (NULL);
+  PACKAGE_LOCALE = g_build_filename (PACKAGE_PREFIX, "locale", NULL);
   // g_win32_get_package_installation_directory (NULL, NULL);
 #endif
   PACKAGE_LIB_DIR = g_build_filename (PACKAGE_PREFIX, "library", NULL);
@@ -1284,7 +1278,7 @@ int main (int argc, char *argv[])
     HRESULT hr = SHGetKnownFolderPath (& FOLDERID_LocalAppData, 0, NULL, & localPath);
     if (FAILED(hr))
     {
-      fprintf (stderr, "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s", hr);
+      fprintf (stderr, _("Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"), hr);
       ATOMES_CONFIG_DIR = NULL;
       ATOMES_CONFIG = NULL;
     }
@@ -1302,9 +1296,12 @@ int main (int argc, char *argv[])
     ATOMES_CONFIG_DIR = g_strdup_printf ("%s/.config/atomes", pw -> pw_dir);
     ATOMES_CONFIG = g_strdup_printf ("%s/atomes.pml", ATOMES_CONFIG_DIR);
 #endif
+
+    bindtextdomain (PACKAGE, PACKAGE_LOCALE);
+    textdomain (PACKAGE);
+
     set_atomes_preferences ();
-    // setlocale(LC_ALL,"en_US");
-    gtk_disable_setlocale ();
+
 #if GLIB_MINOR_VERSION < 74
     AtomesApp = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
 #else

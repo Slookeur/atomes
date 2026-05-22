@@ -240,6 +240,19 @@ image * clean_image (project * to_clean, image * to_cli)
       g_free (to_cli -> show_coord[i]);
       to_cli -> show_coord[i] = NULL;
     }
+    if (to_cli -> spcolor[i])
+    {
+      for (j=0; j<((i < 2) ? to_clean -> nspec : 1); j++)
+      {
+        if (to_cli -> spcolor[i][j])
+        {
+          g_free (to_cli -> spcolor[i][j]);
+          to_cli -> spcolor[i][j] = NULL;
+        }
+      }
+      g_free (to_cli -> spcolor[i]);
+      to_cli -> spcolor[i] = NULL;
+    }
   }
   if (to_cli -> at_color)
   {
@@ -260,22 +273,6 @@ image * clean_image (project * to_clean, image * to_cli)
   {
     g_free (to_cli -> atomicrad);
     to_cli -> atomicrad = NULL;
-  }
-  for (i=0; i<9; i++)
-  {
-    if (to_cli -> spcolor[i])
-    {
-      for (j=0; j<((i < 2) ? to_clean -> nspec : 1); j++)
-      {
-        if (to_cli -> spcolor[i][j])
-        {
-          g_free (to_cli -> spcolor[i][j]);
-          to_cli -> spcolor[i][j] = NULL;
-        }
-      }
-      g_free (to_cli -> spcolor[i]);
-      to_cli -> spcolor[i] = NULL;
-    }
   }
   for (i=0; i<2; i++)
   {
@@ -328,13 +325,12 @@ void clean_animation (project * proj, glwin * view)
 {
   int i;
   snapshot * shot = view -> anim -> first;
-  snapshot * del;
+  shot = view -> anim -> first;
   for (i=0; i < view -> anim -> frames-1; i++)
   {
-    del = shot;
     shot -> img = clean_image (proj, shot -> img);
     shot = shot -> next;
-    g_free (del);
+    g_free (shot -> prev);
   }
   view -> anim -> first = view -> anim -> last = shot;
   view -> anim -> frames = 0;
@@ -456,11 +452,11 @@ void window_encode (glwin * view, gboolean video)
   int i;
   if (video)
   {
-    str = g_strdup_printf ("%s - movie encoding", prepare_for_title(get_project_by_id(view -> proj) -> name));
+    str = g_strdup_printf (_("%s - movie encoding"), prepare_for_title(get_project_by_id(view -> proj) -> name));
   }
   else
   {
-    str = g_strdup_printf ("%s - image rendering", prepare_for_title(get_project_by_id(view -> proj) -> name));
+    str = g_strdup_printf (_("%s - image rendering"), prepare_for_title(get_project_by_id(view -> proj) -> name));
   }
   GtkWidget * win = dialog_cancel_apply (str, view -> win, FALSE);
   g_free (str);
@@ -473,7 +469,7 @@ void window_encode (glwin * view, gboolean video)
     hbox = create_hbox (0);
     gtk_widget_set_size_request (hbox, 300, -1);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Frames recorded:", 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Frames recorded:"), 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
     str = g_strdup_printf ("<b>%d</b>", view -> anim -> frames);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
@@ -482,7 +478,7 @@ void window_encode (glwin * view, gboolean video)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     gtk_widget_set_size_request (hbox, 300, -1);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Frames per seconds:", 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Frames per seconds:"), 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
     resf = create_entry (G_CALLBACK(set_video_frames), 100, 10, FALSE, NULL);
     framesec = 24;
     update_entry_int (GTK_ENTRY(resf), framesec);
@@ -492,17 +488,17 @@ void window_encode (glwin * view, gboolean video)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
     gtk_widget_set_size_request (hbox, 300, -1);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Extra frames every (frames):", 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Extra frames every (frames):"), 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
     rese = create_entry (G_CALLBACK(set_video_extra_frames), 100, 10, FALSE, NULL);
     extraframes = 10;
     update_entry_int (GTK_ENTRY(rese), extraframes);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rese, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Movie resolution (in pixels):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("Movie resolution (in pixels):"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   }
   else
   {
     gtk_widget_set_size_request (vbox, -1, 230);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Image resolution (in pixels):", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("Image resolution (in pixels):"), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   }
   hbox = create_hbox (0);
   gtk_widget_set_size_request (hbox, 300, -1);
@@ -524,14 +520,14 @@ void window_encode (glwin * view, gboolean video)
   if (video)
   {
     // Codec
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Video codec:", 300, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Video codec:"), 300, -1, 0.0, 0.5), FALSE, FALSE, 0);
     for (i=0; i<VIDEO_CODECS; i++) combo_text_append (cod, codec_name[i]);
     g_signal_connect (G_OBJECT(cod), "changed", G_CALLBACK(set_video_codec), NULL);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cod, FALSE, FALSE, 0);
   }
   else
   {
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Image format:", 150, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Image format:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 0);
     GtkWidget * fixed = gtk_fixed_new ();
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, TRUE, TRUE, 0);
     for (i=0; i<IMAGE_FORMATS; i++) combo_text_append (cod, image_name[i]);
@@ -551,7 +547,7 @@ void window_encode (glwin * view, gboolean video)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
     gtk_widget_set_size_request (hbox, 300, -1);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Video quality (bitrate in kb/s):", 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Video quality (bitrate in kb/s):"), 350, -1, 0.0, 0.5), FALSE, FALSE, 0);
     resb = create_entry (G_CALLBACK(set_video_bitrate), 100, 10, FALSE, NULL);
     bitrate = 5000;
     update_entry_int (GTK_ENTRY(resb), bitrate);
@@ -565,18 +561,18 @@ void window_encode (glwin * view, gboolean video)
   {
     if (video)
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= recorded quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("OpenGL quality [0-1000] (0= recorded quality):"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
     else
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("OpenGL quality [0-1000] (0= on-screen quality):", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("OpenGL quality [0-1000] (0= on-screen quality):"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, spin_button (G_CALLBACK(set_video_opengl_spin), 0, 0, 1000, 1, 0, 100, NULL), FALSE, FALSE, 20);
   }
   oglquality = 0;
   if (video)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Progress: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("Progress: "), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
     encoding_pb = gtk_progress_bar_new ();
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR(encoding_pb), 0.0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, encoding_pb, FALSE, FALSE, 0);

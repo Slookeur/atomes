@@ -488,9 +488,9 @@ GtkWidget * create_selection_tree (glwin * view, int sid, int mid)
   GtkTreeViewColumn * sel_col[7];
   GtkCellRenderer * sel_cell[7];
   GtkTreeStore * sel_model;
-  gchar * ctitle[3][7]={{"Id", "Atom 1", "Atom 2", "Distance [Å]", "Using PBC", "NULL", "NULL"},
-                        {"Id", "Atom 1", "Atom 2", "Atom 3", "θ [°]", "Using PBC", "NULL"},
-                        {"Id", "Atom 1", "Atom 2", "Atom 3", "Atom 4", "ϕ [°]", "Using PBC"}};
+  gchar * ctitle[3][7]={{i18n("Id."), i18n("Atom 1"), i18n("Atom 2"), i18n("Distance [Å]"), i18n("Using PBC"), "NULL", "NULL"},
+                        {i18n("Id."), i18n("Atom 1"), i18n("Atom 2"), i18n("Atom 3"), "θ [°]", i18n("Using PBC"), "NULL"},
+                        {i18n("Id."), i18n("Atom 1"), i18n("Atom 2"), i18n("Atom 3"), i18n("Atom 4"), "ϕ [°]", i18n("Using PBC")}};
   gchar * ctype[3][7]={{"text", "text", "text", "text", "active", "text", "text"},
                        {"text", "text", "text", "text", "text", "active", "text"},
                        {"text", "text", "text", "text", "text", "text", "active"}};
@@ -515,13 +515,13 @@ GtkWidget * create_selection_tree (glwin * view, int sid, int mid)
     if ((mid == 0 && i < 4) || (mid == 1 && i < 5) || (mid == 2 && i < 6))
     {
       sel_cell[i] = gtk_cell_renderer_text_new();
-      sel_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[mid][i], sel_cell[i], ctype[mid][i], i, NULL);
+      sel_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[mid][i]), sel_cell[i], ctype[mid][i], i, NULL);
       if (i == 0) gtk_tree_view_column_set_visible (sel_col[i], FALSE);
     }
     else if ((mid == 0 && i == 4) || (mid == 1 && i == 5) || (mid == 2 && i == 6))
     {
       sel_cell[i] = gtk_cell_renderer_toggle_new ();
-      sel_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[mid][i], sel_cell[i], ctype[mid][i], i, NULL);
+      sel_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[mid][i]), sel_cell[i], ctype[mid][i], i, NULL);
     }
     gtk_tree_view_column_set_alignment (sel_col[i], 0.5);
     gtk_tree_view_append_column (GTK_TREE_VIEW(selection_tree), sel_col[i]);
@@ -623,11 +623,11 @@ gchar * create_measure_label (glwin * view, int sid)
   image * img = view -> anim -> last -> img;
   if (img -> selected[sid] -> selected < MAX_IN_SELECTION)
   {
-    str = g_strdup_printf ("\tAtom(s) in selection<sup>*</sup> :\t<b>%d</b>", img -> selected[sid] -> selected);
+    str = g_strdup_printf (_("\tAtom(s) in selection<sup>*</sup> :\t<b>%d</b>"), img -> selected[sid] -> selected);
   }
   else
   {
-    str = g_strdup_printf ("\tSorry too many [%d] atoms in selection<sup>*</sup>", img -> selected[sid] -> selected);
+    str = g_strdup_printf (_("\tSorry too many [%d] atoms in selection<sup>*</sup>"), img -> selected[sid] -> selected);
   }
   return str;
 }
@@ -672,7 +672,7 @@ G_MODULE_EXPORT void close_ml (GtkButton * but, gpointer data)
 G_MODULE_EXPORT void measure_labels (GtkButton * but, gpointer data)
 {
   glwin * view = (glwin *) data;
-  gchar * str = g_strdup_printf ("%s - measures - style", get_project_by_id(view -> proj) -> name);
+  gchar * str = g_strdup_printf (_("%s - measures - style"), get_project_by_id(view -> proj) -> name);
   GtkWidget * win = create_win (str, view -> measure_win -> win, TRUE, FALSE);
   //gtk_widget_set_size_request (win, -1, -1480);
   g_free (str);
@@ -680,7 +680,7 @@ G_MODULE_EXPORT void measure_labels (GtkButton * but, gpointer data)
   add_container_child (CONTAINER_WIN, win, vbox);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, labels_tab (view, (is_atom_win_active(view) || (view -> mode == EDITION && view -> selection_mode == NSELECTION-1)) ? 4 : 3), FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (0);
-  GtkWidget * close_but = create_button ("Close", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_ml), win);
+  GtkWidget * close_but = create_button (_("Close"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_ml), win);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, close_but, FALSE, TRUE, 150);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
   add_gtk_close_event (win, G_CALLBACK(hide_this_window), NULL);
@@ -737,7 +737,7 @@ G_MODULE_EXPORT void window_measures (GtkWidget * widg, gpointer data)
   if (view -> measure_win == NULL)
   {
     view -> measure_win = g_malloc0(sizeof*view -> measure_win);
-    gchar * str = g_strdup_printf ("%s - measures", get_project_by_id(view -> proj) -> name);
+    gchar * str = g_strdup_printf (_("%s - measures"), get_project_by_id(view -> proj) -> name);
     int pi = get_selection_type (view);
     view -> measure_win -> win = create_win (str, view -> win, FALSE, FALSE);
     gtk_widget_set_size_request (view -> measure_win -> win, 450, 500);
@@ -748,18 +748,18 @@ G_MODULE_EXPORT void window_measures (GtkWidget * widg, gpointer data)
     view -> measure_win -> label = markup_label(create_measure_label(view, pi), -1, 50, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, view -> measure_win -> label, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, FALSE, FALSE, 0);
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 0), gtk_label_new ("Distances"));
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 1), gtk_label_new ("Angles"));
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 2), gtk_label_new ("Dihedrals"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 0), gtk_label_new (_("Distances")));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 1), gtk_label_new (_("Angles")));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), measurment_tab (view, pi, 2), gtk_label_new (_("Dihedrals")));
 
-    str = g_strdup_printf ("You can select up to %d atoms for both inter-atomic distance(s) and angle(s),",  MAX_IN_SELECTION-1);
+    str = g_strdup_printf (_("You can select up to %d atoms for both inter-atomic distance(s) and angle(s),"),  MAX_IN_SELECTION-1);
     append_comments (vbox, "<sup>*</sup>", str);
     g_free (str);
-    str = g_strdup_printf ("and up to %d atoms for dihedral angle(s) measurement(s)", MAX_IN_SELECTION-11);
+    str = g_strdup_printf (_("and up to %d atoms for dihedral angle(s) measurement(s)"), MAX_IN_SELECTION-11);
     append_comments (vbox, " ", str);
     g_free (str);
     GtkWidget * hbox = create_hbox (0);
-    GtkWidget * but = create_button ("Font and style", IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(measure_labels), view);
+    GtkWidget * but = create_button (_("Font and style"), IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(measure_labels), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, TRUE, 150);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
     add_gtk_close_event (view -> measure_win -> win,  G_CALLBACK(close_measure_event), view);

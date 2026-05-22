@@ -198,7 +198,7 @@ void cut_box (project * this_proj, GtkWidget * vbox)
   hbo = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbo, hbo, FALSE, FALSE, 1);
   gtk_widget_set_size_request (hbo, 250, -1);
-  str = g_strdup_printf ("Total");
+  str = g_strdup_printf (_("Total"));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (str);
   cut = create_entry (G_CALLBACK(set_cut), 120, 15, FALSE, (gpointer)GINT_TO_POINTER(k));
@@ -207,7 +207,7 @@ void cut_box (project * this_proj, GtkWidget * vbox)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbo, markup_label("&#xC5;", 30, -1, 0.0, 0.5), FALSE, FALSE, 5);
   tmpcut[k] = this_proj -> chemistry -> grtotcutoff;
   add_container_child (CONTAINER_SCR, cutscroll, vbo);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Cutoff(s) must be &#8805; 0.5 &#xC5;</b>", -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Cutoff(s) must be &#8805; 0.5 &#xC5;</b>"), -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
 }
 
 /*!
@@ -226,7 +226,7 @@ G_MODULE_EXPORT void run_window_cuts (GtkDialog * win, gint response_id, gpointe
     gboolean upc = FALSE;
     if (opengl_project -> modelgl -> rings || opengl_project -> modelgl -> chains)
     {
-      upc = ask_yes_no ("Data can be lost !", "You will lose\n rings statistics and/or chains statistics data\nProceed anyway ?", GTK_MESSAGE_WARNING, GTK_WIDGET(win));
+      upc = ask_yes_no (_("Data can be lost !"), _("You will lose\n rings statistics and/or chains statistics data\nProceed anyway ?"), GTK_MESSAGE_WARNING, GTK_WIDGET(win));
     }
     else
     {
@@ -275,7 +275,7 @@ G_MODULE_EXPORT void window_cuts (GtkWidget * widg, gpointer data)
   tint * the_data = (tint *)data;
   int p = the_data -> a;
   opengl_project_changed (p);
-  gchar * str = g_strdup_printf ("Adjust cutoff radius(ii) - %s", prepare_for_title(opengl_project -> name));
+  gchar * str = g_strdup_printf (_("Adjust cutoff radius(ii) - %s"), prepare_for_title(opengl_project -> name));
   GtkWidget * win = dialog_cancel_apply (str, opengl_project -> modelgl -> win, FALSE);
   g_free (str);
   cut_box (opengl_project, dialog_get_content_area (win));

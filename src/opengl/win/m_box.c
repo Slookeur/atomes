@@ -298,18 +298,18 @@ GtkWidget * create_layout_widget (gchar * str, GtkWidget * menu, int vab, gpoint
 GtkWidget * menu_box_axis (glwin * view, int id, int ab)
 {
   GtkWidget * widg;
-  gchar * menu_title[2]={"Box", "Axis"};
+  gchar * menu_title[2]={i18n("Box"), i18n("Axis")};
   GtkWidget * ab_menu;
   GtkWidget * menu_ab = gtk_menu_new ();
   if (id == 0 && ab == 0)
   {
-    view -> ogl_box[0] = create_menu_item (TRUE, menu_title[ab]);
+    view -> ogl_box[0] = create_menu_item (TRUE, _(menu_title[ab]));
     gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_box[0], menu_ab);
     widget_set_sensitive (view -> ogl_box[0], get_project_by_id(view -> proj) -> cell.ltype);
   }
   else
   {
-    ab_menu = create_menu_item (TRUE, menu_title[ab]);
+    ab_menu = create_menu_item (TRUE, _(menu_title[ab]));
     gtk_menu_item_set_submenu ((GtkMenuItem *)ab_menu, menu_ab);
     if (ab == 0) widget_set_sensitive (ab_menu, get_project_by_id(view -> proj) -> cell.ltype);
   }
@@ -318,24 +318,24 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   int i = (ab) ? view -> anim -> last -> img -> xyz -> axis : view -> anim -> last -> img -> abc -> box;
   if (id == 0)
   {
-    view -> ogl_box_axis[ab][0] = create_box_axis_menu ("Show/Hide", i, i, menu_ab, & view -> colorp[0][ab]);
+    view -> ogl_box_axis[ab][0] = create_box_axis_menu (_("Show/Hide"), i, i, menu_ab, & view -> colorp[0][ab]);
   }
   else
   {
-    widg = create_box_axis_menu ("Show/Hide", i, i, menu_ab, & view -> colorp[0][ab]);
+    widg = create_box_axis_menu (_("Show/Hide"), i, i, menu_ab, & view -> colorp[0][ab]);
   }
-  widg = create_menu_item (FALSE, "Style");
+  widg = create_menu_item (FALSE, _("Style"));
   gtk_menu_shell_append ((GtkMenuShell *)menu_ab, widg);
   GtkWidget * menus = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menus);
   gchar * str;
-  str = g_strdup_printf ("Width [ %f pts ]", (ab) ? view -> anim -> last -> img -> xyz -> line : view -> anim -> last -> img -> abc -> line);
+  str = g_strdup_printf (_("Width [ %f pts ]"), (ab) ? view -> anim -> last -> img -> xyz -> line : view -> anim -> last -> img -> abc -> line);
   int box_axis = (ab) ? view -> anim -> last -> img -> xyz -> axis : view -> anim -> last -> img -> abc -> box;
   if (id == 0)
   {
-    view -> ogl_box_axis[ab][1] = create_box_axis_menu (text_styles[1], i, 1, menus, & view -> colorp[1][ab]);
-    view -> ogl_box_axis[ab][2] = create_box_axis_menu (text_styles[4], i, 4, menus, & view -> colorp[4][ab]);
-    view -> ogl_box_axis[ab][3] = create_menu_item (TRUE, "Lines");
+    view -> ogl_box_axis[ab][1] = create_box_axis_menu (_(text_styles[1]), i, 1, menus, & view -> colorp[1][ab]);
+    view -> ogl_box_axis[ab][2] = create_box_axis_menu (_(text_styles[4]), i, 4, menus, & view -> colorp[4][ab]);
+    view -> ogl_box_axis[ab][3] = create_menu_item (TRUE, _("Lines"));
     gtk_menu_shell_append ((GtkMenuShell *)menu_ab, view -> ogl_box_axis[ab][3]);
     menul = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_box_axis[ab][3], menul);
@@ -343,11 +343,11 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   }
   else
   {
-    create_box_axis_menu (text_styles[1], i, 1, menus, & view -> colorp[1][ab]);
-    create_box_axis_menu (text_styles[4], i, 4, menus, & view -> colorp[4][ab]);
+    create_box_axis_menu (_(text_styles[1]), i, 1, menus, & view -> colorp[1][ab]);
+    create_box_axis_menu (_(text_styles[4]), i, 4, menus, & view -> colorp[4][ab]);
     if (i == WIREFRAME)
     {
-      widg = create_menu_item (FALSE, "Lines");
+      widg = create_menu_item (FALSE, _("Lines"));
       gtk_menu_shell_append ((GtkMenuShell *)menu_ab, widg);
       menul = gtk_menu_new ();
       gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menul);
@@ -356,10 +356,10 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   }
   g_free (str);
 
-  str = g_strdup_printf ("Radius [ %f Å ]", (ab) ? view -> anim -> last -> img -> xyz -> rad : view -> anim -> last -> img -> abc -> rad);
+  str = g_strdup_printf (_("Radius [ %f Å ]"), (ab) ? view -> anim -> last -> img -> xyz -> rad : view -> anim -> last -> img -> abc -> rad);
   if (id == 0)
   {
-    view -> ogl_box_axis[ab][5] = create_menu_item (FALSE, "Cylinders");
+    view -> ogl_box_axis[ab][5] = create_menu_item (FALSE, _("Cylinders"));
     gtk_menu_shell_append ((GtkMenuShell *)menu_ab, view -> ogl_box_axis[ab][5]);
     menul = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_box_axis[ab][5], menul);
@@ -367,7 +367,7 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
   }
   else if (i == CYLINDERS)
   {
-    widg = create_menu_item (FALSE, "Cylinders");
+    widg = create_menu_item (FALSE, _("Cylinders"));
     gtk_menu_shell_append ((GtkMenuShell *)menu_ab, widg);
     menul = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menul);
@@ -377,7 +377,7 @@ GtkWidget * menu_box_axis (glwin * view, int id, int ab)
 
   if (ab == 0)
   {
-    widg = create_menu_item (FALSE, "Color");
+    widg = create_menu_item (FALSE, _("Color"));
     gtk_menu_shell_append ((GtkMenuShell *)menu_ab, widg);
     if (id == 0)
     {
@@ -538,12 +538,12 @@ GMenu * axis_box_style (glwin * view, int popm, int ab, int abs)
 {
   GMenu * menu = g_menu_new ();
   gchar * str = g_strdup_printf ("%s-style", (ab) ? "axis" : "box");
-  append_opengl_item (view, menu, text_styles[1], str, popm, 0, NULL, IMG_NONE, NULL, FALSE,
+  append_opengl_item (view, menu, _(text_styles[1]), str, popm, 0, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(change_box_axis_radio), & view -> colorp[1][ab], FALSE, (abs == WIREFRAME) ? TRUE : FALSE,
                       TRUE, (abs != NONE) ? TRUE : FALSE);
   g_free (str);
-  str = g_strdup_printf ("%s-style", (ab) ? "axis" : "box");
-  append_opengl_item (view, menu, text_styles[4], str, popm, 1, NULL, IMG_NONE, NULL, FALSE,
+  str = g_strdup_printf (_("%s-style"), (ab) ? "axis" : "box");
+  append_opengl_item (view, menu, _(text_styles[4]), str, popm, 1, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(change_box_axis_radio), & view -> colorp[4][ab], FALSE, (abs == CYLINDERS) ? TRUE : FALSE,
                       TRUE, (abs != NONE) ? TRUE : FALSE);
   g_free (str);
@@ -565,17 +565,17 @@ GMenu * axis_box_param (glwin * view, int popm, int ab, int style)
   gchar * str, * key;
   if (style == WIREFRAME)
   {
-    str = g_strdup_printf ("Width [ %f pts ]", (ab) ? view -> anim -> last -> img -> xyz -> line : view -> anim -> last -> img -> abc -> line);
+    str = g_strdup_printf (_("Width [ %f pts ]"), (ab) ? view -> anim -> last -> img -> xyz -> line : view -> anim -> last -> img -> abc -> line);
     key = g_strdup_printf ("%s-width", (ab) ? "axis" : "box");
   }
   else if (style == CYLINDERS)
   {
-    str = g_strdup_printf ("Radius [ %f Å ]", (ab) ? view -> anim -> last -> img -> xyz -> rad : view -> anim -> last -> img -> abc -> rad);
+    str = g_strdup_printf (_("Radius [ %f Å ]"), (ab) ? view -> anim -> last -> img -> xyz -> rad : view -> anim -> last -> img -> abc -> rad);
     key = g_strdup_printf ("%s-radius", (ab) ? "axis" : "box");
   }
   else
   {
-    str = g_strdup_printf (" length [ %f Å ]", view -> anim -> last -> img -> xyz -> length);
+    str = g_strdup_printf (_(" length [ %f Å ]"), view -> anim -> last -> img -> xyz -> length);
     key = g_strdup_printf ("axis-legnth");
   }
   GMenu * menu = g_menu_new ();
@@ -597,24 +597,24 @@ GMenu * axis_box_param (glwin * view, int popm, int ab, int style)
 */
 GMenuItem * menu_box_axis (glwin * view, int popm, int ab)
 {
-  GMenuItem * ab_item = g_menu_item_new ((ab) ? "Axis" : "Box", (ab) ? NULL : (get_project_by_id(view -> proj) -> cell.ltype) ? NULL : "None");
+  GMenuItem * ab_item = g_menu_item_new ((ab) ? _("Axis") : _("Box"), (ab) ? NULL : (get_project_by_id(view -> proj) -> cell.ltype) ? NULL : "None");
   int i = (ab) ? view -> anim -> last -> img -> xyz -> axis : view -> anim -> last -> img -> abc -> box;
   GMenu * menu = g_menu_new ();
   append_opengl_item (view, menu, "Show/Hide", (ab) ? "show-axis" : "show-box", popm, popm, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(show_hide_box_axis), & view -> colorp[0][ab], TRUE, (i != NONE) ? TRUE : FALSE, FALSE, (ab) ? TRUE : get_project_by_id(view -> proj) -> cell.ltype);
 
-  append_submenu (menu, "Style", axis_box_style (view, popm, ab, i));
+  append_submenu (menu, _("Style"), axis_box_style (view, popm, ab, i));
   GMenuItem * item ;
   if (i == WIREFRAME)
   {
-    item = g_menu_item_new ("Lines", NULL);
+    item = g_menu_item_new (_("Lines"), NULL);
     g_menu_item_set_attribute (item, "custom", "s", (ab) ? "axis-lines" : "box-lines", NULL);
     g_menu_item_set_submenu (item, (GMenuModel *)axis_box_param (view, popm, ab, WIREFRAME));
     g_menu_append_item (menu, item);
   }
   if (i == CYLINDERS)
   {
-    item = g_menu_item_new ("Cylinders", NULL);
+    item = g_menu_item_new (_("Cylinders"), NULL);
     g_menu_item_set_attribute (item, "custom", "s", (ab) ? "axis-cylinders" : "box-cylinders", NULL);
     g_menu_item_set_submenu (item, (GMenuModel *)axis_box_param (view, popm, ab, CYLINDERS));
     g_menu_append_item (menu, item);
@@ -624,11 +624,11 @@ GMenuItem * menu_box_axis (glwin * view, int popm, int ab)
   {
     GMenu * menuc = g_menu_new ();
     append_opengl_item (view, menuc, "box-color", "box-color", popm, popm, NULL, IMG_NONE, NULL, TRUE, NULL, NULL, FALSE, FALSE, FALSE, FALSE);
-    append_opengl_item (view, menuc, "More colors ...", "box-color", popm, popm, NULL, IMG_NONE, NULL, FALSE,
+    append_opengl_item (view, menuc, _("More Colors ..."), "box-color", popm, popm, NULL, IMG_NONE, NULL, FALSE,
                         G_CALLBACK(to_run_box_color_window), view, FALSE, FALSE, FALSE, get_project_by_id(view -> proj) -> cell.ltype);
-    append_submenu (menu, "Color", menuc);
+    append_submenu (menu, _("Color"), menuc);
     g_object_unref (menuc);
-    append_opengl_item (view, menu, "Advanced", "box-advanced", popm, popm, NULL, IMG_STOCK, DPROPERTIES, FALSE,
+    append_opengl_item (view, menu, _("Advanced"), "box-advanced", popm, popm, NULL, IMG_STOCK, DPROPERTIES, FALSE,
                       G_CALLBACK(to_box_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   }
   else

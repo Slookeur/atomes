@@ -62,14 +62,14 @@ void init_sq (project * this_proj, int sqk)
 {
   int i, j, k;
 
-  this_proj -> analysis[sqk] -> curves[0] -> name = g_strdup_printf ("S(q) %s", "Neutrons");
-  this_proj -> analysis[sqk] -> curves[1] -> name = g_strdup_printf ("S(q) %s - %s", "Neutrons", "smoothed");
-  this_proj -> analysis[sqk] -> curves[2] -> name = g_strdup_printf ("Q(q) %s", "Neutrons");
-  this_proj -> analysis[sqk] -> curves[3] -> name = g_strdup_printf ("Q(q) %s - %s", "Neutrons", "smoothed");
-  this_proj -> analysis[sqk] -> curves[4] -> name = g_strdup_printf ("S(q) %s", "X-rays");
-  this_proj -> analysis[sqk] -> curves[5] -> name = g_strdup_printf ("S(q) %s - %s", "X-rays", "smoothed");
-  this_proj -> analysis[sqk] -> curves[6] -> name = g_strdup_printf ("Q(q) %s", "X-rays");
-  this_proj -> analysis[sqk] -> curves[7] -> name = g_strdup_printf ("Q(q) %s - %s", "X-rays", "smoothed");
+  this_proj -> analysis[sqk] -> curves[0] -> name = g_strdup_printf ("S(q) %s", _("Neutrons"));
+  this_proj -> analysis[sqk] -> curves[1] -> name = g_strdup_printf ("S(q) %s - %s", _("Neutrons"), _("smoothed"));
+  this_proj -> analysis[sqk] -> curves[2] -> name = g_strdup_printf ("Q(q) %s", _("Neutrons"));
+  this_proj -> analysis[sqk] -> curves[3] -> name = g_strdup_printf ("Q(q) %s - %s", _("Neutrons"), _("smoothed"));
+  this_proj -> analysis[sqk] -> curves[4] -> name = g_strdup_printf ("S(q) %s", _("X-rays"));
+  this_proj -> analysis[sqk] -> curves[5] -> name = g_strdup_printf ("S(q) %s - %s", _("X-rays"), _("smoothed"));
+  this_proj -> analysis[sqk] -> curves[6] -> name = g_strdup_printf ("Q(q) %s", _("X-rays"));
+  this_proj -> analysis[sqk] -> curves[7] -> name = g_strdup_printf ("Q(q) %s - %s", _("X-rays"), _("smoothed"));
   k = 8;
   for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
@@ -77,7 +77,7 @@ void init_sq (project * this_proj, int sqk)
     {
       this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s] - %s", active_chem -> label[i], active_chem -> label[j], "smoothed");
+      this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("AL(q)[%s,%s] - %s", active_chem -> label[i], active_chem -> label[j], _("smoothed"));
       k=k+1;
     }
   }
@@ -87,7 +87,7 @@ void init_sq (project * this_proj, int sqk)
     {
       this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s]", active_chem -> label[i], active_chem -> label[j]);
       k=k+1;
-      this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s] - %s", active_chem -> label[i], active_chem -> label[j], "smoothed");
+      this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("FZ(q)[%s,%s] - %s", active_chem -> label[i], active_chem -> label[j], _("smoothed"));
       k=k+1;
     }
   }
@@ -95,19 +95,19 @@ void init_sq (project * this_proj, int sqk)
   {
     this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NN]");
     k=k+1;
-    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NN] - %s", "smoothed");
+    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NN] - %s", _("smoothed"));
     k=k+1;
     this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NC]");
     k=k+1;
-    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NC] - %s", "smoothed");
+    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[NC] - %s", _("smoothed"));
     k=k+1;
     this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[CC]");
     k=k+1;
-    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[CC] - %s", "smoothed");
+    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[CC] - %s", _("smoothed"));
     k=k+1;
     this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ]");
     k=k+1;
-    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ] - %s", "smoothed");
+    this_proj -> analysis[sqk] -> curves[k] -> name = g_strdup_printf ("BT(q)[ZZ] - %s", _("smoothed"));
   }
   add_curve_widgets (this_proj, sqk);
   this_proj -> analysis[sqk] -> init_ok = TRUE;
@@ -128,41 +128,41 @@ void update_sq_view (project * this_proj, int sqk)
   view_buffer (this_proj -> analysis[sqk] -> calc_buffer);
   if (sqk == SKD || sqk == SQD)
   {
-    print_info ("\n\nStructure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+    print_info (_("\n\nStructure factor(s)"), "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
   else
   {
-    print_info ("\n\nDynamic structure factor(s)", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+    print_info (_("\n\nDynamic structure factor(s)"), "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
   if (sqk == SKD || sqk == SKT)
   {
-    print_info (" - reciprocal space calculation\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
+    print_info (_(" - reciprocal space calculation\n\n"), "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
   else
   {
     print_info (" - FFT[g(r)]\n\n", "heading", this_proj -> analysis[sqk] -> calc_buffer);
   }
-  print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("\tReciprocal space discretization:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("\t - Number of δq steps: ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("Calculation details:\n\n"), NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("\tReciprocal space discretization:\n\n"), NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("\t - Number of δq steps: "), "bold", this_proj -> analysis[sqk] -> calc_buffer);
   str = g_strdup_printf ("%d", this_proj -> analysis[sqk] -> num_delta);
   print_info (str, "bold_blue", this_proj -> analysis[sqk] -> calc_buffer);
   g_free (str);
-  print_info ("\n\n\t between ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("\n\n\t between "), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info (" ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("and", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("and"), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info (" ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("\n\t where ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("\n\t where "), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
-  print_info (" is the minimum wave vector, and ", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_(" is the minimum wave vector, and "), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
-  print_info (" is the maximum wave vector:\n\n", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_(" is the maximum wave vector:\n\n"), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\t\tQ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("min", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info (" = ", "bold", this_proj -> analysis[sqk] -> calc_buffer);
@@ -172,7 +172,7 @@ void update_sq_view (project * this_proj, int sqk)
   print_info (" Å", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("-1", "sup_bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
-  print_info ("and", NULL, this_proj -> analysis[sqk] -> calc_buffer);
+  print_info (_("and"), NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("\t", NULL, this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("Q", "bold", this_proj -> analysis[sqk] -> calc_buffer);
   print_info ("max", "sub_bold", this_proj -> analysis[sqk] -> calc_buffer);
@@ -217,7 +217,7 @@ G_MODULE_EXPORT void on_calc_sq_released (GtkWidget * widg, gpointer data)
   prepostcalc (widg, TRUE, SQD, i, 1.0);
   if (! i)
   {
-    show_error ("The S(q) calculation has failed", 0, widg);
+    show_error (_("The S(q) calculation has failed"), 0, widg);
   }
   else
   {
@@ -280,7 +280,7 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
     if (! j)
     {
       remove_action ("analyze.3");
-      show_error ("The S(q) calculation has failed", 0, widg);
+      show_error (_("The S(q) calculation has failed"), 0, widg);
     }
     else
     {
@@ -292,7 +292,7 @@ G_MODULE_EXPORT void on_calc_sk_released (GtkWidget * widg, gpointer data)
   else
   {
     prepostcalc (widg, TRUE, SKD, i, 1.0);
-    show_error ("Problem during the selection of the k-points\nused to sample the reciprocal lattice", 0, widg);
+    show_error (_("Problem during the selection of the k-points\nused to sample the reciprocal lattice"), 0, widg);
   }
   fill_tool_model ();
   for (i=1; i<3; i++) update_after_calc (i);

@@ -113,13 +113,13 @@ void update_spherical_view (project * this_proj)
   if (this_proj -> analysis[SPH] -> calc_buffer == NULL) this_proj -> analysis[SPH] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[SPH] -> calc_buffer);
 
-  print_info ("\n\nSpherical harmonics\n\n", "heading", this_proj -> analysis[SPH] -> calc_buffer);
+  print_info (_("\n\nSpherical harmonics\n\n"), "heading", this_proj -> analysis[SPH] -> calc_buffer);
   m = 0;
   for (i=0; i<this_proj -> nspec; i++)
   {
-    print_info ("\nResults for the ", NULL, this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (_("\nResults for the "), NULL, this_proj -> analysis[SPH] -> calc_buffer);
     print_info (exact_name(active_chem -> label[i]), textcolor(i), this_proj -> analysis[SPH] -> calc_buffer);
-    print_info (" atoms: \n\n", NULL, this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (_(" atoms: \n\n"), NULL, this_proj -> analysis[SPH] -> calc_buffer);
     // Here print average spec info
 
     print_info ("\tl\t", "bold_italic", this_proj -> analysis[SPH] -> calc_buffer);
@@ -127,7 +127,7 @@ void update_spherical_view (project * this_proj)
     print_info ("l", "bold_italic", this_proj -> analysis[SPH] -> calc_buffer);
     print_info (")","bold", this_proj -> analysis[SPH] -> calc_buffer);
     print_info (active_chem -> label[i], textcolor(i), this_proj -> analysis[SPH] -> calc_buffer);
-    print_info ("[All]", "bold", this_proj -> analysis[SPH] -> calc_buffer);
+    print_info (_("[All]"), "bold", this_proj -> analysis[SPH] -> calc_buffer);
     for (j=0 ; j < active_coord -> ntg[1][i]; j++)
     {
       print_info ("\tQ(","bold", this_proj -> analysis[SPH] -> calc_buffer);
@@ -204,11 +204,11 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
   }
   if (! err_update)
   {
-    show_error ("Impossible to update FORTRAN data", 0, (widg) ? widg : MainWindow);
+    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : MainWindow);
   }
   else if (! active_project -> dmtx)
   {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, widg);
   }
   else
   {
@@ -237,7 +237,7 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
     prepostcalc (widg, TRUE, SPH, i, 1.0);
     if (! i)
     {
-      show_error ("Unexpected error when analyzing the spherical harmonics", 0, widg);
+      show_error (_("Unexpected error when analyzing the spherical harmonics"), 0, widg);
     }
     else
     {

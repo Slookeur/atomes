@@ -584,7 +584,7 @@ int action_atoms_from_project (project * this_proj, atom_search * asearch, gbool
           m = tmp_new -> coord[l];
           if (m >= edit -> coord -> ntg[l][k])
           {
-            g_warning ("Error: at= %d, sp= %d, l= %d, geo_id= %d, edit -> coord -> ntg[%d][%d]= %d", j+1, k, l, m, l, k, edit -> coord -> ntg[l][k]);
+            g_warning (_("Error: at= %d, sp= %d, l= %d, geo_id= %d, edit -> coord -> ntg[%d][%d]= %d"), j+1, k, l, m, l, k, edit -> coord -> ntg[l][k]);
           }
           tmpgeo[l][k][m] ++;
         }
@@ -1118,7 +1118,7 @@ void clean_all_trees (atom_search * asearch, project * this_proj)
 void apply_action (project * this_proj, atom_search * asearch)
 {
   gchar * str;
-  gchar * appl[3] = {"replaced", "removed", "inserted"};
+  gchar * appl[3] = {i18n("replaced"), i18n("removed"), i18n("inserted")};
   int k, l;
   l = 0;
   gboolean visible = (this_proj -> modelgl -> atom_win) ? this_proj -> modelgl -> atom_win -> visible : FALSE;
@@ -1135,17 +1135,17 @@ void apply_action (project * this_proj, atom_search * asearch)
     switch (k)
     {
       case 0:
-        str = g_strdup_printf ("No atoms to be %s !", appl[asearch -> action-3]);
+        str = g_strdup_printf (_("No atoms to be %s !"), _(appl[asearch -> action-3]));
         break;
       default:
         if (asearch -> action == REPLACE && l)
         {
           if (asearch -> pointer[0].c == 8) l += asearch -> int_b - k;
-          str = g_strdup_printf ("%d atom(s) removed !\n%d atom(s) inserted !", l, k);
+          str = g_strdup_printf (_("%d atom(s) removed !\n%d atom(s) inserted !"), l, k);
         }
         else
         {
-          str = g_strdup_printf ("%d atom(s) %s !", k, appl[asearch -> action-3]);
+          str = g_strdup_printf (_("%d atom(s) %s !"), k, _(appl[asearch -> action-3]));
         }
       break;
     }
@@ -2061,11 +2061,11 @@ G_MODULE_EXPORT void take_action (GtkButton * but, gpointer data)
   {
     if (i < RANMOVE)
     {
-      show_info ("Nothing to be done, check selection !", 0, this_proj -> modelgl -> atom_win -> win);
+      show_info (_("Nothing to be done, check selection !"), 0, this_proj -> modelgl -> atom_win -> win);
     }
     else
     {
-      show_info ("Nothing to be done, check selection and/or MSD !", 0, this_proj -> modelgl -> atom_win -> win);
+      show_info (_("Nothing to be done, check selection and/or MSD !"), 0, this_proj -> modelgl -> atom_win -> win);
     }
   }
 }

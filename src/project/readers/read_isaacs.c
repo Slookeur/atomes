@@ -126,7 +126,7 @@ int XmlwriterFilename (const char * uri)
   rc = xmlTextWriterStartDocument(writer, NULL, MY_ENCODING, NULL);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" I.S.A.A.C.S. v1.0 XML file ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" I.S.A.A.C.S. v1.0 XML file "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST "isaacs-xml");
   if (rc < 0) return 0;
@@ -138,7 +138,7 @@ int XmlwriterFilename (const char * uri)
 	  <file> <file>
    </data>*/
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Data format and file containing the configuration(s) ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Data format and file containing the configuration(s) "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"data");
   if (rc < 0) return 0;
@@ -193,7 +193,7 @@ int XmlwriterFilename (const char * uri)
     </element>
   </chemistry> */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Chemistry information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Chemistry information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"chemistry");
   if (rc < 0) return 0;
@@ -267,7 +267,7 @@ int XmlwriterFilename (const char * uri)
     </vectors>
   </box> */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Box information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Box information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"box");
   if (rc < 0) return 0;
@@ -373,7 +373,7 @@ int XmlwriterFilename (const char * uri)
   </pbc>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" PBC information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" PBC information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"pbc");
   if (rc < 0) return 0;
@@ -409,7 +409,7 @@ int XmlwriterFilename (const char * uri)
   </cutoffs>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Cutoffs information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Cutoffs information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"cutoffs");
   if (rc < 0) return 0;
@@ -448,7 +448,7 @@ int XmlwriterFilename (const char * uri)
 
   if (active_project -> steps > 1)
   {
-    rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Time series ");
+    rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Time series "));
     if (rc < 0) return 0;
     rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"time-series");
     if (rc < 0) return 0;
@@ -466,7 +466,7 @@ int XmlwriterFilename (const char * uri)
   <project></project>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Apply project ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Apply project "));
   if (rc < 0) return 0;
   if (active_project -> run)
   {
@@ -750,7 +750,7 @@ int testopening (char * tdata, char * tfichier)
     else
     {
       j=4;
-      err=g_strdup_printf("The %s\n %s\n from the XML file does not exist\n", tdata, tfichier);
+      err=g_strdup_printf(_("The %s\n %s\n from the XML file does not exist\n"), tdata, tfichier);
       show_error (err, 0, MainWindow);
       g_free (err);
       return j;
@@ -758,7 +758,7 @@ int testopening (char * tdata, char * tfichier)
   }
   else
   {
-    show_error ("Unknown data format in XML file\n", 0, MainWindow);
+    show_error (_("Unknown data format in XML file\n"), 0, MainWindow);
     j=4;
     return j;
   }
@@ -791,11 +791,11 @@ int setchemistry (xmlNodePtr xsnode)
   ats = val;
   if (ats != active_project -> natomes)
   {
-    show_warning ("The number of atoms in the XML file\n"
-                  "is not the same that the number of atoms\n"
-                  "in the file containing the coordinates.\n"
-                  "Other information from the XML file\n"
-                  "will be ignored\n", MainWindow);
+    show_warning (_("The number of atoms in the XML file\n"
+                    "is not the same that the number of atoms\n"
+                    "in the file containing the coordinates.\n"
+                    "Other information from the XML file\n"
+                    "will be ignored\n"), MainWindow);
     res=5;
     goto xend;
   }
@@ -814,9 +814,9 @@ int setchemistry (xmlNodePtr xsnode)
     ats = val;
     if (ats != active_project -> nspec)
     {
-      show_warning ("The number of chemical species in the XML file\n"
-                    "is not the same that the number of chemical species\n"
-                    "in the file that contains the atomic coordinates.\n", MainWindow);
+      show_warning (_("The number of chemical species in the XML file\n"
+                      "is not the same that the number of chemical species\n"
+                      "in the file that contains the atomic coordinates.\n"), MainWindow);
       res = 5;
       goto xend;
     }
@@ -1425,34 +1425,34 @@ gchar * open_xml (const char * filetoread)
   switch(oxml)
   {
     case 1:
-      return ("Impossible to open the ISAACS project file (XML) file\n");
+      return (_("Impossible to open the ISAACS project file (XML) file\n"));
       break;
     case 2:
-      return ("The file is not a valid ISAACS project file (XML) file\n");
+      return (_("The file is not a valid ISAACS project file (XML) file\n"));
       break;
     case 3:
-      return ("The ISAACS project file (XML) file is incomplete\n");
+      return (_("The ISAACS project file (XML) file is incomplete\n"));
       break;
     case 4:
-      return ("Problem(s) in the &lt;data&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;data&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 5:
-      return ("Problem(s) in the &lt;chemistry&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;chemistry&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 6:
-      return ("Problem(s) in the &lt;element&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;element&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 7:
-      return ("Problem(s) in the &lt;box&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;box&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 8:
-      return ("Problem(s) in the &lt;pbc&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;pbc&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 9:
-      return ("Problem(s) in the &lt;cutoffs&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;cutoffs&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 10:
-      return ("Problem(s) in the &lt;time-series&gt; section of the ISAACS project file (XML)\n");
+      return (_("Problem(s) in the &lt;time-series&gt; section of the ISAACS project file (XML)\n"));
       break;
     default:
       return NULL;

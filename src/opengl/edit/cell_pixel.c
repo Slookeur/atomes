@@ -256,7 +256,7 @@ GtkWidget * pixels_tab (project * this_proj)
 {
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox = create_hbox (0);
-  gchar * str = g_strdup_printf ("\tSelect pixel to check, from 1 to %d:", this_proj -> pix[0]*this_proj -> pix[1]*this_proj->pix[2]);
+  gchar * str = g_strdup_printf (_("\tSelect pixel to check, from 1 to %d:"), this_proj -> pix[0]*this_proj -> pix[1]*this_proj->pix[2]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_entry(G_CALLBACK(set_pix), 100, 15, FALSE, GINT_TO_POINTER(this_proj -> id)), FALSE, FALSE, 10);

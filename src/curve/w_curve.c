@@ -154,14 +154,14 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
             g=0.0;
             d=1.0;
             y = cstate -> mouseState.start_y + 8;
-            str = g_strdup_printf ("zoom: out (x) / in (y)");
+            str = g_strdup_printf (_("zoom: out (x) / in (y)"));
           }
           else
           {
             g=1.0;
             d=0.0;
             y = cstate -> mouseState.start_y - 4;
-            str = g_strdup_printf ("zoom: out (x) / out (y)");
+            str = g_strdup_printf (_("zoom: out (x) / out (y)"));
           }
         }
         else
@@ -173,14 +173,14 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
             g=0.0;
             d=0.0;
             y = cstate -> mouseState.start_y + 8;
-            str = g_strdup_printf ("zoom: in (x) / in (y)");
+            str = g_strdup_printf (_("zoom: in (x) / in (y)"));
           }
           else
           {
             g=0.0;
             d=1.0;
             y = cstate -> mouseState.start_y - 4;
-            str = g_strdup_printf ("zoom: in (x) / out (y)");
+            str = g_strdup_printf (_("zoom: in (x) / out (y)"));
           }
         }
         cairo_set_source_rgba (rec, r, g, d, 0.05);
@@ -216,7 +216,7 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
       }
       else
       {
-        str = g_strdup_printf ("(Not in plot)");
+        str = g_strdup_printf (_("(Not in plot)"));
       }
       gtk_label_set_text (GTK_LABEL(this_curve -> pos), str);
       g_free (str);
@@ -254,7 +254,7 @@ void curve_zoom_in_out (gboolean state, gdouble event_x, gdouble event_y, gpoint
     }
     else
     {
-      str = g_strdup_printf ("Not in plot");
+      str = g_strdup_printf (_("Not in plot"));
     }
     gtk_label_set_text (GTK_LABEL(this_curve -> pos), str);
     g_free (str);

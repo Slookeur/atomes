@@ -107,7 +107,7 @@ GLuint create_shader (int type, const GLchar * src)
     glGetShaderiv (shader, GL_INFO_LOG_LENGTH, & log_len);
     buffer = g_malloc0(log_len + 1);
     glGetShaderInfoLog (shader, log_len, NULL, buffer);
-    g_warning ("Compilation failure in %s shader:\n%s",
+    g_warning (_("Compilation failure in %s shader:\n%s"),
                type == GL_VERTEX_SHADER ? "vertex" : "fragment",
                buffer);
 

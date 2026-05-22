@@ -45,7 +45,13 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 #include "cell_edit.h"
 
-gchar * edit_names[7] = {"Wrap All Atoms in", "Shift Center", "Add Extra(s)", "Create Super-Cell", "Adjust Density", "Cut Slab", "PBC Pixels Debug"};
+gchar * edit_names[7] = {i18n("Wrap All Atoms in"), 
+                         i18n("Shift Center"), 
+                         i18n("Add Extra(s)"), 
+                         i18n("Create Super-Cell"), 
+                         i18n("Adjust Density"), 
+                         i18n("Cut Slab"), 
+                         i18n("PBC Pixels Debug")};
 
 /*!
   \fn G_MODULE_EXPORT void close_cell_edit (GtkButton * but, gpointer data)
@@ -160,7 +166,7 @@ GtkWidget * create_cell_notebook (project * this_proj, GtkWidget * vbox)
     if (doit)
     {
       j = (i < 2) ? i+1 : i+2;
-      str = g_strdup_printf ("<b>%s</b>", edit_names[j]);
+      str = g_strdup_printf ("<b>%s</b>", _(edit_names[j]));
       gtk_notebook_insert_page (GTK_NOTEBOOK(notebook), cell_tab (i, this_proj), markup_label(str, -1, -1, 0.0, 0.5), i);
       if (i > 1) widget_set_sensitive (gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), i), (this_proj -> steps) > 1 ? 0 : 1);
       g_free (str);
@@ -181,7 +187,7 @@ GtkWidget * create_cell_notebook (project * this_proj, GtkWidget * vbox)
 */
 GtkWidget * create_cell_edition_window (project * this_proj, gpointer data)
 {
-  gchar * str = g_strdup_printf ("Cell edition - %s", this_proj -> name);
+  gchar * str = g_strdup_printf (_("Cell edition - %s"), this_proj -> name);
   GtkWidget * win = create_win (str, this_proj -> modelgl -> win, FALSE, FALSE);
   g_free (str);
   GtkWidget * vbox = create_vbox (5);
@@ -194,7 +200,7 @@ GtkWidget * create_cell_edition_window (project * this_proj, gpointer data)
 
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, FALSE, 0);
-  GtkWidget * but = create_button ("Close", IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_cell_edit), this_proj);
+  GtkWidget * but = create_button (_("Close"), IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_cell_edit), this_proj);
   add_box_child_end (hbox, but, FALSE, FALSE, 5);
   add_gtk_close_event (win, G_CALLBACK(close_cell), this_proj);
 

@@ -109,28 +109,28 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 extern ColRGBA init_color (int id, int numid);
 extern gboolean print_ana ();
 
-gchar * celemts[MAXDATC] = {"System information",
-                            "Calculation details",
-                            "Non-bonded interactions",
-                            "Equilibration",
-                            "Thermodynamics",
-                            "Molecular dynamics",
-                            "Output options",
-                            "Computational details"};
-
-gchar * celets[MAXDATC] = {"system information",
-                           "calculation details",
-                           "non-bonded interactions",
-                           "equilibration",
-                           "thermodynamics",
-                           "molecular dynamics",
-                           "output options",
-                           "computational details"};
+gchar * celemts[MAXDATC] = {i18n("System information"),
+                            i18n("Calculation details"),
+                            i18n("Non-bonded interactions"),
+                            i18n("Equilibration"),
+                            i18n("Thermodynamics"),
+                            i18n("Molecular dynamics"),
+                            i18n("Output options"),
+                            i18n("Computational details")};
 
 #define DLP_ENS 4
 #define DLP_ENS_TYPE 10
 gchar * md_ensemble[DLP_ENS] = {"NVE", "NVT", "NPT", "NST"};
-gchar * md_thermo[DLP_ENS_TYPE] = {"Evans", "Langevin", "Andersen", "Berendsen", "Nosë-Hoover", "Gentle Stochastic", "DPD", "Martyna-Tuckerman-Klein", "Two temperature model", "Inhomogeneous Langevin"};
+gchar * md_thermo[DLP_ENS_TYPE] = {"Evans", 
+                                   "Langevin", 
+                                   "Andersen", 
+                                   "Berendsen", 
+                                   "Nosë-Hoover", 
+                                   i18n("Gentle Stochastic"), 
+                                   "DPD", 
+                                   "Martyna-Tuckerman-Klein", 
+                                   i18n("Two temperature model"), 
+                                   i18n("Inhomogeneous Langevin")};
 
 // In the following, 0 = no thermo, > 0 = thermo and num of opts + 1
 int md_ens_opt[DLP_ENS][DLP_ENS_TYPE] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -139,14 +139,14 @@ int md_ens_opt[DLP_ENS][DLP_ENS_TYPE] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                          {0, 3, 0, 3, 3, 0, 0, 3, 0, 0}};
 
 gchar * opts_nvt[9][3]={{NULL, NULL, NULL},
-                        {"Relaxation speed constant (friction):", NULL, NULL},
-                        {"Relaxation time:", "Softness [0.0 - 1.0]:", NULL},
-                        {"Relaxation constant:", NULL, NULL},
-                        {"Relaxation constant:", NULL, NULL},
-                        {"Relaxation constant:", "Langevin friction:", NULL},
-                        {"Shardlow's splitting order:", "Global drag coefficient:", NULL},
-                        {"Relaxation constant:", "Enhancement of relaxation constant:", "Cut-off particle velocity for friction enhancement:"},
-                        {"Relaxation constant:", "Enhancement of relaxation constant:", "Cut-off particle velocity for friction enhancement:"}};
+                        {i18n("Relaxation speed constant (friction):"), NULL, NULL},
+                        {i18n("Relaxation time:"), i18n("Softness [0.0 - 1.0]:"), NULL},
+                        {i18n("Relaxation constant:"), NULL, NULL},
+                        {i18n("Relaxation constant:"), NULL, NULL},
+                        {i18n("Relaxation constant:"), i18n("Langevin friction:"), NULL},
+                        {i18n("Shardlow's splitting order:"), i18n("Global drag coefficient:"), NULL},
+                        {i18n("Relaxation constant:"), i18n("Enhancement of relaxation constant:"), i18n("Cut-off particle velocity for friction enhancement:")},
+                        {i18n("Relaxation constant:"), i18n("Enhancement of relaxation constant:"), i18n("Cut-off particle velocity for friction enhancement:")}};
 
 gchar * unit_nvt[9][3]={{NULL, NULL, NULL},
                         {"<b>ps<sup>-1</sup></b>", NULL, NULL},
@@ -158,12 +158,13 @@ gchar * unit_nvt[9][3]={{NULL, NULL, NULL},
                         {"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", "<b>&#xC5; ps<sup>-1</sup></b>"},
                         {"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", "<b>&#xC5; ps<sup>-1</sup></b>"}};
 
-gchar * opts_npt_nvs[2][3] = {{"Thermostat relaxation speed constant (friction):", "Barostat relaxation speed constant (friction):", NULL},
-                              {"Thermostat relaxation time:", "Barostat relaxation time:", "Target surface tension:"}};
+gchar * opts_npt_nvs[2][3] = {{i18n("Thermostat relaxation speed constant (friction):"), i18n("Barostat relaxation speed constant (friction):"), NULL},
+                              {i18n("Thermostat relaxation time:"), i18n("Barostat relaxation time:"), i18n("Target surface tension:")}};
 
-gchar * unit_npt_nvs[2][3] = {{"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", NULL}, {"<b>ps</b>", "<b>ps</b>", "<b>dyn cm<sup>-1</sup></b>"}};
+gchar * unit_npt_nvs[2][3] = {{"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", NULL}, 
+                              {"<b>ps</b>", "<b>ps</b>", "<b>dyn cm<sup>-1</sup></b>"}};
 
-gchar * extra_nvs[4] = {"Standard", "Area", "Tension", "Orthorhombic"};
+gchar * extra_nvs[4] = {i18n("Standard"), i18n("Area"), i18n("Tension"), i18n("Orthorhombic")};
 
 GtkWidget * check_nvs_butt[4];
 GtkWidget * nvs_label;
@@ -212,8 +213,8 @@ G_MODULE_EXPORT void set_thermo_param (GtkEntry * res, gpointer data)
     }
     else if (v < 1.0 && v != 0.0)
     {
-      show_warning ("Target temperature for the pseudo bath must be &#8805; 1.0 K,\n"
-                    "Alternatively set value to 0.0 K to system temperature.", field_assistant);
+      show_warning (_("Target temperature for the pseudo bath must be &#8805; 1.0 K,\n"
+                      "Alternatively set value to 0.0 K to system temperature."), field_assistant);
     }
   }
   else if (v >= 0.0 && v != tmp_field -> thermo_opts[i])
@@ -331,7 +332,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
         if (opts_nvt[thermo][i] != NULL)
         {
           hbox = create_hbox (5);
-          add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(opts_nvt[thermo][i], 350, -1, 1.0, 0.5), FALSE, FALSE, 50);
+          add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(opts_nvt[thermo][i]), 375, -1, 1.0, 0.5), FALSE, FALSE, 50);
           if (thermo == 6 && i == 0)
           {
             GtkWidget * o_combo = create_combo();
@@ -356,7 +357,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
       for (i=0; i<2; i++)
       {
         hbox = create_hbox (5);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(opts_npt_nvs[(thermo) ? 1 : 0][i], 310, -1, 1.0, 0.5), FALSE, FALSE, 50);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(opts_npt_nvs[(thermo) ? 1 : 0][i]), 410, -1, 1.0, 0.5), FALSE, FALSE, 50);
         entry = create_entry(G_CALLBACK(set_thermo_param), 100, 10, FALSE, GINT_TO_POINTER(i));
         update_entry_double (GTK_ENTRY(entry), tmp_field -> thermo_opts[i]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 5);
@@ -375,25 +376,25 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
           hbox = create_hbox (5);
           val = ((int)tmp_field -> thermo_opts[3] == i) ? TRUE : FALSE;
 #ifdef GTK4
-          check_nvs_butt[i] = check_button (extra_nvs[i], 100, -1, val, G_CALLBACK(check_nvs), GINT_TO_POINTER(i));
+          check_nvs_butt[i] = check_button (_(extra_nvs[i]), 100, -1, val, G_CALLBACK(check_nvs), GINT_TO_POINTER(i));
           if (i)
           {
-            gtk_check_button_set_group ((GtkCheckButton *)extra_nvs[i], (GtkCheckButton *)extra_nvs[0]);
+            gtk_check_button_set_group ((GtkCheckButton *) check_nvs_butt[i], (GtkCheckButton *)check_nvs_butt[0]);
           }
 #else
           if (! i)
           {
-            check_nvs_butt[i] = radio_button (extra_nvs[i], 100, -1, val, G_CALLBACK(check_nvs), GINT_TO_POINTER(i));
+            check_nvs_butt[i] = radio_button (_(extra_nvs[i]), 100, -1, val, G_CALLBACK(check_nvs), GINT_TO_POINTER(i));
           }
           else
           {
-            check_nvs_butt[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(check_nvs_butt[0]), extra_nvs[i]);
+            check_nvs_butt[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(check_nvs_butt[0]), _(extra_nvs[i]));
           }
 #endif
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_nvs_butt[i], FALSE, FALSE, 20);
           if (i == 2)
           {
-            nvs_label = markup_label(opts_npt_nvs[1][2], 150, -1, 0.0, 0.5);
+            nvs_label = markup_label(_(opts_npt_nvs[1][2]), 150, -1, 0.0, 0.5);
             widget_set_sensitive (nvs_label, val);
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, nvs_label, FALSE, FALSE, 0);
             j = 4;
@@ -408,7 +409,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
           if (i > 1)
           {
             val = (((int)tmp_field -> thermo_opts[3] == i) && tmp_field -> thermo_opts[5] == 1.0) ? TRUE : FALSE;
-            nvs_check[i-2] = check_button("Semi-anisotropic constraint", 200, -1, val, G_CALLBACK(check_semi), GINT_TO_POINTER(5));
+            nvs_check[i-2] = check_button(_("Semi-anisotropic constraint"), 200, -1, val, G_CALLBACK(check_semi), GINT_TO_POINTER(5));
             widget_set_sensitive (nvs_check[i-2], val);
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, nvs_check[i-2], FALSE, FALSE, 10);
           }
@@ -463,13 +464,16 @@ GtkWidget * create_thermo_box (int ensemble)
   GtkWidget * vbox = create_vbox (5);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Thermostat:", 100, -1, 0.0, 0.5), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Thermostat:"), 100, -1, 0.0, 0.5), FALSE, FALSE, 30);
   GtkWidget * thermo_box = create_combo();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, thermo_box, FALSE, FALSE, 0);
   int i;
   for (i=0; i<DLP_ENS_TYPE; i++)
   {
-    if (md_ens_opt[ensemble][i]) combo_text_append (thermo_box, md_thermo[i]);
+    if (md_ens_opt[ensemble][i])
+    {
+      combo_text_append (thermo_box, (i == 5 || i == 8 || i == 9) ? _(md_thermo[i]) : md_thermo[i]);
+    }
   }
   combo_set_active (thermo_box, tmp_field -> thermostat);
   g_signal_connect (G_OBJECT (thermo_box), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(0));
@@ -524,7 +528,7 @@ GtkWidget * create_ensemble_box ()
   GtkWidget * vbox = create_vbox (5);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Ensemble:", 100, -1, 0.0, 0.5), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Ensemble:"), 100, -1, 0.0, 0.5), FALSE, FALSE, 30);
   GtkWidget * ensemble = create_combo ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ensemble, FALSE, FALSE, 0);
   int i;
@@ -547,23 +551,23 @@ GtkWidget * create_ensemble_box ()
   gboolean val = (tmp_field -> thermo_opts[6] == 1.0) ? TRUE : FALSE;
   bath_box =  create_hbox (5);
   add_box_child_end (vbox, bath_box, FALSE, FALSE, 0);
-  add_box_child_end (vbox, check_button("Use pseudo thermal bath", 100, -1, val, G_CALLBACK(check_semi), GINT_TO_POINTER(6)), FALSE, FALSE, 5);
+  add_box_child_end (vbox, check_button(_("Use pseudo thermal bath"), 100, -1, val, G_CALLBACK(check_semi), GINT_TO_POINTER(6)), FALSE, FALSE, 5);
   widget_set_sensitive (bath_box, val);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("Thermostat type:", 150, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label(_("Thermostat type:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * combo = create_combo();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, combo, FALSE, FALSE, 00);
-  combo_text_append (combo, "Langevin + Direct");
+  combo_text_append (combo, _("Langevin + Direct"));
   combo_text_append (combo, "Langevin");
   combo_text_append (combo, "Gauss");
-  combo_text_append (combo, "Direct");
+  combo_text_append (combo, _("Direct"));
   combo_set_active (combo, (int)tmp_field -> thermo_opts[7]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_thermostat), GINT_TO_POINTER(1));
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("Thickness:", 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label(_("Thickness:"), 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * entry = create_entry(G_CALLBACK(set_thermo_param), 100, 10, FALSE, GINT_TO_POINTER(8));
   update_entry_double (GTK_ENTRY(entry), tmp_field -> thermo_opts[8]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, entry, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("<b>&#xC5;</b>", 30, -1, 0.0, 0.5), FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label("Target T°:", 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, markup_label(_("Target T°:"), 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_thermo_param), 100, 10, FALSE, GINT_TO_POINTER(9));
   update_entry_double (GTK_ENTRY(entry), tmp_field -> thermo_opts[9]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bath_box, entry, FALSE, FALSE, 5);
@@ -574,14 +578,14 @@ GtkWidget * create_ensemble_box ()
 GtkWidget * step_button;
 GtkWidget * extra_vbox[2];
 GtkWidget * extra_lab[4];
-gchar * md_data[6] = {"Target temperature:", "Verlet integrator:", "Number of steps:", "Time step δt:", "Target pressure:", ""};
-gchar * md_extra[2][4] = {{"Shake iterations limit:", "Shake tolerance:", "", ""},
-                          {"Rattle iterations limit:", "Rattle tolerance:", "FIQA iterations limit:", "FIQA quaternions tolerance:"}};
+gchar * md_data[6] = {i18n("Target temperature:"), i18n("Verlet integrator:"), i18n("Number of steps:"), i18n("Time step δt:"), i18n("Target pressure:"), ""};
+gchar * md_extra[2][4] = {{i18n("Shake iterations limit:"), i18n("Shake tolerance:"), "", ""},
+                          {i18n("Rattle iterations limit:"), i18n("Rattle tolerance:"), i18n("FIQA iterations limit:"), i18n("FIQA quaternions tolerance:")}};
 gchar * md_unit[6] = {"<b>K</b>", "", "", "<b>ps</b>", "<b>katms</b>", ""};
-gchar * extra_unit[4] = {"<b>cycle(s)</b>", "", "<b>cycle(s)</b>", ""};
-gchar * dt_data[3] = {"Maximum time step:", "Maximum distance allowed:", "Minimum distance allowed:"};
+gchar * extra_unit[4] = {i18n("<b>cycle(s)</b>"), "", i18n("<b>cycle(s)</b>"), ""};
+gchar * dt_data[3] = {i18n("Maximum time step:"), i18n("Maximum distance allowed:"), i18n("Minimum distance allowed:")};
 gchar * dt_unit[3] = {"<b>ps</b>", "<b>&#xC5;</b>", "<b>&#xC5;</b>"};
-gchar * md_combo[2][2] = {{"Velocity", "Leapfrog"}, {"Fixed", "Variable"}};
+gchar * md_combo[2][2] = {{i18n("Velocity"), i18n("Leapfrog")}, {i18n("Fixed"), i18n("Variable")}};
 
 /*!
   \fn G_MODULE_EXPORT void set_md_param (GtkEntry * res, gpointer data)
@@ -628,7 +632,7 @@ G_MODULE_EXPORT void set_md_param (GtkEntry * res, gpointer data)
 */
 G_MODULE_EXPORT void show_advance_time_step (GtkButton * but, gpointer data)
 {
-  GtkWidget * dialog = dialogmodal ("Variable time step information", GTK_WINDOW(field_assistant));
+  GtkWidget * dialog = dialogmodal (_("Variable time step information"), GTK_WINDOW(field_assistant));
   GtkWidget * vbox = dialog_get_content_area (dialog);
   GtkWidget * hbox;
   GtkWidget * entry;
@@ -638,7 +642,7 @@ G_MODULE_EXPORT void show_advance_time_step (GtkButton * but, gpointer data)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 2);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(dt_data[j], 250, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(dt_data[j]), 250, -1, 1.0, 0.5), FALSE, FALSE, 5);
     entry = create_entry (G_CALLBACK(set_md_param), 100, 10, FALSE, GINT_TO_POINTER(i+j));
     update_entry_double (GTK_ENTRY(entry), tmp_field -> md_opts[i+j]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 5);
@@ -667,8 +671,10 @@ G_MODULE_EXPORT void set_md_combo (GtkComboBox * box, gpointer data)
     gtk_widget_set_visible (extra_vbox[1], (int)tmp_field -> md_opts[1]);
     for (j=0 ;j<2; j++)
     {
-      gtk_label_set_text (GTK_LABEL(extra_lab[2*j]), md_extra[(int)tmp_field -> md_opts[i]][2*j]);
-      gtk_label_set_text (GTK_LABEL(extra_lab[2*j+1]), md_extra[(int)tmp_field -> md_opts[i]][2*j+1]);
+      gtk_label_set_text (GTK_LABEL(extra_lab[2*j]), 
+                          ((int)tmp_field -> md_opts[i] || 2*j < 2) ? _(md_extra[(int)tmp_field -> md_opts[i]][2*j]) : md_extra[(int)tmp_field -> md_opts[i]][2*j]);
+      gtk_label_set_text (GTK_LABEL(extra_lab[2*j+1]), 
+                          ((int)tmp_field -> md_opts[i] || 2*j+1 < 2) ? _(md_extra[(int)tmp_field -> md_opts[i]][2*j+1]) : md_extra[(int)tmp_field -> md_opts[i]][2*j+1]);
     }
   }
 }
@@ -713,21 +719,21 @@ G_MODULE_EXPORT void check_impact (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
 {
-  GtkWidget * dialog = dialogmodal ("Initiate impact on particle", GTK_WINDOW(field_assistant));
+  GtkWidget * dialog = dialogmodal (_("Initiate impact on particle"), GTK_WINDOW(field_assistant));
   GtkWidget * vbox = dialog_get_content_area (dialog);
   GtkWidget * hbox, * hhbox;
   GtkWidget * entry;
   int i, j;
   gchar * str;
   gtk_box_set_homogeneous (GTK_BOX (vbox), TRUE);
-  gchar * imp_info[4] = {"Index of the particle to impact: ", "Time step of impact:", "Energy of impact:", "Direction (from center of mass):"};
-  gchar * imp_unit[2] = {"<b>n<sup>th</sup> step</b>", "<b>k eV</b>"};
+  gchar * imp_info[4] = {i18n("Index of the particle to impact: "), i18n("Time step of impact:"), i18n("Energy of impact:"), i18n("Direction (from center of mass):")};
+  gchar * imp_unit[2] = {i18n("<b>n<sup>th</sup> step</b>"), "<b>k eV</b>"};
 
   for (i=0; i<4; i++)
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 2);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(imp_info[i], 200, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(imp_info[i]), 200, -1, 1.0, 0.5), FALSE, FALSE, 5);
     if (i < 3)
     {
       j = (i < 2) ? 5 : 10;
@@ -749,7 +755,7 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       }
       else
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(imp_unit[i-1], 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label((i-1) ? imp_unit[i-1] : _(imp_unit[i-1]), 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
       }
     }
     else
@@ -760,7 +766,7 @@ G_MODULE_EXPORT void show_impact_dialog (GtkButton * but, gpointer data)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 50);
       for (j=0; j<3; j++)
       {
-        str = g_strdup_printf ("on %s:", imp_dir[j]);
+        str = g_strdup_printf (_("on %s:"), imp_dir[j]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(str, 50, -1, 1.0, 0.5), FALSE, FALSE, 0);
         g_free (str);
         entry = create_entry (G_CALLBACK(set_md_param), 100, 11, FALSE, GINT_TO_POINTER(j+17));
@@ -794,7 +800,9 @@ GtkWidget * create_md_box ()
     for (j=0; j<2; j++, l++)
     {
       k = (j) ? 110 : 150;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(md_data[2*i+j], k, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, 
+                           markup_label((2*i+j) < 5 ? _(md_data[2*i+j]) :md_data[2*i+j], k, -1, 1.0, 0.5), 
+                           FALSE, FALSE, 5);
       if (j)
       {
         if (i < 2)
@@ -803,7 +811,7 @@ GtkWidget * create_md_box ()
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
           for (k=0; k<2; k++)
           {
-            combo_text_append (combo, md_combo[i][k]);
+            combo_text_append (combo, _(md_combo[i][k]));
           }
           combo_set_active (combo, 0);
           gtk_widget_set_size_request (combo, 100, -1);
@@ -819,7 +827,7 @@ GtkWidget * create_md_box ()
         }
         else
         {
-          step_button = create_button ("Time step details", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_advance_time_step), NULL);
+          step_button = create_button (_("Time step details"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_advance_time_step), NULL);
           widget_set_sensitive (step_button, (int)tmp_field -> md_opts[3]);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, step_button, FALSE, FALSE, 10);
         }
@@ -843,17 +851,17 @@ GtkWidget * create_md_box ()
 
   k = (int)tmp_field -> md_opts[1];
   l = 9;
-  gchar * extra_info[2] = {"<b>Bond constraint(s) dynamics:</b>", "<b>Rotational motion of rigid body(ies):</b>"};
+  gchar * extra_info[2] = {i18n("<b>Bond constraint(s) dynamics:</b>"), i18n("<b>Rotational motion of rigid body(ies):</b>")};
   for (i=0; i<2; i++)
   {
     extra_vbox[i]  = create_vbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, extra_vbox[i], FALSE, FALSE, 20);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, extra_vbox[i], markup_label(extra_info[i], 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, extra_vbox[i], markup_label(_(extra_info[i]), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, extra_vbox[i], hbox, FALSE, FALSE, 0);
     for (j=0; j<2; j++, l++)
     {
-      extra_lab[2*i+j] = markup_label(md_extra[k][2*i+j], 150+j*100, -1, 1.0, 0.5);
+      extra_lab[2*i+j] = markup_label((k || 2*i+j < 2) ? _(md_extra[k][2*i+j]) : md_extra[k][2*i+j], 150+j*100, -1, 1.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, extra_lab[2*i+j], FALSE, FALSE, 5);
       entry = create_entry (G_CALLBACK(set_md_param), 100, 11, FALSE, GINT_TO_POINTER(l));
       if (j)
@@ -865,21 +873,22 @@ GtkWidget * create_md_box ()
         update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> md_opts[l]);
       }
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 5);
-      if (! j) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(extra_unit[2*i+j], 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      if (! j) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(extra_unit[2*i+j]), 30, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
   }
   gtk_widget_set_visible (extra_vbox[1], (int)tmp_field -> md_opts[1]);
+  j = (int)tmp_field -> md_opts[1];
   for (i=0 ;i<2; i++)
   {
-    gtk_label_set_text (GTK_LABEL(extra_lab[2*i]), md_extra[(int)tmp_field -> md_opts[1]][2*i]);
-    gtk_label_set_text (GTK_LABEL(extra_lab[2*i+1]), md_extra[(int)tmp_field -> md_opts[1]][2*i+1]);
+    gtk_label_set_text (GTK_LABEL(extra_lab[2*i]), (j || 2*i < 2) ?_(md_extra[(int)tmp_field -> md_opts[1]][2*i]) : md_extra[(int)tmp_field -> md_opts[1]][2*i]);
+    gtk_label_set_text (GTK_LABEL(extra_lab[2*i+1]), (j || 2*i+1 < 2) ? _(md_extra[(int)tmp_field -> md_opts[1]][2*i+1]) : md_extra[(int)tmp_field -> md_opts[1]][2*i+1]);
   }
 
   hbox = create_hbox (5);
   add_box_child_end (vbox, hbox, FALSE, FALSE, 0);
   gboolean val = (tmp_field -> md_opts[13] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("<b>Initiate impact on particle</b>", 100, -1, val, G_CALLBACK(check_impact), NULL), FALSE, FALSE, 10);
-  impact_but = create_button ("Impact details", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_impact_dialog), NULL);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("<b>Initiate impact on particle</b>"), 100, -1, val, G_CALLBACK(check_impact), NULL), FALSE, FALSE, 10);
+  impact_but = create_button (_("Impact details"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_impact_dialog), NULL);
   widget_set_sensitive (impact_but, val);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, impact_but, FALSE, FALSE, 10);
   return vbox;
@@ -889,12 +898,12 @@ GtkWidget * equi_lab[6];
 GtkWidget * equi_entry[3];
 GtkWidget * equi_box[9];
 
-gchar * equi_info[8]= {"Equilibrate for the first:", "Scale temperature:", "Cap forces:",
-                       "Resample the momenta distribution:", "Minimize system configuration:",
-                       "Optimize system configuration from start:", "Perform zero temperature (10 K) optimization", "Include equilibration data in statistics"};
-gchar * equi_data[5]= {"Every:", "f<sub>max</sub>=", "During:", "Minimize:", "Optimize"};
-gchar * equi_unit[3]= {"<b>step(s)</b>", "<b>k<sub><i>B</i></sub>T / &#xC5;</b>", "<b>step(s)</b>"};
-gchar * equi_min[3]= {"Force", "Energy", "Distance"};
+gchar * equi_info[8]= {i18n("Equilibrate for the first:"), i18n("Scale temperature:"), i18n("Cap forces:"),
+                       i18n("Resample the momenta distribution:"), i18n("Minimize system configuration:"),
+                       i18n("Optimize system configuration from start:"), i18n("Perform zero temperature (10 K) optimization"), i18n("Include equilibration data in statistics")};
+gchar * equi_data[5]= {i18n("Every:"), "f<sub>max</sub>=", i18n("During:"), i18n("Minimize:"), i18n("Optimize")};
+gchar * equi_unit[3]= {i18n("<b>step(s)</b>"), "<b>k<sub><i>B</i></sub>T / &#xC5;</b>", i18n("<b>step(s)</b>")};
+gchar * equi_min[3]= {i18n("Force"), i18n("Energy"), i18n("Distance")};
 gchar * equi_minu[3]= {"<b>k<sub><i>B</i></sub>T / &#xC5;</b>", "", "<b>&#xC5;</b>"};
 
 double equi_lim[2][3] = {{1.0, 0.0, 0.000001}, {1000.0, 0.01, 0.1}};
@@ -917,7 +926,7 @@ G_MODULE_EXPORT void set_equi_combo (GtkComboBox * box, gpointer data)
   k = (i == 9) ? 0 : 1;
   tmp_field -> equi_opts[j] = init_minop[(int)tmp_field -> equi_opts[i]];
   update_entry_double (GTK_ENTRY(equi_entry[2*k]), tmp_field -> equi_opts[j]);
-  gtk_label_set_text (GTK_LABEL(equi_lab[4*k]), g_strdup_printf ("%s:", equi_min[(int)tmp_field -> equi_opts[i]]));
+  gtk_label_set_text (GTK_LABEL(equi_lab[4*k]), g_strdup_printf ("%s:", _(equi_min[(int)tmp_field -> equi_opts[i]])));
   gtk_label_set_text (GTK_LABEL(equi_lab[4*k+1]), g_strdup_printf ("<b>%s</b>", equi_minu[(int)tmp_field -> equi_opts[i]]));
   gtk_label_set_use_markup (GTK_LABEL(equi_lab[4*k+1]), TRUE);
 }
@@ -945,7 +954,7 @@ G_MODULE_EXPORT void set_equi_param (GtkEntry * res, gpointer data)
     }
     else
     {
-      gchar * str = g_strdup_printf ("Minimization parameter must ∈ [ %f - %f ]",
+      gchar * str = g_strdup_printf (_("Minimization parameter must ∈ [ %f - %f ]"),
                                      equi_lim[0][(int)tmp_field -> equi_opts[j]], equi_lim[1][(int)tmp_field -> equi_opts[j]]);
       show_warning (str, field_assistant);
       g_free (str);
@@ -1011,7 +1020,7 @@ GtkWidget * create_equi_box ()
   hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   val = (tmp_field -> equi_opts[0] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Equilibrate", 100, -1, val, G_CALLBACK(check_equi), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Equilibrate"), 100, -1, val, G_CALLBACK(check_equi), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
   equi_box[0] =  create_vbox (5);
   widget_set_sensitive (equi_box[0], val);
   gtk_box_set_homogeneous (GTK_BOX (equi_box[0]), TRUE);
@@ -1040,7 +1049,7 @@ GtkWidget * create_equi_box ()
     if (i)
     {
       val = (tmp_field -> equi_opts[j] == 1.0) ? TRUE : FALSE;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(equi_info[i], 300, -1, val, G_CALLBACK(check_equi), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(equi_info[i]), 300, -1, val, G_CALLBACK(check_equi), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
       if (i == 4 || i == 5)
       {
         hhbox = create_hbox (5);
@@ -1051,23 +1060,23 @@ GtkWidget * create_equi_box ()
       equi_box[i] = create_hbox (5);
       widget_set_sensitive (equi_box[i], val);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, equi_box[i], FALSE, FALSE, 5);
-      if (i < 6) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], markup_label(equi_data[i-1], 100, -1, 0.8, 0.5), FALSE, FALSE, 0);
+      if (i < 6) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], markup_label((i != 2) ? _(equi_data[i-1]) : equi_data[i-1], 100, -1, 0.8, 0.5), FALSE, FALSE, 0);
       if (i < 4)
       {
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], entry, FALSE, FALSE, 5);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], markup_label(equi_unit[i-1], 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], markup_label((i != 2) ? _(equi_unit[i-1]) : equi_unit[i-1], 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
       }
       else if (i < 6)
       {
         combo = create_combo();
-        for (m=0; m<3; m++) combo_text_append (combo, equi_min[m]);
+        for (m=0; m<3; m++) combo_text_append (combo, _(equi_min[m]));
         combo_set_active (combo, (int)tmp_field -> equi_opts[l]);
         gtk_widget_set_size_request (combo, 100, -1);
         g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_equi_combo), GINT_TO_POINTER(l));
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], combo, FALSE, FALSE, 5);
         for (m=i-4; m<2; m++, l++)
         {
-          equi_lab[(i-4)*2+2*m] =  markup_label((i == 4 && m) ? equi_data[0] : g_strdup_printf ("%s:", equi_min[(int)tmp_field -> equi_opts[l]]), 75, -1, 0.8, 0.5);
+          equi_lab[(i-4)*2+2*m] =  markup_label((i == 4 && m) ? _(equi_data[0]) : g_strdup_printf ("%s:", _(equi_min[(int)tmp_field -> equi_opts[l]])), 75, -1, 0.8, 0.5);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], equi_lab[(i-4)*2+2*m], FALSE, FALSE, 0);
           k = (i == 4 && m) ? 5 : 10;
           equi_entry[i-4+m] = create_entry (G_CALLBACK(set_equi_param), k*10, k + k/6, FALSE, GINT_TO_POINTER(l+1+m/2));
@@ -1080,36 +1089,36 @@ GtkWidget * create_equi_box ()
             update_entry_double (GTK_ENTRY(equi_entry[i-4+m]), tmp_field -> equi_opts[l+1+m/2]);
           }
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], equi_entry[i-4+m], FALSE, FALSE, 5);
-          equi_lab[(i-4)*2+2*m+1] = markup_label((i == 4 && m) ? equi_unit[0] : equi_minu[(int)tmp_field -> equi_opts[l]], 50, -1, 0.0, 0.5);
+          equi_lab[(i-4)*2+2*m+1] = markup_label((i == 4 && m) ? _(equi_unit[0]) : equi_minu[(int)tmp_field -> equi_opts[l]], 50, -1, 0.0, 0.5);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, equi_box[i], equi_lab[(i-4)*2+2*m+1], FALSE, FALSE, 0);
         }
       }
     }
     else
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(equi_info[i], 250, -1, 0.8, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(equi_info[i]), 250, -1, 0.8, 0.5), FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 5);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(equi_unit[i], 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label((i != 1) ? _(equi_unit[i]) : equi_unit[i], 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
   }
   return vbox;
 }
 
-gchar * traj_data[4] = {"Defects:",
-                        "Displacements:",
-                        "History:",
-                        "Atom's MSD:"};
+gchar * traj_data[4] = {i18n("Defects:"),
+                        i18n("Displacements:"),
+                        i18n("History:"),
+                        i18n("Atom's MSD:")};
 
-gchar * traj_info[4][3] = {{"From step:", "Every:", "Site interstitial cutoff:"},
-                           {"From step:", "Every:", "Qualifying cutoff:"},
-                           {"From step:", "Every:", "Data level:"},
-                           {"From step:", "Every:", NULL}};
+gchar * traj_info[4][3] = {{i18n("From step:"), i18n("Every:"), i18n("Site interstitial cutoff:")},
+                           {i18n("From step:"), i18n("Every:"), i18n("Qualifying cutoff:")},
+                           {i18n("From step:"), i18n("Every:"), i18n("Data level:")},
+                           {i18n("From step:"), i18n("Every:"), NULL}};
 
 gchar * traj_level[3]={"0", "1", "2"};
 
-gchar * out_print[3]={"Radial distribution functions (RDFs):",
-                      "Velocity autocorrelation functions (VAFs):",
-                      "Z density profile:"};
+gchar * out_print[3]={i18n("Radial distribution functions (RDFs):"),
+                      i18n("Velocity autocorrelation functions (VAFs):"),
+                      i18n("Z density profile:")};
 
 GtkWidget * out_hbox[11];
 GtkWidget * out_entry[3];
@@ -1226,7 +1235,7 @@ GtkWidget * create_traj_box ()
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     k = (i < 4) ? 4*i : 15;
     val = (tmp_field -> out_opts[k] == 1.0) ? TRUE : FALSE;
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(traj_data[i], 150, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(traj_data[i]), 150, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
     out_hbox[i] = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, out_hbox[i], FALSE, FALSE, 0);
     widget_set_sensitive (out_hbox[i], val);
@@ -1234,7 +1243,7 @@ GtkWidget * create_traj_box ()
     for (j=0; j<3-i/3; j++)
     {
       l = (j == 2) ? 150 : 50;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label(traj_info[i][j], l, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label((i < 3 || j < 2) ? _(traj_info[i][j]) : traj_info[i][j], l, -1, 1.0, 0.5), FALSE, FALSE, 5);
       if (i != 2 || j != 2)
       {
         l = (j<2) ? 50 : 100;
@@ -1248,7 +1257,7 @@ GtkWidget * create_traj_box ()
         else
         {
           update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> out_opts[k+j+1]);
-          if (j) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+          if (j) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
         }
       }
       else
@@ -1277,20 +1286,20 @@ GtkWidget * create_dump_box ()
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Dump restart information every:", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Dump restart information every:"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
   entry = create_entry (G_CALLBACK(set_out_param), 50, 6, FALSE, GINT_TO_POINTER(30));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
   update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> out_opts[30]);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
 
   return vbox;
 }
 
-gchar * out_data[3] = {"Print system data:",
-                       "Accumulate statistics data:",
-                       "Rolling average stack:"};
+gchar * out_data[3] = {i18n("Print system data:"),
+                       i18n("Accumulate statistics data:"),
+                       i18n("Rolling average stack:")};
 
-gchar * out_info[3] = {"Every:", "Every:", " "};
+gchar * out_info[3] = {i18n("Every:"), i18n("Every:"), " "};
 
 /*!
   \fn GtkWidget * create_out_box ()
@@ -1310,15 +1319,15 @@ GtkWidget * create_out_box ()
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     j = 2*(i-4)+15;
     val = (tmp_field -> out_opts[j] == 1.0) ? TRUE : FALSE;
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(out_data[i-4], 200, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(out_data[i-4]), 200, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
     out_hbox[i] = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, out_hbox[i], FALSE, FALSE, 0);
     widget_set_sensitive (out_hbox[i], val);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label(out_info[i-4], 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label((i-4 < 2) ? _(out_info[i-4]) : out_info[i-4], 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
     entry = create_entry (G_CALLBACK(set_out_param), 50, 5, FALSE, GINT_TO_POINTER(j+1));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], entry, FALSE, FALSE, 0);
     update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> out_opts[j+1]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i], markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
   }
   return vbox;
 }
@@ -1343,16 +1352,16 @@ GtkWidget * create_overall_box ()
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     val = (tmp_field -> out_opts[k] == 1.0) ? TRUE : FALSE;
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(out_print[l], 300, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(k)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(out_print[l]), 350, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(k)), FALSE, FALSE, 5);
     out_hbox[i+l+1] = create_hbox (5);
     widget_set_sensitive (out_hbox[i+l+1], val);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, out_hbox[i+l+1], FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label("Every:", 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label(_("Every:"), 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
     entry = create_entry (G_CALLBACK(set_out_param), 50, 5, FALSE, GINT_TO_POINTER(k+1));
     update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> out_opts[k+1]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label("Bin size:", 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[i+l+1], markup_label(_("Bin size:"), 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
     m = (l==1) ? k + 2 : 23;
     n = (l==1) ? 1 : 2;
     out_entry[l] = create_entry (G_CALLBACK(set_out_param), n*50, n*5, FALSE, GINT_TO_POINTER(m));
@@ -1379,7 +1388,7 @@ GtkWidget * create_overall_box ()
       gtk_widget_set_size_request (hhbox, 330, -1);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, out_hbox[10], FALSE, FALSE, 0);
       val = (tmp_field -> out_opts[29] == 1.0) ? TRUE : FALSE;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[10], check_button("Ignore time-averaging for the VAFs", 100, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(29)), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, out_hbox[10], check_button(_("Ignore time-averaging for the VAFs"), 100, -1, val, G_CALLBACK(check_out), GINT_TO_POINTER(29)), FALSE, FALSE, 5);
       widget_set_sensitive (out_hbox[10], val);
     }
   }
@@ -1387,8 +1396,8 @@ GtkWidget * create_overall_box ()
 }
 
 GtkWidget * ana_box[5];
-gchar * ana_info[5]={"All:", "Bonds:", "Angles:", "Dihedrals:", "Inversions:"};
-gchar * ana_param[3]={"Every:", "Num. δ", "Cutoff = "};
+gchar * ana_info[5]={i18n("All:"), i18n("Bonds:"), i18n("Angles:"), i18n("Dihedrals:"), i18n("Inversions:")};
+gchar * ana_param[3]={i18n("Every:"), i18n("Num. δ"), i18n("Cutoff = ")};
 
 /*!
   \fn G_MODULE_EXPORT void set_ana_param (GtkEntry * res, gpointer data)
@@ -1479,29 +1488,29 @@ GtkWidget * create_analyze_box ()
     j = (i < 3) ? 4*i: 11 + 3*(i-3);
     val = (tmp_field -> ana_opts[j] == 1.0) ? TRUE : FALSE;
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(ana_info[i], 100, -1, val, G_CALLBACK(check_ana), GINT_TO_POINTER(j)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(ana_info[i]), 100, -1, val, G_CALLBACK(check_ana), GINT_TO_POINTER(j)), FALSE, FALSE, 5);
     ana_box[i] = create_hbox (5);
 
     widget_set_sensitive (ana_box[i], val);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ana_box[i], FALSE, FALSE, 0);
 
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(ana_param[0], 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(_(ana_param[0]), 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
     entry = create_entry (G_CALLBACK(set_ana_param), 50, 5, FALSE, GINT_TO_POINTER(j+1));
 
     update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> ana_opts[j+1]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
     if (i < 2)
     {
-      str = g_strdup_printf ("%sr in [0 : r]", ana_param[1]);
+      str = g_strdup_printf (_("%sr in [0 : r]"), _(ana_param[1]));
     }
     else if (i == 3)
     {
-      str = g_strdup_printf ("%s° in [-180 : 180]", ana_param[1]);
+      str = g_strdup_printf (_("%s° in [-180 : 180]"), _(ana_param[1]));
     }
     else
     {
-      str = g_strdup_printf ("%s° in [0 : 180]", ana_param[1]);
+      str = g_strdup_printf (_("%s° in [0 : 180]"), _(ana_param[1]));
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(str, 160, -1, 1.0, 0.5), FALSE, FALSE, 5);
     g_free (str);
@@ -1520,7 +1529,7 @@ GtkWidget * create_analyze_box ()
     g_free (str);
     if (i < 2)
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(ana_param[2], 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], markup_label(_(ana_param[2]), 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
       entry = create_entry (G_CALLBACK(set_ana_param), 100, 11, FALSE, GINT_TO_POINTER(j+3));
       update_entry_double (GTK_ENTRY(entry), tmp_field -> ana_opts[j+3]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ana_box[i], entry, FALSE, FALSE, 0);
@@ -1535,12 +1544,11 @@ GtkWidget * time_box[2];
 GtkWidget * io_box[2];
 GtkWidget * io_pre;
 GtkWidget * misc_box;
-gchar * time_info[2]={"Set job time:", "Set job closure time:"};
-gchar * io_rw_m[4] = {"MPI I/O", "FORTRAN I/O", "Traditional master I/O", "netCDF I/O"};
-gchar * io_info[2] = {"<b>General Input/Output (I/O) read interface:</b>", "<b>General Input/Output (I/O) write interface:</b>"};
-gchar * io_para[4] = {"Reader count:", "Batch size:", "Buffer size:", "// error check"};
+gchar * time_info[2]={i18n("Set job time:"), i18n("Set job closure time:")};
+gchar * io_rw_m[4] = {"MPI I/O", "FORTRAN I/O", i18n("Traditional master I/O"), "netCDF I/O"};
+gchar * io_info[2] = {i18n("<b>General Input/Output (I/O) read interface:</b>"), i18n("<b>General Input/Output (I/O) write interface:</b>")};
+gchar * io_para[4] = {i18n("Reader count:"), i18n("Batch size:"), i18n("Buffer size:"), i18n("// error check")};
 gchar * io_pres[2] = {"Float - 32 bit", "Double - 64 bit"};
-gchar * io_type[2] = {"Sorted", "Unsorted"};
 GtkWidget * io_hp[2][4];
 GtkWidget * check_e[2];
 
@@ -1579,8 +1587,8 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       }
       else
       {
-        show_warning ("The batch size or max. number of particles by batch\n"
-                      "must &#x2208; [1 - 10 000 000]",
+        show_warning (_("The batch size or max. number of particles by batch\n"
+                        "must &#x2208; [1 - 10 000 000]"),
                       field_assistant);
       }
     }
@@ -1595,7 +1603,7 @@ G_MODULE_EXPORT void set_io_param (GtkEntry * res, gpointer data)
       }
       else
       {
-        show_warning ("The buffer size or max. number of ASCII line records by batch\nmust &#x2208; [100 - 100 000]", field_assistant);
+        show_warning (_("The buffer size or max. number of ASCII line records by batch\nmust &#x2208; [100 - 100 000]"), field_assistant);
       }
     }
     else if (i == 19 || i == 20 || i == 21)
@@ -1705,7 +1713,7 @@ GtkWidget * create_job_box ()
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     val = (tmp_field -> io_opts[2*i] == 1.0) ? TRUE : FALSE;
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(time_info[i], 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(time_info[i]), 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
     time_box[i] =  create_hbox (5);
     widget_set_sensitive (time_box[i], val);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, time_box[i], FALSE, FALSE, 0);
@@ -1737,17 +1745,17 @@ GtkWidget * create_io_box ()
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
     val = (tmp_field -> io_opts[k] == 1.0) ? TRUE : FALSE;
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(io_info[i], 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(k)), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(io_info[i]), 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(k)), FALSE, FALSE, 5);
     io_box[i] = create_vbox (5);
     widget_set_sensitive (io_box[i], val);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, io_box[i], FALSE, FALSE, 0);
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, io_box[i], hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Method:", 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Method:"), 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
     combo = create_combo();
     for (j=0; j<4; j++)
     {
-      combo_text_append(combo, io_rw_m[j]);
+      combo_text_append(combo, (j == 2) ? _(io_rw_m[j]) : io_rw_m[j]);
     }
     k ++;
     combo_set_active (combo, (int)tmp_field -> io_opts[k]);
@@ -1759,7 +1767,7 @@ GtkWidget * create_io_box ()
     {
       io_pre = create_hbox(5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, io_pre, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_pre, markup_label("Real precision:", 150, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_pre, markup_label(_("Real precision:"), 150, -1, 1.0, 0.5), FALSE, FALSE, 5);
       combo = create_combo();
       for (j=0; j<2; j++) combo_text_append(combo, io_pres[j]);
       k ++;
@@ -1767,9 +1775,10 @@ GtkWidget * create_io_box ()
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_pre, combo, FALSE, FALSE, 5);
       widget_set_sensitive (io_pre, m);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Type:", 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Type:"), 50, -1, 1.0, 0.5), FALSE, FALSE, 5);
       combo = create_combo();
-      for (j=0; j<2; j++) combo_text_append(combo, io_type[j]);
+      combo_text_append (combo, _("Sorted"));
+      combo_text_append (combo, _("Unsorted"));
       k ++;
       combo_set_active (combo, (int)tmp_field -> io_opts[k]);
       g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_io_method), GINT_TO_POINTER(k));
@@ -1781,7 +1790,7 @@ GtkWidget * create_io_box ()
     {
       io_hp[i][j] = create_hbox (5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, io_hp[i][j], FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_hp[i][j], markup_label(io_para[j], 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, io_hp[i][j], markup_label(_(io_para[j]), 100, -1, 1.0, 0.5), FALSE, FALSE, 5);
       k++;
       entry = create_entry (G_CALLBACK(set_io_param), 70, 8, FALSE, GINT_TO_POINTER(k));
       update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> io_opts[k]);
@@ -1789,7 +1798,7 @@ GtkWidget * create_io_box ()
       if (j == 1) widget_set_sensitive (io_hp[i][j], l);
     }
     k++;
-    check_e[i] = check_button(io_para[j], 50, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(k));
+    check_e[i] = check_button(_(io_para[j]), 50, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(k));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_e[i], FALSE, FALSE, 20);
     widget_set_sensitive (check_e[i], l);
     k ++;
@@ -1813,7 +1822,7 @@ GtkWidget * create_misc_box ()
   hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   val = (tmp_field -> io_opts[18] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Random number generator seeds:", 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(18)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Random number generator seeds:"), 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(18)), FALSE, FALSE, 5);
   misc_box =  create_hbox (5);
   widget_set_sensitive (misc_box, val);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, misc_box, FALSE, FALSE, 0);
@@ -1829,19 +1838,19 @@ GtkWidget * create_misc_box ()
   hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   val = (tmp_field -> io_opts[22] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Limits to 2 the number of processors in <i>z</i> direction for slab simulations", 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(22)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Limits to 2 the number of processors in <i>z</i> direction for slab simulations"), 200, -1, val, G_CALLBACK(check_io), GINT_TO_POINTER(22)), FALSE, FALSE, 5);
   return vbox;
 }
 
 
 GtkWidget * elec_box[4];
 GtkWidget * pres_spin;
-gchar * eval_m[10] = {"Direct Coulomb sum", "Distance dependent dielectric Coulomb sum",
-                      "Ewald sum (auto)", "Ewald sum",
-                      "Reaction field electrostatics", "Reaction field with Fennel damping",
-                      "Reaction field with Fennel damping (auto)",
-                      "Force-shifted Coulomb sum", "Force-shifted Coulomb sum with Fennel damping",
-                      "Force-shifted Coulomb sum with Fennel damping (auto)"};
+gchar * eval_m[10] = {i18n("Direct Coulomb sum"), i18n("Distance dependent dielectric Coulomb sum"),
+                      i18n("Ewald sum (auto)"), i18n("Ewald sum"),
+                      i18n("Reaction field electrostatics"), i18n("Reaction field with Fennel damping"),
+                      i18n("Reaction field with Fennel damping (auto)"),
+                      i18n("Force-shifted Coulomb sum"), i18n("Force-shifted Coulomb sum with Fennel damping"),
+                      i18n("Force-shifted Coulomb sum with Fennel damping (auto)")};
 
 /*!
   \fn G_MODULE_EXPORT void set_elec_param (GtkEntry * res, gpointer data)
@@ -1865,7 +1874,7 @@ G_MODULE_EXPORT void set_elec_param (GtkEntry * res, gpointer data)
     }
     else if (v < 0.0)
     {
-      show_warning ("Cutoff must be > 0.0 &#xC5;", field_assistant);
+      show_warning (_("Cutoff must be > 0.0 &#xC5;"), field_assistant);
     }
   }
   else if (i == 3)
@@ -1878,12 +1887,12 @@ G_MODULE_EXPORT void set_elec_param (GtkEntry * res, gpointer data)
       }
       else
       {
-        show_warning ("Padding must be &#8805; min(0.05, 0.5%r<sub>cut</sub>) &#xC5;", field_assistant);
+        show_warning (_("Padding must be &#8805; min(0.05, 0.5%r<sub>cut</sub>) &#xC5;"), field_assistant);
       }
     }
     else if (v < 0.0)
     {
-      show_warning ("Padding must be > 0.0 &#xC5;", field_assistant);
+      show_warning (_("Padding must be > 0.0 &#xC5;"), field_assistant);
     }
   }
   else
@@ -1905,7 +1914,7 @@ G_MODULE_EXPORT void set_elec_param (GtkEntry * res, gpointer data)
         }
         else if (w < 1e-20 || w > 0.5)
         {
-          show_warning ("Precision must &#x2208; [10<sup>-20</sup> - 0.5]", field_assistant);
+          show_warning (_("Precision must &#x2208; [10<sup>-20</sup> - 0.5]"), field_assistant);
           w = tmp_field -> elec_opts[i] / pow (10, j);
         }
       }
@@ -1977,7 +1986,7 @@ GtkWidget * create_elec_param_box ()
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Precision:", 180, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Precision:"), 180, -1, 0.0, 0.5), FALSE, FALSE, 0);
     // tmp_field -> elec_opts[6] = 1e-20;
     entry = create_entry (G_CALLBACK(set_elec_param), 100, 11, FALSE, GINT_TO_POINTER(6));
     double v = tmp_field -> elec_opts[6];
@@ -1998,7 +2007,7 @@ GtkWidget * create_elec_param_box ()
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Ewald convergence parameter:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Ewald convergence parameter:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
     // tmp_field -> elec_opts[6] = 1.0;
     entry = create_entry (G_CALLBACK(set_elec_param), 100, 11, FALSE, GINT_TO_POINTER(6));
     update_entry_double (GTK_ENTRY(entry), tmp_field -> elec_opts[6]);
@@ -2006,7 +2015,7 @@ GtkWidget * create_elec_param_box ()
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>&#xC5;<sup>-1</sup></b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Maximum k vector index in directions:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Maximum k vector index in directions:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     int i;
@@ -2025,7 +2034,7 @@ GtkWidget * create_elec_param_box ()
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Fennell damping parameter (&#x3B1;):", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Fennell damping parameter (&#x3B1;):"), 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
     entry = create_entry (G_CALLBACK(set_elec_param), 100, 11, FALSE, GINT_TO_POINTER(6));
     update_entry_double (GTK_ENTRY(entry), tmp_field -> elec_opts[6]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -2035,11 +2044,11 @@ GtkWidget * create_elec_param_box ()
   {
     hbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Evaluate <i>k</i>-space contribution to the Ewald sum every:", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Evaluate <i>k</i>-space contribution to the Ewald sum every:"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     entry = create_entry (G_CALLBACK(set_elec_param), 50, 5, FALSE, GINT_TO_POINTER(10));
     update_entry_int (GTK_ENTRY(entry), (int)tmp_field -> elec_opts[10]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>step(s)</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>step(s)</b>"), 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
   }
   return vvbox;
 }
@@ -2100,7 +2109,7 @@ GtkWidget * create_electro_box ()
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   gboolean val = (tmp_field -> elec_opts[0] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button("Evaluate electrostatics interactions", -1, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button(_("Evaluate electrostatics interactions"), -1, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   elec_box[0] = create_vbox(5);
@@ -2108,13 +2117,13 @@ GtkWidget * create_electro_box ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, elec_box[0], FALSE, FALSE, 50);
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, elec_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Long range interaction cutoff [r<sub>cut</sub>]:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Long range interaction cutoff [r<sub>cut</sub>]:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * entry = create_entry (G_CALLBACK(set_elec_param), 100, 10, FALSE, GINT_TO_POINTER(1));
   update_entry_double (GTK_ENTRY(entry), tmp_field -> elec_opts[1]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>&#xC5;</b>", 30, -1, 0.0, 0.5), FALSE, FALSE, 5);
   val = (tmp_field -> elec_opts[2] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Add padding to r<sub>cut</sub>:", 150, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(2)), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Add padding to r<sub>cut</sub>:"), 150, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(2)), FALSE, FALSE, 0);
   elec_box[1] = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, elec_box[1], FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_elec_param), 100, 10, FALSE, GINT_TO_POINTER(3));
@@ -2123,15 +2132,15 @@ GtkWidget * create_electro_box ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, elec_box[1], markup_label("<b>&#xC5;</b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 5);
   widget_set_sensitive (elec_box[1], val);
   val = (tmp_field -> elec_opts[4] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, elec_box[0], check_button("Use extended coulombic exclusion", -1, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(4)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, elec_box[0], check_button(_("Use extended coulombic exclusion"), -1, -1, val, G_CALLBACK(check_elec), GINT_TO_POINTER(4)), FALSE, FALSE, 5);
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, elec_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Evaluation method:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Evaluation method:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * combo = create_combo();
   int i;
   for (i=0; i<10; i++)
   {
-    combo_text_append(combo, eval_m[i]);
+    combo_text_append(combo, _(eval_m[i]));
   }
   combo_set_active (combo, (int)tmp_field -> elec_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_elec_eval), NULL);
@@ -2145,7 +2154,7 @@ GtkWidget * create_electro_box ()
 
 GtkWidget * vdw_box[2];
 gchar * eval_vdw[6] = {"Lorentz-Berthelot", "Fender-Halsey", "Hogervorst",
-                       "Halgren HHG", "Tang-Toennies", "Functional"};
+                       "Halgren HHG", "Tang-Toennies", i18n("Functional")};
 
 /*!
   \fn G_MODULE_EXPORT void set_vdw_param (GtkEntry * res, gpointer data)
@@ -2169,7 +2178,7 @@ G_MODULE_EXPORT void set_vdw_param (GtkEntry * res, gpointer data)
     }
     else if (v < 0.0)
     {
-      show_warning ("Cutoff must be > 0.0 &#xC5;", field_assistant);
+      show_warning (_("Cutoff must be > 0.0 &#xC5;"), field_assistant);
     }
   }
   update_entry_double (GTK_ENTRY(res), tmp_field -> vdw_opts[i]);
@@ -2228,7 +2237,7 @@ GtkWidget * create_vdws_box ()
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   gboolean val = (tmp_field -> vdw_opts[0] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button("Evaluate van der Waals interactions", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button(_("Evaluate van der Waals interactions"), -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   vdw_box[0] = create_vbox(5);
@@ -2237,7 +2246,7 @@ GtkWidget * create_vdws_box ()
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vdw_box[0], FALSE, FALSE, 50);
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Short range interaction cutoff:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Short range interaction cutoff:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * entry = create_entry (G_CALLBACK(set_vdw_param), 100, 10, FALSE, GINT_TO_POINTER(1));
   update_entry_double (GTK_ENTRY(entry), tmp_field -> vdw_opts[1]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -2245,27 +2254,27 @@ GtkWidget * create_vdws_box ()
 
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Enforce direct calculation of van der Waals interactions", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(2)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Enforce direct calculation of van der Waals interactions"), -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(2)), FALSE, FALSE, 5);
 
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Apply force-shifting (contributions smoothly fall to zero near r<sub>cut</sub>)", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(3)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Apply force-shifting (contributions smoothly fall to zero near r<sub>cut</sub>)"), -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(3)), FALSE, FALSE, 5);
 
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Apply mixing rule (when needed and if possible generate cross species interactions)", -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(4)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Apply mixing rule (when needed and if possible generate cross species interactions)"), -1, -1, val, G_CALLBACK(check_vdw), GINT_TO_POINTER(4)), FALSE, FALSE, 5);
   vdw_box[1] = create_vbox(5);
   val = (tmp_field -> vdw_opts[4] == 1.0) ? TRUE : FALSE;
   widget_set_sensitive (vdw_box[1], val);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[0], vdw_box[1], FALSE, FALSE, 0);
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vdw_box[1], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Mixing rule:", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Mixing rule:"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * combo = create_combo();
   int i;
   for (i=0; i<6; i++)
   {
-    combo_text_append(combo, eval_vdw[i]);
+    combo_text_append(combo, (i == 5) ? _(eval_vdw[i]) : eval_vdw[i]);
   }
   combo_set_active (combo, (int)tmp_field -> vdw_opts[5]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_vdw_mix), NULL);
@@ -2315,12 +2324,12 @@ GtkWidget * create_metal_box ()
   gboolean val = (tmp_field -> met_opts[0] == 1.0) ? TRUE : FALSE;
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Enforce direct calculation of metal interactions by explicit potentials, does not work with *EAM* potentials",
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Enforce direct calculation of metal interactions by explicit potentials, does not work with *EAM* potentials"),
                                                   -1, 25, val, G_CALLBACK(check_met), GINT_TO_POINTER(0)), FALSE, FALSE, 5);
   val = (tmp_field -> met_opts[1] == 1.0) ? TRUE : FALSE;
   hbox = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button("Switch the default embedding functions, <i>F</i>, from <i>F(&#x3c1;)</i> to <i>F(√&#x3c1;)</i>",
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_("Switch the default embedding functions, <i>F</i>, from <i>F(&#x3c1;)</i> to <i>F(√&#x3c1;)</i>"),
                                                   -1, 25, val, G_CALLBACK(check_met), GINT_TO_POINTER(1)), FALSE, FALSE, 5);
   return vbox;
 }
@@ -2347,7 +2356,7 @@ G_MODULE_EXPORT void set_sys_param (GtkEntry * res, gpointer data)
     }
     else if (v < 1.0)
     {
-      show_warning ("Subcelling threshold density must be &#8805; 1.0", field_assistant);
+      show_warning (_("Subcelling threshold density must be &#8805; 1.0"), field_assistant);
     }
   }
   else if (v >= 0.0 && v != tmp_field -> sys_opts[i])
@@ -2365,16 +2374,16 @@ G_MODULE_EXPORT void set_sys_param (GtkEntry * res, gpointer data)
 }
 
 GtkWidget * sys_box[4];
-gchar * sys_opts[10] = {"Relative dielectric constant &#949;<sub>r</sub>",
-                        "Allowed local variation of system density:",
-                        "Ignore the particle indices in CONFIG file",
-                        "Ignore strict checks, hide warnings and assume safe simulation parameters",
-                        "Skip detailed topology reporting during read of FIELD file in output",
-                        "Ignore center of mass removal during the calculation",
-                        "Set tolerance for relaxed shell model:",
-                        "Set the subcelling threshold density of particles per link cell:",
-                        "Create an expanded version of the current model:",
-                        "Restart calculation:"};
+gchar * sys_opts[10] = {i18n("Relative dielectric constant &#949;<sub>r</sub>"),
+                        i18n("Allowed local variation of system density:"),
+                        i18n("Ignore the particle indices in CONFIG file"),
+                        i18n("Ignore strict checks, hide warnings and assume safe simulation parameters"),
+                        i18n("Skip detailed topology reporting during read of FIELD file in output"),
+                        i18n("Ignore center of mass removal during the calculation"),
+                        i18n("Set tolerance for relaxed shell model:"),
+                        i18n("Set the subcelling threshold density of particles per link cell:"),
+                        i18n("Create an expanded version of the current model:"),
+                        i18n("Restart calculation:")};
 
 /*!
   \fn G_MODULE_EXPORT void set_sys_restart (GtkComboBox * box, gpointer data)
@@ -2445,7 +2454,7 @@ GtkWidget * create_sys_box ()
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     if (i < 2)
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(sys_opts[i], 300, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(sys_opts[i]), 350, -1, 0.0, 0.5), FALSE, FALSE, 5);
       entry = create_entry (G_CALLBACK(set_sys_param), 100, 10, FALSE, GINT_TO_POINTER(i));
       update_entry_double (GTK_ENTRY(entry), tmp_field -> sys_opts[i]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -2455,7 +2464,7 @@ GtkWidget * create_sys_box ()
     {
       j = (i < 7) ? i : (i == 7) ? 8 : 10;
       val = (tmp_field -> sys_opts[j] == 1.0) ? TRUE : FALSE;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(sys_opts[i], -1, 25, val, G_CALLBACK(check_sys), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(sys_opts[i]), -1, 25, val, G_CALLBACK(check_sys), GINT_TO_POINTER(i)), FALSE, FALSE, 5);
       if (i > 5)
       {
         sys_box[i-6] = create_hbox(5);
@@ -2496,16 +2505,16 @@ GtkWidget * create_restart_box ()
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   gboolean val = (tmp_field -> sys_opts[14] == 1.0) ? TRUE : FALSE;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(sys_opts[9], -1, 25, val, G_CALLBACK(check_sys), GINT_TO_POINTER(14)), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button(_(sys_opts[9]), -1, 25, val, G_CALLBACK(check_sys), GINT_TO_POINTER(14)), FALSE, FALSE, 5);
   sys_box[3] = create_hbox(5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, sys_box[3], FALSE, FALSE, 0);
   widget_set_sensitive (sys_box[3], val);
-  gchar * rtype[3]={"Continue current simulation",
-                    "Start new simulation from older run without temperature reset",
-                    "Start new simulation from older run with temperature reset"};
+  gchar * rtype[3]={i18n("Continue current simulation"),
+                    i18n("Start new simulation from older run without temperature reset"),
+                    i18n("Start new simulation from older run with temperature reset")};
   GtkWidget * combo = create_combo();
   int i;
-  for (i=0; i<3; i++) combo_text_append(combo, rtype[i]);
+  for (i=0; i<3; i++) combo_text_append(combo, _(rtype[i]));
   combo_set_active (combo, (int)tmp_field -> sys_opts[15]);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_sys_restart), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, sys_box[3], combo, FALSE, FALSE, 20);
@@ -2527,51 +2536,51 @@ GtkWidget * vbox_control (int f)
   switch (f)
   {
     case 0:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Global options:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Global options:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_sys_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Restart options:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Restart options:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_restart_box(), FALSE, FALSE, 0);
       break;
     case 1:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Intra-molecular probability denisty function (PDF) analysis:</b>", 350, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Intra-molecular probability denisty function (PDF) analysis:</b>"), 350, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_analyze_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Overall analysis:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 10);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Overall analysis:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_overall_box(), FALSE, FALSE, 0);
       break;
     case 2:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>van der Waals (Non-bonded short range):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>van der Waals (Non-bonded short range):</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_vdws_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Electrostatics (Non-bonded long range):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Electrostatics (Non-bonded long range):</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_electro_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Metallic interactions:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Metallic interactions:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_metal_box(), FALSE, FALSE, 0);
       break;
     case 3:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Equilibration:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Equilibration:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_equi_box(), FALSE, FALSE, 0);
       break;
     case 4:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Thermodynamics:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Thermodynamics:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_ensemble_box(), FALSE, FALSE, 0);
       break;
     case 5:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Molecular dynamics:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Molecular dynamics:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_md_box(), FALSE, FALSE, 0);
       break;
     case 6:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Output information:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Output information:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_out_box(), FALSE, FALSE, 10);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Trajectory file(s):</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Trajectory file(s):</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_traj_box(), FALSE, FALSE, 10);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Restart file:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Restart file:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_dump_box(), FALSE, FALSE, 10);
       break;
     case 7:
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Job options:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Job options:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_job_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>I/O options:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>I/O options:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_io_box(), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>Other options:</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b>Other options:</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_misc_box(), FALSE, FALSE, 0);
       break;
     default:

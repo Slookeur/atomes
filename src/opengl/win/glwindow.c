@@ -123,11 +123,11 @@ extern GtkWidget * shortcuts_window (int sections, int group_by_section[sections
 
 atomic_object * copied_object = NULL;
 
-gchar * opengl_section_names[]={ "General", "Analysis mode", "Edition mode" };
+gchar * opengl_section_names[]={ i18n("General"), i18n("Analysis mode"), i18n("Edition mode") };
 int opengl_group_by_section[] = { 5, 4, 3 };
-gchar * opengl_group_names[]={"Styles", "Measures", "Selection mode", "Window management", "Mouse mode",
-                              "Camera rotation", "Camera motion", "Camera spin", "Model interaction",
-                              "Coordinates rotation", "Coordinates translation", "Model interaction"};
+gchar * opengl_group_names[]={i18n("Styles"), i18n("Measures"), i18n("Selection mode"), i18n("Window management"), i18n("Mouse mode"),
+                              i18n("Camera rotation"), i18n("Camera motion"), i18n("Camera spin"), i18n("Model interaction"),
+                              i18n("Coordinates rotation"), i18n("Coordinates translation"), i18n("Model interaction")};
 int opengl_shortcut_by_group[] = { 10, 1, 4, 6, 2, // Global
                                     4, 6, 6, 3,    // Analysis
                                     4, 6, 6 };     // Edition
@@ -136,87 +136,87 @@ shortcuts opengl_shortcuts[] = {
 //
 // Global
 //
-  { "Atom(s) color map", "change atom(s) color map", GDK_KEY_a, "a" },
-  { "Polyhedra color map", "change polyhedra color map", GDK_KEY_p, "p" },
-  { "Ball and stick", "change global style to ball and stick", GDK_KEY_b, "b" },
-  { "Cylinders", "change global style to cylinders", GDK_KEY_c, "c" },
-  { "Spheres", "change global style to spheres", GDK_KEY_s, "s" },
-  { "Covalent radius", "change global style to cylinders", GDK_KEY_o, "o" },
-  { "Ionic radius", "change global style to cylinders", GDK_KEY_i, "i" },
-  { "van der Waals radius", "change global style to van der Waals radius", GDK_KEY_v, "v" },
-  { "In crystal radius", "change global style to in crystal radius", GDK_KEY_r, "r" },
-  { "Wireframe", "change global style to wireframe", GDK_KEY_w, "w" },
+  { i18n("Atom(s) color map"), i18n("change atom(s) color map"), GDK_KEY_a, "a" },
+  { i18n("Polyhedra color map"), i18n("change polyhedra color map"), GDK_KEY_p, "p" },
+  { i18n("Balls and Sticks"), i18n("change global style to balls and sticks"), GDK_KEY_b, "b" },
+  { i18n("Cylinders"), i18n("change global style to cylinders"), GDK_KEY_c, "c" },
+  { i18n("Spheres"), i18n("change global style to spheres"), GDK_KEY_s, "s" },
+  { i18n("Covalent Radii"), i18n("change global style to covalent radii"), GDK_KEY_o, "o" },
+  { i18n("Ionic Radii"), i18n("change global style to ionic radii"), GDK_KEY_i, "i" },
+  { i18n("van der Waals Radii"), i18n("change global style to van der Waals radii"), GDK_KEY_v, "v" },
+  { i18n("In Crystal Radii"), i18n("change global style to in crystal radii"), GDK_KEY_r, "r" },
+  { i18n("Wireframes"), i18n("change global style to wireframes"), GDK_KEY_w, "w" },
 //
-  { "All measures for the selection, pressed:\n\n"
-    "\t- 1st time: show inter-atomic distance(s)\n"
-    "\t- 2nd time: show inter-atomic angles\n"
-    "\t- 3rd time: hide measures", "Show measures", GDK_KEY_m, "m" },
+  { i18n("All measures for the selection, pressed:\n\n"
+         "\t- 1st time: show inter-atomic distances\n"
+         "\t- 2nd time: show inter-atomic angles\n"
+         "\t- 3rd time: hide measures"), i18n("Show measures"), GDK_KEY_m, "m" },
 //
-  { "Atom", "atom selection mode", GDK_KEY_a, "<Shift>a" },
-  { "Coordination", "coordination sphere selection mode", GDK_KEY_c, "<Shift>c" },
-  { "Fragment", "fragment selection mode", GDK_KEY_f, "<Shift>f" },
-  { "Molecule", "molecule selection mode", GDK_KEY_m, "<Shift>m" },
+  { i18n("Atom"), i18n("atom selection mode"), GDK_KEY_a, "<Shift>a" },
+  { i18n("Coordination"), i18n("coordination sphere selection mode"), GDK_KEY_c, "<Shift>c" },
+  { i18n("Fragment"), i18n("fragment selection mode"), GDK_KEY_f, "<Shift>f" },
+  { i18n("Molecule"), i18n("molecule selection mode"), GDK_KEY_m, "<Shift>m" },
 //
-  { "Environments", "Environments window",  GDK_KEY_e, "<Ctrl>e" },
-  { "Measures", "Measures window",  GDK_KEY_m, "<Ctrl>m" },
-  { "Recorder", "Recorder window",  GDK_KEY_r, "<Ctrl>r" },
-  { "Create new project", "Create new project",  GDK_KEY_n, "<Ctrl>n" },
-  { "Enter fullscreen", "Enter fullscreen", GDK_KEY_f, "<Ctrl>f" },
-  { "Exit fullscreen", "Exit fullscreen", GDK_KEY_Escape, "Escape" },
+  { i18n("Environments"), i18n("Environments window"),  GDK_KEY_e, "<Ctrl>e" },
+  { i18n("Measures"), i18n("Measures window"),  GDK_KEY_m, "<Ctrl>m" },
+  { i18n("Recorder"), i18n("Recorder window"),  GDK_KEY_r, "<Ctrl>r" },
+  { i18n("Create new project"), i18n("Create new project"),  GDK_KEY_n, "<Ctrl>n" },
+  { i18n("Enter fullscreen"), i18n("Enter fullscreen"), GDK_KEY_f, "<Ctrl>f" },
+  { i18n("Exit fullscreen"), i18n("Exit fullscreen"), GDK_KEY_Escape, "Escape" },
 //
 #ifdef OSX
-  { "Analysis mode", "Analysis mode", GDK_KEY_a, "<Meta>a" },
-  { "Edition mode", "Edition mode", GDK_KEY_e, "<Meta>e" },
+  { i18n("Analysis mode"), i18n("Analysis mode"), GDK_KEY_a, "<Meta>a" },
+  { i18n("Edition mode"), i18n("Edition mode"), GDK_KEY_e, "<Meta>e" },
 #else
-  { "Analysis mode", "Analysis mode", GDK_KEY_a, "<Alt>a" },
-  { "Edition mode", "Edition mode", GDK_KEY_e, "<Alt>e" },
+  { i18n("Analysis mode"), i18n("Analysis mode"), GDK_KEY_a, "<Alt>a" },
+  { i18n("Edition mode"), i18n("Edition mode"), GDK_KEY_e, "<Alt>e" },
 #endif
 //
 // Analysis
 //
-  { "Rotate right", "rotate right", GDK_KEY_Right, "Right" },
-  { "Rotate left", "rotate left", GDK_KEY_Left, "Left" },
-  { "Rotate up", "rotate up", GDK_KEY_Up, "Up" },
-  { "Rotate down", "rotate down", GDK_KEY_Down, "Down" },
+  { i18n("Rotate right"), i18n("rotate right"), GDK_KEY_Right, "Right" },
+  { i18n("Rotate left"), i18n("rotate left"), GDK_KEY_Left, "Left" },
+  { i18n("Rotate up"), i18n("rotate up"), GDK_KEY_Up, "Up" },
+  { i18n("Rotate down"), i18n("rotate down"), GDK_KEY_Down, "Down" },
 //
-  { "Move right", "move camera right", GDK_KEY_Right, "<Ctrl>Right" },
-  { "Move left", "move camera left", GDK_KEY_Left, "<Ctrl>Left" },
-  { "Move up", "move camera up", GDK_KEY_Up, "<Ctrl>Up" },
-  { "Move down", "move camera down", GDK_KEY_Down, "<Ctrl>Down" },
-  { "Zoom in", "zoom camera in", GDK_KEY_Down, "<Shift>Up" },
-  { "Zoom out", "zoom camera out", GDK_KEY_Down, "<Shift>Down" },
+  { i18n("Move right"), i18n("move camera right"), GDK_KEY_Right, "<Ctrl>Right" },
+  { i18n("Move left"), i18n("move camera left"), GDK_KEY_Left, "<Ctrl>Left" },
+  { i18n("Move up"), i18n("move camera up"), GDK_KEY_Up, "<Ctrl>Up" },
+  { i18n("Move down"), i18n("move camera down"), GDK_KEY_Down, "<Ctrl>Down" },
+  { i18n("Zoom in"), i18n("zoom camera in"), GDK_KEY_Down, "<Shift>Up" },
+  { i18n("Zoom out"), i18n("zoom camera out"), GDK_KEY_Down, "<Shift>Down" },
 //
-  { "Spin right", "rotate right", GDK_KEY_Right, "<Ctrl><Shift>Right" },
-  { "Spin left", "rotate left", GDK_KEY_Left, "<Ctrl><Shift>Left" },
-  { "Spin up", "rotate up", GDK_KEY_Up, "<Ctrl><Shift>Up" },
-  { "Spin down", "rotate down", GDK_KEY_Down, "<Ctrl><Shift>Down" },
-  { "Pause / restart", "pause / restart spinning", GDK_KEY_space, "space" },
-  { "Stop", "stop spinning",  GDK_KEY_s, "<Ctrl>s" },
+  { i18n("Spin right"), i18n("rotate right"), GDK_KEY_Right, "<Ctrl><Shift>Right" },
+  { i18n("Spin left"), i18n("rotate left"), GDK_KEY_Left, "<Ctrl><Shift>Left" },
+  { i18n("Spin up"), i18n("rotate up"), GDK_KEY_Up, "<Ctrl><Shift>Up" },
+  { i18n("Spin down"), i18n("rotate down"), GDK_KEY_Down, "<Ctrl><Shift>Down" },
+  { i18n("Pause / restart"), i18n("pause / restart spinning"), GDK_KEY_space, "space" },
+  { i18n("Stop"), i18n("stop spinning"),  GDK_KEY_s, "<Ctrl>s" },
 //
-  { "Label / unlabel all atom(s)", "Label / unlabel all atom(s)",  GDK_KEY_l, "<Ctrl>l" },
-  { "Select / unselect all atom(s)", "Select / unselect all atom(s)",  GDK_KEY_a, "<Ctrl>a" },
-  { "Copy selection", "Copy selection",  GDK_KEY_c, "<Ctrl>c" },
+  { i18n("Label / unlabel all atom(s)"), i18n("Label / unlabel all atom(s)"),  GDK_KEY_l, "<Ctrl>l" },
+  { i18n("Select / unselect all atom(s)"), i18n("Select / unselect all atom(s)"),  GDK_KEY_a, "<Ctrl>a" },
+  { i18n("Copy selection"), i18n("Copy selection"),  GDK_KEY_c, "<Ctrl>c" },
 //
 // Edition
 //
-  { "Rotate right", "rotate right", GDK_KEY_Right, "Right" },
-  { "Rotate left", "rotate left", GDK_KEY_Left, "Left" },
-  { "Rotate up", "rotate up", GDK_KEY_Up, "Up" },
-  { "Rotate down", "rotate down", GDK_KEY_Down, "Down" },
+  { i18n("Rotate right"), i18n("rotate right"), GDK_KEY_Right, "Right" },
+  { i18n("Rotate left"), i18n("rotate left"), GDK_KEY_Left, "Left" },
+  { i18n("Rotate up"), i18n("rotate up"), GDK_KEY_Up, "Up" },
+  { i18n("Rotate down"), i18n("rotate down"), GDK_KEY_Down, "Down" },
 //
-  { "Translate right", "move camera right", GDK_KEY_Right, "<Ctrl>Right" },
-  { "Translate left", "move camera left", GDK_KEY_Left, "<Ctrl>Left" },
-  { "Translate up", "move camera up", GDK_KEY_Up, "<Ctrl>Up" },
-  { "Translate down", "move camera down", GDK_KEY_Down, "<Ctrl>Down" },
-  { "Zoom in", "zoom camera in", GDK_KEY_Up, "<Shift>Up" },
-  { "Zoom out", "zoom camera out", GDK_KEY_Down, "<Shift>Down" },
+  { i18n("Translate right"), i18n("move camera right"), GDK_KEY_Right, "<Ctrl>Right" },
+  { i18n("Translate left"), i18n("move camera left"), GDK_KEY_Left, "<Ctrl>Left" },
+  { i18n("Translate up"), i18n("move camera up"), GDK_KEY_Up, "<Ctrl>Up" },
+  { i18n("Translate down"), i18n("move camera down"), GDK_KEY_Down, "<Ctrl>Down" },
+  { i18n("Zoom in"), i18n("zoom camera in"), GDK_KEY_Up, "<Shift>Up" },
+  { i18n("Zoom out"), i18n("zoom camera out"), GDK_KEY_Down, "<Shift>Down" },
 //
-  { "Label / unlabel all atom(s)", "Label / unlabel all atom(s)",  GDK_KEY_l, "<Ctrl>l" },
-  { "Select / unselect all atom(s)", "Select / unselect all atom(s)",  GDK_KEY_a, "<Ctrl>a" },
-  { "Copy all selection", "Copy selection",  GDK_KEY_c, "<Ctrl>c" },
-  { "Cut selection", "Cut selection",  GDK_KEY_x, "<Ctrl>x" },
-  { "Paste selection", "Paste selection",  GDK_KEY_v, "<Ctrl>v" },
-  { "Delete selection", "Delete selection", GDK_KEY_Delete, "Delete" }
+  { i18n("Label / unlabel all atom(s)"), i18n("Label / unlabel all atom(s)"),  GDK_KEY_l, "<Ctrl>l" },
+  { i18n("Select / unselect all atom(s)"), i18n("Select / unselect all atom(s)"),  GDK_KEY_a, "<Ctrl>a" },
+  { i18n("Copy selection"), i18n("Copy selection"),  GDK_KEY_c, "<Ctrl>c" },
+  { i18n("Cut selection"), i18n("Cut selection"),  GDK_KEY_x, "<Ctrl>x" },
+  { i18n("Paste selection"), i18n("Paste selection"),  GDK_KEY_v, "<Ctrl>v" },
+  { i18n("Delete selection"), i18n("Delete selection"), GDK_KEY_Delete, "Delete" }
 };
 
 #ifdef GTK3
@@ -307,13 +307,13 @@ GtkWidget * coord_menu (glwin * view)
   }
   for (i=0; i<2; i++)
   {
-    view -> ogl_rings[i*6] = menu_item_new_with_submenu ("Ring(s)", view -> rings, prep_rings_menu (view, i*6));
+    view -> ogl_rings[i*6] = menu_item_new_with_submenu (_("Ring(s)"), view -> rings, prep_rings_menu (view, i*6));
   }
-  view -> ogl_chains[0] = menu_item_new_with_submenu ("Chain(s)", view -> chains, add_menu_coord (view, 0, 9));
+  view -> ogl_chains[0] = menu_item_new_with_submenu (_("Chain(s)"), view -> chains, add_menu_coord (view, 0, 9));
   view -> ogl_coord[1] = menu_coord (view, 0);
-  view -> ogl_coord[2] = menu_item_new_with_submenu ("Polyhedra", TRUE, menu_poly (view, 0));
-  view -> ogl_coord[3] = menu_item_new_with_submenu ("Fragment(s)", get_project_by_id(view -> proj) -> coord -> totcoord[2], add_menu_coord (view, 0, 2));
-  view -> ogl_coord[4] = menu_item_new_with_submenu ("Molecule(s)", get_project_by_id(view -> proj) -> coord -> totcoord[3], add_menu_coord (view, 0, 3));
+  view -> ogl_coord[2] = menu_item_new_with_submenu (_("Polyhedra"), TRUE, menu_poly (view, 0));
+  view -> ogl_coord[3] = menu_item_new_with_submenu (_("Fragment(s)"), get_project_by_id(view -> proj) -> coord -> totcoord[2], add_menu_coord (view, 0, 2));
+  view -> ogl_coord[4] = menu_item_new_with_submenu (_("Molecule(s)"), get_project_by_id(view -> proj) -> coord -> totcoord[3], add_menu_coord (view, 0, 3));
   GtkWidget * menu = gtk_menu_new ();
   gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_coord[1]);
   gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_coord[2]);
@@ -321,7 +321,7 @@ GtkWidget * coord_menu (glwin * view)
   gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_chains[0]);
   gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_coord[3]);
   gtk_menu_shell_append ((GtkMenuShell *)menu, view -> ogl_coord[4]);
-  gtk3_menu_item (menu, "Advanced", IMG_NONE, NULL, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Advanced"), IMG_NONE, NULL, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   // add_advanced_item (menu, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK);
   return menu;
 }
@@ -487,11 +487,11 @@ G_MODULE_EXPORT void view_shortcuts (GtkWidget * widg, gpointer data)
 */
 void menu_items_opengl (GtkWidget * menu, glwin * view, int pop)
 {
-  GtkWidget * style = gtk3_menu_item (menu, "Style", IMG_FILE, (gpointer)PACKAGE_MOL, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, get_project_by_id(view -> proj) -> nspec);
+  GtkWidget * style = gtk3_menu_item (menu, _("Style"), IMG_FILE, (gpointer)PACKAGE_MOL, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, get_project_by_id(view -> proj) -> nspec);
   gtk_menu_item_set_submenu ((GtkMenuItem *)style, menu_style(view, pop));
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Color Scheme(s)", get_project_by_id(view -> proj) -> nspec, menu_map(view, pop)));
-  gtk3_menu_item (menu, "Material And Light(s)", IMG_NONE, NULL, G_CALLBACK(opengl_advanced), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
-  gtk3_menu_item (menu, "Render Image", IMG_FILE, (gpointer)PACKAGE_IMG, G_CALLBACK(render_gl_image), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Color Maps"), get_project_by_id(view -> proj) -> nspec, menu_map(view, pop)));
+  gtk3_menu_item (menu, _("Material and Light(s)"), IMG_NONE, NULL, G_CALLBACK(opengl_advanced), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Render Image"), IMG_FILE, (gpointer)PACKAGE_IMG, G_CALLBACK(render_gl_image), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
 }
 
 /*!
@@ -522,9 +522,9 @@ void menu_items_model (GtkWidget * menu, glwin * view, int pop)
 {
   if (get_project_by_id(view -> proj) -> nspec)
   {
-    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Atom(s)", TRUE, menu_atoms (view, pop, 0)));
-    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Bond(s)", TRUE, menu_bonds (view, pop, 0)));
-    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Clone(s)", TRUE, menu_clones (view, pop)));
+    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Atom(s)"), TRUE, menu_atoms (view, pop, 0)));
+    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Bond(s)"), TRUE, menu_bonds (view, pop, 0)));
+    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Clone(s)"), TRUE, menu_clones (view, pop)));
     gtk_menu_shell_append ((GtkMenuShell *)menu, menu_box_axis (view, 0, 0));
   }
 }
@@ -555,17 +555,17 @@ GtkWidget * menu_model (glwin * view, int pop)
 */
 void menu_items_view (GtkWidget * menu, glwin * view, int popm)
 {
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Representation", TRUE, menu_rep (view, popm)));
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Projection", TRUE, menu_proj (view)));
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Background", TRUE, menu_back (view)));
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Representation"), TRUE, menu_rep (view, popm)));
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Projection"), TRUE, menu_proj (view)));
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Background"), TRUE, menu_back (view)));
   if (get_project_by_id(view -> proj) -> nspec) gtk_menu_shell_append ((GtkMenuShell *)menu, menu_box_axis (view, popm, 1));
   if (! popm)
   {
     add_menu_separator (menu);
-    gtk3_menu_item (menu, "Reset view", IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, "Center molecule", IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Reset view"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Center molecule"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
     add_menu_separator (menu);
-    gtk3_menu_item (menu, "Fullscreen", IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_f, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Fullscreen"), IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_f, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   }
 }
 
@@ -596,7 +596,7 @@ GtkWidget * menu_help (glwin * view, int popm)
 {
   GtkWidget * menu;
   menu = gtk_menu_new ();
-  gtk3_menu_item (menu, "Shortcuts", IMG_NONE, NULL, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Shortcuts"), IMG_NONE, NULL, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   return menu;
 }
 #endif
@@ -619,16 +619,16 @@ void prepare_opengl_menu_bar (glwin * view)
   view -> menu_bar = gtk_menu_bar_new ();
   gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu ("OpenGL", TRUE, menu_opengl(view, 0)));
   project * this_proj = get_project_by_id (view -> proj);
-  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu ("Model", this_proj -> nspec, menu_model(view, 0)));
-  view -> ogl_coord[0] = create_menu_item (FALSE, "Chemistry");
+  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu (_("Model"), this_proj -> nspec, menu_model(view, 0)));
+  view -> ogl_coord[0] = create_menu_item (FALSE, _("Chemistry"));
   gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, view -> ogl_coord[0]);
   widget_set_sensitive (view -> ogl_coord[0], this_proj -> nspec);
   if (this_proj -> nspec)
   {
     gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_coord[0], coord_menu (view));
   }
-  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu ("Tools", TRUE, menu_tools(view, 0)));
-  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu ("View", TRUE, menu_view(view, 0)));
+  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu (_("Tools"), TRUE, menu_tools(view, 0)));
+  gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_item_new_with_submenu (_("View"), TRUE, menu_view(view, 0)));
   gtk_menu_shell_append ((GtkMenuShell *)view -> menu_bar, menu_anim (view, 0));
 
   show_the_widgets (view -> menu_bar);
@@ -636,7 +636,7 @@ void prepare_opengl_menu_bar (glwin * view)
   if (this_proj -> nspec) update_all_menus (view, this_proj -> natomes);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> menu_box, view -> menu_bar, TRUE, TRUE, 0);
   /* GtkWidget * menu = gtk_menu_bar_new ();
-  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Help", TRUE, menu_help(view, 0)));
+  gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Help"), TRUE, menu_help(view, 0)));
   add_box_child_end (view -> menu_box, menu, FALSE, FALSE, 0);
   show_the_widgets (menu);*/
   show_the_widgets (view -> menu_bar);
@@ -1356,7 +1356,7 @@ gboolean create_3d_model (int p, gboolean load)
 #ifndef GTKGLAREA
   if (! glXQueryExtension (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), NULL, NULL))
   {
-    g_warning ("Sorry OpenGL is not supported !");
+    g_warning (_("Sorry OpenGL is not supported !"));
     return FALSE;
   }
   else
@@ -1373,7 +1373,7 @@ gboolean create_3d_model (int p, gboolean load)
     GtkWidget * gl_vbox;
     if (load)
     {
-      gchar * str = g_strdup_printf ("%s - 3D view - [%s mode]", this_proj -> name, mode_name[0]);
+      gchar * str = g_strdup_printf (_("%s - 3D view - [%s mode]"), this_proj -> name, _(mode_name[0]));
       this_proj -> modelgl -> win = create_win (str, MainWindow, FALSE, TRUE);
 #ifdef GTK3
 #ifdef GTKGLAREA
@@ -1520,7 +1520,7 @@ void prep_model (int p)
       prepare_opengl_menu_bar (active_glwin);
 #ifdef GTK3
       GtkWidget * menu = gtk_menu_bar_new ();
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Help", TRUE, menu_help(active_glwin, 0)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Help"), TRUE, menu_help(active_glwin, 0)));
       add_box_child_end (active_glwin -> menu_box, menu, FALSE, FALSE, 0);
       show_the_widgets (menu);
 #endif

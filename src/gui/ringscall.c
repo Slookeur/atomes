@@ -90,14 +90,14 @@ void init_ring (project * this_proj)
     for ( j = 0 ; j < 4 ; j++ )
     {
 
-      this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %sAll]", rings_type[i], cp[j]);
+      this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf (_("%s - %sAll]"), _(rings_type[i]), cp[j]);
       l=l+1;
     }
     for ( j = 0 ; j < this_proj -> nspec ; j++ )
     {
       for ( k = 0 ; k < 4 ; k++ )
       {
-        this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %s%s]", rings_type[i], cp[k], active_chem -> label[j]);
+        this_proj -> analysis[RIN] -> curves[l] -> name = g_strdup_printf ("%s - %s%s]", _(rings_type[i]), cp[k], active_chem -> label[j]);
         l=l+1;
       }
     }
@@ -160,7 +160,7 @@ void update_rings_view (project * this_proj, int c)
   j = this_proj -> rsparam[c][0];
   if (j == 0)
   {
-    nelt = g_strdup_printf ("All");
+    nelt = g_strdup_printf (_("All"));
     col = NULL;
   }
   else
@@ -168,31 +168,31 @@ void update_rings_view (project * this_proj, int c)
     nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
     col = g_strdup_printf("%s", textcolor(j-1));
   }
-  print_info ("\n\nRing statistics\n\n", "heading", this_proj -> analysis[RIN] -> calc_buffer);
-  str = g_strdup_printf ("\n%s rings analysis details:\n", rings_type[c]);
+  print_info (_("\n\nRing statistics\n\n"), "heading", this_proj -> analysis[RIN] -> calc_buffer);
+  str = g_strdup_printf (_("\n%s rings analysis details:\n"), rings_type[c]);
   print_info (str, "italic", this_proj -> analysis[RIN] -> calc_buffer);
   g_free (str);
 
   if (this_proj -> rsparam[c][2])
   {
-    print_info (" * only ABAB rings have been considered\n", "italic", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_(" * only ABAB rings have been considered\n"), "italic", this_proj -> analysis[RIN] -> calc_buffer);
   }
   if (this_proj -> rsparam[c][3])
   {
-    print_info (" * no homopolar bonds in the rings (A-A, B-B ...)\n", "italic", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_(" * no homopolar bonds in the rings (A-A, B-B ...)\n"), "italic", this_proj -> analysis[RIN] -> calc_buffer);
   }
   if (this_proj -> rsparam[c][4])
   {
-    print_info (" * no homopolar bonds in the connectivity matrix (A-A, B-B ...)\n", "italic", this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_(" * no homopolar bonds in the connectivity matrix (A-A, B-B ...)\n"), "italic", this_proj -> analysis[RIN] -> calc_buffer);
   }
 
-  print_info ("\n Atom(s) used to start the search: ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+  print_info (_("\n Atom(s) used to start the search: "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
   print_info (nelt, col, this_proj -> analysis[RIN] -> calc_buffer);
-  if (j != 0) print_info (" atom(s) only", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+  if (j != 0) print_info (_(" atom(s) only"), NULL, this_proj -> analysis[RIN] -> calc_buffer);
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n Average number of rings per configuration: ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_("\n Average number of rings per configuration: "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
     str = g_strdup_printf ("%f", this_proj -> rsdata[c][0]);
     print_info (str, "bold", this_proj -> analysis[RIN] -> calc_buffer);
     g_free (str);
@@ -202,7 +202,7 @@ void update_rings_view (project * this_proj, int c)
   }
   else
   {
-    print_info ("\n Total number of rings: ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_("\n Total number of rings: "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
     str = g_strdup_printf ("%f\n", this_proj -> rsdata[c][0]);
     print_info (str, "bold", this_proj -> analysis[RIN] -> calc_buffer);
     g_free (str);
@@ -211,16 +211,16 @@ void update_rings_view (project * this_proj, int c)
   {
     if (this_proj -> steps > 1)
     {
-      print_info (" Average number of ring(s) with n > ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+      print_info (_(" Average number of ring(s) with n > "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
     }
     else
     {
-      print_info (" Number of ring(s) with n > ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+      print_info (_(" Number of ring(s) with n > "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
     }
     str = g_strdup_printf ("%d", this_proj -> rsparam[c][1]);
     print_info (str, "bold", this_proj -> analysis[RIN] -> calc_buffer);
     g_free (str);
-    print_info ("  nodes that potentially exist: ", NULL, this_proj -> analysis[RIN] -> calc_buffer);
+    print_info (_("  nodes that potentially exist: "), NULL, this_proj -> analysis[RIN] -> calc_buffer);
     str = g_strdup_printf ("%f", this_proj -> rsdata[c][2]);
     print_info (str, "bold", this_proj -> analysis[RIN] -> calc_buffer);
     g_free (str);
@@ -443,7 +443,7 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
 
   if (! run_distance_matrix (widg, search+1, 0))
   {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, widg);
   }
   else
   {
@@ -477,18 +477,18 @@ G_MODULE_EXPORT void on_calc_rings_released (GtkWidget * widg, gpointer data)
     active_project -> rsdata[i][4] = get_calc_time (start_time, stop_time);
     if (j == 0)
     {
-      show_error ("The ring statistics calculation has failed", 0, widg);
+      show_error (_("The ring statistics calculation has failed"), 0, widg);
       active_glwin -> ring_max[i] = 0;
       active_project -> rsdata[i][4] = 0.0;
     }
     else if (j == 2)
     {
-      gchar * str = g_strdup_printf ("\t<b>The ring statistics have failed !</b>\n\n"
-                                     "The number of ring per MD step appears\n"
-                                     "to be bigger than the initial value of <b>%d</b>\n"
-                                     "used to allocate memory to store the results.\n\n"
-                                     "Increase the value and start again !",
-                                     active_project -> rsearch[1]);
+      gchar * str = g_strdup_printf (_("\t<b>The ring statistics have failed !</b>\n\n"
+                                       "The number of ring per MD step appears\n"
+                                       "to be bigger than the initial value of <b>%d</b>\n"
+                                       "used to allocate memory to store the results.\n\n"
+                                       "Increase the value and start again !"),
+                                       active_project -> rsearch[1]);
       show_error (str, 0, widg);
       g_free (str);
       active_glwin -> ring_max[i] = 0;

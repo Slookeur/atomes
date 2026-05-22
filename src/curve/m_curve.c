@@ -73,20 +73,20 @@ extern GtkWidget * shortcuts_window (int sections, int group_by_section[sections
                                      gchar * section_names[sections], gchar * group_names[groups], shortcuts shortcs[]);
 int ** extrarid;
 
-gchar * curve_section_names[]={ "Curve window"};
+gchar * curve_section_names[]={i18n("Curve window")};
 int curve_group_by_section[] = { 2 };
-gchar * curve_group_names[]={"Edition", "Export"};
+gchar * curve_group_names[]={i18n("Edition "), i18n("Export")};
 int curve_shortcut_by_group[] = { 3, 2 };
 
 shortcuts curve_shortcuts[] = {
 //
 // Global
 //
-  { "Autoscale", "Autoscale", GDK_KEY_a, "<Ctrl>a" },
-  { "Edit curve", "Edit curve", GDK_KEY_e, "<Ctrl>e" },
-  { "Close curve", "Close curve", GDK_KEY_c, "<Ctrl>c" },
-  { "Export data", "Export data", GDK_KEY_s, "<Ctrl>s" },
-  { "Save image", "Save image", GDK_KEY_i, "<Ctrl>i" }
+  { i18n("Autoscale"), i18n("Autoscale"), GDK_KEY_a, "<Ctrl>a" },
+  { i18n("Edit curve"), i18n("Edit curve"), GDK_KEY_e, "<Ctrl>e" },
+  { i18n("Close curve"), i18n("Close curve"), GDK_KEY_c, "<Ctrl>c" },
+  { i18n("Export data"), i18n("Export data"), GDK_KEY_s, "<Ctrl>s" },
+  { i18n("Save image"), i18n("Save image"), GDK_KEY_i, "<Ctrl>i" }
 };
 
 /*!
@@ -507,10 +507,10 @@ GMenu * create_curve_menu (gchar * str)
 {
   GMenu * menu = g_menu_new ();
   gchar * act = g_strdup_printf ("%s.edit.curve", str);
-  append_menu_item (menu, "Edit Curve", (const gchar *)act, "<CTRL>E", NULL, IMG_STOCK, PAGE_SETUP, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Edit Curve"), (const gchar *)act, "<CTRL>E", NULL, IMG_STOCK, PAGE_SETUP, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   act = g_strdup_printf ("%s.save.image", str);
-  append_menu_item (menu, "Export Image", (const gchar *)act, "<CTRL>I", NULL, IMG_FILE, PACKAGE_IMG, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Export Image"), (const gchar *)act, "<CTRL>I", NULL, IMG_FILE, PACKAGE_IMG, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   return menu;
 }
@@ -527,7 +527,7 @@ GMenu * create_curve_menu (gchar * str)
 GMenu * edit_data_section (GSimpleActionGroup * action_group, gchar * str, tint * data)
 {
   GMenu * menu = g_menu_new ();
-  GMenuItem * item = g_menu_item_new ("Edit Data", NULL);
+  GMenuItem * item = g_menu_item_new (_("Edit Data"), NULL);
   gchar * str_edit = g_strdup_printf ("%s-win-edit", str);
   g_menu_item_set_attribute (item, "custom", "s", str_edit, NULL);
   g_free (str_edit);
@@ -553,7 +553,7 @@ GMenu * curve_close_section (gchar * str)
 {
   GMenu * menu = g_menu_new ();
   gchar * act = g_strdup_printf ("%s.close.curve", str);
-  append_menu_item (menu, "Close", (const gchar *)act, "<CTRL>C", NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Close"), (const gchar *)act, "<CTRL>C", NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   return menu;
 }
@@ -569,7 +569,7 @@ GMenu * curve_help_menu (gchar * str)
 {
   GMenu * menu = g_menu_new ();
   gchar * act = g_strdup_printf ("%s.shortcuts.curve", str);
-  append_menu_item (menu, "Shortcuts", (const gchar *)act, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Shortcuts"), (const gchar *)act, NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   return menu;
 }
@@ -589,7 +589,7 @@ GMenu * create_data_menu (GSimpleActionGroup * action_group, int pop, gchar * st
   GMenu * menu = g_menu_new ();
   g_menu_append_section (menu, NULL, (GMenuModel*)edit_data_section(action_group, str, data));
   gchar * act = g_strdup_printf ("%s.save.data", str);
-  append_menu_item (menu, "Save Data", (const gchar *)act, "<CTRL>S", NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Save Data"), (const gchar *)act, "<CTRL>S", NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   if (! pop) g_menu_append_section (menu, NULL, (GMenuModel *)curve_close_section(str));
   return menu;
@@ -608,10 +608,10 @@ GMenu * curve_menu_bar (GSimpleActionGroup * action_group, gchar * str, tint * d
 {
   GMenu * menu = g_menu_new ();
   prep_extra_rid (data);
-  append_submenu (menu, "Data", create_data_menu(action_group, 0, str, data));
+  append_submenu (menu, _("Data"), create_data_menu(action_group, 0, str, data));
   g_free (extrarid);
-  append_submenu (menu, "Curve", create_curve_menu(str));
-  append_submenu (menu, "Help", curve_help_menu(str));
+  append_submenu (menu, _("Curve"), create_curve_menu(str));
+  append_submenu (menu, _("Help"), curve_help_menu(str));
   return menu;
 }
 
@@ -656,7 +656,7 @@ void curve_window_add_menu_bar (tint * data)
 GMenu * create_add_remove_section (GSimpleActionGroup * action_group, gchar * act, int num, tint * data)
 {
   GMenu * menu = g_menu_new ();
-  GMenuItem * item = g_menu_item_new ("Add Data Set", NULL);
+  GMenuItem * item = g_menu_item_new (_("Add Data Set"), NULL);
 #ifdef MENU_ICONS
   GIcon * gicon = get_gicon_from_data (IMG_STOCK, LIST_ADD);
   g_menu_item_set_icon (item, gicon);
@@ -674,7 +674,7 @@ GMenu * create_add_remove_section (GSimpleActionGroup * action_group, gchar * ac
   g_menu_append_item (menu, item);
   g_object_unref (item);
 
-  item = g_menu_item_new ("Remove Data Set", NULL);
+  item = g_menu_item_new (_("Remove Data Set"), NULL);
 #ifdef MENU_ICONS
   gicon = get_gicon_from_data (IMG_STOCK, LIST_REM);
   g_menu_item_set_icon (item, gicon);
@@ -704,7 +704,7 @@ GMenu * autoscale_section (gchar * str)
 {
   GMenu * menu = g_menu_new ();
   gchar * act = g_strdup_printf ("%s.autoscale.curve", str);
-  append_menu_item (menu, "Autoscale", (const gchar *)act, "<CTRL>A", NULL, IMG_STOCK, FITBEST, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Autoscale"), (const gchar *)act, "<CTRL>A", NULL, IMG_STOCK, FITBEST, FALSE, FALSE, FALSE, NULL);
   g_free (act);
   return menu;
 }

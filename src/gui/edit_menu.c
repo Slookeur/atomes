@@ -70,15 +70,10 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "preferences.h"
 
-char * box_p[2]={"<b>Edges [&#xC5;]</b>", "<b>Angles [&#xB0;]</b>"};
+char * box_p[2]={i18n("<b>Edges [&#xC5;]</b>"), i18n("<b>Angles [&#xB0;]</b>")};
 char * box_prop[2][3]={{"<b><i>a</i></b>", "<b><i>b</i></b>", "<b><i>c</i></b>"},
                        {"alpha - &#x3B1;", "beta - &#x3B2;", "gamma - &#x263;"}};
-char * chem_lab[CHEM_PARAMS+2]={"Atom:", "Element:",
-                                "Atomic number", "Atomic mass:", "Radius",
-                                "Neutrons scattering length:", "X-rays scattering length:"};
-char * chem_rad[4]={"Covalent", "Ionic", "van der Waals", "In crystal"};
-char * chem_unit[4]={" g/mol", " &#xC5;", " fm", " e.u"};
-char * edit_prop[4]={"Chemistry and physics", "Box and periodicity", "Bond cutoffs", "Lattice vectors"};
+char * edit_prop[4]={i18n("Chemistry and physics"), i18n("Box and periodicity"), i18n("Bond cutoffs"), i18n("Lattice vectors")};
 char * vect_name[3]={"<i>a</i>", "<i>b</i>", "<i>c</i>"};
 char * vect_comp[3]={"x", "y", "z"};
 GtkWidget * frac_box;
@@ -234,7 +229,7 @@ G_MODULE_EXPORT void run_vectors (GtkDialog * win, gint response_id, gpointer da
 G_MODULE_EXPORT void on_vectors_clicked (GtkButton * but, gpointer data)
 {
   int i, j, k;
-  GtkWidget * win = dialog_cancel_apply (edit_prop[3], MainWindow, FALSE);
+  GtkWidget * win = dialog_cancel_apply (_(edit_prop[3]), MainWindow, FALSE);
   GtkWidget * table = gtk_grid_new ();
   add_box_child_start (GTK_ORIENTATION_VERTICAL, dialog_get_content_area (win), table, FALSE, FALSE, 5);
   k = 0;
@@ -281,10 +276,10 @@ void edit_box (GtkWidget * vbox)
   tmp_frac = active_cell -> frac;
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                       check_button ("Apply Periodic Boundary Conditions",
+                       check_button (_("Apply <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions"),
                                      -1, 40, tmp_pbc, G_CALLBACK(toggle_pbc), NULL), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                       check_button ("Fractional coordinates",
+                       check_button (_("Fractional coordinates"),
                                      -1, 40, tmp_frac, G_CALLBACK(toggle_frac), NULL), FALSE, FALSE, 0);
   GtkWidget * table = gtk_grid_new ();
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, table, FALSE, FALSE, 0);
@@ -303,7 +298,7 @@ void edit_box (GtkWidget * vbox)
   k = 0;
   for (i=0; i<2; i++)
   {
-    gtk_grid_attach (GTK_GRID (table), markup_label(box_p[i], -1, 50, 0.5, 0.5), 1, i+2*i, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), markup_label(_(box_p[i]), -1, 50, 0.5, 0.5), 1, i+2*i, 1, 1);
     for (j=0; j<3; j++, k++)
     {
       gtk_grid_attach (GTK_GRID (table), markup_label(box_prop[i][j], -1, -1, 0.5, 0.5), j, i+2*i+1, 1, 1);
@@ -312,7 +307,7 @@ void edit_box (GtkWidget * vbox)
       gtk_grid_attach (GTK_GRID (table), entry, j, i+2*i+2, 1, 1);
     }
   }
-  GtkWidget * but = create_button ("Lattice Vectors", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_vectors_clicked), NULL);
+  GtkWidget * but = create_button (_("Lattice vectors"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_vectors_clicked), NULL);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 145);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 15);
@@ -413,7 +408,13 @@ G_MODULE_EXPORT void toggle_xcor (GtkToggleButton * but, gpointer data)
 */
 void edit_chem (GtkWidget * vbox)
 {
+  char * chem_lab[CHEM_PARAMS+2]={i18n("Atom:"), i18n("Element:"),
+                                  i18n("Atomic number:"), i18n("Atomic mass:"), i18n("Radius:"),
+                                  i18n("Neutrons scattering length:"), i18n("X-rays scattering length:")};
+  char * chem_rad[4]={i18n("Covalent"), i18n("Ionic"), "van der Waals", i18n("In Crystal")};
+  char * chem_unit[4]={" g/mol", " &#xC5;", " fm", " e.u"};
   int i, j;
+
   spec_box = create_combo();
   widget_set_sensitive(spec_box, 1);
   g_signal_connect(G_OBJECT(spec_box), "changed", G_CALLBACK(on_spec_changed), NULL);
@@ -424,7 +425,7 @@ void edit_chem (GtkWidget * vbox)
   for (i=0; i<CHEM_PARAMS+2; i++)
   {
     j = (i == 0) ? i : i + 2;
-    gtk_grid_attach (GTK_GRID (table), markup_label(chem_lab[i], 180, 30, 0.0, 0.5), 0, j, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), markup_label(_(chem_lab[i]), 180, 30, 0.0, 0.5), 0, j, 1, 1);
     if (i == 0)
     {
       for (j=0; j<active_project -> nspec; j++)
@@ -447,7 +448,7 @@ void edit_chem (GtkWidget * vbox)
           gtk_widget_set_size_request (rad_box, -1, 30);
           for (j=0; j<4; j++)
           {
-            combo_text_append (rad_box, chem_rad[j]);
+            combo_text_append (rad_box, _(chem_rad[j]));
           }
           combo_set_active (rad_box, -1);
           g_signal_connect(G_OBJECT(rad_box), "changed", G_CALLBACK(on_rad_changed), NULL);
@@ -710,12 +711,12 @@ gboolean test_cutoffs ()
 */
 void edit_bonds (GtkWidget * vbox)
 {
-  gchar * mess[2] = {"To define the existence of a bond between two atoms i (&#x3B1;) and j (&#x3B2;), ",
-                     "a bond exits if the two following conditions are verified:"};
-  gchar * cond[2] = {"1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)",
-                     "2) D<sub>ij</sub> &#x3c; first minimum of the partial gr<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)"};
-  gchar * m_end= "0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>";
-  gchar * fin = "D<sub>max</sub> is the maximum inter-atomic distance in the model\n";
+  gchar * mess[2] = {i18n("To define the existence of a bond between 2 atoms i (&#x3B1;) and j (&#x3B2;), "),
+                     i18n("a bond exits if the 2 following conditions are verified:")};
+  gchar * cond[2] = {i18n("1) D<sub>ij</sub> &#x3c; first minimum of the total g(r) - r<sub>cut</sub> (Tot.)"),
+                     i18n("2) D<sub>ij</sub> &#x3c; first minimum of the partial g<sub>&#x3B1;,&#x3B2;</sub>(r) - r<sub>cut</sub> (&#x3B1;,&#x3B2;)")};
+  gchar * m_end= i18n("0.0 &#x3c; r<sub>cut</sub> &#x2264; D<sub>max</sub>");
+  gchar * fin = i18n("D<sub>max</sub> is the maximum inter-atomic distance in the model\n");
   gchar * str;
   if (! preferences)
   {
@@ -723,33 +724,33 @@ void edit_bonds (GtkWidget * vbox)
     {
       if (active_project -> analysis[GDR] -> max != 0.0)
       {
-        str = g_strdup_printf ("%s\twith\tD<sub>max</sub> = %f  &#xC5;",
-                               m_end, active_project -> analysis[GDR] -> max);
+        str = g_strdup_printf (_("%s\twith\tD<sub>max</sub> = %f  &#xC5;"),
+                               _(m_end), active_project -> analysis[GDR] -> max);
       }
       else
       {
-        str = g_strdup_printf ("With %s", m_end);
+        str = g_strdup_printf (_("With %s"), _(m_end));
       }
     }
     else
     {
-      str = g_strdup_printf ("With %s", m_end);
+      str = g_strdup_printf (_("With %s"), _(m_end));
     }
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[0], -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(mess[1], -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_(mess[0]), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_(mess[1]), -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
   GtkWidget * vvbox = create_vbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[0], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(cond[0]), -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cond[1], -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(cond[1]), -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
   if (! preferences)
   {
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(fin, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, vbox, markup_label(_(fin), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
     g_free (str);
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
@@ -774,8 +775,8 @@ G_MODULE_EXPORT void run_on_edit_activate (GtkDialog * win, gint response_id, gp
   int i = (id < 2) ? id : (id > 2 && id < 5) ? 1 : 2;
 
   gboolean done = FALSE;
-  char * errpbc ="To apply PBC or use fractional coordinates\n"
-                 "describe properly the simulation box parameters";
+  char * errpbc = i18n("To apply PBC or use fractional coordinates\n"
+                       "describe properly the simulation box parameters");
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
@@ -806,7 +807,7 @@ G_MODULE_EXPORT void run_on_edit_activate (GtkDialog * win, gint response_id, gp
         }
         else
         {
-          show_warning (errpbc, GTK_WIDGET(win));
+          show_warning (_(errpbc), GTK_WIDGET(win));
         }
       }
       else
@@ -816,7 +817,7 @@ G_MODULE_EXPORT void run_on_edit_activate (GtkDialog * win, gint response_id, gp
         {
           if (active_project -> modelgl -> rings || active_project -> modelgl -> chains)
           {
-            upc = ask_yes_no ("Data can be lost !", "You will lose\n rings statistics and/or chains statistics data\nProceed anyway ?", GTK_MESSAGE_WARNING, GTK_WIDGET(win));
+            upc = ask_yes_no (_("Data can be lost !"), _("You will lose\n rings statistics and/or chains statistics data\nProceed anyway ?"), GTK_MESSAGE_WARNING, GTK_WIDGET(win));
           }
           else
           {
@@ -867,7 +868,7 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
   gboolean skip = FALSE;
   int id = GPOINTER_TO_INT(data);
   i = (id < 2) ? id : (id > 2 && id < 5) ? 1 : 2;
-  GtkWidget * win = dialog_cancel_apply (edit_prop[i], MainWindow, FALSE);
+  GtkWidget * win = dialog_cancel_apply (_(edit_prop[i]), MainWindow, FALSE);
   GtkWidget * box = dialog_get_content_area (win);
   gtk_box_set_homogeneous (GTK_BOX(box), FALSE);
   if (i == 0)

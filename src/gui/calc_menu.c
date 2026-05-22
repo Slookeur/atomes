@@ -168,7 +168,7 @@ void update_omega_max ()
   {
     omega_max_info = create_hbox(0);
     double omega_max = pi/(delt * num_delt);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label ("&#969;<sub>max</sub> =", 50, -1, 0.0, 0.5), FALSE, FALSE, 2);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label (_("&#969;<sub>max</sub> ="), 50, -1, 0.0, 0.5), FALSE, FALSE, 2);
     str = g_strdup_printf ("%f", (t_unit == 1) ? omega_max : omega_max * 1000.0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, omega_max_info, markup_label (str, 100, -1, 1.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
@@ -176,7 +176,7 @@ void update_omega_max ()
   }
   else
   {
-    str = g_strdup_printf ("Update step(s) between conf. and &#x3b4;t to evaluate &#969;<sub>max</sub>");
+    str = g_strdup_printf (_("Update step(s) between conf. and &#x3b4;t to evaluate &#969;<sub>max</sub>"));
     omega_max_info = markup_label (str, -1, -1, 0.5, 0.5);
     g_free (str);
   }
@@ -294,8 +294,7 @@ void calc_sph (GtkWidget * vbox)
   GtkWidget * entry;
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  gchar * str = "Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> &#x2208; [2-40]";
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,  markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,  markup_label ( _("Maximum <b><i>l</i></b>, <i>l<sub>max</sub></i> &#x2208; [2-40]"), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(SPH));
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[SPH] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
@@ -312,12 +311,12 @@ void calc_sph (GtkWidget * vbox)
 void calc_msd (GtkWidget * vbox, int cid)
 {
   int i, j, k, l, m;
-  gchar * val_b[3]={"Number of configurations:",
-                    "\tTime step &#x3b4;t used during the dynamics:",
-                    "\tNumber of step(s) between each configuration:"};
-  gchar * val_c[3]={"Number of configurations:",
-                    "Time step &#x3b4;t",
-                    "Step(s) between conf."};
+  gchar * val_b[3]={i18n("Number of configurations:"),
+                    i18n("\tTime step &#x3b4;t used during the dynamics:"),
+                    i18n("\tNumber of step(s) between each configuration:")};
+  gchar * val_c[3]={i18n("Number of configurations:"),
+                    i18n("Time step &#x3b4;t"),
+                    i18n("Step(s) between conf.")};
   GtkWidget * hbox;
   GtkWidget * entry;
   k = (cid == MSD) ? 15 : 0;
@@ -325,13 +324,13 @@ void calc_msd (GtkWidget * vbox, int cid)
   m = (cid == MSD) ? 0 : 5;
   hbox = create_hbox (k);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (val_b[0]), FALSE, FALSE, m);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (_(val_b[0])), FALSE, FALSE, m);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (g_strdup_printf ("<b>%d</b>",active_project -> steps), -1, 50, 0.5, 0.5), FALSE, FALSE, 10);
   for (i=1; i<3; i++)
   {
     hbox = create_hbox (k);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ((cid == MSD) ? val_b[i] : val_c[i], l, -1, 0.0, 0.5), FALSE, FALSE, m);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ((cid == MSD) ? _(val_b[i]) : _(val_c[i]), l, -1, 0.0, 0.5), FALSE, FALSE, m);
     if (i == 1)
     {
       entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, (gpointer)GINT_TO_POINTER(-MSD));
@@ -427,7 +426,7 @@ GtkWidget * combox_rings (gchar * str, int num, gchar * list_item[num], int id)
   // GtkWidget * fixed = gtk_fixed_new ();
   rings_box[id] = create_combo ();
   gtk_widget_set_size_request (rings_box[id], 180, -1);
-  for (i=0; i<num; i++) combo_text_append (rings_box[id], list_item[i]);
+  for (i=0; i<num; i++) combo_text_append (rings_box[id], _(list_item[i]));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rings_box[id], FALSE, FALSE, 10);
 
   //gtk_fixed_put (GTK_FIXED(fixed), rings_box[id], -1, 5);
@@ -578,45 +577,45 @@ G_MODULE_EXPORT void toggle_rings (GtkToggleButton * but, gpointer data)
 */
 void calc_rings (GtkWidget * vbox)
 {
-  gchar * defs[6]={"All rings (No rules)",
-                   "King's [1, 3]",
-                   "Guttman's [2]",
-                   "Primitives [4, 5, 6]",
-                   "Strongs [4, 5]"};
-  gchar * val_a[2]={"Definition of ring to be used: ", "Atom(s) to initiate the search from: "};
-  gchar * val_b[2][2]={{"<i><b>n</b><sub>max</sub></i> = maximum size for a ring <sup>*</sup>",
-                        "Maximum number of rings of size <i><b>n</b></i> per MD step <sup>**</sup>"},
-                       {"<i><b>n</b><sub>max</sub></i> = maximum size for a chain <sup>*</sup>",
-                        "Maximum number of chains of size <i><b>n</b></i> per MD step <sup>**</sup>"}};
-  gchar * val_c[2][4]={{"Only search for ABAB rings", "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>", "No homopolar bonds in the connectivity matrix", " "},
-                       {"Only search for AAAA chains", "Only search for ABAB chains",
-                        "No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>", "Only search for 1-(2)<sub>n</sub>-1 coordinated atom chains, ie. isolated chains."}};
+  gchar * defs[6]={i18n("All Rings (No Rule)"),
+                   i18n("King's [1, 3]"),
+                   i18n("Guttman's [2]"),
+                   i18n("Primitives [4, 5, 6]"),
+                   i18n("Strongs [4, 5]")};
+  gchar * val_a[2]={i18n("Definition of ring to be used: "), i18n("Atom(s) to initiate the search from: ")};
+  gchar * val_b[2][2]={{i18n("<i><b>n</b><sub>max</sub></i> = maximum size for a ring <sup>*</sup>"),
+                        i18n("Maximum number of rings of size <i><b>n</b></i> per MD step <sup>**</sup>")},
+                       {i18n("<i><b>n</b><sub>max</sub></i> = maximum size for a chain <sup>*</sup>"),
+                        i18n("Maximum number of chains of size <i><b>n</b></i> per MD step <sup>**</sup>")}};
+  gchar * val_c[2][4]={{i18n("Only search for ABAB rings"), i18n("No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>"), i18n("No homopolar bonds in the connectivity matrix"), " "},
+                       {i18n("Only search for AAAA chains"), i18n("Only search for ABAB chains"),
+                        i18n("No homopolar bonds in the chains (A-A, B-B ...) <sup>***</sup>"), i18n("Only search for 1-(2)<sub>n</sub>-1 coordinated atom chains, ie. isolated chains.")}};
   gchar * start[3]={"<sup>*</sup>", "<sup>**</sup>", "<sup>***</sup>"};
-  gchar * val_d[3]={"<i><b>n</b><sub>max</sub></i> in total number of nodes (or atoms)",
-                    "value used for memory allocation = f(<i><b>n</b><sub>max</sub></i>, system studied)",
-                    "but homopolar bonds can shorten the rings"};
-  gchar * val_e={"\n<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
-                 "<sub>[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).</sub>\n"
-                 "<sub>[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).</sub>\n"
-                 "<sub>[4] K. Goetzke and H. J. Klein. <i>J. Non-Cryst. Solids.</i>, <b>127</b>:215-220 (1991).</sub>\n"
-                 "<sub>[5] X. Yuan and A. N. Cormack. <i>Comp. Mat. Sci.</i>, <b>24</b>:343-360 (2002).</sub>\n"
-                 "<sub>[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>"};
+  gchar * val_d[3]={i18n("in total number of nodes (or atoms)"),
+                    i18n("value used for memory allocation = f(<i><b>n</b><sub>max</sub></i>, system studied)"),
+                    i18n("but homopolar bonds can shorten the rings")};
+  gchar * val_e={i18n("<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
+                      "<sub>[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).</sub>\n"
+                      "<sub>[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).</sub>\n"
+                      "<sub>[4] K. Goetzke and H. J. Klein. <i>J. Non-Cryst. Solids.</i>, <b>127</b>:215-220 (1991).</sub>\n"
+                      "<sub>[5] X. Yuan and A. N. Cormack. <i>Comp. Mat. Sci.</i>, <b>24</b>:343-360 (2002).</sub>\n"
+                      "<sub>[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>")};
   gchar * list_node[(preferences) ? 2 : active_project -> nspec+1];
   int i, j, k;
 
-  if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[0], 5, defs, 0), FALSE, FALSE, 5);
+  if (! search_type)  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (_(val_a[0]), 5, defs, 0), FALSE, FALSE, 5);
 
-  list_node[0] = g_strdup_printf ("All");
+  list_node[0] = g_strdup_printf (_("All"));
   if (preferences)
   {
-    list_node[1] = g_strdup_printf ("Chemical species");
+    list_node[1] = g_strdup_printf (_("Chemical Species"));
   }
   else
   {
     for (i=0; i<active_project -> nspec; i++) list_node[i+1] = g_strdup_printf ("%s", active_chem -> label[i]);
   }
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (val_a[1], (preferences) ? 2 : active_project -> nspec+1, list_node, 1), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, combox_rings (_(val_a[1]), (preferences) ? 2 : active_project -> nspec+1, list_node, 1), FALSE, FALSE, 5);
 
   j = (preferences) ? tmp_rsparam[0] : active_project -> rsearch[0];
   k = RIN + search_type;
@@ -625,7 +624,7 @@ void calc_rings (GtkWidget * vbox)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b[search_type][i], 400, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(val_b[search_type][i]), 400, -1, 0.0, 0.5), FALSE, FALSE, 0);
     if (i == 0)
     {
       rings_entry[i] = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(k));
@@ -664,7 +663,7 @@ void calc_rings (GtkWidget * vbox)
     {
       status = (search_type) ? active_project -> csparam[i+1] : active_project -> rsparam[j][i+2];
     }
-    rings_check[i] = check_button (val_c[search_type][i], -1, 40, status, G_CALLBACK(toggle_rings), GINT_TO_POINTER(i));
+    rings_check[i] = check_button (_(val_c[search_type][i]), -1, 40, status, G_CALLBACK(toggle_rings), GINT_TO_POINTER(i));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, rings_check[i], FALSE, FALSE, 0);
     if (! preferences)
     {
@@ -674,11 +673,11 @@ void calc_rings (GtkWidget * vbox)
   }
   for (i=0; i<3; i++)
   {
-    append_comments (vbox, start[i], val_d[i]);
+    append_comments (vbox, start[i], _(val_d[i]));
   }
   if (! search_type)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (val_e, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (_(val_e), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
     i = 0;
     g_signal_connect(G_OBJECT(rings_box[0]), "changed", G_CALLBACK(combox_rings_changed), GINT_TO_POINTER(0));
     combo_set_active (rings_box[0], (preferences) ? tmp_rsparam[0] : active_project -> rsearch[0]);
@@ -773,18 +772,17 @@ G_MODULE_EXPORT void toggle_bond (GtkToggleButton * Button, gpointer data)
     if (status)
     {
       // To add = do not annoy me with that again !
-      show_info ("Activate this option and the result of the nearest neighbors\n"
-                 "analysis will be saved during the search in a file that you may\n"
-                 "use afterwards.\n", 0, MainWindow);
+      show_info (_("The result of the nearest neighbors analysis\n"
+                   "will be saved in a file that you may use afterwards.\n"), 0, MainWindow);
 #ifdef GTK4
-      GtkFileChooserNative * info;
+     GtkFileChooserNative * info;
 #else
       GtkWidget * info;
 #endif
-      info = create_file_chooser ("Save neighbors analysis in file",
+      info = create_file_chooser (_("Save neighbors analysis in file"),
                                   GTK_WINDOW(MainWindow),
                                   GTK_FILE_CHOOSER_ACTION_SAVE,
-                                  "Save");
+                                  _("Save"));
       GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
       gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
@@ -815,14 +813,14 @@ gboolean test_gr (int rdf)
 {
   if (active_project -> analysis[rdf] -> num_delta < 2)
   {
-    show_warning ("You must specify a number of &#x3b4;r >= 2\n"
-                  "to discretize the real space between 0.0 and D<sub>max</sub>\n", calc_win);
+    show_warning (_("You must specify a number of &#x3b4;r intevals >= 2\n"
+                    "to discretize the real space between 0.0 and D<sub>max</sub>\n"), calc_win);
     return FALSE;
   }
   else if (rdf == GDK && (active_project -> analysis[rdf] -> max > active_project -> analysis[SKD] -> max || active_project -> analysis[rdf] -> max <= active_project -> analysis[SKD] -> min))
   {
-    show_warning ("You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
-                  "for the FFT, with Q<sub>min</sub> < Q<sub>max</sub>[FFT] <= Q<sub>max</sub>", calc_win);
+    show_warning (_("You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
+                    "for the FFT, with Q<sub>min</sub> < Q<sub>max</sub>[FFT] <= Q<sub>max</sub>"), calc_win);
     return FALSE;
   }
   else
@@ -842,14 +840,14 @@ gboolean test_sq (int fdq)
 {
   if (active_project -> analysis[fdq] -> max <= active_project -> analysis[fdq] -> min)
   {
-    show_warning ("You must specify a maximum wave vector Q<sub>max</sub>\n"
-                  "note that Q<sub>max</sub> must be > Q<sub>min</sub>", calc_win);
+    show_warning (_("You must specify a maximum wave vector Q<sub>max</sub>\n"
+                    "note that Q<sub>max</sub> must be > Q<sub>min</sub>"), calc_win);
     return FALSE;
   }
   else if (active_project -> analysis[fdq] -> num_delta < 2)
   {
-    show_warning ("You must specify a number of &#x3b4;q >= 2\n"
-                  "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n", calc_win);
+    show_warning (_("You must specify a number of &#x3b4;q intervals >= 2\n"
+                    "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n"), calc_win);
     return FALSE;
   }
   else
@@ -867,22 +865,18 @@ gboolean test_bonds ()
 {
   if (active_project -> runc[0] && active_project -> analysis[BND] -> num_delta < 2)
   {
-    show_warning ("You must specify a number of &#x3b4;r >= 2\n"
-                  "to discretize the real space between\n"
-                  "the shortest and the highest inter-atomic distances", calc_win);
+    show_warning (_("You must specify a number of &#x3b4;r intervals >= 2\n"
+                    "to discretize the real space between\n"
+                    "the shortest and the highest inter-atomic distances"), calc_win);
     return FALSE;
   }
-
   if (active_project -> runc[1] && active_project -> analysis[ANG] -> num_delta < 2)
   {
-    show_warning ("You must specify a number of &#x3b4;&#x3b8; >= 2\n"
-                  "to discretize the angular space between 0 and 180°", calc_win);
+    show_warning (_("You must specify a number of &#x3b4;&#x3b8; intervals >= 2\n"
+                    "to discretize the angular space between 0 and 180°"), calc_win);
     return FALSE;
   }
-  else
-  {
-    return TRUE;
-  }
+  return TRUE;
 }
 
 /*!
@@ -895,27 +889,27 @@ gboolean test_rings ()
   int i, j;
   i = (search_type) ? active_project -> csparam[5] : active_project -> rsparam[active_project -> rsearch[0]][1];
   j = (search_type) ? active_project -> csearch : active_project -> rsearch[1];
-  gchar * sobj[2]={"ring", "chain"};
+  gchar * sobj[2]={i18n("ring"), i18n("chain")};
   gchar * str;
   if (i == 0)
   {
-    str = g_strdup_printf ("You must specify a maximum %s size > 1 for the search", sobj[search_type]);
+    str = g_strdup_printf (_("You must specify a maximum %s size > 1 for the search"), _(sobj[search_type]));
     show_warning (str, calc_win);
     g_free (str);
     return FALSE;
   }
   if (j == 0)
   {
-    str = g_strdup_printf ("You must specify a number of %ss per size 'n' and per node\n"
-                           "this value is used when allocating the memory to store the results\n"
-                           "and depends on both the maximum %s size used in the search\n"
-                           "and the system studied.\n"
-                           "We recommend a value at least equal to 100.\n"
-                           "If it appears that the value given is not big enough\n"
-                           "(ex: more than 100 different %ss of size 'n' for a single node)\n"
-                           "then the search will failed but the program will propose\n"
-                           "you to initiate a new search using a higher value",
-                           sobj[search_type], sobj[search_type], sobj[search_type]);
+    str = g_strdup_printf (_("You must specify a number of %ss per size 'n' and per node\n"
+                             "this value is used when allocating the memory to store the results\n"
+                             "and depends on both the maximum %s size used in the search\n"
+                             "and the system studied.\n"
+                             "We recommend a value at least equal to 100.\n"
+                             "If it appears that the value given is not big enough\n"
+                             "(ex: more than 100 different %ss of size 'n' for a single node)\n"
+                             "then the search will failed but the program will propose\n"
+                             "you to initiate a new search using a higher value"),
+                             sobj[search_type], sobj[search_type], sobj[search_type]);
     show_warning (str, calc_win);
     g_free (str);
     return FALSE;
@@ -932,7 +926,7 @@ gboolean test_sph ()
 {
   if (active_project -> analysis[SPH] -> num_delta < 2 || active_project -> analysis[SPH] -> num_delta > 40)
   {
-    show_warning ("You must specify a number <i>l<sub>max</sub></i> &#x2208; [2-40]", calc_win);
+    show_warning (_("You must specify a number <i>l<sub>max</sub></i> &#x2208; [2-40]"), calc_win);
     return FALSE;
   }
   else
@@ -952,16 +946,16 @@ gboolean test_msd ()
   {
     if (active_project -> analysis[MSD] -> delta < 1)
     {
-      show_warning ("You must specify the time step &#x3b4;t\n"
-                    "used to integrate the Newton's equations\n"
-                    "of motion during the molecular dynamics\n", calc_win);
+      show_warning (_("You must specify the time step &#x3b4;t\n"
+                      "used to integrate the Newton's equations\n"
+                      "of motion during the molecular dynamics\n"), calc_win);
       return FALSE;
     }
     if (active_project -> tunit < 0)
     {
-      show_warning ("You must specify the time unit\n"
-                    "used to integrate the Newton's equations\n"
-                    "of motion during the molecular dynamics\n", calc_win);
+      show_warning (_("You must specify the time unit\n"
+                      "used to integrate the Newton's equations\n"
+                      "of motion during the molecular dynamics\n"), calc_win);
       return FALSE;
     }
     else
@@ -973,9 +967,9 @@ gboolean test_msd ()
   {
     if (active_project -> analysis[MSD] -> num_delta < 1)
     {
-      show_warning ("You must specify the number of steps\n"
+      show_warning (_("You must specify the number of steps\n"
                     "between each of the %d configurations\n"
-                    "found for the molecular dynamics\n", calc_win);
+                    "found for the molecular dynamics\n"), calc_win);
       return FALSE;
     }
     else
@@ -1000,7 +994,7 @@ gboolean test_skt ()
   }
   else
   {
-    show_warning ("You must specify the number of frequency points\n", calc_win);
+    show_warning (_("You must specify the number of frequency points\n"), calc_win);
     return FALSE;
   }
 }
@@ -1014,25 +1008,25 @@ gboolean test_skt ()
 */
 void calc_bonds (GtkWidget * vbox)
 {
-  gchar * val_a[2]={"Number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]",
-                    "Number of &#x3b4;&#x3b8; [0-180°]"};
-  gchar * val_b[4]={"First coordination sphere properties",
-                    "Bond and dihedral angles distribution",
-                    "Search for molecules and isolated fragments",
-                    "Output detailed results in text file"};
+  gchar * val_a[2]={i18n("Number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"),
+                    i18n("Number of &#x3b4;&#x3b8; [0-180°]")};
+  gchar * val_b[4]={i18n("First coordination sphere properties"),
+                    i18n("Bond and dihedral angles distribution"),
+                    i18n("Search for molecules and isolated fragments"),
+                    i18n("Output detailed results in text file")};
 
   GtkWidget * hbox;
   int i;
   for (i=0; i<3; i++)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                         check_button (val_b[i], -1, 40, active_project -> runc[i], G_CALLBACK(toggle_bond), (gpointer)GINT_TO_POINTER(i)),
+                         check_button (_(val_b[i]), -1, 40, active_project -> runc[i], G_CALLBACK(toggle_bond), (gpointer)GINT_TO_POINTER(i)),
                          FALSE, FALSE, 0);
     if (i < 2)
     {
       hbox = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a[i], 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(val_a[i]), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
       ba_entry[i] = create_entry (G_CALLBACK(set_delta), 150, 15, FALSE, (gpointer)GINT_TO_POINTER(BND+i));
       update_entry_int (GTK_ENTRY(ba_entry[i]), active_project -> analysis[BND+i] -> num_delta);
       widget_set_sensitive (ba_entry[i], active_project -> runc[i]);
@@ -1133,11 +1127,11 @@ G_MODULE_EXPORT void set_advanced_sq (GtkEntry * entry, gpointer data)
   {
     if (idc -> b == 0 && (v < 0.0 || v > 1.0))
     {
-      show_warning ("You must specify a probability between 0.0 and 1.0", calc_win);
+      show_warning (_("You must specify a probability between 0.0 and 1.0"), calc_win);
     }
     else if (idc -> b == 1 && (v < qmin || v > qmax))
     {
-      show_warning ("Q<sub>lim</sub> must be &#8805; Q<sub>min</sub> and &#8804; Q<sub>max</sub>", calc_win);
+      show_warning (_("Q<sub>lim</sub> must be &#8805; Q<sub>min</sub> and &#8804; Q<sub>max</sub>"), calc_win);
     }
     else
     {
@@ -1163,7 +1157,7 @@ G_MODULE_EXPORT void set_sfact (GtkEntry * entry, gpointer data)
   double v = string_to_double ((gpointer)m);
   if (v <= 0.0 || v >= 1.0)
   {
-    show_warning ("The smoothing factor must be between 0.0 and 1.0", calc_win);
+    show_warning (_("The smoothing factor must be between 0.0 and 1.0"), calc_win);
   }
   else
   {
@@ -1352,7 +1346,7 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
   }
   else
   {
-    show_error ("No data set(s) to be smoothed\n", 0, calc_win);
+    show_error (_("No data set(s) to be smoothed\n"), 0, calc_win);
   }
 }
 
@@ -1367,9 +1361,9 @@ G_MODULE_EXPORT void on_smoother_released (GtkButton * button, gpointer data)
 */
 void add_advanced_options (int skq, dint skadv[2], GtkWidget * vbox)
 {
-  gchar * adv_name[2]={"Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> &#x2208; [0.0-1.0]",
-                       "Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] &#x2208; [Q<sub>min</sub>-Q<sub>max</sub>]"};
-  GtkWidget * advanced_options = create_expander ("  Advanced options", NULL);
+  gchar * adv_name[2]={i18n("Probability to keep wave\nvector <i>q</i> > Q<sub>lim</sub> &#x2208; [0.0-1.0]"),
+                       i18n("Q<sub>lim</sub> [&#xC5;<sup>-1</sup>] &#x2208; [Q<sub>min</sub>-Q<sub>max</sub>]")};
+  GtkWidget * advanced_options = create_expander (_("  Advanced options"), NULL);
   gtk_widget_set_size_request (advanced_options, -1, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, advanced_options, FALSE, TRUE, 10);
   avbox = create_vbox (5);
@@ -1382,7 +1376,7 @@ void add_advanced_options (int skq, dint skadv[2], GtkWidget * vbox)
   {
     ahbox = create_hbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, ahbox, FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label (adv_name[j], 175, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ahbox, markup_label (_(adv_name[j]), 175, -1, 0.0, 0.5), FALSE, FALSE, 5);
     aentry = create_entry (G_CALLBACK(set_advanced_sq), 100, 15, FALSE, & skadv[j]);
     update_entry_double (GTK_ENTRY(aentry), active_project -> sk_advanced[i][j]);
     fixed = gtk_fixed_new ();
@@ -1405,16 +1399,16 @@ void add_advanced_options (int skq, dint skadv[2], GtkWidget * vbox)
 */
 void add_smoothing_options (int grsqk, GtkWidget * vbox)
 {
-  GtkWidget * smooth_options = create_expander ("  Gaussian data smoothing", NULL);
+  GtkWidget * smooth_options = create_expander (_("  Gaussian data smoothing"), NULL);
   gtk_widget_set_size_request (smooth_options, -1, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, smooth_options, FALSE, TRUE, 10);
   GtkWidget * avbox = create_vbox (5);
   GtkWidget * smbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, gtk_label_new("Factor [0.0-1.0]"), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, gtk_label_new(_("Factor [0.0-1.0]")), FALSE, FALSE, 0);
   GtkWidget * sentry = create_entry (G_CALLBACK(set_sfact), 100, 15, FALSE, GINT_TO_POINTER(grsqk));
   update_entry_double (GTK_ENTRY(sentry), active_project -> analysis[grsqk] -> fact);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, sentry, FALSE, TRUE, 10);
-  GtkWidget * smooth = create_button ("Smooth", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_smoother_released), GINT_TO_POINTER(grsqk));
+  GtkWidget * smooth = create_button (_("Smooth"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(on_smoother_released), GINT_TO_POINTER(grsqk));
   g_signal_connect (G_OBJECT(smooth_options), "activate", G_CALLBACK(expand_opt), GINT_TO_POINTER(0));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, smbox, smooth, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, avbox, smbox, FALSE, FALSE, 5);
@@ -1433,13 +1427,13 @@ void add_smoothing_options (int grsqk, GtkWidget * vbox)
 */
 void calc_gr_sq (GtkWidget * box, int id)
 {
-  gchar * val_a[4]={"Number of &#x3b4;r steps",
-                    "Number of &#x3b4;q steps",
-                    "Number of &#x3b4;q steps",
-                    "Number of &#x3b4;r steps"};
-  gchar * val_b[3]={"Q<sub>max</sub> [&#xC5;<sup>-1</sup>]",
-                    "Q<sub>max</sub> [&#xC5;<sup>-1</sup>]",
-                    "Q<sub>max</sub> for the FFT [&#xC5;<sup>-1</sup>]"};
+  gchar * val_a[4]={i18n("Number of &#x3b4;r steps"),
+                    i18n("Number of &#x3b4;q steps"),
+                    i18n("Number of &#x3b4;q steps"),
+                    i18n("Number of &#x3b4;r steps")};
+  gchar * val_b[3]={i18n("Q<sub>max</sub> [&#xC5;<sup>-1</sup>]"),
+                    i18n("Q<sub>max</sub> [&#xC5;<sup>-1</sup>]"),
+                    i18n("Q<sub>max</sub> for the FFT [&#xC5;<sup>-1</sup>]")};
 
   if (id == SKD)
   {
@@ -1451,7 +1445,7 @@ void calc_gr_sq (GtkWidget * box, int id)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, vbox, FALSE, FALSE, 0);
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a[id], 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(val_a[id]), 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
   GtkWidget * entry= create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(id));
   update_entry_int (GTK_ENTRY(entry), active_project -> analysis[id] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -1459,7 +1453,7 @@ void calc_gr_sq (GtkWidget * box, int id)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b[id-1], 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(val_b[id-1]), 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
     GtkWidget * entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(id));
     update_entry_double (GTK_ENTRY(entry), active_project -> analysis[id] -> max);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -1484,19 +1478,19 @@ void calc_gr_sq (GtkWidget * box, int id)
   if (id == GDR || id == GDK)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                         markup_label ("D<sub>max</sub> is the maximum inter-atomic distance in the model", -1, -1, 0.0, 0.5),
+                         markup_label (_("D<sub>max</sub> is the maximum inter-atomic distance in the model"), -1, -1, 0.0, 0.5),
                          FALSE, FALSE, 0);
   }
   if (id > 0)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                         markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
+                         markup_label (_("Q<sub>min</sub> is the minimum wave vector for the model"), -1, -1, 0.0, 0.5),
                          FALSE, FALSE, 0);
   }
   if (id == GDK)
   {
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                         markup_label ("Q<sub>max</sub> is the maximum wave vector to compute S(q)", -1, -1, 0.0, 0.5),
+                         markup_label (_("Q<sub>max</sub> is the maximum wave vector to compute S(q)"), -1, -1, 0.0, 0.5),
                          FALSE, FALSE, 0);
   }
 
@@ -1670,10 +1664,11 @@ void add_correlations_options (int cid)
   sktqw_delta[cid] = create_vbox(0);
   t_q_vbox[cid] = NULL;
   add_box_child_start (GTK_ORIENTATION_VERTICAL, sktqw_vbox[cid], sktqw_delta[cid], FALSE, FALSE, 0);
-  gchar * val_a=(! cid) ? "Number of <b>&#x3b4;t</b> results to save" : "Number of <b>q</b> vectors to analyze";
+  gchar * aco_info = g_strdup_printf ("%s", (! cid) ? _("Number of <b>&#x3b4;t</b> results to save") : _("Number of <b>q</b> vectors to analyze"));
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, sktqw_delta[cid], hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (aco_info, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  g_free (aco_info);
   int val, vbl;
   if (! cid)
   {
@@ -1710,12 +1705,12 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
     case 0:
       if (v <= 0 || v >= active_project -> steps-1)
       {
-        show_warning ("This value must be &#62; 0 and &#60; number of steps", calc_win);
+        show_warning (_("This value must be &#62; 0 and &#60; number of steps"), calc_win);
       }
       else
       {
         active_project -> skt_corr_threshold = v;
-        gchar * str = g_strdup_printf ("%d calculation results in total !", active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
+        gchar * str = g_strdup_printf (_("%d calculation results in total !"), active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
         skt_all_info = destroy_this_widget (skt_all_info);
         skt_all_info = markup_label (str, -1, -1, 0.5, 0.5);
         g_free (str);
@@ -1729,7 +1724,7 @@ G_MODULE_EXPORT void set_correlations (GtkEntry * entry, gpointer data)
     case 1:
       if (v <= 0)
       {
-        show_warning ("This value must be > 0", calc_win);
+        show_warning (_("This value must be > 0"), calc_win);
       }
       else
       {
@@ -1811,11 +1806,6 @@ G_MODULE_EXPORT void toggle_skt_all (GtkToggleButton * but, gpointer data)
 */
 void calc_sk_t (GtkWidget * box)
 {
-  gchar * val_a="Number of &#x3b4;q steps";
-  gchar * val_b="Q<sub>max</sub> [&#xC5;<sup>-1</sup>]";
-  gchar * val_c="&#x3b4;t<sub>min</sub>";
-  gchar * val_d="&#969; points in [0.0, &#969;<sub>max</sub>]";
-
   skadv[0].a = skadv[1].a = SKT;
   skadv[0].b = 0;
   skadv[1].b = 1;
@@ -1848,7 +1838,10 @@ void calc_sk_t (GtkWidget * box)
 
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_a, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+
+  gchar * str = g_strdup_printf ("%s", _("Number of &#x3b4;q steps"));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  g_free (str);
   GtkWidget * entry = create_entry (G_CALLBACK(set_delta), 100, 15, FALSE, GINT_TO_POINTER(SKT));
   update_entry_int (GTK_ENTRY(entry), (preferences) ? tmp_num_delta[SKT-2] : active_project -> analysis[SKT] -> num_delta);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -1857,7 +1850,9 @@ void calc_sk_t (GtkWidget * box)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_b, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    str = g_strdup_printf ("%s", _("Q<sub>max</sub> [&#xC5;<sup>-1</sup>]"));
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    g_free (str);
     entry= create_entry (G_CALLBACK(set_max), 100, 15, FALSE, GINT_TO_POINTER(SKT));
     update_entry_double (GTK_ENTRY(entry), active_project -> analysis[SKT] -> max);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -1866,19 +1861,19 @@ void calc_sk_t (GtkWidget * box)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                         markup_label ("Q<sub>min</sub> is the minimum wave vector for the model", -1, -1, 0.0, 0.5),
+                         markup_label (_("Q<sub>min</sub> is the minimum wave vector for the model"), -1, -1, 0.0, 0.5),
                          FALSE, FALSE, 5);
 
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_c, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("&#x3b4;t<sub>min</sub>", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
     entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(0));
     update_entry_int (GTK_ENTRY(entry), active_project -> skt_corr_threshold);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                         markup_label ("&#x3b4;t<sub>min</sub> is the correlation threshold", -1, -1, 0.0, 0.5),
+                         markup_label (_("&#x3b4;t<sub>min</sub> is the correlation threshold"), -1, -1, 0.0, 0.5),
                          FALSE, FALSE, 5);
   }
 
@@ -1892,7 +1887,9 @@ void calc_sk_t (GtkWidget * box)
   }
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[0], hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (val_d, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  str = g_strdup_printf ("%s", _("&#969; points in [0.0, &#969;<sub>max</sub>]"));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  g_free (str);
   entry = create_entry (G_CALLBACK(set_correlations), 100, 15, FALSE, GINT_TO_POINTER(1));
   update_entry_int (GTK_ENTRY(entry), (preferences) ? tmp_sqw_freq : active_project -> sqw_freq);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 10);
@@ -1905,13 +1902,13 @@ void calc_sk_t (GtkWidget * box)
     add_advanced_options (SKT, skadv, vbox_skt[0]);
     add_smoothing_options (SKT, vbox_skt[0]);
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], markup_label ("<b>Results</b>", -1, -1, 0.0, 0.5), FALSE, FALSE, (preferences) ? 10 : 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], markup_label (_("<b>Results</b>"), -1, -1, 0.0, 0.5), FALSE, FALSE, (preferences) ? 10 : 0);
   GtkWidget * tbox = create_vbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox_skt[(preferences) ? 0 : 1], tbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("<b>atomes</b> cannot yet display 3D results,", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("but we are working to add this feature !", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("For the time being you need to select", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label ("what to display using the 2D graph system:", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label (_("<b>atomes</b> cannot yet display 3D results,"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label (_("but we are working to add this feature !"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label (_("For the time being you need to select"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, tbox, markup_label (_("what to display using the 2D graph system:"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
 
   GtkWidget * notebook = gtk_notebook_new ();
 #ifdef GTK4
@@ -1921,7 +1918,6 @@ void calc_sk_t (GtkWidget * box)
 
   GtkWidget * nbox;
   GtkWidget * scroll;
-  gchar * str;
   for (i=0; i<2; i++)
   {
     scroll = create_scroll (NULL, 200, (preferences) ? 100 : 350, GTK_SHADOW_NONE);
@@ -1929,10 +1925,10 @@ void calc_sk_t (GtkWidget * box)
     add_container_child (CONTAINER_SCR, scroll, nbox);
     if (! i)
     {
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, check_button("All <b>&#x3b4;t</b> correlated calculations", -1, -1, FALSE, G_CALLBACK(toggle_skt_all), NULL), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, nbox, check_button(_("All <b>&#x3b4;t</b> correlated calculations"), -1, -1, FALSE, G_CALLBACK(toggle_skt_all), NULL), FALSE, FALSE, 5);
       if (! preferences)
       {
-        str = g_strdup_printf ("%d calculation results in total !", active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
+        str = g_strdup_printf (_("%d calculation results in total !"), active_project -> analysis[SKD] -> numc * (active_project -> steps - active_project -> skt_corr_threshold));
         skt_all_info = markup_label (str, -1, -1, 0.5, 0.5);
         g_free (str);
         skt_res_info = create_hbox (0);
@@ -1957,7 +1953,7 @@ void calc_sk_t (GtkWidget * box)
     }
     if (! i) widget_set_sensitive(skt_all_info, (preferences) ? tmp_skt_sets : active_project -> skt_all_sets);
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scroll,
-                              markup_label((! i) ? "<b>Intermediate scattering</b>: F(q,&#x3b4;t)" : "<b>Dynamic calculations</b>: S(q,&#969;)", -1, -1, 0.0, 0.5));
+                              markup_label((! i) ? _("<b>Intermediate scattering</b>: F(q,&#x3b4;t)") : _("<b>Dynamic calculations</b>: S(q,&#969;)"), -1, -1, 0.0, 0.5));
   }
 }
 

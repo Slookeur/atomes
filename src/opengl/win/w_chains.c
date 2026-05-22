@@ -295,7 +295,7 @@ GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this)
   int i, j, k;
   GtkTreeViewColumn * chains_col[7];
   GtkCellRenderer * chains_cell[7];
-  gchar * ctitle[7]={"MD step", "Chain(s) size", "Id.", "Show", "Label", "Pick", "Atoms"};
+  gchar * ctitle[7]={i18n("MD step"), i18n("Chain(s) size"), i18n("Id."), i18n("Show"), i18n("Label"), i18n("Pick"), i18n("Atoms")};
   gchar * ctype[7]={"text", "text", "text", "active", "active", "active", "text"};
   GType col_type_ms[7]={G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
   GType col_type_ss[6]={G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING};
@@ -318,7 +318,7 @@ GtkWidget * create_chains_tree (project * this_proj, gboolean fill_this)
       g_signal_connect (G_OBJECT(chains_cell[i]), "toggled", G_CALLBACK(on_select_chains), & this_proj -> modelgl -> colorp[i][0]);
     }
     gtk_cell_renderer_set_fixed_size (chains_cell[i], -1, 25);
-    chains_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[i+k], chains_cell[i], ctype[i+k], i, NULL);
+    chains_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[i+k]), chains_cell[i], ctype[i+k], i, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(chains_tree), chains_col[i]);
     gtk_tree_view_column_set_alignment (chains_col[i], 0.5);
     gtk_tree_view_column_set_cell_data_func (chains_col[i], chains_cell[i], rings_set_visible, & this_proj -> modelgl -> colorp[i][0], NULL);
@@ -820,12 +820,12 @@ G_MODULE_EXPORT void update_chains_search (GtkEntry * res, gpointer data)
 GtkWidget * create_chains_search (project * this_proj)
 {
   GtkWidget * chains_search = create_vbox (BSEP);
-  gchar * str = g_strdup_printf ("Too many chains in your model !\n"
-                                 "  It is impossible to display the entire list ...\n"
-                                 "... instead you can look for chain(s) 'manually':\n");
+  gchar * str = g_strdup_printf (_("Too many chains in your model !\n"
+                                   "  It is impossible to display the entire list ...\n"
+                                   "... instead you can look for chain(s) individually:\n"));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, chains_search, markup_label(str, 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
   g_free (str);
-  gchar * search_item[3]={"MD step:", "Chain size:", "Chain ID:"};
+  gchar * search_item[3]={i18n("MD step:"), i18n("Chain size:"), i18n("Chain Id.:")};
   int i, j;
   GtkWidget * hbox;
   GtkWidget * entry;
@@ -836,7 +836,7 @@ GtkWidget * create_chains_search (project * this_proj)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, chains_search, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(search_item[i], 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(search_item[i]), 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
     entry = create_entry (G_CALLBACK(update_chains_search), 100, 15, FALSE, & this_proj -> modelgl -> colorp[i][0]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,entry, FALSE, FALSE, 0);
     if (i==0)
@@ -857,7 +857,7 @@ GtkWidget * create_chains_search (project * this_proj)
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, coord -> chlab[i], FALSE, FALSE, 5);
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, chains_search, markup_label("<b>Search result(s)</b>", 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, chains_search, markup_label(_("<b>Search result(s)</b>"), 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, chains_search, create_chains_tree (this_proj, FALSE), FALSE, FALSE, 0);
   return chains_search;
 }
@@ -903,16 +903,16 @@ G_MODULE_EXPORT void run_save_chains_to_file (GtkDialog * info, gint response_id
         gchar * str;
         if (fp)
         {
-          fprintf (fp, "# This file contains the list of all chains in the %s model\n\n",  prepare_for_title(this_proj -> name));
+          fprintf (fp, _("# This file contains the list of all chains in the %s model\n\n"),  prepare_for_title(this_proj -> name));
           int h, i, j, k, l;
           for (h=0; h < this_proj -> steps; h++)
           {
             i = h+1;
-            if (this_proj -> steps > 1) fprintf (fp, "Step N°%d\n", i);
+            if (this_proj -> steps > 1) fprintf (fp, _("Step N°%d\n"), i);
             for (i=0; i < this_proj -> coord -> totcoord[9]; i++)
             {
               j = this_proj -> coord -> geolist[9][0][i];
-              fprintf (fp, (this_proj -> steps > 1) ? "\n\tChain(s) of size %d atoms\n" : "\nChain(s) of size %d atoms\n", j);
+              fprintf (fp, (this_proj -> steps > 1) ? _("\n\tChain(s) of size %d atoms\n") : _("\nChain(s) of size %d atoms\n"), j);
               k = this_proj -> modelgl -> num_chains[h][j-1];
               // ring size
               for (l=0; l<k; l++)
@@ -927,7 +927,7 @@ G_MODULE_EXPORT void run_save_chains_to_file (GtkDialog * info, gint response_id
         }
         else
         {
-          str = g_strdup_printf ("Impossible to open file: %s", chains_file);
+          str = g_strdup_printf (_("Impossible to open file: %s"), chains_file);
           show_error (str, 0, this_proj -> modelgl -> coord_win -> win);
           g_free (str);
         }
@@ -956,10 +956,10 @@ G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data)
 #else
   GtkWidget * info;
 #endif
-  info = create_file_chooser ("Save atoms in chains to file",
+  info = create_file_chooser (_("Save atoms in chains to file"),
                               GTK_WINDOW(MainWindow),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
-                              "Save");
+                              _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
   gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
@@ -1010,6 +1010,7 @@ GtkWidget * chains_tab (glwin * view)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, chains, hbox, FALSE, FALSE, 2);
   GtkWidget * hhbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, TRUE, TRUE, 100);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button("Save to file", IMG_NONE, NULL, 50, -1, GTK_RELIEF_NORMAL, G_CALLBACK(save_chains_to_file), & view -> colorp[0][0]), TRUE, TRUE, 40);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button(_("Save to file"), IMG_NONE, NULL, 50, -1, 
+                       GTK_RELIEF_NORMAL, G_CALLBACK(save_chains_to_file), & view -> colorp[0][0]), TRUE, TRUE, 40);
   return chains;
 }

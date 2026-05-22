@@ -291,7 +291,7 @@ GtkWidget * create_projects_tree (curve_edition * cedit, gpointer data)
   int i;
   GtkTreeViewColumn * projcol[6];
   GtkCellRenderer * projcell[6];
-  gchar * col_title[6] = {" ", "Data sets", "Select", " ", " ", " "};
+  gchar * col_title[6] = {" ", i18n("Data sets"), i18n("Select"), " ", " ", " "};
   gchar * ctype[6]={"text", "text", "active", "text", "text", "text"};
   GType col_type[6] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
   projmodel = gtk_tree_store_newv (6, col_type);
@@ -301,14 +301,14 @@ GtkWidget * create_projects_tree (curve_edition * cedit, gpointer data)
     if (i == 2)
     {
       projcell[i] = gtk_cell_renderer_toggle_new ();
-      projcol[i] = gtk_tree_view_column_new_with_attributes(col_title[i],  projcell[i], ctype[i], i, NULL);
+      projcol[i] = gtk_tree_view_column_new_with_attributes(_(col_title[i]),  projcell[i], ctype[i], i, NULL);
       g_signal_connect (G_OBJECT(projcell[i]), "toggled", G_CALLBACK(toggle_curve), data);
       gtk_tree_view_column_set_cell_data_func (projcol[i], projcell[i], set_visible_curve_data, NULL, NULL);
     }
     else
     {
       projcell[i] = gtk_cell_renderer_text_new();
-      projcol[i] =  gtk_tree_view_column_new_with_attributes(col_title[i], projcell[i], ctype[i], i, NULL);
+      projcol[i] =  gtk_tree_view_column_new_with_attributes(_(col_title[i]), projcell[i], ctype[i], i, NULL);
     }
     gtk_tree_view_append_column(GTK_TREE_VIEW(cedit -> projtree), projcol[i]);
     if (i == 0 || i > 2) gtk_tree_view_column_set_visible (projcol[i], FALSE);
@@ -359,7 +359,7 @@ void edit_curve (gpointer data)
   this_curve -> curve_edit = g_malloc0(sizeof*this_curve -> curve_edit);
   curve_edition * this_cedit = this_curve -> curve_edit;
 
-  this_cedit -> win = dialogmodal ("Edit curve", GTK_WINDOW(this_curve -> window));
+  this_cedit -> win = dialogmodal (_("Edit curve"), GTK_WINDOW(this_curve -> window));
   gtk_window_set_resizable (GTK_WINDOW (this_cedit -> win), FALSE);
 #ifndef GTK4
   gtk_window_set_icon (GTK_WINDOW (this_cedit -> win), THETD);
@@ -369,28 +369,28 @@ void edit_curve (gpointer data)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ebox, enoote, FALSE, FALSE, 0);
 
 // The first tab of the notebook
-  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_1 (this_cedit, data), gtk_label_new ("Graph"));
-//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 0), gtk_label_new ("Graph"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_1 (this_cedit, data), gtk_label_new (_("Graph")));
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 0), gtk_label_new (_("Graph")));
 
 // The second tab of the notebook
-  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_2 (this_cedit, data), gtk_label_new ("Data"));
-//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 1), gtk_label_new ("Data"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_2 (this_cedit, data), gtk_label_new (_("Data")));
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 1), gtk_label_new (_("Data")));
 
 // The third tab of the notebook
-  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_3 (this_cedit, data), gtk_label_new ("Legend"));
-//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 2), gtk_label_new ("Legend"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_3 (this_cedit, data), gtk_label_new (_("Legend")));
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 2), gtk_label_new (_("Legend")));
 
 // The fourth tab of the notebook
-  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_4 (this_cedit, data), gtk_label_new ("Axis"));
-//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 3), gtk_label_new ("Axis"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), create_tab_4 (this_cedit, data), gtk_label_new (_("Axis")));
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 3), gtk_label_new (_("Axis")));
 
 // The fifth tab of the notebook
   dbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, dbox, markup_label("<b>Add data set(s) to the active window</b>", -1, 30, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, dbox, markup_label(_("<b>Add data set(s) to the active window</b>"), -1, 30, 0.5, 0.5), FALSE, FALSE, 0);
   scrollsets = create_scroll (dbox, 250, 525, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, scrollsets, create_projects_tree (this_cedit, data));
-  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), dbox, gtk_label_new ("Add data set"));
-//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 4), gtk_label_new ("Add data set"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(enoote), dbox, gtk_label_new (_("Add data set")));
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (enoote), gtk_notebook_get_nth_page (GTK_NOTEBOOK (enoote), 4), gtk_label_new (_("Add data set")));
 
   add_gtk_close_event (this_cedit -> win, G_CALLBACK(destroy_this_window), NULL);
 

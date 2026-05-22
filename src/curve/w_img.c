@@ -70,11 +70,8 @@ int forme;
 G_MODULE_EXPORT void set_size (GtkEntry * val, gpointer data)
 {
   const gchar * m;
-  char * text[2];
   int i, j;
   j = GPOINTER_TO_INT(data);
-  text[0] = "X size must be > 0";
-  text[1] = "Y size must be > 0";
   m = entry_get_text (val);
   i = string_to_double ((gpointer)m);
   if (i > 0)
@@ -83,7 +80,7 @@ G_MODULE_EXPORT void set_size (GtkEntry * val, gpointer data)
   }
   else
   {
-    show_warning (text[j], NULL);
+    show_warning ((j) ? _("Y size must be > 0") : _("X size must be > 0"), NULL);
   }
   update_entry_int (val, resol[j]);
 }
@@ -226,19 +223,19 @@ G_MODULE_EXPORT void run_write_image (GtkDialog * info, gint response_id, gpoint
 */
 void write_image (gpointer curetow)
 {
-  gchar * i_filter[4]={"PNG file (*.png)",
-                       "PDF file (*.pdf)",
-                       "SVG file (*.svg)",
-                       "EPS file (*.eps)"};
+  gchar * i_filter[4]={i18n("PNG file (*.png)"),
+                       i18n("PDF file (*.pdf)"),
+                       i18n("SVG file (*.svg)"),
+                       i18n("EPS file (*.eps)")};
   GtkFileFilter * filter;
   Curve * this_curve = get_curve_from_pointer (curetow);
   if (forme == -1)
   {
-    show_warning ("To save an image please enter a file format", this_curve -> window);
+    show_warning (_("To save an image please enter a file format"), this_curve -> window);
   }
   else if (resol[0] == 0 || resol[1] == 0)
   {
-    show_warning ("You need to specify the size of the image", this_curve -> window);
+    show_warning (_("You need to specify the size of the image"), this_curve -> window);
   }
   else
   {
@@ -247,16 +244,16 @@ void write_image (gpointer curetow)
 #else
     GtkWidget * info;
 #endif
-    info = create_file_chooser (i_title[forme],
+    info = create_file_chooser (_(i_title[forme]),
                                 GTK_WINDOW(this_curve -> window),
-     				            GTK_FILE_CHOOSER_ACTION_SAVE,
-                                "Save");
+     				                    GTK_FILE_CHOOSER_ACTION_SAVE,
+                                _("Save"));
     GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
     gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
 #endif
     filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(GTK_FILE_FILTER(filter), i_filter[forme]);
+    gtk_file_filter_set_name(GTK_FILE_FILTER(filter), _(i_filter[forme]));
     gtk_file_filter_add_pattern(GTK_FILE_FILTER(filter), i_pattern[forme]);
     gtk_file_chooser_add_filter (chooser, filter);
 #ifdef GTK4
@@ -322,7 +319,7 @@ void save_image (gpointer cdata)
   int i;
   gchar * str;
   Curve * this_curve = get_curve_from_pointer (cdata);
-  save_img = dialog_cancel_apply ("Export image", this_curve -> window, FALSE);
+  save_img = dialog_cancel_apply (_("Export image"), this_curve -> window, FALSE);
   gtk_window_set_resizable (GTK_WINDOW (save_img), FALSE);
 #ifndef GTK4
   gtk_window_set_icon (GTK_WINDOW (save_img), THETD);
@@ -332,13 +329,13 @@ void save_image (gpointer cdata)
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, TRUE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("Format: ", -1, 50, 0.0, 0.5), TRUE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("Format: "), -1, 50, 0.0, 0.5), TRUE, TRUE, 0);
   GtkWidget * fixed = gtk_fixed_new ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, TRUE, TRUE, 10);
   comboformat = create_combo ();
   for (i=0; i<4; i++)
   {
-    str = g_strdup_printf ("%s - (%s)", i_title[i], i_pattern[i]);
+    str = g_strdup_printf ("%s - (%s)", _(i_title[i]), i_pattern[i]);
     combo_text_append (comboformat, str);
     g_free (str);
   }
@@ -350,7 +347,7 @@ void save_image (gpointer cdata)
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, TRUE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Size: ", 100, -1, 0.0, 0.5), FALSE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Size: "), 100, -1, 0.0, 0.5), FALSE, TRUE, 0);
 
   xlgt = get_widget_width (this_curve -> plot);
   ylgt = get_widget_height (this_curve -> plot);
@@ -362,9 +359,9 @@ void save_image (gpointer cdata)
   update_entry_int (GTK_ENTRY(y), ylgt);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, y, TRUE, TRUE, 0);
 
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new ("pixels"), TRUE, TRUE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (_("pixels")), TRUE, TRUE, 0);
 
-  background = check_button ("Make background transparent", -1, -1, FALSE, G_CALLBACK(set_background), NULL);
+  background = check_button (_("Make background transparent"), -1, -1, FALSE, G_CALLBACK(set_background), NULL);
   widget_set_sensitive (background, FALSE);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, background, TRUE, TRUE, 0);
 

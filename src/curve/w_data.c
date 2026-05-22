@@ -175,20 +175,20 @@ void write_curve (gpointer idata)
   GtkWidget * info;
 #endif
   Curve * this_curve = get_curve_from_pointer (idata);
-  info = create_file_chooser ("Save Data",
+  info = create_file_chooser (_("Save Data"),
                               GTK_WINDOW(this_curve -> window),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
-                              "Save");
+                              _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
 #ifdef GTK3
   gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
 #endif
   filter1 = gtk_file_filter_new();
-  gtk_file_filter_set_name (GTK_FILE_FILTER(filter1), "Xmgrace file (*.agr)");
+  gtk_file_filter_set_name (GTK_FILE_FILTER(filter1), _("Xmgrace file (*.agr)"));
   gtk_file_filter_add_pattern (GTK_FILE_FILTER(filter1), "*.agr");
   gtk_file_chooser_add_filter (chooser, filter1);
   filter2 = gtk_file_filter_new();
-  gtk_file_filter_set_name (GTK_FILE_FILTER(filter2), "x/y ASCII file (*.dat)");
+  gtk_file_filter_set_name (GTK_FILE_FILTER(filter2), _("x/y ASCII file (*.dat)"));
   gtk_file_filter_add_pattern (GTK_FILE_FILTER(filter2), "*.dat");
   gtk_file_chooser_add_filter (chooser, filter2);
   if (this_curve -> cfile != NULL)

@@ -38,8 +38,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 
-gchar * text_renders[OGL_RENDERS] = {"Filled", "Lines", "Points"};
-
 /*!
   \fn void set_render (gpointer data)
 

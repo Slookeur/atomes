@@ -178,7 +178,7 @@ void init_ang (project * this_proj)
     {
       for ( k = 0 ; k < this_proj -> nspec ; k++ )
       {
-        this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Angles [%s-%s-%s]",
+        this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf(_("Angles [%s-%s-%s]"),
                                                                           active_chem -> label[i],
                                                                           active_chem -> label[j],
                                                                           active_chem -> label[k]);
@@ -194,7 +194,7 @@ void init_ang (project * this_proj)
       {
         for ( l = 0 ; l < this_proj -> nspec ; l++ )
         {
-          this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf("Dihedral [%s-%s-%s-%s]",
+          this_proj -> analysis[ANG] -> curves[h] -> name = g_strdup_printf(_("Dihedrals [%s-%s-%s-%s]"),
                                                                             active_chem -> label[i], active_chem -> label[j],
                                                                             active_chem -> label[k], active_chem -> label[l]);
           h=h+1;
@@ -428,14 +428,14 @@ void update_ang_view (project * this_proj)
 
   if (this_proj -> analysis[ANG] -> calc_buffer == NULL) this_proj -> analysis[ANG] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\n\nAngles and diherdrals distribution(s)\n\n", "heading", this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\tAngular space discretization:\n\n", NULL, this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\t - Number of δ° steps: ", "bold", this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\n\nAngles and diherdrals distribution(s)\n\n"), "heading", this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("Calculation details:\n\n"), NULL, this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\tAngular space discretization:\n\n"), NULL, this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\t - Number of δ° steps: "), "bold", this_proj -> analysis[ANG] -> calc_buffer);
   str = g_strdup_printf ("%d", this_proj -> analysis[ANG] -> num_delta);
   print_info (str, "bold_blue", this_proj -> analysis[ANG] -> calc_buffer);
   g_free (str);
-  print_info ("\n\n\t between 0.0 and 180.0", NULL, this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\n\n\t between 0.0 and 180.0"), NULL, this_proj -> analysis[ANG] -> calc_buffer);
   print_info (" °\n\n\t - δ° = ", "bold", this_proj -> analysis[ANG] -> calc_buffer);
   str = g_strdup_printf ("%f", this_proj -> analysis[ANG] -> delta);
   print_info (str, "bold_blue", this_proj -> analysis[ANG] -> calc_buffer);
@@ -492,7 +492,7 @@ void update_glwin_after_bonds (int bonding, int * colm)
             }
             else if (! active_glwin -> atom_win -> adv_bonding[0] && active_glwin -> adv_bonding[0])
             {
-              combo_text_append (active_glwin -> search_widg[i] -> filter_box, "Fragment");
+              combo_text_append (active_glwin -> search_widg[i] -> filter_box, _("Fragment"));
             }
             if (active_glwin -> atom_win -> adv_bonding[0] && ! active_glwin -> adv_bonding[0])
             {
@@ -500,7 +500,7 @@ void update_glwin_after_bonds (int bonding, int * colm)
             }
             else if (! active_glwin -> atom_win -> adv_bonding[1] && active_glwin -> adv_bonding[1])
             {
-              combo_text_append (active_glwin -> search_widg[i] -> filter_box, "Molecule");
+              combo_text_append (active_glwin -> search_widg[i] -> filter_box, _("Molecule"));
             }
             j = active_glwin -> search_widg[i] -> object + active_glwin -> search_widg[i] -> filter;
             if (j == 4)
@@ -586,14 +586,14 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
 
   if (! active_project -> dmtx)
   {
-    show_error ("The nearest neighbors table calculation has failed", 0, (widg) ? widg : MainWindow);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, (widg) ? widg : MainWindow);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
   }
   else if (! err_update)
   {
-    show_error ("Impossible to update FORTRAN data", 0, (widg) ? widg : MainWindow);
+    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : MainWindow);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
@@ -620,7 +620,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       active_project -> analysis[SPH] -> avail_ok = j;
       if (! j)
       {
-        show_error ("Unexpected error when calculating bond properties", 0, (widg) ? widg : MainWindow);
+        show_error (_("Unexpected error when calculating bond properties"), 0, (widg) ? widg : MainWindow);
       }
       else
       {
@@ -632,7 +632,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           clock_gettime (CLOCK_MONOTONIC, & start_time);
           if (! molecules_ (& mol_update, & k))
           {
-            show_error ("Unexpected error when looking for isolated fragment(s) and molecule(s)", 0, (widg) ? widg : MainWindow);
+            show_error (_("Unexpected error when looking for isolated fragment(s) and molecule(s)"), 0, (widg) ? widg : MainWindow);
             if (active_glwin)
             {
               for (k=0; k<2; k++)
@@ -678,7 +678,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       if (! j)
       {
         prepostcalc (widg, TRUE, ANG, j, 1.0);
-        show_error ("Unexpected error when calculating the bond angles distribution", 0, (widg) ? widg : MainWindow);
+        show_error (_("Unexpected error when calculating the bond angles distribution"), 0, (widg) ? widg : MainWindow);
       }
       else
       {
@@ -686,7 +686,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
         prepostcalc (widg, TRUE, ANG, j, 1.0);
         if (! j)
         {
-          show_error ("Unexpected error when calculating the dihedral angles distribution", 0, (widg) ? widg : MainWindow);
+          show_error (_("Unexpected error when calculating the dihedral angles distribution"), 0, (widg) ? widg : MainWindow);
         }
         else
         {
@@ -732,16 +732,16 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
   view_buffer (active_project -> analysis[BND] -> calc_buffer);
   if (sp == 0)
   {
-    print_info ("\n\nBond properties\n\n", "heading", active_project -> analysis[BND] -> calc_buffer);
-    print_info ("Existence of a bond between two atoms i (α) and j (β)\n", "italic", active_project -> analysis[BND] -> calc_buffer);
-    print_info ("if the two following conditions are verified:\n\n\t1) D", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\n\nBond properties\n\n"), "heading", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("Existence of a bond between 2 atoms i (α) and j (β)\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("if the 2 following conditions are verified:\n\n\t1) D"), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("ij", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
-    str = g_strdup_printf (" < first minimum of the total RDF (%9.5f Å )\n\t2) D", active_chem -> grtotcutoff);
+    str = g_strdup_printf (_(" < first minimum of the total g(r) (%9.5f Å )\n\t2) D"), active_chem -> grtotcutoff);
     print_info (str, "italic", active_project -> analysis[BND] -> calc_buffer);
     g_free (str);
     print_info ("ij", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
     print_info (" < r", "italic", active_project -> analysis[BND] -> calc_buffer);
-    print_info ("cut", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("cut"), "sub_italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("(α,β)\n", "italic", active_project -> analysis[BND] -> calc_buffer);
     bdtc = sac * active_chem -> nsps[sp];
   }
@@ -749,13 +749,13 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
   {
     bdtc += sac * active_chem -> nsps[sp];
   }
-  print_info ("\nCoordination numbers: ", "italic", active_project -> analysis[BND] -> calc_buffer);
+  print_info (_("\nCoordination numbers: "), "italic", active_project -> analysis[BND] -> calc_buffer);
   spr = g_strdup_printf("%s", textcolor(sp));
   print_info (active_chem -> element[sp], spr, active_project -> analysis[BND] -> calc_buffer);
   str = g_strdup_printf ("\n\n\t%s", exact_name(active_chem -> label[sp]));
   print_info (str, spr, active_project -> analysis[BND] -> calc_buffer);
   g_free (str);
-  print_info (" (total)=\t", "italic", active_project -> analysis[BND] -> calc_buffer);
+  print_info (_(" (total)=\t"), "italic", active_project -> analysis[BND] -> calc_buffer);
   str = g_strdup_printf("%9.5lf\n", sac);
   print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
   g_free (str);
@@ -768,7 +768,7 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
     print_info (active_chem -> label[j], str, active_project -> analysis[BND] -> calc_buffer);
     print_info (")", spr, active_project -> analysis[BND] -> calc_buffer);
     print_info ("[r", NULL, active_project -> analysis[BND] -> calc_buffer);
-    print_info ("cut", "sub", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("cut"), "sub", active_project -> analysis[BND] -> calc_buffer);
     print_info ("(", NULL, active_project -> analysis[BND] -> calc_buffer);
     print_info (active_chem -> label[sp], spr, active_project -> analysis[BND] -> calc_buffer);
     print_info (",", NULL, active_project -> analysis[BND] -> calc_buffer);
@@ -782,7 +782,7 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
     str = g_strdup_printf ("%9.5lf", ssac[j]);
     print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
     g_free (str);
-    print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
     if (sac != 0.0)
     {
       str = g_strdup_printf ("%7.3lf", ssac[j]*100.0/(sac));
@@ -798,7 +798,7 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
   g_free (spr);
   if (sp == active_project -> nspec-1)
   {
-    print_info ("\nAverage coordination number: ", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\nAverage coordination number: "), "italic", active_project -> analysis[BND] -> calc_buffer);
     str = g_strdup_printf ("%9.5lf\n", bdtc / active_project -> natomes);
     print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
     g_free (str);
@@ -839,11 +839,11 @@ void warren_cowley_out_ (int * spa, double ssac[active_project -> nspec])
   // Warren-Cowley for binary A x B 1-x systems
   if (! id_a)
   {
-    print_info ("\nWarren-Cowley chemical order parameters for A", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\nWarren-Cowley chemical order parameters for A"), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("B", "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("1-x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
-    print_info (" binary systems:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_(" binary systems:\n\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
   }
   print_info ("\tα", NULL, active_project -> analysis[BND] -> calc_buffer);
   print_info ("l", "sub", active_project -> analysis[BND] -> calc_buffer);
@@ -877,11 +877,11 @@ void cargill_spaepen_out_ (int * spa, double ssac[active_project -> nspec])
   // Cargill-Spaepen for metal alloys, also A x B 1-x systems
   if (! id_a)
   {
-    print_info ("\nCargill-Spaepen chemical order parameters for A", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\nCargill-Spaepen chemical order parameters for A"), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("B", "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info ("1-x", "sub_italic", active_project -> analysis[BND] -> calc_buffer);
-    print_info (" binary systems:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_(" binary systems:\n\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
   }
   print_info ("\tη", NULL, active_project -> analysis[BND] -> calc_buffer);
   print_info ("[", NULL, active_project -> analysis[BND] -> calc_buffer);
@@ -912,14 +912,14 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
   gchar * str, * spr, * snr;
   int tgsa;
 
-  print_info ("\nEnvironments for ", "italic", active_project -> analysis[BND] -> calc_buffer);
+  print_info (_("\nEnvironments for "), "italic", active_project -> analysis[BND] -> calc_buffer);
   spr = g_strdup_printf ("%s", textcolor(sp));
   str = g_strdup_printf ("%s", exact_name(active_chem -> label[sp]));
   print_info (str, spr, active_project -> analysis[BND] -> calc_buffer);
   g_free (spr);
   g_free (str);
-  print_info (" atoms:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
-  print_info ("\t            \tN(tot)", NULL, active_project -> analysis[BND] -> calc_buffer);
+  print_info (_(" atoms:\n\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
+  print_info (_("\t            \tN(tot)"), NULL, active_project -> analysis[BND] -> calc_buffer);
   for ( j=0 ; j < active_project -> nspec ; j++ )
   {
     snr = g_strdup_printf ("%s", exact_name(active_chem -> label[j]));
@@ -932,7 +932,7 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
     g_free (str);
     g_free (snr);
   }
-  print_info ("\tNumber\t\t or \tPercent\n\n", NULL, active_project -> analysis[BND] -> calc_buffer);
+  print_info (_("\tNumber\t\t or \tPercent\n\n"), NULL, active_project -> analysis[BND] -> calc_buffer);
 
   tgsa = 0;
   for ( i=0 ; i < totgsa; i++ )
@@ -971,7 +971,7 @@ void env_info (int sp, int totgsa, int numgsa[totgsa])
     str = g_strdup_printf("  %16.5lf", (1.0*numgsa[i])/active_project -> steps);
     print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
     g_free (str);
-    print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
     str = g_strdup_printf ("%7.3lf ", 100.0*numgsa[i]/tgsa);
     print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
     g_free (str);
@@ -992,13 +992,13 @@ void update_angle_view (project * this_proj)
 
   if (this_proj -> analysis[ANG] -> calc_buffer == NULL) this_proj -> analysis[ANG] -> calc_buffer = add_buffer (NULL, NULL, NULL);
   view_buffer (this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\n\nAngle distribution function(s)\n\n", "heading", this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\tAngle space discretization:\n\n", NULL, this_proj -> analysis[ANG] -> calc_buffer);
-  print_info ("\t - Number of δ° steps: ", "bold", this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\n\nAngle distribution function(s)\n\n"), "heading", this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\tAngle space discretization:\n\n"), NULL, this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\t - Number of δ° steps: "), "bold", this_proj -> analysis[ANG] -> calc_buffer);
   str = g_strdup_printf ("%d", this_proj -> analysis[ANG] -> num_delta);
   print_info (str, "bold_blue", this_proj -> analysis[ANG] -> calc_buffer);
   g_free (str);
-  print_info ("\n\n\t between 0.0 and 180.0°\n", NULL, this_proj -> analysis[ANG] -> calc_buffer);
+  print_info (_("\n\n\t between 0.0 and 180.0°\n"), NULL, this_proj -> analysis[ANG] -> calc_buffer);
 }
 
 /*!
@@ -1036,9 +1036,9 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
 
   if (print && bonds_update && ! atomes_render_image)
   {
-    print_info ("\nNumber and proportion of tetrahedra links for ", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\nNumber and proportion of tetrahedra links for "), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info (exact_name(active_chem -> label[* sid]), textcolor(* sid), active_project -> analysis[BND] -> calc_buffer);
-    print_info (" atoms:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_(" atoms:\n\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
     for ( i=0 ; i < active_project -> nspec ; i++ )
     {
       if (eda[i] != 0.0 || cda[i] != 0.0)
@@ -1049,10 +1049,10 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         print_info (exact_name(active_chem -> label[i]), textcolor(i), active_project -> analysis[BND] -> calc_buffer);
         print_info (")", NULL, active_project -> analysis[BND] -> calc_buffer);
         print_info ("4", "sub", active_project -> analysis[BND] -> calc_buffer);
-        print_info (" tetrahedra:\n", NULL, active_project -> analysis[BND] -> calc_buffer);
+        print_info (_(" tetrahedra:\n"), NULL, active_project -> analysis[BND] -> calc_buffer);
         if (eda[i] != 0.0)
         {
-          print_info ("\t\t Edge-sharing:   ", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t\t Edge-sharing:   "), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%11.5lf", eda[i]/active_project -> steps);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1062,7 +1062,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
             print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
             g_free (str);
           }
-          print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%7.3lf", 100*eda[i]/(eda[i]+cda[i]));
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1076,7 +1076,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         }
         if (cda[i] != 0.0)
         {
-          print_info ("\t\t Corner-sharing: ", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t\t Corner-sharing: "), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%11.5lf", cda[i]/active_project -> steps);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1086,7 +1086,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
             print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
             g_free (str);
           }
-          print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%7.3lf", 100*cda[i]/(eda[i]+cda[i]));
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1100,7 +1100,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         }
         if (dda[i] != 0.0)
         {
-          print_info ("\t\t with the following bond defects: ", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t\t with the following bond defects: "), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%11.5lf", dda[i]/active_project -> steps);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1110,7 +1110,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
             print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
             g_free (str);
           }
-          print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%7.3lf", 100*dda[i]/(eda[i]+cda[i]));
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1124,9 +1124,9 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         }
       }
     }
-    print_info ("\nNumber and proportion of tetrahedra units for ", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_("\nNumber and proportion of tetrahedra units for "), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info (exact_name(active_chem -> label[* sid]), textcolor(* sid), active_project -> analysis[BND] -> calc_buffer);
-    print_info (" atoms:\n\n", "italic", active_project -> analysis[BND] -> calc_buffer);
+    print_info (_(" atoms:\n\n"), "italic", active_project -> analysis[BND] -> calc_buffer);
     for ( i=0 ; i < active_project -> nspec ; i++ )
     {
       if (atd[i] != 0.0)
@@ -1137,8 +1137,8 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         print_info (exact_name(active_chem -> label[i]), textcolor(i), active_project -> analysis[BND] -> calc_buffer);
         print_info (")", NULL, active_project -> analysis[BND] -> calc_buffer);
         print_info ("4", "sub", active_project -> analysis[BND] -> calc_buffer);
-        print_info (" tetrahedra:\n", NULL, active_project -> analysis[BND] -> calc_buffer);
-        print_info ("\t\t Total number of tetrahedra:", NULL, active_project -> analysis[BND] -> calc_buffer);
+        print_info (_(" tetrahedra:\n"), NULL, active_project -> analysis[BND] -> calc_buffer);
+        print_info (_("\t\t Total number of tetrahedra:"), NULL, active_project -> analysis[BND] -> calc_buffer);
         str = g_strdup_printf("%11.5lf", atd[i]/active_project -> steps);
         print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
         g_free (str);
@@ -1151,7 +1151,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         print_info ("\n", "bold", active_project -> analysis[BND] -> calc_buffer);
         if (eda[i] != 0.0 )
         {
-          print_info ("\t\t Edge-sharing:   ", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t\t Edge-sharing:   "), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%11.5lf", 2.0*eda[i]/active_project -> steps);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1161,7 +1161,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
             print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
             g_free (str);
           }
-          print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%7.3lf", 2.0*100*eda[i]/(eda[i]+cda[i]));
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1176,7 +1176,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
         if (cda[i] != 0.0 )
         {
 
-          print_info ("\t\t Corner-sharing: ", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t\t Corner-sharing: "), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%11.5lf", (atd[i]-2*eda[i])/active_project -> steps);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);
@@ -1186,7 +1186,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
             print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
             g_free (str);
           }
-          print_info ("\t or \t", NULL, active_project -> analysis[BND] -> calc_buffer);
+          print_info (_("\t or \t"), NULL, active_project -> analysis[BND] -> calc_buffer);
           str = g_strdup_printf("%7.3lf", 100.0*(atd[i]-2.0*eda[i])/atd[i]);
           print_info (str, "bold", active_project -> analysis[BND] -> calc_buffer);
           g_free (str);

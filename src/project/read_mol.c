@@ -146,8 +146,8 @@ int read_mol (FILE * fp)
     }
 
     active_glwin -> ogl_coord[i+1] = destroy_this_widget (active_glwin -> ogl_coord[i+1]);
-    if (i == 2) active_glwin -> ogl_coord[3] = menu_item_new_with_submenu ("Fragment(s)", active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 2));
-    if (i == 3) active_glwin -> ogl_coord[4] = menu_item_new_with_submenu ("Molecule(s)", active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 3));
+    if (i == 2) active_glwin -> ogl_coord[3] = menu_item_new_with_submenu (_("Fragment(s)"), active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 2));
+    if (i == 3) active_glwin -> ogl_coord[4] = menu_item_new_with_submenu (_("Molecule(s)"), active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 3));
     GtkWidget * cmenu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (active_glwin -> ogl_coord[0]));
     gtk_menu_shell_insert (GTK_MENU_SHELL(cmenu), active_glwin -> ogl_coord[i+1], i+2);
   }

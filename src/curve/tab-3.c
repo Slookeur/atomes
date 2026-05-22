@@ -324,7 +324,7 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, leghbox, legvbox, FALSE, FALSE, 10);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, legvbox,
-                      check_button ("Show/Hide legend", -1, -1, this_curve -> show_legend, G_CALLBACK(show_data_legend), data),
+                      check_button (_("Show/Hide legend"), -1, -1, this_curve -> show_legend, G_CALLBACK(show_data_legend), data),
                       FALSE, TRUE, 5);
 
   legend_area = create_hbox (0);
@@ -332,15 +332,15 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   cedit -> legend_box = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, legend_area, cedit -> legend_box, FALSE, FALSE, 0);
 
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> legend_box, "Font:"),
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> legend_box, _("Font:")),
                       font_button (this_curve -> legend_font, 150, -1, G_CALLBACK(set_legend_font), data),
                       FALSE, FALSE, 0);
 
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> legend_box, "Color:"),
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> legend_box, _("Color:")),
                        color_button (this_curve -> legend_color, TRUE, 150, 30, G_CALLBACK(set_legend_color), data),
                        FALSE, FALSE, 0);
 
-  dhbox = bbox (cedit -> legend_box, "Position:");
+  dhbox = bbox (cedit -> legend_box, _("Position:"));
   GtkWidget * lxyc;
   for ( i=0 ; i < 2 ; i++ )
   {
@@ -353,7 +353,7 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   dhbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> legend_box, dhbox, FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, dhbox,
-                       check_button ("Show/Hide legend box", -1, -1, this_curve -> show_legend_box, G_CALLBACK(show_data_legend_box), data),
+                       check_button (_("Show/Hide legend box"), -1, -1, this_curve -> show_legend_box, G_CALLBACK(show_data_legend_box), data),
                        FALSE, FALSE, 40);
 
   cedit -> legend_box_style = create_hbox (0);
@@ -370,15 +370,15 @@ GtkWidget * create_tab_3 (curve_edition * cedit, gpointer data)
   gtk_widget_set_size_request (legend_dash_box, 120, -1);
   combo_set_active (legend_dash_box, this_curve -> legend_box_dash - 1);
   g_signal_connect (G_OBJECT(legend_dash_box), "changed", G_CALLBACK(set_legend_box_line), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, "Line style:"), legend_dash_box, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, _("Line style:")), legend_dash_box, FALSE, FALSE, 0);
 
 // Legend box linewidth
   legend_thickness = create_entry (G_CALLBACK(set_legend_box_thickness), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(legend_thickness), this_curve -> legend_box_thickness);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, "Line width:"), legend_thickness, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, _("Line width:")), legend_thickness, FALSE, FALSE, 0);
 
 // Legend box line color
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, "Color:"),
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbox (legend_style_box, _("Color:")),
                        color_button (this_curve -> legend_box_color, TRUE, 120, -1, G_CALLBACK(set_legend_box_color), data),
                        FALSE, FALSE, 0);
 

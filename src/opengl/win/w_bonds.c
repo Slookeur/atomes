@@ -76,7 +76,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> length;
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("Axis length [ %f Å ]", v);
+      str = g_strdup_printf (_("Axis length [ %f Å ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][7]), str);
       g_free (str);
 #endif
@@ -93,7 +93,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("Radius [ %f Å ]", v);
+        str = g_strdup_printf (_("Radius [ %f Å ]"), v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][6]), str);
         g_free (str);
 #endif
@@ -110,7 +110,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         if (v > 0.0) opengl_project -> modelgl -> anim -> last -> img -> xyz -> line = v;
         v = opengl_project -> modelgl -> anim -> last -> img -> xyz -> line;
 #ifdef GTK3
-        str = g_strdup_printf ("Width [ %f pts ]", v);
+        str = g_strdup_printf (_("Width [ %f pts ]"), v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[1][4]), str);
         g_free (str);
 #endif
@@ -131,7 +131,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> abc -> rad;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("Radius [ %f Å ]", v);
+        str = g_strdup_printf (_("Radius [ %f Å ]"), v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][6]), str);
         g_free (str);
 #endif
@@ -149,7 +149,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
         v = opengl_project -> modelgl -> anim -> last -> img -> abc -> line;
 #ifdef GTK3
         // GTK3 Menu Action To Check
-        str = g_strdup_printf ("Width [ %f pts ]", v);
+        str = g_strdup_printf (_("Width [ %f pts ]"), v);
         gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_box_axis[0][4]), str);
         g_free (str);
 #endif
@@ -171,7 +171,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       v = opengl_project -> modelgl -> anim -> last -> img -> radall[1];
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("Cylinder(s) [ %f Å ]", v);
+      str = g_strdup_printf (_("Cylinder(s) [ %f Å ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_bonds[8]), str);
       g_free (str);
 #endif
@@ -185,7 +185,7 @@ G_MODULE_EXPORT void update_bond_parameter (GtkEntry * res, gpointer data)
       v = opengl_project -> modelgl -> anim -> last -> img -> radall[0];
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("Cylinder(s) [ %f Å ]", v);
+      str = g_strdup_printf (_("Cylinder(s) [ %f Å ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(opengl_project -> modelgl -> ogl_bonds[1]), str);
       g_free (str);
 #endif
@@ -357,8 +357,8 @@ G_MODULE_EXPORT void set_bond_parameter (GtkWidget * widg, gpointer data)
 #endif
 {
   tint * the_data = (tint *)data;
-  gchar * title[2][2] = {{"Adjust atomic bond radius(ii)", "Adjust clone bond radius(ii)"},
-                         {"Adjust atomic line width(s)", "Adjust clone line width(s)"}};
+  gchar * title[2][2] = {{i18n("Adjust atomic bond radius(ii)"), i18n("Adjust clone bond radius(ii)")},
+                         {i18n("Adjust atomic line width(s)"), i18n("Adjust clone line width(s)")}};
 
   int p = the_data -> a;
   opengl_project_changed (p);
@@ -374,7 +374,7 @@ G_MODULE_EXPORT void set_bond_parameter (GtkWidget * widg, gpointer data)
   {
     val = opengl_project -> modelgl -> anim -> last -> img -> bondrad;
   }
-  GtkWidget * win = dialogmodal (title[jd][id], GTK_WINDOW(opengl_project -> modelgl -> win));
+  GtkWidget * win = dialogmodal (_(title[jd][id]), GTK_WINDOW(opengl_project -> modelgl -> win));
   bonds_input_win (win, opengl_project, s, id, val);
   run_this_gtk_dialog (win, G_CALLBACK(run_destroy_dialog), NULL);
 #ifdef GTK4
@@ -407,26 +407,26 @@ G_MODULE_EXPORT void window_bonds (GtkWidget * widg, gpointer data)
 {
   int id;
   tint * bid = (tint *)data;
-  gchar * obj[4] = {"box", "axis", "bond", "clone bond"};
-  gchar * Nobj[4] = {"Box", "Axis", "Bond", "Clone bond"};
+  gchar * obj[4] = {i18n("box"), i18n("axis"), i18n("bond"), i18n("clone bond")};
+  gchar * Nobj[4] = {i18n("Box"), i18n("Axis"), i18n("Bond"), i18n("Clone bond")};
   gchar * str;
   switch (bid -> b)
   {
     case 0:
       id = -5;
-      str = g_strdup_printf ("Adjust axis length");
+      str = g_strdup_printf (_("Adjust axis length"));
       break;
     case 1:
       id = -3 - bid -> c;
-      str = g_strdup_printf ("Adjust %s line width", obj[bid -> c]);
+      str = g_strdup_printf (_("Adjust %s line width"), _(obj[bid -> c]));
       break;
     case 4:
       id = -3 - bid -> c;
-      str = g_strdup_printf ("Adjust %s cylinders radius", obj[bid -> c]);
+      str = g_strdup_printf (_("Adjust %s cylinders radius"), _(obj[bid -> c]));
       break;
     default:
       id = - bid -> b + 1;
-      str = g_strdup_printf ("Adjust %s cylinders radius", obj[bid -> b]);
+      str = g_strdup_printf (_("Adjust %s cylinders radius"), _(obj[bid -> b]));
       break;
   }
   opengl_project_changed (bid -> a);
@@ -439,16 +439,16 @@ G_MODULE_EXPORT void window_bonds (GtkWidget * widg, gpointer data)
   switch (bid -> b)
   {
     case 0:
-      str = g_strdup_printf ("Axis length");
+      str = g_strdup_printf (_("Axis length"));
       break;
     case 1:
-      str = g_strdup_printf ("%s line width", Nobj[bid -> c]);
+      str = g_strdup_printf (_("%s line width"), _(Nobj[bid -> c]));
       break;
     case 4:
-      str = g_strdup_printf ("%s cylinders radius", Nobj[bid -> c]);
+      str = g_strdup_printf (_("%s cylinders radius"), _(Nobj[bid -> c]));
       break;
     default:
-      str = g_strdup_printf ("%s cylinders radius", Nobj[bid -> b]);
+      str = g_strdup_printf (_("%s cylinders radius"), _(Nobj[bid -> b]));
       break;
   }
   GtkWidget * label = gtk_label_new (str);
@@ -475,7 +475,7 @@ G_MODULE_EXPORT void window_bonds (GtkWidget * widg, gpointer data)
   switch (bid -> b)
   {
     case 1:
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" [pts]", 40, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(" [pts]"), 40, -1, 0.0, 0.5), FALSE, FALSE, 0);
       break;
     default:
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" [&#xC5;]", 30, -1, 0.0, 0.5), FALSE, FALSE, 0);

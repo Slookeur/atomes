@@ -259,11 +259,11 @@ int get_style (gchar * str)
 #else
   for (i=0; i<OGL_STYLES; i++)
   {
-    if (g_strcmp0 (text_styles[i], str) == 0) return i;
+    if (g_strcmp0 (_(text_styles[i]), str) == 0) return i;
   }
   for (i=0; i<FILLED_STYLES; i++)
   {
-    if (g_strcmp0 (text_filled[i], str) == 0)
+    if (g_strcmp0 (_(text_filled[i]), str) == 0)
     {
       return OGL_STYLES + i;
     }
@@ -406,7 +406,14 @@ gchar * get_object_from_action (GSimpleAction * action)
         {
           g_free (str);
           g_free (act_end);
-          return g_strdup_printf ("%s", mol[i].object);
+          if (i == 9 || i == 13 || i == 16 || i == 17)
+          {
+            return g_strdup_printf ("%s", _(mol[i].object));
+          }
+          else
+          {
+            return g_strdup_printf ("%s", mol[i].object);
+          }
           break;
         }
         g_free (str);
@@ -428,7 +435,7 @@ gchar * get_object_from_action (GSimpleAction * action)
           {
             g_free (str);
             g_free (act_end);
-            return g_strdup_printf ("%s in %s", action_atoms[j], g_strdup_printf ("%s (%d)", get_project_by_id(i) -> name, i+1));
+            return g_strdup_printf (_("%s in %s"), _(action_atoms[j]), g_strdup_printf ("%s (%d)", get_project_by_id(i) -> name, i+1));
           }
           g_free (str);
         }
@@ -494,7 +501,7 @@ void to_replace_this_object (int type, GtkWidget * widg, gpointer data)
 #endif
   else
   {
-    lab = g_strdup_printf ("Copied Data");
+    lab = g_strdup_printf (_("Copied Data"));
   }
   h = get_selected_object_id (FALSE, opengl_project -> id,  lab, insert_search);
   g_free (lab);
@@ -607,11 +614,11 @@ void remove_object ()
   {
     if (! i)
     {
-      str = g_strdup_printf ("No atoms to be removed !");
+      str = g_strdup_printf (_("No atoms to be removed !"));
     }
     else
     {
-      str = g_strdup_printf ("%d atom(s) removed !", i);
+      str = g_strdup_printf (_("%d atom(s) removed !"), i);
     }
     show_info (str, 0, opengl_project -> modelgl -> win);
     g_free (str);
@@ -671,11 +678,11 @@ void insert_object (int action, gpointer data)
     j = action_atoms_from_project (opengl_project, insert_search, vis);
     if (action == 1)
     {
-      str = g_strdup_printf ("%d atom(s) removed !\n%d atom(s) inserted !", i, j);
+      str = g_strdup_printf (_("%d atom(s) removed !\n%d atom(s) inserted !"), i, j);
     }
     else
     {
-      str = g_strdup_printf ("%d atom(s) inserted !", (inserted_from_lib) ? inserted_from_lib : j);
+      str = g_strdup_printf (_("%d atom(s) inserted !"), (inserted_from_lib) ? inserted_from_lib : j);
       inserted_from_lib = 0;
     }
     clean_other_window_after_edit (opengl_project);
@@ -730,7 +737,7 @@ G_MODULE_EXPORT void add_object (GtkWidget * widg, gpointer data)
 #endif
     else
     {
-      lab = g_strdup_printf ("Copied Data");
+      lab = g_strdup_printf (_("Copied Data"));
     }
     allocate_todo (insert_search, 1);
     insert_search -> todo[0] = 1;
@@ -2976,13 +2983,18 @@ GMenu * add_edition_sub_menu (glwin * view, gchar * act, int aid, GCallback hand
     if (mol[i].type)
     {
       menus = g_menu_new ();
-      append_submenu (menu, mol[i].type, menus);
-
+      append_submenu (menu, _(mol[i].type), menus);
     }
     if (mol[i].object)
     {
-      append_opengl_item (view, menus, mol[i].object, eact, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
-    }
+      if (i == 9 || i == 13 || i == 16 || i == 17)
+      {
+        append_opengl_item (view, menus, _(mol[i].object), eact, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+      }
+      else
+      {
+        append_opengl_item (view, menus, mol[i].object, eact, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+      }
   }
   g_free (eact);
 
@@ -3009,7 +3021,7 @@ GMenu * add_edition_sub_menu (glwin * view, gchar * act, int aid, GCallback hand
         menups = g_menu_new ();
         for (j=0; j<3; j++)
         {
-          word = g_strdup_printf ("%s in %s", action_atoms[j], name);
+          word = g_strdup_printf (_("%s in %s"), _(action_atoms[j]), name);
           str = g_strdup_printf ("%s-%d", eact, j);
           append_opengl_item (view, menups, word, str, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
           g_free (word);
@@ -3021,11 +3033,11 @@ GMenu * add_edition_sub_menu (glwin * view, gchar * act, int aid, GCallback hand
       }
     }
     g_free (eact);
-    append_submenu (menu, "Import From Project", menup);
+    append_submenu (menu, _("Import From Project"), menup);
     g_object_unref (menup);
   }
   eact = g_strdup_printf ("cp-%s-%d", act, aid);
-  append_opengl_item (view, menu, "Copied Data", eact, 1, 0, "<CTRL>V", IMG_NONE, NULL, FALSE, G_CALLBACK(add_object), data, FALSE, FALSE, FALSE, (copied_object) ? TRUE : FALSE);
+  append_opengl_item (view, menu, _("Copied Data"), eact, 1, 0, "<CTRL>V", IMG_NONE, NULL, FALSE, G_CALLBACK(add_object), data, FALSE, FALSE, FALSE, (copied_object) ? TRUE : FALSE);
   g_free (eact);
   return menu;
 }
@@ -3050,16 +3062,16 @@ GMenu * add_style_sub_menu (glwin * view, gchar * act, int aid, GCallback handle
   {
     if (i != SPACEFILL)
     {
-      append_opengl_item (view, menu, text_styles[i], actc, i, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+      append_opengl_item (view, menu, _(text_styles[i]), actc, i, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
     }
     else
     {
       GMenu * menuf = g_menu_new ();
       for (j=0; j < FILLED_STYLES; j++)
       {
-        append_opengl_item (view, menuf, text_filled[j], actc, j+OGL_STYLES, j+OGL_STYLES, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+        append_opengl_item (view, menuf, _(text_filled[j]), actc, j+OGL_STYLES, j+OGL_STYLES, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
       }
-      append_submenu (menu, text_styles[i], menuf);
+      append_submenu (menu, _(text_styles[i]), menuf);
     }
   }
   g_free (actc);
@@ -3084,17 +3096,17 @@ void add_style_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
   {
     if (i != SPACEFILL)
     {
-      gtk3_menu_item (menu, text_styles[i], IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
+      gtk3_menu_item (menu, _(text_styles[i]), IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
     }
     else
     {
-      GtkWidget *widg = create_menu_item (FALSE, "Spacefilled");
+      GtkWidget *widg = create_menu_item (FALSE, _("Spacefilled"));
       gtk_menu_shell_append ((GtkMenuShell *)menu, widg);
       GtkWidget * menuf = gtk_menu_new ();
       gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menuf);
       for (j=0; j < FILLED_STYLES; j++)
       {
-        gtk3_menu_item (menuf, text_filled[j], IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
+        gtk3_menu_item (menuf, _(text_filled[j]), IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
       }
     }
   }
@@ -3122,14 +3134,21 @@ void add_edition_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
   {
     if (mol[i].type != NULL)
     {
-      titem = create_menu_item (TRUE, mol[i].type);
+      titem = create_menu_item (TRUE, _(mol[i].type));
       gtk_menu_shell_append ((GtkMenuShell *)menu, titem);
       smenu = gtk_menu_new ();
       gtk_menu_item_set_submenu ((GtkMenuItem *)titem, smenu);
     }
     if (mol[i].object != NULL)
     {
-      gtk3_menu_item (smenu, mol[i].object, IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
+      if (i == 9 || i == 13 || i == 16 || i == 17)
+      {
+        gtk3_menu_item (smenu, _(mol[i].object), IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
+      }
+      else
+      {
+        gtk3_menu_item (smenu, mol[i].object, IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
+      }
     }
   }
 
@@ -3145,7 +3164,7 @@ void add_edition_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
 
   if (doit)
   {
-    titem = create_menu_item (TRUE, "Import From Project");
+    titem = create_menu_item (TRUE, _("Import From Project"));
     gtk_menu_shell_append ((GtkMenuShell *)menu, titem);
     smenu = gtk_menu_new ();
     gtk_menu_item_set_submenu ((GtkMenuItem *)titem, smenu);
@@ -3163,7 +3182,7 @@ void add_edition_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
         gtk_menu_item_set_submenu ((GtkMenuItem *)sitem, pmenu);
         for (j=0; j<3; j++)
         {
-          word = g_strdup_printf ("%s in %s", action_atoms[j], name);
+          word = g_strdup_printf (_("%s in %s"), _(action_atoms[j]), name);
           gtk3_menu_item (pmenu, word, IMG_NONE, NULL, handler, data, FALSE, 0, 0, FALSE, FALSE, FALSE);
           g_free (word);
         }
@@ -3171,7 +3190,7 @@ void add_edition_sub_menu (GtkWidget * item, GCallback handler, gpointer data)
       }
     }
   }
-  GtkWidget * pastem = gtk3_menu_item (menu, "Copied Data", IMG_NONE, NULL, G_CALLBACK(add_object), data, TRUE, GDK_KEY_v, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+  GtkWidget * pastem = gtk3_menu_item (menu, _("Copied Data"), IMG_NONE, NULL, G_CALLBACK(add_object), data, TRUE, GDK_KEY_v, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   if (! copied_object) widget_set_sensitive (pastem, 0);
 }
 #endif
@@ -3291,8 +3310,8 @@ GtkWidget * create_selection_item (glwin * view, gchar * str, int mid, int gid, 
 #endif
 }
 
-gchar * mot[2][2]={{"All Non-Selected Atom(s)/Bond(s)", "All Selected Atom(s)/Bond(s)"},
-                   {"All Non-Labelled Atom(s)/Bond(s)", "All Labelled Atom(s)/Bond(s)"}};
+gchar * snsab[2][2]={{i18n("All Non-Selected Atom(s)/Bond(s)"), i18n("All Selected Atom(s)/Bond(s)")},
+                     {i18n("All Non-Labelled Atom(s)/Bond(s)"), i18n("All Labelled Atom(s)/Bond(s)")}};
 
 #ifdef GTK4
 /*!
@@ -3349,7 +3368,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
      || (mid == 0 && ! is_selected) || (mid == 1 && is_selected)
      || (mid == 2 && ! is_labelled) || (mid == 3 && is_labelled) || (mid > 8 && mid < 11)))
   {
-    str = g_strdup_printf ("This Atom: %s<sub>%d</sub>", exact_name(this_proj -> chemistry -> label[spa]), ati+1);
+    str = g_strdup_printf (_("This Atom: %s<sub>%d</sub>"), exact_name(this_proj -> chemistry -> label[spa]), ati+1);
 #ifdef GTK4
     if (mid == 6)
     {
@@ -3384,7 +3403,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
   }
   else if (bti > -1 && mid != 4 && mid != 7)
   {
-    str = g_strdup_printf ("This Bond: %s<sub>%d</sub> - %s<sub>%d</sub>",
+    str = g_strdup_printf (_("This Bond: %s<sub>%d</sub> - %s<sub>%d</sub>"),
                            exact_name(this_proj -> chemistry -> label[spa]), ati+1,
                            exact_name(this_proj -> chemistry -> label[spb]), bti+1);
 #ifdef GTK4
@@ -3441,20 +3460,20 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
 #ifdef GTK4
       if (mid == 6)
       {
-        append_submenu (menu, mot[j][i], add_style_sub_menu (view, "all-s", aid, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k)));
+        append_submenu (menu, _(snsab[j][i]), add_style_sub_menu (view, "all-s", aid, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k)));
       }
       else  if (mid == 10)
       {
-        append_submenu (menu, mot[j][i], add_edition_sub_menu (view, "all-e", aid, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k)));
+        append_submenu (menu, _(snsab[j][i]), add_edition_sub_menu (view, "all-e", aid, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k)));
       }
       else
       {
         strb = g_strdup_printf ("act-all-%d-%d", aid, mid+k);
-        append_opengl_item (view, menu, mot[j][i], strb, 1, 0, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k), FALSE, FALSE, FALSE, TRUE);
+        append_opengl_item (view, menu, _(snsab[j][i]), strb, 1, 0, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k), FALSE, FALSE, FALSE, TRUE);
         g_free (strb);
       }
 #else
-      sel = create_menu_item_from_widget (markup_label (mot[j][i], -1, -1, 0.0, 0.5), FALSE, FALSE, FALSE);
+      sel = create_menu_item_from_widget (markup_label (_(snsab[j][i]), -1, -1, 0.0, 0.5), FALSE, FALSE, FALSE);
       if (mid == 6)
       {
         add_style_sub_menu (sel, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+k));
@@ -3478,7 +3497,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     if (this_proj -> modelgl -> adv_bonding[i])
     {
       j = this_proj -> atoms[s][ati].coord[2+i];
-      str = (! i) ? g_strdup_printf ("Fragment N°:\t<b>%d</b>", j+1) : g_strdup_printf ("Molecule N°:\t<b>%d</b>", j+1);
+      str = (! i) ? g_strdup_printf (_("Fragment N°:\t<b>%d</b>"), j+1) : g_strdup_printf (_("Molecule N°:\t<b>%d</b>"), j+1);
 #ifdef GTK4
       create_selection_item (menu, view, str, (! i) ? "afm" : "amo", aid, mid, 2+i, j, aoc, handler_b, & atoid[mid][2+i]);
 #else
@@ -3492,7 +3511,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     if (this_proj -> atoms[s][ati].coord[0] > -1)
     {
       i = this_proj -> atoms[s][ati].coord[0];
-      str = g_strdup_printf ("All <b>%d</b> Fold %s Atoms", this_proj -> coord -> geolist[0][spa][i], exact_name(this_proj -> chemistry -> label[spa]));
+      str = g_strdup_printf (_("All %s Atoms <b>%d</b> Fold"), exact_name(this_proj -> chemistry -> label[spa]), this_proj -> coord -> geolist[0][spa][i]);
 #ifdef GTK4
       create_selection_item (menu, view, str, "atc", aid, mid, 0, i,  aoc, handler_b, & atoid[mid][0]);
 #else
@@ -3503,7 +3522,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     if (this_proj -> atoms[s][ati].coord[1] > -1)
     {
       i = this_proj -> atoms[s][ati].coord[1];
-      str = g_strdup_printf ("All <b>%s</b> Coordinations", env_name (this_proj, i, spa, 1, NULL));
+      str = g_strdup_printf (_("All <b>%s</b> Coordinations"), env_name (this_proj, i, spa, 1, NULL));
 #ifdef GTK4
       create_selection_item (menu, view, str, "apc", aid, mid, 1, i, aoc, handler_b, & atoid[mid][1]);
 #else
@@ -3513,11 +3532,11 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     }
     if (! aoc)
     {
-      str = g_strdup_printf ("All <b>%s</b> Atoms", exact_name(this_proj -> chemistry -> label[spa]));
+      str = g_strdup_printf (_("All <b>%s</b> Atoms"), exact_name(this_proj -> chemistry -> label[spa]));
     }
     else
     {
-      str = g_strdup_printf ("All <b>%s*</b> Clones", exact_name(this_proj -> chemistry -> label[spa]));
+      str = g_strdup_printf (_("All <b>%s*</b> Clones"), exact_name(this_proj -> chemistry -> label[spa]));
     }
 #ifdef GTK4
     create_selection_item (menu, view, str, "asp", aid, mid, 0, -1, aoc, handler_c, & atoid[mid][2]);
@@ -3532,7 +3551,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     {
       i = this_proj -> atoms[s][ati].coord[0];
       j = this_proj -> atoms[s][bti].coord[0];
-      str = g_strdup_printf ("All %s <b>%d</b> - %s <b>%d</b> Bonds",
+      str = g_strdup_printf (_("All %s <b>%d</b> - %s <b>%d</b> Bonds"),
                              exact_name(this_proj -> chemistry -> label[spa]), this_proj -> coord -> geolist[0][spa][i],
                              exact_name(this_proj -> chemistry -> label[spb]), this_proj -> coord -> geolist[0][spb][j]);
 #ifdef GTK4
@@ -3546,7 +3565,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
     {
       i = this_proj -> atoms[s][ati].coord[1];
       j = this_proj -> atoms[s][bti].coord[1];
-      str = g_strdup_printf ("All <b>%s</b> - <b>%s</b> Bonds",  env_name (this_proj, i, spa, 1, NULL), env_name (this_proj, j, spb, 1, NULL));
+      str = g_strdup_printf (_("All <b>%s</b> - <b>%s</b> Bonds"),  env_name (this_proj, i, spa, 1, NULL), env_name (this_proj, j, spb, 1, NULL));
 #ifdef GTK4
       create_selection_item (menu, view, str, "apcb", aid, mid, -1, -1, aoc, G_CALLBACK(select_action_for_all_bonds), GINT_TO_POINTER(mid+2*CONTEXTACT));
 #else
@@ -3554,7 +3573,7 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
 #endif
       g_free (str);
     }
-    str = g_strdup_printf ("All %s - %s Bonds", exact_name(this_proj -> chemistry -> label[spa]), exact_name(this_proj -> chemistry -> label[spb]));
+    str = g_strdup_printf (_("All %s - %s Bonds"), exact_name(this_proj -> chemistry -> label[spa]), exact_name(this_proj -> chemistry -> label[spb]));
 #ifdef GTK4
     create_selection_item (menu, view, str, "acb", aid, mid, -1, -1, aoc, G_CALLBACK(select_action_for_all_bonds), GINT_TO_POINTER(mid));
 #else
@@ -3564,13 +3583,13 @@ GtkWidget * selection_menu (glwin * view, int ati, int bti, int aoc, int mid, GC
   }
   if (mid > 3 && mid < 6)
   {
-    gchar * mat[2]={"All Hidden Atom(s)/Bond(s)", "All Visible Atom(s)/Bond(s)"};
+    gchar * mat[2]={i18n("All Hidden Atom(s)/Bond(s)"), i18n("All Visible Atom(s)/Bond(s)")};
 #ifdef GTK4
     strb = g_strdup_printf ("all-hv-%d-%d", aid, mid);
-    append_opengl_item (view, menu, mat[mid%2], strb, 1, 0, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+2*CONTEXTACT), FALSE, FALSE, FALSE, TRUE);
+    append_opengl_item (view, menu, _(mat[mid%2]), strb, 1, 0, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+2*CONTEXTACT), FALSE, FALSE, FALSE, TRUE);
     g_free (strb);
 #else
-    gtk3_menu_item (menu, mat[mid%2], IMG_NONE, NULL, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+2*CONTEXTACT), FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _(mat[mid%2]), IMG_NONE, NULL, G_CALLBACK(select_action_for_all), GINT_TO_POINTER(mid+2*CONTEXTACT), FALSE, 0, 0, FALSE, FALSE, FALSE);
 #endif
   }
   return menu;
@@ -3670,7 +3689,18 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
   int s = view -> anim -> last -> img -> step;
   int i, j;
   gchar * str, * strp;
-  gchar * menu_names[CONTEXTACT] = {"Select", "Unselect", "Label", "Unlabel", "Show", "Hide", "Style", "Color", "Edit as New Project", "Remove", "Replace", "Copy"};
+  gchar * menu_names[CONTEXTACT] = {i18n("Select"), 
+                                    i18n("Unselect"), 
+                                    i18n("Label"), 
+                                    i18n("Unlabel"), 
+                                    i18n("Show"), 
+                                    i18n("Hide"), 
+                                    i18n("Style"), 
+                                    i18n("Color"), 
+                                    i18n("Edit as New Project"), 
+                                    i18n("Remove"), 
+                                    i18n("Replace"), 
+                                    i18n("Copy")};
   GCallback handlers[CONTEXTACT][3] = {{G_CALLBACK(select_unselect_this_atom), G_CALLBACK(select_unselect_coord), G_CALLBACK(select_unselect_atoms)},
                                        {G_CALLBACK(select_unselect_this_atom), G_CALLBACK(select_unselect_coord), G_CALLBACK(select_unselect_atoms)},
                                        {G_CALLBACK(label_unlabel_this_atom), G_CALLBACK(label_unlabel_coord), G_CALLBACK(label_unlabel_atoms)},
@@ -3738,7 +3768,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
     }
     if (dist.pbc)
     {
-      strp = g_strdup_printf ("<b>%s \t d= %.3f Å (PBC)</b>", str, dist.length);
+      strp = g_strdup_printf ("<b>%s \t d= %.3f Å (%s)</b>", str, dist.length, _("PBC"));
     }
     else
     {
@@ -3756,7 +3786,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
       if (view -> adv_bonding[i])
       {
         j = opengl_project -> atoms[s][ati].coord[2+i] + 1;
-        str = (! i) ? g_strdup_printf ("Fragment N°:\t<b>%d</b>", j) : g_strdup_printf ("Molecule N°:\t<b>%d</b>", j);
+        str = (! i) ? g_strdup_printf (_("Fragment N°:\t<b>%d</b>"), j) : g_strdup_printf (_("Molecule N°:\t<b>%d</b>"), j);
 #ifdef GTK4
         append_opengl_item (view, gmenu, str, "w-dist-fm", 1, 0, NULL, IMG_NONE, NULL, FALSE, NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 #else
@@ -3796,7 +3826,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
     if (opengl_project -> atoms[s][ati].coord[0] > -1)
     {
       i = opengl_project -> atoms[s][ati].coord[0];
-      str = g_strdup_printf ("Total Coordination:  <b>%d</b>", opengl_project -> coord -> geolist[0][selected_aspec][i]);
+      str = g_strdup_printf (_("Total Coordination:  <b>%d</b>"), opengl_project -> coord -> geolist[0][selected_aspec][i]);
 #ifdef GTK4
       append_opengl_item (view, gmenu, str, "w-tc", 1, 0, NULL, IMG_NONE, NULL, FALSE, NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 #else
@@ -3805,8 +3835,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
 #endif
       g_free (str);
       i = opengl_project -> atoms[s][ati].coord[1];
-      str = g_strdup_printf ("Partial Coordination: <b>%s</b>",
-                             env_name (opengl_project, i, selected_aspec, 1, NULL));
+      str = g_strdup_printf (_("Partial Coordination: <b>%s</b>"), env_name (opengl_project, i, selected_aspec, 1, NULL));
 #ifdef GTK4
       append_opengl_item (view, gmenu, str, "w-pc", 1, 0, NULL, IMG_NONE, NULL, FALSE, NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 #else
@@ -3820,7 +3849,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
       if (view -> adv_bonding[i])
       {
         j = opengl_project -> atoms[s][ati].coord[2+i] + 1;
-        str = (! i) ? g_strdup_printf ("Fragment N°:\t<b>%d</b>", j) : g_strdup_printf ("Molecule N°:\t<b>%d</b>", j);
+        str = (! i) ? g_strdup_printf (_("Fragment N°:\t<b>%d</b>"), j) : g_strdup_printf (_("Molecule N°:\t<b>%d</b>"), j);
 #ifdef GTK4
         append_opengl_item (view, gmenu, str, "w-fm", 1, 0, NULL, IMG_NONE, NULL, FALSE, NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 #else
@@ -3879,9 +3908,10 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
     if (go)
     {
 #ifdef GTK4
-      append_submenu (menua, menu_names[j], selection_menu (i, view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2]));
+      append_submenu (menua, _(menu_names[j]), selection_menu (i, view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2]));
 #else
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu(menu_names[j], TRUE, selection_menu (view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2])));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu(_(menu_names[j]), 
+                             TRUE, selection_menu (view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2])));
 #endif
     }
   }
@@ -3989,7 +4019,7 @@ G_MODULE_EXPORT void to_center_this_molecule (GtkWidget * widg, gpointer data)
 {
   glwin * view = (glwin *)data;
   gboolean center = ! get_project_by_id(view -> proj) -> cell.crystal ? TRUE :
-                    ask_yes_no ("Center crystal atom(s)", "Are you sure, this can affect the visual representation of the unit cell ?", GTK_MESSAGE_QUESTION, view -> win);
+                    ask_yes_no (_("Center crystal atom(s)"), _("Are you sure, this can affect the visual representation of the unit cell ?"), GTK_MESSAGE_QUESTION, view -> win);
   if (center) center_this_molecule (view);
 }
 
@@ -4004,7 +4034,7 @@ G_MODULE_EXPORT void to_center_this_molecule (GtkWidget * widg, gpointer data)
 GMenu * tools_section (glwin * view)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Tools", menu_tools(view, 1));
+  append_submenu (menu, _("Tools"), menu_tools(view, 1));
   return menu;
 }
 
@@ -4018,7 +4048,7 @@ GMenu * tools_section (glwin * view)
 GMenu * anim_section (glwin * view)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Animate", menu_anim(view, 1));
+  append_submenu (menu, _("Animate"), menu_anim(view, 1));
   return menu;
 }
 
@@ -4167,9 +4197,9 @@ void popup_main_menu (glwin * view, double ptx, double pty)
   else
   {
     g_menu_append_section (gmenu, NULL, (GMenuModel *)tools_section(view));
-    append_submenu (gmenu, "Insert", add_edition_sub_menu (view, "ins", 0, G_CALLBACK(to_add_object), & view -> colorp[0][0]));
+    append_submenu (gmenu, _("Insert"), add_edition_sub_menu (view, "ins", 0, G_CALLBACK(to_add_object), & view -> colorp[0][0]));
     if (opengl_project -> steps == 1) g_menu_append_section (gmenu, NULL, (GMenuModel *)extract_section(view, 1));
-    append_opengl_item (view, gmenu, "Reset Motion", "res-mot", 1, 0, NULL, IMG_STOCK, MEDIA_LOOP, FALSE, G_CALLBACK(reset_coords), view, FALSE, FALSE, FALSE, TRUE);
+    append_opengl_item (view, gmenu, _("Reset Motion"), "res-mot", 1, 0, NULL, IMG_STOCK, MEDIA_LOOP, FALSE, G_CALLBACK(reset_coords), view, FALSE, FALSE, FALSE, TRUE);
   }
   g_menu_append_section (gmenu, NULL, (GMenuModel*)menu_reset(view, 1));
   g_menu_append_section (gmenu, NULL, (GMenuModel*)menu_fullscreen(view, 1));
@@ -4194,22 +4224,22 @@ void popup_main_menu (glwin * view, double ptx, double pty)
     add_menu_separator (menu);
     if (get_project_by_id(view -> proj) -> nspec)
     {
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Atom(s)", TRUE, menu_atoms (view, 1, 0)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Bond(s)", TRUE, menu_bonds (view, 1, 0)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Clone(s)", TRUE, menu_clones (view, 1)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Atom(s)"), TRUE, menu_atoms (view, 1, 0)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Bond(s)"), TRUE, menu_bonds (view, 1, 0)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Clone(s)"), TRUE, menu_clones (view, 1)));
       gtk_menu_shell_append ((GtkMenuShell *)menu, menu_box_axis (view, 1, 0));
       add_menu_separator (menu);
       gtk_menu_shell_append ((GtkMenuShell *)menu, menu_coord (view, 1));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Polyhedra", TRUE, menu_poly (view, 1)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Rings", view -> rings, menu_rings (view, 1)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Chain(s)", view -> chains, add_menu_coord (view, 1, 9)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Fragment(s)", opengl_project -> coord -> totcoord[2], add_menu_coord (view, 1, 2)));
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Molecule(s)", opengl_project -> coord -> totcoord[3], add_menu_coord (view, 1, 3)));
-      gtk3_menu_item (menu, "Advanced", IMG_NONE, NULL, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Polyhedra"), TRUE, menu_poly (view, 1)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Rings"), view -> rings, menu_rings (view, 1)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Chain(s)"), view -> chains, add_menu_coord (view, 1, 9)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Fragment(s)"), opengl_project -> coord -> totcoord[2], add_menu_coord (view, 1, 2)));
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Molecule(s)"), opengl_project -> coord -> totcoord[3], add_menu_coord (view, 1, 3)));
+      gtk3_menu_item (menu, _("Advanced"), IMG_NONE, NULL, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
       // add_advanced_item (menu, G_CALLBACK(coord_properties), (gpointer)& view -> colorp[30][0], TRUE, GDK_KEY_e, GDK_CONTROL_MASK);
       add_menu_separator (menu);
     }
-    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu ("Tools", TRUE, menu_tools(view, 1)));
+    gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu (_("Tools"), TRUE, menu_tools(view, 1)));
     add_menu_separator (menu);
     menu_items_view (menu, view, 1);
     add_menu_separator (menu);
@@ -4217,37 +4247,37 @@ void popup_main_menu (glwin * view, double ptx, double pty)
   }
   else
   {
-    item = create_menu_item (TRUE, "Tools");
+    item = create_menu_item (TRUE, _("Tools"));
     gtk_menu_item_set_submenu ((GtkMenuItem *)item, menu_tools(view, 1));
     gtk_menu_shell_append ((GtkMenuShell *)menu, item);
     add_menu_separator (menu);
 
-    item = create_menu_item (TRUE, "Insert");
+    item = create_menu_item (TRUE, _("Insert"));
     add_edition_sub_menu (item, G_CALLBACK(to_add_object), & view -> colorp[0][0]);
     gtk_menu_shell_append ((GtkMenuShell *)menu, item);
     add_menu_separator (menu);
 
     if (opengl_project -> steps == 1)
     {
-      gtk3_menu_item (menu, "Extract/Rebuild on Motion", IMG_STOCK, (gpointer)ECUT, G_CALLBACK(turn_rebuild), & view -> colorp[0][0], FALSE, 0, 0, TRUE, FALSE, view -> rebuild[0][0]);
-      gtk3_menu_item (menu, "Extract/Rebuild on Copy", IMG_STOCK, (gpointer)ECUT, G_CALLBACK(turn_rebuild), & view -> colorp[1][0], FALSE, 0, 0, TRUE, FALSE, view -> rebuild[1][0]);
+      gtk3_menu_item (menu, _("Extract/Rebuild on Motion"), IMG_STOCK, (gpointer)ECUT, G_CALLBACK(turn_rebuild), & view -> colorp[0][0], FALSE, 0, 0, TRUE, FALSE, view -> rebuild[0][0]);
+      gtk3_menu_item (menu, _("Extract/Rebuild on Copy"), IMG_STOCK, (gpointer)ECUT, G_CALLBACK(turn_rebuild), & view -> colorp[1][0], FALSE, 0, 0, TRUE, FALSE, view -> rebuild[1][0]);
     }
-    gtk3_menu_item (menu, "Reset Motion", IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(reset_coords), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Reset Motion"), IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(reset_coords), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   }
   add_menu_separator (menu);
-  gtk3_menu_item (menu, "Reset View", IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
-  gtk3_menu_item (menu, "Center Molecule", IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Reset View"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Center Molecule"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   add_menu_separator (menu);
   if (! view -> fullscreen)
   {
-    gtk3_menu_item (menu, "Fullscreen", IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_f, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Fullscreen"), IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_f, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   }
   else
   {
-    gtk3_menu_item (menu, "Exit Fullscreen", IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_Escape, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Exit Fullscreen"), IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_Escape, 0, FALSE, FALSE, FALSE);
   }
   add_menu_separator (menu);
-  gtk3_menu_item (menu, "Shortcuts", IMG_NONE, NULL, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menu, _("Shortcuts"), IMG_NONE, NULL, G_CALLBACK(view_shortcuts), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   pop_menu_at_pointer (menu, NULL);
 #endif
 }

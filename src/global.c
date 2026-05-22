@@ -61,6 +61,14 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 */
 
+#include <libintl.h>
+#include <locale.h>
+#ifdef OSX
+#include <xlocale.h>
+#endif
+#include <glib.h>
+#include <glib/gi18n.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -69,11 +77,14 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
+#define i18n(String) String
+
 #define BILLION  1000000000L;
 
 #ifdef G_OS_WIN32
 gchar * PACKAGE_PREFIX = NULL;
 gchar * PACKAGE_LIBEXEC = NULL;
+gchar * PACKAGE_LOCALE = NULL;
 #endif
 gchar * PACKAGE_LIB_DIR = NULL;
 gchar * PACKAGE_IMP = NULL;
@@ -127,17 +138,17 @@ gchar * PACKAGE_SGTC = NULL;
 gchar * ATOMES_CONFIG_DIR = NULL;
 gchar * ATOMES_CONFIG = NULL;
 gchar * ATOMES_URL = "https://atomes.ipcms.fr";
-gchar * mode_name[2]={"Analysis", "Edition"};
+gchar * mode_name[2] = {i18n("Analysis"), i18n("Edition")};
 gchar * bravais_img[14];
 gchar * ifield[8];
 gchar * projfile = NULL;
-char * ifbug="\nIf this is a bug please report it to:";
+char * ifbug = i18n("\nIf this is a bug please report it to:");
 
-char * rings_type[5] = {"All (No rules)",
-                        "King's",
-                        "Guttman's",
-                        "Primitive",
-                        "Strong"};
+char * rings_type[5] = {i18n("All (No Rule)"),
+                        i18n("King's"),
+                        i18n("Guttman's"),
+                        i18n("Primitive"),
+                        i18n("Strong")};
 
 char * untime[5] = {"fs",
                     "ps",
@@ -600,10 +611,10 @@ double * duplicate_double (int num, double * old_val)
 double string_to_double (gpointer string)
 {
   char * endPtr = NULL;
-  double value = strtod ((char *)string, & endPtr);
+  double value = g_ascii_strtod ((char *)string, & endPtr);
   if (endPtr == (char *)string)
   {
-     g_warning ("Error in string format: string = \"%s\" - value == %lf\n", endPtr, value);
+     g_warning (_("Error in string format: string = \"%s\" - value == %lf\n"), endPtr, value);
   }
   return value;
 }
@@ -632,7 +643,7 @@ double get_calc_time (struct timespec start, struct timespec stop)
 gchar * calculation_time (gboolean modelv, double ctime)
 {
   int i, j, k;
-  gchar * t_string = (modelv) ? "\n \tAnalysis was performed in: ": "";
+  gchar * t_string = (modelv) ? _("\n \tAnalysis was performed in: "): "";
   if (ctime < 60.0)
   {
     return g_strdup_printf ("%s%f s", t_string, ctime);

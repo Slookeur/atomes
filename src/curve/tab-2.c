@@ -345,7 +345,7 @@ G_MODULE_EXPORT void set_data_thickness (GtkEntry * thickd, gpointer data)
   }
   else
   {
-    show_warning ("Line width must be > 0.0", this_curve -> window);
+    show_warning (_("Line width must be > 0.0"), this_curve -> window);
     if (i > 0)
     {
       update_entry_double (thickd, get_extra_layout (data, i-1) -> thickness);
@@ -389,7 +389,7 @@ G_MODULE_EXPORT void set_data_glyph_size (GtkEntry * glsize, gpointer data)
   }
   else
   {
-    show_warning ("Glyph size must be > 0.0", this_curve -> window);
+    show_warning (_("Glyph size must be > 0.0"), this_curve -> window);
     if (i > 0)
     {
       update_entry_double (glsize, get_extra_layout (data, i-1) -> gsize);
@@ -433,7 +433,7 @@ G_MODULE_EXPORT void set_data_hist_width (GtkEntry * entry, gpointer data)
   }
   else
   {
-    show_warning ("Bar width must be > 0.0", this_curve -> window);
+    show_warning (_("Bar width must be > 0.0"), this_curve -> window);
     if (i > 0)
     {
       update_entry_double (entry, get_extra_layout (data, i-1) -> hwidth);
@@ -477,7 +477,7 @@ G_MODULE_EXPORT void set_data_hist_opac (GtkEntry * entry, gpointer data)
   }
   else
   {
-    show_warning ("Bar opacity must &#x2208; [0.0 - 1.0]", this_curve -> window);
+    show_warning (_("Bar opacity must &#x2208; [0.0 - 1.0]"), this_curve -> window);
     if (i > 0)
     {
       update_entry_double (entry, get_extra_layout (data, i-1) -> hopac);
@@ -544,7 +544,7 @@ G_MODULE_EXPORT void set_data_glyph_freq (GtkEntry * glfreq, gpointer data)
   }
   else
   {
-    show_warning ("Glyph frequency must be > 0", this_curve -> window);
+    show_warning (_("Glyph frequency must be > 0"), this_curve -> window);
     if (i > 0)
     {
       update_entry_int (glfreq, get_extra_layout (data, i-1) -> thickness);
@@ -834,7 +834,6 @@ GtkWidget * create_org_list (gpointer data)
   int i;
   GtkTreeViewColumn * orgcol[4];
   GtkCellRenderer * orgcell[4];
-  gchar * col_title[4] = {" ", " ", " ", "Data set(s)"};
   gchar * ctype[4] = {"text", "text", "text", "text"};
   GType col_type[4] = {G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING};
   GtkListStore * orglist = gtk_list_store_newv (4, col_type);
@@ -844,7 +843,7 @@ GtkWidget * create_org_list (gpointer data)
   for (i=0; i<4; i++)
   {
     orgcell[i] = gtk_cell_renderer_text_new();
-    orgcol[i] =  gtk_tree_view_column_new_with_attributes(col_title[i], orgcell[i], ctype[i], i, NULL);
+    orgcol[i] =  gtk_tree_view_column_new_with_attributes((i<3) ? " " : _("Data set(s)"), orgcell[i], ctype[i], i, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(cedit -> orgtree), orgcol[i]);
     if (i < 3)
     {
@@ -910,14 +909,11 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   GtkWidget * dhbox;
   Curve * this_curve = get_curve_from_pointer (data);
   int i;
-  const int naspects = 2;
-  char * aspects[2];
-  aspects[0]="x/y";
-  aspects[1]="bar";
+
   GtkWidget * databox = create_vbox (BSEP);
   cedit -> thesetbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, cedit -> thesetbox, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> thesetbox, markup_label("<b>Select set: </b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> thesetbox, markup_label(_("<b>Select set: </b>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
   cedit -> setcolorbox = create_combo ();
   prepbox (data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> thesetbox, cedit -> setcolorbox, FALSE, FALSE, 10);
@@ -929,14 +925,12 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> pixarea, dhbox, FALSE, FALSE, 0);
 
   cedit -> data_aspect = create_combo ();
-  for ( i=0 ; i < naspects ; i++ )
-  {
-    combo_text_append (cedit -> data_aspect, aspects[i]);
-  }
+  combo_text_append (cedit -> data_aspect, "x/y");
+  combo_text_append (cedit -> data_aspect, _("Bar"));
   combo_set_active (cedit -> data_aspect, this_curve -> layout -> aspect);
   gtk_widget_set_size_request (cedit -> data_aspect, 120, -1);
   g_signal_connect (G_OBJECT(cedit -> data_aspect), "changed", G_CALLBACK(set_data_aspect), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Plot type:"), cedit -> data_aspect, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, _("Plot type:")), cedit -> data_aspect, FALSE, FALSE, 0);
   if (((tint *)data) -> b == MSD)
   {
     widget_set_sensitive (cedit -> data_aspect, 0);
@@ -944,11 +938,11 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
 
 // Data color
   cedit -> data_color = color_button (this_curve -> layout -> datacolor, TRUE, 120, -1, G_CALLBACK(set_data_color), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Data color:"), cedit -> data_color, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, _("Data color:")), cedit -> data_color, FALSE, FALSE, 0);
 
 // Line style
   cedit -> data_dash = create_combo ();
-  combo_text_append (cedit -> data_dash, "No line");
+  combo_text_append (cedit -> data_dash, _("No Line"));
   for ( i=1 ; i < ndash ; i++)
   {
      combo_text_append (cedit -> data_dash, g_strdup_printf("%d", i));
@@ -956,7 +950,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   gtk_widget_set_size_request (cedit -> data_dash, 120, -1);
   combo_set_active (cedit -> data_dash, this_curve -> layout -> dash);
   g_signal_connect (G_OBJECT(cedit -> data_dash), "changed", G_CALLBACK(set_data_dash), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Line style:"), cedit -> data_dash, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, _("Line style:")), cedit -> data_dash, FALSE, FALSE, 0);
 
 // Line line width
   cedit -> data_thickness = create_entry (G_CALLBACK(set_data_thickness), 120, 10, FALSE, data);
@@ -965,7 +959,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   {
     widget_set_sensitive (cedit -> data_thickness, 0);
   }
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, "Line width:"), cedit -> data_thickness, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (dhbox, _("Line width:")), cedit -> data_thickness, FALSE, FALSE, 0);
 
   GtkWidget * data_shape = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, dhbox, data_shape, FALSE, FALSE, 0);
@@ -973,7 +967,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, data_shape, cedit -> Glyph_box, FALSE, FALSE, 0);
 // Glyph type
   cedit -> data_glyph = create_combo ();
-  combo_text_append (cedit -> data_glyph, "No glyph");
+  combo_text_append (cedit -> data_glyph, _("No Glyph"));
   for ( i=1 ; i < nglyph ; i++)
   {
      combo_text_append (cedit -> data_glyph, g_strdup_printf("%d", i));
@@ -981,17 +975,17 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   gtk_widget_set_size_request (cedit -> data_glyph, 120, -1);
   combo_set_active (cedit -> data_glyph, this_curve -> layout -> glyph);
   g_signal_connect (G_OBJECT(cedit -> data_glyph), "changed", G_CALLBACK(set_data_glyph), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, "Glyph type:"), cedit -> data_glyph, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, _("Glyph type:")), cedit -> data_glyph, FALSE, FALSE, 0);
 
 // Glyph size
   cedit -> data_glyph_size = create_entry (G_CALLBACK(set_data_glyph_size), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(cedit -> data_glyph_size), this_curve -> layout -> gsize);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, "Glyph size:"), cedit -> data_glyph_size, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, _("Glyph size:")), cedit -> data_glyph_size, FALSE, FALSE, 0);
 
 // Glyph frequency
   cedit -> data_glyph_freq = create_entry (G_CALLBACK(set_data_glyph_freq), 120, 10, FALSE, data);
   update_entry_int (GTK_ENTRY(cedit -> data_glyph_freq), this_curve -> layout -> gfreq);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, "Glyph freq.:"), cedit -> data_glyph_freq, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Glyph_box, _("Glyph freq.:")), cedit -> data_glyph_freq, FALSE, FALSE, 0);
   if (this_curve -> layout -> glyph == 0)
   {
     widget_set_sensitive (cedit -> data_glyph_size, 0);
@@ -1003,19 +997,19 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   // Histogram width
   cedit -> data_hist_width = create_entry (G_CALLBACK(set_data_hist_width), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(cedit -> data_hist_width), this_curve -> layout -> hwidth);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, "Bar width:"), cedit -> data_hist_width, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, _("Bar width:")), cedit -> data_hist_width, FALSE, FALSE, 0);
   // Histogram opacity
   cedit -> data_hist_opac = create_entry (G_CALLBACK(set_data_hist_opac), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(cedit -> data_hist_opac), this_curve -> layout -> hopac);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, "Color opacity:"), cedit -> data_hist_opac, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, _("Color opacity:")), cedit -> data_hist_opac, FALSE, FALSE, 0);
 
   cedit -> data_hist_pos = create_combo ();
-  combo_text_append (cedit -> data_hist_pos, "Transparent");
-  combo_text_append (cedit -> data_hist_pos, "Plain");
+  combo_text_append (cedit -> data_hist_pos, _("Transparent"));
+  combo_text_append (cedit -> data_hist_pos, _("Plain"));
   gtk_widget_set_size_request (cedit -> data_hist_pos, 120, -1);
   combo_set_active (cedit -> data_hist_pos, this_curve -> layout -> hpos);
   g_signal_connect (G_OBJECT(cedit -> data_hist_pos), "changed", G_CALLBACK(set_data_hist_pos), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, "Bar opacity:"), cedit -> data_hist_pos, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (cedit -> Hist_box, _("Bar opacity:")), cedit -> data_hist_pos, FALSE, FALSE, 0);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   GtkWidget * hbox;
@@ -1024,13 +1018,13 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, hbox, FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                         check_button ("Automatic <i>x axis</i> shift for bar diagram  (to improve visibility)", -1, -1, this_curve -> bshift, G_CALLBACK(set_bshift), data),
+                         check_button (_("Automatic <i>x axis</i> shift for bar diagram (to improve visibility)"), -1, -1, this_curve -> bshift, G_CALLBACK(set_bshift), data),
                          FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   }
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, hbox, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>Layers organization: </b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>Layers organization: </b>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
   GtkWidget * shbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, shbox, FALSE, FALSE, 5);
 
@@ -1040,7 +1034,7 @@ GtkWidget * create_tab_2 (curve_edition * cedit, gpointer data)
   add_container_child (CONTAINER_SCR, cedit -> datascroll, create_org_list(data));
   widget_set_sensitive (cedit -> orgtree, this_curve -> extrac -> extras);
 #ifndef GTK4
-  gchar * str = "\tMove up/down to adjust layer position (up to front, down to back)";
+  gchar * str = _("\tMove up/down to adjust layer position (up to front, down to back)");
   add_box_child_start (GTK_ORIENTATION_VERTICAL, databox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
 #endif
   return databox;

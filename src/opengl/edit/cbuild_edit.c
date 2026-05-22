@@ -99,22 +99,13 @@ extern void get_origin (space_group * spg);
 extern int test_lattice (builder_edition * cbuilder, cell_info * cif_cell);
 extern int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
 
-gchar * crystal_sytems[7] = {"Triclinic", "Monoclinic", "Othorhombic", "Tetragonal", "Trigonal", "Hexagonal", "Cubic"};
-gchar * bravais_keys[7][4] = {{"Primitive", NULL, NULL, NULL},
-                              {"Primitive", "Base-centered", NULL, NULL},
-                              {"Primitive", "Base-centered", "Body-centered", "Face-centered"},
-                              {"Primitive", "Body-centered", NULL, NULL},
-                              {"Hexagonal axes", "Rhombohedral axes", NULL, NULL},
-                              {"Hexagonal", NULL, NULL, NULL},
-                              {"Primitive", "Body-centered", "Face-centered", NULL}};
-
-gchar * latt_info[7]={"<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; &#x2260; &#x3B2; &#x2260; &#x263;",                                                 // Triclinic
-                      "<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° &#x2260; &#x263;\n\tor\n&#x3B1; = &#x263; = 90° &#x2260; &#x3B2;",  // Monoclinic
-                      "<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°",                                                         // Orthorhombic
-                      "<i>a</i> = <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°",                                                                // Tetragonal
-                      "<i>a</i> = <i>b</i> = <i>c</i>\n&#x3B1; = &#x3B2; = &#x3B3; &#x2260; 90°",                                                                // Trigonal R
-                      "<i>a</i> = <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° and &#x263; = 120°",                                                       // Hexagonal
-                      "<i>a</i> = <i>b</i> = <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°"};                                                                      // Cubic
+gchar * latt_info[7]={"<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; &#x2260; &#x3B2; &#x2260; &#x263;",                                                  // Triclinic
+                 i18n("<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° &#x2260; &#x263;\n\tor\n&#x3B1; = &#x263; = 90° &#x2260; &#x3B2;"),  // Monoclinic
+                      "<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°",                                                          // Orthorhombic
+                      "<i>a</i> = <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°",                                                                 // Tetragonal
+                      "<i>a</i> = <i>b</i> = <i>c</i>\n&#x3B1; = &#x3B2; = &#x3B3; &#x2260; 90°",                                                                 // Trigonal R
+                 i18n("<i>a</i> = <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° and &#x263; = 120°"),                                                       // Hexagonal
+                      "<i>a</i> = <i>b</i> = <i>c</i>\n&#x3B1; = &#x3B2; = &#x263; = 90°"};                                                                       // Cubic
 int nsg_bv[7]={2, 13, 59, 68,  25,  27,  36};
 int min_bv[7]={0,  2, 15, 74, 142, 167, 194};
 
@@ -414,13 +405,13 @@ GtkTreeModel * la_combo_tree ()
 {
   GtkTreeIter iter;
   GtkTreeStore *store;
-  gchar * lat[2]={"<b><i>a</i></b>, <b><i>b</i></b>, <b><i>c</i></b>, &#x3B1; &#x3B2; &#x263;", "Vectors"};
+  gchar * lat[2]={"<b><i>a</i></b>, <b><i>b</i></b>, <b><i>c</i></b>, &#x3B1; &#x3B2; &#x263;", i18n("Vectors")};
   int i;
   store = gtk_tree_store_new (1, G_TYPE_STRING);
   for (i=0; i<2; i++)
   {
     gtk_tree_store_append (store, &iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, lat[i], -1);
+    gtk_tree_store_set (store, & iter, 0, (i) ? _(lat[i]) : lat[i], -1);
   }
   return GTK_TREE_MODEL (store);
 }
@@ -753,7 +744,7 @@ G_MODULE_EXPORT void set_so (GtkComboBox * box, gpointer data)
 */
 GtkWidget * sg_info (int sg, gpointer data)
 {
-  gchar * str = g_strdup_printf ("%s group info", groups[sg]);
+  gchar * str = g_strdup_printf (_("%s group info"), groups[sg]);
   GtkWidget * mlab = markup_label(str, -1, -1, 0.5, 0.5);
   GtkWidget * mbut = create_button (NULL, IMG_NONE, NULL, 50, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_sg_info), data);
   add_container_child (CONTAINER_BUT, mbut, mlab);
@@ -859,7 +850,8 @@ void adjust_bv_img (builder_edition * cbuilder)
 void adjust_lattice_constraints (builder_edition * cbuilder)
 {
   if (cbuilder -> ltc_cons) cbuilder -> ltc_cons = destroy_this_widget(cbuilder -> ltc_cons);
-  gchar * str = g_strdup_printf ("<b>%s</b>", latt_info[get_crystal_id (cbuilder -> cell.sp_group -> id)]);
+  int i = get_crystal_id (cbuilder -> cell.sp_group -> id);
+  gchar * str = g_strdup_printf ("<b>%s</b>", (i == 1 || i == 5) ? _(latt_info[i]) : latt_info[i]);
   cbuilder -> ltc_cons = markup_label(str, 150, -1, 0.0, 0.5);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> ltc_box, cbuilder -> ltc_cons, FALSE, FALSE, 5);
@@ -894,7 +886,7 @@ G_MODULE_EXPORT void set_sg (GtkComboBox * box, gpointer data)
     else
     {
       // Error reading file
-      show_error ("Cannot read space group *.sgl file ?!\nPlease check the program library !", 0, cbuilder -> win);
+      show_error (_("Cannot read space group *.sgl file ?!\nPlease check the program library !"), 0, cbuilder -> win);
     }
   }
 }
@@ -945,12 +937,19 @@ G_MODULE_EXPORT void set_bl (GtkComboBox * box, gpointer data)
 */
 GtkWidget * create_bl_combo (int cs, gpointer data)
 {
+  gchar * bravais_keys[7][4] = {{i18n("Primitive "), NULL, NULL, NULL},
+                                {i18n("Primitive "), i18n("Base-centered"), NULL, NULL},
+                                {i18n("Primitive "), i18n("Base-centered"), i18n("Body-centered"), i18n("Face-centered")},
+                                {i18n("Primitive "), i18n("Body-centered"), NULL, NULL},
+                                {i18n("Hexagonal Axes"), i18n("Rhombohedral Axes"), NULL, NULL},
+                                {i18n("Hexagonal"), NULL, NULL, NULL},
+                                {i18n("Primitive"), i18n("Body-centered"), i18n("Face-centered"), NULL}};
   GtkWidget * cbox = create_combo();
   int i;
-  combo_text_append (cbox, "All");
+  combo_text_append (cbox, _("All"));
   for (i=0; i<4; i++)
   {
-    if (bravais_keys[cs][i]) combo_text_append (cbox, bravais_keys[cs][i]);
+    if (bravais_keys[cs][i]) combo_text_append (cbox, _(bravais_keys[cs][i]));
   }
   i = (cs == 0 || cs == 5) ? 0 : 1;
   widget_set_sensitive (cbox, i);
@@ -1196,18 +1195,18 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
   GtkWidget * info = dialogmodal ("Occupancy set-up", GTK_WINDOW(cbuilder -> win));
   GtkWidget * vbox, * hbox;
   vbox = dialog_get_content_area (info);
-  gchar * boccup[5] = {"<b>Random for the initial cell only</b>",
-                       "<b>Random cell by cell</b>",
-                       "<b>Completely random</b>",
-                       "<b>Successively</b>",
-                       "<b>Alternatively</b>"};
-  gchar * occup[5] = {"<i>Sites are filled randomly in the initial cell only,\n"
-                      "   then the initial cell is simply replicated.</i>",
-                      "<i>Sites are filled randomly for each cell, cell by cell separately.</i>",
-                      "<i>Sites are filled randomly for the entire network,\n"
-                      "   the final crystal is considered as a whole.</i>",
-                      "<i>Sites are filled successively: all object(s) A, then all object(s) B ... </i>",
-                      "<i>Sites are filled alternatively: object A, object B, object A ...</i>"};
+  gchar * boccup[5] = {i18n("<b>Random for the initial cell only</b>"),
+                       i18n("<b>Random cell by cell</b>"),
+                       i18n("<b>Completely random</b>"),
+                       i18n("<b>Successively</b>"),
+                       i18n("<b>Alternatively</b>")};
+  gchar * occup[5] = {i18n("<i>Sites are filled randomly in the initial cell only,\n"
+                           "then the initial cell is simply replicated.</i>"),
+                      i18n("<i>Sites are filled randomly for each cell, cell by cell separately.</i>"),
+                      i18n("<i>Sites are filled randomly for the entire network,\n"
+                           "the final crystal is considered as a whole.</i>"),
+                      i18n("<i>Sites are filled successively: all object(s) A, then all object(s) B ... </i>"),
+                      i18n("<i>Sites are filled alternatively: object A, object B, object A ...</i>")};
 
   GtkWidget * occ_but[5];
   int i;
@@ -1218,7 +1217,7 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
     occp[i].b = i;
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 #ifdef GTK4
-    occ_but[i] = check_button (boccup[i], -1, 25, FALSE, G_CALLBACK(toggle_occ), & occp[i]);
+    occ_but[i] = check_button (_(boccup[i]), -1, 25, FALSE, G_CALLBACK(toggle_occ), & occp[i]);
     if (i)
     {
       gtk_check_button_set_group ((GtkCheckButton *)occ_but[i], (GtkCheckButton *)occ_but[0]);
@@ -1226,12 +1225,12 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
 #else
     if (! i)
     {
-      occ_but[i] = radio_button (boccup[i], -1, 25, FALSE, G_CALLBACK(toggle_occ), & occp[i]);
+      occ_but[i] = radio_button (_(boccup[i]), -1, 25, FALSE, G_CALLBACK(toggle_occ), & occp[i]);
     }
     else
     {
       occ_but[i] = gtk_radio_button_new_from_widget (GTK_RADIO_BUTTON(occ_but[0]));
-      add_container_child (CONTAINER_BUT, occ_but[i], markup_label(boccup[i], -1, 25, 0.0, 0.5));
+      add_container_child (CONTAINER_BUT, occ_but[i], markup_label(_(boccup[i]), -1, 25, 0.0, 0.5));
     }
 #endif
     if (i) g_signal_connect (G_OBJECT(occ_but[i]), "toggled", G_CALLBACK(toggle_occ), & occp[i]);
@@ -1241,35 +1240,35 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, occ_but[i], FALSE, FALSE, 5);
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (occup[i], 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(occup[i]), 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
   }
   i = cbuilder -> occupancy;
   button_set_status (occ_but[i], TRUE);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("<b>Allow overlapping</b>", -1, 25, cbuilder -> overlapping, G_CALLBACK(toggle_overlap), (gpointer)cbuilder), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (_("<b>Allow overlapping</b>"), -1, 25, cbuilder -> overlapping, G_CALLBACK(toggle_overlap), (gpointer)cbuilder), FALSE, FALSE, 0);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  gchar * overlap = "<i>Instead of ensuring that sites are filled by a single object,\n"
-                    "this allows object(s) to share the same crystalline position. \n"
-                    "The option above describes how filled and empty positions alternate.</i>\n";
+  gchar * overlap = _("<i>Instead of ensuring that sites are filled by a single object,\n"
+                      "this allows object(s) to share the same crystalline position. \n"
+                      "The option above describes how filled and empty positions alternate.</i>\n");
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (overlap, 200, -1, 0.5, 0.5), FALSE, FALSE, 50);
 
   // Rounding occupancy here
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Occupancy rounding:</b>", 200, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("<b>Occupancy rounding:</b>"), 200, -1, 0.5, 0.5), FALSE, FALSE, 0);
   GtkWidget * rounding = create_combo ();
   gtk_widget_set_size_request (rounding, -1, 30);
-  for (i=0; i<3; i++) combo_text_append (rounding, cif_occupancies[i]);
+  for (i=0; i<3; i++) combo_text_append (rounding, _(cif_occupancies[i]));
   combo_set_active (rounding, cbuilder -> rounding);
   g_signal_connect(G_OBJECT(rounding), "changed", G_CALLBACK(on_rounding_changed), & cbuilder);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, rounding, FALSE, FALSE, 10);
-  gchar * str = g_strdup_printf ("\t<b>Lowest integer: </b>\n"
-                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.75⌋ = 8\n"
-                                 "\t<b>Highest integer: </b>\n"
-                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n"
-                                 "\t<b>Nearest integer: </b>\n"
-                                 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n"
-                                 "\n\t\t%s\n", cif_occ[0], cif_occ[1], cif_occ[2], cif_sites[0]);
+  gchar * str = g_strdup_printf (_("\t<b>Lowest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.75⌋ = 8\n"
+                                   "\t<b>Highest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌈5.39⌉ = 6\n"
+                                   "\t<b>Nearest integer: </b>\n"
+                                   "\t\t Occupancy %s\n\t\t\t ex:\t ⌊6.82⌉ = 7\t\t and\t ⌊4.31⌉ = 4\n"
+                                   "\n\t\t%s\n"), _(cif_occ[0]), _(cif_occ[1]), _(cif_occ[2]), _(cif_sites[0]));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label (str, 450, -1, 0.5, 0.5), FALSE, FALSE, 5);
   g_free (str);
 
@@ -1288,7 +1287,8 @@ G_MODULE_EXPORT void adjust_occupancy (GtkButton * but, gpointer data)
 GtkWidget * builder_win (project * this_proj, gpointer data)
 {
   int  i, j;
-  gchar * str = (! this_proj -> natomes) ? g_strdup_printf ("Crystal builder - %s", this_proj -> name) : g_strdup_printf ("Crystal builder");
+  gchar * crystal_systems[7] = {i18n("Triclinic"), i18n("Monoclinic"), i18n("Othorhombic"), i18n("Tetragonal"), i18n("Trigonal"), i18n("Hexagonal"), i18n("Cubic")};
+  gchar * str = (! this_proj -> natomes) ? g_strdup_printf (_("Crystal builder - %s"), this_proj -> name) : g_strdup_printf (_("Crystal builder"));
   builder_edition * cbuilder = this_proj -> modelgl -> builder_win;
   GtkWidget * win = create_win (str, this_proj -> modelgl -> win, FALSE, FALSE);
   g_free (str);
@@ -1306,10 +1306,10 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   // Crystal system
   GtkWidget * hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cbuilder -> bv_box[0], hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Crystal system:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Crystal system:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   cbuilder -> cs_combo = create_combo();
 
-  for (i=0; i<7;i++) combo_text_append (cbuilder -> cs_combo, crystal_sytems[i]);
+  for (i=0; i<7;i++) combo_text_append (cbuilder -> cs_combo, _(crystal_systems[i]));
   combo_set_active (cbuilder -> cs_combo, 0);
   gtk_widget_set_size_request (cbuilder -> cs_combo, 150, 25);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> cs_combo, FALSE, FALSE, 0);
@@ -1318,13 +1318,14 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   // Bravais lattice
   cbuilder -> bl_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, cbuilder -> bv_box[0], cbuilder -> bl_box, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> bl_box, markup_label("Bravais lattice:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> bl_box, markup_label(_("Bravais lattice:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   cbuilder -> bl_combo = create_bl_combo (0, (gpointer)cbuilder);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> bl_box, cbuilder -> bl_combo, FALSE, FALSE, 0);
 
   cbuilder -> ltc_box = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> ltc_box, markup_label("Lattice constraints: ", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
-  str = g_strdup_printf ("<b>%s</b>", latt_info[get_crystal_id (1)]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> ltc_box, markup_label(_("Lattice constraints: "), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  i = get_crystal_id (1);
+  str = g_strdup_printf ("<b>%s</b>", (i == 1 || i == 5) ? _(latt_info[i]) : latt_info[i]);
   cbuilder -> ltc_cons = markup_label(str, 150, -1, 0.0, 0.5);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> ltc_box, cbuilder -> ltc_cons, FALSE, FALSE, 5);
@@ -1336,7 +1337,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   // Space group
   cbuilder -> sg_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cbuilder -> sg_box, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> sg_box, markup_label("Space group:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> sg_box, markup_label(_("Space group:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   GtkTreeModel * model = sg_combo_tree (0, 0);
   cbuilder -> sg_combo = gtk_combo_box_new_with_model (model);
   g_object_unref (model);
@@ -1351,7 +1352,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   // Space group option
   cbuilder -> so_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cbuilder -> so_box, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> so_box, markup_label("Settings:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cbuilder -> so_box, markup_label(_("Settings:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   model = so_combo_tree (cbuilder -> cell.sp_group);
   cbuilder -> so_combo = gtk_combo_box_new_with_model (model);
   g_object_unref (model);
@@ -1379,7 +1380,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
   // Lattice parameters
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Lattice parameters:", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Lattice parameters:"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   cbuilder -> lattice_box = create_vbox (BSEP);
   GtkTreeModel * lmodel = la_combo_tree ();
   cbuilder -> la_combo = gtk_combo_box_new_with_model (lmodel);
@@ -1398,7 +1399,7 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
 
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Cell(s):", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Cell(s):"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   hbox = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   GtkWidget * ax_cell[3];
@@ -1411,26 +1412,26 @@ GtkWidget * builder_win (project * this_proj, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ax_cell[i], FALSE, FALSE, 0);
   }
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (" Wrap all atoms in the unit cell after building", -1, -1, FALSE, G_CALLBACK(set_wr), (gpointer)cbuilder), FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (" Show/Hide clones after building", -1, -1, FALSE, G_CALLBACK(set_shc), (gpointer)cbuilder), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (_(" Wrap all atoms in the unit cell after building"), -1, -1, FALSE, G_CALLBACK(set_wr), (gpointer)cbuilder), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (_(" Show/Hide clones after building"), -1, -1, FALSE, G_CALLBACK(set_shc), (gpointer)cbuilder), FALSE, FALSE, 0);
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
   this_proj -> modelgl -> search_widg[7] = allocate_atom_search (this_proj -> id, INSERT, 7, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Add object(s):", 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Add object(s):"), 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   cbuilder -> add_combo = create_action_combo (5, this_proj);
   gtk_widget_set_size_request (cbuilder -> add_combo, 110, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cbuilder -> add_combo, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Occupancy", IMG_STOCK, DPROPERTIES, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(adjust_occupancy), this_proj), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button (_("Occupancy"), IMG_STOCK, DPROPERTIES, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(adjust_occupancy), this_proj), FALSE, FALSE, 5);
 
   GtkWidget * cbscroll = create_scroll (vbox, 400, 200, GTK_SHADOW_NONE);
   add_container_child (CONTAINER_SCR, cbscroll, create_atoms_tree (this_proj -> modelgl -> search_widg[7], this_proj, 0));
 
   hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, FALSE, 5);
-  cbuilder -> pbut = create_button ((this_proj -> natomes) ? "Build (new project)" : "Build", IMG_STOCK, APPLY, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(apply_build), GINT_TO_POINTER(this_proj -> id));
+  cbuilder -> pbut = create_button ((this_proj -> natomes) ? _("Build (new project)") : _("Build"), IMG_STOCK, APPLY, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(apply_build), GINT_TO_POINTER(this_proj -> id));
   add_box_child_end (hbox, cbuilder -> pbut, FALSE, FALSE, 5);
-  GtkWidget * but = create_button ("Close", IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_build), GINT_TO_POINTER(this_proj -> id));
+  GtkWidget * but = create_button (_("Close"), IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_build), GINT_TO_POINTER(this_proj -> id));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 5);
   add_gtk_close_event (win, G_CALLBACK(delete_build), GINT_TO_POINTER(this_proj -> id));
 

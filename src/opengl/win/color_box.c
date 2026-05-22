@@ -363,7 +363,7 @@ GtkWidget * color_box (glwin * view, int ideo, int spec, int geo)
 #endif
   }
 #ifdef GTK3
-  but = create_menu_item (FALSE, "More colors ...");
+  but = create_menu_item (FALSE, _("More Colors ..."));
   gtk_menu_shell_append ((GtkMenuShell *)coltable, but);
   if (ideo < -2)
   {

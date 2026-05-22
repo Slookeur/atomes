@@ -1822,7 +1822,7 @@ G_MODULE_EXPORT void on_realize (GtkWidget * widg, gpointer data)
   }
   else
   {
-    gchar * errm = g_strdup_printf ("Impossible to initialize the OpenGL 3D rendering ! \n %s\n", err -> message);
+    gchar * errm = g_strdup_printf (_("Impossible to initialize the OpenGL 3D rendering ! \n %s\n"), err -> message);
     g_error_free (err);
     show_error (errm, 0, MainWindow);
     g_free (errm);

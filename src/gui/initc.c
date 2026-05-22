@@ -96,10 +96,10 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
 /*    if (adv)
     {
       // bar[run]
-      mess = g_strdup_printf ("Please wait calculation in progress");
+      mess = g_strdup_printf (_("Please wait calculation in progress"));
       pop = show_popup (mess, widg);
       g_free (mess);
-      mess = g_strdup_printf ("Computing");
+      mess = g_strdup_printf (_("Computing"));
       //statusval = gtk_statusbar_push (statusbar, run, mess);
       g_free (mess);
       show_the_widgets (pop);
@@ -236,48 +236,48 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   comp_list[1] = GDK;
   this_proj -> analysis[GDR] = setup_analysis (pid, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
   // g(r) FFT  - same compatibility list
-  this_proj -> analysis[GDK] = setup_analysis (pid, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  this_proj -> analysis[GDK] = setup_analysis (pid, _("g(r)/G(r) from FFT[S(q)]"), GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
 
   // s(q)
   comp_list[0] = SQD;
   comp_list[1] = SKD;
-  this_proj -> analysis[SQD] = setup_analysis (pid, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+  this_proj -> analysis[SQD] = setup_analysis (pid, _("S(q) from FFT[g(r)]"), SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
   // s(k) - same compatibility list
-  this_proj -> analysis[SKD] = setup_analysis (pid, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+  this_proj -> analysis[SKD] = setup_analysis (pid, _("S(q) from Debye Equation"), SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
 
   g_free (comp_list);
 
   comp_list = allocint (1);
   // Bond length  distribution(s)
   comp_list[0] = BND;
-  this_proj -> analysis[BND] = setup_analysis (pid, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
+  this_proj -> analysis[BND] = setup_analysis (pid, _("Bond Properties"), BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
 
   // Angle distribution(s)
   comp_list[0] = ANG;
-  this_proj -> analysis[ANG] = setup_analysis (pid, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+  this_proj -> analysis[ANG] = setup_analysis (pid, _("Angle Distributions"), ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
 
   // Ring statistic(s)
   comp_list[0] = RIN;
-  this_proj -> analysis[RIN] = setup_analysis (pid, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size <i>n</i> of the ring [total number of nodes]");
+  this_proj -> analysis[RIN] = setup_analysis (pid, _("Ring Statistics"), RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, _("Size <i>n</i> of the ring [total number of nodes]"));
 
   // Chain statistic(s)
   comp_list[0] = CHA;
-  this_proj -> analysis[CHA] = setup_analysis (pid, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size <i>n</i> of the chain [total number of nodes]");
+  this_proj -> analysis[CHA] = setup_analysis (pid, _("Chain Statistics"), CHA, FALSE, TRUE, i+1, 1, comp_list, _("Size <i>n</i> of the chain [total number of nodes]"));
 
   // Spherical harmonic(s)
   comp_list[0] = SPH;
-  this_proj -> analysis[SPH] = setup_analysis (pid, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
+  this_proj -> analysis[SPH] = setup_analysis (pid, _("Spherical Harmonics"), SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
 
   if (this_proj -> steps > 1)
   {
     // Mean square displacement
     comp_list[0] = MSD;
-    this_proj -> analysis[MSD] = setup_analysis (pid, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+    this_proj -> analysis[MSD] = setup_analysis (pid, _("Mean Squared Displacement"), MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
 
     // Dynamic structure factor
     // Number of graphs depends on the number of correlation states, not appearing here
     comp_list[0] = SKT;
-    this_proj -> analysis[SKT] = setup_analysis (pid, "Dynamic structure factor", SKT, TRUE, TRUE, 0, 1, comp_list, NULL);
+    this_proj -> analysis[SKT] = setup_analysis (pid, _("Dynamic Structure Factor"), SKT, TRUE, TRUE, 0, 1, comp_list, NULL);
   }
 
   g_free (comp_list);
@@ -315,63 +315,63 @@ void initialize_this_analysis (project * this_proj, int ana)
       comp_list = allocint (2);
       comp_list[0] = SQD;
       comp_list[1] = SKD;
-      this_proj -> analysis[SQD] = setup_analysis (this_proj -> id, "S(q) from FFT[g(r)]", SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+      this_proj -> analysis[SQD] = setup_analysis (this_proj -> id, _("S(q) from FFT[g(r)]"), SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
       break;
     case SKD:
       // S(k)
       comp_list = allocint (2);
       comp_list[0] = SQD;
       comp_list[1] = SKD;
-      this_proj -> analysis[SKD] = setup_analysis (this_proj -> id, "S(q) from Debye equation", SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+      this_proj -> analysis[SKD] = setup_analysis (this_proj -> id, _("S(q) from Debye Equation"), SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
       break;
     case GDK:
       // g(r) FFT S(q)
       comp_list = allocint (2);
       comp_list[0] = GDR;
       comp_list[1] = GDK;
-      this_proj -> analysis[GDK] = setup_analysis (this_proj -> id, "g(r)/G(r) from FFT[S(q)]", GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+      this_proj -> analysis[GDK] = setup_analysis (this_proj -> id, _("g(r)/G(r) from FFT[S(q)]"), GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
       break;
     case BND:
       // Bond length  distribution(s)
       comp_list = allocint (1);
       comp_list[0] = BND;
-      this_proj -> analysis[BND] = setup_analysis (this_proj -> id, "Bonds properties", BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
+      this_proj -> analysis[BND] = setup_analysis (this_proj -> id, _("Bond Properties"), BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
       break;
     case ANG:
       // Angle distribution(s)
       comp_list = allocint (1);
       comp_list[0] = ANG;
-      this_proj -> analysis[ANG] = setup_analysis (this_proj -> id, "Angle distributions", ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+      this_proj -> analysis[ANG] = setup_analysis (this_proj -> id, _("Angle Distributions"), ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
       break;
     case RIN:
       // Ring statistics
       comp_list = allocint (1);
       comp_list[0] = RIN;
-      this_proj -> analysis[RIN] = setup_analysis (this_proj -> id, "Ring statistics", RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, "Size <i>n</i> of the ring [total number of nodes]");
+      this_proj -> analysis[RIN] = setup_analysis (this_proj -> id, _("Ring Statistics"), RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, _("Size <i>n</i> of the ring [total number of nodes]"));
       break;
     case CHA:
       // Chain statistics
       comp_list = allocint (1);
       comp_list[0] = CHA;
-      this_proj -> analysis[CHA] = setup_analysis (this_proj -> id, "Chain statistics", CHA, FALSE, TRUE, i+1, 1, comp_list, "Size <i>n</i> of the chain [total number of nodes]");
+      this_proj -> analysis[CHA] = setup_analysis (this_proj -> id, _("Chain Statistics"), CHA, FALSE, TRUE, i+1, 1, comp_list, _("Size <i>n</i> of the chain [total number of nodes]"));
       break;
     case SPH:
       // Spherical harmonics as order parameters
       comp_list = allocint (1);
       comp_list[0] = SPH;
-      this_proj -> analysis[SPH] = setup_analysis (this_proj -> id, "Spherical harmonics", SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
+      this_proj -> analysis[SPH] = setup_analysis (this_proj -> id, _("Spherical Harmonics"), SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
       break;
     case MSD:
       // Mean square displacement
       comp_list = allocint (1);
       comp_list[0] = MSD;
-      if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (this_proj -> id, "Mean Squared Displacement", MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+      if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (this_proj -> id, _("Mean Squared Displacement"), MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
       break;
     case SKT:
       comp_list = allocint (1);
       comp_list[0] = SKT;
       // Total number of graphs depends on the number of correlation states, not appearing here
-      if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, "Dynamic structure factor", SKT, TRUE, TRUE, 0, 2, comp_list, NULL);
+      if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, _("Dynamic Structure Factor"), SKT, TRUE, TRUE, 0, 2, comp_list, NULL);
       break;
   }
   g_free (comp_list);

@@ -57,8 +57,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include "atom_edit.h"
 
 float limit[2] = {100.0, 180.0};
-gchar * action_name[5] = {"Move", "Replace", "Remove", "Insert", "Random move"};
-gchar * action_atoms[3] = {"All non-selected atoms", "All selected atoms", "All atoms"};
+gchar * action_name[5] = {i18n("Move"), i18n("Replace"), i18n("Remove"), i18n("Insert"), i18n("Random Move")};
+gchar * action_atoms[3] = {i18n("All Non-selected Atoms"), i18n("All Selected Atoms"), i18n("All Atoms")};
 gboolean was_moved;
 
 /*!
@@ -203,10 +203,10 @@ G_MODULE_EXPORT void close_edit (GtkButton * but, gpointer data)
 {
   int id = GPOINTER_TO_INT(data);
   project * this_proj = get_project_by_id(id);
-  gboolean leave = (this_proj -> modelgl -> was_moved) ? ask_yes_no("Leaving without saving ?",
-                                                                    "To preserve atom(s) displacement(s) press the 'Apply' button\n"
-                                                                    "Otherwise initial atom positions will be restored ...\n"
-                                                                    "\t\t\t Are you sure to leave ?" ,
+  gboolean leave = (this_proj -> modelgl -> was_moved) ? ask_yes_no(_("Leaving without saving ?"),
+                                                                    _("To preserve atom(s) displacement(s) press the 'Apply' button\n"
+                                                                      "Otherwise initial atom positions will be restored ...\n"
+                                                                      "\t\t\t Are you sure to leave ?") ,
                                                                     GTK_MESSAGE_QUESTION, this_proj -> modelgl -> atom_win -> win) : TRUE;
   if (leave && this_proj -> modelgl -> atom_win)
   {
@@ -279,7 +279,7 @@ G_MODULE_EXPORT void set_reset_transformation (GtkToggleButton * but, gpointer d
   {
     tint * id = (tint *)data;
     project * this_proj = get_project_by_id (id -> a);
-    if (ask_yes_no("Reset", "Reset and get back to initial coordinates ?\n This will affect all atoms !",
+    if (ask_yes_no(_("Reset"), _("Reset and get back to initial coordinates ?\n This will affect all atoms !"),
                     GTK_MESSAGE_WARNING, this_proj -> modelgl -> atom_win -> win))
     {
       int h, i, j;
@@ -364,7 +364,7 @@ GtkWidget * create_atom_notebook (project * this_proj, GtkWidget * vbox)
   int i;
   for (i=0; i<5; i++)
   {
-    str = g_strdup_printf ("<b>%s</b>", action_name[i]);
+    str = g_strdup_printf ("<b>%s</b>", _(action_name[i]));
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), action_tab(i, this_proj), markup_label(str, -1, -1, 0.0, 0.5));
     g_free (str);
   }
@@ -411,7 +411,7 @@ atom_search * allocate_atom_search (int proj, int action, int searchid, int tsiz
 */
 GtkWidget * create_edition_window (project * this_proj)
 {
-  gchar * str = g_strdup_printf ("Model edition - %s", this_proj -> name);
+  gchar * str = g_strdup_printf (_("Model edition - %s"), this_proj -> name);
   this_proj -> modelgl -> was_moved = FALSE;
   GtkWidget * win = create_win (str, this_proj -> modelgl -> win, FALSE, FALSE);
   g_free (str);
@@ -435,9 +435,9 @@ GtkWidget * create_edition_window (project * this_proj)
   this_proj -> modelgl -> atom_win -> notebook = create_atom_notebook (this_proj, this_proj -> modelgl -> atom_win -> vbox);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_end (this_proj -> modelgl -> atom_win -> vbox, hbox, TRUE, FALSE, 0);
-  GtkWidget * but = create_button ("Apply", IMG_STOCK, APPLY, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(apply_edit), GINT_TO_POINTER(this_proj -> id));
+  GtkWidget * but = create_button (_("Apply"), IMG_STOCK, APPLY, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(apply_edit), GINT_TO_POINTER(this_proj -> id));
   add_box_child_end (hbox, but, FALSE, FALSE, 5);
-  but = create_button ("Close", IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_edit), GINT_TO_POINTER(this_proj -> id));
+  but = create_button (_("Close"), IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_edit), GINT_TO_POINTER(this_proj -> id));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 5);
   return win;
 }

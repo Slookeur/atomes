@@ -69,129 +69,129 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #include <libxml/xmlreader.h>
 
 element_data periodic_table_info[] = {
-  {"X", "Unknown", 0, 0},
-  {"H", "Hydrogen", 1, 1.008},
-  {"He", "Helium", 2, 4.003},
-  {"Li", "Lithium", 3, 6.94},
-  {"Be", "Beryllium", 4, 9.012},
-  {"B", "Boron", 5, 10.81},
-  {"C", "Carbon", 6, 12.011},
-  {"N", "Nitrogen", 7, 14.007},
-  {"O", "Oxygen", 8, 15.999},
-  {"F", "Fluorine", 9, 18.998},
-  {"Ne", "Neon", 10, 20.18},
-  {"Na", "Sodium", 11, 22.99},
-  {"Mg", "Magnesium", 12, 24.305},
-  {"Al", "Aluminium", 13, 26.982},
-  {"Si", "Silicon", 14, 28.085},
-  {"P", "Phosphorus", 15, 30.974},
-  {"S", "Sulfur", 16, 32.06},
-  {"Cl", "Chlorine", 17, 35.45},
-  {"Ar", "Argon", 18, 39.948},
-  {"K", "Potassium", 19, 39.098},
-  {"Ca", "Calcium", 20, 40.078},
-  {"Sc", "Scandium", 21, 44.956},
-  {"Ti", "Titanium", 22, 47.867},
-  {"V", "Vanadium", 23, 50.942},
-  {"Cr", "Chromium", 24, 51.996},
-  {"Mn", "Manganese", 25, 54.938},
-  {"Fe", "Iron", 26, 55.845},
-  {"Co", "Cobalt", 27, 58.933},
-  {"Ni", "Nickel", 28, 58.693},
-  {"Cu", "Copper", 29, 63.546},
-  {"Zn", "Zinc", 30, 65.38},
-  {"Ga", "Gallium", 31, 69.723},
-  {"Ge", "Germanium", 32, 72.63},
-  {"As", "Arsenic", 33, 74.922},
-  {"Se", "Selenium", 34, 78.971},
-  {"Br", "Bromine", 35, 79.904},
-  {"Kr", "Krypton", 36, 83.798},
-  {"Rb", "Rubidium", 37, 85.468},
-  {"Sr", "Strontium", 38, 87.62},
-  {"Y", "Yttrium", 39, 88.906},
-  {"Zr", "Zirconium", 40, 91.224},
-  {"Nb", "Niobium", 41, 92.906},
-  {"Mo", "Molybdenum", 42, 95.95},
-  {"Tc", "Technetium", 43, 98},
-  {"Ru", "Ruthenium", 44, 101.07},
-  {"Rh", "Rhodium", 45, 102.906},
-  {"Pd", "Palladium", 46, 106.42},
-  {"Ag", "Silver", 47, 107.868},
-  {"Cd", "Cadmium", 48, 112.414},
-  {"In", "Indium", 49, 114.818},
-  {"Sn", "Tin", 50, 118.71},
-  {"Sb", "Antimony", 51, 121.76},
-  {"Te", "Tellurium", 52, 127.6},
-  {"I", "Iodine", 53, 126.904},
-  {"Xe", "Xenon", 54, 131.293},
-  {"Cs", "Caesium", 55, 132.905},
-  {"Ba", "Barium", 56, 137.327},
-  {"La", "Lanthanum", 57, 138.905},
-  {"Ce", "Cerium", 58, 140.116},
-  {"Pr", "Praseodymium", 59, 140.908},
-  {"Nd", "Neodymium", 60, 144.242},
-  {"Pm", "Promethium", 61, 145},
-  {"Sm", "Samarium", 62, 150.36},
-  {"Eu", "Europium", 63, 151.964},
-  {"Gd", "Gadolinium", 64, 157.25},
-  {"Tb", "Terbium", 65, 158.925},
-  {"Dy", "Dysprosium", 66, 162.5},
-  {"Ho", "Holmium", 67, 164.93},
-  {"Er", "Erbium", 68, 167.259},
-  {"Tm", "Thulium", 69, 168.934},
-  {"Yb", "Ytterbium", 70, 173.045},
-  {"Lu", "Lutetium", 71, 174.967},
-  {"Hf", "Hafnium", 72, 178.49},
-  {"Ta", "Tantalum", 73, 180.948},
-  {"W", "Tungsten", 74, 183.84},
-  {"Re", "Rhenium", 75, 186.207},
-  {"Os", "Osmium", 76, 190.23},
-  {"Ir", "Iridium", 77, 192.217},
-  {"Pt", "Platinum", 78, 195.084},
-  {"Au", "Gold", 79, 196.967},
-  {"Hg", "Mercury", 80, 200.592},
-  {"Tl", "Thallium", 81, 204.38},
-  {"Pb", "Lead", 82, 207.2},
-  {"Bi", "Bismuth", 83, 208.98},
-  {"Po", "Polonium", 84, 209},
-  {"At", "Astatine", 85, 210},
-  {"Rn", "Radon", 86, 222},
-  {"Fr", "Francium", 87, 223},
-  {"Ra", "Radium", 88, 226},
-  {"Ac", "Actinium", 89, 227},
-  {"Th", "Thorium", 90, 232.038},
-  {"Pa", "Protactinium", 91, 231.036},
-  {"U", "Uranium", 92, 238.029},
-  {"Np", "Neptunium", 93, 237},
-  {"Pu", "Plutonium", 94, 244},
-  {"Am", "Americium", 95, 243},
-  {"Cm", "Curium", 96, 247},
-  {"Bk", "Berkelium", 97, 247},
-  {"Cf", "Californium", 98, 251},
-  {"Es", "Einsteinium", 99, 252},
-  {"Fm", "Fermium", 100, 257},
-  {"Md", "Mendelevium", 101, 258},
-  {"No", "Nobelium", 102, 258},
-  {"Lr", "Lawrencium", 103, 262},
-  {"Rf", "Rutherfordium", 104, 267},
-  {"Db", "Dubnium", 105, 268},
-  {"Sg", "Seaborgium", 106, 269},
-  {"Bh", "Bohrium", 107, 270},
-  {"Hs", "Hassium", 108, 277},
-  {"Mt", "Meitnerium", 109, 278},
-  {"Ds", "Darmstadtium", 110, 281},
-  {"Rg", "Roentgenium", 111, 282},
-  {"Cn", "Copernicium", 112, 285},
-  {"Nh", "Nihonium", 113, 286},
-  {"Fl", "Flerovium", 114, 289},
-  {"Mc", "Moscovium", 115, 289},
-  {"Lv", "Livermorium", 116, 293},
-  {"Ts", "Tennessine", 117, 294},
-  {"Og", "Oganesson", 118, 294},
-  {"D", "Deuterium", 1, 2.014000}};
+  {"X",  i18n("Unknown"), 0, 0},
+  {"H",  i18n("Hydrogen"), 1, 1.008},
+  {"He", i18n("Helium"), 2, 4.003},
+  {"Li", i18n("Lithium"), 3, 6.94},
+  {"Be", i18n("Beryllium"), 4, 9.012},
+  {"B",  i18n("Boron"), 5, 10.81},
+  {"C",  i18n("Carbon"), 6, 12.011},
+  {"N",  i18n("Nitrogen"), 7, 14.007},
+  {"O",  i18n("Oxygen"), 8, 15.999},
+  {"F",  i18n("Fluorine"), 9, 18.998},
+  {"Ne", i18n("Neon"), 10, 20.18},
+  {"Na", i18n("Sodium"), 11, 22.99},
+  {"Mg", i18n("Magnesium"), 12, 24.305},
+  {"Al", i18n("Aluminium"), 13, 26.982},
+  {"Si", i18n("Silicon"), 14, 28.085},
+  {"P",  i18n("Phosphorus"), 15, 30.974},
+  {"S",  i18n("Sulfur"), 16, 32.06},
+  {"Cl", i18n("Chlorine"), 17, 35.45},
+  {"Ar", i18n("Argon"), 18, 39.948},
+  {"K",  i18n("Potassium"), 19, 39.098},
+  {"Ca", i18n("Calcium"), 20, 40.078},
+  {"Sc", i18n("Scandium"), 21, 44.956},
+  {"Ti", i18n("Titanium"), 22, 47.867},
+  {"V",  i18n("Vanadium"), 23, 50.942},
+  {"Cr", i18n("Chromium"), 24, 51.996},
+  {"Mn", i18n("Manganese"), 25, 54.938},
+  {"Fe", i18n("Iron"), 26, 55.845},
+  {"Co", i18n("Cobalt"), 27, 58.933},
+  {"Ni", i18n("Nickel"), 28, 58.693},
+  {"Cu", i18n("Copper"), 29, 63.546},
+  {"Zn", i18n("Zinc"), 30, 65.38},
+  {"Ga", i18n("Gallium"), 31, 69.723},
+  {"Ge", i18n("Germanium"), 32, 72.63},
+  {"As", i18n("Arsenic"), 33, 74.922},
+  {"Se", i18n("Selenium"), 34, 78.971},
+  {"Br", i18n("Bromine"), 35, 79.904},
+  {"Kr", i18n("Krypton"), 36, 83.798},
+  {"Rb", i18n("Rubidium"), 37, 85.468},
+  {"Sr", i18n("Strontium"), 38, 87.62},
+  {"Y",  i18n("Yttrium"), 39, 88.906},
+  {"Zr", i18n("Zirconium"), 40, 91.224},
+  {"Nb", i18n("Niobium"), 41, 92.906},
+  {"Mo", i18n("Molybdenum"), 42, 95.95},
+  {"Tc", i18n("Technetium"), 43, 98},
+  {"Ru", i18n("Ruthenium"), 44, 101.07},
+  {"Rh", i18n("Rhodium"), 45, 102.906},
+  {"Pd", i18n("Palladium"), 46, 106.42},
+  {"Ag", i18n("Silver"), 47, 107.868},
+  {"Cd", i18n("Cadmium"), 48, 112.414},
+  {"In", i18n("Indium"), 49, 114.818},
+  {"Sn", i18n("Tin"), 50, 118.71},
+  {"Sb", i18n("Antimony"), 51, 121.76},
+  {"Te", i18n("Tellurium"), 52, 127.6},
+  {"I",  i18n("Iodine"), 53, 126.904},
+  {"Xe", i18n("Xenon"), 54, 131.293},
+  {"Cs", i18n("Caesium"), 55, 132.905},
+  {"Ba", i18n("Barium"), 56, 137.327},
+  {"La", i18n("Lanthanum"), 57, 138.905},
+  {"Ce", i18n("Cerium"), 58, 140.116},
+  {"Pr", i18n("Praseodymium"), 59, 140.908},
+  {"Nd", i18n("Neodymium"), 60, 144.242},
+  {"Pm", i18n("Promethium"), 61, 145},
+  {"Sm", i18n("Samarium"), 62, 150.36},
+  {"Eu", i18n("Europium"), 63, 151.964},
+  {"Gd", i18n("Gadolinium"), 64, 157.25},
+  {"Tb", i18n("Terbium"), 65, 158.925},
+  {"Dy", i18n("Dysprosium"), 66, 162.5},
+  {"Ho", i18n("Holmium"), 67, 164.93},
+  {"Er", i18n("Erbium"), 68, 167.259},
+  {"Tm", i18n("Thulium"), 69, 168.934},
+  {"Yb", i18n("Ytterbium"), 70, 173.045},
+  {"Lu", i18n("Lutetium"), 71, 174.967},
+  {"Hf", i18n("Hafnium"), 72, 178.49},
+  {"Ta", i18n("Tantalum"), 73, 180.948},
+  {"W",  i18n("Tungsten"), 74, 183.84},
+  {"Re", i18n("Rhenium"), 75, 186.207},
+  {"Os", i18n("Osmium"), 76, 190.23},
+  {"Ir", i18n("Iridium"), 77, 192.217},
+  {"Pt", i18n("Platinum"), 78, 195.084},
+  {"Au", i18n("Gold"), 79, 196.967},
+  {"Hg", i18n("Mercury"), 80, 200.592},
+  {"Tl", i18n("Thallium"), 81, 204.38},
+  {"Pb", i18n("Lead"), 82, 207.2},
+  {"Bi", i18n("Bismuth"), 83, 208.98},
+  {"Po", i18n("Polonium"), 84, 209},
+  {"At", i18n("Astatine"), 85, 210},
+  {"Rn", i18n("Radon"), 86, 222},
+  {"Fr", i18n("Francium"), 87, 223},
+  {"Ra", i18n("Radium"), 88, 226},
+  {"Ac", i18n("Actinium"), 89, 227},
+  {"Th", i18n("Thorium"), 90, 232.038},
+  {"Pa", i18n("Protactinium"), 91, 231.036},
+  {"U",  i18n("Uranium"), 92, 238.029},
+  {"Np", i18n("Neptunium"), 93, 237},
+  {"Pu", i18n("Plutonium"), 94, 244},
+  {"Am", i18n("Americium"), 95, 243},
+  {"Cm", i18n("Curium"), 96, 247},
+  {"Bk", i18n("Berkelium"), 97, 247},
+  {"Cf", i18n("Californium"), 98, 251},
+  {"Es", i18n("Einsteinium"), 99, 252},
+  {"Fm", i18n("Fermium"), 100, 257},
+  {"Md", i18n("Mendelevium"), 101, 258},
+  {"No", i18n("Nobelium"), 102, 258},
+  {"Lr", i18n("Lawrencium"), 103, 262},
+  {"Rf", i18n("Rutherfordium"), 104, 267},
+  {"Db", i18n("Dubnium"), 105, 268},
+  {"Sg", i18n("Seaborgium"), 106, 269},
+  {"Bh", i18n("Bohrium"), 107, 270},
+  {"Hs", i18n("Hassium"), 108, 277},
+  {"Mt", i18n("Meitnerium"), 109, 278},
+  {"Ds", i18n("Darmstadtium"), 110, 281},
+  {"Rg", i18n("Roentgenium"), 111, 282},
+  {"Cn", i18n("Copernicium"), 112, 285},
+  {"Nh", i18n("Nihonium"), 113, 286},
+  {"Fl", i18n("Flerovium"), 114, 289},
+  {"Mc", i18n("Moscovium"), 115, 289},
+  {"Lv", i18n("Livermorium"), 116, 293},
+  {"Ts", i18n("Tennessine"), 117, 294},
+  {"Og", i18n("Oganesson"), 118, 294},
+  {"D",  i18n("Deuterium"), 1, 2.014000}};
 
 insertion_menu mol[] = {
-    { "Atom", NULL, -1, 0 },
+    { i18n("Atom"), NULL, -1, 0 },
     { NULL, "H", 1, 1 },
     { NULL, "B", 5, 1 },
     { NULL, "C", 6, 1 },
@@ -200,44 +200,44 @@ insertion_menu mol[] = {
     { NULL, "F", 9, 1 },
     { NULL, "S", 16, 1 },
     { NULL, "Cl", 17, 1 },
-    { NULL, "Other ...", -1, 1 },
-    { "Library", NULL, -1, 0 },
+    { NULL, i18n("Other ..."), -1, 1 },
+    { i18n("Library"), NULL, -1, 0 },
     { NULL, "H<sub>2</sub>O", -1, 3 },
     { NULL, "CH<sub>4</sub>", -1, 5 },
-    { NULL, "Toluene", -1, 15 },
+    { NULL, i18n("Toluene"), -1, 15 },
     { NULL, "Cp", -1, 10 },
     { NULL, "C<sub>60</sub>", -1,  60},
-    { NULL, "Ni-Phthalocyanine", -1, 57 },
-    { NULL, "More ...", -1, -1 },
+    { NULL, i18n("Ni-Phthalocyanine"), -1, 57 },
+    { NULL, i18n("More ..."), -1, -1 },
     { NULL, NULL, -1, 0 }};
 
 #define FAMILY 26
-gchar * family_list[FAMILY]={"Misc",
-                             "Alcohols",
-                             "Aldehydes",
-                             "Alkanes",
-                             "Alkenes",
-                             "Alkynes",
-                             "Amides",
-                             "Amines",
-                             "Amino acids",
-                             "Aromatics",
-                             "Carboxylic acids",
-                             "Cyclic alkanes",
-                             "Cyclic alkenes",
-                             "Ethers",
-                             "Fatty acids",
-                             "Fullerenes",
-                             "Heterocyclics",
-                             "Macrocycles",
-                             "Ketones",
-                             "Nitriles",
-                             "Nucleobases",
-                             "Steroids",
-                             "Sugars (Linears)",
-                             "Sugars (Cyclics)",
-                             "Sulfoxides",
-                             "Thiols"};
+gchar * family_list[FAMILY]={i18n("Misc"),
+                             i18n("Alcohols"),
+                             i18n("Aldehydes"),
+                             i18n("Alkanes"),
+                             i18n("Alkenes"),
+                             i18n("Alkynes"),
+                             i18n("Amides"),
+                             i18n("Amines"),
+                             i18n("Amino acids"),
+                             i18n("Aromatics"),
+                             i18n("Carboxylic acids"),
+                             i18n("Cyclic alkanes"),
+                             i18n("Cyclic alkenes"),
+                             i18n("Ethers"),
+                             i18n("Fatty acids"),
+                             i18n("Fullerenes"),
+                             i18n("Heterocyclics"),
+                             i18n("Macrocycles"),
+                             i18n("Ketones"),
+                             i18n("Nitriles"),
+                             i18n("Nucleobases"),
+                             i18n("Steroids"),
+                             i18n("Sugars (Linears)"),
+                             i18n("Sugars (Cyclics)"),
+                             i18n("Sulfoxides"),
+                             i18n("Thiols")};
 
 gchar * family_dir[FAMILY]={"Misc",
                             "Alcohols",
@@ -594,7 +594,7 @@ gchar * open_sml_file (const char * filetoread, int fam)
     node = racine -> children;
     node = findnode(node, "class");
     cdata = xmlNodeGetContent(node);
-    if (g_strcmp0 ((gchar *)cdata, family_list[fam]) != 0)
+    if (g_strcmp0 ((gchar *)cdata, _(family_list[fam])) != 0)
     {
       xmlFree (cdata);
       clean_xml_data (doc, reader);
@@ -633,7 +633,7 @@ int get_family (gchar * str)
   int i;
   for (i=0; i<FAMILY; i++)
   {
-    if (g_strcmp0 (str,family_list[i]) == 0) return i;
+    if (g_strcmp0 (str, _(family_list[i])) == 0) return i;
   }
   return -1;
 }
@@ -833,12 +833,12 @@ void fill_family_tree (GtkListStore * store)
     if (i == 0)
     {
       gtk_list_store_append (store, & first_family_iter);
-      gtk_list_store_set (store, & first_family_iter, 0, i, 1, family_list[i], -1);
+      gtk_list_store_set (store, & first_family_iter, 0, i, 1, _(family_list[i]), -1);
     }
     else
     {
       gtk_list_store_append (store, & family_level);
-      gtk_list_store_set (store, & family_level, 0, i, 1, family_list[i], -1);
+      gtk_list_store_set (store, & family_level, 0, i, 1, _(family_list[i]), -1);
     }
   }
 }
@@ -862,7 +862,7 @@ void insert_preview ()
   gtk_grid_set_column_spacing (GTK_GRID (grid), 1);
 
   gtk_grid_attach (GTK_GRID (grid), lib_proj -> modelgl -> plot, 0, 0, 4, 4);
-  gtk_grid_attach (GTK_GRID (grid), markup_label("<i>Formula:</i>", 100, -1, 0.0, 0.5), 5, 1, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid), markup_label(_("<i>Formula:</i>"), 100, -1, 0.0, 0.5), 5, 1, 3, 1);
   int i;
   for (i=0; i<lib_proj -> nspec; i++)
   {
@@ -881,7 +881,7 @@ void insert_preview ()
     str = g_strdup_printf ("%s</b>", str);
   }
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, -1, 0.0, 0.5), 8, 1, 3, 1);
-  gtk_grid_attach (GTK_GRID (grid),markup_label("<i>Molecular mass:</i>", 100, -1, 0.0, 0.5), 5, 2, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid),markup_label(_("<i>Molecular mass:</i>"), 100, -1, 0.0, 0.5), 5, 2, 3, 1);
   g_free (str);
   double mass = 0.0;
   for (i=0; i<lib_proj -> nspec; i++)
@@ -892,7 +892,7 @@ void insert_preview ()
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, -1, 0.0, 0.5), 8, 2, 3, 1);
   g_free (str);
 
-  gtk_grid_attach (GTK_GRID (grid), markup_label("<i>IUPAC name:</i>", 100, -1, 0.0, 0.5), 0, 5, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid), markup_label(_("<i>IUPAC name:</i>"), 100, -1, 0.0, 0.5), 0, 5, 3, 1);
   str = g_strdup_printf ("<b>%s</b>", check_xml_string(other_name[0]));
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, 30, 0.0, 0.5), 3, 5, 11, 1);
 
@@ -902,7 +902,7 @@ void insert_preview ()
     gtk_fixed_put (GTK_FIXED(lib_preview_plot), hbox, 0, 230);
     GtkWidget * vbox = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<i>Other name(s):</i>", 100, 30, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<i>Other name(s):</i>"), 100, 30, 0.0, 0.5), FALSE, FALSE, 0);
     for (i=1; i<o_names; i++)
     {
       if (i > 1)
@@ -1126,7 +1126,7 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
   int active = activep;
   int nats = this_proj -> natomes;
   lib_visible = visible;
-  GtkWidget * lib = dialogmodal ("Library", GTK_WINDOW((this_proj -> modelgl) ? this_proj -> modelgl -> win : MainWindow));
+  GtkWidget * lib = dialogmodal (_("Library"), GTK_WINDOW((this_proj -> modelgl) ? this_proj -> modelgl -> win : MainWindow));
 #ifdef GTK3
 #ifdef GTKGLAREA
 #ifndef OSX
@@ -1136,16 +1136,16 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
 #endif // OSX
 #endif // GTKGLAREA
 #endif // GTK3
-  gtk_dialog_add_button (GTK_DIALOG(lib), (asearch -> action == REPLACE) ? "Replace" : "Insert", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(lib), (asearch -> action == REPLACE) ? _("Replace") : _("Insert"), GTK_RESPONSE_APPLY);
   GtkWidget * vbox = dialog_get_content_area (lib);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   sml_file_name = mol_name = NULL;
   family_store = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);
   fill_family_tree (family_store);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, library_tree (family_store, 0, "Family"), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, library_tree (family_store, 0, _("Family")), FALSE, FALSE, 0);
   molecule_store = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, library_tree (molecule_store, 1, "Molecule"), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, library_tree (molecule_store, 1, _("Molecule")), FALSE, FALSE, 0);
   lib_preview_box = create_hbox(0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lib_preview_box, FALSE, FALSE, 10);
   lib_preview_plot = NULL;

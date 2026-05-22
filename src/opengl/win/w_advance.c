@@ -97,14 +97,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 extern void set_quality (int q, glwin * view);
 
-gchar * material_template[TEMPLATES] = {"Opaque",
-                                        "Brushed metal",
-                                        "Shiny metal",
-                                        "Plastic",
-                                        "Transparent",
-                                        "Translucent",
-                                        "Diffuse"};
-
 GLfloat template_parameters[TEMPLATES][5] ={{0.50, 0.50, 0.99, 1.00, 1.00},  // Ok
                                             {0.90, 0.60, 0.99, 1.50, 1.00},  // Ok
                                             {0.80, 0.40, 0.99, 1.00, 1.00},  // Ok
@@ -119,23 +111,23 @@ float mat_min_max[5][2] = {{0.0, 1.0},
                            {0.0, 10.0},
                            {0.0, 1.0}};
 
-gchar * ogl_settings[3][10] = {{"Albedo",
-                                "Metallic",
-                                "Roughness",
-                                "Ambient occlusion",
-                                "Gamma correction",
-                                "Opacity"},
-                               {"Position",
-                                "Direction",
-                                "Intensity",
-                                "Constant attenuation",
-                                "Linear attenuation",
-                                "Quadratic attenuation",
-                                "Cone angle",
-                                "Inner cutoff",
-                                "Outer cutoff",
-                                "Type"},
-                               {"<b>Fog color</b>"}};
+gchar * ogl_settings[3][10] = {{i18n("Albedo"),
+                                i18n("Metallic"),
+                                i18n("Roughness"),
+                                i18n("Ambient occlusion"),
+                                i18n("Gamma correction"),
+                                i18n("Opacity")},
+                               {i18n("Position"),
+                                i18n("Direction"),
+                                i18n("Intensity"),
+                                i18n("Constant attenuation"),
+                                i18n("Linear attenuation"),
+                                i18n("Quadratic attenuation"),
+                                i18n("Cone angle"),
+                                i18n("Inner cutoff"),
+                                i18n("Outer cutoff"),
+                                i18n("Type")},
+                               {i18n("<b>Fog color</b>")}};
 
 gchar * lpos[3] = {"x", "y", "z"};
 gchar * cpos[3] = {"r", "g", "b"};
@@ -249,7 +241,7 @@ G_MODULE_EXPORT void run_light_source_to_be_removed (GtkDialog * win, gint respo
   }
   else
   {
-    gchar * str = g_strdup_printf ("You must select %d light source(s) to be removed !", status);
+    gchar * str = g_strdup_printf (_("You must select %d light source(s) to be removed !"), status);
     show_warning (str, GTK_WIDGET(win));
     g_free (str);
   }
@@ -271,13 +263,13 @@ int * light_source_to_be_removed (int val, Lightning * ogl_lightning, opengl_edi
   status = val;
   if (val > 1)
   {
-    str = g_strdup_printf ("Please select the %d light sources to be removed: ", val);
+    str = g_strdup_printf (_("Please select the %d light sources to be removed: "), val);
   }
   else
   {
-    str = g_strdup_printf ("Please select the light source to be removed: ");
+    str = g_strdup_printf (_("Please select the light source to be removed: "));
   }
-  GtkWidget * win = message_dialogmodal (str, "Remove light source(s)", GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, ogl_edit -> win);
+  GtkWidget * win = message_dialogmodal (str, _("Remove light source(s)"), GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, ogl_edit -> win);
   GtkWidget * vbox = dialog_get_content_area (win);
   d_close =  gtk_dialog_get_widget_for_response (GTK_DIALOG (win), GTK_RESPONSE_CLOSE);
   widget_set_sensitive (d_close, 0);
@@ -285,7 +277,7 @@ int * light_source_to_be_removed (int val, Lightning * ogl_lightning, opengl_edi
   light_but = g_malloc0(ogl_lightning -> lights * sizeof*light_but);
   for (i=0; i<ogl_lightning -> lights; i++)
   {
-    str = g_strdup_printf ("Light N°%d", i+1);
+    str = g_strdup_printf (_("Light N°%d"), i+1);
     light_but[i] = check_button (str, -1, 25, FALSE, G_CALLBACK(toggled_delete_ligth), (gpointer)GINT_TO_POINTER(i));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, light_but[i], TRUE, TRUE, 0);
     g_free (str);
@@ -525,7 +517,7 @@ void create_lights_combo (int num_lights, opengl_edition * ogl_win)
   gchar * str;
   for (i=0; i<num_lights; i++)
   {
-    str = g_strdup_printf ("Light N°%d", i+1);
+    str = g_strdup_printf (_("Light N°%d"), i+1);
     combo_text_append (ogl_win -> lights, str);
     g_free (str);
   }
@@ -887,7 +879,7 @@ GtkWidget * create_setting_pos (gchar * lab, int size, float xalign, int pid, in
   }
   if (pid == 1 && ! preferences)
   {
-    ogl_win -> light_show = check_button ("Show light", -1, -1, FALSE, G_CALLBACK(show_this_light), ogl_win);
+    ogl_win -> light_show = check_button (_("Show light"), -1, -1, FALSE, G_CALLBACK(show_this_light), ogl_win);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, sbox, ogl_win -> light_show, FALSE, FALSE, 10);
   }
   return setting_pos;
@@ -910,7 +902,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
 
   GtkWidget * layout = create_layout (-1, 600);
   vbox = add_vbox_to_layout (layout, 480, -1);
-  hbox = bdv_box (vbox, "<b>Number of light sources</b>\n(add or remove lights - up to 10 sources)", 250, 0.0);
+  hbox = bdv_box (vbox, _("<b>Number of light sources</b>\n(add or remove lights - up to 10 sources)"), 250, 0.0);
   gtk_widget_set_size_request (hbox, -1, 65);
 
   GtkWidget * nlights = spin_button (G_CALLBACK(set_nlights_spin), ogl_lightning -> lights, 1.0, 10.0, 1.0, 0, 100, view);
@@ -919,53 +911,48 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fix, FALSE, FALSE, 20);
   gtk_fixed_put (GTK_FIXED (fix), nlights, 0, 20);
 
-  hbox = bdv_box (vbox, "<b>Configure light source <sup>*</sup></b>", 250, 0.0);
+  hbox = bdv_box (vbox, _("<b>Configure light source <sup>*</sup></b>"), 250, 0.0);
   ogl_edit -> lights_box = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ogl_edit -> lights_box, FALSE, FALSE, 10);
   create_lights_combo (ogl_lightning -> lights, ogl_edit);
 
-  bdv_box (vbox, "<b>Light configuration</b>", 250, 0.0);
+  bdv_box (vbox, _("<b>Light configuration</b>"), 250, 0.0);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   ogl_edit -> light_type = create_combo ();
-  gchar * ltype[3] = {"Directional", "Point", "Spot"};
-  for (i=0; i<3; i++)
-  {
-    combo_text_append (ogl_edit -> light_type, ltype[i]);
-  }
+  combo_text_append (ogl_edit -> light_type, _("Directional"));
+  combo_text_append (ogl_edit -> light_type, _("Point"));
+  combo_text_append (ogl_edit -> light_type, _("Spot"));
   g_signal_connect (G_OBJECT (ogl_edit -> light_type), "changed", G_CALLBACK(set_light_type), ogl_edit);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ogl_edit -> light_type, FALSE, FALSE, 60);
 
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new("Fixed by respect to: "), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_("Fixed by respect to: ")), FALSE, FALSE, 10);
   ogl_edit -> light_fix = create_combo();
-  gchar * lfix[2] = {"The viewer", "The model"};
-  for (i=0; i<2; i++)
-  {
-    combo_text_append (ogl_edit -> light_fix, lfix[i]);
-  }
+  combo_text_append (ogl_edit -> light_fix, _("The viewer"));
+  combo_text_append (ogl_edit -> light_fix, _("The model"));
   g_signal_connect (G_OBJECT (ogl_edit -> light_fix), "changed", G_CALLBACK(set_light_fix), ogl_edit);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ogl_edit -> light_fix, FALSE, FALSE, 10);
 
   float values[3] = {0.0, 0.0, 0.0};
   // Position
-  gchar * str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", ogl_settings[1][0]) : g_strdup_printf ("<u>%s:</u>", ogl_settings[1][0]);
+  gchar * str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", _(ogl_settings[1][0])) : g_strdup_printf ("<u>%s:</u>", _(ogl_settings[1][0]));
   ogl_edit -> light_b_coord[0] = create_setting_pos (str, 130, 0.0, 1, 0, values, ogl_edit);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> light_b_coord[0], FALSE, FALSE, 0);
   // Direction
-  str = g_strdup_printf ("<u>%s:</u>", ogl_settings[1][1]);
+  str = g_strdup_printf ("<u>%s:</u>", _(ogl_settings[1][1]));
   ogl_edit -> light_b_coord[1] = create_setting_pos (str, 130, 0.0, 2, 1, values, ogl_edit);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> light_b_coord[1], FALSE, FALSE, 0);
   // Intensity
-  str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", ogl_settings[1][2]) : g_strdup_printf ("<u>%s:</u>", ogl_settings[1][2]);
+  str = (preferences) ? g_strdup_printf ("<u>%s:</u> <sup>**</sup>", _(ogl_settings[1][2])) : g_strdup_printf ("<u>%s:</u>", _(ogl_settings[1][2]));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_setting_pos (str, 130, 0.0, 3, 2, values, ogl_edit), FALSE, FALSE, 0);
   g_free (str);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   ogl_edit -> advanced_light_box = create_vbox (BSEP);
   add_box_child_start ( GTK_ORIENTATION_HORIZONTAL, hbox, ogl_edit -> advanced_light_box, FALSE, FALSE, 40);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> advanced_light_box, markup_label("<b>Advanced parameters</b>", -1, -1, 0.1, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> advanced_light_box, markup_label(_("<b>Advanced parameters</b>"), -1, -1, 0.1, 0.5), FALSE, FALSE, 10);
   GtkWidget * lbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> advanced_light_box, lbox, FALSE, FALSE, 0);
   GtkWidget * lvbox = create_vbox (BSEP);
@@ -978,7 +965,7 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
     for (j=0; j<3; j++)
     {
       ogl_edit -> light_entry[k] = create_entry (G_CALLBACK(update_light_param), 100, 15, FALSE, & ogl_edit -> pointer[k]);
-      str = g_strdup_printf ("<u>%s:</u>", ogl_settings[1][k+3]);
+      str = g_strdup_printf ("<u>%s:</u>", _(ogl_settings[1][k+3]));
       lhbox = adv_box (ogl_edit -> light_b_entry[i], str, 0, 170, 0.0);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, lhbox, ogl_edit -> light_entry[k], FALSE, FALSE, 10);
@@ -990,10 +977,10 @@ GtkWidget * lights_tab (glwin * view, opengl_edition * ogl_edit, Lightning * ogl
   combo_set_active (ogl_edit -> lights, 0);
   update_light_data (0, ogl_edit);
 
-  append_comments (vbox, "<sup>*</sup>", "Note that light N°1 must be a directional light");
+  append_comments (vbox, "<sup>*</sup>", _("Note that light N°1 must be a directional light"));
   if (preferences)
   {
-    append_comments (vbox, "<sup>**</sup>", "Position and attenuation will be corrected based on model depth");
+    append_comments (vbox, "<sup>**</sup>", _("Position and attenuation will be corrected based on model depth"));
   }
   return layout;
 }
@@ -1313,12 +1300,9 @@ GtkWidget * rendering_fix (glwin * view, opengl_edition * ogl_edit)
   GtkWidget * fix = gtk_fixed_new ();
   GtkWidget * rmodel = create_combo ();
   gtk_fixed_put (GTK_FIXED (fix), rmodel, 0, 10);
-  char * r_model[2] = {"3D objects", "Ray tracing"};
-  int i;
-  for (i=0; i<2; i++)
-  {
-    combo_text_append (rmodel, r_model[i]);
-  }
+  combo_text_append (rmodel, _("3D Objects"));
+  combo_text_append (rmodel, _("Ray Tracing"));
+
   g_signal_connect (G_OBJECT (rmodel), "changed", G_CALLBACK(set_r_model), view);
   gtk_widget_set_size_request (rmodel, 110, -1);
   combo_set_active (rmodel, (view) ? view -> anim -> last -> img -> ray_tracing : tmp_opengl[4]);
@@ -1326,17 +1310,14 @@ GtkWidget * rendering_fix (glwin * view, opengl_edition * ogl_edit)
   ogl_edit -> render_fix = gtk_fixed_new ();
   gtk_fixed_put (GTK_FIXED (fix), ogl_edit -> render_fix, 130, 0);
   GtkWidget * quality_scale = create_hscale (3, 500, 1, (view) ? view -> anim -> last -> img -> quality : tmp_opengl[3], GTK_POS_TOP, 1, 100, G_CALLBACK(scale_quality), G_CALLBACK(scroll_scale_quality), view);
-  gtk_fixed_put (GTK_FIXED (ogl_edit -> render_fix), quality_scale, 0, 0);
+  gtk_fixed_put (GTK_FIXED (ogl_edit -> render_fix), quality_scale, 20, 0);
   if (! preferences)
   {
     GtkWidget * fmodel = create_combo ();
     gtk_fixed_put (GTK_FIXED (ogl_edit -> render_fix), fmodel, 120, 10);
-    char * f_model[3] = {"Filled", "Lines", "Points"};
-    int i;
-    for (i=0; i<3; i++)
-    {
-      combo_text_append (fmodel, f_model[i]);
-    }
+    combo_text_append (fmodel, _("Filled"));
+    combo_text_append (fmodel, _("Lines"));
+    combo_text_append (fmodel, _("Points"));
     g_signal_connect (G_OBJECT (fmodel), "changed", G_CALLBACK(set_f_model), view);
     gtk_widget_set_size_request (fmodel, 100, -1);
     combo_set_active (fmodel, view -> anim -> last -> img -> render);
@@ -1360,7 +1341,7 @@ GtkWidget * lightning_fix (glwin * view, Material * this_material)
   GtkWidget * lmodel = create_combo ();
   gtk_fixed_put (GTK_FIXED (fix), lmodel, 0, 10);
 
-  char * l_model[6] = {"None", "Phong", "Blinn", "Cook-Torrance-Blinn", "Cook-Torrance-Beckmann", "Cook-Torrance-GCX"};
+  char * l_model[6] = {i18n("None"), "Phong", "Blinn", "Cook-Torrance-Blinn", "Cook-Torrance-Beckmann", "Cook-Torrance-GCX"};
   int i;
   for (i=0; i<6; i++)
   {
@@ -1388,29 +1369,36 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   int i;
   GtkWidget * box, * hbox;
 
-  gchar * str = g_strdup_printf ("<b>%s</b> ", "Quality");
+  gchar * str = g_strdup_printf ("<b>%s</b> ", _("Quality"));
   box = adv_box (vbox, str, 5, 150, 0.0);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, rendering_fix (view, ogl_edit), FALSE, FALSE, 0);
 
-  str = g_strdup_printf ("<b>%s</b> ", "Lightning model");
+  str = g_strdup_printf ("<b>%s</b> ", _("Lightning model"));
   box = adv_box (vbox, str, 5, 150, 0.0);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, lightning_fix (view, the_mat), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 20);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                       check_button ("<b>Use template</b>", 100, 40, the_mat -> predefine, G_CALLBACK(set_use_template_toggle), view),
+                       check_button (_("<b>Use template</b>"), 100, 40, the_mat -> predefine, G_CALLBACK(set_use_template_toggle), view),
                        FALSE, FALSE, 0);
 
   hbox = create_hbox (BSEP);
-  str = g_strdup_printf ("<b>%s</b> ", "Templates");
+  str = g_strdup_printf ("<b>%s</b> ", _("Templates"));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, markup_label (str, 150, -1, 0.0, 0.5), FALSE, FALSE, 50);
   g_free (str);
+  gchar * material_template[TEMPLATES] = {i18n("Opaque"),
+                                          i18n("Brushed Metal"),
+                                          i18n("Shiny Metal"),
+                                          i18n("Plastic"),
+                                          i18n("Transparent"),
+                                          i18n("Translucent"),
+                                          i18n("Diffuse")};
   ogl_edit -> templates  = create_combo ();
   for (i=0; i<TEMPLATES; i++)
   {
-    combo_text_append (ogl_edit -> templates, material_template[i]);
+    combo_text_append (ogl_edit -> templates, _(material_template[i]));
   }
   combo_set_active (ogl_edit -> templates, the_mat -> predefine-1);
   g_signal_connect (G_OBJECT (ogl_edit -> templates), "changed", G_CALLBACK(set_template), view);
@@ -1426,12 +1414,12 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
   ogl_edit -> param_mat = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> param_mat, FALSE, FALSE, 0);
 
-  bdv_box (ogl_edit -> param_mat, "<b>Material properties</b>", 250, -1);
+  bdv_box (ogl_edit -> param_mat, _("<b>Material properties</b>"), 250, -1);
 
   GtkWidget * m_fixed;
   for (i=0; i<5; i++)
   {
-    str = g_strdup_printf ("<u>%s:</u>", ogl_settings[0][i+1]);
+    str = g_strdup_printf ("<u>%s:</u>", _(ogl_settings[0][i+1]));
     box = adv_box (ogl_edit -> param_mat, str, 0, 130, 0.0);
     g_free (str);
     ogl_edit -> m_scale[i] =  create_hscale (mat_min_max[i][0], mat_min_max[i][1], 0.001, the_mat -> param[i+1],
@@ -1444,7 +1432,7 @@ GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * t
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, m_fixed, FALSE, FALSE, 15);
   }
   float values[] = {the_mat -> albedo.x, the_mat -> albedo.y, the_mat -> albedo.z};
-  str = g_strdup_printf ("<u>%s:</u>", ogl_settings[0][0]);
+  str = g_strdup_printf ("<u>%s:</u>", _(ogl_settings[0][0]));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_mat, create_setting_pos (str, 130, -1, 0, 0, values, ogl_edit), FALSE, FALSE, 10);
   g_free (str);
   show_the_widgets (layout);
@@ -1642,12 +1630,12 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   GtkWidget * layout = create_layout (480, -1);
   GtkWidget * vbox = add_vbox_to_layout (layout, 480, -1);
 
-  GtkWidget * box = adv_box (vbox, "<b>Fog mode</b> ", 10, 150, 0.0);
+  GtkWidget * box = adv_box (vbox, _("<b>Fog mode</b> "), 10, 150, 0.0);
   GtkWidget * fogmod = create_combo ();
-  combo_text_append (fogmod, "None");
-  combo_text_append (fogmod, "Linear");
-  combo_text_append (fogmod, "Exponential");
-  combo_text_append (fogmod, "Exponential squared");
+  combo_text_append (fogmod, _("None"));
+  combo_text_append (fogmod, _("Linear"));
+  combo_text_append (fogmod, _("Exponential"));
+  combo_text_append (fogmod, _("Exponential Squared"));
   gtk_widget_set_size_request (fogmod, 200, -1);
   combo_set_active (fogmod, the_fog -> mode);
   g_signal_connect (G_OBJECT (fogmod), "changed", G_CALLBACK(set_fog_mode), ogl_edit);
@@ -1656,26 +1644,26 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
   ogl_edit -> param_fog = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, ogl_edit -> param_fog, FALSE, FALSE, 0);
 
-  box = adv_box (ogl_edit -> param_fog, "<b>Fog type</b> ", 5, 150, 0.0);
+  box = adv_box (ogl_edit -> param_fog, _("<b>Fog type</b> "), 5, 150, 0.0);
   fogtype = create_combo ();
-  combo_text_append (fogtype, "Plane based");
-  combo_text_append (fogtype, "Range based");
+  combo_text_append (fogtype, _("Plane Based"));
+  combo_text_append (fogtype, _("Range Based"));
   gtk_widget_set_size_request (fogtype, 200, -1);
   combo_set_active (fogtype, the_fog -> mode);
   g_signal_connect (G_OBJECT (fogtype), "changed", G_CALLBACK(set_fog_type), ogl_edit);
   widget_set_sensitive (fogtype, (the_fog -> mode == 1) ? TRUE : FALSE);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, fogtype, FALSE, FALSE, 0);
 
-  ogl_edit -> dens_box =  adv_box (ogl_edit -> param_fog, "<b>Fog density</b>", 10, 150.0, 0.0);
+  ogl_edit -> dens_box =  adv_box (ogl_edit -> param_fog, _("<b>Fog density</b>"), 10, 150.0, 0.0);
   ogl_edit -> fog_range[0] = create_hscale (0.0, 1.0, 0.01, the_fog -> density, GTK_POS_TOP, 3,
                                             250, G_CALLBACK(set_fog_param), G_CALLBACK(scroll_set_fog_param), & ogl_edit -> pointer[0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ogl_edit -> dens_box, ogl_edit -> fog_range[0], FALSE, FALSE, 0);
 
-  char * depthfog[2] = {"\t depth<sup>*</sup> start: ", "\t depth<sup>*</sup> end: "};
+  gchar * depthfog[2] = {_("\t depth<sup>*</sup> start: "), _("\t depth<sup>*</sup> end: ")};
 
   ogl_edit -> depth_box = create_vbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_fog, ogl_edit -> depth_box, FALSE, FALSE, 0);
-  box = adv_box (ogl_edit -> depth_box, "<b>Fog depth</b>", 10, 150.0, 0.0);
+  box = adv_box (ogl_edit -> depth_box, _("<b>Fog depth</b>"), 10, 150.0, 0.0);
   int i;
   for (i=0; i<2; i++)
   {
@@ -1684,10 +1672,10 @@ GtkWidget * fog_tab (glwin * view, opengl_edition * ogl_edit, Fog * the_fog)
                                                 250, G_CALLBACK(set_fog_param), G_CALLBACK(scroll_set_fog_param), & ogl_edit -> pointer[i+1]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, ogl_edit -> fog_range[i+1], FALSE, FALSE, 0);
   }
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> depth_box, markup_label("* % of the OpenGL model depth.", -1, -1, 0.5, 0.5) , FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> depth_box, markup_label(_("* % of the OpenGL model depth."), -1, -1, 0.5, 0.5) , FALSE, FALSE, 5);
 
   float values[] = {the_fog -> color.x, the_fog -> color.y, the_fog -> color.z};
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_fog, create_setting_pos (ogl_settings[2][0], 130, 0.0, 4, 0, values, ogl_edit), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, ogl_edit -> param_fog, create_setting_pos (_(ogl_settings[2][0]), 130, 0.0, 4, 0, values, ogl_edit), FALSE, FALSE, 5);
   show_the_widgets (layout);
   return layout;
 }
@@ -1755,7 +1743,7 @@ G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data)
       view -> opengl_win -> pointer[i].a = view -> proj;
       view -> opengl_win -> pointer[i].b = i;
     }
-    gchar * str = g_strdup_printf ("OpenGL material aspect and light settings - %s", get_project_by_id(view -> proj) -> name);
+    gchar * str = g_strdup_printf (_("OpenGL material aspect and light settings - %s"), get_project_by_id(view -> proj) -> name);
     view -> opengl_win -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
 #ifdef DEBUG
@@ -1775,10 +1763,12 @@ G_MODULE_EXPORT void opengl_advanced (GtkWidget * widg, gpointer data)
    gtk_widget_set_vexpand (notebook, TRUE);
 #endif
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, TRUE, TRUE, 0);
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (view, view -> opengl_win, & view -> anim -> last -> img -> m_terial), markup_label("<b>Material aspect</b>", -1, -1, 0.0, 0.5));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (view, view -> opengl_win, & view -> anim -> last -> img -> m_terial),
+                                                      markup_label(_("<b>Material aspect</b>"), -1, -1, 0.0, 0.5));
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (view, view -> opengl_win, & view -> anim -> last -> img -> l_ghtning),
-                                                      markup_label("<b>Configure light sources</b>", -1, -1, 0.0, 0.5));
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (view, view -> opengl_win, & view -> anim -> last -> img -> f_g), markup_label("<b>Configure fog</b>", -1, -1, 0.0, 0.5));
+                                                      markup_label(_("<b>Configure light sources</b>"), -1, -1, 0.0, 0.5));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (view, view -> opengl_win, & view -> anim -> last -> img -> f_g),
+                                                      markup_label(_("<b>Configure fog</b>"), -1, -1, 0.0, 0.5));
     add_global_option (vbox, & view -> colorp[0][0]);
     add_gtk_close_event (view -> opengl_win -> win, G_CALLBACK(close_advanced), view);
   }

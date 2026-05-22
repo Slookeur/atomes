@@ -269,7 +269,7 @@ void init_project (gboolean alloc_box)
   nprojects ++;
   activep = nprojects - 1;
   new_proj -> id = activep;
-  new_proj -> name = g_strdup_printf("%s%2d", "Project N°", activep);
+  new_proj -> name = g_strdup_printf("%s%2d", _("Project N°"), activep);
   apply_default_parameters_to_project (new_proj, TRUE);
   new_proj -> tfile = -1;
   new_proj -> newproj = TRUE;

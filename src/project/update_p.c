@@ -255,7 +255,7 @@ void active_project_changed (int id)
   }
   if (update_project() == 0)
   {
-    errp = g_strdup_printf ("Impossible to update project: %s\n", active_project -> name);
+    errp = g_strdup_printf (_("Impossible to update project: %s\n"), active_project -> name);
     show_error (errp, 0, MainWindow);
     g_free (errp);
   }
@@ -277,7 +277,7 @@ void active_project_changed (int id)
         }
         g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
         fill_tool_model ();
-        correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
+        correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
         correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
       }
     }

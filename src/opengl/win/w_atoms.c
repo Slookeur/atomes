@@ -193,8 +193,8 @@ void atoms_input_win (GtkWidget * win, project * this_proj, int nspec, int aoc, 
 G_MODULE_EXPORT void set_atom_parameter (GtkWidget * widg, gpointer data)
 {
   tint * the_data = (tint *)data;
-  gchar * title[2][2] = {{"Adjust atom sphere radius", "Adjust clone sphere radius"},
-                         {"Adjust atom point size", "Adjust clone point size"}};
+  gchar * title[2][2] = {{i18n("Adjust atom sphere radius"), i18n("Adjust clone sphere radius")},
+                         {i18n("Adjust atom point size"), i18n("Adjust clone point size")}};
 
   opengl_project_changed (the_data -> a);
   int s = opengl_project -> nspec;
@@ -213,7 +213,7 @@ G_MODULE_EXPORT void set_atom_parameter (GtkWidget * widg, gpointer data)
   {
     val = opengl_project -> modelgl -> anim -> last -> img -> sphererad;
   }
-  GtkWidget * win = dialogmodal (title[jd][id], GTK_WINDOW(opengl_project -> modelgl -> win));
+  GtkWidget * win = dialogmodal (_(title[jd][id]), GTK_WINDOW(opengl_project -> modelgl -> win));
   atoms_input_win (win, opengl_project, s, id, val);
   run_this_gtk_dialog (win, G_CALLBACK(run_destroy_dialog), NULL);
 }
@@ -357,11 +357,11 @@ GtkWidget * prop_tab (glwin * view, int aoc)
   GtkWidget * but;
   GtkWidget * entry;
   project * this_proj = get_project_by_id(view -> proj);
-  gchar * coln[5] = {"Color",
-                     "Radius [Å]",
-                     "Show",
-                     "Label",
-                     "Size [pts]"};
+  gchar * coln[5] = {i18n("Color"),
+                     i18n("Radius [Å]"),
+                     i18n("Show"),
+                     i18n("Label"),
+                     i18n("Size [pts]")};
   int csize[5] = {60, 0, 25, 0, 0};
 
   GtkWidget * prop = create_layout (-1, -1);
@@ -375,11 +375,11 @@ GtkWidget * prop_tab (glwin * view, int aoc)
   {
     if (i == 1 && (k == WIREFRAME || k == PUNT))
     {
-      str = g_strdup_printf ("<b>%s</b>", coln[4]);
+      str = g_strdup_printf ("<b>%s</b>", _(coln[4]));
     }
     else
     {
-      str = g_strdup_printf ("<b>%s</b>", coln[i]);
+      str = g_strdup_printf ("<b>%s</b>", _(coln[i]));
     }
     lab = markup_label(str, -1, -1, 0.0, 0.0);
     g_free (str);
@@ -405,11 +405,11 @@ GtkWidget * prop_tab (glwin * view, int aoc)
     but = color_button (view -> anim -> last -> img -> at_color[j], TRUE, 80, -1, G_CALLBACK(set_atom_color), & view -> colorp[0][j]);
     if (aoc == 0)
     {
-      str = g_strdup_printf ("%s atom(s) color", this_proj -> chemistry -> label[i]);
+      str = g_strdup_printf (_("%s atom(s) color"), this_proj -> chemistry -> label[i]);
     }
     else
     {
-      str = g_strdup_printf ("%s clone(s) color", this_proj -> chemistry -> label[i]);
+      str = g_strdup_printf (_("%s clone(s) color"), this_proj -> chemistry -> label[i]);
     }
     gtk_color_button_set_title (GTK_COLOR_BUTTON(but), str);
     g_free (str);
@@ -509,8 +509,8 @@ G_MODULE_EXPORT gboolean close_event_model (GtkWidget * widg, GdkEvent * event, 
 GtkWidget * advance_atom_notebook (glwin * view, int atom_or_clone)
 {
   GtkWidget * notebook = gtk_notebook_new ();
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), prop_tab (view, atom_or_clone), gtk_label_new ("Display properties"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab (view, atom_or_clone), gtk_label_new ("Label properties"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), prop_tab (view, atom_or_clone), gtk_label_new (_("Display properties")));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), labels_tab (view, atom_or_clone), gtk_label_new (_("Label properties")));
 
   if (view -> search_widg[atom_or_clone] == NULL)
   {
@@ -518,7 +518,7 @@ GtkWidget * advance_atom_notebook (glwin * view, int atom_or_clone)
   }
   gtk_notebook_append_page (GTK_NOTEBOOK(notebook),
                             selection_tab (view -> search_widg[atom_or_clone], get_project_by_id(view -> proj) -> natomes),
-                            gtk_label_new ((atom_or_clone) ? "Clone(s) selection" : "Atom(s) selection"));
+                            gtk_label_new ((atom_or_clone) ? _("Clone(s) selection") : _("Atom(s) selection")));
   return notebook;
 }
 
@@ -533,8 +533,8 @@ GtkWidget * advance_atom_notebook (glwin * view, int atom_or_clone)
 GtkWidget * advanced_atom_properties (int atom_or_clone, glwin * view)
 {
   GtkWidget * aprop;
-  gchar * win_title[2]={"Atom(s) configuration - ", "Clone(s) configuration - "};
-  gchar * str = g_strdup_printf ("%s%s", win_title[atom_or_clone], prepare_for_title(get_project_by_id(view -> proj)->name));
+  gchar * win_title[2]={i18n("Atom(s) configuration - "), i18n("Clone(s) configuration - ")};
+  gchar * str = g_strdup_printf ("%s%s", _(win_title[atom_or_clone]), prepare_for_title(get_project_by_id(view -> proj)->name));
   aprop = create_win (str, view -> win, FALSE, FALSE);
   int i = (get_project_by_id(view -> proj)-> natomes >= GTK_LIMIT) ? 170 : 0;
   gtk_widget_set_size_request (aprop, -1, 580+i);
@@ -544,7 +544,7 @@ GtkWidget * advanced_atom_properties (int atom_or_clone, glwin * view)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,  view -> model_win[atom_or_clone] -> notebook, TRUE, TRUE, 0);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-  GtkWidget * but = create_button ("Close", IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_model), & view -> colorp[atom_or_clone][0]);
+  GtkWidget * but = create_button (_("Close"), IMG_STOCK, FCLOSE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(close_model), & view -> colorp[atom_or_clone][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 5);
   add_gtk_close_event (aprop, G_CALLBACK(close_event_model), & view -> colorp[atom_or_clone][0]);
   return aprop;
@@ -596,6 +596,6 @@ G_MODULE_EXPORT void atom_properties (GSimpleAction * action, GVariant * paramet
   }
   else
   {
-    show_warning (g_strdup_printf ("Error impossible to display the model window for %s !", (atom_or_clone) ? "clones" : "atoms"), this_proj -> modelgl -> win);
+    show_warning (g_strdup_printf (_("Error impossible to display the model window for %s !"), (atom_or_clone) ? _("clones") : _("atoms")), this_proj -> modelgl -> win);
   }
 }

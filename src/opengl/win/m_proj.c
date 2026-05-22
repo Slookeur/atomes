@@ -142,22 +142,22 @@ G_MODULE_EXPORT void set_camera_pos (GtkWidget * widg, gpointer data)
 GtkWidget * menu_proj (glwin * view)
 {
   GtkWidget * menup = gtk_menu_new ();
-  GtkWidget * r = create_menu_item (FALSE, "Right [1, 0, 0]");
+  GtkWidget * r = create_menu_item (FALSE, _("Right [1, 0, 0]"));
   g_signal_connect (G_OBJECT (r), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[RIGHT][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, r);
-  GtkWidget * l = create_menu_item (FALSE, "Left [-1, 0, 0]");
+  GtkWidget * l = create_menu_item (FALSE, _("Left [-1, 0, 0]"));
   g_signal_connect (G_OBJECT (l), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[LEFT][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, l);
-  GtkWidget * t = create_menu_item (FALSE, "Top [0, 1, 0]");
+  GtkWidget * t = create_menu_item (FALSE, _("Top [0, 1, 0]"));
   g_signal_connect (G_OBJECT (t), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[TOP][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, t);
-  GtkWidget * b = create_menu_item (FALSE, "Bottom [0, -1, 0]");
+  GtkWidget * b = create_menu_item (FALSE, _("Bottom [0, -1, 0]"));
   g_signal_connect (G_OBJECT (b), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[BOTTOM][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, b);
-  GtkWidget * f = create_menu_item (FALSE, "Front [0, 0, 1]");
+  GtkWidget * f = create_menu_item (FALSE, _("Front [0, 0, 1]"));
   g_signal_connect (G_OBJECT (f), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[FRONT][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, f);
-  GtkWidget * a = create_menu_item (FALSE, "Back [0, 0, -1]");
+  GtkWidget * a = create_menu_item (FALSE, _("Back [0, 0, -1]"));
   g_signal_connect (G_OBJECT (a), "activate", G_CALLBACK(set_camera_pos), & view -> colorp[BACK][0]);
   gtk_menu_shell_append ((GtkMenuShell *)menup, a);
 
@@ -189,11 +189,16 @@ G_MODULE_EXPORT void to_set_camera_pos (GSimpleAction * action, GVariant * param
 GMenu * menu_proj (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  gchar * projection[6]={"Right [1, 0, 0]", "Left [-1, 0, 0]", "Top [0, 1, 0]", "Bottom [0, -1, 0]", "Front [0, 0, 1]", "Back [0, 0, -1]"};
+  gchar * projection[6]={i18n("Right [1, 0, 0]"), 
+                         i18n("Left [-1, 0, 0]"), 
+                         i18n("Top [0, 1, 0]"), 
+                         i18n("Bottom [0, -1, 0]"), 
+                         i18n("Front [0, 0, 1]"), 
+                         i18n("Back [0, 0, -1]")};
   int i;
   for (i=0; i<6; i++)
   {
-    append_opengl_item (view, menu, projection[i], "proj", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_set_camera_pos), & view -> colorp[i][0], FALSE, FALSE, FALSE, TRUE);
+    append_opengl_item (view, menu, _(projection[i]), "proj", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_set_camera_pos), & view -> colorp[i][0], FALSE, FALSE, FALSE, TRUE);
   }
   return menu;
 }

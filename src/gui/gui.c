@@ -110,27 +110,27 @@ atomes_action edition_acts[] = {{"edit.chemistry",   GINT_TO_POINTER(0)},
                                 {"edit.cutoffs",     GINT_TO_POINTER(2)}};
 
 gchar * calc_name[] = {"g(r)/G(r)",
-                       "S(q) from FFT[g(r)]",
-                       "S(q) from Debye equation",
-                       "g(r)/G(r) from FFT[S(q)]",
-                       "Bonds and angles",
-                       "Ring statistics",
-                       "Chain statistics",
-                       "Spherical harmonics",
-                       "Mean Squared Displacement",
-                       "Dynamic structure factor"};
+                       i18n("S(q) from FFT[g(r)]"),
+                       i18n("S(q) from Debye Equation"),
+                       i18n("g(r)/G(r) from FFT[S(q)]"),
+                       i18n("Bonds and Angles"),
+                       i18n("Ring Statistics"),
+                       i18n("Chain Statistics"),
+                       i18n("Spherical Harmonics"),
+                       i18n("Mean Squared Displacement"),
+                       i18n("Dynamic Structure Factor")};
 
 gchar * graph_name[] = {"g(r)/G(r)",
-                        "S(q) from FFT[g(r)]",
-                        "S(q) from Debye equation",
-                        "g(r)/G(r) from FFT[S(q)]",
-                        "Bonds properties",
-                        "Angle distributions",
-                        "Ring statistics",
-                        "Chain statistics",
-                        "Spherical harmonics",
-                        "Mean Squared Displacement",
-                        "Dynamic structure factor"};
+                        i18n("S(q) from FFT[g(r)]"),
+                        i18n("S(q) from Debye Equation"),
+                        i18n("g(r)/G(r) from FFT[S(q)]"),
+                        i18n("Bond Properties"),
+                        i18n("Angle Distributions"),
+                        i18n("Ring Statistics"),
+                        i18n("Chain Statistics"),
+                        i18n("Spherical Harmonics"),
+                        i18n("Mean Squared Displacement"),
+                        i18n("Dynamic Structure Factor")};
 
 gchar * graph_icon[] = {"pixmaps/gr.png",
                         "pixmaps/sq.png",
@@ -149,23 +149,23 @@ dint davect[9];
 ColRGBA std[6];
 
 shortcuts main_shortcuts[] = {
-  { "About", "open about dialog",  GDK_KEY_a, "<Ctrl>a" },
-  { "Periodic table", "open periodic table",  GDK_KEY_p, "<Ctrl>p" },
-  { "Quit", "quit atomes",  GDK_KEY_q, "<Ctrl>q" },
+  { i18n("About"), i18n("open about dialog"),  GDK_KEY_a, "<Ctrl>a" },
+  { i18n("Periodic table"), i18n("open periodic table"),  GDK_KEY_p, "<Ctrl>p" },
+  { i18n("Quit"), i18n("quit atomes"),  GDK_KEY_q, "<Ctrl>q" },
 //};
 //{
-  { "Open workspace", "open atomes workspace",  GDK_KEY_w, "<Ctrl>w" },
-  { "Save workspace", "save atomes workspace",  GDK_KEY_s, "<Ctrl>s" },
-  { "Close workspace", "close atomes workspace",  GDK_KEY_c, "<Ctrl>c" },
+  { i18n("Open workspace"), i18n("open atomes workspace"),  GDK_KEY_w, "<Ctrl>w" },
+  { i18n("Save workspace"), i18n("save atomes workspace"),  GDK_KEY_s, "<Ctrl>s" },
+  { i18n("Close workspace"), i18n("close atomes workspace"),  GDK_KEY_c, "<Ctrl>c" },
 //};
 //{
-  { "New project", "create new atomes project",  GDK_KEY_n, "<Ctrl>n" },
-  { "Open project", "open atomes project",  GDK_KEY_o, "<Ctrl>o" }
+  { i18n("New project"), i18n("create new atomes project"),  GDK_KEY_n, "<Ctrl>n" },
+  { i18n("Open project"), i18n("open atomes project"),  GDK_KEY_o, "<Ctrl>o" }
 };
 
 gchar * main_section_names[] = { "Main" };
 int main_group_by_section[] = { 3 };
-gchar * main_group_names[] = { "General", "Workspace", "Projects" };
+gchar * main_group_names[] = { i18n("General"), i18n("Workspace"), i18n("Projects") };
 int main_shortcut_by_group[] = { 3, 3, 2 };
 
 /*!
@@ -203,7 +203,7 @@ GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int 
   l = m = 0;
   for (i=0; i<sections; i++)
   {
-    shortcut_section[i] = g_object_new (GTK_TYPE_SHORTCUTS_SECTION, "visible", TRUE, "title", section_names[i], "section-name", section_names[i], NULL);
+    shortcut_section[i] = g_object_new (GTK_TYPE_SHORTCUTS_SECTION, "visible", TRUE, "title", _(section_names[i]), "section-name", _(section_names[i]), NULL);
 #ifdef GTK4
 #if GTK_MINOR_VERSION < 14 || (GTK_MINOR_VERSION == 14 && GTK_MICRO_VERSION < 4)
   gtk_orientable_set_orientation ((GtkOrientable *)shortcut_section[i], GTK_ORIENTATION_HORIZONTAL);
@@ -211,14 +211,14 @@ GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int 
 #endif
     for (j=0; j<group_by_section[i]; j++, l++)
     {
-      shortcut_group[l] = g_object_new (GTK_TYPE_SHORTCUTS_GROUP, "visible", TRUE, "title", group_names[l], NULL);
+      shortcut_group[l] = g_object_new (GTK_TYPE_SHORTCUTS_GROUP, "visible", TRUE, "title", _(group_names[l]), NULL);
       for (k=0; k<shortcut_by_group[l]; k++, m++)
       {
         shortcut = g_object_new (GTK_TYPE_SHORTCUTS_SHORTCUT,
                                  "visible",       TRUE,
                                  "shortcut-type", GTK_SHORTCUT_ACCELERATOR,
                                  "accelerator",   shortcs[m].accelerator,
-                                 "title",         shortcs[m].description,
+                                 "title",         _(shortcs[m].description),
                                  NULL );
 #ifdef GTK4
 #if GTK_MINOR_VERSION > 14 || (GTK_MINOR_VERSION == 14 && GTK_MICRO_VERSION >= 4)
@@ -244,7 +244,7 @@ GtkWidget * shortcuts_window (int sections, int group_by_section[sections], int 
 #if GTK_MINOR_VERSION > 14 || (GTK_MINOR_VERSION == 14 && GTK_MICRO_VERSION >= 4)
     gtk_shortcuts_window_add_section (GTK_SHORTCUTS_WINDOW(win), shortcut_section[i]);
 #else
-    gtk_notebook_append_page (GTK_NOTEBOOK(sections_book), (GtkWidget *)shortcut_section[i], gtk_label_new (section_names[i]));
+    gtk_notebook_append_page (GTK_NOTEBOOK(sections_book), (GtkWidget *)shortcut_section[i], gtk_label_new (_(section_names[i])));
 #endif
 #else
     gtk_container_add (GTK_CONTAINER((GtkWidget *)win), (GtkWidget *)shortcut_section[i]);
@@ -764,18 +764,18 @@ GMenu * workspace_section (gchar * act, int pop)
   GMenu * menu = g_menu_new ();
   gchar * str;
   str =  g_strdup_printf ("%s.workspace.open", act);
-  append_menu_item (menu, "Open", (const gchar *)str, "<CTRL>W", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Open"), (const gchar *)str, "<CTRL>W", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
   g_free (str);
   if (! pop || nprojects)
   {
     str =  g_strdup_printf ("%s.workspace.save", act);
-    append_menu_item (menu, "Save", (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVE, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Save"), (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVE, FALSE, FALSE, FALSE, NULL);
     g_free (str);
     str =  g_strdup_printf ("%s.workspace.save-as", act);
-    append_menu_item (menu, "Save As", (const gchar *)str, "<CTRL>S", NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Save As"), (const gchar *)str, "<CTRL>S", NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
     g_free (str);
     str =  g_strdup_printf ("%s.workspace.close", act);
-    append_menu_item (menu, "Close", (const gchar *)str, "<CTRL>C", NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Close"), (const gchar *)str, "<CTRL>C", NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
   return menu;
@@ -796,10 +796,10 @@ GMenu * port_section (gchar * act, int pop, int port)
   GMenu * menu = g_menu_new ();
   gchar * str;
   str =  g_strdup_printf ("%s.%s.isaacs", act, port_action[port]);
-  append_menu_item (menu, "ISAACS Project File (*.ipf)", (const gchar *)str, NULL, NULL, IMG_FILE, PACKAGE_MOL, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("ISAACS Project File (*.ipf)"), (const gchar *)str, NULL, NULL, IMG_FILE, PACKAGE_MOL, FALSE, FALSE, FALSE, NULL);
   g_free (str);
   str =  g_strdup_printf ("%s.%s.coordinates", act, port_action[port]);
-  append_menu_item (menu, "Atomic Coordinates", (const gchar *)str, NULL, NULL, IMG_FILE, (port) ? PACKAGE_IMP : PACKAGE_CON, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Atomic Coordinates"), (const gchar *)str, NULL, NULL, IMG_FILE, (port) ? PACKAGE_IMP : PACKAGE_CON, FALSE, FALSE, FALSE, NULL);
   g_free (str);
   return menu;
 }
@@ -823,45 +823,45 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
     if (activep != proj)
     {
       str = g_strdup_printf ("%s.project.active", act);
-      append_menu_item (menu, "Make Active", (const gchar *)str, NULL, NULL, IMG_STOCK, YES, FALSE, FALSE, FALSE, NULL);
+      append_menu_item (menu, _("Make Active"), (const gchar *)str, NULL, NULL, IMG_STOCK, YES, FALSE, FALSE, FALSE, NULL);
       g_free (str);
     }
     if (calc > -1)
     {
       str = g_strdup_printf ("%s.project.compute", act);
-      str_n = g_strdup_printf ("Analyze: %s", graph_name[calc]);
+      str_n = g_strdup_printf (_("Analyze: %s"), _(graph_name[calc]));
       append_menu_item (menu, str_n, (get_project_by_id(proj) -> analysis[calc] -> avail_ok) ? (const gchar *)str : "None", NULL, NULL, IMG_FILE, graph_img[calc], FALSE, FALSE, FALSE, NULL);
       g_free (str);
       g_free (str_n);
     }
     str = g_strdup_printf ("%s.project.edit", act);
-    append_menu_item (menu, "Edit Name", (const gchar *)str, NULL, NULL, IMG_STOCK, EDITA, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Edit Name"), (const gchar *)str, NULL, NULL, IMG_STOCK, EDITA, FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
   if (! atomes_from_libreoffice)
   {
     str = g_strdup_printf ("%s.project.new", act);
-    append_menu_item (menu, "New", (const gchar *)str, "<CTRL>N", NULL, IMG_STOCK, FNEW, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("New"), (const gchar *)str, "<CTRL>N", NULL, IMG_STOCK, FNEW, FALSE, FALSE, FALSE, NULL);
     g_free (str);
     str = g_strdup_printf ("%s.project.open", act);
-    append_menu_item (menu, "Open", (const gchar *)str, "<CTRL>O", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Open"), (const gchar *)str, "<CTRL>O", NULL, IMG_STOCK, FOPEN, FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
   if (! pop_up || proj > -1)
   {
     str = g_strdup_printf ("%s.project.save", act);
-    append_menu_item (menu, "Save", (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVE, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Save"), (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVE, FALSE, FALSE, FALSE, NULL);
     g_free (str);
     str = g_strdup_printf ("%s.project.save-as", act);
-    append_menu_item (menu, "Save As", (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Save As"), (const gchar *)str, NULL, NULL, IMG_STOCK, FSAVEAS, FALSE, FALSE, FALSE, NULL);
     g_free (str);
     if (! atomes_from_libreoffice)
     {
       str = g_strdup_printf ("%s.project.close", act);
-      append_menu_item (menu, "Close", (const gchar *)str, NULL, NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
+      append_menu_item (menu, _("Close"), (const gchar *)str, NULL, NULL, IMG_STOCK, FCLOSE, FALSE, FALSE, FALSE, NULL);
       g_free (str);
     }
-    append_submenu (menu, "Export", port_section(act, pop_up, 0));
+    append_submenu (menu, _("Export"), port_section(act, pop_up, 0));
   }
   return menu;
 }
@@ -876,7 +876,7 @@ GMenu * project_section (gchar * act, int pop_up, int proj, int calc)
 GMenu * import_section (gchar * act)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Import", port_section(act, 0, 1));
+  append_submenu (menu, _("Import"), port_section(act, 0, 1));
   return menu;
 }
 
@@ -891,7 +891,7 @@ GMenu * quit_section (gchar * act)
 {
   GMenu * menu = g_menu_new ();
   gchar * str = g_strdup_printf ("%s.program.quit", act);
-  append_menu_item (menu, "Quit", (const gchar *)str, "<CTRL>Q", NULL, IMG_STOCK, FEXIT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Quit"), (const gchar *)str, "<CTRL>Q", NULL, IMG_STOCK, FEXIT, FALSE, FALSE, FALSE, NULL);
   g_free (str);
   return menu;
 }
@@ -904,7 +904,7 @@ GMenu * quit_section (gchar * act)
 GMenu * workspace_title ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Workspace", "None", NULL, NULL, IMG_FILE, PACKAGE_TD, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Workspace"), "None", NULL, NULL, IMG_FILE, PACKAGE_TD, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -927,7 +927,7 @@ GMenu * project_title (int pop_up, int proj)
   }
   else
   {
-    append_menu_item (menu, "Project(s)", "None", NULL, NULL, IMG_FILE, PACKAGE_TD, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Project(s)"), "None", NULL, NULL, IMG_FILE, PACKAGE_TD, FALSE, FALSE, FALSE, NULL);
   }
   return menu;
 }
@@ -968,9 +968,9 @@ GMenu * create_workspace_menu (gchar * act, int pop_up, int proj, int calc)
 GMenu * create_edit_menu ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Chemistry and Physics", "app.edit.chemistry", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Box and Periodicity", "app.edit.periodicity", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Bond Cutoffs", "app.edit.cutoffs", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Chemistry and Physics"), "app.edit.chemistry", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Box and Periodicity"), "app.edit.periodicity", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Bond Cutoffs"), "app.edit.cutoffs", NULL, NULL, IMG_STOCK, DPROPERTIES, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -982,7 +982,7 @@ GMenu * create_edit_menu ()
 GMenu * tool_box_section ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Toolboxes", "app.analyze.tool-box", "<CTRL>T", NULL, IMG_STOCK, PAGE_SETUP, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Toolboxes"), "app.analyze.tool-box", "<CTRL>T", NULL, IMG_STOCK, PAGE_SETUP, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -999,7 +999,7 @@ GMenu * create_analyze_menu ()
   for (i=0; i<NCALCS-1; i++)
   {
     str = g_strdup_printf ("app.analyze.%d", i);
-    append_menu_item (menu, calc_name[i], str, NULL, NULL, IMG_FILE, graph_img[(i < ANG) ? i : i+1], FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _(calc_name[i]), str, NULL, NULL, IMG_FILE, graph_img[(i < ANG) ? i : i+1], FALSE, FALSE, FALSE, NULL);
     g_free (str);
   }
   // Append new calculation menu element here
@@ -1015,10 +1015,10 @@ GMenu * create_analyze_menu ()
 GMenu * create_help_menu ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Periodic Table", "app.help.periodic", "<CTRL>P", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
-  if (! atomes_from_libreoffice) append_menu_item (menu, "Preferences", "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Shortcuts", "app.help.shortcuts", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "About", "app.help.about", "<CTRL>A", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Periodic Table"), "app.help.periodic", "<CTRL>P", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  if (! atomes_from_libreoffice) append_menu_item (menu, _("Preferences"), "app.help.preferences", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Shortcuts"), "app.help.shortcuts", NULL, NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("About"), "app.help.about", "<CTRL>A", NULL, IMG_STOCK, ABOUT, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -1030,10 +1030,10 @@ GMenu * create_help_menu ()
 GMenu * atomes_menu_bar ()
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Workspace", create_workspace_menu("app", 0, -1, -1));
-  append_submenu (menu, "Edit", create_edit_menu());
-  append_submenu (menu, "Analyze", create_analyze_menu());
-  append_submenu (menu, "Help", create_help_menu());
+  append_submenu (menu, _("Workspace"), create_workspace_menu("app", 0, -1, -1));
+  append_submenu (menu, _("Edit"), create_edit_menu());
+  append_submenu (menu, _("Analyze"), create_analyze_menu());
+  append_submenu (menu, _("Help"), create_help_menu());
   return menu;
 }
 

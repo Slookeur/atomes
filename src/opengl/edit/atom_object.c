@@ -726,7 +726,7 @@ atomic_object * create_object_from_selection (project * this_proj)
   int i, j;
   atomic_object * this_object =  g_malloc0(sizeof*this_object);
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
-  this_object -> name = g_strdup_printf ("From selection");
+  this_object -> name = g_strdup_printf (_("From selection"));
   i = 0;
   for (j=0; j<this_proj->natomes; j++)
   {
@@ -788,11 +788,11 @@ atomic_object * create_object_from_atom_coordination (project * this_proj, int c
     case 0:
       if (i > 0)
       {
-        str = g_strdup_printf ("%d-fold", i);
+        str = g_strdup_printf (_("%d-fold"), i);
       }
       else
       {
-        str = g_strdup_printf ("Isolated");
+        str = g_strdup_printf (_("Isolated"));
       }
       break;
     case 1:
@@ -875,11 +875,11 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
       if (i)
       {
         bonding = TRUE;
-        str = g_strdup_printf ("%d-fold", i);
+        str = g_strdup_printf (_("%d-fold"), i);
       }
       else
       {
-        str = g_strdup_printf ("Isolated");
+        str = g_strdup_printf (_("Isolated"));
       }
       j = 0;
       for (k=0; k<this_proj -> natomes; k++)
@@ -908,7 +908,7 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
       str = g_strdup_printf ("%s", env_name(this_proj, l, aid, 1, NULL));
       break;
   }
-  this_object -> name = g_strdup_printf ("All %s - atom(s)", str);
+  this_object -> name = g_strdup_printf (_("All %s - atom(s)"), str);
   g_free (str);
   check_bonding = (j != this_proj -> natomes && bonding) ? TRUE : FALSE;
   add_object_atoms (this_object, this_proj, o_step, j, new_id, check_bonding, remove);
@@ -931,11 +931,11 @@ atomic_object * create_object_from_frag_mol (project * this_proj, int coord, int
   atomic_object * this_object =  g_malloc0(sizeof*this_object);
   if (coord == 2)
   {
-    this_object -> name = g_strdup_printf ("Fragment N°%d", geo+1);
+    this_object -> name = g_strdup_printf (_("Fragment N°%d"), geo+1);
   }
   else
   {
-    this_object -> name = g_strdup_printf ("Molecule N°%d", geo+1);
+    this_object -> name = g_strdup_printf (_("Molecule N°%d"), geo+1);
   }
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
   this_object -> type = - (coord + 3);
@@ -1023,15 +1023,15 @@ int create_object_from_open_project (project * this_proj, int p)
   {
     case 0:
       i = other_proj -> natomes - other_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
-      lib_object -> name = g_strdup_printf ("All non-selected atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All non-selected atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
     case 1:
       i = other_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
-      lib_object -> name = g_strdup_printf ("All selected atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All selected atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
     case 2:
       i = other_proj -> natomes;
-      lib_object -> name = g_strdup_printf ("All atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
   }
   lib_object -> type = FROM_PROJECT;
@@ -1303,11 +1303,11 @@ void to_insert_in_project (int stat, int orig, project * this_proj, atom_search 
     lib_object -> dim = get_object_dim (lib_object);
     if (stat > 119)
     {
-      lib_object -> name = g_strdup_printf ("Empty position");
+      lib_object -> name = g_strdup_printf (_("Empty position"));
     }
     else
     {
-      lib_object -> name = g_strdup_printf ("%s atom", periodic_table_info[stat].lab);
+      lib_object -> name = g_strdup_printf (_("%s atom"), periodic_table_info[stat].lab);
     }
   }
 

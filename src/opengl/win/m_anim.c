@@ -58,29 +58,29 @@ extern G_MODULE_EXPORT void window_sequencer (GtkWidget * widg, gpointer data);
 */
 GtkWidget * menu_anim (glwin * view, int id)
 {
-  GtkWidget * menuanim = create_menu_item (FALSE, "Animate");
+  GtkWidget * menuanim = create_menu_item (FALSE, _("Animate"));
   GtkWidget * menua = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)menuanim, menua);
   if (id == 0)
   {
-    view -> ogl_anim[0] = gtk3_menu_item (menua, "Spin", IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(window_spinner), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    view -> ogl_anim[0] = gtk3_menu_item (menua, _("Spin"), IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(window_spinner), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   }
   else
   {
-    gtk3_menu_item (menua, "Spin", IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(window_spinner), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menua, _("Spin"), IMG_STOCK, (gpointer)MEDIA_LOOP, G_CALLBACK(window_spinner), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   }
-  GtkWidget * item = gtk3_menu_item (menua, "Sequencer", IMG_STOCK, (gpointer)MEDIA_PLAY, G_CALLBACK(window_sequencer), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  GtkWidget * item = gtk3_menu_item (menua, _("Sequencer"), IMG_STOCK, (gpointer)MEDIA_PLAY, G_CALLBACK(window_sequencer), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   if (get_project_by_id(view -> proj) -> steps == 1)
   {
     widget_set_sensitive (item, 0);
   }
   if (id == 0)
   {
-    view -> ogl_anim[1] = gtk3_menu_item (menua, "Recorder", IMG_STOCK, (gpointer)RECORD, G_CALLBACK(window_recorder), (gpointer)view, TRUE, GDK_KEY_r, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    view -> ogl_anim[1] = gtk3_menu_item (menua, _("Recorder"), IMG_STOCK, (gpointer)RECORD, G_CALLBACK(window_recorder), (gpointer)view, TRUE, GDK_KEY_r, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   }
   else
   {
-    gtk3_menu_item (menua, "Recorder", IMG_STOCK, (gpointer)RECORD, G_CALLBACK(window_recorder), (gpointer)view, TRUE, GDK_KEY_r, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menua, _("Recorder"), IMG_STOCK, (gpointer)RECORD, G_CALLBACK(window_recorder), (gpointer)view, TRUE, GDK_KEY_r, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   }
   widget_set_sensitive (menuanim, get_project_by_id(view -> proj) -> natomes);
   return (menuanim);
@@ -139,9 +139,9 @@ G_MODULE_EXPORT void to_rec (GSimpleAction * action, GVariant * parameter, gpoin
 GMenu * menu_anim (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Spin", "spin", popm, popm, NULL, IMG_STOCK, (gpointer)MEDIA_LOOP, FALSE, G_CALLBACK(to_spin), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
-  append_opengl_item (view, menu, "Sequencer", "seq", popm, popm, NULL, IMG_STOCK, (gpointer)MEDIA_PLAY, FALSE, G_CALLBACK(to_seq), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
-  append_opengl_item (view, menu, "Recorder", "rec", popm, popm, "<CTRL>R", IMG_STOCK, (gpointer)RECORD, FALSE, G_CALLBACK(to_rec), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Spin"), "spin", popm, popm, NULL, IMG_STOCK, (gpointer)MEDIA_LOOP, FALSE, G_CALLBACK(to_spin), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Sequencer"), "seq", popm, popm, NULL, IMG_STOCK, (gpointer)MEDIA_PLAY, FALSE, G_CALLBACK(to_seq), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Recorder"), "rec", popm, popm, "<CTRL>R", IMG_STOCK, (gpointer)RECORD, FALSE, G_CALLBACK(to_rec), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
 
   return menu;
 }

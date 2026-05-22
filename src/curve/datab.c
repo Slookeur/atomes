@@ -469,13 +469,13 @@ void add_to_column (gpointer data)
   GtkWidget * lab;
   gchar * str;
   qint * dat = (qint *)data;
-  wind = dialogmodal ("Add Constant to Column", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
-  gtk_dialog_add_button (GTK_DIALOG (wind), "Apply", GTK_RESPONSE_APPLY);
+  wind = dialogmodal (_("Add Constant to Column"), GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
+  gtk_dialog_add_button (GTK_DIALOG (wind), _("Apply"), GTK_RESPONSE_APPLY);
   box = dialog_get_content_area (wind);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, TRUE, TRUE, 0);
 
-  str = g_strdup_printf ("Add Constant to Last Column");
+  str = g_strdup_printf (_("Add Constant to Last Column"));
   lab = gtk_label_new (str);
   gtk_widget_set_size_request (lab, 200, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, TRUE, FALSE, 0);
@@ -522,13 +522,13 @@ void multiply_column (gpointer data)
   GtkWidget * lab;
   gchar * str;
   qint * dat = (qint *)data;
-  wind = dialogmodal ("Multiply Column by Constant", GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
-  gtk_dialog_add_button (GTK_DIALOG (wind), "Apply", GTK_RESPONSE_APPLY);
+  wind = dialogmodal (_("Multiply Column by Constant"), GTK_WINDOW(get_project_by_id(dat -> a) -> analysis[dat -> b] -> curves[dat -> c] -> window));
+  gtk_dialog_add_button (GTK_DIALOG (wind), _("Apply"), GTK_RESPONSE_APPLY);
   box = dialog_get_content_area (wind);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, TRUE, TRUE, 0);
 
-  str = g_strdup_printf ("Multiply Last Column by Constant");
+  str = g_strdup_printf (_("Multiply Last Column by Constant"));
   lab = gtk_label_new (str);
   gtk_widget_set_size_request (lab, 200, -1);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, TRUE, FALSE, 0);
@@ -547,8 +547,8 @@ void multiply_column (gpointer data)
 GMenu * insert_place ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Before", "data-pop.insert.before", NULL, NULL, IMG_STOCK, (gpointer)GO_UP, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "After", "data-pop.insert.after", NULL, NULL, IMG_STOCK, (gpointer)GO_DOWN, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Before"), "data-pop.insert.before", NULL, NULL, IMG_STOCK, (gpointer)GO_UP, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("After"), "data-pop.insert.after", NULL, NULL, IMG_STOCK, (gpointer)GO_DOWN, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -560,7 +560,7 @@ GMenu * insert_place ()
 GMenu * insert_data ()
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Insert Row(s)", insert_place());
+  append_submenu (menu, _("Insert Row(s)"), insert_place());
   return menu;
 }
 
@@ -572,7 +572,7 @@ GMenu * insert_data ()
 GMenu * delete_data ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Delete Row(s)", "data-pop.delete", NULL, NULL, IMG_STOCK, (gpointer)LIST_REM, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Delete Row(s)"), "data-pop.delete", NULL, NULL, IMG_STOCK, (gpointer)LIST_REM, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -584,7 +584,7 @@ GMenu * delete_data ()
 GMenu* cell_actions ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Copy Selected Row(s)", "data-pop.copy", NULL, NULL, IMG_STOCK, (gpointer)EDITC, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Copy Selected Row(s)"), "data-pop.copy", NULL, NULL, IMG_STOCK, (gpointer)EDITC, FALSE, FALSE, FALSE, NULL);
   g_menu_append_section (menu, NULL, (GMenuModel*)insert_data());
   g_menu_append_section (menu, NULL, (GMenuModel*)delete_data());
   return menu;
@@ -598,7 +598,7 @@ GMenu* cell_actions ()
 GMenu * cell_title ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Cell Based Operations", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Cell Based Operations"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -610,8 +610,8 @@ GMenu * cell_title ()
 GMenu * column_actions ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Add Constant to Last Column", "data-pop.add", NULL, NULL, IMG_STOCK, (gpointer)LIST_ADD, FALSE, FALSE, FALSE, NULL);
-  append_menu_item (menu, "Multiply Last Column by Constant", "data-pop.mul", NULL, NULL, IMG_STOCK, (gpointer)FCLOSE, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Add Constant to Last Column"), "data-pop.add", NULL, NULL, IMG_STOCK, (gpointer)LIST_ADD, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Multiply Last Column by Constant"), "data-pop.mul", NULL, NULL, IMG_STOCK, (gpointer)FCLOSE, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -623,7 +623,7 @@ GMenu * column_actions ()
 GMenu * column_title ()
 {
   GMenu * menu = g_menu_new ();
-  append_menu_item (menu, "Column Based Operations", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+  append_menu_item (menu, _("Column Based Operations"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   return menu;
 }
 
@@ -1056,8 +1056,8 @@ void edit_data (gpointer data)
     GtkWidget * scrol = create_scroll (vbox, -1, 570, GTK_SHADOW_ETCHED_IN);
     add_container_child (CONTAINER_SCR, scrol, this_curve -> datatree);
     GtkWidget * hbox = create_hbox (0);
-    GtkWidget * butc = create_button ("Cancel", IMG_STOCK, CANCEL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cancel_but), data);
-    GtkWidget * butv = create_button ("Apply", IMG_STOCK, EXECUTE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(validate_changes), data);
+    GtkWidget * butc = create_button (_("Cancel"), IMG_STOCK, CANCEL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cancel_but), data);
+    GtkWidget * butv = create_button (_("Apply"), IMG_STOCK, EXECUTE, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(validate_changes), data);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, butc, TRUE, TRUE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, butv, TRUE, TRUE, 0);
     gtk_widget_set_size_request (hbox, -1, 40);

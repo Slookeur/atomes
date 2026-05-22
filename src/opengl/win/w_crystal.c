@@ -72,8 +72,7 @@ gchar * database_dir[DATABASE] = {"AMCSD"};//, "COD", "DZC"};
 
 
 #define SYMMETRIES 8
-gchar * sym_list[SYMMETRIES]= {"Triclinic", "Monoclinic", "Orthorhombic", "Tetragonal", "Trigonal", "Hexagonal"," Cubic", "Other"};
-
+gchar * sym_list[SYMMETRIES]= {"Triclinic", "Monoclinic", "Orthorhombic", "Tetragonal", "Trigonal", "Hexagonal", " Cubic", "Other"};
 
 extern G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data);
 #ifdef GTK3
@@ -448,7 +447,7 @@ void insert_cif_preview ()
   gtk_grid_set_column_spacing (GTK_GRID (grid), 1);
 
   gtk_grid_attach (GTK_GRID (grid), cif_proj -> modelgl -> plot, 0, 0, 4, 4);
-  gtk_grid_attach (GTK_GRID (grid), markup_label("<i>Formula:</i>", 100, -1, 0.0, 0.5), 5, 1, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid), markup_label(_("<i>Formula:</i>"), 100, -1, 0.0, 0.5), 5, 1, 3, 1);
   int i;
   for (i=0; i<cif_proj -> nspec; i++)
   {
@@ -468,12 +467,12 @@ void insert_cif_preview ()
   }
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, -1, 0.0, 0.5), 8, 1, 3, 1);
   g_free (str);
-  gtk_grid_attach (GTK_GRID (grid),markup_label("<i>Density:</i>", 100, -1, 0.0, 0.5), 5, 2, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid),markup_label(_("<i>Density:</i>"), 100, -1, 0.0, 0.5), 5, 2, 3, 1);
   str = g_strdup_printf ("<b>%.3f g/cm<sup>3</sup></b>", cif_proj -> density);
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, -1, 0.0, 0.5), 8, 2, 3, 1);
   g_free (str);
 
-  gtk_grid_attach (GTK_GRID (grid), markup_label("<i>Name:</i>", 100, -1, 0.0, 0.5), 0, 5, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid), markup_label(_("<i>Name:</i>"), 100, -1, 0.0, 0.5), 0, 5, 3, 1);
   str = g_strdup_printf ("<b>%s</b>", );
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, 30, 0.0, 0.5), 3, 5, 11, 1);
 
@@ -774,7 +773,7 @@ int build_crystal_from_cif_database (project * this_proj)
 {
   int active = activep;
   int res;
-  GtkWidget * clib = dialogmodal ("Crystal builder", GTK_WINDOW(this_proj -> modelgl -> win));
+  GtkWidget * clib = dialogmodal (_("Crystal builder"), GTK_WINDOW(this_proj -> modelgl -> win));
 #ifdef GTK3
 #ifdef GTKGLAREA
 #ifndef G_OS_WIN32
@@ -782,20 +781,20 @@ int build_crystal_from_cif_database (project * this_proj)
 #endif // G_OS_WIN32
 #endif // GTKGLAREA
 #endif // GTK3
-  gtk_dialog_add_button (GTK_DIALOG(clib), "Build", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(clib), _("Build"), GTK_RESPONSE_APPLY);
   GtkWidget * vbox = gtk_dialog_get_content_area(GTK_DIALOG (clib));
   GtkWidget * hbox = create_hbox (5);
   gtk_box_pack_start (GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
   cif_file_name = cif_name = NULL;
 
   database_store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
-  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (database_store, 0, "Database"), FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (database_store, 0, _("Database")), FALSE, FALSE, 0);
   group_store = gtk_list_store_new (3,  G_TYPE_INT, G_TYPE_INT,G_TYPE_STRING);
-  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (database_store, 1, "Symmetry"), FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (database_store, 1, _("Symmetry")), FALSE, FALSE, 0);
   group_store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT,G_TYPE_STRING);
-  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (group_store, 2, "Group"), FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (group_store, 2, _("Group")), FALSE, FALSE, 0);
   cif_store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT,G_TYPE_STRING);
-  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (cif_store, 3, "Crystal"), FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(hbox), cif_tree (cif_store, 3, _("Crystal")), FALSE, FALSE, 0);
   fill_database_store (database_store);
   cif_preview_box = create_hbox(0);
   gtk_box_pack_start (GTK_BOX(hbox), cif_preview_box, FALSE, FALSE, 0);

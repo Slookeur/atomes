@@ -68,16 +68,24 @@ extern G_MODULE_EXPORT void create_field (GtkWidget * widg, gpointer data);
 extern gboolean spin (gpointer data);
 extern void check_hidden_visible (project * this_proj);
 
-char * input_types[NINPUTS] = {"Classical: DL-POLY",
-                               "Classical: LAMMPS",
-                               "First-Principles: CPMD",
-                               "First-Principles: CP2K",
-                               "QM-MM: CPMD - [Soon]",
-                               "QM-MM: CP2K - [Soon]"};
+char * input_types[NINPUTS] = {i18n("Classical: DL-POLY"),
+                               i18n("Classical: LAMMPS"),
+                               i18n("First-Principles: CPMD"),
+                               i18n("First-Principles: CP2K"),
+                               i18n("QM-MM: CPMD - [Soon]"),
+                               i18n("QM-MM: CP2K - [Soon]")};
 
-gchar * modes[3]={"Analysis", "Edition", "Input(s)"};
-gchar * smodes[NSELECTION]={"Atom/Bond", "Coordination Sphere", "Fragment", "Molecule", "Single Fragment", "Single Molecule", "Measures (Edition Mode Only)"};
-gchar * invl[2]={"Selection", "Visible/Hidden"};
+gchar * modes[3]={i18n("Analysis "), i18n("Edition "), i18n("Input(s)")};
+
+gchar * smodes[NSELECTION]={i18n("Atom/Bond"), 
+                            i18n("Coordination Sphere"), 
+                            i18n("Fragment"), 
+                            i18n("Molecule"), 
+                            i18n("Single Fragment"), 
+                            i18n("Single Molecule"), 
+                            i18n("Measures (Edition Mode Only)")};
+
+gchar * invl[2]={i18n("Selection"), i18n("Visible/Hidden")};
 
 /*!
   \fn void set_motion_sensitive (glwin * view, int status)
@@ -229,7 +237,7 @@ G_MODULE_EXPORT void set_mode (GtkWidget * widg, gpointer data)
     widget_set_sensitive (this_proj -> modelgl -> ogl_smode[NSELECTION-1], (this_proj -> modelgl -> mode == EDITION) ? 1 : 0);
 #endif
     i = (this_proj -> modelgl -> mode == EDITION) ? EDITION : ANALYZE;
-    gchar * str = g_strdup_printf ("%s - 3D view - [%s mode]", prepare_for_title(this_proj -> name), mode_name[i]);
+    gchar * str = g_strdup_printf (_("%s - 3D view - [%s mode]"), prepare_for_title(this_proj -> name), _(mode_name[i]));
     gtk_window_set_title (GTK_WINDOW (this_proj -> modelgl -> win), str);
     g_free (str);
     this_proj -> modelgl -> create_shaders[MEASU] = TRUE;
@@ -305,13 +313,13 @@ GtkWidget * menu_tools (glwin * view, int id)
 {
   int i;
   GtkWidget * menut = gtk_menu_new ();
-  gtk3_menu_item (menut, "Measures", IMG_NONE, NULL, G_CALLBACK(window_measures), (gpointer)view, TRUE, GDK_KEY_m, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
-  GtkWidget * widg = gtk3_menu_item (menut, "Volumes", IMG_NONE, NULL, G_CALLBACK(window_volumes), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+  gtk3_menu_item (menut, _("Measures"), IMG_NONE, NULL, G_CALLBACK(window_measures), (gpointer)view, TRUE, GDK_KEY_m, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
+  GtkWidget * widg = gtk3_menu_item (menut, _("Volumes"), IMG_NONE, NULL, G_CALLBACK(window_volumes), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
   widget_set_sensitive (widg, (get_project_by_id(view -> proj) -> steps > 1) ? 0 : 1);
   add_menu_separator (menut);
-  gtk_menu_shell_append ((GtkMenuShell *)menut, menu_item_new_with_submenu("Edit", TRUE, menu_edit(view, id)));
+  gtk_menu_shell_append ((GtkMenuShell *)menut, menu_item_new_with_submenu(_("Edit"), TRUE, menu_edit(view, id)));
   add_menu_separator (menut);
-  widg = create_menu_item (FALSE, "Mouse Mode");
+  widg = create_menu_item (FALSE, _("Mouse Mode"));
   gtk_menu_shell_append ((GtkMenuShell *)menut, widg);
   GtkWidget * menum = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menum);
@@ -321,7 +329,7 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<2; i++)
     {
-      view -> ogl_mode[i] = gtk3_menu_item (menum, modes[i], IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[i][0],
+      view -> ogl_mode[i] = gtk3_menu_item (menum, _(modes[i]), IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[i][0],
                                             TRUE, accel[i], GDK_MOD1_MASK, TRUE, TRUE, (i == view -> mode) ? TRUE : FALSE);
       widget_set_sensitive (view -> ogl_mode[i], (get_project_by_id(view -> proj) -> steps > 1) ? 0 : 1);
     }
@@ -330,12 +338,12 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<2; i++)
     {
-      widg = gtk3_menu_item (menum, modes[i], IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[i][0],
+      widg = gtk3_menu_item (menum, _(modes[i]), IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[i][0],
                              TRUE, accel[i], GDK_MOD1_MASK, TRUE, TRUE, (i == view -> mode) ? TRUE : FALSE);
       widget_set_sensitive (widg, (get_project_by_id(view -> proj) -> steps > 1) ? 0 : 1);
     }
   }
-  /*widg = create_menu_item (TRUE, modes[2]);
+  /*widg = create_menu_item (TRUE, _(modes[2]));
   gtk_menu_shell_append ((GtkMenuShell *)menum, widg);
   GtkWidget * menui = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menui);
@@ -344,7 +352,7 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<NINPUTS; i++)
     {
-      view -> ogl_mode[i+2] = gtk3_menu_item (menum, modes[i], IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[2+i][0],
+      view -> ogl_mode[i+2] = gtk3_menu_item (menum, _(modes[i]), IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[2+i][0],
                                               FALSE, 0, 0, TRUE, TRUE, (i+2 == view -> mode) ? TRUE : FALSE);
       widget_set_sensitive (view -> ogl_mode[i+2], 0);
     }
@@ -353,12 +361,12 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<NINPUTS; i++)
     {
-      widg = gtk3_menu_item (menum, modes[i], IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[2+i][0],
+      widg = gtk3_menu_item (menum, _(modes[i]), IMG_NONE, NULL, G_CALLBACK(set_mode), & view -> colorp[2+i][0],
                              FALSE, 0, 0, TRUE, TRUE, (i+2 == view -> mode) ? TRUE : FALSE);
       widget_set_sensitive (widg, 0);
     }
   }*/
-  widg = create_menu_item (FALSE, "Selection Mode");
+  widg = create_menu_item (FALSE, _("Selection Mode"));
   gtk_menu_shell_append ((GtkMenuShell *)menut, widg);
   GtkWidget * menusm = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menusm);
@@ -369,12 +377,12 @@ GtkWidget * menu_tools (glwin * view, int id)
     {
       if (i < 4)
       {
-        view -> ogl_smode[i] = gtk3_menu_item (menusm, smodes[i], IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
+        view -> ogl_smode[i] = gtk3_menu_item (menusm, _(smodes[i]), IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
                                                TRUE, acces[i], GDK_SHIFT_MASK, TRUE, TRUE, (i == view -> selection_mode) ? TRUE : FALSE);
       }
       else
       {
-        view -> ogl_smode[i] = gtk3_menu_item (menusm, smodes[i], IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
+        view -> ogl_smode[i] = gtk3_menu_item (menusm, _(smodes[i]), IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
                                                FALSE, 0, 0, TRUE, TRUE, (i == view -> selection_mode) ? TRUE : FALSE);
       }
       if (i == NSELECTION-1) widget_set_sensitive (view -> ogl_smode[i], (view -> mode == EDITION) ? 1 : 0);
@@ -386,12 +394,12 @@ GtkWidget * menu_tools (glwin * view, int id)
     {
       if (i < 4)
       {
-        widg = gtk3_menu_item (menusm, smodes[i], IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
+        widg = gtk3_menu_item (menusm, _(smodes[i]), IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
                                TRUE, acces[i], GDK_SHIFT_MASK, TRUE, TRUE, (i == view -> selection_mode) ? TRUE : FALSE);
       }
       else
       {
-        widg = gtk3_menu_item (menusm, smodes[i], IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
+        widg = gtk3_menu_item (menusm, _(smodes[i]), IMG_NONE, NULL, G_CALLBACK(set_selection_mode), & view -> colorp[i][0],
                                FALSE, 0, 0, TRUE, TRUE, (i == view -> selection_mode) ? TRUE : FALSE);
       }
       if (i == NSELECTION-1) widget_set_sensitive (widg, (view -> mode == EDITION) ? 1 : 0);
@@ -401,7 +409,7 @@ GtkWidget * menu_tools (glwin * view, int id)
   add_menu_separator (menut);
 
   GtkWidget * menuf = NULL;
-  widg = create_menu_item (FALSE, "Molecular Dynamics");
+  widg = create_menu_item (FALSE, _("Molecular Dynamics"));
   widget_set_sensitive (widg, get_project_by_id(view -> proj) -> nspec);
   gtk_menu_shell_append ((GtkMenuShell *)menut, widg);
   menuf = gtk_menu_new ();
@@ -410,7 +418,7 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<NINPUTS; i++)
     {
-      view -> ogl_mode[i+2+NINPUTS] = create_menu_item (TRUE, input_types[i]);
+      view -> ogl_mode[i+2+NINPUTS] = create_menu_item (TRUE, _(input_types[i]));
       gtk_menu_shell_append ((GtkMenuShell *)menuf, view -> ogl_mode[i+2+NINPUTS]);
       g_signal_connect (G_OBJECT (view -> ogl_mode[i+2+NINPUTS]), "activate", G_CALLBACK(create_field), & view -> colorp[i][0]);
       if (i > 3) widget_set_sensitive (view -> ogl_mode[i+2+NINPUTS], 0);
@@ -421,7 +429,7 @@ GtkWidget * menu_tools (glwin * view, int id)
   {
     for (i=0; i<NINPUTS; i++)
     {
-      widg = create_menu_item (TRUE, input_types[i]);
+      widg = create_menu_item (TRUE, _(input_types[i]));
       gtk_menu_shell_append ((GtkMenuShell *)menuf, widg);
       g_signal_connect (G_OBJECT (widg), "activate", G_CALLBACK(create_field), & view -> colorp[i][0]);
       // if (i < 2 || i > 3) widget_set_sensitive (widg, view -> adv_bonding[1]);
@@ -432,13 +440,13 @@ GtkWidget * menu_tools (glwin * view, int id)
 
   add_menu_separator (menut);
   GtkWidget * menuin = NULL;
-  widg = create_menu_item (FALSE, "Invert");
+  widg = create_menu_item (FALSE, _("Invert"));
   gtk_menu_shell_append ((GtkMenuShell *)menut, widg);
   menuin = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)widg, menuin);
   for (i=0; i<2; i++)
   {
-    widg = create_menu_item (FALSE, invl[i]);
+    widg = create_menu_item (FALSE, _(invl[i]));
     gtk_menu_shell_append ((GtkMenuShell *)menuin, widg);
     g_signal_connect (G_OBJECT (widg), "activate", G_CALLBACK(invert_this), & view -> colorp[i][0]);
   }
@@ -470,7 +478,7 @@ G_MODULE_EXPORT void to_window_measures (GSimpleAction * action, GVariant * para
 GMenu * measure_section (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Measures", "measures", popm, popm, "<CTRL>M", IMG_NONE, NULL, FALSE, G_CALLBACK(to_window_measures), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Measures"), "measures", popm, popm, "<CTRL>M", IMG_NONE, NULL, FALSE, G_CALLBACK(to_window_measures), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -499,7 +507,7 @@ G_MODULE_EXPORT void to_window_volumes (GSimpleAction * action, GVariant * param
 GMenu * volume_section (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Volumes", "volumes", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_window_volumes), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Volumes"), "volumes", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_window_volumes), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -514,7 +522,7 @@ GMenu * volume_section (glwin * view, int popm)
 GMenu * edit_section (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Edit", menu_edit(view, popm));
+  append_submenu (menu, _("Edit"), menu_edit(view, popm));
   return menu;
 }
 
@@ -578,7 +586,7 @@ GMenu * mouse_mode_menu (glwin * view, int popm)
   j = (get_project_by_id(view -> proj) -> steps > 1) ? 0 : 1;
   for (i=0; i<2; i++)
   {
-    append_opengl_item (view, menu, modes[i], "mouse-mode", popm, i, accel[i], IMG_NONE, NULL, FALSE,
+    append_opengl_item (view, menu, _(modes[i]), "mouse-mode", popm, i, accel[i], IMG_NONE, NULL, FALSE,
                         G_CALLBACK(change_mouse_mode_radio), (gpointer)view, FALSE, (i == view -> mode) ? TRUE : FALSE, TRUE, j);
   }
   return menu;
@@ -647,13 +655,13 @@ GMenu * selection_mode_menu (glwin * view, int popm)
     if (i < 4)
     {
       str = g_strdup_printf ("<SHIFT>%s", acces[i]);
-      append_opengl_item (view, menu, smodes[i], "sel-mode", popm, i, str, IMG_NONE, NULL, FALSE, G_CALLBACK(change_sel_mode_radio), (gpointer)view,
+      append_opengl_item (view, menu, _(smodes[i]), "sel-mode", popm, i, str, IMG_NONE, NULL, FALSE, G_CALLBACK(change_sel_mode_radio), (gpointer)view,
                           FALSE, (i == view -> selection_mode) ? TRUE : FALSE, TRUE, j);
       g_free (str);
     }
     else
     {
-      append_opengl_item (view, menu, smodes[i], "sel-mode", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(change_sel_mode_radio), (gpointer)view,
+      append_opengl_item (view, menu, _(smodes[i]), "sel-mode", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(change_sel_mode_radio), (gpointer)view,
                           FALSE, (i == view -> selection_mode) ? TRUE : FALSE, TRUE, j);
     }
   }
@@ -671,8 +679,8 @@ GMenu * selection_mode_menu (glwin * view, int popm)
 GMenu * modes_section (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Mouse Mode", mouse_mode_menu(view, popm));
-  append_submenu (menu, "Selection Mode", selection_mode_menu(view, popm));
+  append_submenu (menu, _("Mouse Mode"), mouse_mode_menu(view, popm));
+  append_submenu (menu, _("Selection Mode"), selection_mode_menu(view, popm));
   return menu;
 }
 
@@ -704,7 +712,7 @@ GMenu * md_menu (glwin * view, int popm)
   int i;
   for (i=0; i<NINPUTS; i++)
   {
-    append_opengl_item (view, menu, input_types[i], "md", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_create_field), & view -> colorp[i][0],
+    append_opengl_item (view, menu, _(input_types[i]), "md", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_create_field), & view -> colorp[i][0],
                         FALSE, FALSE, FALSE, (i < 2) ? view -> adv_bonding[1] : (i > 3) ? FALSE : TRUE);
   }
   return menu;
@@ -738,7 +746,7 @@ GMenu * inv_menu (glwin * view, int popm)
   int i;
   for (i=0; i<2; i++)
   {
-    append_opengl_item (view, menu, invl[i], "inv", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_invert_this), & view -> colorp[i][0], FALSE, FALSE, FALSE, TRUE);
+    append_opengl_item (view, menu, _(invl[i]), "inv", popm, i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_invert_this), & view -> colorp[i][0], FALSE, FALSE, FALSE, TRUE);
   }
   return menu;
 }
@@ -774,8 +782,8 @@ GMenu * menu_tools (glwin * view, int popm)
   g_menu_append_section (menu, NULL, (GMenuModel*)volume_section(view, popm));
   g_menu_append_section (menu, NULL, (GMenuModel*)edit_section(view, popm));
   g_menu_append_section (menu, NULL, (GMenuModel*)modes_section(view, popm));
-  g_menu_append_section (menu, NULL, (GMenuModel*)add_section_item_with_menu(view, "Molecular Dynamics", md_menu(view, popm)));
-  g_menu_append_section (menu, NULL, (GMenuModel*)add_section_item_with_menu(view, "Invert", inv_menu(view, popm)));
+  g_menu_append_section (menu, NULL, (GMenuModel*)add_section_item_with_menu(view, _("Molecular Dynamics"), md_menu(view, popm)));
+  g_menu_append_section (menu, NULL, (GMenuModel*)add_section_item_with_menu(view, _("Invert"), inv_menu(view, popm)));
   return menu;
 }
 #endif
