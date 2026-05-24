@@ -325,12 +325,12 @@ msgid "\tNumber of step(s) between each configuration:"
 msgstr "\tNombre de pas entre chaque configuration:"
 
 # File: gui/calc_menu.c, Line: 318
-# File: gui/preferences.c, Line: 4244
+# File: gui/preferences.c, Line: 4240
 msgid "Time step &#x3b4;t"
 msgstr "Pas de temps &#x3b4;t"
 
 # File: gui/calc_menu.c, Line: 319
-# File: gui/preferences.c, Line: 4233
+# File: gui/preferences.c, Line: 4229
 msgid "Step(s) between conf."
 msgstr "Pas entre les conf."
 
@@ -727,7 +727,7 @@ msgstr "Fermer l'espace de travail ?"
 
 # File: calc/calc.c, Line: 106
 # File: gui/callbacks.c, Line: 133
-# File: gui/preferences.c, Line: 4949,4982
+# File: gui/preferences.c, Line: 4945,4978
 msgid "Are you sure ?"
 msgstr "Etes-vous sûr ?"
 
@@ -1137,7 +1137,7 @@ msgstr "Masse atomique:"
 msgid "Radius:"
 msgstr "Rayon:"
 
-# File: gui/preferences.c, Line: 3426,3589
+# File: gui/preferences.c, Line: 3426,3587
 # File: opengl/win/m_bonds.c, Line: 245
 msgid "Radius"
 msgstr "Rayon"
@@ -1445,7 +1445,7 @@ msgid "open atomes project"
 msgstr "ouvrir un projet atomes"
 
 # File: gui/gui.c, Line: 168
-# File: gui/preferences.c, Line: 2474,3682,3859,4323,5066
+# File: gui/preferences.c, Line: 2474,3678,3855,4319,5062
 # File: opengl/win/glwindow.c, Line: 126
 msgid "General"
 msgstr "Général"
@@ -2233,7 +2233,7 @@ msgstr "Police"
 msgid "Shift"
 msgstr "Changement"
 
-# File: gui/preferences.c, Line: 516,3700
+# File: gui/preferences.c, Line: 516,3696
 # File: opengl/win/w_axis.c, Line: 1000
 msgid "Colors"
 msgstr "Couleurs"
@@ -2354,7 +2354,7 @@ msgstr "Modèle"
 msgid "Factor"
 msgstr "Facteur"
 
-# File: gui/preferences.c, Line: 1201,3426,3589
+# File: gui/preferences.c, Line: 1201,3426,3587
 # File: opengl/win/w_labels.c, Line: 837
 msgid "Width"
 msgstr "Largeur"
@@ -2497,7 +2497,7 @@ msgstr "Élément"
 msgid "Symbol"
 msgstr "Symbole"
 
-# File: gui/preferences.c, Line: 3426,3589
+# File: gui/preferences.c, Line: 3426,3587
 # File: opengl/edit/cell_cut.c, Line: 307
 # File: opengl/win/w_axis.c, Line: 974
 # File: opengl/win/w_labels.c, Line: 726
@@ -2564,20 +2564,11 @@ msgstr "\t<u>Clone(s)</u>"
 msgid "Atom(s) "
 msgstr "Atome(s) "
 
-# File: gui/preferences.c, Line: 3587
-msgid "Dot(s)"
-msgstr "Point(s)"
-
-# File: gui/preferences.c, Line: 3587
-msgid "Sphere(s)"
-msgstr "Sphère(s)"
-
 # File: gui/preferences.c, Line: 3299
 msgid "atom(s) "
 msgstr "atome(s) "
 
 # File: calc/dl_poly/dlp_field.c, Line: 346
-# File: gui/preferences.c, Line: 3586
 # File: opengl/win/glwindow.c, Line: 526
 # File: opengl/win/m_clones.c, Line: 125
 # File: opengl/win/menu_bar.c, Line: 187
@@ -2585,33 +2576,25 @@ msgstr "atome(s) "
 msgid "Bond(s)"
 msgstr "Liaison(s)"
 
-# File: gui/preferences.c, Line: 3590
-msgid "Wireframe(s)"
-msgstr "Fil(s) de fer"
-
-# File: gui/preferences.c, Line: 3590
-msgid "Cylinder(s)"
-msgstr "Cylindre(s)"
-
-# File: gui/preferences.c, Line: 3648
+# File: gui/preferences.c, Line: 3644
 msgid "The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options"
 msgstr "L'onglet <b>Modèle</b> regroupe les options des atome(s), liaison(s) et clone(s)"
 
-# File: gui/preferences.c, Line: 3649
+# File: gui/preferences.c, Line: 3645
 msgid "which effect apply when the corresponding <b>OpenGL</b> style is used:"
 msgstr "quel effet s'applique lorsque le style <b>OpenGL</b> correspondant est utilisé:"
 
-# File: gui/preferences.c, Line: 3650
+# File: gui/preferences.c, Line: 3646
 # File: opengl/win/glwindow.c, Line: 141
 # File: opengl/win/m_style.c, Line: 59
 msgid "Balls and Sticks"
 msgstr "Boules et Bâtonnets"
 
-# File: gui/preferences.c, Line: 3650
+# File: gui/preferences.c, Line: 3646
 msgid "atoms<sup>*</sup> and bonds radii"
 msgstr "atomes<sup>*</sup> et rayons des liaisons"
 
-# File: gui/preferences.c, Line: 3651
+# File: gui/preferences.c, Line: 3647
 # File: opengl/win/glwindow.c, Line: 148
 # File: opengl/win/m_style.c, Line: 60
 # File: opengl/win/w_axis.c, Line: 935
@@ -2619,21 +2602,21 @@ msgstr "atomes<sup>*</sup> et rayons des liaisons"
 msgid "Wireframes"
 msgstr "Fils de Fer"
 
-# File: gui/preferences.c, Line: 3651
+# File: gui/preferences.c, Line: 3647
 msgid "dots<sup>**</sup> size and wireframes width"
 msgstr "taille des points<sup>**</sup> et largeur des fils de fer"
 
-# File: gui/preferences.c, Line: 3652
+# File: gui/preferences.c, Line: 3648
 # File: opengl/win/m_style.c, Line: 61,371,406,505
 # File: opengl/win/popup.c, Line: 3103
 msgid "Spacefilled"
 msgstr "Volumique"
 
-# File: gui/preferences.c, Line: 3652
+# File: gui/preferences.c, Line: 3648
 msgid "tabulated parameters"
 msgstr "paramètres tabulés"
 
-# File: gui/preferences.c, Line: 3653
+# File: gui/preferences.c, Line: 3649
 # File: opengl/win/glwindow.c, Line: 142
 # File: opengl/win/m_box.c, Line: 362,370,617
 # File: opengl/win/m_style.c, Line: 63
@@ -2642,306 +2625,306 @@ msgstr "paramètres tabulés"
 msgid "Cylinders"
 msgstr "Cylindres"
 
-# File: gui/preferences.c, Line: 3653
+# File: gui/preferences.c, Line: 3649
 msgid "bonds radii"
 msgstr "rayons des liaisons"
 
-# File: gui/preferences.c, Line: 3656
+# File: gui/preferences.c, Line: 3652
 msgid "It also provides options to customize atomic label(s),"
 msgstr "Il fournit également des options pour personnaliser les labels atomiques,"
 
-# File: gui/preferences.c, Line: 3656
+# File: gui/preferences.c, Line: 3652
 msgid "and, the model box, if any:"
 msgstr "et la boîte du modèle, le cas échéant:"
 
-# File: gui/preferences.c, Line: 3657,3705
+# File: gui/preferences.c, Line: 3653,3701
 msgid "Labels"
 msgstr "Labels"
 
-# File: gui/preferences.c, Line: 3657
+# File: gui/preferences.c, Line: 3653
 msgid "atom labels"
 msgstr "labels d'atomes"
 
-# File: gui/preferences.c, Line: 3658,3722
+# File: gui/preferences.c, Line: 3654,3718
 # File: opengl/win/m_box.c, Line: 301,600
 # File: opengl/win/w_bonds.c, Line: 411
 msgid "Box"
 msgstr "Boîte"
 
-# File: gui/preferences.c, Line: 3658
+# File: gui/preferences.c, Line: 3654
 msgid "model box details"
 msgstr "détails de la boîte du modèle"
 
-# File: gui/preferences.c, Line: 3663
+# File: gui/preferences.c, Line: 3659
 msgid "<b>Atoms</b>"
 msgstr "<b>Atomes</b>"
 
-# File: gui/preferences.c, Line: 3663
+# File: gui/preferences.c, Line: 3659
 msgid "<b>Clones</b>"
 msgstr "<b>Clones</b>"
 
-# File: gui/preferences.c, Line: 3668
+# File: gui/preferences.c, Line: 3664
 msgid "Edit species colors"
 msgstr "Éditer les couleurs des espèces"
 
-# File: gui/preferences.c, Line: 3672
+# File: gui/preferences.c, Line: 3668
 msgid "Always show clone(s), if any."
 msgstr "Affichez toujours les clones, le cas échéant."
 
-# File: gui/preferences.c, Line: 3675
+# File: gui/preferences.c, Line: 3671
 msgid "Always show box, if any."
 msgstr "Montrez toujours la boîte, le cas échéant."
 
-# File: gui/preferences.c, Line: 3679
+# File: gui/preferences.c, Line: 3675
 msgid "the same parameters are also used for the <b>spheres</b> style"
 msgstr "les mêmes paramètres sont également utilisés pour le style <b>sphères</b>"
 
-# File: gui/preferences.c, Line: 3680
+# File: gui/preferences.c, Line: 3676
 msgid "the same parameters are also used for the <b>dots</b> style"
 msgstr "les mêmes paramètres sont également utilisés pour le style <b>points</b>"
 
-# File: gui/preferences.c, Line: 3701
+# File: gui/preferences.c, Line: 3697
 msgid "Adjust color(s)"
 msgstr "Ajuster la ou les couleurs"
 
-# File: gui/preferences.c, Line: 3746
+# File: gui/preferences.c, Line: 3742
 msgid "f(atoms) <sup>*</sup>"
 msgstr "f(atomes) <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 3789
+# File: gui/preferences.c, Line: 3785
 # File: opengl/win/m_map.c, Line: 1132,1239
 # File: opengl/win/w_coord.c, Line: 90
 msgid "Atomic Species"
 msgstr "Espèces Chimiques"
 
-# File: gui/preferences.c, Line: 3790
+# File: gui/preferences.c, Line: 3786
 # File: opengl/win/m_poly.c, Line: 333,493
 msgid "Total Coordination(s)"
 msgstr "Coordination(s) Totale(s)"
 
-# File: gui/preferences.c, Line: 3791
+# File: gui/preferences.c, Line: 3787
 # File: opengl/win/m_poly.c, Line: 334,494
 msgid "Partial Coordination(s)"
 msgstr "Coordination(s) Partielle(s)"
 
-# File: gui/preferences.c, Line: 3820
+# File: gui/preferences.c, Line: 3816
 msgid "The <b>OpenGL</b> tab regroups rendering options"
 msgstr "L'onglet <b>OpenGL</b> regroupe les options de rendu"
 
-# File: gui/preferences.c, Line: 3821
+# File: gui/preferences.c, Line: 3817
 msgid "use it to configure the OpenGL 3D scene:"
 msgstr "utilisez-le pour configurer la scène 3D OpenGL:"
 
-# File: gui/preferences.c, Line: 3822,3861
+# File: gui/preferences.c, Line: 3818,3857
 msgid "Material"
 msgstr "Matériau"
 
-# File: gui/preferences.c, Line: 3822
+# File: gui/preferences.c, Line: 3818
 msgid "aspect for atom(s) and bond(s)"
 msgstr "aspect pour les atomes et les liaisons"
 
-# File: gui/preferences.c, Line: 3823,3862
+# File: gui/preferences.c, Line: 3819,3858
 msgid "Lights"
 msgstr "Lumières"
 
-# File: gui/preferences.c, Line: 3823
+# File: gui/preferences.c, Line: 3819
 msgid "lightning of the scene"
 msgstr "éclairage de la scène"
 
-# File: gui/preferences.c, Line: 3824,3863
+# File: gui/preferences.c, Line: 3820,3859
 msgid "Fog"
 msgstr "Brouillard"
 
-# File: gui/preferences.c, Line: 3824
+# File: gui/preferences.c, Line: 3820
 msgid "atmosphere effects"
 msgstr "effets d'atmosphère"
 
-# File: gui/preferences.c, Line: 3825
+# File: gui/preferences.c, Line: 3821
 msgid "It also offers to adjust the main visualization style and the color maps"
 msgstr "Il propose également d'ajuster le style de visualisation principal et les cartes de couleurs"
 
-# File: gui/preferences.c, Line: 3830
+# File: gui/preferences.c, Line: 3826
 msgid "<b>Style</b>"
 msgstr "<b>Style</b>"
 
-# File: gui/preferences.c, Line: 3842
+# File: gui/preferences.c, Line: 3838
 msgid "if 10 000 atoms or more: <b>Wireframes</b>, otherwise: <b>Balls and sticks</b>"
 msgstr "si 10 000 atomes ou plus: <b>Fils de fer</b>, sinon: <b>Boules et bâttonets</b>"
 
-# File: gui/preferences.c, Line: 3845
+# File: gui/preferences.c, Line: 3841
 msgid "<b>Color maps</b>"
 msgstr "<b>Palettes de couleurs</b>"
 
-# File: gui/preferences.c, Line: 3848
+# File: gui/preferences.c, Line: 3844
 msgid "\tatom(s) and bond(s)"
 msgstr "\tatome(s) et liaison(s)"
 
-# File: gui/preferences.c, Line: 3853
+# File: gui/preferences.c, Line: 3849
 msgid "\tpolyhedra"
 msgstr "\tpolyèdres"
 
-# File: gui/preferences.c, Line: 4020,4200
+# File: gui/preferences.c, Line: 4016,4196
 msgid "Spec. &#x3B1;"
 msgstr "Esp. &#x3B1;"
 
-# File: gui/preferences.c, Line: 4021,4215
+# File: gui/preferences.c, Line: 4017,4211
 msgid "Spec. &#x3B2;"
 msgstr "Esp. &#x3B2;"
 
-# File: gui/preferences.c, Line: 4022
+# File: gui/preferences.c, Line: 4018
 msgid "R<sub>cut</sub> (&#x3B1;, &#x3B2;)"
 msgstr "R<sub>coup</sub> (&#x3B1;, &#x3B2;)"
 
-# File: gui/preferences.c, Line: 4023
+# File: gui/preferences.c, Line: 4019
 msgid "Use <sup>*</sup>"
 msgstr "Utilisez <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 4044
+# File: gui/preferences.c, Line: 4040
 msgid "Unused values will not be saved !"
 msgstr "Les valeurs inutilisées ne seront pas enregistrées !"
 
-# File: gui/preferences.c, Line: 4191
+# File: gui/preferences.c, Line: 4187
 msgid "Select partial cutoffs(s)"
 msgstr "Sélectionnez les rayons de coupure partiels"
 
-# File: gui/preferences.c, Line: 4233,4273
+# File: gui/preferences.c, Line: 4229,4269
 msgid "Step(s) between configurations"
 msgstr "Pas entre les configurations"
 
-# File: gui/preferences.c, Line: 4271
+# File: gui/preferences.c, Line: 4267
 msgid "<b>g(r)</b>: number of &#x3b4;r"
 msgstr "<b>g(r)</b> : nombre de &#x3b4;r"
 
-# File: gui/preferences.c, Line: 4271
+# File: gui/preferences.c, Line: 4267
 msgid "<b>s(q)</b>: number of &#x3b4;q"
 msgstr "<b>s(q)</b> : nombre de &#x3b4;q"
 
-# File: gui/preferences.c, Line: 4271
+# File: gui/preferences.c, Line: 4267
 msgid "<b>s(k)</b>: number of &#x3b4;k"
 msgstr "<b>s(k)</b> : nombre de &#x3b4;k"
 
-# File: gui/preferences.c, Line: 4271
+# File: gui/preferences.c, Line: 4267
 msgid "<b>g(r) FFT</b>: number of &#x3b4;r"
 msgstr "<b>g(r) FFT</b> : nombre de &#x3b4;r"
 
-# File: gui/preferences.c, Line: 4272
+# File: gui/preferences.c, Line: 4268
 msgid "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"
 msgstr "<b>D<sub>ij</sub></b>: nombre de &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"
 
-# File: gui/preferences.c, Line: 4272
+# File: gui/preferences.c, Line: 4268
 msgid "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]"
 msgstr "<b>Distribution des angles</b>: nombre de &#x3b4;&#x3b8; [0-180°]"
 
-# File: gui/preferences.c, Line: 4273
+# File: gui/preferences.c, Line: 4269
 msgid "<b>Spherical harmonics</b>: l<sub>max</sub> &#x2208; [2-40]"
 msgstr "<b>Harmoniques sphériques</b>: l<sub>max</sub> &#x2208; [2-40]"
 
-# File: gui/preferences.c, Line: 4273
+# File: gui/preferences.c, Line: 4269
 msgid "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"
 msgstr "<b>F(k,&#x3b4;t)</b>: nombre de &#x3b4;k"
 
-# File: gui/preferences.c, Line: 4274
+# File: gui/preferences.c, Line: 4270
 msgid "The <b>Analysis</b> tab regroups calculation options"
 msgstr "L'onglet <b>Analyse</b> regroupe les options de calcul"
 
-# File: gui/preferences.c, Line: 4275
+# File: gui/preferences.c, Line: 4271
 msgid "use it to setup your own default parameters:"
 msgstr "utilisez-le pour configurer vos propres paramètres par défaut:"
 
-# File: gui/preferences.c, Line: 4276,4347
+# File: gui/preferences.c, Line: 4272,4343
 msgid "Calculations"
 msgstr "Calculs"
 
-# File: gui/preferences.c, Line: 4276
+# File: gui/preferences.c, Line: 4272
 msgid "most analysis options"
 msgstr "la plupart des options d'analyse"
 
-# File: gui/preferences.c, Line: 4277,4354
+# File: gui/preferences.c, Line: 4273,4350
 # File: opengl/win/popup.c, Line: 4234
 msgid "Rings"
 msgstr "Anneaux"
 
-# File: gui/preferences.c, Line: 4277
+# File: gui/preferences.c, Line: 4273
 msgid "ring statistics options"
 msgstr "options de statistiques d'anneaux"
 
-# File: gui/preferences.c, Line: 4278,4354
+# File: gui/preferences.c, Line: 4274,4350
 msgid "Chains"
 msgstr "Chaînes"
 
-# File: gui/preferences.c, Line: 4278
+# File: gui/preferences.c, Line: 4274
 msgid "chain statistics options"
 msgstr "options de statistiques de chaînes"
 
-# File: gui/preferences.c, Line: 4279
+# File: gui/preferences.c, Line: 4275
 msgid "dynamic structure factor options"
 msgstr "options de facteur de structure dynamique"
 
-# File: gui/preferences.c, Line: 4284
+# File: gui/preferences.c, Line: 4280
 msgid "To determine the existence, or the absence, of a chemical bond"
 msgstr "Déterminer l’existence ou l’absence d’une liaison chimique"
 
-# File: gui/preferences.c, Line: 4285
+# File: gui/preferences.c, Line: 4281
 msgid "between 2 atoms is a key feature in the <b>atomes</b> software"
 msgstr "entre 2 atomes est une fonctionnalité clé du logiciel <b>atomes</b>"
 
-# File: gui/preferences.c, Line: 4288
+# File: gui/preferences.c, Line: 4284
 msgid "It is used for analysis purposes, and, to draw bonds in the OpenGL window."
 msgstr "Cela est utilisé à des fins d'analyse et pour dessiner des liaisons dans la fenêtre OpenGL."
 
-# File: gui/preferences.c, Line: 4290
+# File: gui/preferences.c, Line: 4286
 msgid "You can adapt below the distance cutoffs:"
 msgstr "Vous pouvez adapter ci-dessous les rayons de coupure:"
 
-# File: gui/preferences.c, Line: 4296
+# File: gui/preferences.c, Line: 4292
 msgid "<b>Total cutoff</b>"
 msgstr "<b>Rayon de coupure total</b>"
 
-# File: gui/preferences.c, Line: 4298
+# File: gui/preferences.c, Line: 4294
 msgid "Evaluated by <b>atomes</b>"
 msgstr "Évalué par <b>atomes</b>"
 
-# File: gui/preferences.c, Line: 4299
+# File: gui/preferences.c, Line: 4295
 msgid "User Defined <sup>*</sup>"
 msgstr "Défini par l'Utilisateur <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 4317
+# File: gui/preferences.c, Line: 4313
 msgid "<b>Partial cutoff(s)</b>"
 msgstr "<b>Rayon(s) de coupure partiel(s)</b>"
 
-# File: gui/preferences.c, Line: 4318
+# File: gui/preferences.c, Line: 4314
 msgid "Set default cutoff(s)"
 msgstr "Définir les rayons de coupure par défaut"
 
-# File: gui/preferences.c, Line: 4321
+# File: gui/preferences.c, Line: 4317
 msgid "The highest this value is, the highest the number of neighbors around an atom."
 msgstr "Plus cette valeur est élevée, plus le nombre de voisins autour d’un atome est élevé."
 
-# File: gui/preferences.c, Line: 4343
+# File: gui/preferences.c, Line: 4339
 msgid "<b>Dynamical analysis: MSD, S(q,&#969;)</b>"
 msgstr "<b>Analyse dynamique: DCM, S(q,&#969;)</b>"
 
-# File: gui/preferences.c, Line: 4883
+# File: gui/preferences.c, Line: 4879
 msgid "Apply to project(s) in workspace ?"
 msgstr "Appliquer aux projets de l'espace de travail ?"
 
-# File: gui/preferences.c, Line: 4883
+# File: gui/preferences.c, Line: 4879
 msgid "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?"
 msgstr "Les préférences ont été enregistrées pour la session active !\n Souhaitez-vous appliquer ces préférences au(x) projet(s) ouvert(s) dans l'espace de travail ?"
 
-# File: gui/preferences.c, Line: 4886
+# File: gui/preferences.c, Line: 4882
 msgid "Project selection"
 msgstr "Sélection de projets"
 
-# File: gui/preferences.c, Line: 4886
+# File: gui/preferences.c, Line: 4882
 msgid "Select to apply preferences"
 msgstr "Sélectionnez pour appliquer les préférences"
 
-# File: gui/preferences.c, Line: 4895
+# File: gui/preferences.c, Line: 4891
 msgid "Including analysis parameters and cutoffs ..."
 msgstr "Y compris les paramètres d'analyse et les rayons de coupure ..."
 
-# File: gui/preferences.c, Line: 4949
+# File: gui/preferences.c, Line: 4945
 msgid "Restore default parameters"
 msgstr "Restaurer les paramètres par défaut"
 
@@ -2949,107 +2932,107 @@ msgstr "Restaurer les paramètres par défaut"
 msgid "Analysis"
 msgstr "analyse"
 
-# File: gui/preferences.c, Line: 4958,5068
+# File: gui/preferences.c, Line: 4954,5064
 # File: opengl/win/m_tools.c, Line: 78
 msgid "Analysis "
 msgstr "Analyse"
 
-# File: gui/preferences.c, Line: 4960,5070
+# File: gui/preferences.c, Line: 4956,5066
 # File: opengl/win/glwindow.c, Line: 622
 # File: opengl/win/menu_bar.c, Line: 270,275
 # File: opengl/win/w_volumes.c, Line: 1138
 msgid "Model"
 msgstr "Modèle"
 
-# File: gui/preferences.c, Line: 4961,5071
+# File: gui/preferences.c, Line: 4957,5067
 # File: opengl/win/glwindow.c, Line: 631
 # File: opengl/win/menu_bar.c, Line: 279
 msgid "View"
 msgstr "Vue"
 
-# File: gui/preferences.c, Line: 4982
+# File: gui/preferences.c, Line: 4978
 msgid "Save parameters"
 msgstr "Enregistrer les paramètres"
 
-# File: gui/preferences.c, Line: 4985,5131
+# File: gui/preferences.c, Line: 4981,5127
 msgid "Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"
 msgstr "Voulez-vous sauvegarder les préférences d'<b>atomes</b> dans:\n\n\t%s\n\nS'il est trouvé, ce fichier est traité à chaque démarrage d'<b>atomes</b>.\n\n\t\t\t\t\t\tEnregistrer le fichier ?"
 
-# File: gui/preferences.c, Line: 4986,5132
+# File: gui/preferences.c, Line: 4982,5128
 msgid "Save atomes preferences to file ?"
 msgstr "Enregistrer les préférences d'atomes dans un fichier ?"
 
-# File: gui/preferences.c, Line: 4990,5136
+# File: gui/preferences.c, Line: 4986,5132
 msgid "Error while trying to save preferences to file"
 msgstr "Erreur lors de la tentative d'enregistrement des préférences dans le fichier"
 
-# File: gui/preferences.c, Line: 5028
+# File: gui/preferences.c, Line: 5024
 msgid "User preferences"
 msgstr "Préférences utilisateur"
 
-# File: gui/preferences.c, Line: 5041
+# File: gui/preferences.c, Line: 5037
 msgid "Browse the following to modify the default configuration of <b>atomes</b>"
 msgstr "Parcourez ce qui suit pour modifier la configuration par défaut d'<b>atomes</b>"
 
-# File: gui/preferences.c, Line: 5042
+# File: gui/preferences.c, Line: 5038
 msgid "by replacing internal parameters by user defined preferences."
 msgstr "en remplaçant les paramètres internes par des préférences définies par l'utilisateur."
 
-# File: gui/preferences.c, Line: 5043
+# File: gui/preferences.c, Line: 5039
 msgid "calculation preferences"
 msgstr "préférences de calcul"
 
-# File: gui/preferences.c, Line: 5044
+# File: gui/preferences.c, Line: 5040
 msgid "rendering preferences"
 msgstr "préférences de rendu"
 
-# File: gui/preferences.c, Line: 5045
+# File: gui/preferences.c, Line: 5041
 msgid "atom(s), bond(s) and box preferences"
 msgstr "préférences d'atome(s), liaison(s) et boîte"
 
-# File: gui/preferences.c, Line: 5046
+# File: gui/preferences.c, Line: 5042
 msgid "representation and projection preferences"
 msgstr "préférences de représentation et projection"
 
-# File: gui/preferences.c, Line: 5047
+# File: gui/preferences.c, Line: 5043
 msgid "Default parameters are used for any new project added to the workspace\n"
 msgstr "Les paramètres par défaut sont utilisés pour tout nouveau projet ajouté à l'espace de travail\n"
 
-# File: gui/preferences.c, Line: 5062
+# File: gui/preferences.c, Line: 5058
 msgid "Restore <b>atomes</b> default parameters"
 msgstr "Restaurer les paramètres par défaut d'<b>atomes</b>"
 
-# File: gui/preferences.c, Line: 5098
+# File: gui/preferences.c, Line: 5094
 msgid "rendering"
 msgstr "rendu"
 
-# File: gui/preferences.c, Line: 5108
+# File: gui/preferences.c, Line: 5104
 # File: opengl/win/w_bonds.c, Line: 410
 msgid "box"
 msgstr "boîte"
 
-# File: gui/preferences.c, Line: 5112
+# File: gui/preferences.c, Line: 5108
 # File: opengl/win/w_bonds.c, Line: 410
 msgid "axis"
 msgstr "axes"
 
-# File: gui/preferences.c, Line: 5116
+# File: gui/preferences.c, Line: 5112
 msgid "background"
 msgstr "arrière-plan"
 
-# File: gui/preferences.c, Line: 5088
+# File: gui/preferences.c, Line: 5084
 msgid "representation"
 msgstr "représentation"
 
-# File: gui/preferences.c, Line: 5089
+# File: gui/preferences.c, Line: 5085
 msgid "Set %s preferences as default preferences ?"
 msgstr "Définir les préférences %s comme préférences par défaut ?"
 
-# File: gui/preferences.c, Line: 5091
+# File: gui/preferences.c, Line: 5087
 msgid "Set model preferences as default ?"
 msgstr "Définir les préférences du modèle par défaut ?"
 
-# File: gui/preferences.c, Line: 5161
+# File: gui/preferences.c, Line: 5157
 msgid "Set default"
 msgstr "Définir par défaut"
 
@@ -3284,7 +3267,7 @@ msgstr "Erreur dans le format de chaîne : chaîne = \"%s\" - valeur == %lf\n"
 msgid "\n \tAnalysis was performed in: "
 msgstr "\n \tL'analyse a été réalisée en: "
 
-# File: project/close_p.c, Line: 525
+# File: project/close_p.c, Line: 526
 msgid "No project to be closed"
 msgstr "Aucun projet à clôturer"
 
@@ -6747,55 +6730,55 @@ msgstr "<b>Les seuils doivent être &#8805; 0,5 &#xC5;</b>"
 msgid "Adjust cutoff radius(ii) - %s"
 msgstr "Ajuster le rayon de coupure(ii) - %s"
 
-# File: opengl/win/w_encode.c, Line: 459
+# File: opengl/win/w_encode.c, Line: 455
 msgid "%s - movie encoding"
 msgstr "%s - encodage du film"
 
-# File: opengl/win/w_encode.c, Line: 463
+# File: opengl/win/w_encode.c, Line: 459
 msgid "%s - image rendering"
 msgstr "%s - rendu d'image"
 
-# File: opengl/win/w_encode.c, Line: 476
+# File: opengl/win/w_encode.c, Line: 472
 msgid "Frames recorded:"
 msgstr "Images enregistrées:"
 
-# File: opengl/win/w_encode.c, Line: 485
+# File: opengl/win/w_encode.c, Line: 481
 msgid "Frames per seconds:"
 msgstr "Images par seconde:"
 
-# File: opengl/win/w_encode.c, Line: 495
+# File: opengl/win/w_encode.c, Line: 491
 msgid "Extra frames every (frames):"
 msgstr "Images supplémentaires toutes les (images):"
 
-# File: opengl/win/w_encode.c, Line: 500
+# File: opengl/win/w_encode.c, Line: 496
 msgid "Movie resolution (in pixels):"
 msgstr "Résolution de la vidéo (en pixels):"
 
-# File: opengl/win/w_encode.c, Line: 505
+# File: opengl/win/w_encode.c, Line: 501
 msgid "Image resolution (in pixels):"
 msgstr "Résolution de l'image (en pixels):"
 
-# File: opengl/win/w_encode.c, Line: 527
+# File: opengl/win/w_encode.c, Line: 523
 msgid "Video codec:"
 msgstr "Codec vidéo:"
 
-# File: opengl/win/w_encode.c, Line: 534
+# File: opengl/win/w_encode.c, Line: 530
 msgid "Image format:"
 msgstr "Format des images:"
 
-# File: opengl/win/w_encode.c, Line: 554
+# File: opengl/win/w_encode.c, Line: 550
 msgid "Video quality (bitrate in kb/s):"
 msgstr "Qualité vidéo (débit en kb/s):"
 
-# File: opengl/win/w_encode.c, Line: 568
+# File: opengl/win/w_encode.c, Line: 564
 msgid "OpenGL quality [0-1000] (0= recorded quality):"
 msgstr "Qualité OpenGL [0-1000] (0= qualité enregistrée):"
 
-# File: opengl/win/w_encode.c, Line: 572
+# File: opengl/win/w_encode.c, Line: 568
 msgid "OpenGL quality [0-1000] (0= on-screen quality):"
 msgstr "Qualité OpenGL [0-1000] (0= qualité à l'écran):"
 
-# File: opengl/win/w_encode.c, Line: 579
+# File: opengl/win/w_encode.c, Line: 575
 msgid "Progress: "
 msgstr "Progrès: "
 
@@ -12342,7 +12325,7 @@ msgid "%s contains the following <b>%d</b> type(s) %s"
 msgstr "%s contient le(s) type(s) <b>%d</b> suivants %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 1782
-msgid "the force field do not contains any %s(s)"
+msgid "the force field do not contains any %s"
 msgstr "le champ de force ne contient aucun %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 1875
