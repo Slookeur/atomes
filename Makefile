@@ -61,7 +61,7 @@ ifeq ($(LINUX),1)
   CP = cp
   CPFLAGS = -f
   ECHO = echo
-	MSGFMT = msgfmt
+  MSGFMT = msgfmt
 
   EXT =
 
@@ -136,6 +136,7 @@ ifeq ($(WINDOWS),1)
   CAT = $(DEV)bin/cat
   CPFLAGS = -f
   ECHO = $(DEV)bin/echo
+  MSGFMT = $(DEV)bin/msgfmt
 
   WINDRES = $(COMP)windres
   WIN_ATOMES = $(OBJ)win_atomes.o
@@ -487,8 +488,8 @@ atomes: locale version ogl exe
 debug: locale version ogl exe
 
 locale:
-	$(MSGFMT) $(LOCALE)/en/atomes-messages.po -o  $(LOCALE)/en/LC_MESSAGES/atomes.mo
-	$(MSGFMT) $(LOCALE)/fr/atomes-messages.po -o  $(LOCALE)/fr/LC_MESSAGES/atomes.mo
+	$(MSGFMT) $(LOCALE)/en/atomes-messages.po -o $(LOCALE)/en/LC_MESSAGES/atomes.mo
+	$(MSGFMT) $(LOCALE)/fr/atomes-messages.po -o $(LOCALE)/fr/LC_MESSAGES/atomes.mo
 
 version:
 	$(ECHO) "#define FC \""$(FC) $(FCVER)"\"" > src/version.h
