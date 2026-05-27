@@ -594,7 +594,7 @@ gchar * open_sml_file (const char * filetoread, int fam)
     node = racine -> children;
     node = findnode(node, "class");
     cdata = xmlNodeGetContent(node);
-    if (g_strcmp0 ((gchar *)cdata, _(family_list[fam])) != 0)
+    if (g_strcmp0 ((gchar *)cdata, family_list[fam]) != 0)
     {
       xmlFree (cdata);
       clean_xml_data (doc, reader);

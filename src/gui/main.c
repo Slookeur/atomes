@@ -212,9 +212,9 @@ void print_version ()
           LIBSWSCALE_VERSION_MINOR,
           LIBSWSCALE_VERSION_MICRO);
 #ifdef OPENMP
-  float v;
-  char * v_string;
-  switch (_OPENMP)
+  float v = 0.0;
+  char * v_string = NULL;
+  switch (OPENMP)
   {
     case 200505:
       v = 2.5;
@@ -1299,6 +1299,7 @@ int main (int argc, char *argv[])
 
     bindtextdomain (PACKAGE, PACKAGE_LOCALE);
     textdomain (PACKAGE);
+    bind_textdomain_codeset(PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
 
     set_atomes_preferences ();
 
