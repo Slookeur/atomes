@@ -10788,7 +10788,7 @@ msgstr "<b>Autres options:</b>"
 msgid "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters."
-msgstr "En %s, 12 à 6 interactions non-liées sont évaluées à l'aide de : \n"
+msgstr "Dans %s, les interactions non-liées 12-6 sont évaluées à l'aide de : \n"
 "%s\n"
 "<i><b>A</b></i> et <i><b>B</b></i> sont calculés à l'aide de Ɛ<sub>i/j</sub> et r0<sub>i/j</sub> fournis par les paramètres du champ de force."
 
@@ -10796,7 +10796,7 @@ msgstr "En %s, 12 à 6 interactions non-liées sont évaluées à l'aide de : \
 msgid "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters."
-msgstr "En %s, 12 à 6 interactions non-liées sont évaluées à l'aide de : \n"
+msgstr "Dans %s, les interactions non-liées 12-6 sont évaluées à l'aide de : \n"
 "%s\n"
 "<i><b>A</b></i> et <i><b>B</b></i> sont calculés à l'aide de A<sub>i/j</sub> et B<sub>i/j</sub> fournis par les paramètres du champ de force."
 

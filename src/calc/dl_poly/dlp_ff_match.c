@@ -1472,7 +1472,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
       tmp_fbody -> fpid[prop -> b] = -1;
     }
   }
-  if (prop -> a == 15)
+  if (prop -> a == 15 && i)
   {
     float * vcl;
     float eij;
