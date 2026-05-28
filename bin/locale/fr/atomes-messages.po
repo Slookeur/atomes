@@ -2307,7 +2307,7 @@ msgstr "Zoom"
 # File: gui/preferences.c, Line: 1081
 # File: opengl/win/m_rep.c, Line: 428
 msgid "Camera pitch"
-msgstr "Emplacement caméra"
+msgstr "Pitch caméra"
 
 # File: gui/preferences.c, Line: 1081
 # File: opengl/win/m_rep.c, Line: 428
@@ -2793,19 +2793,19 @@ msgstr "Pas entre les configurations"
 
 # File: gui/preferences.c, Line: 4267
 msgid "<b>g(r)</b>: number of &#x3b4;r"
-msgstr "<b>g(r)</b> : nombre de &#x3b4;r"
+msgstr "<b>g(r)</b>: nombre de &#x3b4;r"
 
 # File: gui/preferences.c, Line: 4267
 msgid "<b>s(q)</b>: number of &#x3b4;q"
-msgstr "<b>s(q)</b> : nombre de &#x3b4;q"
+msgstr "<b>s(q)</b>: nombre de &#x3b4;q"
 
 # File: gui/preferences.c, Line: 4267
 msgid "<b>s(k)</b>: number of &#x3b4;k"
-msgstr "<b>s(k)</b> : nombre de &#x3b4;k"
+msgstr "<b>s(k)</b>: nombre de &#x3b4;k"
 
 # File: gui/preferences.c, Line: 4267
 msgid "<b>g(r) FFT</b>: number of &#x3b4;r"
-msgstr "<b>g(r) FFT</b> : nombre de &#x3b4;r"
+msgstr "<b>g(r) FFT</b>: nombre de &#x3b4;r"
 
 # File: gui/preferences.c, Line: 4268
 msgid "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"
@@ -2902,7 +2902,7 @@ msgstr "Plus cette valeur est élevée, plus le nombre de voisins autour d’un 
 
 # File: gui/preferences.c, Line: 4339
 msgid "<b>Dynamical analysis: MSD, S(q,&#969;)</b>"
-msgstr "<b>Analyse dynamique: DCM, S(q,&#969;)</b>"
+msgstr "<b>Déplacement Carré Moyen</b>:"
 
 # File: gui/preferences.c, Line: 4879
 msgid "Apply to project(s) in workspace ?"
@@ -2996,7 +2996,7 @@ msgstr "préférences de représentation et projection"
 
 # File: gui/preferences.c, Line: 5043
 msgid "Default parameters are used for any new project added to the workspace\n"
-msgstr "Les paramètres par défaut sont utilisés pour tout nouveau projet ajouté à l'espace de travail\n"
+msgstr "Les paramètres par défaut sont utilisés\npour tout nouveau projet ajouté à l'espace de travail\n"
 
 # File: gui/preferences.c, Line: 5058
 msgid "Restore <b>atomes</b> default parameters"
@@ -5552,7 +5552,7 @@ msgstr "Profondeur <b>Ca</b>méra"
 
 # File: opengl/win/m_rep.c, Line: 429
 msgid "Camera right/left"
-msgstr "Caméra droite/gauche"
+msgstr "Cam. droite/gauche"
 
 # File: opengl/win/m_rep.c, Line: 429
 msgid "Camera up/down"

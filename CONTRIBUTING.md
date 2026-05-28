@@ -14,6 +14,7 @@ To get started with [atomes][atomes] development give a look to the [DEVELOPER.m
 
 There are many possible task: 
 
+  - Propose a translation in your native language.
   - Testing the features, reporting any bugs you find.
   - Improving the documentation.
   - Graphics design.

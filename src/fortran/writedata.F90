@@ -864,7 +864,7 @@ if (nfile  .eq. afile-1) close(200)
 
 013 FORMAT ("@type xy")
 014 FORMAT (f20.10,3x,f20.10)
-015 FORMAT ("# ",A65," ",A35)
+015 FORMAT ("# ",A65," ",A36)
 019 FORMAT ("@type bar")
 
 END SUBROUTINE
@@ -890,7 +890,7 @@ REAL (KIND=c_double), DIMENSION(ndata), INTENT(IN) :: xdata, ydata
 INTEGER :: WA, WB
 CHARACTER (LEN=5) :: xaxis="xaxis", yaxis="yaxis"
 CHARACTER (LEN=65) :: xlabel
-CHARACTER (LEN=35) :: ylabel
+CHARACTER (LEN=36) :: ylabel
 INTERFACE
   CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc, snp)
     INTEGER, INTENT(IN) :: job, nleg, idl, snp
@@ -1038,7 +1038,7 @@ close(100)
 003 FORMAT ("@    ",A5," tick on")
 004 FORMAT ("@    ",A5," tick major size ",f8.6)
 005 FORMAT ("@    ",A5," tick minor size ",f8.6)
-006 FORMAT ("@    ",A5," label ",A35)
+006 FORMAT ("@    ",A5," label ",A36)
 007 FORMAT ("@    ",A5," ticklabel on")
 008 FORMAT ("@    ",A5," ticklabel char size 0.800000")
 009 FORMAT ("@    legend on")
@@ -1047,7 +1047,7 @@ close(100)
 012 FORMAT ("@target G0.S0")
 013 FORMAT ("@type xy")
 014 FORMAT (f20.10,3x,f20.10)
-015 FORMAT ("# ",A65," ",A35)
+015 FORMAT ("# ",A65," ",A36)
 016 FORMAT ("@    xaxes scale Logarithmic")
 017 FORMAT ("@    yaxes scale Logarithmic")
 018 FORMAT (i4,5x,f20.10)

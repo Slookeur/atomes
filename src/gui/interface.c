@@ -183,10 +183,10 @@ G_MODULE_EXPORT void create_about_dialog (GtkWidget * widg, gpointer data)
 #endif
   gchar * str;
   const gchar * authors[] = {"Dr. Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>",
+                             "", NULL};
+                             /*"Collaborations:",
                              "",
-                             "Collaborations:",
-                             "",
-                             "Dr. Noël Jakse <noel.jakse@grenoble-inp.fr> : dynamic structure factor", NULL};
+                             "Dr. Noël Jakse <noel.jakse@grenoble-inp.fr> : dynamic structure factor", NULL}; */
   const gchar * weblabel = "https://atomes.ipcms.fr";
   const gchar * comments = i18n("Visualization, analyzis, creation/edition and post-processing of atomic scale models !");
   const gchar * copyrights = "Copyright © 2026 \nDr. Sébastien Le Roux";

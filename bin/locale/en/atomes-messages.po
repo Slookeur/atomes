@@ -2902,7 +2902,7 @@ msgstr "The highest this value is, the highest the number of neighbors around an
 
 # File: gui/preferences.c, Line: 4339
 msgid "<b>Dynamical analysis: MSD, S(q,&#969;)</b>"
-msgstr "<b>Dynamical analysis: MSD, S(q,&#969;)</b>"
+msgstr "<b>Mean Squared Displacement :</b>"
 
 # File: gui/preferences.c, Line: 4879
 msgid "Apply to project(s) in workspace ?"

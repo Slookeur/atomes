@@ -4275,7 +4275,7 @@ GtkWidget * calc_preferences ()
                           {"S(q,&#969;)", i18n("dynamic structure factor options")}};
 
   vbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 20);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("To determine the existence, or the absence, of a chemical bond"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("between 2 atoms is a key feature in the <b>atomes</b> software"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
@@ -4323,7 +4323,7 @@ GtkWidget * calc_preferences ()
   int i;
   for (i=0; i<NUM_DELTA; i++)
   {
-    if (i != 7)
+    if (i != 7 && i != 8)
     {
       hbox = create_hbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(default_delta_num_leg[i]), (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
@@ -4349,9 +4349,9 @@ GtkWidget * calc_preferences ()
     calc_rings (vbox);
     gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? _("Chains") : _("Rings")));
   }
-  vbox = create_vbox (BSEP);
+  /*vbox = create_vbox (BSEP);
   calc_sk_t (vbox);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, markup_label("S(q,&#969;)", -1, -1, 0.0, 0.5));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, markup_label("S(q,&#969;)", -1, -1, 0.0, 0.5));*/
 
   show_the_widgets (notebook);
   return notebook;

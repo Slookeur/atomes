@@ -324,7 +324,7 @@ enum ImageFormats {
 /*!< \def NCALCS
   \brief number of analysis
 */
-#define NCALCS 11
+#define NCALCS 10
 
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
