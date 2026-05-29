@@ -977,7 +977,7 @@ void lattice_info_ (int * bid, double * volume, double * density,
     {
       active_project -> analysis[GDR] -> max = fdmax_ (& active_cell -> pbc);
       active_project -> analysis[SQD] -> min = active_project -> analysis[SKD] -> min = fkmin_ (& active_cell -> pbc);
-      if (active_project -> analysis[SKT]) active_project -> analysis[SKT] -> min = active_project -> analysis[SKD] -> min;
+      // if (active_project -> analysis[SKT]) active_project -> analysis[SKT] -> min = active_project -> analysis[SKD] -> min;
     }
     int i, j;
     active_cell -> volume = active_cell -> density = 0.0;

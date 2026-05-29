@@ -554,7 +554,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
             break;
         }
         if (the_rep -> camera_widg[i]) the_rep -> camera_widg[i] = destroy_this_widget (the_rep -> camera_widg[i]);
-        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 10000.0 : smax[i];
+        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 1000.0 : smax[i];
         the_rep -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], v_max, sdel[i], sdig[i], 150, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
         if (i > 2 || i == 0)

@@ -3817,17 +3817,17 @@ msgstr "Erreur: at= %d, sp= %d, l= %d, geo_id= %d, edit -> coord -> ntg[%d][%d]=
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "replaced"
-msgstr "remplacé"
+msgstr "remplacer"
 
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "removed"
-msgstr "supprimé"
+msgstr "supprimer"
 
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "inserted"
-msgstr "inséré"
+msgstr "inséser"
 
 # File: opengl/edit/atom_action.c, Line: 1138
 msgid "No atoms to be %s !"
@@ -4398,7 +4398,7 @@ msgstr "Groupe d'espace: "
 
 # File: opengl/edit/cbuild_info.c, Line: 523
 msgid "Number: "
-msgstr "Nombre: "
+msgstr "Numéro: "
 
 # File: opengl/edit/cbuild_info.c, Line: 537
 msgid "Crystal system: "
@@ -5548,7 +5548,7 @@ msgstr "Profond. <b>P</b>erspective"
 
 # File: opengl/win/m_rep.c, Line: 427
 msgid "<b>C</b>amera depth"
-msgstr "Profondeur <b>Ca</b>méra"
+msgstr "Profondeur <b>C</b>améra"
 
 # File: opengl/win/m_rep.c, Line: 429
 msgid "Camera right/left"
