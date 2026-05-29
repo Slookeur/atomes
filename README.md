@@ -5,22 +5,22 @@
 
 [atomes][atomes] is a Free (Open Source) cross-platform software licensed under the terms 
 of the Affero GPL v3+ license. 
-***atomes*** is a toolbox developed to analyze, to visualize and to create/edit three-dimensional atomic scale models.
+**atomes** is a toolbox developed to analyze, to visualize and to create/edit three-dimensional atomic scale models.
 It offers a workspace that allows to have many projects opened simultaneously.
 
 The different projects in the workspace can exchange data: analysis results, atomic coordinates ...
-atomes also provides an advanced input preparation system for further calculations using well known molecular dynamics codes:
+**atomes** also provides an advanced input preparation system for further calculations using well known molecular dynamics codes:
 
 - Classical MD : [DLPOLY][dlpoly] and [LAMMPS][lammps]
 - ab-initio MD : [CPMD][cpmd] and [CP2K][cp2k]
 - QM-MM MD : [CPMD][cpmd] and [CP2K][cp2k]
 
 To prepare the input ﬁlles for these calculations is likely to be the key, and most complicated step towards MD simulations. 
-atomes offers a user-friendly assistant to help and guide the user step by step to achieve this crucial step.
+**atomes** offers a user-friendly assistant to help and guide the user step by step to achieve this crucial step.
 
 ## Features
 
-  - Analysis of 3D atomic scale models: neutron and x-rays diffraction, rings statistics, chain statistics, bond order, MSD ...
+  - Analysis of 3D atomic scale models: neutrons and x-rays diffraction, ring statistics, chain statistics, bond order, MSD ...
   - Visualization: measures, coordination polyhedras, advanced coloring, advanced design
   - Edition: molecular library, crystal builder, cell edition, surface creation and passivation ...
   - MD input preparation: 
@@ -90,6 +90,8 @@ to
 
 The documenation is hosted on [GitHub][github] here: [atomes documentation][atomes-doc]
 
+Developer documentation is hosted on [GitHub][github] here: [atomes developer documentation][devel-doc]
+
 ## Tutorials
 
 Tutorial are regrouped and hosted on [GitHub][github] here: [atomes tutorials][atomes-tuto]
@@ -104,6 +106,7 @@ Tutorial are regrouped and hosted on [GitHub][github] here: [atomes tutorials][a
 [atomes]:https://atomes.ipcms.fr/
 [atomes-doc]:https://slookeur.github.io/atomes-doc/
 [atomes-tuto]:https://slookeur.github.io/atomes-tuto/
+[devel-doc]:https://slookeur.github.io/atomes-doxygen/
 [dlpoly]:https://www.scd.stfc.ac.uk/Pages/DL_POLY.aspx
 [lammps]:https://lammps.sandia.gov/
 [cpmd]:http://www.cpmd.org
