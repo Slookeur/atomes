@@ -197,7 +197,7 @@ In the following examples are use to illustrate both how to create the user inte
 
     ...
 
-    GtkWidget * check = check_button ("Apply this or not ?", -1, 40, status, G_CALLBACK(toggle_parameter), NULL);
+    GtkWidget * check = check_button (_("Apply this or not ?"), -1, 40, status, G_CALLBACK(toggle_parameter), NULL);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, idc_box, check, FALSE, FALSE, 0);
    
     ...
@@ -239,7 +239,7 @@ In the following examples are use to illustrate both how to create the user inte
                          FALSE, FALSE, 0);
     GtkWidget * combo = create_combo ();
     int i;
-    gchar * list_items[] = {"First choice", "Second choice", "Third choice"};
+    gchar * list_items[] = {i18n("First choice"), i18n("Second choice"), i18n("Third choice")};
     for (i=0; i<G_N_ELEMENT(list_items); i++)
     {
       combo_text_append (combo, list_item[i]);
@@ -260,6 +260,10 @@ In the following examples are use to illustrate both how to create the user inte
 > - [`create_entry`][create_entry]
 > - [`check_button`][check_button]
 > - [`create_combo`][create_combo]
+
+> [!WARNING]
+> String in between `_( )` or `i18n( )` indicates that the string is translatable. 
+> Translation(s) should be inserted in the `locale/lang/atomes-messages.po` file(s). 
 
 ## Next : [Adding the new analysis to the **atomes** software][analysing]
 ## Previous : [Adding the new analysis description in the code][adding]

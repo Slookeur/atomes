@@ -114,14 +114,14 @@ void update_idc_view (project * this_proj)
   // The list of available font styles, or tags, can be found, and amended if needed, 
   // in the file 'src/gui/gtk-misc.c' in the function 'void setup_text_tags (GtkTextBuffer * buffer)' 
 
-  print_info ("\n\nThis is the new IDC analysis\n\n", "heading", this_proj -> analysis[IDC] -> calc_buffer);
+  print_info (_("\n\nThis is the new IDC analysis\n\n"), "heading", this_proj -> analysis[IDC] -> calc_buffer);
   print_info ("Calculation details:\n\n", NULL, this_proj -> analysis[IDC] -> calc_buffer);
   
-  print_info ("\n\n\t - Number of steps in IDC: ", "bold", this_proj -> analysis[IDC] -> calc_buffer);
+  print_info (_("\n\n\t - Number of steps in IDC: "), "bold", this_proj -> analysis[IDC] -> calc_buffer);
   str = g_strdup_printf ("%d", this_proj -> analysis[IDC] -> num_delta);
   print_info (str, "bold_blue", this_proj -> analysis[IDC] -> calc_buffer);
   g_free (str);
-  print_info ("\n\n\t - Step δ used in IDC: ", "bold", this_proj -> analysis[IDC] -> calc_buffer);
+  print_info (_("\n\n\t - Step δ used in IDC: "), "bold", this_proj -> analysis[IDC] -> calc_buffer);
   str = g_strdup_printf ("%f", this_proj -> analysis[IDC] -> delta);
   print_info (str, "bold_blue", this_proj -> analysis[IDC] -> calc_buffer);
   g_free (str);
@@ -172,9 +172,13 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
 }
 
 ```
- >[!TIP]
- > At this point **atomes** only cares for the elements of the active project and 
- > `active_project` is a pointer that was set on that particular project. 
+>[!TIP]
+> At this point **atomes** only cares for the elements of the active project and 
+> `active_project` is a pointer that was set on that particular project. 
+
+> [!WARNING]
+> String in between `_( )` or `i18n( )` indicates that the string is translatable. 
+> Translation(s) should be inserted in the `locale/lang/atomes-messages.po` file(s).
 
 ## 3. Display information results in the main software window
 

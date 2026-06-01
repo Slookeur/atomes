@@ -38,30 +38,35 @@
     - [`gchar * calc_name`][calc_name] : append a line to add the new analysis name for the menu items
     ```C
     gchar * calc_name[] = {"g(r)/G(r)",
-                           "S(q) from FFT[g(r)]",
-                           "S(q) from Debye equation",
-                           "g(r)/G(r) from FFT[S(q)]",
-                           "Bonds and angles",
-                           "Ring statistics",
-                           "Chain statistics",
-                           "Spherical harmonics",
-                           "Mean Squared Displacement",
-                           "Dynamic structure factor",
+                           i18n("S(q) from FFT[g(r)]"),
+                           i18n("S(q) from Debye Equation"),
+                           i18n("g(r)/G(r) from FFT[S(q)]"),
+                           i18n("Bonds and Angles"),
+                           i18n("Ring Statistics"),
+                           i18n("Chain Statistics"),
+                           i18n("Spherical Harmonics"),
+                           i18n("Mean Squared Displacement"),
+                           i18n("Dynamic Structure Factor"),
                            "The new analysis"};  // This is an example
     ```
+> [!TIP]
+> If the name of the analysis is a translatable string insert the new string name with `i18n( )`
+> and add the corresponding `lang` translatation in the file in `locale/lang/atomes-messages.po`
+> If no translation is provided the string in the code is used. 
+
     - [`gchar * graph_name`][graph_name] : append a line to add the new analysis name for the tool box window
     ```C
     gchar * graph_name[] = {"g(r)/G(r)",
-                            "S(q) from FFT[g(r)]",
-                            "S(q) from Debye equation",
-                            "g(r)/G(r) from FFT[S(q)]",
-                            "Bonds properties",
-                            "Angle distributions",
-                            "Ring statistics",
-                            "Chain statistics",
-                            "Spherical harmonics",
-                            "Mean Squared Displacement",
-                            "Dynamic structure factor",
+                            i18n("S(q) from FFT[g(r)]"),
+                            i18n("S(q) from Debye Equation"),
+                            i18n("g(r)/G(r) from FFT[S(q)]"),
+                            i18n("Bond Properties"),
+                            i18n("Angle Distributions"),
+                            i18n("Ring Statistics"),
+                            i18n("Chain Statistics"),
+                            i18n("Spherical Harmonics"),
+                            i18n("Mean Squared Displacement"),
+                            i18n("Dynamic Structure Factor"),
                             "The new analysis"};  // This is an example
     ```
     - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
@@ -105,14 +110,20 @@ void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
   int num_c = ;                 // Number of analysis compatible, to allow overlap of the data on the graph window
   int c_list[num_c] = {};       // List of compatible analysis, integer list in the ID list, including self
   gchar * d_title = "x title";  // Default x axis title for the analysis, if any, can be NULL
-  active_project -> analysis[IDC] = setup_analysis (pid, "Analysis name", IDC, TRUE, num_g, num_c, c_list, d_title);  // This is an example
+  active_project -> analysis[IDC] = setup_analysis (pid, _("Analysis name"), IDC, TRUE, num_g, num_c, c_list, d_title);  // This is an example
 
   ...
 }
 ```
 > [!WARNING]
 > Analyis compatibility list **MUST** include its own unique ID, in the example IDC, and all other compatible analysis if any. 
-> This information is used to handle superposition of data sets on graph windows 
+> This information is used to handle superposition of data sets on graph windows
+
+> [!TIP]
+> If the name of the analysis is a translatable string insert the new string name with `_( )`
+> and add the corresponding `lang` translatation in the file in `locale/lang/atomes-messages.po`
+> If no translation is provided the string in the code is used. 
+
 
 ## 4. Update the default availability for the new calculation:
 
