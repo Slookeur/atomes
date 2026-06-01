@@ -161,7 +161,7 @@ G_MODULE_EXPORT void on_calc_idc_released (GtkWidget * widg, gpointer data)
   {
     // You can specify the reason of the error at this point
     // If needed use the value of 'res_idc' to select the error message to diplay
-    show_error ("The IDC calculation has failed", 0, widg);
+    show_error (_("The IDC calculation has failed"), 0, widg);
   }
   else
   {

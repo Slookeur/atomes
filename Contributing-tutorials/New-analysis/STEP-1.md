@@ -47,13 +47,8 @@
                            i18n("Spherical Harmonics"),
                            i18n("Mean Squared Displacement"),
                            i18n("Dynamic Structure Factor"),
-                           "The new analysis"};  // This is an example
+                           i18n("The new analysis")};  // This is an example
     ```
-> [!TIP]
-> If the name of the analysis is a translatable string insert the new string name with `i18n( )`
-> and add the corresponding `lang` translatation in the file in `locale/lang/atomes-messages.po`
-> If no translation is provided the string in the code is used. 
-
     - [`gchar * graph_name`][graph_name] : append a line to add the new analysis name for the tool box window
     ```C
     gchar * graph_name[] = {"g(r)/G(r)",
@@ -67,7 +62,7 @@
                             i18n("Spherical Harmonics"),
                             i18n("Mean Squared Displacement"),
                             i18n("Dynamic Structure Factor"),
-                            "The new analysis"};  // This is an example
+                            i18n("The new analysis")};  // This is an example
     ```
     - [`gchar * graph_icon`][graph_icon] : append a line to add the new analysis icon file name
     ```C
@@ -84,6 +79,10 @@
                             "pixmaps/sq.png",
                             "pixmaps/idc.png"};  // this is an example
     ```
+> [!TIP]
+> If the name of the analysis is a translatable string insert the new string name with `i18n( )`
+> and add the corresponding `lang` translatation in the file in `locale/lang/atomes-messages.po`
+> If no translation is provided the string in the code is used. 
 
 ## 3. Edit the file [`src/gui/initc.c`][init.c] to declare the new analysis
 
