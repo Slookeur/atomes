@@ -828,7 +828,7 @@ void read_this_file (int file_type, gchar * this_file)
     int i = open_save_workspace (fp, 0);
     if (i != 0)
     {
-      gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\nError code: %d\n"), this_file, i);
+      gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\n"), this_file);
       show_error (err, 0, MainWindow);
       g_free (err);
     }

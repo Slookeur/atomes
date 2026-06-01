@@ -247,6 +247,7 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
 {
   int j;
   project_error = g_malloc0(sizeof*project_error);
+  gchar * tmp_err;
   if (act == 0)
   {
     reading_input = TRUE;
@@ -254,6 +255,7 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     reading_input = FALSE;
     if (j != OK)
     {
+      tmp_err = g_strdup_printf ("%s", get_project_by_id (pid) -> name);
       to_close_this_project (aid, active_project);
     }
     else
@@ -280,20 +282,35 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
   }
   if (j != OK)
   {
-    if (pfile != NULL)
+    gchar * err;
+    if (pfile != NULL && ! wid)
     {
-      gchar * err = g_strdup_printf (_("Impossible to %s project file: \n\n"
-                                     "\t\t%s\n\n"
-                                     "\tError %s %s\n"
-                                     "\tProject file version: <b>%1.1f</b>\n"),
-                                     (! act) ? _("open") : _("save"),
-                                     pfile,
-                                     (! act) ? _("reading") : _("saving"),
-                                     _(project_error -> error_signal.message),
-                                     project_file_version);
-      show_error_with_trace (err, project_error, act, 0, MainWindow);
-      g_free (err);
+      err = g_strdup_printf (_("Impossible to %s project file: \n\n"
+                               "\t\t%s\n\n"
+                               "\tError %s %s\n"
+                               "\tProject file version: <b>%1.1f</b>\n"),
+                               (! act) ? _("open") : _("save"),
+                               pfile,
+                               (! act) ? _("reading") : _("saving"),
+                               _(project_error -> error_signal.message),
+                               project_file_version);
+
     }
+    else if (wid)
+    {
+      err = g_strdup_printf (_("Impossible to %s workspace file.\n"
+                               "Error with project: \n\n"
+                               "\t\t%s\n\n"
+                               "\tError %s %s\n"
+                               "\tProject file version: <b>%1.1f</b>\n"),
+                               (! act) ? _("open") : _("save"),
+                               tmp_err,
+                               (! act) ? _("reading") : _("saving"),
+                               _(project_error -> error_signal.message),
+                               project_file_version);
+    }
+    show_error_with_trace (err, project_error, act, 0, MainWindow);
+    g_free (err);
   }
   g_free (project_error);
   project_error = NULL;
@@ -351,7 +368,7 @@ int open_save_workspace (FILE * fp, int act)
     if (fread (& i, sizeof(int), 1, fp) != 1) return 1;
     ver = g_malloc0(i*sizeof*ver);
     if (fread (ver, sizeof(char), i, fp) != i) return 1;
-    // test on ver for version
+    // test on ver for version ?
     g_free (ver);
     if (fread (& i, sizeof(int), 1, fp) != 1) return 1;
   }
@@ -503,8 +520,7 @@ G_MODULE_EXPORT void run_on_open_save_active (GtkDialog * info, gint response_id
       int k = open_save_workspace (fp, osp.b);
       if (k != 0)
       {
-        err = g_strdup_printf (_("Error %s workspace file\n%s\nError code: %d\n"),
-                               _(mess[osp.b]), projfile, k);
+        err = g_strdup_printf (_("Error %s workspace file\n%s\n"), _(mess[osp.b]), projfile);
         show_error (err, 0, MainWindow);
         g_free (err);
       }

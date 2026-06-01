@@ -217,7 +217,7 @@ int read_project_curve (FILE * fp, int wid, int pid)
   }
 
 #ifdef DEBUG
-  // debugiocurve (this_proj, win, rid, cid, "READ");
+  // debugiocurve (this_proj, FALSE, rid, cid, "READ");
 #endif
   return OK;
 }

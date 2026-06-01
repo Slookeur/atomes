@@ -859,9 +859,11 @@ if (DOATOMS) then
     002 continue
     !$OMP END PARALLEL
 
-    do RB=1, abc
-      if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
-    enddo
+    ! There is an issue with the next lines, keeping it commented for the time being
+    ! do RB=1, abc
+    !   if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
+    ! enddo
+
     if (allocated(THEPIX)) deallocate(THEPIX)
     if (allocated(ATPIX)) deallocate(ATPIX)
     if (.not.DISTMTX) then
@@ -1534,6 +1536,7 @@ else
   !$OMP END DO NOWAIT
 
   006 continue
+
   do RB=1, abc
     if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
   enddo

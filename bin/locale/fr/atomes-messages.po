@@ -653,7 +653,7 @@ msgstr "<b>Diffusion intermédiaire</b>: F(q,&#x3b4;t)"
 msgid "<b>Dynamic calculations</b>: S(q,&#969;)"
 msgstr "<b>Calculs dynamiques</b>: S(q,&#969;)"
 
-# File: gui/callbacks.c, Line: 288
+# File: gui/callbacks.c, Line: 286
 msgid "Impossible to %s project file: \n\n"
 "\t\t%s\n\n"
 "\tError %s %s\n"
@@ -661,7 +661,19 @@ msgid "Impossible to %s project file: \n\n"
 msgstr "Impossible d%s le fichier projet: \n\n"
 "\t\t%s\n\n"
 "\tErreur %s %s\n"
-"\tVersion du fichier du projet : <b>%1.1f</b>\n"
+"\tVersion du fichier du projet: <b>%1.1f</b>\n"
+
+# File: gui/callbacks.c, Line: 299
+msgid "Impossible to %s workspace file.\n"
+"Error with project: \n\n"
+"\t\t%s\n\n"
+"\tError %s %s\n"
+"\tProject file version: <b>%1.1f</b>\n"
+msgstr "Impossible d%s le fichier espace de travail.\n"
+"Erreur pour le projet: \n\n"
+"\t\t%s\n\n"
+"\tErreur %s %s\n"
+"\tVersion du fichier du projet: <b>%1.1f</b>\n"
 
 # File: gui/callbacks.c, Line: 1524
 msgid "Error while parsing the chemical information\n"
@@ -821,9 +833,9 @@ msgstr "en lisant"
 msgid "saving"
 msgstr "en sauvegardant"
 
-# File: gui/callbacks.c, Line: 506
-msgid "Error %s workspace file\n%s\nError code: %d\n"
-msgstr "Erreur %s le fichier d'espace de travail\n%s\nCode d'erreur: %d\n"
+# File: gui/callbacks.c, Line: 520
+msgid "Error %s workspace file\n%s\n"
+msgstr "Erreur %s le fichier d'espace de travail\n%s\n"
 
 # File: gui/callbacks.c, Line: 539
 msgid "Open Project File(s)"
@@ -1923,8 +1935,8 @@ msgid "\n3D atomic scale model analysis, creation/edition and post-processing to
 msgstr "\nOutil d'analyse, de création/édition et de post-traitement de modèles atomiques 3D\n"
 
 # File: gui/main.c, Line: 831
-msgid "Error while reading workspace file\n%s\nError code: %d\n"
-msgstr "Erreur lors de la lecture du fichier d'espace de travail\n%s\nCode d'erreur : %d\n"
+msgid "Error while reading workspace file\n%s\n"
+msgstr "Erreur lors de la lecture du fichier d'espace de travail\n%s\n"
 
 # File: gui/main.c, Line: 1045
 msgid "Impossible to load the splash screen\n"
