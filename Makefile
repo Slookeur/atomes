@@ -136,15 +136,15 @@ ifeq ($(WINDOWS),1)
   CAT = $(DEV)bin/cat
   CPFLAGS = -f
   ECHO = $(DEV)bin/echo
-  MSGFMT = $(DEV)bin/msgfmt
+  MSGFMT = $(COMP)msgfmt
 
   WINDRES = $(COMP)windres
   WIN_ATOMES = $(OBJ)win_atomes.o
   WIN_STARTUP = $(OBJ)win_startup.o
 
   EXT=".exe"
-  FCVER = 14.2.0
-  CCVER = 14.2.0
+  FCVER = 16.1.0
+  CCVER = 16.1.0
 
 endif
 
@@ -483,11 +483,11 @@ endif
 
 # The rule to build the executable
 
-atomes: locale version ogl exe
+atomes: all_langs version ogl exe
 
-debug: locale version ogl exe
+debug: all_langs version ogl exe
 
-locale:
+all_langs:
 	$(MSGFMT) $(LOCALE)/en/atomes-messages.po -o $(LOCALE)/en/LC_MESSAGES/atomes.mo
 	$(MSGFMT) $(LOCALE)/fr/atomes-messages.po -o $(LOCALE)/fr/LC_MESSAGES/atomes.mo
 
