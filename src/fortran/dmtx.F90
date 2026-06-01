@@ -860,9 +860,9 @@ if (DOATOMS) then
     !$OMP END PARALLEL
 
     ! There is an issue with the next lines, keeping it commented for the time being
-    ! do RB=1, abc
-    !   if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
-    ! enddo
+    !do RB=1, abc
+    !  if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
+    !enddo
 
     if (allocated(THEPIX)) deallocate(THEPIX)
     if (allocated(ATPIX)) deallocate(ATPIX)

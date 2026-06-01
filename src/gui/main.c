@@ -214,7 +214,7 @@ void print_version ()
 #ifdef OPENMP
   float v = 0.0;
   char * v_string = NULL;
-  switch (OPENMP)
+  switch (_OPENMP)
   {
     case 200505:
       v = 2.5;
