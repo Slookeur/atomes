@@ -859,12 +859,12 @@ if (DOATOMS) then
     002 continue
     !$OMP END PARALLEL
 
-    ! There is an issue with the next lines, keeping it commented for the time being
-    !do RB=1, abc
-    !  if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
-    !enddo
-
-    if (allocated(THEPIX)) deallocate(THEPIX)
+    if (allocated(THEPIX)) then
+      do RC=1, abc
+        if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+      enddo
+      deallocate(THEPIX)
+    endif
     if (allocated(ATPIX)) deallocate(ATPIX)
     if (.not.DISTMTX) then
       goto 001
@@ -1537,11 +1537,12 @@ else
 
   006 continue
 
-  do RB=1, abc
-    if (allocated(THEPIX(RB)%ATOM_ID)) deallocate(THEPIX(RB)%ATOM_ID)
-  enddo
-  if (allocated(THEPIX)) deallocate(THEPIX)
-
+  if (allocated(THEPIX)) then
+    do RC=1, abc
+      if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+    enddo
+    deallocate(THEPIX)
+  endif
   !$OMP END PARALLEL
 
   if (.not.DISTMTX) goto 001
@@ -1570,7 +1571,12 @@ if (ALC) then
 endif
 if (PIXR) call PIXOUT (POUT)
 
-if (allocated(THEPIX)) deallocate(THEPIX)
+if (allocated(THEPIX)) then
+  do RC=1, abc
+    if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+  enddo
+  deallocate(THEPIX)
+endif
 if (allocated(POA)) deallocate(POA)
 if (allocated(BA)) deallocate(BA)
 if (allocated(BB)) deallocate(BB)
