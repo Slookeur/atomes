@@ -2995,6 +2995,7 @@ GMenu * add_edition_sub_menu (glwin * view, gchar * act, int aid, GCallback hand
       {
         append_opengl_item (view, menus, mol[i].object, eact, 1, i, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
       }
+    }
   }
   g_free (eact);
 
@@ -3689,17 +3690,17 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
   int s = view -> anim -> last -> img -> step;
   int i, j;
   gchar * str, * strp;
-  gchar * menu_names[CONTEXTACT] = {i18n("Select"), 
-                                    i18n("Unselect"), 
-                                    i18n("Label"), 
-                                    i18n("Unlabel"), 
-                                    i18n("Show"), 
-                                    i18n("Hide"), 
-                                    i18n("Style"), 
-                                    i18n("Color"), 
-                                    i18n("Edit as New Project"), 
-                                    i18n("Remove"), 
-                                    i18n("Replace"), 
+  gchar * menu_names[CONTEXTACT] = {i18n("Select"),
+                                    i18n("Unselect"),
+                                    i18n("Label"),
+                                    i18n("Unlabel"),
+                                    i18n("Show"),
+                                    i18n("Hide"),
+                                    i18n("Style"),
+                                    i18n("Color"),
+                                    i18n("Edit as New Project"),
+                                    i18n("Remove"),
+                                    i18n("Replace"),
                                     i18n("Copy")};
   GCallback handlers[CONTEXTACT][3] = {{G_CALLBACK(select_unselect_this_atom), G_CALLBACK(select_unselect_coord), G_CALLBACK(select_unselect_atoms)},
                                        {G_CALLBACK(select_unselect_this_atom), G_CALLBACK(select_unselect_coord), G_CALLBACK(select_unselect_atoms)},
@@ -3910,7 +3911,7 @@ void popup_selection (glwin * view, double ptx, double pty, int spe, int mmod, i
 #ifdef GTK4
       append_submenu (menua, _(menu_names[j]), selection_menu (i, view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2]));
 #else
-      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu(_(menu_names[j]), 
+      gtk_menu_shell_append ((GtkMenuShell *)menu, menu_item_new_with_submenu(_(menu_names[j]),
                              TRUE, selection_menu (view, ati, bti, aoc, j, handlers[j][0], handlers[j][1], handlers[j][2])));
 #endif
     }

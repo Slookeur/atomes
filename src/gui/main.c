@@ -213,7 +213,7 @@ void print_version ()
           LIBSWSCALE_VERSION_MICRO);
 #ifdef OPENMP
   float v = 0.0;
-  char * v_string = NULL;
+  char * v_string;
   switch (_OPENMP)
   {
     case 200505:
@@ -243,6 +243,13 @@ void print_version ()
     case 202011:
       v = 5.1;
       v_string = "2020-11";
+      break;
+    case 202111:
+      v = 5.2;
+      v_string = "2021-11";
+      break;
+    default:
+      v_string = "unknown";
       break;
   }
   printf ("OpenMP version         : %1.1f (%s)\n", v, v_string);
@@ -557,6 +564,7 @@ int parse_command_line (int argc, char *argv[])
   int opt;
   int index = -1;
   int i, j;
+  double v;
   gchar * image_x = NULL;
   gchar * image_y = NULL;
   int img_opt = 0;
@@ -670,7 +678,7 @@ int parse_command_line (int argc, char *argv[])
         img_opt += (index == -1) ? 1 : 0;
         break;
       case 'P':
-        double v = string_to_double(optarg);
+        v = string_to_double(optarg);
         render_image_back_pos = (v >= 0.0 && v <= 1.0) ? v : NONE;
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;

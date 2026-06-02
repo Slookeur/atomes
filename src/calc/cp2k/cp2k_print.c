@@ -425,7 +425,7 @@ void print_var_section (int num, gchar ** section,  int i18p, int * i18pos, GtkT
       if (i18pos)
       {
         gboolean do_translate = FALSE;
-        for (j=0; j<i18p; j++) 
+        for (j=0; j<i18p; j++)
         {
           if (i == i18pos[j])
           {
@@ -1095,6 +1095,7 @@ void print_cp2k_print (gchar * spaces, gchar * info, int i, int j, GtkTextBuffer
 void print_cp2k (int f, GtkTextBuffer * buffer)
 {
   int i;
+  int * totrans;
   switch (f)
   {
     case 0:
@@ -1102,7 +1103,7 @@ void print_cp2k (int f, GtkTextBuffer * buffer)
       if (tmp_cp2k -> input_type && (int)tmp_cp2k -> opts[CP2RES]) print_var_section (7, cp2krestart, 0, NULL, buffer);
       break;
     case 1:
-      int * totrans = allocint (5);
+      totrans = allocint (5);
       totrans[0] = 0;
       totrans[1] = 10;
       totrans[2] = 12;
