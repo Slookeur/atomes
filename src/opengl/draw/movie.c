@@ -250,7 +250,7 @@ static GLubyte * capture_opengl_image (unsigned int width, unsigned int height)
   GLubyte * pixels = g_malloc0(nvals * sizeof(GLubyte));
   GLubyte * rgb = g_malloc0(nvals * sizeof(GLubyte));
   glReadPixels (0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
-  // Flip data veritcally
+  // Flip data vertically
   for (i = 0; i < height; i++)
   {
     memcpy (rgb + 4 * width * i, pixels  + 4 * width * (height - i - 1), 4 * width);
