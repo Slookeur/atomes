@@ -576,7 +576,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     }
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? _("Reset") : _("Reset view"), IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? _("Reset") : _("Reset View"), IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
     if (! preferences)
     {
       add_gtk_close_event (the_rep -> win, G_CALLBACK(on_rep_delete), view);
@@ -778,7 +778,7 @@ G_MODULE_EXPORT void to_center_molecule (GSimpleAction * action, GVariant * para
 GMenu * menu_reset (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Reset View", "reset-view", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Reset View"), "reset-view", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   append_opengl_item (view, menu, _("Center Molecule"), "center-mol", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_center_molecule), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }

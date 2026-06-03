@@ -1934,27 +1934,27 @@ msgstr "\nReport a bug to <"
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 
-# File: gui/main.c, Line: 831
+# File: gui/main.c, Line: 839
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Error while reading workspace file\n%s\n"
 
-# File: gui/main.c, Line: 1045
+# File: gui/main.c, Line: 1053
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible to load the splash screen\n"
 
-# File: gui/main.c, Line: 1147
+# File: gui/main.c, Line: 1155
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Fatal error on OpenGL initialization: trying to adjust environment !"
 
-# File: gui/main.c, Line: 1150
+# File: gui/main.c, Line: 1158
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible to initialize the OpenGL 3D rendering !"
 
-# File: gui/main.c, Line: 1153
+# File: gui/main.c, Line: 1161
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "GDK visual must be modified to initialize the OpenGL context !"
 
-# File: gui/main.c, Line: 1277
+# File: gui/main.c, Line: 1289
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -5146,7 +5146,7 @@ msgid "Background"
 msgstr "Background"
 
 # File: opengl/win/glwindow.c, Line: 565
-# File: opengl/win/m_rep.c, Line: 579
+# File: opengl/win/m_rep.c, Line: 579,781
 # File: opengl/win/popup.c, Line: 4268
 msgid "Reset View"
 msgstr "Reset View"
