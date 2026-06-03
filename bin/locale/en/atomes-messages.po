@@ -5147,13 +5147,15 @@ msgstr "Background"
 
 # File: opengl/win/glwindow.c, Line: 565
 # File: opengl/win/m_rep.c, Line: 579
-msgid "Reset view"
-msgstr "Reset view"
+# File: opengl/win/popup.c, Line: 4268
+msgid "Reset View"
+msgstr "Reset View"
 
 # File: opengl/win/glwindow.c, Line: 566
 # File: opengl/win/m_rep.c, Line: 782
-msgid "Center molecule"
-msgstr "Center molecule"
+# File: opengl/win/popup.c, Line: 4269
+msgid "Center Molecule"
+msgstr "Center Molecule"
 
 # File: opengl/win/glwindow.c, Line: 568
 # File: opengl/win/m_rep.c, Line: 797
@@ -5857,14 +5859,6 @@ msgstr "Color palette error: rings - %d - %d, custom= %s"
 # File: opengl/win/popup.c, Line: 4202,4265
 msgid "Reset Motion"
 msgstr "Reset Motion"
-
-# File: opengl/win/popup.c, Line: 4268
-msgid "Reset View"
-msgstr "Reset View"
-
-# File: opengl/win/popup.c, Line: 4269
-msgid "Center Molecule"
-msgstr "Center Molecule"
 
 # File: opengl/win/popup.c, Line: 4277
 msgid "Exit Fullscreen"

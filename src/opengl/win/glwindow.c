@@ -562,8 +562,8 @@ void menu_items_view (GtkWidget * menu, glwin * view, int popm)
   if (! popm)
   {
     add_menu_separator (menu);
-    gtk3_menu_item (menu, _("Reset view"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
-    gtk3_menu_item (menu, _("Center molecule"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Reset View"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
+    gtk3_menu_item (menu, _("Center Molecule"), IMG_STOCK, (gpointer)FITBEST, G_CALLBACK(to_center_this_molecule), (gpointer)view, FALSE, 0, 0, FALSE, FALSE, FALSE);
     add_menu_separator (menu);
     gtk3_menu_item (menu, _("Fullscreen"), IMG_STOCK, (gpointer)FULLSCREEN, G_CALLBACK(set_full_screen), (gpointer)view, TRUE, GDK_KEY_f, GDK_CONTROL_MASK, FALSE, FALSE, FALSE);
   }

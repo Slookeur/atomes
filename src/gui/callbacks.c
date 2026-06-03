@@ -328,7 +328,7 @@ void quit_gtk ()
   {
     // Update image for LibreOffice document
     atomes_render_image = TRUE;
-    simple_image_render();
+    simple_image_render ();
     atomes_render_image = FALSE;
     // Mandatory saving of the project file
     FILE * fp = fopen (projfile, dfi[1]);
