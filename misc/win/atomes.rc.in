@@ -29,11 +29,11 @@ BEGIN
 			VALUE "CompanyName", "CNRS - IPCMS - DMO"
 			VALUE "FileDescription", "@PACKAGE_STRING@"
 			VALUE "FileVersion", "@PACKAGE_VERSION@"
-			VALUE "LegalCopyright", "\251 2025 S\351bastien Le Roux"
+			VALUE "LegalCopyright", "\251 2026 S\351bastien Le Roux"
 			VALUE "OriginalFileName", "@PACKAGE@.exe"
 			VALUE "ProductName", "@PACKAGE_STRING@"
 			VALUE "ProductVersion", "@PACKAGE_VERSION@"
-		END
+    :x
 	END
 	BLOCK "VarFileInfo"
 	BEGIN
