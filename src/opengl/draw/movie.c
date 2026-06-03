@@ -249,6 +249,11 @@ static GLubyte * capture_opengl_image (unsigned int width, unsigned int height)
   nvals = width * height * 4;
   GLubyte * pixels = g_malloc0(nvals * sizeof(GLubyte));
   GLubyte * rgb = g_malloc0(nvals * sizeof(GLubyte));
+  // On macOS, OpenGL runs over Metal with asynchronous command submission.
+  // glFinish() ensures all GPU rendering commands from draw() have completed
+  // before we read the framebuffer, preventing partial image captures.
+  // This is harmless on Linux and Windows where the driver synchronizes implicitly.
+  glFinish ();
   glReadPixels (0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
   // Flip data vertically
   for (i = 0; i < height; i++)
@@ -1252,6 +1257,9 @@ G_MODULE_EXPORT void run_save_movie (GtkDialog * info, gint response_id, gpointe
     for (i=0; i<2; i++) tmp_pixels[i] = view -> pixels[i];
     view -> pixels[0] = vopts -> video_res[0];
     view -> pixels[1] = vopts -> video_res[1];
+    // On macOS, the CoreAnimation layer may invalidate the current GL context
+    // between the file dialog callback and our OpenGL calls.
+    gtk_gl_area_make_current ((GtkGLArea *)view -> plot);
     init_frame_buffer (vopts -> video_res[0], vopts -> video_res[1]);
     init_opengl ();
     re_create_all_md_shaders (view);

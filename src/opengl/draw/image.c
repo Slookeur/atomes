@@ -132,9 +132,14 @@ G_MODULE_EXPORT void run_render_image (GtkDialog * info, gint response_id, gpoin
       destroy_this_dialog (info);
 #endif
     }
-    init_frame_buffer (iopts -> video_res[0], iopts -> video_res[1]);
     project * this_proj = get_project_by_id (iopts -> proj);
     glwin * view = this_proj -> modelgl;
+    // On macOS, the CoreAnimation layer may invalidate the current GL context
+    // between the file dialog callback and the OpenGL calls. Without explicitly
+    // making the context current, FBO creation and rendering silently fail or
+    // operate on the wrong context, causing partial or missing image captures.
+    gtk_gl_area_make_current ((GtkGLArea *)view -> plot);
+    init_frame_buffer (iopts -> video_res[0], iopts -> video_res[1]);
     init_opengl ();
     int i, x, y, q;
     for (i=0; i<NGLOBAL_SHADERS; i++)

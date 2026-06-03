@@ -3829,17 +3829,17 @@ msgstr "Erreur: at= %d, sp= %d, l= %d, geo_id= %d, edit -> coord -> ntg[%d][%d]=
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "replaced"
-msgstr "remplacer"
+msgstr "remplacé(s)"
 
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "removed"
-msgstr "supprimer"
+msgstr "supprimé(s)"
 
 # File: opengl/edit/atom_action.c, Line: 1121
 # File: opengl/edit/atom_search.c, Line: 269
 msgid "inserted"
-msgstr "inséser"
+msgstr "inséré(s)"
 
 # File: opengl/edit/atom_action.c, Line: 1138
 msgid "No atoms to be %s !"
