@@ -280,7 +280,7 @@ GMenu * menu_atom_edit (glwin * view, int popm)
   for (i=0; i<5; i++)
   {
     act = g_strdup_printf ("ated-%d", i);
-    append_opengl_item (view, menu, action_name[i], act, popm, 0, NULL, IMG_NONE, NULL, FALSE,
+    append_opengl_item (view, menu, _(action_name[i]), act, popm, 0, NULL, IMG_NONE, NULL, FALSE,
                         G_CALLBACK(action_window), & view -> colorp[i][0], FALSE, FALSE, FALSE, (i == 3) ? j : (this_proj -> natomes) ? j : 0);
     g_free (act);
   }
