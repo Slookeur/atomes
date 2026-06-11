@@ -1,4 +1,10 @@
-2026-06-10 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+2026-06-11 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+         Release of version 1.3.1
+         * Bug corrections:
+		Ensure that init_camera always uses the active project 'preferences.c'
+		Curve layout when saving workspace 'save_curve.c'
+		
+2026-06-11 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.3.0
          * New features:
 		New code structure to facilitate the use of the 2D graph system

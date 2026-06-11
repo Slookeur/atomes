@@ -279,6 +279,10 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     {
       if (pfile != NULL) get_project_by_id(pid) -> projfile = g_strdup_printf ("%s", pfile);
     }
+    else
+    {
+      tmp_err = g_strdup_printf ("%s", get_project_by_id(pid) -> name);
+    }
   }
   if (j != OK)
   {
@@ -310,6 +314,7 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
                                project_file_version);
     }
     show_error_with_trace (err, project_error, act, 0, MainWindow);
+    g_free (tmp_err);
     g_free (err);
   }
   g_free (project_error);

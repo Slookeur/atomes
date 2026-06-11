@@ -325,7 +325,14 @@ G_MODULE_EXPORT void apply_edit (GtkButton * but, gpointer data)
   this_proj -> modelgl -> mode = ANALYZE;
   image * last = this_proj -> modelgl -> anim -> last -> img;
   vec4_t q = last -> rotation_quaternion;
+  j = -1;
+  if (id != active_project)
+  {
+    i = activep;
+    active_project_changed (id);
+  }
   init_camera (this_proj);
+  if (j != -1) active_project_changed (j);
   last -> rotation_quaternion = q;
   this_proj -> modelgl -> mode = i;
   for (h=0; h<3; h++)

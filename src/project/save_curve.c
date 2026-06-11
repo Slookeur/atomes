@@ -188,7 +188,7 @@ int save_project_curve (FILE * fp, project * this_proj, int wid, int rid, int ci
           if (fwrite (& k, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_CURVE);
           if (fwrite (& ctmp -> id.b, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_CURVE);
           if (fwrite (& ctmp -> id.c, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_CURVE);
-          if (! write_data_layout (fp, ctmp -> layout)) return signal_error (__FILE__, __func__, __LINE__, ERROR_CURVE);
+          if (write_data_layout (fp, ctmp -> layout) != OK) return signal_error (__FILE__, __func__, __LINE__, ERROR_CURVE);
         }
         if (ctmp -> next != NULL) ctmp = ctmp -> next;
       }
