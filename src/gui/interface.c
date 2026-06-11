@@ -338,7 +338,7 @@ void show_error_with_trace (gchar * error, atomes_error * this_error, int act, i
                                "\t\tLine    : <b>%d</b></span>\n\n"
                                "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n"),
                              (! act) ? _("reading") : _("saving"),
-                             this_error -> error_signal.message,
+                             _(this_error -> error_signal.message),
                              this_error -> error_file,
                              this_error -> error_func,
                              this_error -> error_line,
@@ -352,7 +352,7 @@ void show_error_with_trace (gchar * error, atomes_error * this_error, int act, i
                                "\t\tFunction: <b>%s()</b>\n"
                                "\t\tLine    : <b>%d</b></span>\n"),
                              (! act) ? _("reading") : _("saving"),
-                             this_error -> error_signal.message,
+                             _(this_error -> error_signal.message),
                              this_error -> error_file,
                              this_error -> error_func,
                              this_error -> error_line);
@@ -365,7 +365,7 @@ void show_error_with_trace (gchar * error, atomes_error * this_error, int act, i
   add_box_child_start (GTK_ORIENTATION_VERTICAL, content_area, exp_trace, FALSE, FALSE, 0);
   if (! val)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, content_area, markup_label (ifbug, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, content_area, markup_label (_(ifbug), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   }
   show_web (dialog, val);
   g_warning ("%s", error);

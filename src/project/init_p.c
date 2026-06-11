@@ -218,7 +218,14 @@ void apply_default_parameters_to_project (project * this_proj, gboolean with_ana
       preferences = FALSE;
       setup_default_image (this_proj, img);
       preferences = TRUE;
+      i = -1;
+      if (this_proj -> id != activep)
+      {
+        i = activep;
+        active_project_changed (this_proj -> id);
+      }
       init_camera (this_proj);
+      if (i != -1) active_project_changed (i);
       setup_default_species_parameters_for_image (this_proj, img);
       clean_atom_style (this_proj);
       init_shaders (this_proj -> modelgl);

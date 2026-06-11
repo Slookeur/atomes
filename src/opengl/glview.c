@@ -1180,6 +1180,7 @@ GLdouble get_max_depth (GLdouble depth)
 void init_camera (project * this_proj)
 {
   glwin * view = this_proj -> modelgl;
+  // the call to ogl_max_() requires this_proj to be the active project !
   view -> anim -> last -> img -> p_depth = (this_proj -> natomes) ? oglmax_ () : 50.0;
   view -> anim -> last -> img -> m_depth = get_max_depth (view -> anim -> last -> img -> p_depth);
   view -> anim -> last -> img -> gnear = default_rep.gnear;

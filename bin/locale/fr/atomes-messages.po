@@ -446,11 +446,11 @@ msgstr "Enregistrer l'analyse des voisins dans un fichier"
 # File: curve/w_data.c, Line: 181
 # File: curve/w_img.c, Line: 250
 # File: gui/calc_menu.c, Line: 782
-# File: gui/callbacks.c, Line: 555,913,1770
+# File: gui/callbacks.c, Line: 560,918,1775
 # File: gui/gui.c, Line: 772,853
 # File: gui/work_menu.c, Line: 134,148,177
-# File: opengl/draw/image.c, Line: 207
-# File: opengl/draw/movie.c, Line: 1302
+# File: opengl/draw/image.c, Line: 212
+# File: opengl/draw/movie.c, Line: 1310
 # File: opengl/win/m_map.c, Line: 885
 # File: opengl/win/w_chains.c, Line: 959
 # File: opengl/win/w_rings.c, Line: 1094
@@ -653,7 +653,7 @@ msgstr "<b>Diffusion intermédiaire</b>: F(q,&#x3b4;t)"
 msgid "<b>Dynamic calculations</b>: S(q,&#969;)"
 msgstr "<b>Calculs dynamiques</b>: S(q,&#969;)"
 
-# File: gui/callbacks.c, Line: 291
+# File: gui/callbacks.c, Line: 295
 msgid "Impossible to %s project file: \n\n"
 "\t\t%s\n\n"
 "\tError %s %s\n"
@@ -663,7 +663,7 @@ msgstr "Impossible d%s le fichier projet: \n\n"
 "\tErreur %s %s\n"
 "\tVersion du fichier du projet: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 305
+# File: gui/callbacks.c, Line: 309
 msgid "Impossible to %s workspace file.\n"
 "Error with project: \n\n"
 "\t\t%s\n\n"
@@ -675,13 +675,13 @@ msgstr "Impossible d%s le fichier espace de travail.\n"
 "\tErreur %s %s\n"
 "\tVersion du fichier du projet: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 1540
+# File: gui/callbacks.c, Line: 1545
 msgid "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 msgstr "Erreur lors de l'analyse des informations chimiques\n"
 "veuillez vérifier attentivement le fichier de coordonnées"
 
-# File: gui/callbacks.c, Line: 88,1771
+# File: gui/callbacks.c, Line: 88,1776
 msgid "XYZ file"
 msgstr "Fichier XYZ"
 
@@ -689,7 +689,7 @@ msgstr "Fichier XYZ"
 msgid "XYZ file - NPT"
 msgstr "Fichier XYZ - NPT"
 
-# File: gui/callbacks.c, Line: 90,1771
+# File: gui/callbacks.c, Line: 90,1776
 msgid "Chem3D file"
 msgstr "Fichier Chem3D"
 
@@ -815,146 +815,146 @@ msgstr "Fonction: %s()\n"
 msgid "Line    : %d</span>"
 msgstr "Ligne   : %d</span>"
 
-# File: gui/callbacks.c, Line: 292
+# File: gui/callbacks.c, Line: 296
 msgid "open"
 msgstr "'ouvrir"
 
-# File: gui/callbacks.c, Line: 292
+# File: gui/callbacks.c, Line: 296
 msgid "save"
 msgstr "e sauvegarder"
 
-# File: gui/callbacks.c, Line: 294,468
+# File: gui/callbacks.c, Line: 298,473
 # File: gui/interface.c, Line: 340
 msgid "reading"
 msgstr "en lisant"
 
-# File: gui/callbacks.c, Line: 294,468
+# File: gui/callbacks.c, Line: 298,473
 # File: gui/interface.c, Line: 340
 msgid "saving"
 msgstr "en sauvegardant"
 
-# File: gui/callbacks.c, Line: 523
+# File: gui/callbacks.c, Line: 528
 msgid "Error %s workspace file\n%s\n"
 msgstr "Erreur %s le fichier d'espace de travail\n%s\n"
 
-# File: gui/callbacks.c, Line: 555
+# File: gui/callbacks.c, Line: 560
 msgid "Open Project File(s)"
 msgstr "Ouvrir un ou plusieurs fichiers de projet"
 
-# File: gui/callbacks.c, Line: 555
+# File: gui/callbacks.c, Line: 560
 msgid "Save Project File"
 msgstr "Enregistrer le fichier de projet"
 
-# File: gui/callbacks.c, Line: 555
+# File: gui/callbacks.c, Line: 560
 msgid "Open Workspace"
 msgstr "Ouvrir un espace de travail"
 
-# File: gui/callbacks.c, Line: 555
+# File: gui/callbacks.c, Line: 560
 msgid "Save Workspace"
 msgstr "Enregistrer l'espace de travail"
 
-# File: gui/callbacks.c, Line: 555,913,1376,1770
+# File: gui/callbacks.c, Line: 560,918,1381,1775
 # File: gui/gui.c, Line: 767,847
 # File: gui/work_menu.c, Line: 132,145
 # File: opengl/win/m_map.c, Line: 885
 msgid "Open"
 msgstr "Ouvrir"
 
-# File: gui/callbacks.c, Line: 557
+# File: gui/callbacks.c, Line: 562
 msgid "Project file (*.apf)"
 msgstr "Fichier de projet (*.apf)"
 
-# File: gui/callbacks.c, Line: 557
+# File: gui/callbacks.c, Line: 562
 msgid "Workspace file (*.awf)"
 msgstr "Fichier d'espace de travail (*.awf)"
 
-# File: gui/callbacks.c, Line: 575
+# File: gui/callbacks.c, Line: 580
 msgid "A workspace is already open !"
 msgstr "Un espace de travail est déjà ouvert !"
 
-# File: gui/callbacks.c, Line: 579
+# File: gui/callbacks.c, Line: 584
 msgid "Empty workspace ... nothing to be saved\n"
 msgstr "Espace de travail vide ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 586
+# File: gui/callbacks.c, Line: 591
 msgid "Workspace contains only empty projects ... nothing to be saved\n"
 msgstr "L'espace de travail ne contient que des projets vides ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 591
+# File: gui/callbacks.c, Line: 596
 msgid "No project open ... nothing to be saved\n"
 msgstr "Aucun projet ouvert ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 595
+# File: gui/callbacks.c, Line: 600
 msgid "Empty project ... nothing to be saved\n"
 msgstr "Projet vide ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 646
+# File: gui/callbacks.c, Line: 651
 msgid "%s - New project"
 msgstr "%s - Nouveau projet"
 
 # File: calc/cpmd/cpmd_init.c, Line: 1556
-# File: gui/callbacks.c, Line: 706,911,1383,1826
+# File: gui/callbacks.c, Line: 711,916,1388,1831
 # File: opengl/win/m_map.c, Line: 937
 msgid "All files (*)"
 msgstr "Tous les fichiers (*)"
 
-# File: gui/callbacks.c, Line: 822
+# File: gui/callbacks.c, Line: 827
 msgid "ISAACS project file (XML) successfully opened"
 msgstr "Le fichier de projet ISAACS (XML) a été ouvert avec succès"
 
-# File: gui/callbacks.c, Line: 875
+# File: gui/callbacks.c, Line: 880
 msgid "Impossible to write the IPF file\n"
 msgstr "Impossible d'écrire le fichier IPF\n"
 
-# File: gui/callbacks.c, Line: 911
+# File: gui/callbacks.c, Line: 916
 msgid "IPF file (*.ipf)"
 msgstr "Fichier IPF (*.ipf)"
 
-# File: gui/callbacks.c, Line: 912
+# File: gui/callbacks.c, Line: 917
 msgid "Import ISAACS Project File"
 msgstr "Importer le fichier de projet ISAACS"
 
-# File: gui/callbacks.c, Line: 912
+# File: gui/callbacks.c, Line: 917
 msgid "Export ISAACS Project File"
 msgstr "Exporter le fichier de projet ISAACS"
 
-# File: gui/callbacks.c, Line: 918
+# File: gui/callbacks.c, Line: 923
 msgid "Save an empty project ?"
 msgstr "Enregistrer un projet vide ?"
 
-# File: gui/callbacks.c, Line: 918
+# File: gui/callbacks.c, Line: 923
 msgid "Do you want to save an empty project ?"
 msgstr "Voulez-vous sauvegarder un projet vide ?"
 
-# File: gui/callbacks.c, Line: 1032
+# File: gui/callbacks.c, Line: 1037
 msgid "Label of atomic spec. N° %d:"
 msgstr "Label de l'espèce atomique. N° %d :"
 
-# File: gui/callbacks.c, Line: 1038
+# File: gui/callbacks.c, Line: 1043
 msgid "Number of %s atom(s):"
 msgstr "Nombre d'atomes %s :"
 
-# File: gui/callbacks.c, Line: 1043
+# File: gui/callbacks.c, Line: 1048
 msgid "Number of atom(s) for spec. N° %d:"
 msgstr "Nombre d'atomes pour l'espèce N° %d :"
 
-# File: gui/callbacks.c, Line: 1124
+# File: gui/callbacks.c, Line: 1129
 msgid "Chemical species info:"
 msgstr "Informations sur les espèces chimiques:"
 
-# File: gui/callbacks.c, Line: 1127
+# File: gui/callbacks.c, Line: 1132
 msgid "Species: "
 msgstr "Espèces: "
 
-# File: gui/callbacks.c, Line: 1266
+# File: gui/callbacks.c, Line: 1271
 msgid "Total number of atom(s):"
 msgstr "Nombre total d'atome(s):"
 
-# File: gui/callbacks.c, Line: 1266
+# File: gui/callbacks.c, Line: 1271
 msgid "Number of chemical species:"
 msgstr "Nombre d'espèces chimiques:"
 
-# File: gui/callbacks.c, Line: 1267
+# File: gui/callbacks.c, Line: 1272
 msgid "Reading CPMD / VASP trajectory"
 msgstr "Lecture de la trajectoire CPMD/VASP"
 
@@ -965,70 +965,70 @@ msgstr "Lecture de la trajectoire CPMD/VASP"
 # File: calc/dl_poly/dlp_edit.c, Line: 1264
 # File: calc/dl_poly/dlp_mol.c, Line: 473,756
 # File: curve/datab.c, Line: 473,526,1060
-# File: gui/callbacks.c, Line: 1268
+# File: gui/callbacks.c, Line: 1273
 # File: gui/gtk-misc.c, Line: 619
-# File: opengl/edit/atom_edit.c, Line: 438
+# File: opengl/edit/atom_edit.c, Line: 445
 # File: opengl/win/m_map.c, Line: 506,739,983
 msgid "Apply"
 msgstr "Appliquer"
 
-# File: gui/callbacks.c, Line: 1347
+# File: gui/callbacks.c, Line: 1352
 msgid "Please select the file format of the NPT cell data"
 msgstr "Veuillez sélectionner le format de fichier des données des cellules NPT"
 
-# File: gui/callbacks.c, Line: 1347,1681
+# File: gui/callbacks.c, Line: 1352,1686
 msgid "Select format:"
 msgstr "Sélectionnez le format:"
 
-# File: gui/callbacks.c, Line: 1373
+# File: gui/callbacks.c, Line: 1378
 msgid "Read cell data for NPT molecular dynamics"
 msgstr "Lire les données des cellules pour la dynamique moléculaire NPT"
 
-# File: gui/callbacks.c, Line: 1379
+# File: gui/callbacks.c, Line: 1384
 msgid "DAT files (*.dat)"
 msgstr "Fichiers DAT (*.dat)"
 
-# File: gui/callbacks.c, Line: 1526
+# File: gui/callbacks.c, Line: 1531
 msgid "Error loading atomic coordinates:\nfile does not exist"
 msgstr "Erreur lors du chargement des coordonnées atomiques:\nle fichier n'existe pas"
 
-# File: gui/callbacks.c, Line: 1529
+# File: gui/callbacks.c, Line: 1534
 msgid "Error loading coordinates file: format not supported"
 msgstr "Erreur de chargement du fichier de coordonnées: format non pris en charge"
 
-# File: gui/callbacks.c, Line: 1532
+# File: gui/callbacks.c, Line: 1537
 msgid "Error at input: impossible to process input file data"
 msgstr "Erreur de lecture: impossible de traiter les données du fichier d'entrée"
 
-# File: gui/callbacks.c, Line: 1614
+# File: gui/callbacks.c, Line: 1619
 msgid "%s - symmetry position(s)"
 msgstr "%s - position(s) de symétrie"
 
-# File: gui/callbacks.c, Line: 1681
+# File: gui/callbacks.c, Line: 1686
 msgid "Please select the file format of the atomic coordinates"
 msgstr "Veuillez sélectionner le format de fichier des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1689
+# File: gui/callbacks.c, Line: 1694
 msgid "Please select the format of the atomic coordinates"
 msgstr "Veuillez sélectionner le format des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1729
+# File: gui/callbacks.c, Line: 1734
 msgid "Impossible to export the atomic coordinates\nError code: %d"
 msgstr "Impossible d'exporter les coordonnées atomiques\nCode d'erreur: %d"
 
-# File: gui/callbacks.c, Line: 1769
+# File: gui/callbacks.c, Line: 1774
 msgid "Import atomic coordinates"
 msgstr "Importer des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1769
+# File: gui/callbacks.c, Line: 1774
 msgid "Export atomic coordinates"
 msgstr "Exporter les coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1845
+# File: gui/callbacks.c, Line: 1850
 msgid "No project loaded ... nothing to be saved\n"
 msgstr "Aucun projet chargé ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 1849
+# File: gui/callbacks.c, Line: 1854
 msgid "Project <b>%s</b> is empty ... nothing to be saved\n"
 msgstr "Le projet <b>%s</b> est vide ... rien à sauvegarder\n"
 
@@ -1055,7 +1055,7 @@ msgstr "Chaînes - C<sub>c</sub>(n)[%s]"
 # File: gui/chainscall.c, Line: 94
 # File: opengl/win/glwindow.c, Line: 312
 # File: opengl/win/menu_bar.c, Line: 216,220
-# File: opengl/win/popup.c, Line: 4235
+# File: opengl/win/popup.c, Line: 4236
 # File: opengl/win/w_coord.c, Line: 1332
 msgid "Chain(s)"
 msgstr "Chaîne(s)"
@@ -1329,7 +1329,7 @@ msgstr "Annuler"
 # File: opengl/win/m_poly.c, Line: 455
 # File: opengl/win/m_rep.c, Line: 752
 # File: opengl/win/menu_bar.c, Line: 238
-# File: opengl/win/popup.c, Line: 4238
+# File: opengl/win/popup.c, Line: 4239
 msgid "Advanced"
 msgstr "Avancé"
 
@@ -1479,7 +1479,7 @@ msgstr "Enregistrer Sous"
 # File: curve/m_curve.c, Line: 556
 # File: gui/gui.c, Line: 778,861
 # File: gui/work_menu.c, Line: 135,151,180
-# File: opengl/edit/atom_edit.c, Line: 440
+# File: opengl/edit/atom_edit.c, Line: 447
 # File: opengl/edit/cbuild_edit.c, Line: 1434
 # File: opengl/edit/cell_edit.c, Line: 203
 # File: opengl/win/w_atoms.c, Line: 547
@@ -1563,7 +1563,7 @@ msgstr "Préférences"
 # File: gui/gui.c, Line: 1020
 # File: opengl/win/glwindow.c, Line: 599
 # File: opengl/win/menu_bar.c, Line: 253
-# File: opengl/win/popup.c, Line: 4280
+# File: opengl/win/popup.c, Line: 4281
 msgid "Shortcuts"
 msgstr "Raccourcis"
 
@@ -1609,7 +1609,7 @@ msgstr "\n\tErreur %s %s, à:\n"
 "<span font_desc=\"monospace 10\">\t\tFichier : <b>%s</b>\n"
 "\t\tFonction: <b>%s()</b>\n"
 "\t\tLigne   : <b>%d</b></span>\n\n"
-"\tHistorique:\n%s\t\t →\t\t <i>appeler à</i> <span font_desc=\"monospace 10\"><b>%s()</b></span>\n"
+"\tHistorique:\n%s\t\t →\t\t <i>appel à</i> <span font_desc=\"monospace 10\"><b>%s()</b></span>\n"
 
 # File: gui/interface.c, Line: 353
 msgid "\n\tError %s %s, at:\n"
@@ -2213,7 +2213,7 @@ msgstr "Profondeur"
 # File: opengl/win/m_back.c, Line: 72
 # File: opengl/win/m_box.c, Line: 380,629
 # File: opengl/win/m_coord.c, Line: 656
-# File: opengl/win/popup.c, Line: 3666
+# File: opengl/win/popup.c, Line: 3667
 # File: opengl/win/w_atoms.c, Line: 360
 # File: opengl/win/w_coord.c, Line: 537,873,892,997
 msgid "Color"
@@ -2401,7 +2401,7 @@ msgstr "options des axes"
 # File: gui/preferences.c, Line: 2466,2526
 # File: opengl/win/glwindow.c, Line: 630
 # File: opengl/win/menu_bar.c, Line: 278
-# File: opengl/win/popup.c, Line: 4030,4242
+# File: opengl/win/popup.c, Line: 4031,4243
 msgid "Tools"
 msgstr "Outils"
 
@@ -2584,7 +2584,7 @@ msgstr "atome(s) "
 # File: opengl/win/glwindow.c, Line: 526
 # File: opengl/win/m_clones.c, Line: 125
 # File: opengl/win/menu_bar.c, Line: 187
-# File: opengl/win/popup.c, Line: 4228
+# File: opengl/win/popup.c, Line: 4229
 msgid "Bond(s)"
 msgstr "Liaison(s)"
 
@@ -2620,7 +2620,7 @@ msgstr "taille des points<sup>**</sup> et largeur des fils de fer"
 
 # File: gui/preferences.c, Line: 3648
 # File: opengl/win/m_style.c, Line: 61,371,406,505
-# File: opengl/win/popup.c, Line: 3103
+# File: opengl/win/popup.c, Line: 3104
 msgid "Spacefilled"
 msgstr "Volumique"
 
@@ -2852,7 +2852,7 @@ msgid "most analysis options"
 msgstr "la plupart des options d'analyse"
 
 # File: gui/preferences.c, Line: 4273,4350
-# File: opengl/win/popup.c, Line: 4234
+# File: opengl/win/popup.c, Line: 4235
 msgid "Rings"
 msgstr "Anneaux"
 
@@ -3283,14 +3283,14 @@ msgstr "\n \tL'analyse a été réalisée en: "
 msgid "No project to be closed"
 msgstr "Aucun projet à clôturer"
 
-# File: project/init_p.c, Line: 272
+# File: project/init_p.c, Line: 279
 msgid "Project N°"
 msgstr "Projet N°"
 
 # File: opengl/win/glwindow.c, Line: 315
 # File: opengl/win/m_map.c, Line: 1139,1250
 # File: opengl/win/menu_bar.c, Line: 224,228
-# File: opengl/win/popup.c, Line: 4236
+# File: opengl/win/popup.c, Line: 4237
 # File: opengl/win/w_coord.c, Line: 93,1351
 # File: opengl/win/w_volumes.c, Line: 1139
 # File: project/read_mol.c, Line: 149
@@ -3300,7 +3300,7 @@ msgstr "Fragment(s)"
 # File: opengl/win/glwindow.c, Line: 316
 # File: opengl/win/m_map.c, Line: 1140,1253
 # File: opengl/win/menu_bar.c, Line: 232,236
-# File: opengl/win/popup.c, Line: 4237
+# File: opengl/win/popup.c, Line: 4238
 # File: opengl/win/w_coord.c, Line: 94,1355
 # File: opengl/win/w_volumes.c, Line: 1140
 # File: project/read_mol.c, Line: 150
@@ -3808,7 +3808,7 @@ msgstr "Mauvais format de fichier - l'enregistrement <b>%d</b> sur la ligne <b>%
 msgid "Error - chemical species changes between steps %d and %d, for atom %d !"
 msgstr "Erreur : l'espèce chimique change entre les pas %d et %d, pour l'atome %d !"
 
-# File: opengl/glview.c, Line: 1825
+# File: opengl/glview.c, Line: 1826
 msgid "Impossible to initialize the OpenGL 3D rendering ! \n %s\n"
 msgstr "Impossible d'initialiser le rendu 3D OpenGL ! \n %s\n"
 
@@ -3876,20 +3876,20 @@ msgid "Move"
 msgstr "Déplacer"
 
 # File: opengl/edit/atom_edit.c, Line: 60
-# File: opengl/win/popup.c, Line: 3702
+# File: opengl/win/popup.c, Line: 3703
 # File: opengl/win/w_library.c, Line: 1139
 # File: opengl/win/w_search.c, Line: 2904,3579
 msgid "Replace"
 msgstr "Remplacer"
 
 # File: opengl/edit/atom_edit.c, Line: 60
-# File: opengl/win/popup.c, Line: 3701
+# File: opengl/win/popup.c, Line: 3702
 # File: opengl/win/w_search.c, Line: 2904,3580,4104
 msgid "Remove"
 msgstr "Supprimer"
 
 # File: opengl/edit/atom_edit.c, Line: 60
-# File: opengl/win/popup.c, Line: 4200
+# File: opengl/win/popup.c, Line: 4201
 # File: opengl/win/w_library.c, Line: 1139
 # File: opengl/win/w_search.c, Line: 3581
 msgid "Insert"
@@ -3926,7 +3926,7 @@ msgstr "Réinitialiser"
 msgid "Reset and get back to initial coordinates ?\n This will affect all atoms !"
 msgstr "Réinitialiser et revenir aux coordonnées initiales ?\n Cela affectera tous les atomes !"
 
-# File: opengl/edit/atom_edit.c, Line: 414
+# File: opengl/edit/atom_edit.c, Line: 421
 # File: workspace/workspace.c, Line: 384
 msgid "Model edition - %s"
 msgstr "Édition du modèle - %s"
@@ -3949,7 +3949,7 @@ msgstr "Axe de l'oeil (spectateur)"
 
 # File: opengl/edit/atom_move.c, Line: 1237
 # File: opengl/win/m_atoms.c, Line: 364,443,709,806
-# File: opengl/win/popup.c, Line: 3696
+# File: opengl/win/popup.c, Line: 3697
 # File: opengl/win/w_atoms.c, Line: 362
 # File: opengl/win/w_chains.c, Line: 298
 # File: opengl/win/w_coord.c, Line: 537,892,997
@@ -5089,14 +5089,14 @@ msgstr "Anneau(x)"
 # File: opengl/win/glwindow.c, Line: 314
 # File: opengl/win/m_map.c, Line: 1165,1276
 # File: opengl/win/menu_bar.c, Line: 205
-# File: opengl/win/popup.c, Line: 4233
+# File: opengl/win/popup.c, Line: 4234
 msgid "Polyhedra"
 msgstr "Polyèdres"
 
 # File: opengl/win/glwindow.c, Line: 490
 # File: opengl/win/m_box.c, Line: 327,606
 # File: opengl/win/menu_bar.c, Line: 166
-# File: opengl/win/popup.c, Line: 3698
+# File: opengl/win/popup.c, Line: 3699
 msgid "Style"
 msgstr "Style"
 
@@ -5110,7 +5110,7 @@ msgstr "Palettes de Couleurs"
 msgid "Material and Light(s)"
 msgstr "Matériau et Éclairage(s)"
 
-# File: opengl/draw/image.c, Line: 204
+# File: opengl/draw/image.c, Line: 209
 # File: opengl/win/glwindow.c, Line: 494
 # File: opengl/win/menu_bar.c, Line: 171
 msgid "Render Image"
@@ -5123,7 +5123,7 @@ msgstr "Générer Une Image"
 # File: opengl/win/m_clones.c, Line: 122,185
 # File: opengl/win/m_edit.c, Line: 360
 # File: opengl/win/menu_bar.c, Line: 186
-# File: opengl/win/popup.c, Line: 4227
+# File: opengl/win/popup.c, Line: 4228
 # File: opengl/win/w_search.c, Line: 4000,4141
 # File: calc/dl_poly/dlp_field.c, Line: 143
 msgid "Atom(s)"
@@ -5131,7 +5131,7 @@ msgstr "Atome(s)"
 
 # File: opengl/win/glwindow.c, Line: 527
 # File: opengl/win/menu_bar.c, Line: 188
-# File: opengl/win/popup.c, Line: 4229
+# File: opengl/win/popup.c, Line: 4230
 msgid "Clone(s)"
 msgstr "Clone(s)"
 
@@ -5147,19 +5147,19 @@ msgstr "Arrière-plan"
 
 # File: opengl/win/glwindow.c, Line: 565
 # File: opengl/win/m_rep.c, Line: 579,781
-# File: opengl/win/popup.c, Line: 4268
+# File: opengl/win/popup.c, Line: 4269
 msgid "Reset View"
 msgstr "Réinitialiser la Vue"
 
 # File: opengl/win/glwindow.c, Line: 566
 # File: opengl/win/m_rep.c, Line: 782
-# File: opengl/win/popup.c, Line: 4269
+# File: opengl/win/popup.c, Line: 4270
 msgid "Center Molecule"
 msgstr "Centrer la Molécule"
 
 # File: opengl/win/glwindow.c, Line: 568
 # File: opengl/win/m_rep.c, Line: 797
-# File: opengl/win/popup.c, Line: 4273
+# File: opengl/win/popup.c, Line: 4274
 msgid "Fullscreen"
 msgstr "Plein écran"
 
@@ -5203,7 +5203,7 @@ msgstr "Nombre maximum de %s par pas de DM: %d"
 
 # File: opengl/win/m_anim.c, Line: 61
 # File: opengl/win/menu_bar.c, Line: 280
-# File: opengl/win/popup.c, Line: 4044
+# File: opengl/win/popup.c, Line: 4045
 msgid "Animate"
 msgstr "Animer"
 
@@ -5359,12 +5359,12 @@ msgid "Atoms"
 msgstr "Atomes"
 
 # File: opengl/win/m_edit.c, Line: 213,337
-# File: opengl/win/popup.c, Line: 4262
+# File: opengl/win/popup.c, Line: 4263
 msgid "Extract/Rebuild on Motion"
 msgstr "Extraire/Reconstruire après Déplacement"
 
 # File: opengl/win/m_edit.c, Line: 213,337
-# File: opengl/win/popup.c, Line: 4263
+# File: opengl/win/popup.c, Line: 4264
 msgid "Extract/Rebuild on Copy"
 msgstr "Extraire/Reconstruire après Copie"
 
@@ -5584,7 +5584,7 @@ msgstr "<b>Projection</b>"
 # File: calc/cpmd/cpmd_nose.c, Line: 468
 # File: curve/cedit.c, Line: 294
 # File: opengl/win/m_rep.c, Line: 487
-# File: opengl/win/popup.c, Line: 3692
+# File: opengl/win/popup.c, Line: 3693
 msgid "Select"
 msgstr "Sélectionner"
 
@@ -5694,12 +5694,12 @@ msgstr "Dynamique Moléculaire"
 msgid "Invert"
 msgstr "Inverser"
 
-# File: opengl/win/popup.c, Line: 438,3024,3185
+# File: opengl/win/popup.c, Line: 438,3025,3186
 # File: opengl/win/w_search.c, Line: 2416,2669
 msgid "%s in %s"
 msgstr "%s de %s"
 
-# File: opengl/win/popup.c, Line: 504,740,3040,3193
+# File: opengl/win/popup.c, Line: 504,740,3041,3194
 msgid "Copied Data"
 msgstr "Données Copiées"
 
@@ -5715,32 +5715,32 @@ msgstr "%d atome(s) supprimé(s) !"
 msgid "%d atom(s) inserted !"
 msgstr "%d atome(s) inséré(s) !"
 
-# File: opengl/win/popup.c, Line: 3036,3167
+# File: opengl/win/popup.c, Line: 3037,3168
 # File: opengl/win/w_search.c, Line: 2658
 msgid "Import From Project"
 msgstr "Importer Depuis le Projet"
 
-# File: opengl/win/popup.c, Line: 3313
+# File: opengl/win/popup.c, Line: 3314
 msgid "All Non-Selected Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Non Sélectionnés"
 
-# File: opengl/win/popup.c, Line: 3313
+# File: opengl/win/popup.c, Line: 3314
 msgid "All Selected Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Sélectionnés"
 
-# File: opengl/win/popup.c, Line: 3314
+# File: opengl/win/popup.c, Line: 3315
 msgid "All Non-Labelled Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Non Étiquetés"
 
-# File: opengl/win/popup.c, Line: 3314
+# File: opengl/win/popup.c, Line: 3315
 msgid "All Labelled Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Étiquetés"
 
-# File: opengl/win/popup.c, Line: 3371
+# File: opengl/win/popup.c, Line: 3372
 msgid "This Atom: %s<sub>%d</sub>"
 msgstr "Cet atome: %s<sub>%d</sub>"
 
-# File: opengl/win/popup.c, Line: 3406
+# File: opengl/win/popup.c, Line: 3407
 msgid "This Bond: %s<sub>%d</sub> - %s<sub>%d</sub>"
 msgstr "Cette liaison: %s<sub>%d</sub> - %s<sub>%d</sub>"
 
@@ -5752,47 +5752,47 @@ msgstr "Fragment N°:\t<b>%d</b>"
 msgid "Molecule N°:\t<b>%d</b>"
 msgstr "Molécule N°:\t<b>%d</b>"
 
-# File: opengl/win/popup.c, Line: 3514
+# File: opengl/win/popup.c, Line: 3515
 msgid "All %s Atoms <b>%d</b> Fold"
 msgstr "Tous les %s Avec <b>%d</b> Voisins"
 
-# File: opengl/win/popup.c, Line: 3525
+# File: opengl/win/popup.c, Line: 3526
 msgid "All <b>%s</b> Coordinations"
 msgstr "Toutes les Coordinations <b>%s</b>"
 
-# File: opengl/win/popup.c, Line: 3535
+# File: opengl/win/popup.c, Line: 3536
 msgid "All <b>%s</b> Atoms"
 msgstr "Tous les <b>%s</b>"
 
-# File: opengl/win/popup.c, Line: 3539
+# File: opengl/win/popup.c, Line: 3540
 msgid "All <b>%s*</b> Clones"
 msgstr "Tous les Clones <b>%s*</b>"
 
-# File: opengl/win/popup.c, Line: 3554
+# File: opengl/win/popup.c, Line: 3555
 msgid "All %s <b>%d</b> - %s <b>%d</b> Bonds"
 msgstr "Toutes les Laisons %s <b>%d</b> - %s <b>%d</b>"
 
-# File: opengl/win/popup.c, Line: 3568
+# File: opengl/win/popup.c, Line: 3569
 msgid "All <b>%s</b> - <b>%s</b> Bonds"
 msgstr "Toutes les Liaisons <b>%s</b> - <b>%s</b>"
 
-# File: opengl/win/popup.c, Line: 3576
+# File: opengl/win/popup.c, Line: 3577
 msgid "All %s - %s Bonds"
 msgstr "Toutes les Liaisons %s - %s"
 
-# File: opengl/win/popup.c, Line: 3586
+# File: opengl/win/popup.c, Line: 3587
 msgid "All Hidden Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Cachés"
 
-# File: opengl/win/popup.c, Line: 3586
+# File: opengl/win/popup.c, Line: 3587
 msgid "All Visible Atom(s)/Bond(s)"
 msgstr "Tous les Atomes/Liaison(s) Visibles"
 
-# File: opengl/win/popup.c, Line: 3693
+# File: opengl/win/popup.c, Line: 3694
 msgid "Unselect"
 msgstr "Désélectionner"
 
-# File: opengl/win/popup.c, Line: 3694
+# File: opengl/win/popup.c, Line: 3695
 # File: opengl/win/w_atoms.c, Line: 363
 # File: opengl/win/w_chains.c, Line: 298
 # File: opengl/win/w_coord.c, Line: 537,892,997
@@ -5801,47 +5801,47 @@ msgstr "Désélectionner"
 msgid "Label"
 msgstr "Label"
 
-# File: opengl/win/popup.c, Line: 3695
+# File: opengl/win/popup.c, Line: 3696
 msgid "Unlabel"
 msgstr "Enlever le label"
 
-# File: opengl/win/popup.c, Line: 3697
+# File: opengl/win/popup.c, Line: 3698
 msgid "Hide"
 msgstr "Masquer"
 
-# File: opengl/win/popup.c, Line: 3700
+# File: opengl/win/popup.c, Line: 3701
 msgid "Edit as New Project"
 msgstr "Éditer en tant que Nouveau Projet"
 
-# File: opengl/win/popup.c, Line: 3703
+# File: opengl/win/popup.c, Line: 3704
 msgid "Copy"
 msgstr "Copier"
 
-# File: opengl/win/popup.c, Line: 3829
+# File: opengl/win/popup.c, Line: 3830
 msgid "Total Coordination:  <b>%d</b>"
 msgstr "Coordination Totale: <b>%d</b>"
 
-# File: opengl/win/popup.c, Line: 3838
+# File: opengl/win/popup.c, Line: 3839
 msgid "Partial Coordination: <b>%s</b>"
 msgstr "Coordination Partielle: <b>%s</b>"
 
-# File: opengl/win/popup.c, Line: 4022
+# File: opengl/win/popup.c, Line: 4023
 msgid "Center crystal atom(s)"
 msgstr "Centrer le(s) atome(s) du cristal"
 
-# File: opengl/win/popup.c, Line: 4022
+# File: opengl/win/popup.c, Line: 4023
 msgid "Are you sure, this can affect the visual representation of the unit cell ?"
 msgstr "Êtes-vous sûr que cela peut affecter la représentation visuelle de la cellule unitaire ?"
 
-# File: opengl/win/popup.c, Line: 4093
+# File: opengl/win/popup.c, Line: 4094
 msgid "Color palette error: %s - %d - custom= %s"
 msgstr "Erreur de palette de couleurs: %s - %d - personnalisé= %s"
 
-# File: opengl/win/popup.c, Line: 4125
+# File: opengl/win/popup.c, Line: 4126
 msgid "Color palette error: %s - spec= %d - coord= %d, custom= %s"
 msgstr "Erreur de palette de couleurs: %s - spec= %d - coord= %d, custom= %s"
 
-# File: opengl/win/popup.c, Line: 4142
+# File: opengl/win/popup.c, Line: 4143
 msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Erreur de palette de couleurs: %s - %d, personnalisé= %s"
 
@@ -5852,15 +5852,15 @@ msgstr "Erreur de palette de couleurs: %s - %d, personnalisé= %s"
 msgid "molecule"
 msgstr "molécule"
 
-# File: opengl/win/popup.c, Line: 4155
+# File: opengl/win/popup.c, Line: 4156
 msgid "Color palette error: rings - %d - %d, custom= %s"
 msgstr "Erreur de palette de couleurs: anneaux - %d - %d, personnalisé= %s"
 
-# File: opengl/win/popup.c, Line: 4202,4265
+# File: opengl/win/popup.c, Line: 4203,4266
 msgid "Reset Motion"
 msgstr "Réinitialiser le(s) Déplacement(s)"
 
-# File: opengl/win/popup.c, Line: 4277
+# File: opengl/win/popup.c, Line: 4278
 msgid "Exit Fullscreen"
 msgstr "Quitter le Plein Écran"
 
@@ -8039,72 +8039,72 @@ msgid "%s - volumes"
 msgstr "%s - volumes"
 
 # File: opengl/draw/d_measures.c, Line: 96,453
-# File: opengl/win/popup.c, Line: 3771
+# File: opengl/win/popup.c, Line: 3772
 msgid "PBC"
 msgstr "CLP"
 
-# File: opengl/draw/image.c, Line: 161
+# File: opengl/draw/image.c, Line: 166
 msgid "An error occurred when exporting an image\nyou might want to try again\nsorry for the trouble"
 msgstr "Une erreur s'est produite en exportant l'image\nvous pouvez réessayer\ndésolé pour le dérangement"
 
-# File: opengl/draw/image.c, Line: 217
-# File: opengl/draw/movie.c, Line: 1313
+# File: opengl/draw/image.c, Line: 222
+# File: opengl/draw/movie.c, Line: 1321
 msgid "%s file (*.%s)"
 msgstr "Fichier %s (*.%s)"
 
-# File: opengl/draw/movie.c, Line: 317,335,354
+# File: opengl/draw/movie.c, Line: 322,340,359
 msgid "Error in movie encoding : video frame - error : %s"
 msgstr "Erreur pendant l'encodage du film : image vidéo - erreur : %s"
 
-# File: opengl/draw/movie.c, Line: 342
+# File: opengl/draw/movie.c, Line: 347
 msgid "Error in movie encoding : video frame - warning : packet empty, ignoring frame= %d"
 msgstr "Erreur pendant l'encodage du film : image vidéo - avertissement : paquet vide, image ignorée = %d"
 
-# File: opengl/draw/movie.c, Line: 402
+# File: opengl/draw/movie.c, Line: 407
 msgid "Error in movie encoding : impossible to find codec %s"
 msgstr "Erreur pendant l'encodage du film : impossible de trouver le codec %s"
 
-# File: opengl/draw/movie.c, Line: 407
+# File: opengl/draw/movie.c, Line: 412
 msgid "Error in movie encoding : impossible to allocate encoding context"
 msgstr "Erreur pendant l'encodage du film : impossible d'attribuer le contexte d'encodage"
 
-# File: opengl/draw/movie.c, Line: 464
+# File: opengl/draw/movie.c, Line: 469
 msgid "Error in movie encoding : impossible to allocate video stream"
 msgstr "Erreur pendant l'encodage du film : impossible d'attribuer le flux vidéo"
 
-# File: opengl/draw/movie.c, Line: 471
+# File: opengl/draw/movie.c, Line: 476
 msgid "Error in movie encoding : impossible to allocate raw frame buffer"
 msgstr "Erreur pendant l'encodage du film : impossible d'allouer le frame buffer brut"
 
-# File: opengl/draw/movie.c, Line: 1028
+# File: opengl/draw/movie.c, Line: 1033
 msgid "Error in movie encoding : impossible to allocate AV format context"
 msgstr "Erreur pendant l'encodage du film : impossible d'attribuer le contexte du format AV"
 
-# File: opengl/draw/movie.c, Line: 1035
+# File: opengl/draw/movie.c, Line: 1040
 msgid "Error in movie encoding : impossible to guess container format : change file name"
 msgstr "Erreur pendant l'encodage du film : impossible de deviner le format du conteneur : changer le nom du fichier"
 
-# File: opengl/draw/movie.c, Line: 1044
+# File: opengl/draw/movie.c, Line: 1049
 msgid "Error in movie encoding : impossible to create video stream"
 msgstr "Erreur pendant l'encodage du film : impossible de créer un flux vidéo"
 
-# File: opengl/draw/movie.c, Line: 1052
+# File: opengl/draw/movie.c, Line: 1057
 msgid "Error in movie encoding : impossible to open codec, error= %s"
 msgstr "Erreur pendant l'encodage du film : impossible d'ouvrir le codec, erreur= %s"
 
-# File: opengl/draw/movie.c, Line: 1070
+# File: opengl/draw/movie.c, Line: 1075
 msgid "Error in movie encoding : impossible to open video file '%s'"
 msgstr "Erreur pendant l'encodage du film : impossible d'ouvrir le fichier vidéo '%s'"
 
-# File: opengl/draw/movie.c, Line: 1080
+# File: opengl/draw/movie.c, Line: 1085
 msgid "Error in movie encoding : impossible to write the AV format header"
 msgstr "Erreur pendant l'encodage du film : impossible d'écrire l'en-tête au format AV"
 
-# File: opengl/draw/movie.c, Line: 1263
+# File: opengl/draw/movie.c, Line: 1271
 msgid "An error occurred when encoding movie\nyou might want to try again\nsorry for the trouble"
 msgstr "Une erreur s'est produite lors de l'encodage du film\nvous pouvez réessayer\ndésolé pour le dérangement"
 
-# File: opengl/draw/movie.c, Line: 1299
+# File: opengl/draw/movie.c, Line: 1307
 msgid "Render Movie"
 msgstr "Encoder une Vidéo"
 
@@ -9225,7 +9225,7 @@ msgstr "! La section MOTION obligatoire inclut le fichier\n"
 msgid "  LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n"
 msgstr "  LOG_PRINT_KEY T                   ! => Impression à l'écran lors de l'écriture du fichier de redémarrage\n"
 
-# File: calc/cp2k/cp2k_print.c, Line: 1180
+# File: calc/cp2k/cp2k_print.c, Line: 1181
 msgid "! The mandatory SUBSYS section include file\n"
 msgstr "! La section obligatoire SUBSYS inclut le fichier\n"
 
