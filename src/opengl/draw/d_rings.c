@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file d_rings.c
@@ -184,7 +184,7 @@ void create_ring_lists ()
     int * nrings[5];
     for (i=0; i < 5; i++)
     {
-      nrings[i] = g_malloc0 (coord_gl -> totcoord[i+4]*sizeof*nrings[i]);
+      nrings[i] = g_malloc0(coord_gl -> totcoord[i+4]*sizeof*nrings[i]);
       for (j=0; j < coord_gl -> totcoord[i+4]; j++)
       {
         // k is the size of the ring in total number of atoms:
@@ -234,9 +234,9 @@ void create_ring_lists ()
     }
     if (rtot > 0)
     {
-      wingl -> ogl_glsl[RINGS][step] = g_malloc0 (sizeof*wingl -> ogl_glsl[RINGS][step]);
+      wingl -> ogl_glsl[RINGS][step] = g_malloc0(sizeof*wingl -> ogl_glsl[RINGS][step]);
       wingl -> n_shaders[RINGS][step] = 1;
-      object_3d * rings = g_malloc0 (sizeof*rings);
+      object_3d * rings = g_malloc0(sizeof*rings);
       rings -> vert_buffer_size = POLY_BUFF_SIZE;
       rings -> num_vertices = rtot * (plot -> abc -> extra_cell[0]+1)*(plot -> abc -> extra_cell[1]+1)*(plot -> abc -> extra_cell[2]+1);
       rings -> vertices = allocfloat (rings -> vert_buffer_size*rings -> num_vertices);
@@ -278,7 +278,6 @@ void create_ring_lists ()
         }
       }
       wingl -> ogl_glsl[RINGS][step][0] = init_shader_program (RINGS, GLSL_POLYEDRA, full_vertex, NULL, full_color, GL_TRIANGLES, 3, 1, TRUE, rings);
-      g_free (rings);
     }
   }
   wingl -> create_shaders[RINGS] = FALSE;

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file w_box.c
@@ -44,10 +44,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glview.h"
 #include "glwindow.h"
 #include "preferences.h"
-
-#define BOX_STYLES 2
-
-gchar * box_style[BOX_STYLES] = {"Wireframe", "Cylinders"};
 
 gboolean from_box_or_axis = FALSE;
 
@@ -91,7 +87,7 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Radius [ %f Å ]", v);
+      str = g_strdup_printf (_("Radius [ %f Å ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][6]), str);
       g_free (str);
 #endif
@@ -110,7 +106,7 @@ G_MODULE_EXPORT void update_box_parameter (GtkEntry * res, gpointer data)
     {
 #ifdef GTK3
       // GTK3 Menu Action To Check
-      str = g_strdup_printf ("_Width [ %f pts ]", v);
+      str = g_strdup_printf (_("Width [ %f pts ]"), v);
       gtk_menu_item_set_label (GTK_MENU_ITEM(view -> ogl_box_axis[0][4]), str);
       g_free (str);
 #endif
@@ -163,8 +159,8 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
 #endif
   if (i == 1)
   {
-    if (is_the_widget_visible(box_win -> width_box)) hide_the_widgets (box_win -> width_box);
-    if (! is_the_widget_visible(box_win -> radius_box)) show_the_widgets (box_win -> radius_box);
+    hide_the_widgets (box_win -> width_box);
+    show_the_widgets (box_win -> radius_box);
     if (! preferences)
     {
 #ifdef GTK3
@@ -179,8 +175,8 @@ G_MODULE_EXPORT void set_box_combo_style (GtkWidget * widg, gpointer data)
   }
   else if (i == 0)
   {
-    if (is_the_widget_visible(box_win -> radius_box)) hide_the_widgets (box_win -> radius_box);
-    if (! is_the_widget_visible(box_win -> width_box)) show_the_widgets (box_win -> width_box);
+    hide_the_widgets (box_win -> radius_box);
+    show_the_widgets (box_win -> width_box);
     if (! preferences)
     {
 #ifdef GTK3
@@ -368,14 +364,14 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   if (preferences)
   {
     the_box -> win = create_vbox (BSEP);
-    adv_box (the_box -> win, "<b>Box settings</b>", 5, 120, 0.0);
+    adv_box (the_box -> win, _("<b>Box settings</b>"), 5, 120, 0.0);
     GtkWidget * hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, the_box -> win, hbox, FALSE, FALSE, 20);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 60);
   }
   else
   {
-    gchar * str = g_strdup_printf ("%s - box settings", get_project_by_id(view -> proj)->name);
+    gchar * str = g_strdup_printf (_("%s - box settings"), get_project_by_id(view -> proj)->name);
     the_box -> win = create_win (str, view -> win, FALSE, FALSE);
     g_free (str);
     add_container_child (CONTAINER_WIN, the_box -> win, vbox);
@@ -390,7 +386,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   {
     ac = FALSE;
   }
-  the_box -> show_hide = check_button ("Show / hide box", 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
+  the_box -> show_hide = check_button (_("Show/Hide box"), 100, 40, ac, G_CALLBACK(set_show_box_toggle), data);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> show_hide, FALSE, FALSE, 0);
   the_box -> box_data = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, the_box -> box_data, TRUE, TRUE, 10);
@@ -399,12 +395,10 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   GtkWidget * pos_box = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, the_box -> box_data, pos_box, TRUE, TRUE, 0);
 
-  box = abox (the_box -> box_data, "Style ", 5);
+  box = abox (the_box -> box_data, _("Style "), 5);
   the_box -> styles  = create_combo ();
-  for (i=0; i<BOX_STYLES; i++)
-  {
-    combo_text_append (the_box -> styles, box_style[i]);
-  }
+  combo_text_append (the_box -> styles, _("Wireframes"));
+  combo_text_append (the_box -> styles, _("Cylinders"));
   if (box_type == NONE) i = NONE;
   if (box_type == WIREFRAME) i = 0;
   if (box_type == CYLINDERS) i = 1;
@@ -412,17 +406,17 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
   gtk_widget_set_size_request (the_box -> styles, 120, -1);
   g_signal_connect (G_OBJECT (the_box -> styles), "changed", G_CALLBACK(set_box_combo_style), data);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, the_box -> styles, FALSE, FALSE, 10);
-  the_box -> width_box = abox (the_box -> box_data, "Line width [pts] ", 0);
+  the_box -> width_box = abox (the_box -> box_data, _("Line width [pts] "), 0);
   the_box -> width  = create_entry (G_CALLBACK(update_box_parameter), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(the_box -> width), box_line);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_box -> width_box, the_box -> width, FALSE, FALSE, 10);
-  the_box -> radius_box = abox (the_box -> box_data, "Cylinder radius [&#xC5;] ", 0);
+  the_box -> radius_box = abox (the_box -> box_data, _("Cylinder radius [&#xC5;] "), 0);
   the_box -> radius = create_entry (G_CALLBACK(update_box_parameter), 120, 10, FALSE, data);
   update_entry_double (GTK_ENTRY(the_box -> radius), box_rad);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, the_box -> radius_box, the_box -> radius, FALSE, FALSE, 10);
 
   // Colors
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (the_box -> box_data, "Color ", 5), color_button(box_color, TRUE, 120, -1, G_CALLBACK(set_color_box), data), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, abox (the_box -> box_data, _("Color "), 5), color_button(box_color, TRUE, 120, -1, G_CALLBACK(set_color_box), data), FALSE, FALSE, 10);
 
   if (! preferences)
   {
@@ -431,7 +425,7 @@ G_MODULE_EXPORT void box_advanced (GtkWidget * widg, gpointer data)
     show_the_widgets (the_box -> win);
     if (box_type)
     {
-     hide_the_widgets (the_box -> width_box);
+      hide_the_widgets (the_box -> width_box);
     }
     else
     {

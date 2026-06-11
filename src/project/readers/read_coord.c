@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_coord.c
@@ -101,7 +101,7 @@ void add_reader_info (gchar * info, int mid)
   {
     if (! this_reader -> msg)
     {
-      this_reader -> info = g_malloc0 (sizeof*this_reader -> info);
+      this_reader -> info = g_malloc0(sizeof*this_reader -> info);
     }
     else
     {
@@ -142,14 +142,14 @@ void format_error (int stp, int ato, gchar * mot, int line)
   gchar * str;
   if (ato < 0)
   {
-    str = g_strdup_printf ("Wrong file format: error at step %d !\n"
-                           "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !",
+    str = g_strdup_printf (_("Wrong file format: error at step %d !\n"
+                             "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"),
                            stp, mot, line);
   }
   else
   {
-    str = g_strdup_printf ("Wrong file format: error at step %d, atom %d !\n"
-                           "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !",
+    str = g_strdup_printf (_("Wrong file format: error at step %d, atom %d !\n"
+                             "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"),
                            stp, ato, mot, line+1);
   }
   add_reader_info (str, 0);
@@ -190,19 +190,19 @@ int set_v_dummy (gchar * this_word)
   }
   this_reader -> dummy[this_reader -> ndummy-1] = g_strdup_printf ("%s", this_word);
   // Dummy added, then do we use this dummy ?
-  gchar * str = g_strdup_printf ("Use dummy atom(s) for unknown %s species ?", this_word);
-  gboolean use_dummy = ask_yes_no ("Use dummy atom(s) ?", str, GTK_MESSAGE_QUESTION, MainWindow);
+  gchar * str = g_strdup_printf (_("Use dummy atom(s) for unknown %s species ?"), this_word);
+  gboolean use_dummy = ask_yes_no (_("Use dummy atom(s) ?"), str, GTK_MESSAGE_QUESTION, MainWindow);
   g_free (str);
   if (use_dummy)
   {
-    str = g_strdup_printf ("Using dummy atom(s) for unknown %s species", this_word);
+    str = g_strdup_printf (_("Using dummy atom(s) for unknown %s species"), this_word);
     add_reader_info (str, 1);
     g_free (str);
     return this_reader -> ndummy;
   }
   else
   {
-    str = g_strdup_printf ("No dummy atom(s) for unknown %s species", this_word);
+    str = g_strdup_printf (_("No dummy atom(s) for unknown %s species"), this_word);
     add_reader_info (str, 1);
     g_free (str);
     return 0;
@@ -279,7 +279,7 @@ int open_coord_file (gchar * filename, int fti)
   res = stat (filename, & status);
   if (res == -1)
   {
-    add_reader_info ("Error - cannot get file statistics !\n", 0);
+    add_reader_info (_("Error - cannot get file statistics !\n"), 0);
     return 1;
   }
   int fsize = status.st_size;
@@ -287,7 +287,7 @@ int open_coord_file (gchar * filename, int fti)
   coordf = fopen (filename, dfi[0]);
   if (! coordf)
   {
-    add_reader_info ("Error - cannot open coordinates file !\n", 0);
+    add_reader_info (_("Error - cannot open coordinates file !\n"), 0);
     return 1;
   }
   int i, j, k, l;
@@ -297,7 +297,7 @@ int open_coord_file (gchar * filename, int fti)
   fclose (coordf);
   int linecount = 0;
   for (j=0; j<fsize; j++) if (coord_content[j] == '\n') linecount ++;
-  coord_line = g_malloc0 (linecount*sizeof*coord_line);
+  coord_line = g_malloc0(linecount*sizeof*coord_line);
   coord_line[0] = & coord_content[0];
   i = 1;
   for (j=0; j<fsize; j++)
@@ -321,16 +321,16 @@ int open_coord_file (gchar * filename, int fti)
   {
     if (head == NULL)
     {
-      head = g_malloc0 (sizeof*head);
-      tail = g_malloc0 (sizeof*tail);
+      head = g_malloc0(sizeof*head);
+      tail = g_malloc0(sizeof*tail);
       tail = head;
     }
     else
     {
-      tail -> next = g_malloc0 (sizeof*tail -> next);
+      tail -> next = g_malloc0(sizeof*tail -> next);
       if (fti == 9 || fti == 10)
       {
-        tail -> next -> prev = g_malloc0 (sizeof*tail -> next -> prev);
+        tail -> next -> prev = g_malloc0(sizeof*tail -> next -> prev);
         tail -> next -> prev = tail;
       }
       tail = tail -> next;
@@ -413,33 +413,33 @@ int open_coord_file (gchar * filename, int fti)
           k = build_crystal (FALSE, active_project, j, TRUE, FALSE, & this_reader -> lattice, MainWindow);
           if (! k)
           {
-            add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
+            add_reader_info (_("Error(s) trying to build crystal using the CIF file parameters !\n"
                              "This usually comes from: \n"
                              "\t - incorrect space group description\n"
                              "\t - incomplete space group description\n"
                              "\t - missing space group setting\n"
-                             "\t - incorrect space group setting\n", 0);
+                             "\t - incorrect space group setting\n"), 0);
             res = 3;
             goto end;
           }
           else if (k < 0)
           {
-            add_reader_info ("Error(s) trying to build crystal using the CIF file parameters !\n"
-                             "Information lead to change(s) between each configuration\n", 0);
+            add_reader_info (_("Error(s) trying to build crystal using the CIF file parameters !\n"
+                             "Information lead to change(s) between each configuration\n"), 0);
             res = 3;
             goto end;
           }
           else if (k > 1 && i)
           {
-            add_reader_info ("Potential issue(s) when building crystal !\n"
+            add_reader_info (_("Potential issue(s) when building crystal !\n"
                              "This usually comes from: \n"
                              "\t - incorrect space group description\n"
                              "\t - incomplete space group description\n"
                              "\t - missing space group setting\n"
-                             "\t - incorrect space group setting\n", 1);
+                             "\t - incorrect space group setting\n"), 1);
             if (this_reader -> num_sym_pos && active_project -> steps == 1)
             {
-               add_reader_info ("\nAnother model will be built using included symmetry positions\n", 1);
+               add_reader_info (_("\nAnother model will be built using included symmetry positions\n"), 1);
               cif_use_symmetry_positions = TRUE;
             }
             i = 0;
@@ -460,13 +460,19 @@ int open_coord_file (gchar * filename, int fti)
         active_project -> atoms[i][j].cloned = FALSE;
       }
     }
+    if (active_project -> steps > 1)
+    {
+      active_project -> skt_corr_threshold = (active_project -> steps < 20) ? 1 : 10;
+      active_project -> skt_n_data_sets = min (5, active_project -> steps);
+      active_project -> sqw_n_data_sets = 5;
+    }
     if (fti != 9 || this_reader -> cartesian)
     {
       active_project -> nspec = this_reader -> nspec;
       active_project -> chemistry = alloc_chem_data (active_project -> nspec);
       active_project_changed (activep);
       k = l = 0;
-      reader_info (coord_files_ext[fti], "Number of species", active_project -> nspec);
+      reader_info (coord_files_ext[fti], _("Number of species"), active_project -> nspec);
       for (i=0; i<active_project -> nspec; i++)
       {
         active_chem -> chem_prop[CHEM_Z][i] = this_reader -> z[i];
@@ -474,7 +480,7 @@ int open_coord_file (gchar * filename, int fti)
         if (this_reader -> z[i] < 1.0)
         {
           active_chem -> label[i] = g_strdup_printf ("%s", this_reader -> dummy[l]);
-          active_chem -> element[i] = g_strdup_printf ("Dummy %s", this_reader -> dummy[l]);
+          active_chem -> element[i] = g_strdup_printf (_("Dummy %s"), this_reader -> dummy[l]);
           active_chem -> chem_prop[CHEM_M][i] = 1.0;
           active_chem -> chem_prop[CHEM_R][i] = 0.5;
           l ++;
@@ -487,7 +493,7 @@ int open_coord_file (gchar * filename, int fti)
           active_chem -> chem_prop[CHEM_R][i] = set_radius_ (& j, & k);
           if (! active_chem -> chem_prop[CHEM_R][i])
           {
-            gchar * str = g_strdup_printf ("For species %s, radius is equal to 0.0 !\n", active_chem -> label[i]);
+            gchar * str = g_strdup_printf (_("For species %s, radius is equal to 0.0 !\n"), active_chem -> label[i]);
             add_reader_info (str, 1);
             g_free (str);
           }
@@ -500,7 +506,7 @@ int open_coord_file (gchar * filename, int fti)
     }
     else
     {
-      reader_info (coord_files_ext[fti], "Number of species", active_project -> nspec);
+      reader_info (coord_files_ext[fti], _("Number of species"), active_project -> nspec);
       for (i=0; i<active_project -> nspec; i++)
       {
         g_print ("Reading coordinates [%s]:\t %s, nsps[%d]= %d\n", coord_files_ext[fti], active_chem -> label[i], i+1, active_chem -> nsps[i]);

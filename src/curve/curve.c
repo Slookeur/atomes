@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file curve.c
@@ -32,7 +32,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   double scale (double axe);
 
-  void prep_plot (project * this_proj, int rid, int cid);
+  void prep_plot (Curve * this_curve);
   void clean_this_curve_window (int cid, int rid);
   void set_curve_data_zero (int rid, int cid, int interv);
   void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid);
@@ -44,6 +44,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   curve_dash * selectdash (int iddash);
 
+  Curve * get_curve_from_pointer (gpointer data);
 */
 
 #include <gtk/gtk.h>
@@ -134,7 +135,7 @@ int lenp = 1;
 curve_dash * selectdash (int iddash)
 {
   curve_dash * dashtab;
-  dashtab = g_malloc0 (sizeof*dashtab);
+  dashtab = g_malloc0(sizeof*dashtab);
 
   if (iddash == 0)
   {
@@ -191,7 +192,7 @@ curve_dash * selectdash (int iddash)
      dashtab -> a = pdashed;
      dashtab -> b = lenp;
   }
-  return (dashtab);
+  return dashtab;
 }
 
 /*!
@@ -304,23 +305,32 @@ double scale (double axe)
 }
 
 /*!
-  \fn void prep_plot (project * this_proj, int rid, int cid)
+  \fn Curve * get_curve_from_pointer (gpointer data)
+
+  \brief get Curve pointer from pointer
+  \param data the target pointer
+*/
+Curve * get_curve_from_pointer (gpointer data)
+{
+  tint * ad = (tint *)data;
+  return get_project_by_id(ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
+}
+
+/*!
+  \fn void prep_plot (Curve * this_curve)
 
   \brief prepare curve plot (setting up variables for the plot)
 
-  \param this_proj the target project
-  \param rid the calculation id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void prep_plot (project * this_proj, int rid, int cid)
+void prep_plot (Curve * this_curve)
 {
-  x_min = resol[0] * this_proj -> curves[rid][cid] -> frame_pos[0][0];
-  x_max = resol[0] * this_proj -> curves[rid][cid] -> frame_pos[0][1];
-  y_max = resol[1] * (1.0 - this_proj -> curves[rid][cid] -> frame_pos[1][1]);
+  x_min = resol[0] * this_curve -> frame_pos[0][0];
+  x_max = resol[0] * this_curve -> frame_pos[0][1];
+  y_max = resol[1] * (1.0 - this_curve -> frame_pos[1][1]);
   y_max = resol[1] - y_max;
-  y_min = resol[1] * (1.0 - this_proj -> curves[rid][cid] -> frame_pos[1][0]);
+  y_min = resol[1] * (1.0 - this_curve -> frame_pos[1][0]);
   y_min = resol[1] - y_min;
-
   // The x size of the graph in pixels
   XDRAW = x_max - x_min;
 // The y size of the graph in pixels
@@ -337,24 +347,24 @@ void prep_plot (project * this_proj, int rid, int cid)
 */
 void clean_this_curve_window (int cid, int rid)
 {
-  /*if (active_project -> curves[rid][cid] -> window != NULL)
+  /*if (active_project -> analysis[rid] -> curves[cid] -> window != NULL)
   {
-    active_project -> curves[rid][cid] -> window = destroy_this_widget (active_project -> curves[rid][cid] -> window);
-    active_project -> curves[rid][cid] -> plot = destroy_this_widget (active_project -> curves[rid][cid] -> plot);
+    active_project -> analysis[rid] -> curves[cid] -> window = destroy_this_widget (active_project -> analysis[rid] -> curves[cid] -> window);
+    active_project -> analysis[rid] -> curves[cid] -> plot = destroy_this_widget (active_project -> analysis[rid] -> curves[cid] -> plot);
   }*/
-  if (active_project -> curves[rid][cid] -> ndata > 0)
+  if (active_project -> analysis[rid] -> curves[cid] -> ndata > 0)
   {
     int i;
     for (i=0; i<2; i++)
     {
-      if (active_project -> curves[rid][cid] -> data[i] != NULL)
+      if (active_project -> analysis[rid] -> curves[cid] -> data[i] != NULL)
       {
-        g_free (active_project -> curves[rid][cid] -> data[i]);
-        active_project -> curves[rid][cid] -> data[i] = NULL;
+        g_free (active_project -> analysis[rid] -> curves[cid] -> data[i]);
+        active_project -> analysis[rid] -> curves[cid] -> data[i] = NULL;
       }
     }
   }
-  active_project -> curves[rid][cid] -> ndata = 0;
+  active_project -> analysis[rid] -> curves[cid] -> ndata = 0;
 }
 
 /*!
@@ -368,12 +378,23 @@ void clean_this_curve_window (int cid, int rid)
 */
 void set_curve_data_zero (int rid, int cid, int interv)
 {
-  active_project -> curves[rid][cid] -> ndata = interv;
-  active_project -> curves[rid][cid] -> data[0] = allocdouble (interv);
+  active_project -> analysis[rid] -> curves[cid] -> ndata = interv;
+  active_project -> analysis[rid] -> curves[cid] -> data[0] = allocdouble (interv);
   int i;
-  for (i=0; i<interv; i++)
+  if (rid != SKT)
   {
-    active_project -> curves[rid][cid] -> data[0][i] = active_project -> min[rid] + i*active_project -> delta[rid];
+    for (i=0; i<interv; i++)
+    {
+      active_project -> analysis[rid] -> curves[cid] -> data[0][i] = active_project -> analysis[rid] -> min + i*active_project -> analysis[rid] -> delta;
+    }
+  }
+  else
+  {
+    double delta_omega = (pi/(active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta)) / active_project -> sqw_freq;
+    for (i=0; i<interv; i++)
+    {
+      active_project -> analysis[rid] -> curves[cid] -> data[0][i] = i*delta_omega;
+    }
   }
 }
 
@@ -390,10 +411,10 @@ void set_curve_data_zero (int rid, int cid, int interv)
 void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid)
 {
   int i, j;
-
+  Curve * this_curve = active_project -> analysis[* rid] -> curves[* cid];
 #ifdef DEBUG
-  /*g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, active_project -> curves[* rid][* cid] -> name, * interv);
-  for ( i=0 ; i < *interv ; i++ )
+  // g_debug ("SAVE_CURVE:: rid= %d, cid= %d, name= %s, interv= %d", * rid, * cid, this_curve -> name, * interv);
+  /*for ( i=0 ; i < *interv ; i++ )
   {
     g_debug ("SAVECURVE:: i= %d, data[i]= %f", i, datacurve[i]);
   }*/
@@ -402,41 +423,41 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
   clean_this_curve_window (* cid, * rid);
   if (* interv != 0)
   {
-    int inter = (* rid == SP) ? * interv/2 + 1: * interv;
-    if (* rid == SK)
+    int inter = (* rid == SPH) ? * interv/2 + 1: * interv;
+    if (* rid == SKD || (* rid == SKT && * cid < active_project -> skt_sets))
     {
-      active_project -> curves[* rid][* cid] -> ndata = inter;
-      active_project -> curves[* rid][* cid] -> data[0] = duplicate_double (inter, xsk);
+      this_curve -> ndata = inter;
+      this_curve -> data[0] = duplicate_double (inter, xsk);
     }
     else
     {
       set_curve_data_zero (* rid, * cid, inter);
     }
-    if (* rid != SP)
+    if (* rid != SPH)
     {
-      active_project -> curves[* rid][* cid] -> data[1] = duplicate_double (inter, datacurve);
+      this_curve -> data[1] = duplicate_double (inter, datacurve);
     }
     else
     {
-      active_project -> curves[* rid][* cid] -> data[1] = allocdouble (inter);
+      this_curve -> data[1] = allocdouble (inter);
       for (i=0; i<inter; i++)
       {
-        active_project -> curves[* rid][* cid] -> data[1][i] = datacurve[i*2];
+        this_curve -> data[1][i] = datacurve[i*2];
       }
     }
     for (i=0; i<2; i++)
     {
-      j = active_project -> curves[* rid][* cid] -> extrac -> extras;
-      active_project -> curves[* rid][* cid] -> extrac -> extras = 0;
-      autoscale_axis (active_project, * rid, * cid, i);
-      active_project -> curves[* rid][* cid] -> extrac -> extras = j;
-      active_project -> curves[* rid][* cid] -> majt[i] = scale (active_project -> curves[* rid][* cid] -> axmax[i] - active_project -> curves[* rid][* cid] -> axmin[i]);
-      active_project -> curves[* rid][* cid] -> mint[i] = 2;
+      j = (this_curve -> extrac) ? this_curve -> extrac -> extras : 0;
+      if (this_curve -> extrac) this_curve -> extrac -> extras = 0;
+      autoscale_axis (active_project, this_curve, * rid, * cid, i);
+      if (this_curve -> extrac) this_curve -> extrac -> extras = j;
+      this_curve -> majt[i] = scale (this_curve -> axmax[i] - this_curve -> axmin[i]);
+      this_curve -> mint[i] = 2;
     }
   }
   else
   {
-    active_project -> curves[* rid][* cid] -> ndata = 0;
+    this_curve -> ndata = 0;
   }
 }
 
@@ -451,19 +472,18 @@ void save_curve_ (int * interv, double datacurve[* interv], int * cid, int * rid
 void hide_curves (project * this_proj, int c)
 {
   int i;
-
-  for ( i = 0 ; i < this_proj -> numc[c] ; i ++ )
+  for ( i = 0 ; i < this_proj -> analysis[c] -> numc ; i ++ )
   {
-    if (this_proj -> curves[c][i])
+    if (this_proj -> analysis[c] -> curves[i])
     {
-      if (this_proj -> curves[c][i] -> window)
+      if (this_proj -> analysis[c] -> curves[i] -> window)
       {
-        if (is_the_widget_visible(this_proj -> curves[c][i] -> window))
+        if (is_the_widget_visible(this_proj -> analysis[c] -> curves[i] -> window))
         {
-          hide_the_widgets (this_proj -> curves[c][i] -> window);
-          adjust_tool_model (c, i, this_proj -> curves[c][i] -> path);
-          g_free (this_proj -> curves[c][i] -> path);
-          this_proj -> curves[c][i] -> path = NULL;
+          hide_the_widgets (this_proj -> analysis[c] -> curves[i] -> window);
+          adjust_tool_model (c, i, this_proj -> analysis[c] -> curves[i] -> path);
+          g_free (this_proj -> analysis[c] -> curves[i] -> path);
+          this_proj -> analysis[c] -> curves[i] -> path = NULL;
         }
       }
     }
@@ -489,23 +509,29 @@ void remove_this_curve_from_extras (int a, int b, int c)
     if (i != a)
     {
       this_proj = get_project_by_id (i);
-      for (j=0; j<NGRAPHS; j++)
+      if (this_proj -> analysis)
       {
-        if (this_proj -> idcc[j] != NULL)
+        for (j=0; j<NCALCS; j++)
         {
-          for (k=0; k<this_proj -> numc[j]; k++)
+          if (this_proj -> analysis[j])
           {
-            if (this_proj -> curves[j][k] -> extrac > 0)
+            if (this_proj -> analysis[j] -> idcc != NULL)
             {
-              ctmp = this_proj -> curves[j][k] -> extrac -> first;
-              for (l=0; l<this_proj -> curves[j][k] -> extrac -> extras; l++)
+              for (k=0; k<this_proj -> analysis[j] -> numc; k++)
               {
-                if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
+                if (this_proj -> analysis[j] -> curves[k] -> extrac > 0)
                 {
-                  remove_extra (this_proj -> curves[j][k] -> extrac, ctmp);
-                  break;
+                  ctmp = this_proj -> analysis[j] -> curves[k] -> extrac -> first;
+                  for (l=0; l<this_proj -> analysis[j] -> curves[k] -> extrac -> extras; l++)
+                  {
+                    if (ctmp -> id.a == a && ctmp -> id.b == b && ctmp -> id.c == c)
+                    {
+                      remove_extra (this_proj -> analysis[j] -> curves[k] -> extrac, ctmp);
+                      break;
+                    }
+                    if (ctmp -> next != NULL) ctmp = ctmp -> next;
+                  }
                 }
-                if (ctmp -> next != NULL) ctmp = ctmp -> next;
               }
             }
           }
@@ -526,27 +552,47 @@ void remove_this_curve_from_extras (int a, int b, int c)
 void erase_curves (project * this_proj, int c)
 {
   int i, j;
-
-  for (i=0 ; i<this_proj -> numc[c]; i ++)
+  for (i=0 ; i<this_proj -> analysis[c] -> numc; i ++)
   {
-    if (this_proj -> curves[c][i])
+    if (this_proj -> analysis[c] -> curves[i])
     {
       remove_this_curve_from_extras (this_proj -> id, c, i);
       for (j=0; j<2; j++)
       {
-        if (this_proj -> curves[c][i] -> data[j])
+        if (this_proj -> analysis[c] -> curves[i] -> data[j])
         {
-          free (this_proj -> curves[c][i] -> data[j]);
-          this_proj -> curves[c][i] -> data[j] = NULL;
+          g_free (this_proj -> analysis[c] -> curves[i] -> data[j]);
+          this_proj -> analysis[c] -> curves[i] -> data[j] = NULL;
         }
+        if (this_proj -> analysis[c] -> curves[i] -> axis_title[j])
+        {
+          g_free (this_proj -> analysis[c] -> curves[i] -> axis_title[j]);
+        }
+        g_free (this_proj -> analysis[c] -> curves[i] -> labels_font[j]);
+        this_proj -> analysis[c] -> curves[i] -> labels_font[j] = NULL;
+        g_free (this_proj -> analysis[c] -> curves[i] -> axis_title_font[j]);
+        this_proj -> analysis[c] -> curves[i] -> axis_title_font[j] = NULL;
       }
-      if (this_proj -> curves[c][i] -> name)
+      if (this_proj -> analysis[c] -> curves[i] -> name)
       {
-        g_free (this_proj -> curves[c][i] -> name);
-        this_proj -> curves[c][i] -> name = NULL;
+        g_free (this_proj -> analysis[c] -> curves[i] -> name);
+        this_proj -> analysis[c] -> curves[i] -> name = NULL;
       }
-      g_free (this_proj -> curves[c][i]);
-      this_proj -> curves[c][i] = NULL;
+      if (this_proj -> analysis[c] -> curves[i] -> title)
+      {
+        g_free (this_proj -> analysis[c] -> curves[i] -> title);
+        this_proj -> analysis[c] -> curves[i] -> title = NULL;
+      }
+      if (this_proj -> analysis[c] -> curves[i] -> title_font)
+      {
+        g_free (this_proj -> analysis[c] -> curves[i] -> title_font);
+        this_proj -> analysis[c] -> curves[i] -> title_font = NULL;
+      }
+      g_free (this_proj -> analysis[c] -> curves[i] -> legend_font);
+      g_free (this_proj -> analysis[c] -> curves[i] -> layout);
+      g_free (this_proj -> analysis[c] -> curves[i] -> extrac);
+      g_free (this_proj -> analysis[c] -> curves[i]);
+      this_proj -> analysis[c] -> curves[i] = NULL;
     }
   }
 }
@@ -563,15 +609,15 @@ void update_curves ()
   for (i=0; i<nprojects; i++)
   {
     this_proj = get_project_by_id(i);
-    for (j=0; j<NGRAPHS; j++)
+    for (j=0; j<NCALCS; j++)
     {
-      for (k=0; k<this_proj -> numc[j]; k++)
+      for (k=0; k<this_proj -> analysis[j] -> numc; k++)
       {
-        if (this_proj -> curves[j][k] -> plot != NULL)
+        if (this_proj -> analysis[j] -> curves[k] -> plot != NULL)
         {
-          if (is_the_widget_visible(this_proj -> curves[j][k] -> plot))
+          if (is_the_widget_visible(this_proj -> analysis[j] -> curves[k] -> plot))
           {
-            gtk_widget_queue_draw (this_proj -> curves[j][k] -> plot);
+            gtk_widget_queue_draw (this_proj -> analysis[j] -> curves[k] -> plot);
           }
         }
       }
@@ -588,6 +634,5 @@ void update_curves ()
 */
 void update_curve (gpointer data)
 {
-  tint * cd = (tint *)data;
-  gtk_widget_queue_draw (get_project_by_id(cd -> a) -> curves[cd -> b][cd -> c] -> plot);
+  gtk_widget_queue_draw (get_curve_from_pointer(data) -> plot);
 }

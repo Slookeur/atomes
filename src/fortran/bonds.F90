@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file bonds.F90
@@ -378,6 +378,21 @@ enddo
 call CLEAN_GEOM ()
 if (allocated(GESP)) deallocate(GESP)
 
+if (NSP .eq. 2) then
+  do i=1, NSP
+    do j=1, NSP
+      MAC(j)=MA_COUNT(i,j)
+    enddo
+    call warren_cowley_out (i-1, MAC)
+  enddo
+  do i=1, NSP
+    do j=1, NSP
+      MAC(j)=MA_COUNT(i,j)
+    enddo
+    call cargill_spaepen_out (i-1, MAC)
+  enddo
+endif
+
 if (adv .eq. 1) then
   if (.not.EESCS()) then
     bonding=0
@@ -660,7 +675,8 @@ USE PARAMETERS
 
 IMPLICIT NONE
 
-DOUBLE PRECISION :: dmax
+DOUBLE PRECISION :: maxd
+DOUBLE PRECISION, DIMENSION(3) :: dmax
 
 do l=1,3
   pmin(l) = FULLPOS(1,l,1)
@@ -690,15 +706,19 @@ deallocate (NFULLPOS)
 
 if (PBC) then
   oglmax = sqrt(Dij)
-  dmax = 0.0d0
+  dmax(:) = 0.0d0
+  maxd = 0.0d0
   do l=1, NCELLS
-    dmax = max(dmax, THE_BOX(l)%maxv)
+    do m=1, 3
+      dmax(m) = max(dmax(m), THE_BOX(l)%modv(m)*THE_BOX(l)%modv(m))
+    enddo
   enddo
-  if (oglmax < dmax) oglmax = dmax*3.0;
+  maxd = sqrt(dmax(1)+dmax(2)+dmax(3))
+  if (oglmax < maxd) oglmax = maxd;
 else
-  oglmax=2.0*sqrt(Dij)
+  oglmax=sqrt(Dij)
 endif
-
+oglmax = 2.0*oglmax
 if (oglmax .lt. 10.0) oglmax = 10.0
 
 END FUNCTION

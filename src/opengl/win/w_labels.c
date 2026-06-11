@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file w_labels.c
@@ -68,9 +68,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "glwindow.h"
 #include "preferences.h"
 
-#define LABEL_FORMATS 4
+#define LABEL_FORMATS 5
 
-gchar * lab_formats[LABEL_FORMATS] = {"Element name", "Atomic symbol", "Atomic symbol + ID number", "ID number"};
+gchar * lab_formats[LABEL_FORMATS] = {i18n("Element Name"), i18n("Atomic Symbol"), i18n("Atomic Symbol + Id. Number"), i18n("Sym. + Id. Num. Subscript"), i18n("Id. Number")};
 
 GtkWidget * atom_color_box;
 GtkWidget ** color_title;
@@ -230,7 +230,7 @@ G_MODULE_EXPORT void use_atom_default_colors (GtkToggleButton * but, gpointer da
   }
   else
   {
-    this_proj -> modelgl -> anim -> last -> img -> labels[b].color = g_malloc (2*this_proj -> nspec*sizeof*this_proj -> modelgl -> anim -> last -> img -> labels[b].color);
+    this_proj -> modelgl -> anim -> last -> img -> labels[b].color = g_malloc0(2*this_proj -> nspec*sizeof*this_proj -> modelgl -> anim -> last -> img -> labels[b].color);
     init_labels_colors (this_proj -> modelgl -> anim -> last -> img, this_proj -> nspec, b);
     this_proj -> modelgl -> anim -> last -> img -> labels[b].n_colors = 2*this_proj -> nspec;
   }
@@ -679,11 +679,11 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * box;
   if (lid < 2)
   {
-    box = abox (vbox, "Templates ", 0);
+    box = abox (vbox, _("Templates "), 0);
     GtkWidget * formats  = create_combo ();
     for (i=0; i<LABEL_FORMATS; i++)
     {
-      combo_text_append (formats, lab_formats[i]);
+      combo_text_append (formats, _(lab_formats[i]));
     }
     combo_set_active (formats, acl_format);
     gtk_widget_set_size_request (formats, 220, -1);
@@ -692,49 +692,49 @@ GtkWidget * labels_tab (glwin * view, int lid)
   }
   else
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b><u>Label(s):</u></b>", -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b><u>Label(s):</u></b>"), -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
   }
   // Rendering
-  box = abox (vbox, "Rendering ", 0);
+  box = abox (vbox, _("Rendering "), 0);
   GtkWidget * config  = create_combo ();
-  combo_text_append (config, "Basic text");
-  combo_text_append (config, "Highlighted");
+  combo_text_append (config, _("Basic Text"));
+  combo_text_append (config, _("Highlighted"));
   combo_set_active (config, label -> render);
   gtk_widget_set_size_request (config, 220, -1);
   g_signal_connect (G_OBJECT (config), "changed", G_CALLBACK(set_labels_render), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, config, FALSE, FALSE, 10);
   // Font
-  box = abox (vbox, "Font", 0);
+  box = abox (vbox, _("Font"), 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, font_button (label -> font, 220, -1, G_CALLBACK(set_labels_font), lab_pointer), FALSE, FALSE, 10);
   if (lid == 3 || lid == 4)
   {
-    box = abox (vbox, "Font color", 0);
+    box = abox (vbox, _("Font color"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, color_button (label -> color[0], TRUE, 220, -1, G_CALLBACK(set_label_color), lab_pointer), FALSE, FALSE, 10);
   }
 
   // Position
-  box = abox (vbox, "Position", 0);
+  box = abox (vbox, _("Position"), 0);
   GtkWidget * position = create_combo ();
-  combo_text_append (position, "Always visible");
-  combo_text_append (position, "Normal");
+  combo_text_append (position, _("Always Visible"));
+  combo_text_append (position, _("Normal"));
   combo_set_active (position, label -> position);
   gtk_widget_set_size_request (position, 220, -1);
   g_signal_connect (G_OBJECT (position), "changed", G_CALLBACK(set_labels_position), lab_pointer);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box, position, FALSE, FALSE, 10);
 
   // Size / scale
-  box = abox (vbox, "Size", 0);
+  box = abox (vbox, _("Size"), 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
-                       check_button ("scale with zoom in/out", 220, -1, label -> scale, G_CALLBACK(set_labels_scale), lab_pointer),
+                       check_button (_("Scale with zoom in/out"), 220, -1, label -> scale, G_CALLBACK(set_labels_scale), lab_pointer),
                        FALSE, FALSE, 10);
 
   if (lid == 3 || lid == 4)
   {
     // Tilt
-    box = abox (vbox, "Tilt", 0);
+    box = abox (vbox, _("Tilt"), 0);
     tilt = create_combo ();
-    combo_text_append (tilt, "None");
-    combo_text_append (tilt, "Adapted");
+    combo_text_append (tilt, _("None"));
+    combo_text_append (tilt, _("Adapted"));
     combo_set_active (tilt, mtilt);
     gtk_widget_set_size_request (tilt, 220, -1);
     g_signal_connect (G_OBJECT (tilt), "changed", G_CALLBACK(set_labels_tilt), measure_pointer);
@@ -744,7 +744,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
   GtkWidget * chbox;
   if (lid < 3)
   {
-    box = abox (vbox, "Distance to atom [&#xC5;]", 0);
+    box = abox (vbox, _("Distance to atom [&#xC5;]"), 0);
     chbox = create_hbox (0);
     for (i=0; i<2; i++)
     {
@@ -775,16 +775,16 @@ GtkWidget * labels_tab (glwin * view, int lid)
   }
   if (lid < 3 && ! preferences)
   {
-    box = abox (vbox, "Color(s)", 0);
+    box = abox (vbox, _("Color(s)"), 0);
     GtkWidget * col_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, col_box, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, col_box,
-                         check_button ("Use atom colors", 100, 40, ac, G_CALLBACK(use_atom_default_colors), (gpointer)lab_pointer),
+                         check_button (_("Use atom colors"), 100, 40, ac, G_CALLBACK(use_atom_default_colors), (gpointer)lab_pointer),
                          FALSE, FALSE, 0);
     atom_color_box = create_vbox (5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, col_box, atom_color_box, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, atom_color_box, markup_label ("Please select atom label colors:", -1, -1, 0.25, 0.5), FALSE, FALSE, 5);
-    color_title = g_malloc (this_proj -> nspec*sizeof*color_title);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, atom_color_box, markup_label (_("Please select atom label colors:"), -1, -1, 0.25, 0.5), FALSE, FALSE, 5);
+    color_title = g_malloc0(this_proj -> nspec*sizeof*color_title);
     for (i=0; i< this_proj -> nspec; i++)
     {
       chbox = create_hbox (0);
@@ -804,13 +804,13 @@ GtkWidget * labels_tab (glwin * view, int lid)
   }
   else if (lid >= 3)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b><u>Line(s):</u></b>", -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<b><u>Line(s):</u></b>"), -1, 40, 0.0, 0.5), FALSE, FALSE, 0);
     GtkWidget * hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Show / hide", -1, 40, mpattern+1, G_CALLBACK(enable_lines), measure_pointer), FALSE, FALSE, 30);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Show/Hide"), -1, 40, mpattern+1, G_CALLBACK(enable_lines), measure_pointer), FALSE, FALSE, 30);
     line_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, line_box, TRUE, TRUE, 0);
-    box = abox (line_box, "Pattern", 0);
+    box = abox (line_box, _("Pattern"), 0);
     GtkListStore * store = gtk_list_store_new (1, GDK_TYPE_PIXBUF);
     GtkTreeIter iter;
     for (i=0; i<NDOTS; i++)
@@ -819,7 +819,7 @@ GtkWidget * labels_tab (glwin * view, int lid)
       gtk_list_store_set (store, & iter, 0, gdk_pixbuf_new_from_file (dots[i], NULL), -1);
     }
     lstyle = gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
-    g_object_unref (G_OBJECT(store));
+    g_object_unref (store);
     GtkCellRenderer * renderer;
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(lstyle), renderer, FALSE );
@@ -829,12 +829,12 @@ GtkWidget * labels_tab (glwin * view, int lid)
     gtk_widget_set_size_request (lstyle, 100, 35);
     g_signal_connect (G_OBJECT (lstyle), "changed", G_CALLBACK(set_measure_style), measure_pointer);
 
-    box = abox (line_box, "Factor", 0);
+    box = abox (line_box, _("Factor"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                          create_hscale(1.0, 10.0, 1.0, (double)mfactor, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_factor), G_CALLBACK(scroll_set_measure_factor), measure_pointer),
                          TRUE, TRUE, 0);
 
-    box = abox (line_box, "Width", 0);
+    box = abox (line_box, _("Width"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, box,
                          create_hscale(1.0, 10.0, 1.0, mwidth, GTK_POS_RIGHT, 0, 100, G_CALLBACK(set_measure_width), G_CALLBACK(scroll_set_measure_width), measure_pointer),
                          TRUE, TRUE, 0);

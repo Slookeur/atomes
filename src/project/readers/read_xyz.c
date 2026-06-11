@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_xyz.c
@@ -306,13 +306,13 @@ int open_xyz_file (int linec)
   this_word = strtok (this_line, " ");
   if (! this_word)
   {
-    add_reader_info ("Wrong file format - cannot find the number of atoms !", 0);
-    add_reader_info ("Wrong file format - first line is corrupted !", 0);
+    add_reader_info (_("Wrong file format - cannot find the number of atoms !"), 0);
+    add_reader_info (_("Wrong file format - first line is corrupted !"), 0);
     res = 2;
     goto end;
   }
   this_reader -> natomes = (int)string_to_double ((gpointer)this_word);
-  reader_info ("xyz", "Number of atoms", this_reader -> natomes);
+  reader_info ("xyz", _("Number of atoms"), this_reader -> natomes);
   g_free (this_line);
   if (linec%(this_reader -> natomes + 2) != 0)
   {
@@ -321,7 +321,7 @@ int open_xyz_file (int linec)
   else
   {
     this_reader -> steps = linec / (this_reader -> natomes + 2);
-    reader_info ("xyz", "Number of steps", this_reader -> steps);
+    reader_info ("xyz", _("Number of steps"), this_reader -> steps);
     res = xyz_get_atom_coordinates ();
   }
 #else
@@ -329,13 +329,13 @@ int open_xyz_file (int linec)
   this_word = strtok (this_line, " ");
   if (! this_word)
   {
-    add_reader_info ("Wrong file format - cannot find the number of atoms !", 0);
-    add_reader_info ("Wrong file format - the first line is corrupted !", 0);
+    add_reader_info (_("Wrong file format - cannot find the number of atoms !"), 0);
+    add_reader_info (_("Wrong file format - first line is corrupted !"), 0);
     res = 2;
     goto end;
   }
   this_reader -> natomes = (int)string_to_double ((gpointer)this_word);
-  reader_info ("xyz", "Number of atoms", this_reader -> natomes);
+  reader_info ("xyz", _("Number of atoms"), this_reader -> natomes);
   g_free (this_line);
   if (linec%(this_reader -> natomes + 2) != 0)
   {
@@ -344,7 +344,7 @@ int open_xyz_file (int linec)
   else
   {
     this_reader -> steps = linec / (this_reader -> natomes + 2);
-    reader_info ("xyz", "Number of steps", this_reader -> steps);
+    reader_info ("xyz", _("Number of steps"), this_reader -> steps);
     res = xyz_get_atom_coordinates ();
   }
 #endif

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_coord.c
@@ -92,8 +92,8 @@ void print_coord_info (project * this_proj, coord_info * coord)
   int test;
   if (coord -> species)
   {
-    min_bs = allocint(coord -> species);
-    max_bs = allocint(coord -> species);
+    min_bs = allocint (coord -> species);
+    max_bs = allocint (coord -> species);
     g_debug (" ");
     g_debug ("coord -> species = %d", coord -> species);
     g_debug (" ");
@@ -189,7 +189,7 @@ void print_coord_info (project * this_proj, coord_info * coord)
 */
 coord_info * duplicate_coord_info (coord_info * old_coord)
 {
-  coord_info * new_coord = g_malloc0 (sizeof*new_coord);
+  coord_info * new_coord = g_malloc0(sizeof*new_coord);
   int i, j, k, l;
   if (! old_coord -> species) return new_coord;
   new_coord -> species = old_coord -> species;
@@ -202,14 +202,14 @@ coord_info * duplicate_coord_info (coord_info * old_coord)
     {
       j = (i < 2) ? new_coord -> species : 1;
       new_coord -> ntg[i] = duplicate_int (j, old_coord -> ntg[i]);
-      new_coord -> geolist[i] = g_malloc0 (j*sizeof*new_coord -> geolist[i]);
-      if (i == 1) new_coord -> partial_geo = g_malloc0 (j*sizeof*new_coord -> partial_geo);
+      new_coord -> geolist[i] = g_malloc0(j*sizeof*new_coord -> geolist[i]);
+      if (i == 1) new_coord -> partial_geo = g_malloc0(j*sizeof*new_coord -> partial_geo);
       for (k=0; k<j; k++)
       {
         new_coord -> geolist[i][k] = duplicate_int (new_coord -> ntg[i][k], old_coord -> geolist[i][k]);
         if (i == 1)
         {
-          new_coord -> partial_geo[k] = g_malloc0 (new_coord -> ntg[i][k]*sizeof*new_coord -> partial_geo[k]);
+          new_coord -> partial_geo[k] = g_malloc0(new_coord -> ntg[i][k]*sizeof*new_coord -> partial_geo[k]);
           for (l=0; l<new_coord -> ntg[i][k]; l++)
           {
             new_coord -> partial_geo[k][l] = duplicate_int (new_coord -> species, old_coord -> partial_geo[k][l]);
@@ -246,16 +246,16 @@ void clean_coords_and_geoms (project * this_proj, atom_edition * edit,
   int * tntg;
   coord_info * old_coord = duplicate_coord_info (edit -> coord);
   g_free (edit -> coord);
-  edit -> coord = g_malloc0 (sizeof*edit -> coord);
+  edit -> coord = g_malloc0(sizeof*edit -> coord);
   coord_info * tmp_coord = edit -> coord;
   this_proj -> coord -> cmin = 20;
   this_proj -> coord -> cmax = 0;
   for (i=0; i<2; i++)
   {
     tmp_coord -> totcoord[i] = 0;
-    tmp_coord -> geolist[i] = g_malloc (new_spec*sizeof*tmp_coord -> geolist[i]);
+    tmp_coord -> geolist[i] = g_malloc0(new_spec*sizeof*tmp_coord -> geolist[i]);
     tmp_coord -> ntg[i] = allocint (new_spec);
-    if (i) tmp_coord -> partial_geo = g_malloc (new_spec*sizeof*tmp_coord -> partial_geo);
+    if (i) tmp_coord -> partial_geo = g_malloc0(new_spec*sizeof*tmp_coord -> partial_geo);
     showcoord[i] = allocbool(old_coord -> totcoord[i]);
     showpoly[i] = allocbool(old_coord -> totcoord[i]);
     // g_debug ("i= %d, allocating showcoord/poly of %d", i, old_coord -> totcoord[i]);
@@ -330,7 +330,7 @@ void clean_coords_and_geoms (project * this_proj, atom_edition * edit,
         }
         if (l)
         {
-          tmp_coord -> geolist[i][j] = allocint(l);
+          tmp_coord -> geolist[i][j] = allocint (l);
           if (i)
           {
             // g_debug ("allocating partial[%d] of %d and %d", j, l, new_spec);
@@ -570,7 +570,7 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
   if ((add && old_spec) || rem)
   {
     int h, i, j, k, l, m, n, o, p, q;
-    image * new_img = g_malloc0 (sizeof*new_img);
+    image * new_img = g_malloc0(sizeof*new_img);
     setup_image_spec_data (this_proj, new_img);
     image * old_img = this_proj -> modelgl -> anim -> last -> img;
     // copy info in new data, then clean old data and copy it back
@@ -648,8 +648,8 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
     old_img -> atomicrad = duplicate_double (2*new_spec, new_img -> atomicrad);
     old_img -> pointrad = duplicate_double (2*new_spec, new_img -> pointrad);
     old_img -> at_color = duplicate_color (2*new_spec, new_img -> at_color);
-    old_img -> linerad = g_malloc (2*new_spec*sizeof*old_img -> linerad);
-    old_img -> bondrad = g_malloc (2*new_spec*sizeof*old_img -> bondrad);
+    old_img -> linerad = g_malloc0(2*new_spec*sizeof*old_img -> linerad);
+    old_img -> bondrad = g_malloc0(2*new_spec*sizeof*old_img -> bondrad);
     for (i=0; i<2*new_spec; i++)
     {
       old_img -> linerad[i] = duplicate_double (2*new_spec, new_img -> linerad[i]);
@@ -660,11 +660,11 @@ void recover_opengl_data (project * this_proj, int nmols, int add, int rem, int 
       old_img -> spcolor[i] = NULL;
       if (i < 2)
       {
-        old_img -> spcolor[i] = g_malloc (new_spec*sizeof*old_img -> spcolor[i]);
+        old_img -> spcolor[i] = g_malloc0(new_spec*sizeof*old_img -> spcolor[i]);
       }
       else
       {
-        old_img -> spcolor[i] = g_malloc (1*sizeof*old_img -> spcolor[i]);
+        old_img -> spcolor[i] = g_malloc0(1*sizeof*old_img -> spcolor[i]);
         old_img -> spcolor[i][0] = NULL;
       }
     }

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file preferences.c
@@ -43,7 +43,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   float get_radius (int object, int col, int z, element_radius * rad_list);
 
-  double xml_string_to_double (gchar * content);
+  double xml_string_to_double (xmlChar * content);
 
   G_MODULE_EXPORT gboolean pref_color_button_event (GtkWidget * widget, GdkEventButton * event, gpointer data);
 
@@ -63,6 +63,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void radius_set_color_and_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data);
   void color_button_event (GtkWidget * widget, double event_x, double event_y, guint event_button, gpointer data);
   void add_cut_box ();
+  void dyna_parameters (GtkWidget * vbox, int cid);
   void clean_all_tmp ();
   void duplicate_rep_data (rep_data * new_rep, rep_data * old_rep);
   void duplicate_background_data (background * new_back, background * old_back);
@@ -137,11 +138,13 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <errno.h>
 #endif
 
-extern void apply_default_parameters_to_project (project * this_proj);
+extern void apply_default_parameters_to_project (project * this_proj, gboolean with_analysis);
 extern xmlNodePtr findnode (xmlNodePtr startnode, char * nname);
 extern int search_type;
 extern void edit_bonds (GtkWidget * vbox);
+extern void update_omega_max ();
 extern void calc_rings (GtkWidget * vbox);
+extern void calc_sk_t (GtkWidget * vbox);
 extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif);
 extern G_MODULE_EXPORT gboolean scroll_scale_quality (GtkRange * range, GtkScrollType scroll, gdouble value, gpointer data);
 extern GtkWidget * materials_tab (glwin * view, opengl_edition * ogl_edit, Material * the_mat);
@@ -159,13 +162,17 @@ extern G_MODULE_EXPORT void scale_quality (GtkRange * range, gpointer data);
 extern void duplicate_fog (Fog * new_fog, Fog * old_fog);
 extern void duplicate_material (Material * new_mat, Material * old_mat);
 extern void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab);
-extern Light init_light_source (int type, float val, float vbl);
-extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+extern Light * init_light_source (int type, float size);
+extern Light ** copy_light_sources (int dima, int dimb, Light ** old_sp);
 extern GtkWidget * lightning_fix (glwin * view, Material * this_material);
 extern GtkWidget * adv_box (GtkWidget * box, char * lab, int vspace, int size, float xalign);
 extern float mat_min_max[5][2];
-extern gchar * ogl_settings[3][10];
+extern GtkWidget * omega_max_hbox;
+extern GtkWidget * omega_max_info;
+extern GtkWidget * skt_all_info;
 
+GtkWidget * dyna_entry[2][2];
+GtkWidget * dyna_combo[2];
 GtkWidget * atom_entry_over[8];
 GtkWidget * bond_entry_over[6];
 GtkWidget * meas_combo;
@@ -178,11 +185,17 @@ double default_totcut;
 double tmp_totcut;
 bond_cutoff * default_bond_cutoff;
 bond_cutoff * tmp_bond_cutoff;
-int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd */
+
+// Generic parameters for all calculations
+#define NUM_DELTA 9
+int * default_num_delta = NULL;   /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = sp \n 7 = msd \n 8 = S(q,w) */
 int * tmp_num_delta = NULL;
+
+// Dynamical calculations
 double * default_delta_t = NULL;  /*!< 0 = time step, \n 1 = time unit , in: fs, ps, ns, µs, ms */
 double * tmp_delta_t = NULL;
 
+// Ring statistics
 int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        0 = Default search, \n
                                        1 = Initial node(s) for the search: selected chemical species or all atoms, \n
@@ -192,6 +205,8 @@ int * default_rsparam = NULL;     /*!< Ring statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Include homopolar bond(s) when calculating the distance matrix */
 int * tmp_rsparam = NULL;
+
+// Chain statistics
 int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        0 = Initial node(s) for the search: selected chemical species or all atoms, \n
                                        1 = Maximum size for a chain Cmax, \n
@@ -201,6 +216,16 @@ int * default_csparam = NULL;     /*!< Chain statistics parameters: \n
                                        5 = Include Homopolar bond(s) in the analysis or not, \n
                                        6 = Search only for 1-(2)n-1 chains */
 int * tmp_csparam = NULL;
+
+// F(k,t) and S(q,w)
+gboolean default_skt_sets;        /*!< Output calculation results for all t steps */
+int default_skt_n_sets;           /*!< Number of configuration(s) to save when computing S(k,t) */
+int default_sqw_n_sets;           /*!< Number of q vector(s) to compute S(q,w) */
+int default_sqw_freq;             /*!< Frequency intervals */
+gboolean tmp_skt_sets;
+int tmp_skt_n_sets;
+int tmp_sqw_n_sets;
+int tmp_sqw_freq;
 
 // 5+3 styles + 5+3 cloned styles
 element_radius * default_atomic_rad[16];
@@ -420,72 +445,78 @@ int save_preferences_to_xml_file ()
 #ifdef G_OS_WIN32
     if (! CreateDirectory(ATOMES_CONFIG_DIR, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
     {
-      pref_error = g_strdup_printf ("Error: impossible to create %s (code: %lu)\n", ATOMES_CONFIG_DIR, GetLastError());
+      pref_error = g_strdup_printf (_("Error: impossible to create %s (code: %lu)\n"), ATOMES_CONFIG_DIR, GetLastError());
       return 0;
     }
 #else
     if (mkdir(ATOMES_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IRWXO) && errno != EEXIST)
     {
-      pref_error = g_strdup_printf ("Error: impossible to create %s (code: %s)\n", ATOMES_CONFIG_DIR, strerror(errno));
+      pref_error = g_strdup_printf (_("Error: impossible to create %s (code: %s)\n"), ATOMES_CONFIG_DIR, strerror(errno));
       return 0;
     }
 #endif
   }
   xmlTextWriterPtr writer;
 
-  gchar * xml_delta_num_leg[8] = {"g(r): number of δr", "s(q): number of δq", "s(k): number of δk", "g(r) FFT: number of δr",
-                                  "Dij: number of δr [min(Dij)-max(Dij)]", "Angles distribution: number of δθ [0-180°]",
-                                  "Spherical harmonics: l(max) in [2-40]", "MSD: steps between configurations"};
-  gchar * xml_delta_t_leg[2] = {"MSD: time steps δt", "MSD: time unit"};
-  gchar * xml_rings_leg[7] = {"Default search",
-                              "Atom(s) to initiate the search from",
-                              "Maximum size for a ring",
-                              "Maximum number of rings of size n per MD step",
-                              "Only search for ABAB rings",
-                              "No homopolar bonds in the rings (A-A, B-B ...)",
-                              "No homopolar bonds in the connectivity matrix"};
-  gchar * xml_chain_leg[7] = {"Atom(s) to initiate the search from",
-                              "Maximum size for a ring",
-                              "Maximum number of rings of size n per MD step",
-                              "Only search for AAAA chains",
-                              "Only search for ABAB chains",
-                              "No homopolar bonds in the chains (A-A, B-B ...)",
-                              "Only search for 1-(2)n-1 chains"};
-  gchar * xml_opengl_leg[4] = {"Default style",
-                               "Atom(s) color map",
-                               "Polyhedra color map",
-                               "Quality"};
-  gchar * xml_material_leg[8] = {"Predefine material",
-                                 "Lightning model",
-                                 "Metallic",
-                                 "Roughness",
-                                 "Back lightning",
+  gchar * xml_delta_num_leg[NUM_DELTA] = {i18n("g(r): number of δr"), i18n("s(q): number of δq"), i18n("s(k): number of δk"), i18n("g(r) FFT: number of δr"),
+                                          i18n("Dij: number of δr [min(Dij)-max(Dij)]"), i18n("Angles distribution: number of δθ [0-180°]"),
+                                          i18n("Spherical harmonics: l(max) in [2-40]"), i18n("MSD: steps between configurations"),
+                                          i18n("F(k,t): number of δk")};
+  gchar * xml_delta_t_leg[2] = {i18n("MSD: time steps δt"), i18n("MSD: time unit")};
+  gchar * xml_rings_leg[7] = {i18n("Default search"),
+                              i18n("Atom(s) to initiate the search from"),
+                              i18n("Maximum size for a ring"),
+                              i18n("Maximum number of rings of size n per MD step"),
+                              i18n("Only search for ABAB rings"),
+                              i18n("No homopolar bonds in the rings (A-A, B-B ...)"),
+                              i18n("No homopolar bonds in the connectivity matrix")};
+  gchar * xml_chain_leg[7] = {i18n("Atom(s) to initiate the search from"),
+                              i18n("Maximum size for a ring"),
+                              i18n("Maximum number of rings of size n per MD step"),
+                              i18n("Only search for AAAA chains"),
+                              i18n("Only search for ABAB chains"),
+                              i18n("No homopolar bonds in the chains (A-A, B-B ...)"),
+                              i18n("Only search for 1-(2)n-1 chains")};
+  gchar * xml_skt_leg[4] = {i18n("Analyze all correlated δt steps"),
+                            i18n("Number of analyzed δt steps"),
+                            i18n("Number of analyzed q points"),
+                            i18n("Number of frequency points")};
+  gchar * xml_opengl_leg[5] = {i18n("Default style"),
+                               i18n("Atom(s) color map"),
+                               i18n("Polyhedra color map"),
+                               i18n("Quality"),
+                               i18n("Ray Tracing")};
+  gchar * xml_material_leg[8] = {i18n("Predefine material"),
+                                 i18n("Lightning model"),
+                                 i18n("Metallic"),
+                                 i18n("Roughness"),
+                                 i18n("Back lightning"),
                                  "Gamma",
-                                 "Opacity",
-                                 "Albedo"};
-  gchar * xml_lightning_leg[7] = {"Type",
-                                  "Fix",
-                                  "Position",
-                                  "Direction",
-                                  "Intensity",
-                                  "Attenuation",
-                                  "Spot specifics"};
-  gchar * xml_fog_leg[5] = {"Mode",
-                            "Type",
-                            "Density",
-                            "Depth",
-                            "Color"};
-  gchar * xml_model_leg[2] = {"Show clones",
-                              "Show box"};
-  gchar * xml_label_leg[6] = {"Position",
-                              "Rendering" ,
-                              "Scaling",
-                              "Font",
-                              "Shift",
-                              "Colors"};
-  gchar * xml_axis_leg[3] = {"Legend on x",
-                             "Legend on y",
-                             "Legend on z"};
+                                 i18n("Opacity"),
+                                 i18n("Albedo")};
+  gchar * xml_lightning_leg[7] = {i18n("Type"),
+                                  i18n("Fix"),
+                                  i18n("Position"),
+                                  i18n("Direction"),
+                                  i18n("Intensity"),
+                                  i18n("Attenuation"),
+                                  i18n("Spot specifics")};
+  gchar * xml_fog_leg[5] = {i18n("Mode"),
+                            i18n("Type"),
+                            i18n("Density"),
+                            i18n("Depth"),
+                            i18n("Color")};
+  gchar * xml_model_leg[2] = {i18n("Show clones"),
+                              i18n("Show box")};
+  gchar * xml_label_leg[6] = {i18n("Position"),
+                              i18n("Rendering") ,
+                              i18n("Scaling"),
+                              i18n("Font"),
+                              i18n("Shift"),
+                              i18n("Colors")};
+  gchar * xml_axis_leg[3] = {i18n("Legend on x"),
+                             i18n("Legend on y"),
+                             i18n("Legend on z")};
 
   /* Create a new XmlWriter for ATOMES_CONFIG, with no compression. */
   writer = xmlNewTextWriterFilename (ATOMES_CONFIG, 0);
@@ -498,7 +529,7 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterStartDocument (writer, NULL, MY_ENCODING, NULL);
   if (rc < 0) return 0;
 
-  rc = xmlTextWriterWriteComment (writer, (const xmlChar *)"atomes preferences XML file");
+  rc = xmlTextWriterWriteComment (writer, (const xmlChar *)_("atomes preferences XML file"));
   if (rc < 0) return 0;
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atomes_preferences-xml");
@@ -516,7 +547,7 @@ int save_preferences_to_xml_file ()
     if (default_totcut > 0.0)
     {
        str = g_strdup_printf ("%lf",  default_totcut);
-       rc = xml_save_parameter_to_file (writer, "Total cutoff", "default_totcut", TRUE, 0, str);
+       rc = xml_save_parameter_to_file (writer, _("Total cutoff"), "default_totcut", TRUE, 0, str);
        g_free (str);
        if (! rc) return 0;
     }
@@ -529,7 +560,7 @@ int save_preferences_to_xml_file ()
       {
         rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"parameter");
         if (rc < 0) return 0;
-        str = g_strdup_printf ("cutoff %s-%s", periodic_table_info[tmp_cut -> Z[0]].lab, periodic_table_info[tmp_cut -> Z[1]].lab);
+        str = g_strdup_printf (_("cutoff %s-%s"), periodic_table_info[tmp_cut -> Z[0]].lab, periodic_table_info[tmp_cut -> Z[1]].lab);
         rc = xmlTextWriterWriteAttribute(writer, BAD_CAST (const xmlChar *)"info", BAD_CAST str);
         g_free (str);
         if (rc < 0) return 0;
@@ -556,10 +587,10 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
   }
 
-  for (i=0; i<8; i++)
+  for (i=0; i<NUM_DELTA; i++)
   {
     str = g_strdup_printf ("%d",  default_num_delta[i]);
-    rc = xml_save_parameter_to_file (writer, xml_delta_num_leg[i], "default_num_delta", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_delta_num_leg[i]), "default_num_delta", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
@@ -567,7 +598,7 @@ int save_preferences_to_xml_file ()
   for (i=0; i<2; i++)
   {
     str = g_strdup_printf ("%f", default_delta_t[i]);
-    rc = xml_save_parameter_to_file (writer, xml_delta_t_leg[i], "default_delta_t", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_delta_t_leg[i]), "default_delta_t", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
@@ -575,7 +606,7 @@ int save_preferences_to_xml_file ()
   for (i=0; i<7; i++)
   {
     str = g_strdup_printf ("%d", default_rsparam[i]);
-    rc = xml_save_parameter_to_file (writer,  xml_rings_leg[i], "default_rsparam", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_rings_leg[i]), "default_rsparam", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
@@ -583,10 +614,28 @@ int save_preferences_to_xml_file ()
   for (i=0; i<7; i++)
   {
     str = g_strdup_printf ("%d", default_csparam[i]);
-    rc = xml_save_parameter_to_file (writer,  xml_chain_leg[i], "default_csparam", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_chain_leg[i]), "default_csparam", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
+  // F(k,t) and S(q,w)
+  // Work to do here !
+  str = g_strdup_printf ("%d", default_skt_sets);
+  rc = xml_save_parameter_to_file (writer, _(xml_skt_leg[0]), "default_skt_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_skt_n_sets);
+  rc = xml_save_parameter_to_file (writer, _(xml_skt_leg[1]), "default_skt_n_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_sqw_n_sets);
+  rc = xml_save_parameter_to_file (writer, _(xml_skt_leg[2]), "default_sqw_n_sets", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
+  str = g_strdup_printf ("%d", default_sqw_freq);
+  rc = xml_save_parameter_to_file (writer, _(xml_skt_leg[2]), "default_sqw_freq", FALSE, i, str);
+  g_free (str);
+  if (! rc) return 0;
 
   // End analysis
   rc = xmlTextWriterEndElement (writer);
@@ -594,11 +643,11 @@ int save_preferences_to_xml_file ()
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"opengl");
   if (rc < 0) return 0;
-  for (i=0; i<4; i++)
+  for (i=0; i<5; i++)
   {
 
     str = g_strdup_printf ("%d", default_opengl[i]);
-    rc = xml_save_parameter_to_file (writer,  xml_opengl_leg[i], "default_opengl", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_opengl_leg[i]), "default_opengl", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
@@ -607,19 +656,19 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
 
   str = g_strdup_printf ("%d", default_material.predefine);
-  rc = xml_save_parameter_to_file (writer,  xml_material_leg[0], "default_material", TRUE, -1, str);
+  rc = xml_save_parameter_to_file (writer, _(xml_material_leg[0]), "default_material", TRUE, -1, str);
   g_free (str);
   if (! rc) return 0;
 
   for (i=0; i<6; i++)
   {
     str = g_strdup_printf ("%f", default_material.param[i]);
-    rc = xml_save_parameter_to_file (writer, xml_material_leg[i+1], "default_material", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_material_leg[i+1]), "default_material", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
   }
 
-  rc = xml_save_xyz_to_file (writer, 6, xml_material_leg[7], "default_material", default_material.albedo);
+  rc = xml_save_xyz_to_file (writer, 6, _(xml_material_leg[7]), "default_material", default_material.albedo);
   if (! rc) return rc;
 
   // End material
@@ -630,7 +679,7 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
 
   str = g_strdup_printf ("%d", default_lightning.lights);
-  rc = xml_save_parameter_to_file (writer, "Number of lights", "default_lightning", TRUE, 0, str);
+  rc = xml_save_parameter_to_file (writer, _("Number of lights"), "default_lightning", TRUE, 0, str);
   g_free (str);
   if (! rc) return 0;
 
@@ -643,32 +692,32 @@ int save_preferences_to_xml_file ()
     g_free (str);
     if (rc < 0) return 0;
 
-    str = g_strdup_printf ("%d", default_lightning.spot[i].type);
-    rc = xml_save_parameter_to_file (writer, xml_lightning_leg[0], "light.type", FALSE, 0, str);
+    str = g_strdup_printf ("%d", default_lightning.spot[i] -> type);
+    rc = xml_save_parameter_to_file (writer, _(xml_lightning_leg[0]), "light.type", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
-    str = g_strdup_printf ("%d", default_lightning.spot[i].fix);
-    rc = xml_save_parameter_to_file (writer, xml_lightning_leg[1], "light.fix", FALSE, 0, str);
+    str = g_strdup_printf ("%d", default_lightning.spot[i] -> fix);
+    rc = xml_save_parameter_to_file (writer, _(xml_lightning_leg[1]), "light.fix", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
 
-    if (default_lightning.spot[i].type)
+    if (default_lightning.spot[i] -> type)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[2], "light.position", default_lightning.spot[i].position);
+      rc = xml_save_xyz_to_file (writer, -1, _(xml_lightning_leg[2]), "light.position", default_lightning.spot[i] -> position);
       if (! rc) return rc;
     }
-    if (default_lightning.spot[i].type != 1)
+    if (default_lightning.spot[i] -> type != 1)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[3], "light.direction", default_lightning.spot[i].direction);
+      rc = xml_save_xyz_to_file (writer, -1, _(xml_lightning_leg[3]), "light.direction", default_lightning.spot[i] -> direction);
       if (! rc) return rc;
     }
-    rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[4], "light.intensity", default_lightning.spot[i].intensity);
+    rc = xml_save_xyz_to_file (writer, -1, _(xml_lightning_leg[4]), "light.intensity", default_lightning.spot[i] -> intensity);
     if (! rc) return rc;
-    if (default_lightning.spot[i].type)
+    if (default_lightning.spot[i] -> type)
     {
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[5], "light.attenuation", default_lightning.spot[i].attenuation);
+      rc = xml_save_xyz_to_file (writer, -1, _(xml_lightning_leg[5]), "light.attenuation", default_lightning.spot[i] -> attenuation);
       if (! rc) return rc;
-      rc = xml_save_xyz_to_file (writer, -1, xml_lightning_leg[6], "light.spot", default_lightning.spot[i].spot_data);
+      rc = xml_save_xyz_to_file (writer, -1, _(xml_lightning_leg[6]), "light.spot", default_lightning.spot[i] -> spot_data);
       if (! rc) return rc;
     }
      rc = xmlTextWriterEndElement (writer);
@@ -683,17 +732,17 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
   // Mode
   str = g_strdup_printf ("%d", default_fog.mode);
-  rc = xml_save_parameter_to_file (writer, xml_fog_leg[0], "fog.mode", TRUE, 0, str);
+  rc = xml_save_parameter_to_file (writer, _(xml_fog_leg[0]), "fog.mode", TRUE, 0, str);
   g_free (str);
   if (! rc) return 0;
   // Type
   str = g_strdup_printf ("%d", default_fog.based);
-  rc = xml_save_parameter_to_file (writer, xml_fog_leg[1], "fog.type", TRUE, 1, str);
+  rc = xml_save_parameter_to_file (writer, _(xml_fog_leg[1]), "fog.type", TRUE, 1, str);
   g_free (str);
   if (! rc) return 0;
   // Density
   str = g_strdup_printf ("%f", default_fog.density);
-  rc = xml_save_parameter_to_file (writer, xml_fog_leg[2], "fog.density", TRUE, 2, str);
+  rc = xml_save_parameter_to_file (writer, _(xml_fog_leg[2]), "fog.density", TRUE, 2, str);
   g_free (str);
   if (! rc) return 0;
   // Depth
@@ -733,14 +782,14 @@ int save_preferences_to_xml_file ()
   if (default_clones)
   {
     str = g_strdup_printf ("%d", default_clones);
-    rc = xml_save_parameter_to_file (writer, xml_model_leg[0], "default_clones", FALSE, 0, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_model_leg[0]), "default_clones", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
   }
   if (! default_cell)
   {
     str = g_strdup_printf ("%d", default_cell);
-    rc = xml_save_parameter_to_file (writer, xml_model_leg[1], "default_cell", FALSE, 0, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_model_leg[1]), "default_cell", FALSE, 0, str);
     g_free (str);
     if (! rc) return 0;
   }
@@ -788,7 +837,7 @@ int save_preferences_to_xml_file ()
         {
           if (default_o_at_rs[j+l*5])
           {
-            str_a = (l) ? g_strdup_printf ("clone-%s", xml_atom_leg[k]) : g_strdup_printf ("%s", xml_atom_leg[k]);
+            str_a = (l) ? g_strdup_printf ("clone-%s", _(xml_atom_leg[k])) : g_strdup_printf ("%s", _(xml_atom_leg[k]));
             str_b = g_strdup_printf ("%f", default_at_rs[j+l*5]);
             rc = xml_save_parameter_to_file (writer, str_a, "default_at_rs", TRUE, j+l*5, str_b);
             g_free (str_a);
@@ -805,7 +854,7 @@ int save_preferences_to_xml_file ()
             n = (o && m) ? 5 : n;
             if (default_atomic_rad[j+n+5*o+m])
             {
-              str_a = (o) ? g_strdup_printf ("clone-%s", (j == 2) ? xml_filled_leg[m] : xml_atom_leg[k]) : g_strdup_printf ("%s", (j == 2) ? xml_filled_leg[m] : xml_atom_leg[k]);
+              str_a = (o) ? g_strdup_printf ("clone-%s", (j == 2) ? _(xml_filled_leg[m]) : _(xml_atom_leg[k])) : g_strdup_printf ("%s", (j == 2) ? _(xml_filled_leg[m]) : _(xml_atom_leg[k]));
               rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
               g_free (str_a);
               if (rc < 0) return 0;
@@ -831,7 +880,7 @@ int save_preferences_to_xml_file ()
         {
           if (default_o_bd_rw[j+k*3])
           {
-            str_a = (k) ? g_strdup_printf ("clone-%s", xml_bond_leg[j]) : g_strdup_printf ("%s", xml_bond_leg[j]);
+            str_a = (k) ? g_strdup_printf ("clone-%s", _(xml_bond_leg[j])) : g_strdup_printf ("%s", _(xml_bond_leg[j]));
             str_b = g_strdup_printf ("%f", default_bd_rw[j+k*3]);
             rc = xml_save_parameter_to_file (writer, str_a, "default_bd_rw", TRUE, j+k*3, str_b);
             g_free (str_a);
@@ -840,7 +889,7 @@ int save_preferences_to_xml_file ()
           }
           if (default_bond_rad[j+k*3])
           {
-            str_a = (k) ? g_strdup_printf ("clone-%s", xml_bond_leg[j]) : g_strdup_printf ("%s", xml_bond_leg[j]);
+            str_a = (k) ? g_strdup_printf ("clone-%s", _(xml_bond_leg[j])) : g_strdup_printf ("%s", _(xml_bond_leg[j]));
             rc = xmlTextWriterStartElement (writer, BAD_CAST str_a);
             g_free (str_a);
             if (rc < 0) return 0;
@@ -878,23 +927,23 @@ int save_preferences_to_xml_file ()
     if (rc < 0) return 0;
 
     str = g_strdup_printf ("%d", default_label[i].position);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[0], "default_label", TRUE, 0, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[0]), "default_label", TRUE, 0, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%d", default_label[i].render);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[1]), "default_label", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%d", default_label[i].scale);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[2]), "default_label", TRUE, 2, str);
     g_free (str);
     if (! rc) return 0;
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[i].font);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[3]), "default_label", TRUE, 3, default_label[i].font);
     if (! rc) return 0;
-    rc = xml_save_xyz_to_file (writer, 4, xml_label_leg[4], "default_label", vec3(default_label[i].shift[0], default_label[i].shift[1], default_label[i].shift[2]));
+    rc = xml_save_xyz_to_file (writer, 4, _(xml_label_leg[4]), "default_label", vec3(default_label[i].shift[0], default_label[i].shift[1], default_label[i].shift[2]));
     if (! rc) return 0;
     str = g_strdup_printf ("%d", default_acl_format[i]);
-    rc = xml_save_parameter_to_file (writer, "Format", "default_label", TRUE, 5, str);
+    rc = xml_save_parameter_to_file (writer, _("Format"), "default_label", TRUE, 5, str);
     g_free (str);
     if (! rc) return 0;
     if (default_label[i].n_colors || default_label_color[i])
@@ -903,7 +952,7 @@ int save_preferences_to_xml_file ()
       if (rc < 0) return 0;
       if (default_label[i].n_colors)
       {
-        xml_save_color_to_file (writer, i, "Only label color", "only_label_color", default_label[i].color[0]);
+        xml_save_color_to_file (writer, i, _("Only label color"), "only_label_color", default_label[i].color[0]);
       }
       else
       {
@@ -957,10 +1006,10 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"box");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%f", (default_box.box == WIREFRAME) ? default_box.line : default_box.rad);
-    rc = xml_save_parameter_to_file (writer, (default_box.box == WIREFRAME) ? "Wireframe width" : "Cylinder radius", "default_box", TRUE, default_box.box, str);
+    rc = xml_save_parameter_to_file (writer, (default_box.box == WIREFRAME) ? _("Wireframe width") : _("Cylinder radius"), "default_box", TRUE, default_box.box, str);
     g_free (str);
     if (! rc) return 0;
-    rc = xml_save_color_to_file (writer, -1, "Color", "default_box", default_box.color);
+    rc = xml_save_color_to_file (writer, -1, _("Color"), "default_box", default_box.color);
     if (! rc) return 0;
     // End box
     rc = xmlTextWriterEndElement (writer);
@@ -978,28 +1027,28 @@ int save_preferences_to_xml_file ()
   // Background
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"background");
   str = g_strdup_printf ("%d", default_background.gradient);
-  rc = xml_save_parameter_to_file (writer, "Gradient", "default_background", TRUE, 0, str);
+  rc = xml_save_parameter_to_file (writer, _("Gradient"), "default_background", TRUE, 0, str);
   g_free (str);
   if (! rc) return 0;
   if (default_background.gradient)
   {
     str = g_strdup_printf ("%d", default_background.direction);
-    rc = xml_save_parameter_to_file (writer, "Direction", "default_background", TRUE, 1, str);
+    rc = xml_save_parameter_to_file (writer, _("Direction"), "default_background", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%f", default_background.position);
-    rc = xml_save_parameter_to_file (writer, "Mixed position", "default_background", TRUE, 2, str);
+    rc = xml_save_parameter_to_file (writer, _("Mixed position"), "default_background", TRUE, 2, str);
     g_free (str);
     if (! rc) return 0;
     for (i=0; i<2; i++)
     {
-      rc = xml_save_color_to_file (writer, i+3, "Color", "default_background", default_background.gradient_color[i]);
+      rc = xml_save_color_to_file (writer, i+3, _("Color"), "default_background", default_background.gradient_color[i]);
       if (! rc) return 0;
     }
   }
   else
   {
-    rc = xml_save_color_to_file (writer, -1, "Color", "default_background", default_background.color);
+    rc = xml_save_color_to_file (writer, -1, _("Color"), "default_background", default_background.color);
     if (! rc) return 0;
   }
 
@@ -1011,32 +1060,32 @@ int save_preferences_to_xml_file ()
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"representation");
   if (rc < 0) return 0;
   str = g_strdup_printf ("%d", default_rep.rep);
-  rc = xml_save_parameter_to_file (writer, "Representation type", "default_rep", TRUE, 0, str);
+  rc = xml_save_parameter_to_file (writer, _("Representation type"), "default_rep", TRUE, 0, str);
   g_free (str);
   if (! rc) return 0;
   if (default_rep.rep)
   {
     str = g_strdup_printf ("%lf", default_rep.gnear);
-    rc = xml_save_parameter_to_file (writer, "Camera depth", "default_rep", TRUE, 1, str);
+    rc = xml_save_parameter_to_file (writer, _("Camera depth"), "default_rep", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
   }
 
   str = g_strdup_printf ("%lf", 1.0 - 0.5*default_rep.zoom);
-  rc = xml_save_parameter_to_file (writer, "Zoom", "default_rep", TRUE, 2, str);
+  rc = xml_save_parameter_to_file (writer, _("Zoom"), "default_rep", TRUE, 2, str);
   g_free (str) ;
   if (! rc) return 0;
   for (i=0; i<2; i++)
   {
     str = g_strdup_printf ("%lf", - default_rep.c_angle[i]);
-    rc = xml_save_parameter_to_file (writer, (i) ? "Camera pitch" : "Camera heading", "default_rep", TRUE, 3+i, str);
+    rc = xml_save_parameter_to_file (writer, (i) ? _("Camera pitch") : _("Camera heading"), "default_rep", TRUE, 3+i, str);
     g_free (str) ;
     if (! rc) return 0;
   }
   for (i=0; i<2; i++)
   {
     str = g_strdup_printf ("%lf", default_rep.c_shift[i]);
-    rc = xml_save_parameter_to_file (writer, (i) ? "Camera x" : "Camera y", "default_rep", TRUE, 5+i, str);
+    rc = xml_save_parameter_to_file (writer, (i) ? _("Camera x") : _("Camera y"), "default_rep", TRUE, 5+i, str);
     g_free (str) ;
     if (! rc) return 0;
   }
@@ -1052,21 +1101,21 @@ int save_preferences_to_xml_file ()
     if (default_axis.t_pos != NONE)
     {
       str = g_strdup_printf ("%d", default_axis.t_pos);
-      rc = xml_save_parameter_to_file (writer, "Template position", "default_axis", TRUE, 0, str);
+      rc = xml_save_parameter_to_file (writer, _("Template position"), "default_axis", TRUE, 0, str);
       g_free (str);
       if (! rc) return 0;
     }
     else
     {
-      rc = xml_save_xyz_to_file (writer, 0, "Custom position", "default_axis", vec3(default_axis.c_pos[0], default_axis.c_pos[1], default_axis.c_pos[2]));
+      rc = xml_save_xyz_to_file (writer, 0, _("Custom position"), "default_axis", vec3(default_axis.c_pos[0], default_axis.c_pos[1], default_axis.c_pos[2]));
       if (! rc) return 0;
     }
     str = g_strdup_printf ("%f", (default_axis.axis == WIREFRAME) ? default_axis.line : default_axis.rad);
-    rc = xml_save_parameter_to_file (writer, (default_axis.axis == WIREFRAME) ? "Wireframe width" : "Cylinder radius", "default_axis", TRUE, default_axis.axis, str);
+    rc = xml_save_parameter_to_file (writer, (default_axis.axis == WIREFRAME) ? _("Wireframe width") : _("Cylinder radius"), "default_axis", TRUE, default_axis.axis, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%f", default_axis.length);
-    rc = xml_save_parameter_to_file (writer, "Length", "default_axis", TRUE, 2, str);
+    rc = xml_save_parameter_to_file (writer, _("Length"), "default_axis", TRUE, 2, str);
     g_free (str);
     if (! rc) return 0;
     if (default_axis.labels)
@@ -1074,18 +1123,18 @@ int save_preferences_to_xml_file ()
       rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
       if (rc < 0) return 0;
       str = g_strdup_printf ("%d", default_label[2].render);
-      rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+      rc = xml_save_parameter_to_file (writer, _(xml_label_leg[1]), "default_label", TRUE, 1, str);
       g_free (str);
       if (! rc) return 0;
       str = g_strdup_printf ("%d", default_label[2].scale);
-      rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+      rc = xml_save_parameter_to_file (writer, _(xml_label_leg[2]), "default_label", TRUE, 2, str);
       g_free (str);
       if (! rc) return 0;
-      rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[2].font);
+      rc = xml_save_parameter_to_file (writer, _(xml_label_leg[3]), "default_label", TRUE, 3, default_label[2].font);
       if (! rc) return 0;
       for (i=0; i<3; i++)
       {
-        rc = xml_save_parameter_to_file (writer, xml_axis_leg[i], "axis_legend", TRUE, i, default_axis.title[i]);
+        rc = xml_save_parameter_to_file (writer, _(xml_axis_leg[i]), "axis_legend", TRUE, i, default_axis.title[i]);
         if (! rc) return 0;
       }
       rc = xmlTextWriterEndElement (writer);
@@ -1095,7 +1144,7 @@ int save_preferences_to_xml_file ()
     {
       for (i=0; i<3; i++)
       {
-        rc = xml_save_color_to_file (writer, i, "Color", "default_axis", default_axis.color[i]);
+        rc = xml_save_color_to_file (writer, i, _("Color"), "default_axis", default_axis.color[i]);
         if (! rc) return 0;
       }
     }
@@ -1114,42 +1163,42 @@ int save_preferences_to_xml_file ()
     rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"labels");
     if (rc < 0) return 0;
     str = g_strdup_printf ("%d", default_label[i+3].position);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[0], "default_label", TRUE, 0, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[0]), "default_label", TRUE, 0, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%d", default_label[i+3].render);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[1], "default_label", TRUE, 1, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[1]), "default_label", TRUE, 1, str);
     g_free (str);
     if (! rc) return 0;
     str = g_strdup_printf ("%d", default_label[i+3].scale);
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[2], "default_label", TRUE, 2, str);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[2]), "default_label", TRUE, 2, str);
     g_free (str);
     if (! rc) return 0;
-    rc = xml_save_parameter_to_file (writer, xml_label_leg[3], "default_label", TRUE, 3, default_label[i+3].font);
+    rc = xml_save_parameter_to_file (writer, _(xml_label_leg[3]), "default_label", TRUE, 3, default_label[i+3].font);
     if (! rc) return 0;
-    xml_save_color_to_file (writer, i+3, "Font color", "default_font_color", default_label[i+3].color[0]);
+    xml_save_color_to_file (writer, i+3, _("Font color"), "default_font_color", default_label[i+3].color[0]);
     if (! rc) return 0;
 
     rc = xmlTextWriterEndElement (writer); // End label
     if (rc < 0) return 0;
     // mtilt
     str = g_strdup_printf ("%d", default_mtilt[i]);
-    rc = xml_save_parameter_to_file (writer, "Tilt along", "default_mtilt", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _("Tilt along"), "default_mtilt", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
     // mtilt
     str = g_strdup_printf ("%d", default_mpattern[i]);
-    rc = xml_save_parameter_to_file (writer, "Pattern", "default_mpattern", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _("Pattern"), "default_mpattern", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
     // mfactor
     str = g_strdup_printf ("%d", default_mfactor[i]);
-    rc = xml_save_parameter_to_file (writer, "Factor", "default_mfactor", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _("Factor"), "default_mfactor", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
     // mfactor
     str = g_strdup_printf ("%lf", default_mwidth[i]);
-    rc = xml_save_parameter_to_file (writer, "Width", "default_mwidth", TRUE, i, str);
+    rc = xml_save_parameter_to_file (writer, _("Width"), "default_mwidth", TRUE, i, str);
     g_free (str);
     if (! rc) return 0;
 
@@ -1164,7 +1213,7 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
   for (i=0; i<2; i++)
   {
-    xml_save_color_to_file (writer, i, "Selection color", "default_sel_color", default_sel_color[i]);
+    xml_save_color_to_file (writer, i, _("Selection color"), "default_sel_color", default_sel_color[i]);
     if (! rc) return 0;
   }
   rc = xmlTextWriterEndElement (writer);
@@ -1187,19 +1236,19 @@ int save_preferences_to_xml_file ()
 int label_id;
 
 /*!
-  \fn double xml_string_to_double (gchar * content)
+  \fn double xml_string_to_double (xmlChar * content)
 
   \brief convert XML string to double
 
   \param content the string to convert
 */
-double xml_string_to_double (gchar * content)
+double xml_string_to_double (xmlChar * content)
 {
-  return (g_strcmp0(content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
+  return (g_strcmp0((const char *)content, "") == 0) ? 0.0 : string_to_double ((gpointer)content);
 }
 
 /*!
-  \fn void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
+  \fn void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 
   \brief set default parameter
 
@@ -1212,7 +1261,7 @@ double xml_string_to_double (gchar * content)
   \param end final value, if any, -1.0 otherwise
   \param col color to set, if any
 */
-void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
+void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t * vect, float start, float end, ColRGBA * col)
 {
   element_radius * tmp_rad;
   element_color * tmp_col;
@@ -1259,6 +1308,22 @@ void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t *
   {
     default_csparam[vid] = (int)xml_string_to_double(content);
   }
+  else if (g_strcmp0(key, "default_skt_sets") == 0)
+  {
+    default_skt_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_skt_n_sets") == 0)
+  {
+    default_skt_n_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_sqw_n_sets") == 0)
+  {
+    default_sqw_n_sets = (int)xml_string_to_double(content);
+  }
+  else if (g_strcmp0(key, "default_sqw_freq") == 0)
+  {
+    default_sqw_freq = (int)xml_string_to_double(content);
+  }
   else if (g_strcmp0(key, "default_opengl") == 0)
   {
     default_opengl[vid] = (int)xml_string_to_double(content);
@@ -1280,35 +1345,50 @@ void set_parameter (gchar * content, gchar * key, int vid, dint * bond, vec3_t *
   }
   else if (g_strcmp0(key, "default_lightning") == 0)
   {
-    default_lightning.lights = (int)xml_string_to_double(content);
+    int lights = (int)xml_string_to_double(content);
+    if (default_lightning.lights != lights)
+    {
+      int i;
+      for (i=0; i<default_lightning.lights; i++)
+      {
+        g_free (default_lightning.spot[i]);
+      }
+      g_free (default_lightning.spot);
+      default_lightning.lights = lights;
+      default_lightning.spot = g_malloc0 (default_lightning.lights*sizeof*default_lightning.spot);
+      for (i=0; i<default_lightning.lights; i++)
+      {
+        default_lightning.spot[i] = init_light_source ((i < 3) ? i : 1, 1.0);
+      }
+    }
   }
   else if (g_strcmp0(key, "light.type") == 0)
   {
-    default_lightning.spot[vid].type = (int)xml_string_to_double(content);
+    default_lightning.spot[vid] -> type = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.fix") == 0)
   {
-    default_lightning.spot[vid].fix = (int)xml_string_to_double(content);
+    default_lightning.spot[vid] -> fix = (int)xml_string_to_double(content);
   }
   else if (g_strcmp0(key, "light.direction") == 0 && vect)
   {
-    default_lightning.spot[vid].direction = * vect;
+    default_lightning.spot[vid] -> direction = * vect;
   }
   else if (g_strcmp0(key, "light.position") == 0 && vect)
   {
-    default_lightning.spot[vid].position = * vect;
+    default_lightning.spot[vid] -> position = * vect;
   }
   else if (g_strcmp0(key, "light.intensity") == 0 && vect)
   {
-    default_lightning.spot[vid].intensity = * vect;
+    default_lightning.spot[vid] -> intensity = * vect;
   }
   else if (g_strcmp0(key, "light.attenuation") == 0 && vect)
   {
-    default_lightning.spot[vid].attenuation = * vect;
+    default_lightning.spot[vid] -> attenuation = * vect;
   }
   else if (g_strcmp0(key, "light.spot") == 0 && vect)
   {
-    default_lightning.spot[vid].spot_data = * vect;
+    default_lightning.spot[vid] -> spot_data = * vect;
   }
   else if (g_strcmp0(key, "fog.mode") == 0)
   {
@@ -1615,15 +1695,15 @@ void read_parameter (xmlNodePtr parameter_node)
   gboolean set_r, set_g, set_b, set_a;
   gboolean set_alpha, set_beta;
   ColRGBA col;
-  gchar * key;
-  gchar * content;
+  gchar * key = NULL;
+  xmlChar * content, * p_cont;
   int id;
   dint bond;
   float start, end;
   vec3_t vec;
   while (parameter_node)
   {
-    content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+    content = xmlNodeGetContent(parameter_node);
     p_details = parameter_node -> properties;
     set_codevar = set_id = FALSE;
     set_x = set_y = set_z = FALSE;
@@ -1636,69 +1716,71 @@ void read_parameter (xmlNodePtr parameter_node)
       p_node = p_details -> children;
       if (p_node)
       {
+        p_cont = xmlNodeGetContent(p_node);
         if (g_strcmp0("key",(char *)p_details -> name) == 0)
         {
-          key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+          key = g_strdup_printf ("%s", p_cont);
           set_codevar = TRUE;
         }
         else if (g_strcmp0("id",(char *)p_details -> name) == 0)
         {
-          id = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          id = (int) string_to_double ((gpointer)p_cont);
           set_id = TRUE;
         }
         else if (g_strcmp0("α",(char *)p_details -> name) == 0)
         {
-          bond.a = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          bond.a = (int) string_to_double ((gpointer)p_cont);
           set_alpha = TRUE;
         }
         else if (g_strcmp0("β",(char *)p_details -> name) == 0)
         {
-          bond.b = (int) string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          bond.b = (int) string_to_double ((gpointer)p_cont);
           set_beta = TRUE;
         }
         else if (g_strcmp0("x",(char *)p_details -> name) == 0)
         {
-          vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.x = string_to_double ((gpointer)p_cont);
           set_x = TRUE;
         }
         else if (g_strcmp0("y",(char *)p_details -> name) == 0)
         {
-          vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.y = string_to_double ((gpointer)p_cont);
           set_y = TRUE;
         }
         else if (g_strcmp0("z",(char *)p_details -> name) == 0)
         {
-          vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          vec.z = string_to_double ((gpointer)p_cont);
           set_z = TRUE;
         }
         else if (g_strcmp0("start",(char *)p_details -> name) == 0)
         {
-          start = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          start = string_to_double ((gpointer)p_cont);
         }
         else if (g_strcmp0("end",(char *)p_details -> name) == 0)
         {
-          end = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          end = string_to_double ((gpointer)p_cont);
         }
         else if (g_strcmp0("red",(char *)p_details -> name) == 0)
         {
-          col.red = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.red = string_to_double ((gpointer)p_cont);
           set_r = TRUE;
         }
         else if (g_strcmp0("green",(char *)p_details -> name) == 0)
         {
-          col.green = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.green = string_to_double ((gpointer)p_cont);
           set_g = TRUE;
         }
         else if (g_strcmp0("blue",(char *)p_details -> name) == 0)
         {
-          col.blue = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.blue = string_to_double ((gpointer)p_cont);
           set_b = TRUE;
         }
         else if (g_strcmp0("alpha",(char *)p_details -> name) == 0)
         {
-          col.alpha = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+          col.alpha = string_to_double ((gpointer)p_cont);
           set_a = TRUE;
         }
+        xmlFree (p_cont);
       }
       p_details = p_details -> next;
     }
@@ -1708,7 +1790,8 @@ void read_parameter (xmlNodePtr parameter_node)
       // g_print ("key= %s, id= %d, content= %s\n", key, id, content);
       set_parameter (content, key, id, (set_alpha && set_beta) ? & bond : NULL, (set_x && set_y && set_z) ? & vec : NULL, start, end, (set_r && set_g && set_b && set_a) ? & col : NULL);
     }
-    g_free (content);
+    if (key) g_free (key);
+    xmlFree (content);
     parameter_node = parameter_node -> next;
     parameter_node = findnode (parameter_node, "parameter");
   }
@@ -1726,12 +1809,12 @@ void read_light (xmlNodePtr light_node)
   xmlNodePtr l_node, p_node;
   xmlNodePtr parameter_node;
   xmlAttrPtr l_details, p_details;
-  gchar * key;
+  gchar * key = NULL;
   int lid;
   gboolean set_codevar;
   gboolean set_lid = FALSE;
   gboolean set_x, set_y, set_z;
-  gchar * content;
+  xmlChar * content, * p_cont;
   vec3_t vec;
   l_details = light_node -> properties;
   while (l_details)
@@ -1741,7 +1824,9 @@ void read_light (xmlNodePtr light_node)
     {
       if (g_strcmp0("id",(char *)l_details -> name) == 0)
       {
-        lid = (int) string_to_double ((gpointer)xmlNodeGetContent(l_node));
+        content = xmlNodeGetContent(l_node);
+        lid = (int) string_to_double ((gpointer)content);
+        xmlFree (content);
         set_lid = TRUE;
       }
     }
@@ -1754,33 +1839,35 @@ void read_light (xmlNodePtr light_node)
     set_x = set_y = set_z = FALSE;
     while (parameter_node)
     {
-      content = g_strdup_printf ("%s", xmlNodeGetContent(parameter_node));
+      content = xmlNodeGetContent(parameter_node);
       p_details = parameter_node -> properties;
       while (p_details)
       {
         p_node = p_details -> children;
         if (p_node)
         {
+          p_cont = xmlNodeGetContent(p_node);
           if (g_strcmp0("key",(char *)p_details -> name) == 0)
           {
-            key = g_strdup_printf ("%s", xmlNodeGetContent(p_node));
+            key = g_strdup_printf ("%s", p_cont);
             set_codevar = TRUE;
           }
           else if (g_strcmp0("x",(char *)p_details -> name) == 0)
           {
-            vec.x = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.x = string_to_double ((gpointer)p_cont);
             set_x = TRUE;
           }
           else if (g_strcmp0("y",(char *)p_details -> name) == 0)
           {
-            vec.y = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.y = string_to_double ((gpointer)p_cont);
             set_y = TRUE;
           }
           else if (g_strcmp0("z",(char *)p_details -> name) == 0)
           {
-            vec.z = string_to_double ((gpointer)xmlNodeGetContent(p_node));
+            vec.z = string_to_double ((gpointer)p_cont);
             set_z = TRUE;
           }
+          xmlFree (p_cont);
         }
         p_details = p_details -> next;
       }
@@ -1788,7 +1875,8 @@ void read_light (xmlNodePtr light_node)
       {
         set_parameter (content, key, lid, NULL, (set_x && set_y && set_z) ? & vec : NULL, -1.0, -1.0, NULL);
       }
-      g_free (content);
+      if (key) g_free (key);
+      xmlFree (content);
       parameter_node = parameter_node -> next;
       parameter_node = findnode (parameter_node, "parameter");
     }
@@ -1865,7 +1953,6 @@ void read_preferences_from_xml_file ()
   xmlTextReaderPtr reader;
   xmlNodePtr racine;
   xmlNodePtr node, p_node, l_node, c_node;
-  const xmlChar aml[22]="atomes_preferences-xml";
   int i;
   reader = xmlReaderForFile (ATOMES_CONFIG, NULL, 0);
   if (reader)
@@ -1874,164 +1961,167 @@ void read_preferences_from_xml_file ()
     if (doc)
     {
       racine = xmlDocGetRootElement (doc);
-      if (! g_strcmp0 ((char *)(racine -> name), (char *)aml))
+      if (racine)
       {
-        node = findnode(racine -> children, "analysis");
-        if (node)
+        if (g_strcmp0 ((char *)(racine -> name), "atomes_preferences-xml") == 0)
         {
-          p_node = findnode (node  -> children, "cutoffs");
-          if (p_node)
+          node = findnode(racine -> children, "analysis");
+          if (node)
           {
-            read_preferences (p_node);
-            l_node = findnode(p_node -> children, "partials");
-            if (l_node)
+            p_node = findnode (node  -> children, "cutoffs");
+            if (p_node)
             {
-              read_preferences (l_node);
-            }
-          }
-          read_preferences (node);
-        }
-        node = findnode(racine -> children, "opengl");
-        if (node)
-        {
-          p_node = findnode (node  -> children, "material");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode (node  -> children, "lightning");
-          if (p_node)
-          {
-            read_preferences (p_node);
-            l_node = findnode (p_node -> children, "light");
-            while (l_node)
-            {
-              read_light (l_node);
-              l_node = l_node -> next;
-              l_node = findnode (l_node, "light");
-            }
-          }
-          p_node = findnode (node  -> children, "fog");
-          if (p_node)
-          {
-            read_preferences(p_node);
-          }
-          read_preferences (node);
-        }
-        node = findnode(racine -> children, "model");
-        if (node)
-        {
-          read_preferences (node);
-          p_node = findnode(node -> children, "atoms_and_bonds");
-          if (p_node)
-          {
-            for (i=0; i<OGL_STYLES; i++)
-            {
-              l_node = findnode (p_node -> children, xml_style_leg[i]);
+              read_preferences (p_node);
+              l_node = findnode(p_node -> children, "partials");
               if (l_node)
               {
-                read_style_from_xml_file (l_node -> children, i);
+                read_preferences (l_node);
               }
             }
+            read_preferences (node);
           }
-          p_node = findnode(node -> children, "labels");
-          if (p_node)
+          node = findnode(racine -> children, "opengl");
+          if (node)
           {
-            for (i=0; i<2; i++)
+            p_node = findnode (node  -> children, "material");
+            if (p_node)
             {
-              l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
-              if (l_node)
+              read_preferences (p_node);
+            }
+            p_node = findnode (node  -> children, "lightning");
+            if (p_node)
+            {
+              read_preferences (p_node);
+              l_node = findnode (p_node -> children, "light");
+              while (l_node)
               {
-                label_id = i;
-                read_preferences (l_node);
-                c_node = findnode(l_node -> children, "colors");
-                if (c_node)
+                read_light (l_node);
+                l_node = l_node -> next;
+                l_node = findnode (l_node, "light");
+              }
+            }
+            p_node = findnode (node  -> children, "fog");
+            if (p_node)
+            {
+              read_preferences(p_node);
+            }
+            read_preferences (node);
+          }
+          node = findnode(racine -> children, "model");
+          if (node)
+          {
+            read_preferences (node);
+            p_node = findnode(node -> children, "atoms_and_bonds");
+            if (p_node)
+            {
+              for (i=0; i<OGL_STYLES; i++)
+              {
+                l_node = findnode (p_node -> children, xml_style_leg[i]);
+                if (l_node)
                 {
-                  read_preferences (c_node);
+                  read_style_from_xml_file (l_node -> children, i);
                 }
               }
             }
-          }
-          c_node = findnode(node -> children, "colors");
-          if (c_node)
-          {
-            for (i=0; i<2; i++)
+            p_node = findnode(node -> children, "labels");
+            if (p_node)
             {
-              l_node = findnode (c_node -> children, (i) ? "clones" : "atoms");
+              for (i=0; i<2; i++)
+              {
+                l_node = findnode (p_node -> children, (i) ? "clones" : "atoms");
+                if (l_node)
+                {
+                  label_id = i;
+                  read_preferences (l_node);
+                  c_node = findnode(l_node -> children, "colors");
+                  if (c_node)
+                  {
+                    read_preferences (c_node);
+                  }
+                }
+              }
+            }
+            c_node = findnode(node -> children, "colors");
+            if (c_node)
+            {
+              for (i=0; i<2; i++)
+              {
+                l_node = findnode (c_node -> children, (i) ? "clones" : "atoms");
+                if (l_node)
+                {
+                  label_id = i;
+                  read_preferences (l_node);
+                }
+              }
+            }
+            p_node = findnode(node -> children, "box");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+          }
+          node = findnode(racine -> children, "view");
+          if (node)
+          {
+            read_preferences (node);
+            p_node = findnode(node -> children, "background");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+            p_node = findnode(node -> children, "representation");
+            if (p_node)
+            {
+              read_preferences (p_node);
+            }
+            p_node = findnode(node -> children, "axis");
+            if (p_node)
+            {
+              read_preferences (p_node);
+              l_node = findnode(p_node -> children, "labels");
               if (l_node)
               {
-                label_id = i;
+                label_id = 2;
+                default_axis.labels = TRUE;
+                read_preferences (l_node);
+              }
+              c_node = findnode(p_node -> children, "colors");
+              if (c_node)
+              {
+                read_preferences (c_node);
+             }
+            }
+            p_node = findnode(node -> children, "measures");
+            if (p_node)
+            {
+              l_node = findnode(p_node -> children, "standard");
+              if (l_node)
+              {
+                c_node = findnode(l_node -> children, "labels");
+                if (c_node)
+                {
+                  label_id = 3;
+                  read_preferences (c_node);
+                }
+                read_preferences (l_node);
+              }
+              l_node = findnode(p_node -> children, "selection");
+              if (l_node)
+              {
+                c_node = findnode(l_node -> children, "labels");
+                if (c_node)
+                {
+                  label_id = 4;
+                  read_preferences (c_node);
+                }
                 read_preferences (l_node);
               }
             }
-          }
-          p_node = findnode(node -> children, "box");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-        }
-        node = findnode(racine -> children, "view");
-        if (node)
-        {
-          read_preferences (node);
-          p_node = findnode(node -> children, "background");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode(node -> children, "representation");
-          if (p_node)
-          {
-            read_preferences (p_node);
-          }
-          p_node = findnode(node -> children, "axis");
-          if (p_node)
-          {
-            read_preferences (p_node);
-            l_node = findnode(p_node -> children, "labels");
-            if (l_node)
+            p_node = findnode(node -> children, "atom-selections");
+            if (p_node)
             {
-              label_id = 2;
-              default_axis.labels = TRUE;
-              read_preferences (l_node);
+              read_preferences (p_node);
             }
-            c_node = findnode(p_node -> children, "colors");
-            if (c_node)
-            {
-              read_preferences (c_node);
-            }
-          }
-          p_node = findnode(node -> children, "measures");
-          if (p_node)
-          {
-            l_node = findnode(p_node -> children, "standard");
-            if (l_node)
-            {
-              c_node = findnode(l_node -> children, "labels");
-              if (c_node)
-              {
-                label_id = 3;
-                read_preferences (c_node);
-              }
-              read_preferences (l_node);
-            }
-            l_node = findnode(p_node -> children, "selection");
-            if (l_node)
-            {
-              c_node = findnode(l_node -> children, "labels");
-              if (c_node)
-              {
-                label_id = 4;
-                read_preferences (c_node);
-              }
-              read_preferences (l_node);
-            }
-          }
-          p_node = findnode(node -> children, "atom-selections");
-          if (p_node)
-          {
-            read_preferences (p_node);
           }
         }
       }
@@ -2052,20 +2142,24 @@ void set_atomes_defaults ()
   int i, j;
   // Analysis preferences
 
-  default_totcut = 0.0;
+  default_totcut = 2.0;
   if (default_bond_cutoff) g_free (default_bond_cutoff);
   default_bond_cutoff = NULL;
-  default_num_delta[GR] = 1000;
-  default_num_delta[SQ] = 1000;
-  default_num_delta[SK] = 1000;
-  default_num_delta[GK] = 1000;
-  default_num_delta[BD] = 100;
-  default_num_delta[AN] = 90;
-  default_num_delta[CH-1] = 20;
-  default_num_delta[MS-2] = 0;
+  default_num_delta[GDR] = 1000;
+  default_num_delta[SQD] = 1000;
+  default_num_delta[SKD] = 1000;
+  default_num_delta[GDK] = 1000;
+  default_num_delta[BND] = 100;
+  default_num_delta[ANG] = 90;
+  default_num_delta[CHA-1] = 20;
+  default_num_delta[MSD-2] = 0;
+  default_num_delta[SKT-2] = 1000;
+
+  // Dynamical calculations
   default_delta_t[0] = 0.0;
   default_delta_t[1] = -1.0;
 
+  // Ring statistics
   default_rsparam[0] = -1;
   default_rsparam[1] = 0;
   default_rsparam[2] = 10;
@@ -2074,6 +2168,7 @@ void set_atomes_defaults ()
   default_rsparam[5] = 0;
   default_rsparam[6] = 0;
 
+  // Chain statistics
   default_csparam[0] = 0;
   default_csparam[1] = 10;
   default_csparam[2] = 500;
@@ -2081,8 +2176,15 @@ void set_atomes_defaults ()
   default_csparam[4] = 0;
   default_csparam[5] = 0;
 
+  // F(k,t) and S(q,w)
+  default_skt_sets = FALSE;
+  default_skt_n_sets = 5;
+  default_sqw_n_sets = 5;
+  default_sqw_freq = 1000;
+
   for (i=0; i<3; i++) default_opengl[i] = 0;
   default_opengl[3] = QUALITY;
+  default_opengl[4] = TRUE;
   // Material
   default_material.predefine = 4; // Plastic
   default_material.albedo = vec3(0.5, 0.5, 0.5);
@@ -2095,11 +2197,18 @@ void set_atomes_defaults ()
 
   // Lights
   default_lightning.lights = 3;
-  if (default_lightning.spot) g_free (default_lightning.spot);
-  default_lightning.spot = g_malloc0 (3*sizeof*default_lightning.spot);
-  default_lightning.spot[0] = init_light_source (0, 1.0, 1.0);
-  default_lightning.spot[1] = init_light_source (1, 1.0, 1.0);
-  default_lightning.spot[2] = init_light_source (1, 1.0, 1.0);
+  if (default_lightning.spot)
+  {
+    for (i=0; i<default_lightning.lights; i++)
+    {
+      g_free (default_lightning.spot[i]);
+    }
+    g_free (default_lightning.spot);
+  }
+  default_lightning.spot = g_malloc0(3*sizeof*default_lightning.spot);
+  default_lightning.spot[0] = init_light_source (0, 1.0);
+  default_lightning.spot[1] = init_light_source (1, 1.0);
+  default_lightning.spot[2] = init_light_source (2, 1.0);
 
   // Fog
   default_fog.mode = 1;
@@ -2129,7 +2238,7 @@ void set_atomes_defaults ()
   for (i=0; i<3; i++)
   {
     default_o_bd_rw[i] = default_o_bd_rw[i+3] = (i == 2) ? TRUE : FALSE;
-    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0 || i == 2) ? 0.5 : DEFAULT_SIZE;
+    default_bd_rw[i] = default_bd_rw[i+3] = (i == 0) ?  0.5 : (i == 2) ? 0.1 : DEFAULT_SIZE;
   }
   for (i=0; i<6; i++)
   {
@@ -2161,7 +2270,7 @@ void set_atomes_defaults ()
     default_label[i].n_colors = (i > 2) ? 1 : 0;
     if (default_label[i].n_colors)
     {
-      default_label[i].color = g_malloc (sizeof*default_label[i].color);
+      default_label[i].color = g_malloc0(sizeof*default_label[i].color);
       default_label[i].color[0].red = 1.0;
       default_label[i].color[0].green = 1.0;
       default_label[i].color[0].blue = 1.0;
@@ -2247,11 +2356,11 @@ void set_atomes_defaults ()
 */
 void set_atomes_preferences ()
 {
-  default_num_delta = allocint (8);
+  default_num_delta = allocint (NUM_DELTA);
   default_delta_t = allocdouble (2);
   default_rsparam = allocint (7);
   default_csparam = allocint (7);
-  default_opengl = allocint (4);
+  default_opengl = allocint (5);
   default_at_rs = allocdouble (10);
   default_o_at_rs = allocbool (10);
   default_bd_rw = allocdouble (6);
@@ -2278,24 +2387,24 @@ GtkWidget * pref_list (gchar * mess[2], int nelem, gchar * mlist[nelem][2], gcha
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * vvbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(mess[0], -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(mess[1], -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(_(mess[0]), -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(_(mess[1]), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
   int i;
   for (i=0; i<nelem; i++)
   {
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
-    str = g_strdup_printf ("<b>%s</b>", mlist[i][0]);
+    str = g_strdup_printf ("<b>%s</b>", _(mlist[i][0]));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 120, -1, 0.0, 0.5), FALSE, FALSE, 5);
     g_free (str);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(":", -1, -1, 1.0, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(mlist[i][1], -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(mlist[i][1]), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   }
   if (end)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(end, -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_(end), -1, -1, 0.5, 0.5), FALSE, FALSE, 20);
   }
   return vbox;
 }
@@ -2350,11 +2459,11 @@ GtkWidget * view_preferences ()
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
   GtkWidget * vbox = create_vbox (BSEP);
-  gchar * info[2] = {"The <b>View</b> tab regroups representation options",
-                     "which effect apply to the general aspect of the model:"};
-  gchar * m_list[3][2] = {{"Representation", "scene set-up and orientation"},
-                          {"Axis", "axis options"},
-                          {"Tools", "measures and selections option"}};
+  gchar * info[2] = {i18n("The <b>View</b> tab regroups representation options"),
+                     i18n("which effect apply to the general aspect of the model:")};
+  gchar * m_list[3][2] = {{i18n("Representation"), i18n("scene set-up and orientation")},
+                          {i18n("Axis"), i18n("axis options")},
+                          {i18n("Tools"), i18n("measures and selections option")}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 30);
 
@@ -2362,25 +2471,25 @@ GtkWidget * view_preferences ()
   gradient_advanced (NULL, NULL);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_gradient_win -> win, FALSE, FALSE, 5);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("General")));
 
   // Tab for representation
   pref_rep_win = g_malloc0(sizeof*pref_rep_win);
   representation_advanced (NULL, NULL);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_rep_win -> win, gtk_label_new ("Representation"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_rep_win -> win, gtk_label_new (_("Representation")));
 
   // Axis
   pref_axis_win = g_malloc0(sizeof*pref_axis_win);
   axis_advanced (NULL, NULL);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_axis_win -> win, gtk_label_new ("Axis"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_axis_win -> win, gtk_label_new (_("Axis")));
 
   // Measures
   vbox = create_vbox (BSEP);
   GtkWidget * hbox;
-  hbox = adv_box (vbox, "<b>Select measure type</b>", 5, 120, 0.0);
+  hbox = adv_box (vbox, _("<b>Select measure type</b>"), 5, 120, 0.0);
   meas_combo = create_combo ();
-  combo_text_append (meas_combo, "Standard");
-  combo_text_append (meas_combo, "Edition mode");
+  combo_text_append (meas_combo, _("Standard"));
+  combo_text_append (meas_combo, _("Edition mode"));
   combo_set_active (meas_combo, 0);
   g_signal_connect (G_OBJECT(meas_combo), "changed", G_CALLBACK(set_measures), GINT_TO_POINTER(0));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, meas_combo , FALSE, FALSE, 40);
@@ -2394,10 +2503,10 @@ GtkWidget * view_preferences ()
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, meas_box[i], FALSE, FALSE, 0);
   }
 
-  hbox = adv_box (vbox, "<b>Select selection type</b>", 15, 120, 0.0);
+  hbox = adv_box (vbox, _("<b>Select selection type</b>"), 15, 120, 0.0);
   sel_combo = create_combo ();
-  combo_text_append (sel_combo, "Standard");
-  combo_text_append (sel_combo, "Edition mode");
+  combo_text_append (sel_combo, _("Standard"));
+  combo_text_append (sel_combo, _("Edition mode"));
   combo_set_active (sel_combo, 0);
   g_signal_connect (G_OBJECT(sel_combo), "changed", G_CALLBACK(set_measures), GINT_TO_POINTER(1));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, sel_combo , FALSE, FALSE, 40);
@@ -2408,13 +2517,13 @@ GtkWidget * view_preferences ()
     hbox = create_hbox (BSEP);
     vvbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vvbox, FALSE, FALSE, 60);
-    hhbox = abox (vvbox, "Color", 0);
+    hhbox = abox (vvbox, _("Color"), 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, color_button(tmp_sel_color[i], TRUE, 100, -1, G_CALLBACK(set_selection_color), GINT_TO_POINTER(i)), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, sel_box[i], hbox, FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, sel_box[i], FALSE, FALSE, 0);
   }
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Tools"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("Tools")));
 
   show_the_widgets (notebook);
 
@@ -3103,16 +3212,16 @@ void color_button_event (GtkWidget * widget, double event_x, double event_y, gui
     if (gtk_tree_view_get_path_at_pos (GTK_TREE_VIEW(widget), event_x, event_y, & path, & column, & i, & j))
 #endif
     {
-      if (g_strcmp0("Color", gtk_tree_view_column_get_title (column)) == 0)
+      if (g_strcmp0(_("Color"), gtk_tree_view_column_get_title (column)) == 0)
       {
         GtkTreeIter row;
         if (gtk_tree_model_get_iter (model, & row, path))
         {
           i = GPOINTER_TO_INT(data);
-          gchar * obj[2]={"atom", "clone"};
+          gchar * obj[2]={_("atom"), _("clone")};
           int z;
           gtk_tree_model_get (model, & row, 3, & z, -1);
-          gchar * str = g_strdup_printf ("%s %s color", periodic_table_info[z].lab, obj[i]);
+          gchar * str = g_strdup_printf (_("%s %s color"), periodic_table_info[z].lab, obj[i]);
           GdkRGBA col = colrgba_togtkrgba (get_spec_color (z, color_list));
           GtkWidget * win = gtk_color_chooser_dialog_new (str, GTK_WINDOW(MainWindow));
           gtk_window_set_modal (GTK_WINDOW(win), TRUE);
@@ -3187,9 +3296,9 @@ G_MODULE_EXPORT void set_stuff_color (GtkColorChooser * colob, gpointer data)
 */
 G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
 {
-  gchar * ats[3]={"atom(s)", "dot(s)", "sphere(s)"};
-  gchar * dim[3]={"radius", "size", "width"};
-  gchar * bts[3]={"bond(s)", "wireframe(s)", "cylinder(s)"};
+  gchar * ats[3]={_("atom(s)"), _("dot(s)"), _("sphere(s)")};
+  gchar * dim[3]={_("radius"), _("size"), _("width")};
+  gchar * bts[3]={_("bond(s)"), _("wireframe(s)"), _("cylinder(s)")};
   the_object = GPOINTER_TO_INT(data);
   int i, j, k, l, n, m;
   int aid, bid;
@@ -3205,7 +3314,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
       aid = - the_object - 2;
       aid = (aid) > 2 ? aid - 3 : aid;
       bid = (the_object == -3 || the_object == -6) ? 2 : 0;
-      str = (the_object < -4) ? g_strdup_printf ("Edit cloned %s %s", bts[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", bts[aid], dim[bid]);
+      str = (the_object < -4) ? g_strdup_printf (_("Edit cloned %s %s"), bts[aid], dim[bid]) : g_strdup_printf (_("Edit %s %s"), bts[aid], dim[bid]);
       num_col = 5;
     }
     else
@@ -3214,7 +3323,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
       aid = the_object - 2;
       aid = (aid == 0 || aid == 2 || aid == 5 || aid == 7) ? 0 : (aid == 1 || aid == 4 || aid == 6 || aid == 9) ? 1 : 2;
       bid = (the_object == 1 || the_object == 6) ? 1 : 0;
-      str = (the_object - 2 > 4) ? g_strdup_printf ("Edit cloned %s %s", ats[aid], dim[bid]) : g_strdup_printf ("Edit %s %s", ats[aid], dim[bid]);
+      str = (the_object - 2 > 4) ? g_strdup_printf (_("Edit cloned %s %s"), ats[aid], dim[bid]) : g_strdup_printf (_("Edit %s %s"), ats[aid], dim[bid]);
       num_col = (the_object == 4 || the_object == 9) ? 8 : 5;
     }
   }
@@ -3224,12 +3333,12 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     if (the_object < 1000)
     {
       aid = the_object - 100;
-      str = g_strdup_printf ("Select %s color", (aid) ? "clone" : "atom");
+      str = g_strdup_printf (_("Select %s color"), (aid) ? _("clone") : _("atom"));
     }
     else
     {
       aid = the_object - 1000;
-      str = g_strdup_printf ("Select %s label color", (aid) ? "clone" : "atom");
+      str = g_strdup_printf (_("Select %s label color"), (aid) ? _("clone") : _("atom"));
       do_label = TRUE;
     }
     num_col = 5;
@@ -3313,9 +3422,9 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   }
 
   pref_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL(pref_model));
-  gchar * name[3] = {"Element", "Symbol", "Z"};
-  gchar * g_name[3] = {"Radius", "Size", "Width"};
-  gchar * f_name[4] = {"Covalent [1]","Ionic [2]","van Der Waals [3]", "Crystal [4,5]"};
+  gchar * name[3] = {_("Element"), _("Symbol"), "Z"};
+  gchar * g_name[3] = {_("Radius"), _("Size"), _("Width")};
+  gchar * f_name[4] = {_("Covalent [1]"),_("Ionic [2]"),"van der Waals [3]", _("Crystal [4,5]")};
   for (i=0; i<num_col; i++)
   {
     pref_cel[i] = gtk_cell_renderer_text_new();
@@ -3332,7 +3441,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
       else
       {
         gtk_cell_renderer_set_alignment (pref_cel[i], 0.5, 0.5);
-        pref_col[i] = gtk_tree_view_column_new_with_attributes("Color", pref_cel[i], "text", i, NULL);
+        pref_col[i] = gtk_tree_view_column_new_with_attributes(_("Color"), pref_cel[i], "text", i, NULL);
         gtk_tree_view_column_set_cell_data_func (pref_col[i], pref_cel[i], color_set_color, NULL, NULL);
       }
     }
@@ -3366,14 +3475,14 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   add_container_child (CONTAINER_SCR, edit_scrol, pref_tree);
   if (! do_label)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<i>User defined values appear in colored bold font.</i>", -1, 40, 0.5, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<i>User defined values appear in colored bold font.</i>"), -1, 40, 0.5, 0.5), FALSE, FALSE, 0);
     if (num_col == 8)
     {
-      gchar * legend={"\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
+      gchar * legend={_("\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
                       "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
                       "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
                       "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
-                      "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"};
+                      "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>")};
        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(legend, -1, 25, 0.0, 0.5), FALSE, FALSE, 0);
    }
   }
@@ -3382,7 +3491,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     gtk_widget_set_sensitive (edit_scrol, ! tmp_label[aid] -> n_colors);
     GtkWidget * vvbox = create_vbox (BSEP);
     GtkWidget * hbox = create_hbox (BSEP);
-    gchar * info[3] = {"By default label and species colors are similar,", "you can modify that using this dialog window.", "You can also use a single color for all labels:"};
+    gchar * info[3] = {_("By default label and species colors are similar,"), _("you can modify that using this dialog window."), _("You can also use a single color for all labels:")};
     for (i=0; i<2; i++)
     {
       hbox = create_hbox (BSEP);
@@ -3394,7 +3503,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(info[i], 300, -1, 0.5, 0.5), FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Use single color", -1, -1, tmp_label[aid] -> n_colors, G_CALLBACK(toggled_default_stuff), data), FALSE, FALSE, 30);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Use single color"), -1, -1, tmp_label[aid] -> n_colors, G_CALLBACK(toggled_default_stuff), data), FALSE, FALSE, 30);
     ColRGBA active_col;
     if (tmp_label[aid] -> n_colors)
     {
@@ -3431,16 +3540,16 @@ GtkWidget * over_param (int object, int style)
   {
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species related parameters", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 60);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button (_("Edit species related parameters"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 60);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Override species based parameters", -1, -1, (object) ? tmp_o_bd_rw[style] : tmp_o_at_rs[style], G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Override species based parameters"), -1, -1, (object) ? tmp_o_bd_rw[style] : tmp_o_at_rs[style], G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(mod*(style+2))), FALSE, FALSE, 10);
   }
   else
   {
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 60+clone, -1, 0.0, 0.0), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Set default value", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Set default value"), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   }
   if (object)
   {
@@ -3474,14 +3583,8 @@ GtkWidget * over_param (int object, int style)
 GtkWidget * style_tab (int style)
 {
   GtkWidget * vbox = create_vbox (BSEP);
-  gchar * object[3]={"<b>Atom(s)</b>", "<b>Bond(s)</b>", "\t<u>Clone(s)</u>"};
-  gchar * ats[3]={"tom(s) ", "ot(s)", "phere(s)"};
-  gchar * ha_init[3]={"A", "D", "S"};
-  gchar * la_init[3]={"a", "d", "s"};
-  gchar * dim[3]={"radius", "size", "width"};
-  gchar * bts[3]={"ond(s)", "ireframe(s)", "ylinder(s)"};
-  gchar * hb_init[3]={"B", "W", "C"};
-  gchar * lb_init[3]={"b", "w", "c"};
+  gchar * object[3]={i18n("<b>Atom(s)</b>"), i18n("<b>Bond(s)</b>"), i18n("\t<u>Clone(s)</u>")};
+  gchar * dim[3]={i18n("Radius"), i18n("Size"), i18n("Width")};
   int i;
   int bsid;
   int lid;
@@ -3503,14 +3606,7 @@ GtkWidget * style_tab (int style)
     for (i=0; i<2; i++)
     {
       adv_box (vbox, object[i*2], 10-5*i, 120, 0.0);
-      if (! i)
-      {
-        str = g_strdup_printf ("\t%s%s %s", ha_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
-      }
-      else
-      {
-        str = g_strdup_printf ("\t\tClone %s%s %s", la_init[lid], ats[lid], dim[(lid != 1) ? 0 : 1]);
-      }
+      str = g_strdup_printf ("\t%s", _(dim[(lid != 1) ? 0 : 1]));
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (0, (style < 5) ? style+5*i : 4 + 5*i), FALSE, FALSE, 0);
@@ -3522,14 +3618,7 @@ GtkWidget * style_tab (int style)
     for (i=0; i<2; i++)
     {
       adv_box (vbox, object[i+1], 10-5*i, 120, 0.0);
-      if (! i)
-      {
-        str = g_strdup_printf ("\t%s%s %s", hb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
-      }
-      else
-      {
-        str = g_strdup_printf ("\t\tClone %s%s %s", lb_init[bsid], bts[bsid], dim[(bsid != 1) ? 0 : 2]);
-      }
+      str = g_strdup_printf ("\t%s", _(dim[(bsid != 1) ? 0 : 2]));
       adv_box (vbox, str, 10, 120, 0.0);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, over_param (1, bsid+3*i), FALSE, FALSE, 0);
@@ -3552,45 +3641,45 @@ GtkWidget * model_preferences ()
   GtkWidget * vbox = create_vbox (BSEP);
   //GtkWidget * hbox;
   //GtkWidget * combo;
-  gchar * info[2] = {"The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options",
-                     "which effect apply when the corresponding <b>OpenGL</b> style is used:"};
-  gchar * m_list[4][2] = {{"Ball and stick", "atoms<sup>*</sup> and bonds radii"},
-                          {"Wireframe", "dots<sup>**</sup> size and wireframes width"},
-                          {"Spacefill", "tabulated parameters"},
-                          {"Cylinders", "bonds radii"}};
+  gchar * info[2] = {i18n("The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options"),
+                     i18n("which effect apply when the corresponding <b>OpenGL</b> style is used:")};
+  gchar * m_list[4][2] = {{i18n("Balls and Sticks"), i18n("atoms<sup>*</sup> and bonds radii")},
+                          {i18n("Wireframes"), i18n("dots<sup>**</sup> size and wireframes width")},
+                          {i18n("Spacefilled"), i18n("tabulated parameters")},
+                          {i18n("Cylinders"), i18n("bonds radii")}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 30, 0.0, 0.0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 4, m_list, NULL), FALSE, FALSE, 0);
-  gchar * other_info[2] = {"It also provides options to customize atomic label(s),", "and, the model box, if any:"};
-  gchar * o_list[2][2] = {{"Labels", "atom labels"},
-                          {"Box", "model box details"}};
+  gchar * other_info[2] = {i18n("It also provides options to customize atomic label(s),"), i18n("and, the model box, if any:")};
+  gchar * o_list[2][2] = {{i18n("Labels"), i18n("atom labels")},
+                          {i18n("Box"), i18n("model box details")}};
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (other_info, 2, o_list, NULL), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 20, 0.0, 0.0), FALSE, FALSE, 0);
 
   GtkWidget * hbox;
-  gchar * obj[2] = {"<b>Atoms</b>", "<b>Clones</b>"};
+  gchar * obj[2] = {i18n("<b>Atoms</b>"), i18n("<b>Clones</b>")};
   int i;
   for (i=0; i<2; i++)
   {
-    hbox = adv_box (vbox, obj[i], 5, 150, 1.0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Edit species colors", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(100+i)), FALSE, FALSE, 30);
+    hbox = adv_box (vbox, _(obj[i]), 5, 150, 1.0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button (_("Edit species colors"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(100+i)), FALSE, FALSE, 30);
   }
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show clone(s), if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Always show clone(s), if any."), 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(0)), FALSE, FALSE, 30);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Always show box, if any.", 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Always show box, if any."), 250, -1, tmp_clones, G_CALLBACK(toggled_default_stuff), GINT_TO_POINTER(1)), FALSE, FALSE, 30);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 5, 0.0, 0.0), FALSE, FALSE, 0);
 
-  append_comments (vbox, "<sup>*</sup>", "the same parameters are also used for the <b>spheres</b> style");
-  append_comments (vbox, "<sup>**</sup>", "the same parameters are also used for the <b>dots</b> style");
+  append_comments (vbox, "<sup>*</sup>", _("the same parameters are also used for the <b>spheres</b> style"));
+  append_comments (vbox, "<sup>**</sup>", _("the same parameters are also used for the <b>dots</b> style"));
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("General")));
 
   for (i=0; i<OGL_STYLES; i++)
   {
-    if (i != 3 && i != 5) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (text_styles[i]));
+    if (i != 3 && i != 5) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), style_tab (i), gtk_label_new (_(text_styles[i])));
   }
 
   vbox = create_vbox (BSEP);
@@ -3604,16 +3693,16 @@ GtkWidget * model_preferences ()
     hbox = create_hbox (BSEP);
     hhbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>.</b>", 5, -1, 0.0, 0.25), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("Colors", 150, 30, 0.0, 0.5), FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button ("Adjust color(s)", IMG_NONE, NULL, 220, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(1000+i)), FALSE, FALSE, 15);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(_("Colors"), 150, 30, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button (_("Adjust color(s)"), IMG_NONE, NULL, 220, -1, GTK_RELIEF_NORMAL, G_CALLBACK(edit_species_parameters), GINT_TO_POINTER(1000+i)), FALSE, FALSE, 15);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, hbox, hhbox, FALSE, FALSE, 40);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   }
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Labels"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("Labels")));
 
   pref_box_win = g_malloc0(sizeof*pref_box_win);
   box_advanced (NULL, NULL);
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_box_win -> win, gtk_label_new ("Box"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), pref_box_win -> win, gtk_label_new (_("Box")));
   show_the_widgets (notebook);
   return notebook;
 }
@@ -3650,17 +3739,17 @@ GtkTreeModel * style_combo_tree ()
   int i, j;
   store = gtk_tree_store_new (2, G_TYPE_STRING, G_TYPE_INT);
   gtk_tree_store_append (store, & iter, NULL);
-  gtk_tree_store_set (store, & iter, 0, "f(atoms) <sup>*</sup>", 1, 0, -1);
+  gtk_tree_store_set (store, & iter, 0, _("f(atoms) <sup>*</sup>"), 1, 0, -1);
   for (i=0; i<OGL_STYLES; i++)
   {
     gtk_tree_store_append (store, & iter, NULL);
-    gtk_tree_store_set (store, & iter, 0, text_styles[i], 1, i+1, -1);
+    gtk_tree_store_set (store, & iter, 0, _(text_styles[i]), 1, i+1, -1);
     if (i == SPACEFILL)
     {
       for (j=0; j<FILLED_STYLES; j++)
       {
         gtk_tree_store_append (store, & iter2, & iter);
-        gtk_tree_store_set (store, & iter2, 0, text_filled[j], 1, -j-1, -1);
+        gtk_tree_store_set (store, & iter2, 0, _(text_filled[j]), 1, -j-1, -1);
       }
     }
   }
@@ -3693,9 +3782,9 @@ G_MODULE_EXPORT void set_default_map (GtkComboBox * box, gpointer data)
 GtkWidget * combo_map (int obj)
 {
   GtkWidget * combo = create_combo ();
-  combo_text_append (combo, "Atomic species");
-  combo_text_append (combo, "Total coordination(s)");
-  combo_text_append (combo, "Partial coordination(s)");
+  combo_text_append (combo, _("Atomic Species"));
+  combo_text_append (combo, _("Total Coordination(s)"));
+  combo_text_append (combo, _("Partial Coordination(s)"));
   combo_set_active (combo, tmp_opengl[1+obj]);
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_map), GINT_TO_POINTER(obj));
   return combo;
@@ -3724,17 +3813,17 @@ GtkWidget * opengl_preferences ()
     pref_ogl_edit -> pointer[i].b = i;
   }
 
-  gchar * info[2] = {"The <b>OpenGL</b> tab regroups rendering options",
-                     "use it to configure the OpenGL 3D scene:"};
-  gchar * m_list[3][2] = {{"Material", "aspect for atom(s) and bond(s)"},
-                          {"Lights", "lightning of the scene"},
-                          {"Fog", "atmosphere effects"}};
-  gchar * end = {"It also offers to adjust the main visualization style and the color maps"};
+  gchar * info[2] = {i18n("The <b>OpenGL</b> tab regroups rendering options"),
+                     i18n("use it to configure the OpenGL 3D scene:")};
+  gchar * m_list[3][2] = {{i18n("Material"), i18n("aspect for atom(s) and bond(s)")},
+                          {i18n("Lights"), i18n("lightning of the scene")},
+                          {i18n("Fog"), i18n("atmosphere effects")}};
+  gchar * end = i18n("It also offers to adjust the main visualization style and the color maps");
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, end), FALSE, FALSE, 30);
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Style</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("<b>Style</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   GtkTreeModel * model = style_combo_tree ();
   combo = gtk_combo_box_new_with_model (model);
   g_object_unref (model);
@@ -3746,28 +3835,28 @@ GtkWidget * opengl_preferences ()
   g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(set_default_style), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-  append_comments (vbox, "<sup>*</sup>", "if 10 000 atoms or more: <b>Wireframe</b>, otherwise: <b>Ball and stick</b>");
+  append_comments (vbox, "<sup>*</sup>", _("if 10 000 atoms or more: <b>Wireframes</b>, otherwise: <b>Balls and sticks</b>"));
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Color maps</b>", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("<b>Color maps</b>"), 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 15);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tatom(s) and bond(s)", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("\tatom(s) and bond(s)"), 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(0), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("\tpolyhedra", 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("\tpolyhedra"), 250, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_map(1), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
 
   show_the_widgets (vbox);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("General")));
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (NULL, pref_ogl_edit, & tmp_material), gtk_label_new ("Material"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new ("Lights"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new ("Fog"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), materials_tab (NULL, pref_ogl_edit, & tmp_material), gtk_label_new (_("Material")));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), lights_tab (NULL, pref_ogl_edit, & tmp_lightning), gtk_label_new (_("Lights")));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), fog_tab (NULL, pref_ogl_edit, & tmp_fog), gtk_label_new (_("Fog")));
 
   gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), 0);
   return notebook;
@@ -3794,15 +3883,22 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
     }
     update_entry_double (res, tmp_totcut);
   }
-  else if (i < 8)
+  else if (i < 9)
   {
     if (value > 0) tmp_num_delta[i] = (int) value;
     update_entry_int (res, tmp_num_delta[i]);
+    if (i == 7 || i == 8)
+    {
+      update_entry_int (GTK_ENTRY(dyna_entry[(i == 7) ? 1 : 0][0]), tmp_num_delta[i]);
+      update_omega_max ();
+    }
   }
-  else
+  else // delta_t
   {
     if (value > 0.0) tmp_delta_t[0] = value;
     update_entry_double (res, tmp_delta_t[0]);
+    update_entry_double (GTK_ENTRY(dyna_entry[(i == 9) ? 1 : 0][1]), tmp_delta_t[0]);
+    update_omega_max ();
   }
 }
 
@@ -3817,14 +3913,17 @@ G_MODULE_EXPORT void set_default_num_delta (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void tunit_changed (GtkComboBox * box, gpointer data)
 {
   tmp_delta_t[1] = (double) combo_get_active ((GtkWidget *)box);
+  int i = GPOINTER_TO_INT(data);
+  combo_set_active (dyna_combo[(i == 7) ? 1 : 0], (int)tmp_delta_t[1]);
+  update_omega_max ();
 }
 
-GtkWidget * all_cut_box;
+GtkWidget * all_cut_box = NULL;
 GtkWidget * cut_combo[2];
 GtkWidget * pcut_box[2];
-GtkWidget * tcut_entry;
-GtkWidget * tcut_box;
-GtkWidget * cut_comments;
+GtkWidget * tcut_entry = NULL;
+GtkWidget * tcut_box = NULL;
+GtkWidget * cut_comments = NULL;
 bond_cutoff * cut_list;
 
 /*!
@@ -3907,23 +4006,17 @@ void add_cut_box ()
   GtkWidget * entry;
 
   int i;
-  for (i=0; i<2; i++)
-  {
-    if (pcut_box[i])
-    {
-     pcut_box[i] = destroy_this_widget(pcut_box[i]);
-    }
-  }
+  for (i=0; i<2; i++) pcut_box[i] = NULL;
   pcut_box[0] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, pcut_box[0], FALSE, FALSE, 10);
   if (cut_list)
   {
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, pcut_box[0], hbox, FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B1;", 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B2;", 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("R<sub>cut</sub> (&#x3B1;, &#x3B2;)", 100, -1, 0.5, 0.5), FALSE, FALSE, 10);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Use <sup>*</sup>", 20, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Spec. &#x3B1;"), 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Spec. &#x3B2;"), 60, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("R<sub>cut</sub> (&#x3B1;, &#x3B2;)"), 100, -1, 0.5, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Use <sup>*</sup>"), 20, -1, 0.5, 0.5), FALSE, FALSE, 10);
   }
   pcut_box[1] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, pcut_box[1], FALSE, FALSE, 10);
@@ -3944,7 +4037,7 @@ void add_cut_box ()
   cut_comments = destroy_this_widget (cut_comments);
   cut_comments = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, cut_comments, FALSE, FALSE, 10);
-  if (cut_list) append_comments (cut_comments, "<sup>*</sup>", "Unused values will not be saved !");
+  if (cut_list) append_comments (cut_comments, "<sup>*</sup>", _("Unused values will not be saved !"));
 
   for (i=0; i<2; i++) combo_set_active (cut_combo[i], -1);
   show_the_widgets (all_cut_box);
@@ -4091,7 +4184,7 @@ G_MODULE_EXPORT void edit_cutoffs (GtkDialog * edit_cuts, gint response_id, gpoi
 */
 G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
 {
-  GtkWidget * win = dialog_cancel_apply ("Select partial cutoffs(s)", MainWindow, TRUE);
+  GtkWidget * win = dialog_cancel_apply (_("Select partial cutoffs(s)"), MainWindow, TRUE);
   GtkWidget * vbox = dialog_get_content_area (win);
   GtkWidget * hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
@@ -4100,7 +4193,7 @@ G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
   cut_list = duplicate_cutoffs (tmp_bond_cutoff);
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, all_cut_box, hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B1;", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Spec. &#x3B1;"), 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
   int i, j;
   for (i=0; i<2; i++)
   {
@@ -4115,12 +4208,48 @@ G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
   }
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cut_combo[0], FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(" ", 20, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Spec. &#x3B2;", 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Spec. &#x3B2;"), 60, -1, 0.0, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, cut_combo[1], FALSE, FALSE, 5);
 
   add_cut_box ();
 
   run_this_gtk_dialog (win, G_CALLBACK(edit_cutoffs), NULL);
+}
+
+/*!
+  \fn void dyna_parameters (GtkWidget * vbox, int cid)
+
+  \brief create time related configuration widgets
+
+  \param vbox the target box to insert the new widgets
+  \param cid the calculation ID (7 = MSD, 8 = S(q,w)
+*/
+void dyna_parameters (GtkWidget * vbox, int cid)
+{
+  gchar * default_leg[2] = {i18n("Step(s) between configurations"), i18n("Step(s) between conf.")};
+  int wid = (cid == 7) ? 0 : 1;
+  GtkWidget * hbox;
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(default_leg[(cid == 7) ? 0 : 1]), (cid == 7) ? 285 : 150, -1, 0.0, 0.5), FALSE, FALSE, (cid == 7) ? 30 : 5);
+  dyna_entry[wid][0] = create_entry (G_CALLBACK(set_default_num_delta), (cid == 7) ? 110 : 100, (cid == 7) ? 10 : 15, FALSE, GINT_TO_POINTER(cid));
+  update_entry_int ((GtkEntry *)dyna_entry[wid][0], tmp_num_delta[cid]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_entry[wid][0], FALSE, FALSE, (cid == 7) ? 0 : 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+
+  hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("Time step &#x3b4;t"), (cid == 7) ? 285 : 150, -1, 0.0, 0.5), FALSE, FALSE, (cid == 7) ? 30 : 5);
+  dyna_entry[wid][1] = create_entry (G_CALLBACK(set_default_num_delta), (cid == 7) ? 110 : 100, (cid == 7) ? 10 : 15, FALSE, GINT_TO_POINTER(cid+2));
+  update_entry_double ((GtkEntry *)dyna_entry[wid][1], tmp_delta_t[0]);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_entry[wid][1], FALSE, FALSE, (cid == 7) ? 0 : 10);
+  dyna_combo[wid] = create_combo ();
+  int i;
+  for (i=0; i<5 ; i++) combo_text_append (dyna_combo[wid], untime[i]);
+
+  combo_set_active (dyna_combo[wid], (int)tmp_delta_t[1]);
+  g_signal_connect(G_OBJECT(dyna_combo[wid]), "changed", G_CALLBACK(tunit_changed), GINT_TO_POINTER(cid));
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, dyna_combo[wid], FALSE, FALSE, 0);
+
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
 }
 
 /*!
@@ -4135,34 +4264,35 @@ GtkWidget * calc_preferences ()
   GtkWidget * hbox;
   gtk_notebook_set_scrollable (GTK_NOTEBOOK(notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-  gchar * default_delta_num_leg[8] = {"<b>g(r)</b>: number of &#x3b4;r", "<b>s(q)</b>: number of &#x3b4;q", "<b>s(k)</b>: number of &#x3b4;k", "<b>g(r) FFT</b>: number of &#x3b4;r",
-                                      "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]", "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]",
-                                      "<b>Spherical harmonics</b>: l<sub>max</sub> in [2-40]", "step(s) between configurations"};
-  gchar * info[2] = {"The <b>Analysis</b> tab regroups calculation options",
-                     "use it to setup your own default parameters:"};
-  gchar * m_list[3][2] = {{"Calculations", "most analysis options"},
-                          {"Rings", "ring statistics options"},
-                          {"Chains", "chain statistics options"}};
+  gchar * default_delta_num_leg[NUM_DELTA] = {i18n("<b>g(r)</b>: number of &#x3b4;r"), i18n("<b>s(q)</b>: number of &#x3b4;q"), i18n("<b>s(k)</b>: number of &#x3b4;k"), i18n("<b>g(r) FFT</b>: number of &#x3b4;r"),
+                                              i18n("<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"), i18n("<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]"),
+                                              i18n("<b>Spherical harmonics</b>: l<sub>max</sub> &#x2208; [2-40]"), i18n("Step(s) between configurations"), i18n("<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k")};
+  gchar * info[2] = {i18n("The <b>Analysis</b> tab regroups calculation options"),
+                     i18n("use it to setup your own default parameters:")};
+  gchar * m_list[4][2] = {{i18n("Calculations"), i18n("most analysis options")},
+                          {i18n("Rings"), i18n("ring statistics options")},
+                          {i18n("Chains"), i18n("chain statistics options")},
+                          {"S(q,&#969;)", i18n("dynamic structure factor options")}};
 
   vbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, pref_list (info, 3, m_list, NULL), FALSE, FALSE, 20);
 
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("To determine the existence, or the absence, of a chemical bond", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("between 2 atoms is a key feature in the <b>atomes</b> software", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("To determine the existence, or the absence, of a chemical bond"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("between 2 atoms is a key feature in the <b>atomes</b> software"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   GtkWidget * vvbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label("It is used for analysis purposes, and, to draw bonds in the OpenGL window.", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(_("It is used for analysis purposes, and, to draw bonds in the OpenGL window."), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
   edit_bonds (vbox);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("You can adapt below the distance cutoffs:", -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("You can adapt below the distance cutoffs:"), -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
 
   hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   GtkWidget * hhbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 40);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>Total cutoff</b>", 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(_("<b>Total cutoff</b>"), 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
   GtkWidget * combo = create_combo();
-  combo_text_append (combo, "Evaluated by <b>atomes</b>");
-  combo_text_append (combo, "User defined <sup>*</sup>");
+  combo_text_append (combo, _("Evaluated by <b>atomes</b>"));
+  combo_text_append (combo, _("User Defined <sup>*</sup>"));
   combo_set_markup (combo);
   gtk_widget_set_size_request (combo, 180, -1);
   combo_set_active (combo, (tmp_totcut == 0.0) ? 0 : 1);
@@ -4180,55 +4310,49 @@ GtkWidget * calc_preferences ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   hhbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 40);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label("<b>Partial cutoff(s)</b>", 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button ("Set default cutoff(s)", IMG_NONE, NULL, 180, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_cutoffs_default), NULL), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, markup_label(_("<b>Partial cutoff(s)</b>"), 120, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button (_("Set default cutoff(s)"), IMG_NONE, NULL, 180, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_cutoffs_default), NULL), FALSE, FALSE, 10);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" ", -1, 20, 0.0, 0.0), FALSE, FALSE, 0);
-  append_comments (vbox, "<sup>*</sup>", "The highest this value is, the highest the number of neighbors around an atom.");
+  append_comments (vbox, "<sup>*</sup>", _("The highest this value is, the highest the number of neighbors around an atom."));
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("General")));
 
   GtkWidget * entry;
   vbox = create_vbox (BSEP);
   int i;
-  for (i=0; i<8; i++)
+  for (i=0; i<NUM_DELTA; i++)
   {
-    if (i == 7)
+    if (i != 7 && i != 8)
     {
       hbox = create_hbox (BSEP);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>Mean Squared Displacement</b>:", 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_(default_delta_num_leg[i]), (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
+      entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
+      update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
     }
-    hbox = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (default_delta_num_leg[i], (i ==7) ? 285 : 310, -1, 0.0, 0.5), FALSE, FALSE, (i == 7) ? 30 : 15);
-    entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
-    update_entry_int ((GtkEntry *)entry, tmp_num_delta[i]);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   }
+  // MSD
+  i = 7;
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("time step(s) &#x3b4;t", 285, -1, 0.0, 0.5), FALSE, FALSE, 30);
-  entry = create_entry (G_CALLBACK(set_default_num_delta), 110, 10, FALSE, GINT_TO_POINTER(i));
-  update_entry_double ((GtkEntry *)entry, tmp_delta_t[0]);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
-  GtkWidget * tcombo = create_combo ();
-  for (i=0; i<5 ; i++) combo_text_append (tcombo, untime[i]);
-
-  combo_set_active (tcombo, (int)tmp_delta_t[1]);
-  g_signal_connect(G_OBJECT(tcombo), "changed", G_CALLBACK(tunit_changed), NULL);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, tcombo, FALSE, FALSE, 0);
-
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("<b>Dynamical analysis: MSD, S(q,&#969;)</b>"), 310, -1, 0.0, 0.5), FALSE, FALSE, 15);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
+  dyna_parameters (vbox, i);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ("Calculations"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new (_("Calculations")));
 
   for (i=0; i<2; i++)
   {
     vbox = create_vbox (BSEP);
     search_type = i;
     calc_rings (vbox);
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? "Chains" : "Rings"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, gtk_label_new ((i) ? _("Chains") : _("Rings")));
   }
+  /*vbox = create_vbox (BSEP);
+  calc_sk_t (vbox);
+  gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vbox, markup_label("S(q,&#969;)", -1, -1, 0.0, 0.5));*/
+
   show_the_widgets (notebook);
   return notebook;
 }
@@ -4240,6 +4364,7 @@ GtkWidget * calc_preferences ()
 */
 void clean_all_tmp ()
 {
+  int i;
   if (tmp_num_delta)
   {
     g_free (tmp_num_delta);
@@ -4267,6 +4392,10 @@ void clean_all_tmp ()
   }
   if (tmp_lightning.spot)
   {
+    for (i=0; i<tmp_lightning.lights; i++)
+    {
+      g_free (tmp_lightning.spot[i]);
+    }
     g_free (tmp_lightning.spot);
     tmp_lightning.spot = NULL;
   }
@@ -4290,7 +4419,7 @@ void clean_all_tmp ()
     g_free (tmp_bd_rw);
     tmp_bd_rw = NULL;
   }
-  int i;
+
   for (i=0; i<16; i++)
   {
     if (tmp_atomic_rad[i])
@@ -4443,11 +4572,19 @@ void prepare_tmp_default ()
   clean_all_tmp ();
   tmp_totcut = default_totcut;
   tmp_bond_cutoff = duplicate_cutoffs (default_bond_cutoff);
-  tmp_num_delta = duplicate_int (8, default_num_delta);
+  tmp_num_delta = duplicate_int (NUM_DELTA, default_num_delta);
   tmp_delta_t = duplicate_double (2, default_delta_t);
+  // Ring statistics
   tmp_rsparam = duplicate_int (7, default_rsparam);
+  // Chain statistics
   tmp_csparam = duplicate_int (7, default_csparam);
-  tmp_opengl = duplicate_int (4, default_opengl);
+  // F(k,t) and S(q,w)
+  tmp_skt_sets = default_skt_sets;
+  tmp_skt_n_sets = default_skt_n_sets;
+  tmp_sqw_n_sets = default_sqw_n_sets;
+  tmp_sqw_freq = default_sqw_freq;
+
+  tmp_opengl = duplicate_int (5, default_opengl);
   duplicate_material (& tmp_material, & default_material);
   tmp_lightning.lights = default_lightning.lights;
   tmp_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, default_lightning.spot);
@@ -4468,7 +4605,7 @@ void prepare_tmp_default ()
   }
   for (i=0; i<5; i++)
   {
-    tmp_label[i] = g_malloc(sizeof*tmp_label[i]);
+    tmp_label[i] = g_malloc0(sizeof*tmp_label[i]);
     duplicate_screen_label (tmp_label[i], & default_label[i]);
   }
   for (i=0; i<2; i++)
@@ -4508,14 +4645,87 @@ gboolean * up_project;
 */
 G_MODULE_EXPORT void update_projects (GtkDialog * proj_sel, gint response_id, gpointer data)
 {
-  int i;
+  int i, j, k, l;
+  float * tmpcut;
+  gboolean update_bonds;
   switch (response_id)
   {
     case GTK_RESPONSE_OK:
       // To write apply to opened projects
       for (i=0; i<nprojects; i++)
       {
-        if (up_project[i]) apply_default_parameters_to_project (get_project_by_id(i));
+        if (up_project[i])
+        {
+          project * this_proj = get_project_by_id(i);
+          if (up_project[i+nprojects])
+          {
+            update_bonds = FALSE;
+            l =  this_proj -> nspec * this_proj -> nspec;
+            tmpcut = allocfloat(l);
+            l = 0;
+            for (j=0; j<this_proj -> nspec; j++)
+            {
+              for (k=0; k<this_proj -> nspec; k++, l++)
+              {
+                tmpcut[l] = this_proj -> chemistry -> cutoffs[j][k];
+              }
+            }
+            if (this_proj -> chemistry -> grtotcutoff != default_totcut) update_bonds = TRUE;
+          }
+          apply_default_parameters_to_project (this_proj, up_project[i+nprojects]);
+          if (up_project[i+nprojects])
+          {
+            if (! update_bonds)
+            {
+              l = 0;
+              for (j=0; j<this_proj -> nspec; j++)
+              {
+                for (k=0; k<this_proj -> nspec; k++, l++)
+                {
+                  if (this_proj -> chemistry -> cutoffs[j][k] != tmpcut[l]) update_bonds = TRUE;
+                }
+              }
+            }
+            if (update_bonds)
+            {
+              if (this_proj -> modelgl -> rings)
+              {
+                this_proj -> modelgl -> rings = FALSE;
+                for (j=0; j<5; j++)
+                {
+                  clean_rings_data (j, this_proj -> modelgl);
+#ifdef GTK3
+                  update_rings_menus (this_proj -> modelgl);
+#endif
+                }
+              }
+              if (this_proj -> modelgl -> chains)
+              {
+                clean_chains_data (this_proj -> modelgl);
+#ifdef GTK3
+                update_chains_menus (this_proj -> modelgl);
+#endif
+              }
+              bonds_update = 1;
+              frag_update = (this_proj -> natomes > ATOM_LIMIT) ? 0 : 1;
+              mol_update = (frag_update) ? ((this_proj -> steps > STEP_LIMIT) ? 0 : 1) : 0;
+              this_proj -> runc[0] = FALSE;
+              this_proj -> dmtx = FALSE;
+              if (this_proj -> id != activep)
+              {
+                k = activep;
+                active_project_changed (this_proj -> id);
+                on_calc_bonds_released (NULL, NULL);
+                active_project_changed (k);
+              }
+              else
+              {
+                update_project ();
+                on_calc_bonds_released (NULL, NULL);
+              }
+            }
+          }
+        }
       }
       break;
     default:
@@ -4570,7 +4780,7 @@ void save_preferences ()
     g_free (default_num_delta);
     default_num_delta = NULL;
   }
-  default_num_delta = duplicate_int (8, tmp_num_delta);
+  default_num_delta = duplicate_int (NUM_DELTA, tmp_num_delta);
   default_delta_t = duplicate_double (2, tmp_delta_t);
   if (default_rsparam)
   {
@@ -4589,7 +4799,12 @@ void save_preferences ()
     g_free (default_opengl);
     default_opengl = NULL;
   }
-  default_opengl = duplicate_int (4, tmp_opengl);
+  default_skt_sets = tmp_skt_sets;
+  default_skt_n_sets = tmp_skt_n_sets;
+  default_sqw_n_sets = tmp_sqw_n_sets;
+  default_sqw_freq = tmp_sqw_freq;
+
+  default_opengl = duplicate_int (5, tmp_opengl);
   duplicate_material (& default_material, & tmp_material);
   default_lightning.lights = tmp_lightning.lights;
   default_lightning.spot = copy_light_sources (tmp_lightning.lights, tmp_lightning.lights, tmp_lightning.spot);
@@ -4661,18 +4876,19 @@ void save_preferences ()
 
   if (nprojects)
   {
-    if (ask_yes_no("Apply to projet(s) in workspace ?", "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?", GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
+    if (ask_yes_no(_("Apply to project(s) in workspace ?"), _("Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?"), GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
      // Select project here
-     GtkWidget * proj_sel = message_dialogmodal ("Project selection", "Select to apply preferences", GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);
+     GtkWidget * proj_sel = message_dialogmodal (_("Project selection"), _("Select to apply preferences"), GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);
      GtkWidget * vbox = dialog_get_content_area (proj_sel);
      GtkWidget * hbox;
-     up_project = allocbool (nprojects);
+     up_project = allocbool (nprojects*2);
      for (i=0; i<nprojects; i++)
      {
        hbox = create_hbox (BSEP);
        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (get_project_by_id(i) -> name, 200, -1, FALSE, G_CALLBACK(toggled_select_project), GINT_TO_POINTER(i)), FALSE, FALSE, 40);
+       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Including analysis parameters and cutoffs ..."), -1, -1, FALSE, G_CALLBACK(toggled_select_project), GINT_TO_POINTER(i+nprojects)), FALSE, FALSE, 20);
      }
      run_this_gtk_dialog (proj_sel, G_CALLBACK(update_projects), NULL);
     }
@@ -4726,7 +4942,7 @@ void adjust_preferences_window ()
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
 
-  if (ask_yes_no("Restore default parameters", "Are you sure ?", GTK_MESSAGE_QUESTION, MainWindow))
+  if (ask_yes_no(_("Restore default parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, MainWindow))
   {
     set_atomes_defaults ();
     prepare_tmp_default ();
@@ -4735,10 +4951,10 @@ G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data
     {
       destroy_this_widget (gtk_notebook_get_nth_page (GTK_NOTEBOOK (preference_notebook), i));
     }
-    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new (_("Analysis ")));
     gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
-    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
-    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new (_("Model")));
+    gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new (_("View")));
     gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
     show_the_widgets (preference_notebook);
     adjust_preferences_window ();
@@ -4759,15 +4975,15 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
-      if (ask_yes_no("Save parameters", "Are you sure ?", GTK_MESSAGE_QUESTION, MainWindow))
+      if (ask_yes_no(_("Save parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, MainWindow))
       {
         save_preferences ();
-        gchar * str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
-        if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
+        gchar * str = g_strdup_printf (_("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"), ATOMES_CONFIG);
+        if (ask_yes_no(_("Save atomes preferences to file ?"), str, GTK_MESSAGE_QUESTION, (GtkWidget *)edit_prefs))
         {
           if (! save_preferences_to_xml_file ())
           {
-            show_error ((pref_error) ? pref_error : "Error while trying to save preferences to file", 0, MainWindow);
+            show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, MainWindow);
             g_free (pref_error);
             pref_error = NULL;
           }
@@ -4776,7 +4992,9 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       }
       break;
     default:
-      destroy_this_dialog (edit_prefs);
+      omega_max_info = destroy_this_widget (omega_max_info);
+      omega_max_hbox = destroy_this_widget (omega_max_hbox);
+      skt_all_info = destroy_this_widget (skt_all_info);
       preferences = FALSE;
       clean_all_tmp ();
       g_free (pref_pointer);
@@ -4789,7 +5007,9 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
       pref_axis_win = NULL;
       if (pref_gradient_win) g_free (pref_gradient_win);
       pref_gradient_win = NULL;
-      preference_notebook = NULL;
+      preference_notebook = destroy_this_widget (preference_notebook);
+      destroy_this_dialog ((GtkDialog *)edit_prefs);
+      edit_prefs = NULL;
       break;
   }
 }
@@ -4801,7 +5021,7 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
 */
 void create_user_preferences_dialog ()
 {
-  GtkWidget * win = dialog_cancel_apply ("User preferences", MainWindow, TRUE);
+  GtkWidget * win = dialog_cancel_apply (_("User preferences"), MainWindow, TRUE);
   preferences = TRUE;
   prepare_tmp_default ();
   GtkWidget * vbox = dialog_get_content_area (win);
@@ -4814,13 +5034,13 @@ void create_user_preferences_dialog ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, preference_notebook, FALSE, FALSE, 0);
 
   GtkWidget * gbox = create_vbox (BSEP);
-  gchar * mess[2] = {"Browse the following to modify the default configuration of <b>atomes</b>",
-                     "by replacing internal parameters by user defined preferences."};
-  gchar * mlist[4][2]= {{"Analysis", "calculation preferences"},
-                        {"OpenGL", "rendering preferences"},
-                        {"Model", "atom(s), bond(s) and box preferences"},
-                        {"View", "representation and projection preferences"}};
-  gchar * end = "Default parameters are used for any new project added to the workspace\n";
+  gchar * mess[2] = {i18n("Browse the following to modify the default configuration of <b>atomes</b>"),
+                     i18n("by replacing internal parameters by user defined preferences.")};
+  gchar * mlist[4][2]= {{i18n("Analysis "), i18n("calculation preferences")},
+                        {"OpenGL", i18n("rendering preferences")},
+                        {i18n("Model"), i18n("atom(s), bond(s) and box preferences")},
+                        {i18n("View"), i18n("representation and projection preferences")}};
+  gchar * end = i18n("Default parameters are used for any new project added to the workspace\n");
 
   pref_pointer = g_malloc0(NUM_COLORS*sizeof*pref_pointer);
   int i;
@@ -4835,15 +5055,15 @@ void create_user_preferences_dialog ()
 
   GtkWidget * hbox = create_hbox (BSEP);
   GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
-  GtkWidget * but_lab = markup_label ("Restore <b>atomes</b> default parameters", -1, -1, 0.5, 0.5);
+  GtkWidget * but_lab = markup_label (_("Restore <b>atomes</b> default parameters"), -1, -1, 0.5, 0.5);
   add_container_child (CONTAINER_BUT, but, but_lab);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 150);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
-  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new ("General"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new (_("General")));
 
-  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new ("Analysis"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new (_("Analysis ")));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), opengl_preferences(), gtk_label_new ("OpenGL"));
-  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new ("Model"));
+  gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), model_preferences(), gtk_label_new (_("Model")));
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), view_preferences(), gtk_label_new ("View"));
   show_the_widgets (preference_notebook);
   gtk_notebook_set_current_page (GTK_NOTEBOOK(preference_notebook), 0);
@@ -4861,10 +5081,10 @@ void create_user_preferences_dialog ()
 G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
 {
   tint * oid = (tint *)data;
-  gchar * pstring[5]={"rendering", "box", "axis", "backgorund", "representation"};
-  gchar * str = g_strdup_printf ("Set %s preferences as default preferences ?", pstring[oid -> b]);
+  gchar * pstring[5]={i18n("rendering"), i18n("box"), i18n("axis"), i18n("background"), i18n("representation")};
+  gchar * str = g_strdup_printf (_("Set %s preferences as default preferences ?"), _(pstring[oid -> b]));
   project * this_proj = get_project_by_id(oid -> a);
-  if (ask_yes_no("Set model preferences as default ?", str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
+  if (ask_yes_no(_("Set model preferences as default ?"), str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
   {
     g_free (str);
     image * img = this_proj -> modelgl -> anim -> last -> img;
@@ -4873,6 +5093,7 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
       case 0:
         // OpenGL preferences, style and color mpas not included : rendering only
         default_opengl[3] = img -> quality;
+        default_opengl[4] = img -> ray_tracing;
         duplicate_material (& default_material, & img -> m_terial);
         default_lightning.lights = img -> l_ghtning.lights;
         default_lightning.spot = copy_light_sources (img -> l_ghtning.lights, img -> l_ghtning.lights, img ->  l_ghtning.spot);
@@ -4903,12 +5124,12 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
         }
         break;
     }
-    str = g_strdup_printf ("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?", ATOMES_CONFIG);
-    if (ask_yes_no("Save atomes preferences to file ?", str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
+    str = g_strdup_printf (_("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"), ATOMES_CONFIG);
+    if (ask_yes_no(_("Save atomes preferences to file ?"), str, GTK_MESSAGE_QUESTION, this_proj -> modelgl -> win))
     {
       if (! save_preferences_to_xml_file ())
       {
-        show_error ((pref_error) ? pref_error : "Error while trying to save preferences to file", 0, MainWindow);
+        show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, MainWindow);
         g_free (pref_error);
         pref_error = NULL;
       }
@@ -4933,6 +5154,6 @@ void add_global_option (GtkWidget * vbox, tint * oid)
 {
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, FALSE, 0);
-  GtkWidget * but = create_button ("Set default", IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_default_options), oid);
+  GtkWidget * but = create_button (_("Set default"), IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(set_default_options), oid);
   add_box_child_end (hbox, but, FALSE, FALSE, 0);
 }

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cp2k_init.c
@@ -94,7 +94,7 @@ double default_cp2k_options[41] = {0.0, 86400.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 double default_vdw_cut[2] = {-2.00000000E+000, 1.05835442E+001};
 double default_cp2k_extra[3][4] = {{0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}, {-1.0, -1.0, 1.0, 0.0}};
 
-gchar * cp2k_unit[6]={"s", "Ry", "fs", "K", "a.u.", "steps"};
+gchar * cp2k_unit[6]={"s", "Ry", "fs", "K", "a.u.", i18n("steps")};
 
 int cp2k_default_num[12] = {7, 3, 3, 4, 3, 11, 8, 4, 10, 9, 4, 2};
 
@@ -114,90 +114,90 @@ gchar * cp2k_default_keywords[11][11] = {{"ENERGY", "ENERGY_FORCES", "GEOMETRY_O
 
 gchar * cp2k_vdw_keywords[2][3] = {{"DRSLL", "LMKLL", "RVV10"}, {"DFTD2", "DFTD3", "DFTD3(BJ)"}};
 
-gchar * cp2k_default_text[11][11] = {{"Single point energy calculation",
-                                      "Single point energy and forces calculation",
-                                      "Geometry optimization", "Molecular dynamics",
-                                      "Vibrational analysis", "Linear response calculation", "Ehrenfest dynamics", " ", " ", " ", " "},
-                                     {"Low", "Medium", "High", " ", " ", " ", " ", " ", " ", " ", " "},
-                                     {"Gaussian and plane waves method",
-                                      "Gaussian and augmented plane waves method",
-                                      "Gaussian and augmented plane waves method only for XC", " ", " ", " ", " ", " ", " ", " ", " "},
-                                     {"Generate an atomic density using the atomic code",
-                                      "Diagonalize the core Hamiltonian",
-                                      "Use random wave-function coefficients",
-                                      "Use the RESTART file", " ", " ", " ", " ", " ", " ", " "},
-                                     {"Broyden mixing approximating the inverse Hessian",
-                                      "Conjugate Gradients", "Direct inversion in the iterative subspace", " ", " ", " ", " ", " ", " ", " ", " "},
-                                     {"Becke + Lee-Yang-Parr", "Becke three-parameters hybrid + LYP", "Bayesian error estimation + van der Walls",
-                                      "Becke + Perdew", "Hamprecht-Cohen-Tozer-Handy", "Local Density Approximation", "Handy-Cohen + LYP", "Padé",
-                                      "Perdew + Burke-Ernzerhof", "Parameter-free PBE", "Tao-Perdew-Staroverov-Scuseria"},
-                                     {"3 dimensional (XYZ)", "2 dimensional (XY)", "2 dimensional (XZ)", "2 dimensional (YZ)",
-                                      "1 dimensional (X)", "1 dimensional (Y)", "1 dimensional (Z)", "Isolated system", " ", " ", " "},
-                                     {"Box parameters (a,b,c and α,β,γ)", "Lattice vectors", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                                     {"Cubic (a = b = c, α = β = γ = 90°)", "Hexagonal (a = b ≠ c, α = β = 90°, γ = 60°)",
-                                      "Orthorhombic (a ≠ b ≠ c, α = β = γ = 90°)", "Rhombohedral (a = b = c, α = β = γ ≠ 90°)",
-                                      "Tetragonal (a = b ≠ c, α = β = γ = 90°)", "Tetragonal (a = c ≠ b, α = β = γ = 90°)", "Tetragonal (a ≠ b = c, α = β = γ = 90°)",
-                                      "Monoclinic (a ≠ b ≠ c ≠ a, α = γ = 90°, β ≠ 90°)", "Triclinic (a ≠ b ≠ c ≠ a, α ≠ β ≠ γ ≠ α ≠ 90°)", "No cell symmetry", " "},
-                                     {"Constant kinetic energy", "Langevin dynamics (constant temperature)", "Constant pressure ensemble (no thermostat)",
-                                      "Constant pressure ensemble using an isotropic cell (no thermostat)", "Constant temperature and pressure using a flexible cell",
-                                      "Constant temperature and pressure using an isotropic cell", "Constant energy (µ-canonical)", "Constant temperature and volume (canonical)",
-                                      "Adiabatic dynamics in constant temperature and volume ensemble (CAFES)", " ", " "},
-                                     {"Diagonalization of a full Hessian matrix", "Conjugate gradients", " ", " ", " ", " ", " ", " ", " ", " ", " "}};
+gchar * cp2k_default_text[11][11] = {{i18n("Single Point Energy Calculation"),
+                                      i18n("Single Point Energy and Forces Calculation"),
+                                      i18n("Geometry Optimization"), i18n("Molecular Dynamics"),
+                                      i18n("Vibrational Analysis"), i18n("Linear Response Calculation"), i18n("Ehrenfest Dynamics"), " ", " ", " ", " "},
+                                     {i18n("Low"), i18n("Medium"), i18n("High"), " ", " ", " ", " ", " ", " ", " ", " "},
+                                     {i18n("Gaussian and Plane Waves Method"),
+                                      i18n("Gaussian and Augmented Plane Waves Method"),
+                                      i18n("Gaussian and Augmented Plane Waves Method Only for XC"), " ", " ", " ", " ", " ", " ", " ", " "},
+                                     {i18n("Generate an Atomic Density Using the Atomic Code"),
+                                      i18n("Diagonalize the Core Hamiltonian"),
+                                      i18n("Use Random Wave-function Coefficients"),
+                                      i18n("Use the RESTART File"), " ", " ", " ", " ", " ", " ", " "},
+                                     {i18n("Broyden Mixing Approximating the Inverse Hessian"),
+                                      i18n("Conjugate Gradients"), i18n("Direct Inversion in the Iterative Subspace"), " ", " ", " ", " ", " ", " ", " ", " "},
+                                     {"Becke + Lee-Yang-Parr", i18n("Becke Three-parameters Hybrid + LYP"), i18n("Bayesian Error Estimation + van der Walls"),
+                                      "Becke + Perdew", "Hamprecht-Cohen-Tozer-Handy", i18n("Local Density Approximation"), "Handy-Cohen + LYP", "Padé",
+                                      "Perdew + Burke-Ernzerhof", i18n("Parameter-free PBE"), "Tao-Perdew-Staroverov-Scuseria"},
+                                     {i18n("3 Dimensional (XYZ)"), i18n("2 Dimensional (XY)"), i18n("2 Dimensional (XZ)"), i18n("2 Dimensional (YZ)"),
+                                      i18n("1 Dimensional (X)"), i18n("1 Dimensional (Y)"), i18n("1 Dimensional (Z)"), i18n("Isolated System"), " ", " ", " "},
+                                     {i18n("Box Parameters (a,b,c and α,β,γ)"), i18n("Lattice Vectors"), " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                                     {i18n("Cubic (a = b = c, α = β = γ = 90°)"), i18n("Hexagonal (a = b ≠ c, α = β = 90°, γ = 60°)"),
+                                      i18n("Orthorhombic (a ≠ b ≠ c, α = β = γ = 90°)"), i18n("Rhombohedral (a = b = c, α = β = γ ≠ 90°)"),
+                                      i18n("Tetragonal (a = b ≠ c, α = β = γ = 90°)"), i18n("Tetragonal (a = c ≠ b, α = β = γ = 90°)"), i18n("Tetragonal (a ≠ b = c, α = β = γ = 90°)"),
+                                      i18n("Monoclinic (a ≠ b ≠ c ≠ a, α = γ = 90°, β ≠ 90°)"), i18n("Triclinic (a ≠ b ≠ c ≠ a, α ≠ β ≠ γ ≠ α ≠ 90°)"), i18n("No Cell Symmetry"), " "},
+                                     {i18n("Constant kinetic energy"), i18n("Langevin dynamics (constant temperature)"), i18n("Constant pressure ensemble (no thermostat)"),
+                                      i18n("Constant pressure ensemble using an isotropic cell (no thermostat)"), i18n("Constant temperature and pressure using a flexible cell"),
+                                      i18n("Constant temperature and pressure using an isotropic cell"), i18n("Constant energy (µ-canonical)"), i18n("Constant temperature and volume (canonical)"),
+                                      i18n("Adiabatic dynamics in constant temperature and volume ensemble (CAFES)"), " ", " "},
+                                     {i18n("Diagonalization of a full Hessian matrix"), i18n("Conjugate gradients"), " ", " ", " ", " ", " ", " ", " ", " ", " "}};
 
-gchar * cp2k_vdw_text[2][3] = {{"Dion-Rydberg-Schroeder-Langreth-Lundqvist non-local van der Waals density functional",
-                                "Lee-Murray-Kong-Lundqvist-Langreth non-local van der Waals density functional",
-                                "Revised Vydrov-van Voorhis non-local van der Waals density functional"},
-                               {"Grimme D2 method", "Grimme D3 method (zero damping)", "Grimme D3 method (Becke-Johnson damping)"}};
+gchar * cp2k_vdw_text[2][3] = {{i18n("Dion-Rydberg-Schroeder-Langreth-Lundqvist non-local van der Waals density functional"),
+                                i18n("Lee-Murray-Kong-Lundqvist-Langreth non-local van der Waals density functional"),
+                                i18n("Revised Vydrov-van Voorhis non-local van der Waals density functional")},
+                               {i18n("Grimme D2 method"), i18n("Grimme D3 method (zero damping)"), i18n("Grimme D3 method (Becke-Johnson damping)")}};
 
 int var_by_cp2sections[4] = {8, 20, 3, 10};
-gchar * global_opts[40] = {"Run type:",
-                           "Max CPU time:",
-                           "Print level:",
-                           "Use restart information:",
-                           "File that contains the restart information:",
-                           "File that contains the basis set(s):",
-                           "File that contains the pseudo-potential(s):",
-                           "File that contains the wave-function:",
-                           "Charge:",
-                           "Density cutoff for the finest grid level:",
-                           "Number of multi-grids:",
-                           "Quickstep method:",
-                           "Initial guess for the wave-function:",
-                           "Maximum inner-SCF cycle(s):",
-                           "Convergence threshold:",
-                           "Maximum outer-SCF cycle(s):",
-                           "Convergence threshold:",
-                           "Orbital transformation minimizer:",
-                           "DFT functional:",
-                           "Spin unrestricted calculation",
-                           "Multiplicity",
-                           "Use van der Waals interactions",
-                           "Restricted Open Kohn-Sham 'ROKS'",
-                           "Forces",
-                           "Stress tensor",
-                           "Mulliken population",
-                           "Löwdin population",
-                           "Orbitals",
-                           "Periodicity:",
-                           "Lattice parameters:",
-                           "Symmetry:",
-                           "Ensemble:",
-                           "Maximum number of MD steps:",
-                           "MD time step:",
-                           "Initial temperature:",
-                           "Geometry optimizer:",
-                           "Maximum number of optimization steps:",
-                           "Atomic forces convergence criterion:",
-                           "Save information every:",
-                           "Add constraint(s)"};
+gchar * global_opts[40] = {i18n("Run type:"),
+                           i18n("Max CPU time:"),
+                           i18n("Print level:"),
+                           i18n("Use restart information:"),
+                           i18n("File that contains the restart information:"),
+                           i18n("File that contains the basis set(s):"),
+                           i18n("File that contains the pseudo-potential(s):"),
+                           i18n("File that contains the wave-function:"),
+                           i18n("Charge:"),
+                           i18n("Density cutoff for the finest grid level:"),
+                           i18n("Number of multi-grids:"),
+                           i18n("Quickstep method:"),
+                           i18n("Initial guess for the wave-function:"),
+                           i18n("Maximum inner-SCF cycle(s):"),
+                           i18n("Convergence threshold:"),
+                           i18n("Maximum outer-SCF cycle(s):"),
+                           i18n("Convergence threshold:"),
+                           i18n("Orbital transformation minimizer:"),
+                           i18n("DFT functional:"),
+                           i18n("Spin unrestricted calculation"),
+                           i18n("Multiplicity"),
+                           i18n("Use van der Waals interactions"),
+                           i18n("Restricted Open Kohn-Sham 'ROKS'"),
+                           i18n("Forces"),
+                           i18n("Stress tensor"),
+                           i18n("Mulliken population"),
+                           i18n("Löwdin population"),
+                           i18n("Orbitals"),
+                           i18n("Periodicity:"),
+                           i18n("Lattice parameters:"),
+                           i18n("Symmetry:"),
+                           i18n("Ensemble:"),
+                           i18n("Maximum number of MD steps:"),
+                           i18n("MD time step:"),
+                           i18n("Initial temperature:"),
+                           i18n("Geometry optimizer:"),
+                           i18n("Maximum number of optimization steps:"),
+                           i18n("Atomic forces convergence criterion:"),
+                           i18n("Save information every:"),
+                           i18n("Add constraint(s)")};
 
-gchar * cpelemts[7] = {"The CP2K input structure",
-                       "provides the general control parameters for the calculation to be performed",
-                       "describes how the interatomic forces will be evaluated",
-                       "describes the model: symmetry, periodicity and atomic species, pseudo-potentials and coordinates",
-                       "describes the displacement of the atoms for molecular dynamics of geometry optimization",
-                       "To describe the thermostat(s) for molecular dynamics",
-                       "To describe the parameters required for restart"};
+gchar * cpelemts[7] = {i18n("The CP2K input structure"),
+                       i18n("provides the general control parameters for the calculation to be performed"),
+                       i18n("describes how the interatomic forces will be evaluated"),
+                       i18n("describes the model: symmetry, periodicity and atomic species, pseudo-potentials and coordinates"),
+                       i18n("describes the displacement of the atoms for molecular dynamics and geometry optimization"),
+                       i18n("To describe the thermostat(s) for molecular dynamics"),
+                       i18n("To describe the parameters required for restart")};
 
 gchar * cpsect[4] = {"GLOBAL",
                      "FORCE_EVAL",
@@ -360,7 +360,7 @@ GtkWidget * create_vdw_box (int id)
 {
   GtkWidget * vbox, * hbox;
   GtkWidget * widg;
-  gchar * cp2k_vdw_vars[2] = {"Type of potential:", "Cutoff:"};
+  gchar * cp2k_vdw_vars[2] = {i18n("Type of potential:"), i18n("Cutoff:")};
   int i, j, k;
   vbox = create_vbox(5);
   i = (id == 0) ? 2 : 3;
@@ -368,12 +368,12 @@ GtkWidget * create_vdw_box (int id)
   {
     hbox = create_hbox(5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
-    if (j < 2) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cp2k_vdw_vars[j], 150, -1, 0.0, 0.5), FALSE, FALSE, 30);
+    if (j < 2) add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(cp2k_vdw_vars[j]), 150, -1, 0.0, 0.5), FALSE, FALSE, 30);
     switch (j)
     {
       case 0:
         widg = create_combo ();
-        for (k=0; k<3; k++) combo_text_append (widg, cp2k_vdw_text[id][k]);
+        for (k=0; k<3; k++) combo_text_append (widg, _(cp2k_vdw_text[id][k]));
         combo_set_active (widg, (int)tmp_cp2k -> extra_opts[0][j+1]);
         g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_option_box), GINT_TO_POINTER(CP2VDW+1));
         break;
@@ -383,7 +383,7 @@ GtkWidget * create_vdw_box (int id)
         update_entry_double (GTK_ENTRY(widg), tmp_cp2k -> extra_opts[0][j+1]);
         break;
       case 2:
-        widg = check_button ("Apply long range corrections", -1, -1, tmp_cp2k -> extra_opts[0][j+1],
+        widg = check_button (_("Apply long range corrections"), -1, -1, tmp_cp2k -> extra_opts[0][j+1],
                              G_CALLBACK(update_cp2k_option_check), GINT_TO_POINTER(0));
         break;
      }
@@ -467,11 +467,10 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
   i = GPOINTER_TO_INT(data);
   GtkWidget * vbox, * hbox;
   GtkWidget * widg;
-  gchar * cp2k_vdw_options[2] = {"Non-local potential", "Pair potential"};
-  gchar * cp2k_roks_options[2] = {"Energy scaling:", "Spin configuration <sup>*</sup>:"};
-  gchar * cp2k_orb_options[2] = {"Number of HOMO levels (-1 for all):", "Number of LUMO levels (-1 for all):"};
+  gchar * cp2k_roks_options[2] = {i18n("Energy scaling:"), i18n("Spin configuration <sup>*</sup>:")};
+  gchar * cp2k_orb_options[2] = {i18n("Number of HOMO levels (-1 for all):"), i18n("Number of LUMO levels (-1 for all):")};
 
-  gchar * str = g_strdup_printf ("%s - options", global_opts[i]);
+  gchar * str = g_strdup_printf (_("%s - options"), i18n(global_opts[i]));
   GtkWidget * dial = dialogmodal (str, GTK_WINDOW(qm_assistant));
   g_free (str);
   vbox = dialog_get_content_area (dial);
@@ -481,10 +480,11 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
       hbox = create_hbox (5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
       widg = create_combo ();
-      for (j=0; j<2; j++)  combo_text_append (widg, cp2k_vdw_options[j]);
+      combo_text_append (widg, _("Non-local potential"));
+      combo_text_append (widg, _("Pair potential"));
       combo_set_active (widg, (int)tmp_cp2k -> extra_opts[0][0]);
       g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_option_box), GINT_TO_POINTER(CP2VDW));
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Type of functional for the van der Waals interactions", 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Type of functional for the van der Waals interactions"), 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 5);
       cp2k_vdw_box[0] = create_vbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cp2k_vdw_box[0], FALSE, FALSE, 10);
@@ -496,7 +496,7 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
       {
         hbox = create_hbox (5);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cp2k_roks_options[j], 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(cp2k_roks_options[j]), 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
         if (j==0)
         {
           widg = create_entry (G_CALLBACK(update_cp2k_option), 100, 15, FALSE, GINT_TO_POINTER(i+j));
@@ -513,19 +513,19 @@ G_MODULE_EXPORT void cp2k_option_dialog (GtkWidget *but, gpointer data)
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 10);
         }
       }
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new ("* for the singly occupied orbitals"), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (_("* for the singly occupied orbitals")), FALSE, FALSE, 5);
       break;
     case CP2POR:
       for (j=0; j<2; j++)
       {
         hbox = create_hbox (5);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(cp2k_orb_options[j], 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(cp2k_orb_options[j]), 250, -1, 0.0, 0.5), FALSE, FALSE, 5);
         widg = create_entry (G_CALLBACK(update_cp2k_option), 100, 15, FALSE, GINT_TO_POINTER(i+j));
         update_entry_int (GTK_ENTRY(widg), tmp_cp2k -> extra_opts[2][j]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
       }
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button ("Write cube files, if not then only print eigenvalues", -1, -1, tmp_cp2k -> extra_opts[2][2],
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, check_button (_("Write cube files, if not then only print eigenvalues"), -1, -1, tmp_cp2k -> extra_opts[2][2],
                                                         G_CALLBACK(update_cp2k_option_check), GINT_TO_POINTER(2)), FALSE, FALSE, 5);
       break;
     case CP2CON:
@@ -671,20 +671,20 @@ G_MODULE_EXPORT void cp2k_file_info (GtkTextBuffer * textbuf, gpointer data)
 */
 GtkWidget * create_cp2k_spec_box (int spec)
 {
-  gchar * info[2] = {"<b>-</b> Select and use set of parameters from the database: ",
-                     "<b>-</b> Define and use other set of parameters: "};
-  gchar * data_name[2][2] = {{"\t\tAvailable basis set for ", "\t\tAvailable pseudo-potential for "},
-                             {"\t\tBasis set for ", "\t\tPseudo-potential for "}};
+  gchar * info[2] = {i18n("<b>-</b> Select and use set of parameters from the database: "),
+                     i18n("<b>-</b> Define and use other set of parameters: ")};
+  gchar * data_name[2][2] = {{i18n("\t\tAvailable basis set for "), i18n("\t\tAvailable pseudo-potential for ")},
+                             {i18n("\t\tBasis set for "), i18n("\t\tPseudo-potential for ")}};
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   gchar * str;
   int i, j;
   for (i=0; i<2; i++)
   {
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(info[i], -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_(info[i]), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
     for (j=0; j<2; j++)
     {
-      str = g_strdup_printf ("%s%s", data_name[i][j], qm_proj -> chemistry -> label[spec]);
+      str = g_strdup_printf ("%s%s", _(data_name[i][j]), qm_proj -> chemistry -> label[spec]);
       hbox = cpmd_box (vbox, str, 5, 5, 300);
       g_free (str);
       if (i==0)
@@ -697,14 +697,15 @@ GtkWidget * create_cp2k_spec_box (int spec)
         }
         else
         {
-          add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>None</b>", -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+          str = g_strdup_printf ("<b>%s</b>", _("None"));
+          add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 5);
+          g_free (str);
         }
       }
       else
       {
          add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_text_view (350, -1, 1, 0, G_CALLBACK(cp2k_file_info),
-                                                               GINT_TO_POINTER(j+10), tmp_cp2k -> spec_files[spec][j]),
-                             FALSE, FALSE, 5);
+                                                          GINT_TO_POINTER(j+10), tmp_cp2k -> spec_files[spec][j]), FALSE, FALSE, 5);
       }
     }
   }
@@ -798,7 +799,7 @@ void cp2k_option_box (GtkWidget * box, int id)
   if (id != CP2SPI)
   {
    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, option_box[optionb],
-                        create_button ("Options", IMG_STOCK, DPROPERTIES, 200, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cp2k_option_dialog), GINT_TO_POINTER(id)),
+                        create_button (_("Options"), IMG_STOCK, DPROPERTIES, 200, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cp2k_option_dialog), GINT_TO_POINTER(id)),
                         FALSE, FALSE, 50);
   }
   widget_set_sensitive (option_box[optionb], (int)tmp_cp2k -> opts[id]);
@@ -827,46 +828,46 @@ GtkWidget * cp2k_section_box (int s)
       {
         cp2k_thermo_box = thermo_box();
         add_box_child_start (GTK_ORIENTATION_VERTICAL, motion_box[motionb], cp2k_thermo_box, FALSE, FALSE, 5);
-        hbox = cpmd_box (motion_box[motionb], global_opts[idopt], 5, 5, 300);
+        hbox = cpmd_box (motion_box[motionb], _(global_opts[idopt]), 5, 5, 300);
       }
       else if (j == CP2FRE || j == CP2FWV)
       {
         checkb ++;
-        checked_box[checkb] = cpmd_box (vbox, global_opts[idopt], 5, 5, 300);
+        checked_box[checkb] = cpmd_box (vbox, _(global_opts[idopt]), 5, 5, 300);
       }
       else if (j == CP2SPM)
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, option_box[optionb], markup_label(global_opts[idopt], 100, 30, 0.0, 0.5), FALSE, FALSE, 50);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, option_box[optionb], markup_label(_(global_opts[idopt]), 100, 30, 0.0, 0.5), FALSE, FALSE, 50);
       }
       else if (j == CP2PFO || j == CP2PLO)
       {
-        if (j == CP2PFO) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<u>Print:</u>", -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+        if (j == CP2PFO) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<u>Print:</u>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
         print_box = create_hbox (0);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, print_box, FALSE, FALSE, 0);
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, print_box, markup_label(global_opts[idopt], 150, 30, 0.0, 0.5), FALSE, FALSE, 50);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, print_box, markup_label(_(global_opts[idopt]), 150, 30, 0.0, 0.5), FALSE, FALSE, 50);
       }
       else if (j > CP2ROK && j < CP2PBC)
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, print_box, markup_label(global_opts[idopt], 150, 30, 0.0, 0.5), FALSE, FALSE, 50);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, print_box, markup_label(_(global_opts[idopt]), 150, 30, 0.0, 0.5), FALSE, FALSE, 50);
       }
       else if (j == CP2ENS || j == CP2GMI)
       {
         motionb ++;
         motion_box[motionb] = create_vbox (BSEP);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, motion_box[motionb], FALSE, FALSE, 5);
-        hbox = cpmd_box (motion_box[motionb], global_opts[idopt], 5, 5, 300);
+        hbox = cpmd_box (motion_box[motionb], _(global_opts[idopt]), 5, 5, 300);
       }
       else if (j > CP2ENS && j < CP2OUF)
       {
-        hbox = cpmd_box (motion_box[motionb], global_opts[idopt], 5, 5, 300);
+        hbox = cpmd_box (motion_box[motionb], _(global_opts[idopt]), 5, 5, 300);
       }
       else if (j == CP2SCN || j == CP2SCO)
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(global_opts[idopt], 150, 30, 0.0, 0.5), FALSE, FALSE, 30);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(global_opts[idopt]), 150, 30, 0.0, 0.5), FALSE, FALSE, 30);
       }
       else
       {
-        hbox = cpmd_box (vbox, global_opts[idopt], 5, 5, 300);
+        hbox = cpmd_box (vbox, _(global_opts[idopt]), 5, 5, 300);
       }
       switch (cp2k_opts_type[s][i])
       {
@@ -885,7 +886,17 @@ GtkWidget * cp2k_section_box (int s)
         case 2:
           icomb ++;
           widg = create_combo ();
-          for (k=0; k<cp2k_default_num[icomb]; k++) combo_text_append (widg, cp2k_default_text[icomb][k]);
+          for (k=0; k<cp2k_default_num[icomb]; k++)
+          {
+            if (icomb == 5 && (k == 0 || k == 3 || k == 4 || k == 6 || k == 7 || k == 8 || k == 10))
+            {
+              combo_text_append (widg, cp2k_default_text[icomb][k]);
+            }
+            else
+            {
+              combo_text_append (widg, _(cp2k_default_text[icomb][k]));
+            }
+          }
           combo_set_active (widg, (int)tmp_cp2k -> opts[j]);
           g_signal_connect (G_OBJECT (widg), "changed", G_CALLBACK(changed_cp2k_box), GINT_TO_POINTER(j));
           break;
@@ -921,24 +932,24 @@ GtkWidget * cp2k_section_box (int s)
       if (j==CP2KTI || j==CP2CUT || j==CP2DLT || j==CP2TMP || j==CP2GEF || j==CP2OUF)
       {
         idunit ++;
-        widg = gtk_label_new (cp2k_unit[idunit]);
+        widg = gtk_label_new ((idunit == 5) ? _(cp2k_unit[idunit]) : cp2k_unit[idunit]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 5);
       }
 
       if (idopt == CP2SYM)
       {
-        gchar * str = g_strdup_printf (" %s provides official CP2K atomic basis sets and pseudo-potentials, are included:", PACKAGE);
+        gchar * str = g_strdup_printf (_(" %s provides official CP2K atomic basis sets and pseudo-potentials, are included:"), PACKAGE);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
         g_free (str);
-        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<sup><tt>\t   - BASIS_MOLOPT\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
-                                                         "<sup><tt>\t   - GTH_BASIS_SETS\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
-                                                         "<sup><tt>\t   - BASIS_SET\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
-                                                         "<sup><tt>\t   - POTENTIAL\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>",
-                                                         -1, -1, 0.1, 0.5), FALSE, FALSE, 0);
-        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(" Following your selection the files that contains the parameters for your calculation will be generated automatically.\n"
-                                                         " Alternatively it is possible to define and use your own set of parameters.",
-                                                         -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
-        hbox = cpmd_box (vbox, "\t\t\t\tChemical species", 20, 5, 300);
+        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
+                             markup_label(_("<sup><tt>\t   - BASIS_MOLOPT\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
+                                            "<sup><tt>\t   - GTH_BASIS_SETS\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
+                                            "<sup><tt>\t   - BASIS_SET\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
+                                            "<sup><tt>\t   - POTENTIAL\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>"),  -1, -1, 0.1, 0.5), FALSE, FALSE, 0);
+        add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
+                             markup_label(_(" Following your selection the files that contains the parameters for your calculation will be generated automatically.\n"
+                                            " Alternatively it is possible to define and use your own set of parameters."), -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
+        hbox = cpmd_box (vbox, _("\t\t\t\tChemical species"), 20, 5, 300);
         cp2k_spec_combo = create_combo ();
         for (k=0; k<qm_proj -> nspec; k++) combo_text_append (cp2k_spec_combo, qm_proj -> chemistry -> label[k]);
         combo_set_active (cp2k_spec_combo, 0);
@@ -965,7 +976,7 @@ gchar * cp_section_name (int p)
 {
   if (p < 4)
   {
-    return g_strdup_printf ("Details of the <b>%s</b> section that %s", cpsect[p], cpelemts[p+1]);
+    return g_strdup_printf (_("Details of the <b>%s</b> section that %s"), cpsect[p], cpelemts[p+1]);
   }
   else
   {
@@ -999,7 +1010,11 @@ GtkWidget * vbox_cp2k (int s)
 */
 G_MODULE_EXPORT void select_input_type (GtkToggleButton * but, gpointer data)
 {
+#ifdef GTK4
   tmp_cp2k -> input_type = GPOINTER_TO_INT (data);
+#else
+  tmp_cp2k -> input_type = ! tmp_cp2k -> input_type;
+#endif
   widget_set_sensitive (fileinf[! tmp_cp2k -> input_type], FALSE);
   widget_set_sensitive (fileinf[tmp_cp2k -> input_type], TRUE);
   print_start_buffer ();
@@ -1015,7 +1030,8 @@ G_MODULE_EXPORT void select_input_type (GtkToggleButton * but, gpointer data)
 GtkWidget * file_info (int id)
 {
   GtkWidget * main_box;
-  gchar * filename[4] = {"CP2K main input file '*.inp'", "forces.inc", "system.inc", "motion.inc"};
+  gchar * filename[4] = {i18n("CP2K main input file '*.inp'"),
+                         "forces.inc", "system.inc", "motion.inc"};
   gchar * filetext[4] = {"<b>&amp;GLOBAL</b>\n...\n<b>&amp;END GLOBAL</b>\n\n<b>@INCLUDE</b> 'forces.inc'\n\n<b>@INCLUDE</b> 'motion.inc'",
                          "<b>&amp;FORCE_EVAL</b>\n...\n<b>@INCLUDE</b> 'system.inc'\n<b>&amp;END FORCE_EVAL</b>",
                          "<b>&amp;SUBSYS</b>\n...\n<b>&amp;END SUBSYS</b>",
@@ -1027,7 +1043,7 @@ GtkWidget * file_info (int id)
     main_box = create_vbox (BSEP);
     hbx = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, stock_image(AFILE), FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, gtk_label_new ("CP2K input file '*.inp'"), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, gtk_label_new (_("CP2K input file '*.inp'")), FALSE, FALSE, 5);
     vframe = gtk_frame_new (NULL);
     gtk_frame_set_label_widget (GTK_FRAME(vframe), hbx);
 #ifdef GTK3
@@ -1036,7 +1052,7 @@ GtkWidget * file_info (int id)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, main_box, vframe, FALSE, FALSE, 10);
     vbox = create_vbox (BSEP);
     add_container_child (CONTAINER_FRA, vframe, vbox);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("! Information", 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("! Information"), 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>&amp;GLOBAL</b>\n...\n<b>&amp;END GLOBAL</b>", 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("<b>&amp;FORCE_EVAL</b>\n...", 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
     hbx  = create_hbox (0);
@@ -1055,7 +1071,7 @@ GtkWidget * file_info (int id)
     {
       hbx = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, stock_image(AFILE), FALSE, FALSE, 5);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, gtk_label_new (filename[i]), FALSE, FALSE, 5);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, gtk_label_new ((! i) ? _(filename[i]) : filename[i]), FALSE, FALSE, 5);
       vframe = gtk_frame_new (NULL);
       gtk_frame_set_label_widget (GTK_FRAME(vframe), hbx);
 #ifdef GTK3
@@ -1063,7 +1079,7 @@ GtkWidget * file_info (int id)
 #endif
       vbx = create_vbox (BSEP);
       add_container_child (CONTAINER_FRA, vframe, vbx);
-      if (i == 0) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, markup_label("! Information", 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
+      if (i == 0) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, markup_label(_("! Information"), 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, markup_label(filetext[i], 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vframe, FALSE, FALSE, 5);
       if (i == 0)
@@ -1085,13 +1101,13 @@ GtkWidget * file_info (int id)
 GtkWidget * init_cp2k ()
 {
   GtkWidget * vbox = create_vbox (BSEP);
-  gchar * text = "The CP2K input system offers to have the information gathered in a single, rather long, file\n"
-                 "or separated in several files each of them dedicated to a particular section of the input: ";
+  gchar * text = _("The CP2K input system offers to have the information gathered in a single, rather long, file\n"
+                   "or separated in several files each of them dedicated to a particular section of the input: ");
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_label_new (text), FALSE, FALSE, 20);
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   GtkWidget * hbx;
-  gchar * ftext[2] = {"Single input file", "Multiple files"};
+  gchar * ftext[2] = {i18n("Single input file"), i18n("Multiple files")};
   int i, j;
   j = tmp_cp2k -> input_type;
   for (i=0; i<2; i++)
@@ -1105,16 +1121,16 @@ GtkWidget * init_cp2k ()
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vfbox[i], hbx, FALSE, FALSE, 0);
 
 #ifdef GTK4
-    filebut[i] = check_button (ftext[i], -1, -1, (i != j) ? FALSE : TRUE, G_CALLBACK(select_input_type), GINT_TO_POINTER(i));
+    filebut[i] = check_button (_(ftext[i]), -1, -1, (i != j) ? FALSE : TRUE, G_CALLBACK(select_input_type), GINT_TO_POINTER(i));
     if (i) gtk_check_button_set_group ((GtkCheckButton *)filebut[i], (GtkCheckButton *)filebut[0]);
 #else
     if (! i)
     {
-      filebut[i] = radio_button (ftext[i], -1, -1, (i != j) ? FALSE : TRUE, G_CALLBACK(select_input_type), GINT_TO_POINTER(i));
+      filebut[i] = radio_button (_(ftext[i]), -1, -1, (i != j) ? FALSE : TRUE, G_CALLBACK(select_input_type), NULL);
     }
     else
     {
-      filebut[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(filebut[0]), ftext[i]);
+      filebut[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(filebut[0]), _(ftext[i]));
     }
 #endif
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, filebut[i], FALSE, FALSE, (i==0) ? 50 : 120);
@@ -1137,19 +1153,19 @@ gchar * page_name_cp2k (int p)
 {
   if (p == 0)
   {
-    return g_strdup_printf ("The CP2K input structure");
+    return g_strdup_printf (_("The CP2K input structure"));
   }
   else if (p < 5)
   {
-    return g_strdup_printf ("The %s section", cpsect[p-1]);
+    return g_strdup_printf (_("The %s section"), cpsect[p-1]);
   }
   else if (p == 5)
   {
-    return g_strdup_printf ("The MOTION section - thermostat(s)");
+    return g_strdup_printf (_("The MOTION section - thermostat(s)"));
   }
   else
   {
-    return g_strdup_printf ("The MOTION section - restart(s)");
+    return g_strdup_printf (_("The MOTION section - restart(s)"));
   }
 }
 
@@ -1160,12 +1176,13 @@ gchar * page_name_cp2k (int p)
 */
 gboolean cp2k_with_motion ()
 {
-  if (GTK_IS_WIDGET(motion_box[0])) hide_the_widgets (motion_box[0]);
-  if (GTK_IS_WIDGET(motion_box[1])) hide_the_widgets (motion_box[1]);
+  int i;
+  for (i=0; i<2; i++) hide_the_widgets (motion_box[i]);
+  hide_the_widgets (motion_box[1]);
   if (tmp_cp2k -> opts[CP2RUN] == 2.0 || tmp_cp2k -> opts[CP2RUN] == 3.0 || tmp_cp2k -> opts[CP2RUN] == 6.0)
   {
-    int i = (tmp_cp2k -> opts[CP2RUN] == 2.0) ? 1 : 0;
-    if (GTK_IS_WIDGET(motion_box[i])) show_the_widgets (motion_box[i]);
+    i = (tmp_cp2k -> opts[CP2RUN] == 2.0) ? 1 : 0;
+    show_the_widgets (motion_box[i]);
     return TRUE;
   }
   else
@@ -1208,12 +1225,12 @@ void add_cp2k_pages ()
     gtk_assistant_set_page_complete (assist, page, TRUE);
   }
   GtkWidget * conclu = create_vbox (BSEP);
-  info = g_strdup_printf ("<b>   Finalize the creation of the CP2K input files now !</b>");
+  info = g_strdup_printf (_("<b>   Finalize the creation of the CP2K input files now !</b>"));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label(info, -1, -1, 0.5, 0.5), TRUE, TRUE, 100);
   g_free (info);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label(_("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   gtk_assistant_append_page (assist, conclu);
-  gtk_assistant_set_page_title (assist, conclu, "Create the input files now !");
+  gtk_assistant_set_page_title (assist, conclu, _("Create the input files now !"));
   gtk_assistant_set_page_type (assist, conclu, GTK_ASSISTANT_PAGE_CONFIRM);
   gtk_assistant_set_page_complete (assist, conclu, TRUE);
   gtk_assistant_update_buttons_state (assist);

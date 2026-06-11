@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file draw.c
@@ -41,24 +41,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 /*!
   \fn void draw_curve (cairo_t * cr,
-                    int cid,
-                    int rid,
-                    project * this_proj,
-                    int points,
-                    ColRGBA withcolor,
-                    int xscale,
-                    int yscale,
-                    int asp,
-                    int vdash,
-                    double thick,
-                    int glyp,
-                    double gize,
-                    int freq,
-                    double hwidth,
-                    double hopac,
-                    int hpos,
-                   int extra,
-                    int pid)
+                      int cid,
+                      int rid,
+                      project * this_proj,
+                      int points,
+                      ColRGBA withcolor,
+                      int xscale,
+                      int yscale,
+                      int asp,
+                      int vdash,
+                      double thick,
+                      int glyp,
+                      double gize,
+                      int freq,
+                      double hwidth,
+                      double hopac,
+                      int hpos,
+                      int extra,
+                      int pid)
 
   \brief draw target curve to the cairo drawing context
 
@@ -111,27 +111,28 @@ void draw_curve (cairo_t * cr,
   gboolean plot;
   gboolean dglyp;
   curve_dash * dasht;
+  Curve * this_curve = this_proj -> analysis[rid] -> curves[cid];
 
   plotdata = allocddouble (points, 2);
   for ( i=0 ; i < points; i++ )
   {
     if (xscale == 0)
     {
-      plotdata[i][0] = x_min + XDRAW * (this_proj -> curves[rid][cid] -> data[0][i] - cxy[0])/ xmax;
+      plotdata[i][0] = x_min + XDRAW * (this_curve -> data[0][i] - cxy[0]) / xmax;
     }
     else
     {
-      x = (i+1) * this_proj -> num_delta[rid] * this_proj -> delta[rid] * pow(10, dxlog);
+      x = (i+1) * this_proj -> analysis[rid] -> num_delta * this_proj -> analysis[rid] -> delta * pow(10, dxlog);
       x = log(x) / log(pow(10, xlog));
       plotdata[i][0] = x_min + XDRAW * x;
     }
     if (yscale == 0)
     {
-      plotdata[i][1] = y_min + YDRAW * (this_proj -> curves[rid][cid] -> data[1][i] - cxy[1]) / ymax;
+      plotdata[i][1] = y_min + YDRAW * (this_curve -> data[1][i] - cxy[1]) / ymax;
     }
     else
     {
-      y = this_proj -> curves[rid][cid] -> data[1][i] * pow(10, dylog);
+      y = this_curve -> data[1][i] * pow(10, dylog);
       y = log(y) / log(pow(10, ylog));
       plotdata[i][1] = y_min + YDRAW * y;
     }
@@ -158,7 +159,7 @@ void draw_curve (cairo_t * cr,
   {
     j = 0;
     k = 1;
-    if (rid == RI) j = 2;
+    if (rid == RIN) j = 2;
     for ( i = j ; i < points - k ; i ++)
     {
       plot = TRUE;
@@ -247,11 +248,11 @@ void draw_curve (cairo_t * cr,
   {
     j = 0;
     k = 1;
-    if (rid == RI) j = 2;
+    if (rid == RIN) j = 2;
     // g_debug ("x_min= %f, x_max= %f, y_min= %f, y_max= %f", x_min, x_max, y_min, y_max);
     for ( i = j ; i < points ; i ++)
     {
-      if (this_proj -> curves[rid][cid] -> data[1][i] != 0.0)
+      if (this_curve -> data[1][i] != 0.0)
       {
         if (plotdata[i][0] >= x_min && plotdata[i][0] <= x_max)
         {

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initc.c
@@ -34,6 +34,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void alloc_curves (int rid);
   void initcwidgets ();
   void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
+  void alloc_analysis_curves (int pid, atomes_analysis * this_analysis);
+  void init_atomes_analysis (project * this_proj, gboolean apply_defaults);
+  void initialize_this_analysis (project * this_proj, int ana);
+
+  atomes_analysis * setup_analysis (gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title);
 
 */
 
@@ -42,6 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 
 extern void clean_this_curve_window (int cid, int rid);
+extern void apply_analysis_default_parameters_to_project (project * this_proj);
 
 /*!
   \fn void clean_curves_data (int calc, int start, int end)
@@ -55,88 +61,15 @@ extern void clean_this_curve_window (int cid, int rid);
 void clean_curves_data (int calc, int start, int end)
 {
   int i;
-  for (i=start; i<end; i++)
+  if (active_project -> analysis[calc])
   {
-    if (active_project -> curves[calc])
+    if (active_project -> analysis[calc] -> curves)
     {
-      clean_this_curve_window (i, calc);
+      for (i=start; i<end; i++)
+      {
+        clean_this_curve_window (i, calc);
+      }
     }
-  }
-}
-
-/*!
-  \fn void alloc_curves (int rid)
-
-  \brief allocating curve data
-
-  \param rid analysis id
-*/
-void alloc_curves (int rid)
-{
-  int i;
-  if (active_project -> idcc[rid] != NULL)
-  {
-    g_free (active_project -> idcc[rid]);
-    active_project -> idcc[rid] = NULL;
-  }
-  active_project -> idcc[rid] = g_malloc0 (active_project -> numc[rid]*sizeof*active_project -> idcc[rid]);
-  if (active_project -> curves[rid] != NULL)
-  {
-    g_free (active_project -> curves[rid]);
-    active_project -> curves[rid] = NULL;
-  }
-  active_project -> curves[rid] = g_malloc (active_project -> numc[rid]*sizeof*active_project -> curves);
-  for (i = 0; i < active_project -> numc[rid]; i++)
-  {
-    active_project -> curves[rid][i] = g_malloc0 (sizeof*active_project -> curves[rid][i]);
-    active_project -> curves[rid][i] -> cfile = NULL;
-    active_project -> curves[rid][i] -> name = NULL;
-    active_project -> curves[rid][i] -> axis_title[0] = NULL;
-    active_project -> curves[rid][i] -> axis_title[1] = NULL;
-  }
-}
-
-/*!
-  \fn void initcwidgets ()
-
-  \brief initializing curve values
-*/
-void initcwidgets ()
-{
-  int i, j;
-
-  j=active_project -> nspec;
-  active_project -> numc[GR] = 16+5*j*j;
-  active_project -> numc[SQ] = 8+4*j*j;
-  active_project -> numc[SK] = 8+4*j*j;
-  active_project -> numc[GK] = active_project -> numc[GR];
-  active_project -> numc[BD] = j*j;
-  active_project -> numc[AN] = j*j*j + j*j*j*j;
-  active_project -> numc[RI] = 20*(j+1);
-  active_project -> numc[CH] = j+1;
-  active_project -> numc[SP] = 0;
-  active_project -> numc[MS] = 0;
-  if (active_project -> steps > 1) active_project -> numc[MS] = 14*j+6;
-
-  if (j == 2)
-  {
-    active_project -> numc[GR] = active_project -> numc[GR] + 6;
-    active_project -> numc[SQ] = active_project -> numc[SQ] + 8;
-    active_project -> numc[SK] = active_project -> numc[SK] + 8;
-    active_project -> numc[GK] = active_project -> numc[GK] + 6;
-  }
-  active_project -> numwid = active_project -> numc[GR]
-                       + active_project -> numc[SQ]
-                       + active_project -> numc[SK]
-                       + active_project -> numc[GK]
-                       + active_project -> numc[BD]
-                       + active_project -> numc[AN]
-                       + active_project -> numc[RI]
-                       + active_project -> numc[CH]
-                       + active_project -> numc[MS];
-  for (i=0; i<NGRAPHS; i++)
-  {
-    if (i != SP) alloc_curves (i);
   }
 }
 
@@ -153,22 +86,20 @@ void initcwidgets ()
 */
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc)
 {
-  //int i;
-//  char * bar[2] = {"bond properties", "nearest neigbhors table"};
-//  char * mess;
-  if (run < NGRAPHS && run > -1) active_project -> visok[run] = adv;
+  if (run < NCALCS && run > -1) active_project -> analysis[run] -> calc_ok = adv;
   if (! status)
   {
+    clock_gettime (CLOCK_MONOTONIC, & start_time);
 #ifdef GTK3
     if (widg != NULL) gdk_window_set_opacity (gtk_widget_get_window(widg), opc);
 #endif
 /*    if (adv)
     {
       // bar[run]
-      mess = g_strdup_printf ("Please wait calculation in progress");
+      mess = g_strdup_printf (_("Please wait calculation in progress"));
       pop = show_popup (mess, widg);
       g_free (mess);
-      mess = g_strdup_printf ("Computing");
+      mess = g_strdup_printf (_("Computing"));
       //statusval = gtk_statusbar_push (statusbar, run, mess);
       g_free (mess);
       show_the_widgets (pop);
@@ -181,8 +112,267 @@ void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double op
       //gtk_statusbar_remove (statusbar, run, statusval);
       //destroy_this_widget(pop);
     }
+    if (run > -1)
+    {
+      clock_gettime (CLOCK_MONOTONIC, & stop_time);
+      active_project -> analysis[run] -> calc_time = get_calc_time (start_time, stop_time);
+    }
 #ifdef GTK3
     if (widg != NULL) gdk_window_set_opacity (gtk_widget_get_window(widg), opc);
 #endif
   }
+}
+
+/*!
+  \fn void alloc_analysis_curves (int pid, atomes_analysis * this_analysis)
+
+  \brief allocating analysis curve data
+
+  \param pid the project id
+  \param this_analysis the target atomes_analysis pointer
+*/
+void alloc_analysis_curves (int pid, atomes_analysis * this_analysis)
+{
+  int i;
+  if (this_analysis -> idcc != NULL)
+  {
+    g_free (this_analysis -> idcc);
+    this_analysis -> idcc = NULL;
+  }
+  this_analysis -> idcc = g_malloc0(this_analysis -> numc*sizeof*this_analysis -> idcc);
+  for (i = 0; i < this_analysis -> numc; i++)
+  {
+    this_analysis -> idcc[i].a = pid;
+    this_analysis -> idcc[i].b = this_analysis -> aid;
+    this_analysis -> idcc[i].c = i;
+  }
+  if (this_analysis -> curves != NULL)
+  {
+    g_free (this_analysis -> curves);
+    this_analysis -> curves = NULL;
+  }
+  this_analysis -> curves = g_malloc0(this_analysis -> numc*sizeof*this_analysis -> curves);
+  for (i = 0; i < this_analysis -> numc; i++)
+  {
+    this_analysis -> curves[i] = g_malloc0(sizeof*this_analysis -> curves[i]);
+  }
+}
+
+/*!
+  \fn atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
+
+  \brief allocate atomes_analysis data structure
+
+  \param pid the project id
+  \param name analysis name
+  \param analysis analysis ID
+  \param req_md requires MD trajectory (1/0)
+  \param graph curves as output or not (1/0)
+  \param num_curves number of curves to be produced for this analysis
+  \param n_compat number of compatible analysis
+  \param compat list of compatible analysis
+  \param x_title default title for x axis for graphs
+*/
+atomes_analysis * setup_analysis (int pid, gchar * name, int analysis, gboolean req_md, gboolean graph, int num_curves, int n_compat, int * compat, gchar * x_title)
+{
+  atomes_analysis * new_analysis = g_malloc0(sizeof*new_analysis);
+  new_analysis -> name = g_strdup_printf ("%s", name);
+  new_analysis -> aid = analysis;
+  new_analysis -> requires_md = req_md;
+  new_analysis -> graph_res = graph;
+  if (graph)
+  {
+    new_analysis -> c_sets = n_compat;
+    new_analysis -> compat_id = duplicate_int (n_compat, compat);
+    if (num_curves)
+    {
+      new_analysis -> numc = num_curves;
+      alloc_analysis_curves (pid, new_analysis);
+    }
+    if (x_title) new_analysis -> x_title = g_strdup_printf ("%s", x_title);
+  }
+  return new_analysis;
+}
+
+/*
+  From global.h:
+
+  #define NCALCS 11 -> but 10
+
+  #define GDR 0
+  #define SQD 1
+  #define SKD 2
+  #define GDK 3
+  #define BND 4
+  #define ANG 5
+  #define RIN 6
+  #define CHA 7
+  #define SPH 8
+  #define MSD 9
+  #define SKT 10
+*/
+
+/*!
+  \fn void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
+
+  \brief initialize analysis data structures for atomes
+
+  \param this_proj the target project
+  \param apply_defaults apply default parameters (1/0)
+*/
+void init_atomes_analysis (project * this_proj, gboolean apply_defaults)
+{
+  int i = this_proj -> nspec;
+  int pid = this_proj -> id;
+  /* Compatible analysis:
+    - always include self first, and others if required
+    - x axis must be similar or allow comparison (ex: distance)
+  */
+  int * comp_list;
+  this_proj -> analysis = g_malloc0(NCALCS*sizeof*this_proj -> analysis);
+  // g(r)
+  comp_list = allocint (2);
+  comp_list[0] = GDR;
+  comp_list[1] = GDK;
+  this_proj -> analysis[GDR] = setup_analysis (pid, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+  // g(r) FFT  - same compatibility list
+  this_proj -> analysis[GDK] = setup_analysis (pid, _("g(r)/G(r) from FFT[S(q)]"), GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+
+  // s(q)
+  comp_list[0] = SQD;
+  comp_list[1] = SKD;
+  this_proj -> analysis[SQD] = setup_analysis (pid, _("S(q) from FFT[g(r)]"), SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+  // s(k) - same compatibility list
+  this_proj -> analysis[SKD] = setup_analysis (pid, _("S(q) from Debye Equation"), SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+
+  g_free (comp_list);
+
+  comp_list = allocint (1);
+  // Bond length  distribution(s)
+  comp_list[0] = BND;
+  this_proj -> analysis[BND] = setup_analysis (pid, _("Bond Properties"), BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
+
+  // Angle distribution(s)
+  comp_list[0] = ANG;
+  this_proj -> analysis[ANG] = setup_analysis (pid, _("Angle Distributions"), ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+
+  // Ring statistic(s)
+  comp_list[0] = RIN;
+  this_proj -> analysis[RIN] = setup_analysis (pid, _("Ring Statistics"), RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, _("Size <i>n</i> of the ring [total number of nodes]"));
+
+  // Chain statistic(s)
+  comp_list[0] = CHA;
+  this_proj -> analysis[CHA] = setup_analysis (pid, _("Chain Statistics"), CHA, FALSE, TRUE, i+1, 1, comp_list, _("Size <i>n</i> of the chain [total number of nodes]"));
+
+  // Spherical harmonic(s)
+  comp_list[0] = SPH;
+  this_proj -> analysis[SPH] = setup_analysis (pid, _("Spherical Harmonics"), SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
+
+  if (this_proj -> steps > 1)
+  {
+    // Mean square displacement
+    comp_list[0] = MSD;
+    this_proj -> analysis[MSD] = setup_analysis (pid, _("Mean Squared Displacement"), MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+
+    // Dynamic structure factor
+    // Number of graphs depends on the number of correlation states, not appearing here
+    comp_list[0] = SKT;
+    // this_proj -> analysis[SKT] = setup_analysis (pid, _("Dynamic Structure Factor"), SKT, TRUE, TRUE, 0, 1, comp_list, NULL);
+  }
+
+  g_free (comp_list);
+
+  if (apply_defaults) apply_analysis_default_parameters_to_project (this_proj);
+}
+
+/*!
+  \fn void initialize_this_analysis (project * this_proj, int ana)
+
+  \brief initialize an analysis data structure for atomes
+
+  \param this_proj the target project data structure
+  \param ana the target analysis
+*/
+void initialize_this_analysis (project * this_proj, int ana)
+{
+  int i = this_proj -> nspec;
+  int * comp_list;
+  if (! this_proj -> analysis)
+  {
+    this_proj -> analysis = g_malloc0(NCALCS*sizeof*this_proj -> analysis);
+  }
+  switch (ana)
+  {
+    case GDR:
+      // g(r)
+      comp_list = allocint (2);
+      comp_list[0] = GDR;
+      comp_list[1] = GDK;
+      this_proj -> analysis[GDR] = setup_analysis (this_proj -> id, "g(r)/G(r)", GDR, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+      break;
+    case SQD:
+      // S(q)
+      comp_list = allocint (2);
+      comp_list[0] = SQD;
+      comp_list[1] = SKD;
+      this_proj -> analysis[SQD] = setup_analysis (this_proj -> id, _("S(q) from FFT[g(r)]"), SQD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+      break;
+    case SKD:
+      // S(k)
+      comp_list = allocint (2);
+      comp_list[0] = SQD;
+      comp_list[1] = SKD;
+      this_proj -> analysis[SKD] = setup_analysis (this_proj -> id, _("S(q) from Debye Equation"), SKD, FALSE, TRUE, 8+4*i*i + ((i ==2) ? 8 : 0), 2, comp_list, "q [Å<sup>-1</sup>]");
+      break;
+    case GDK:
+      // g(r) FFT S(q)
+      comp_list = allocint (2);
+      comp_list[0] = GDR;
+      comp_list[1] = GDK;
+      this_proj -> analysis[GDK] = setup_analysis (this_proj -> id, _("g(r)/G(r) from FFT[S(q)]"), GDK, FALSE, TRUE, 16+5*i*i + ((i ==2) ? 6 : 0), 2, comp_list, "r [Å]");
+      break;
+    case BND:
+      // Bond length  distribution(s)
+      comp_list = allocint (1);
+      comp_list[0] = BND;
+      this_proj -> analysis[BND] = setup_analysis (this_proj -> id, _("Bond Properties"), BND, FALSE, TRUE, i*i, 1, comp_list, "D<sub>ij</sub> [Å]");
+      break;
+    case ANG:
+      // Angle distribution(s)
+      comp_list = allocint (1);
+      comp_list[0] = ANG;
+      this_proj -> analysis[ANG] = setup_analysis (this_proj -> id, _("Angle Distributions"), ANG, FALSE, TRUE, i*i*i + i*i*i*i, 1, comp_list, "θ [°]");
+      break;
+    case RIN:
+      // Ring statistics
+      comp_list = allocint (1);
+      comp_list[0] = RIN;
+      this_proj -> analysis[RIN] = setup_analysis (this_proj -> id, _("Ring Statistics"), RIN, FALSE, TRUE, 20*(i+1), 1, comp_list, _("Size <i>n</i> of the ring [total number of nodes]"));
+      break;
+    case CHA:
+      // Chain statistics
+      comp_list = allocint (1);
+      comp_list[0] = CHA;
+      this_proj -> analysis[CHA] = setup_analysis (this_proj -> id, _("Chain Statistics"), CHA, FALSE, TRUE, i+1, 1, comp_list, _("Size <i>n</i> of the chain [total number of nodes]"));
+      break;
+    case SPH:
+      // Spherical harmonics as order parameters
+      comp_list = allocint (1);
+      comp_list[0] = SPH;
+      this_proj -> analysis[SPH] = setup_analysis (this_proj -> id, _("Spherical Harmonics"), SPH, FALSE, TRUE, 0, 1, comp_list, "Q<sub>l</sub>");
+      break;
+    case MSD:
+      // Mean square displacement
+      comp_list = allocint (1);
+      comp_list[0] = MSD;
+      if (this_proj -> steps > 1) this_proj -> analysis[MSD] = setup_analysis (this_proj -> id, _("Mean Squared Displacement"), MSD, TRUE, TRUE, 14*i+6, 1, comp_list, NULL);
+      break;
+    case SKT:
+      comp_list = allocint (1);
+      comp_list[0] = SKT;
+      // Total number of graphs depends on the number of correlation states, not appearing here
+      // if (this_proj -> steps > 1) this_proj -> analysis[SKT] = setup_analysis (this_proj -> id, _("Dynamic Structure Factor"), SKT, TRUE, TRUE, 0, 2, comp_list, NULL);
+      break;
+  }
+  g_free (comp_list);
 }

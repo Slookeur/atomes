@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file prepdata.F90
@@ -21,6 +21,72 @@
 #if defined (HAVE_CONFIG_H)
 #  include <config.h>
 #endif
+
+SUBROUTINE free_contj_voisj () BIND (C,NAME='free_contj_voisj_')
+
+USE PARAMETERS
+
+IMPLICIT NONE
+
+if (allocated(VOISJ)) deallocate(VOISJ)
+if (allocated(CONTJ)) deallocate(CONTJ)
+
+END SUBROUTINE
+
+SUBROUTINE read_contj (ATO, STP, CON) BIND (C,NAME='read_contj_')
+
+USE PARAMETERS
+
+IMPLICIT NONE
+
+INTEGER (KIND=c_int), INTENT(IN) :: ATO, STP, CON
+
+CONTJ(ATO+1,STP+1) = CON
+
+END SUBROUTINE
+
+SUBROUTINE read_voisj (ATO, STP, CID, VID) BIND (C,NAME='read_voisj_')
+
+USE PARAMETERS
+
+IMPLICIT NONE
+
+INTEGER (KIND=c_int), INTENT(IN) :: ATO, STP, CID, VID
+
+VOISJ(CID+1,ATO+1,STP+1) = VID+1
+
+END SUBROUTINE
+
+INTEGER (KIND=c_int) FUNCTION alloc_contj_voisj (N1, N2) BIND (C,NAME='alloc_contj_voisj_')
+
+USE PARAMETERS
+
+IMPLICIT NONE
+
+INTEGER (KIND=c_int), INTENT(IN) :: N1, N2
+
+! N1 = atomes, N2 = steps
+if (allocated(VOISJ)) deallocate(VOISJ)
+allocate(VOISJ(MAXN,N1,N2), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: alloc_cont_vois"//CHAR(0), "Table: VOISJ"//CHAR(0))
+  alloc_contj_voisj = 0
+  goto 001
+endif
+if (allocated(CONTJ)) deallocate(CONTJ)
+allocate(CONTJ(N1,N2), STAT=ERR)
+if (ERR .ne. 0) then
+  call show_error ("Impossible to allocate memory"//CHAR(0), &
+                   "Function: alloc_cont_vois"//CHAR(0), "Table: CONTJ"//CHAR(0))
+  alloc_contj_voisj = 0
+endif
+
+alloc_contj_voisj = 1
+
+001 continue
+
+END FUNCTION
 
 INTEGER (KIND=c_int) FUNCTION alloc_data (N1, N2, N3) BIND (C,NAME='alloc_data_')
 
@@ -47,6 +113,7 @@ if (ERR .ne. 0) then
   alloc_data = 0
   goto 001
 endif
+
 if (allocated(LOT)) deallocate(LOT)
 allocate(LOT(NA), STAT=ERR)
 if (ERR .ne. 0) then

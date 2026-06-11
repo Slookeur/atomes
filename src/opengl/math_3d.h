@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file math_3d.h
@@ -240,7 +240,7 @@ static inline mat4_t m4_look_at      (vec3_t from, vec3_t to, vec3_t up);
 
 static inline mat4_t m4_transpose    (mat4_t matrix);
 static inline mat4_t m4_mul          (mat4_t a, mat4_t b);
-static inline mat4_t m43_mul(mat4_t a, mat4_t b);
+static inline mat4_t m43_mul         (mat4_t a, mat4_t b);
 static inline mat4_t m4_invert_affine(mat4_t matrix);
 static inline mat4_t m4_translate    (mat4_t matrix, vec3_t translation);
 static inline vec3_t m4_mul_pos      (mat4_t matrix, vec3_t position);
@@ -753,14 +753,14 @@ static inline mat4_t m4_invert_affine(mat4_t matrix) {
 		float c01 = -(m10*m22 - m12*m20),  c11 =   m00*m22 - m02*m20,   c21 = -(m00*m12 - m02*m10);
 		float c02 =   m10*m21 - m11*m20,   c12 = -(m00*m21 - m01*m20),  c22 =   m00*m11 - m01*m10;
 
-		// Caclculate the determinant by using the already calculated determinants
+		// Calculate the determinant by using the already calculated determinants
 		// in the cofactor matrix.
 		// Second sign is already minus from the cofactor matrix.
 		float det = m00*c00 + m10*c10 + m20 * c20;
 		if (fabsf(det) == 0.0000)
 			return m4_identity();
 
-		// Calcuate inverse of R by dividing the transposed cofactor matrix by the
+		// Calculate inverse of R by dividing the transposed cofactor matrix by the
 		// determinant.
 		float i00 = c00 / det,  i10 = c01 / det,  i20 = c02 / det;
 		float i01 = c10 / det,  i11 = c11 / det,  i21 = c12 / det;

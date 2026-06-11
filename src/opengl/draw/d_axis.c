@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file d_axis.c
@@ -48,10 +48,11 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern object_3d * draw_sphere (int quality);
 extern object_3d * draw_cylinder (int quality, float ra, float rb);
 extern object_3d * draw_cylinder_cap (int quality, float rad, gboolean picked);
+extern object_3d * draw_billboard_quad (void);
 extern void setup_line_vertice (float * vertices, vec3_t pos, ColRGBA col, float alpha);
 extern void setup_sphere_vertice (float * vertices, vec3_t pos, ColRGBA col, float rad, float alpha);
-extern void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta);
-extern void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha);
+extern void setup_cylinder_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, float delta, float r_sph_a, float r_sph_b);
+extern void setup_cap_vertice (float * vertices, vec3_t pos_a, vec3_t pos_b, ColRGBA col, float rad, float alpha, gboolean sel);
 extern void setup_triangles (float * vertices, vec3_t sa, vec3_t sb, vec3_t sc);
 extern float poly_alpha;
 extern vec3_t centroid;
@@ -59,7 +60,6 @@ extern vec3_t centroid;
 extern void clean_labels (int id);
 
 extern ColRGBA pcol;
-extern float extra;
 
 float arrow_length;
 float axis_size;
@@ -162,6 +162,7 @@ mat4_t create_axis_matrices (int type)
   }
   axis_model_matrix           = m4_translation (win_coord);
   axis_model_view_matrix      = m4_mul (axis_model_matrix, axis_view_matrix);
+
   return m4_mul (axis_projection_matrix, axis_model_view_matrix);
 }
 
@@ -249,12 +250,12 @@ void prepare_axis_data (float * vert_a, float * vert_b, float * vert_c)
     }
     else
     {
-      setup_cylinder_vertice (vert_a, a, b, pcol, axis_radius, 1.0, 0.0);
+      setup_cylinder_vertice (vert_a, a, b, pcol, axis_radius, 1.0, 0.0, (plot -> ray_tracing) ? axis_radius : 0.0, 0.0);
       c = vec3((i==0)? axis_size : 0.0, (i==1)? axis_size : 0.0, (i==2)? axis_size : 0.0);
       nbs --;
-      setup_cylinder_vertice (vert_b, c, b, pcol, axis_radius+arrow_base, 1.0, 0.0);
+      setup_cylinder_vertice (vert_b, c, b, pcol, axis_radius+arrow_base, 1.0, 0.0, (plot -> ray_tracing) ? axis_radius : 0.0, 0.0);
       nbs --;
-      setup_cap_vertice (vert_c, c, b, pcol, axis_radius+arrow_base, 1.0);
+      setup_cap_vertice (vert_c, c, b, pcol, axis_radius+arrow_base, 1.0, FALSE);
     }
   }
 }
@@ -274,36 +275,50 @@ int create_axis_lists ()
   cleaning_shaders (wingl, MAXIS);
   wingl -> create_shaders[MAXIS] = FALSE;
   if (plot -> xyz -> axis == NONE) return nshaders;
-
+  int saved_tracing = plot -> ray_tracing;
+  plot -> ray_tracing = FALSE;
   if (plot -> xyz -> axis == WIREFRAME)
   {
-    axis_a = g_malloc0 (sizeof*axis_a);
+    axis_a = g_malloc0(sizeof*axis_a);
     axis_a -> vert_buffer_size = LINE_BUFF_SIZE;
     axis_a -> num_vertices = 3*2;
     axis_a -> vertices = allocfloat (axis_a -> vert_buffer_size*axis_a -> num_vertices);
-    axis_b = g_malloc0 (sizeof*axis_b);
+    axis_b = g_malloc0(sizeof*axis_b);
     axis_b -> vert_buffer_size = POLY_BUFF_SIZE;
     axis_b -> num_vertices = 3*6*9;
     axis_b -> vertices = allocfloat (axis_b -> vert_buffer_size*axis_b -> num_vertices);
   }
   else
   {
-    axis_a = draw_cylinder (plot -> quality, 1.0, 1.0);
-    axis_a -> num_instances = 3;
-    axis_a -> inst_buffer_size = CYLI_BUFF_SIZE;
-    axis_a -> instances = allocfloat (axis_a -> num_instances*CYLI_BUFF_SIZE);
-    axis_b = draw_cylinder (plot -> quality, 0.0, 1.0);
-    axis_b -> num_instances = 3;
-    axis_b -> inst_buffer_size = CYLI_BUFF_SIZE;
-    axis_b -> instances = allocfloat (axis_b -> num_instances*CYLI_BUFF_SIZE);
-    axis_c = draw_cylinder_cap (plot -> quality, 1.0, FALSE);
-    axis_c -> num_instances = 3;
-    axis_c -> inst_buffer_size = CAPS_BUFF_SIZE;
-    axis_c -> instances = allocfloat (CAPS_BUFF_SIZE*axis_c -> num_instances);
-    axis_d = draw_sphere (plot -> quality);
+    if (plot -> ray_tracing)
+    {
+      axis_a = draw_billboard_quad ();
+      axis_a -> inst_buffer_size = CYLI_BUFF_SIZE + 2;
+      axis_b = draw_billboard_quad ();
+      axis_b -> inst_buffer_size = CYLI_BUFF_SIZE + 2;
+      axis_c = draw_billboard_quad ();
+      axis_c -> inst_buffer_size = CAPS_BUFF_SIZE + 2;
+      axis_d = draw_billboard_quad ();
+      axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
+    }
+    else
+    {
+      int axis_quality = 50;
+      axis_a = draw_cylinder (axis_quality, 1.0, 1.0);
+      axis_a -> inst_buffer_size = CYLI_BUFF_SIZE;
+      axis_b = draw_cylinder (axis_quality, 0.0, 1.0);
+      axis_b -> inst_buffer_size = CYLI_BUFF_SIZE;
+      axis_c = draw_cylinder_cap (axis_quality, 1.0, FALSE);
+      axis_c -> inst_buffer_size = CAPS_BUFF_SIZE;
+      axis_d = draw_sphere (axis_quality);
+      axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
+    }
+    axis_a -> num_instances = axis_b -> num_instances = axis_c -> num_instances = 3;
+    allocate_instances (axis_a);
+    allocate_instances (axis_b);
+    allocate_instances (axis_c);
     axis_d -> num_instances = 1;
-    axis_d -> inst_buffer_size = ATOM_BUFF_SIZE;
-    axis_d -> instances = allocfloat (ATOM_BUFF_SIZE);
+    allocate_instances (axis_d);
   }
   nshaders = (plot -> xyz -> axis == WIREFRAME) ? 2 : 4;
   prepare_axis_data ((plot -> xyz -> axis == WIREFRAME) ? axis_a -> vertices :  axis_a -> instances,
@@ -319,12 +334,12 @@ int create_axis_lists ()
       prepare_string (plot -> xyz -> title[i], 2, color_axis (i), pos, shift, NULL, NULL, NULL);
     }
     nshaders += (plot -> labels[2].render+1) * (plot -> labels[2].list -> last -> id + 1);
-    wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
+    wingl -> ogl_glsl[MAXIS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
     render_all_strings (MAXIS, 2);
   }
   else
   {
-    wingl -> ogl_glsl[MAXIS][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
+    wingl -> ogl_glsl[MAXIS][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[MAXIS][0]);
   }
   if (plot -> xyz -> axis == WIREFRAME)
   {
@@ -341,17 +356,22 @@ int create_axis_lists ()
     pcol.blue = 0.0;
     pcol.alpha = 1.0;
     setup_sphere_vertice (axis_d -> instances, vec3(0.0,0.0,0.0), pcol, axis_radius, 1.0);
-    wingl -> ogl_glsl[MAXIS][0][0] = init_shader_program (MAXIS, GLSL_SPHERES, sphere_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 4, 1, TRUE, axis_d);
+    const GLchar * vs_sph = (plot -> ray_tracing) ? sphere_vertex_ray : sphere_vertex;
+    const GLchar * vs_cyl = (plot -> ray_tracing) ? cylinder_vertex_ray : cylinder_vertex;
+    const GLchar * vs_cone = (plot -> ray_tracing) ? cone_vertex_ray : cone_vertex;
+    const GLchar * vs_cap = (plot -> ray_tracing) ? cap_vertex_ray : cap_vertex;
+    const GLchar * fs_all = (plot -> ray_tracing) ? full_color_ray : full_color;
+
+    wingl -> ogl_glsl[MAXIS][0][0] = init_shader_program (MAXIS, GLSL_SPHERES, vs_sph, NULL, fs_all, GL_TRIANGLE_STRIP, 4, 1, TRUE, axis_d);
     // Cylinders
-    wingl -> ogl_glsl[MAXIS][0][1] = init_shader_program (MAXIS, GLSL_CYLINDERS, cylinder_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_a);
+    int narray_cyl = (plot -> ray_tracing) ? 8 : 6;
+    wingl -> ogl_glsl[MAXIS][0][1] = init_shader_program (MAXIS, GLSL_CYLINDERS, vs_cyl, NULL, fs_all, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, axis_a);
     // Cones
-    wingl -> ogl_glsl[MAXIS][0][2] = init_shader_program (MAXIS, GLSL_CYLINDERS, cone_vertex, NULL, full_color, GL_TRIANGLE_STRIP, 6, 1, TRUE, axis_b);
+    wingl -> ogl_glsl[MAXIS][0][2] = init_shader_program (MAXIS, GLSL_CYLINDERS, vs_cone, NULL, fs_all, GL_TRIANGLE_STRIP, narray_cyl, 1, TRUE, axis_b);
     // Cones Caps
-    wingl -> ogl_glsl[MAXIS][0][3] = init_shader_program (MAXIS, GLSL_CAPS, cap_vertex, NULL, full_color, GL_TRIANGLE_FAN, 5, 1, TRUE, axis_c);
-    g_free (axis_c);
-    g_free (axis_d);
+    GLenum prim_cap = (plot -> ray_tracing) ? GL_TRIANGLE_STRIP : GL_TRIANGLE_FAN;
+    wingl -> ogl_glsl[MAXIS][0][3] = init_shader_program (MAXIS, GLSL_CAPS, vs_cap, NULL, fs_all, prim_cap, 5, 1, TRUE, axis_c);
   }
-  g_free (axis_a);
-  g_free (axis_b);
+  plot -> ray_tracing = saved_tracing;
   return nshaders;
 }

@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file initchains.F90
@@ -133,8 +133,8 @@ if (TAMP .eq. 0.0) then
   goto 001
 endif
 
-l=0
-if (TLT .ne. NSP+1) l = l + TLT
+l=TLT
+if (TLT .eq. NSP+1) l = 0
 
 call save_curve (TAILLC, CTAB, l, IDCH)
 

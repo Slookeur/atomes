@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file global.c
@@ -61,6 +61,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 */
 
+#include <libintl.h>
+#include <locale.h>
+#ifdef OSX
+#include <xlocale.h>
+#endif
+#include <glib.h>
+#include <glib/gi18n.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -69,11 +77,14 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
+#define i18n(String) String
+
 #define BILLION  1000000000L;
 
 #ifdef G_OS_WIN32
 gchar * PACKAGE_PREFIX = NULL;
 gchar * PACKAGE_LIBEXEC = NULL;
+gchar * PACKAGE_LOCALE = NULL;
 #endif
 gchar * PACKAGE_LIB_DIR = NULL;
 gchar * PACKAGE_IMP = NULL;
@@ -87,14 +98,6 @@ gchar * PACKAGE_JPG = NULL;
 gchar * PACKAGE_BMP = NULL;
 gchar * PACKAGE_TIFF = NULL;
 gchar * PACKAGE_VOID = NULL;
-gchar * PACKAGE_GR = NULL;
-gchar * PACKAGE_SQ = NULL;
-gchar * PACKAGE_BD = NULL;
-gchar * PACKAGE_AN = NULL;
-gchar * PACKAGE_RI = NULL;
-gchar * PACKAGE_CH = NULL;
-gchar * PACKAGE_SP = NULL;
-gchar * PACKAGE_MS = NULL;
 gchar * PACKAGE_TD = NULL;
 gchar * PACKAGE_MOL = NULL;
 gchar * PACKAGE_OGL = NULL;
@@ -135,17 +138,17 @@ gchar * PACKAGE_SGTC = NULL;
 gchar * ATOMES_CONFIG_DIR = NULL;
 gchar * ATOMES_CONFIG = NULL;
 gchar * ATOMES_URL = "https://atomes.ipcms.fr";
-gchar * mode_name[2]={"Analysis", "Edition"};
+gchar * mode_name[2] = {i18n("Analysis"), i18n("Edition")};
 gchar * bravais_img[14];
 gchar * ifield[8];
 gchar * projfile = NULL;
-char * ifbug="\nIf this is a bug please report it to:";
+char * ifbug = i18n("\nIf this is a bug please report it to:");
 
-char * rings_type[5] = {"All (No rules)",
-                        "King's",
-                        "Guttman's",
-                        "Primitive",
-                        "Strong"};
+char * rings_type[5] = {i18n("All (No Rule)"),
+                        i18n("King's"),
+                        i18n("Guttman's"),
+                        i18n("Primitive"),
+                        i18n("Strong")};
 
 char * untime[5] = {"fs",
                     "ps",
@@ -166,6 +169,7 @@ int atomes_visual = 1; // OpenGL visual: 1 = GTK default, 0 = X11 default (GTK3 
 // Loop Id for the dialogs
 int dialog_id = -1;
 
+int reading_step_limit;
 int bonds_update = 0;
 int frag_update = 0;
 int mol_update = 0;
@@ -188,6 +192,9 @@ gboolean selected_status = FALSE;
 gboolean silent_input = FALSE;
 gboolean cif_use_symmetry_positions = FALSE;
 
+gboolean atomes_from_libreoffice = FALSE;
+gboolean atomes_render_image = FALSE;
+
 struct timespec start_time;
 struct timespec stop_time;
 
@@ -195,7 +202,6 @@ double opac = 0.75;
 double pi = 3.141592653589793238462643383279502884197;
 
 GSimpleAction * edition_actions[3];
-GSimpleAction * analyze_actions[9];
 
 GtkApplication * AtomesApp = NULL;
 GtkWidget * MainWindow = NULL;
@@ -226,25 +232,6 @@ GdkPixbuf * RUN = NULL;
 // Basic utility functions
 
 /*!
-  \fn int StringLength (char * str)
-
-  \brief return the length of a string
-
-  \param str string to measure
-* /
-int StringLength (char * str)
-{
-  int na, nb;
-  char c;
-
-  for (na = 0; (c = * str) != '\0'; ++ str, na ++);
-  -- str;
-  for (nb = na; (c = * str) == ' '; -- str, nb --);
-  return nb;
-}
-*/
-
-/*!
   \fn gboolean * allocbool (int  val)
 
   \brief allocate a gboolean * pointer
@@ -255,7 +242,7 @@ gboolean * allocbool (int  val)
 {
   gboolean * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -272,7 +259,7 @@ gboolean ** allocdbool (int xal, int yal)
   gboolean ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -295,7 +282,7 @@ gboolean *** alloctbool (int xal, int yal, int zal)
   gboolean *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -315,7 +302,7 @@ int * allocint (int  val)
 {
   int * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -332,11 +319,11 @@ int ** allocdint (int xal, int yal)
   int ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocint(yal);
+    var[i] = allocint (yal);
   }
   return var;
 }
@@ -355,11 +342,11 @@ int *** alloctint (int xal, int yal, int zal)
   int *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocdint(yal, zal);
+    var[i] = allocdint (yal, zal);
   }
   return var;
 }
@@ -379,11 +366,11 @@ int **** allocqint (int wal, int xal, int yal, int zal)
   int **** var = NULL;
   int i;
 
-  var = g_malloc (wal*sizeof*var);
+  var = g_malloc0(wal*sizeof*var);
   for ( i = 0 ; i < wal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = alloctint(xal, yal, zal);
+    var[i] = alloctint (xal, yal, zal);
   }
   return var;
 }
@@ -399,7 +386,7 @@ float * allocfloat (int  val)
 {
   float * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -416,11 +403,11 @@ float ** allocdfloat (int xal, int yal)
   float ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
-    var[i] = allocfloat(yal);
+    var[i] = allocfloat (yal);
   }
   return var;
 }
@@ -439,7 +426,7 @@ float *** alloctfloat (int xal, int yal, int zal)
   float *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -460,7 +447,7 @@ double * allocdouble (int val)
 {
   double * var = NULL;
 
-  var = g_malloc0 (val*sizeof*var);
+  var = g_malloc0(val*sizeof*var);
   return var;
 }
 
@@ -477,7 +464,7 @@ double ** allocddouble (int xal, int yal)
   double ** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -500,7 +487,7 @@ double *** alloctdouble (int xal, int yal, int zal)
   double *** var = NULL;
   int i;
 
-  var = g_malloc (xal*sizeof*var);
+  var = g_malloc0(xal*sizeof*var);
   for ( i = 0 ; i < xal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -524,7 +511,7 @@ double **** allocqdouble (int wal, int xal, int yal, int zal)
   double **** var = NULL;
   int i;
 
-  var = g_malloc (wal*sizeof*var);
+  var = g_malloc0(wal*sizeof*var);
   for ( i = 0 ; i < wal ; i ++ )
   {
     /* allocation d'un tableau de tableau */
@@ -543,7 +530,7 @@ double **** allocqdouble (int wal, int xal, int yal, int zal)
 */
 gchar ** duplicate_strings (int num, gchar ** old_val)
 {
-  gchar ** new_val = g_malloc0 (num*sizeof*new_val);
+  gchar ** new_val = g_malloc0(num*sizeof*new_val);
   int i;
   for (i=0; i<num; i++) new_val[i] = g_strdup_printf ("%s", old_val[i]);
   return new_val;
@@ -624,10 +611,10 @@ double * duplicate_double (int num, double * old_val)
 double string_to_double (gpointer string)
 {
   char * endPtr = NULL;
-  double value = strtod ((char *)string, & endPtr);
+  double value = g_ascii_strtod ((char *)string, & endPtr);
   if (endPtr == (char *)string)
   {
-     g_print ("Error in string format: string = \"%s\" - value == %lf\n", endPtr, value);
+     g_warning (_("Error in string format: string = \"%s\" - value == %lf\n"), endPtr, value);
   }
   return value;
 }
@@ -656,7 +643,7 @@ double get_calc_time (struct timespec start, struct timespec stop)
 gchar * calculation_time (gboolean modelv, double ctime)
 {
   int i, j, k;
-  gchar * t_string = (modelv) ? "\n \tAnalysis was performed in: ": "";
+  gchar * t_string = (modelv) ? _("\n \tAnalysis was performed in: "): "";
   if (ctime < 60.0)
   {
     return g_strdup_printf ("%s%f s", t_string, ctime);

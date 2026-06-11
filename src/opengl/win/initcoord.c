@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initcoord.c
@@ -133,13 +133,13 @@ void gcid_spcolor_setup (int sp, int id)
   int i;
   if (active_glwin -> gcid[id] == NULL)
   {
-    active_glwin -> gcid[id] = g_malloc0 (active_coord -> totcoord[id]*sizeof*active_glwin -> gcid[id]);
+    active_glwin -> gcid[id] = g_malloc0(active_coord -> totcoord[id]*sizeof*active_glwin -> gcid[id]);
     for (i=0; i<active_coord -> totcoord[id]; i++)
     {
-      active_glwin -> gcid[id][i] = g_malloc0 (64*sizeof*active_glwin -> gcid[id][i]);
+      active_glwin -> gcid[id][i] = g_malloc0(64*sizeof*active_glwin -> gcid[id][i]);
     }
   }
-  active_image -> spcolor[id][sp] = g_malloc0 (active_coord -> totcoord[id]*sizeof*active_image -> spcolor[id][sp]);
+  active_image -> spcolor[id][sp] = g_malloc0(active_coord -> totcoord[id]*sizeof*active_image -> spcolor[id][sp]);
 }
 
 #ifdef GTK3
@@ -264,7 +264,7 @@ GtkWidget * poly_show_setup (int * sp, int id, int jd)
   }
   else
   {
-    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, "Show/Hide");
+    active_glwin -> oglmpv[jd][id][* sp] = create_menu_item (TRUE, _("Show/Hide"));
   }
   gtk_menu_item_set_submenu ((GtkMenuItem *)active_glwin -> oglmpv[jd][id][* sp], menup);
   return menup;
@@ -326,7 +326,7 @@ void allocate_partial_geo_ (int * sp, int * ngsp)
     g_free (active_coord -> partial_geo[* sp]);
     active_coord -> partial_geo[* sp] = NULL;
   }
-  active_coord -> partial_geo[* sp] = g_malloc (* ngsp * sizeof*active_coord -> partial_geo[* sp]);
+  active_coord -> partial_geo[* sp] = g_malloc0(* ngsp * sizeof*active_coord -> partial_geo[* sp]);
 }
 
 /*!
@@ -344,7 +344,7 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
   int i, j, k, l, m, n, o;
 #ifdef GTK3
   // GTK3 Menu Action To Check
-  gchar * str;
+  gchar * str, * env;
   GtkWidget * spm;
   GtkWidget * menupv;
   GtkWidget * menuc;
@@ -431,7 +431,9 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
     {
       if (* id)
       {
-        str = exact_name(env_name (active_project, n, * sp, 1, NULL));
+        env = env_name (active_project, n, * sp, 1, NULL);
+        str = exact_name (env);
+        g_free (env);
         spm = create_menu_item_from_widget (markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, FALSE);
       }
       else
@@ -478,22 +480,23 @@ void init_menu_coordinations_ (int * id, int * sp, int * ngsp, int coordt[* ngsp
 void init_menu_fragmol_ (int * id)
 {
 #ifdef DEBUG
-  gchar * keyw[2] = {"fragment(s)", "molecule(s)"};
+  gchar * keyw[2] = {i18n("fragment(s)"), i18n("molecule(s)")};
   if (active_project -> steps > 1)
   {
-    gchar * str = g_strdup_printf ("Maximum number of %s per MD step: %d", keyw[* id -2], active_coord -> totcoord[* id]);
+    gchar * str = g_strdup_printf (_("Maximum number of %s per MD step: %d"), _(keyw[* id -2]), active_coord -> totcoord[* id]);
     g_debug ("%s", str);
   }
 #endif // DEBUG
   if (* id == 3)
   {
+    if (active_image -> show_coord[3]) g_free (active_image -> show_coord[3]);
     active_image -> show_coord[3] = allocbool (active_coord -> totcoord[3]);
 #ifdef GTK3
     // GTK3 Menu Action To Check
     if (active_coord -> totcoord[3] <= COORD_MAX_MENU)
     {
-      active_glwin -> ogl_geom[0][3] =  g_malloc (active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[0][3]);
-      active_glwin -> ogl_geom[1][3] =  g_malloc (active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[1][3]);
+      active_glwin -> ogl_geom[0][3] =  g_malloc0(active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[0][3]);
+      active_glwin -> ogl_geom[1][3] =  g_malloc0(active_coord -> totcoord[3]*sizeof*active_glwin -> ogl_geom[1][3]);
     }
 #endif
   }
@@ -528,11 +531,11 @@ void init_menu_fragmol_ (int * id)
       {
         if (* id == 2)
         {
-          str = g_strdup_printf ("Fragment N°%d", i+1);
+          str = g_strdup_printf (_("Fragment N°%d"), i+1);
         }
         else
         {
-          str = g_strdup_printf ("Molecule N°%d", i+1);
+          str = g_strdup_printf (_("Molecule N°%d"), i+1);
         }
         active_glwin -> ogl_geom[k][* id][i] = create_coord_menu (0, str, TRUE, active_glwin -> oglmv[k][* id][0], & active_glwin -> gcid[* id][i][* id]);
         spm = create_menu_item (TRUE, str);
@@ -607,7 +610,7 @@ void init_menurings_ (int * coo, int * ids, int * ngsp, int coordt[* ngsp], int 
     j = 0;
     active_glwin -> oglmc[i][* coo][j] = NULL;
     active_glwin -> oglmc[i][* coo][j] = coord_color_setup (& j, * coo, i);
-    if (! * init) active_glwin -> ogl_poly[i][* coo] = g_malloc0 (*ngsp*sizeof*active_glwin -> ogl_poly[i][* coo]);
+    if (! * init) active_glwin -> ogl_poly[i][* coo] = g_malloc0(*ngsp*sizeof*active_glwin -> ogl_poly[i][* coo]);
     for ( j=0 ; j < * ngsp ; j++ )
     {
       if (i == 0)
@@ -639,7 +642,7 @@ void init_menurings_ (int * coo, int * ids, int * ngsp, int coordt[* ngsp], int 
       }
       g_free (str);
     }
-    allt = create_menu_item (TRUE, "_All");
+    allt = create_menu_item (TRUE, _("All"));
     g_signal_connect (G_OBJECT (allt), "activate", G_CALLBACK(coord_properties), & active_glwin -> colorp[* coo][1]);
     gtk_menu_shell_append ((GtkMenuShell *)active_glwin -> oglmc[i][* coo][0], allt);
   }
@@ -660,13 +663,18 @@ void init_opengl_coords (int id, int nt, int init)
   int k;
   active_coord -> species = active_project -> nspec;
   active_coord -> totcoord[id] = nt;
+  if (active_image -> show_coord[id])
+  {
+    g_free (active_image -> show_coord[id]);
+    active_image -> show_coord[id] = NULL;
+  }
   active_image -> show_coord[id] = allocbool (nt);
 #ifdef GTK3
   int i, j;
   for (i=0; i<2; i++)
   {
     if (active_glwin -> ogl_geom[i][id]) g_free (active_glwin -> ogl_geom[i][id]);
-    active_glwin -> ogl_geom[i][id] =  g_malloc0 (nt*sizeof*active_glwin -> ogl_geom[i][id]);
+    active_glwin -> ogl_geom[i][id] =  g_malloc0(nt*sizeof*active_glwin -> ogl_geom[i][id]);
     for (j=0; j < nt; j++)
     {
       active_glwin -> ogl_geom[i][id][j] = NULL;
@@ -677,7 +685,7 @@ void init_opengl_coords (int id, int nt, int init)
   {
     k = (id > 3) ? 1 : active_project -> nspec;
     if (active_coord -> ntg[id]) g_free (active_coord -> ntg[id]);
-    active_coord -> ntg[id] = g_malloc0 (k*sizeof*active_coord -> ntg[id]);
+    active_coord -> ntg[id] = g_malloc0(k*sizeof*active_coord -> ntg[id]);
     if (id > 3) active_coord -> ntg[id][0] = nt;
     if (id < 9)
     {
@@ -690,7 +698,7 @@ void init_opengl_coords (int id, int nt, int init)
       for (i=0; i<2; i++)
       {
         if (active_glwin -> ogl_poly[i][id]) g_free (active_glwin -> ogl_poly[i][id]);
-        active_glwin -> ogl_poly[i][id] = g_malloc0 (nt*sizeof*active_glwin -> ogl_poly[i][id]);
+        active_glwin -> ogl_poly[i][id] = g_malloc0(nt*sizeof*active_glwin -> ogl_poly[i][id]);
         for (j=0; j < nt; j++)
         {
           active_glwin -> ogl_poly[i][id][j] = NULL;

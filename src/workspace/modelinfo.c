@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file modelinfo.c
@@ -115,31 +115,31 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
   if (g_strcmp0(this_proj -> projfile, "(null)") == 0) this_proj -> projfile = NULL;
   if (this_proj -> projfile != NULL)
   {
-    print_info ("\n\tProject file: ", "italic", buffer);
+    print_info (_("\n\tProject file: "), "italic", buffer);
     print_info (this_proj -> projfile, NULL, buffer);
   }
 
   if (this_proj -> tfile > -1 && this_proj -> coordfile != NULL)
   {
-    print_info ("\n\tCoordinates file: ", "italic", buffer);
+    print_info (_("\n\tCoordinates file: "), "italic", buffer);
     print_info (this_proj -> coordfile, NULL, buffer);
-    print_info ("\n\tFile type:   ", "italic", buffer);
+    print_info (_("\n\tFile type:   "), "italic", buffer);
     print_info (coord_files[this_proj -> tfile], NULL, buffer);
     this_proj -> tfile = 0;
   }
-  print_info ("\n\nModel properties\n\n\n", "heading", buffer);
+  print_info (_("\n\nModel properties\n\n\n"), "heading", buffer);
   if (this_proj -> steps > 1)
   {
-    print_info ("\tNumber of MD steps = ", "italic", buffer);
+    print_info (_("\tNumber of MD steps = "), "italic", buffer);
     str = g_strdup_printf ("%d\n", this_proj -> steps);
     print_info (str, "bold", buffer);
     g_free (str);
   }
-  print_info ("\tNumber of atoms    = ", "italic", buffer);
+  print_info (_("\tNumber of atoms    = "), "italic", buffer);
   str = g_strdup_printf ("%d\n", this_proj -> natomes);
   print_info (str, "bold", buffer);
   g_free (str);
-  print_info ("\tNumber of species  = ", "italic", buffer);
+  print_info (_("\tNumber of species  = "), "italic", buffer);
   str = g_strdup_printf ("%d\n\n", this_proj -> nspec);
   print_info (str, "bold", buffer);
   g_free (str);
@@ -149,11 +149,11 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
                         {"α", "β", "γ"}};
     if (this_proj -> cell.npt)
     {
-      print_info ("\tAv. lattice parameters:\n\n", NULL, buffer);
+      print_info (_("\tAv. lattice parameters:\n\n"), NULL, buffer);
     }
     else
     {
-      print_info ("\tLattice parameters:\n\n", NULL, buffer);
+      print_info (_("\tLattice parameters:\n\n"), NULL, buffer);
     }
     for (i=0; i<2; i++)
     {
@@ -182,11 +182,11 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
     print_info ("\n", NULL, buffer);
     if (this_proj -> cell.npt)
     {
-      print_info ("\tAv. lattice vectors:\n\n\t\t", NULL, buffer);
+      print_info (_("\tAv. lattice vectors:\n\n\t\t"), NULL, buffer);
     }
     else
     {
-      print_info ("\tLattice vectors:\n\n\t\t", NULL, buffer);
+      print_info (_("\tLattice vectors:\n\n\t\t"), NULL, buffer);
     }
     for (i=0; i<3; i++)
     {
@@ -221,22 +221,22 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
     if (this_proj -> cell.sp_group)
     {
       print_info ("\n", NULL, buffer);
-      print_info ("\tCrystal information:\n\n", "italic", buffer);
+      print_info (_("\tCrystal information:\n\n"), "italic", buffer);
       str = g_strdup_printf ("%d", this_proj -> cell.sp_group -> id);
-      print_info ("\t\tSpace group N°:       ","italic", buffer);
+      print_info (_("\t\tSpace group N°:       "),"italic", buffer);
       print_info (str, "bold", buffer);
       g_free (str);
       print_info ("\n", NULL, buffer);
-      print_info ("\t\tSpace group:          ","italic", buffer);
+      print_info (_("\t\tSpace group:          "),"italic", buffer);
       print_spg_name (g_strdup_printf ("%s", groups[this_proj -> cell.sp_group -> id-1]), buffer);
       print_info ("\n", NULL, buffer);
-      print_info ("\t\tSpace group setting:  ","italic", buffer);
+      print_info (_("\t\tSpace group setting:  "),"italic", buffer);
       print_spg_setting (this_proj -> cell.sp_group -> setting, buffer);
       print_info ("\n", NULL, buffer);
       print_info ("\t\tHermman-Mauguin:      ","italic", buffer);
       print_spg_setting (this_proj -> cell.sp_group -> hms, buffer);
       print_info ("\n", NULL, buffer);
-      print_info ("\t\tBravais lattice:      ","italic", buffer);
+      print_info (_("\t\tBravais lattice:      "),"italic", buffer);
       print_info (this_proj -> cell.sp_group -> bravais, "bold", buffer);
       print_info ("\n", NULL, buffer);
     }
@@ -244,11 +244,11 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
     print_info ("\n", NULL, buffer);
     if (this_proj -> cell.npt)
     {
-      print_info ("\tAv. volume         = ", "italic", buffer);
+      print_info (_("\tAv. volume         = "), "italic", buffer);
     }
     else
     {
-      print_info ("\tVolume             = ", "italic", buffer);
+      print_info (_("\tVolume             = "), "italic", buffer);
     }
     str = g_strdup_printf ("%14.6lf", this_proj -> cell.volume);
     print_info (str, "bold", buffer);
@@ -257,11 +257,11 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
     print_info ("3", "sup", buffer);
     if (this_proj -> cell.npt)
     {
-      print_info ("\n\tAv. density        = ", "italic", buffer);
+      print_info (_("\n\tAv. density        = "), "italic", buffer);
     }
     else
     {
-      print_info ("\n\tDensity            = ", "italic", buffer);
+      print_info (_("\n\tDensity            = "), "italic", buffer);
     }
     str = g_strdup_printf ("%14.6lf", this_proj -> cell.density);
     print_info (str, "bold", buffer);
@@ -270,19 +270,19 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
     print_info ("3", "sup", buffer);
     if (this_proj -> cell.npt)
     {
-      print_info ("\n\tAv. number density = ", "italic", buffer);
+      print_info (_("\n\tAv. number density = "), "italic", buffer);
     }
     else
     {
-      print_info ("\n\tNumber density     = ", "italic", buffer);
+      print_info (_("\n\tNumber density     = "), "italic", buffer);
     }
     str = g_strdup_printf ("%14.6lf", this_proj -> natomes / this_proj -> cell.volume);
     print_info (str, "bold", buffer);
     g_free (str);
-    print_info ("  Atoms / Å", NULL, buffer);
+    print_info (_("  atoms / Å"), NULL, buffer);
     print_info ("3", "sup", buffer);
   }
-  print_info ("\n\n\tEmpirical formula:\t", "italic", buffer);
+  print_info (_("\n\n\tEmpirical formula:\t"), "italic", buffer);
   for (i=0; i<this_proj -> nspec; i++)
   {
     print_info (this_proj -> chemistry -> label[i], "bold", buffer);
@@ -296,13 +296,13 @@ void model_info (project * this_proj, GtkTextBuffer * buffer)
   }
   if (this_proj -> cell.volume != 0.0)
   {
-    print_info ("\n\n\tAtom\t Number    Fraction\tNumber density (atoms / Å", "italic", buffer);
+    print_info (_("\n\n\tAtom\t Number    Fraction\tNumber density (atoms / Å"), "italic", buffer);
     print_info ("3", "sup", buffer);
     print_info (")\n", "italic", buffer);
   }
   else
   {
-    print_info ("\n\n\tAtom\t Number    Fraction", "italic", buffer);
+    print_info (_("\n\n\tAtom\t Number    Fraction"), "italic", buffer);
   }
 
   for (i=0; i<this_proj -> nspec; i++)

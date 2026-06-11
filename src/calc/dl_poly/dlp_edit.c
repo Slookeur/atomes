@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_edit.c
@@ -88,7 +88,7 @@ extern int * atoms_id;
 extern int ** atoms_id_list;
 extern char *** ff_atoms;
 
-extern gchar * felemts[MAXDATA+1];
+extern gchar * felemt[MAXDATA+1];
 extern gchar * elemts[MAXDATA];
 extern gchar * mo_title[8];
 
@@ -540,12 +540,29 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
         if (obj == 11 && key == 0 && i == 0)
         {
           hbox = create_hbox (0);
-          lab = markup_label ("<u><i>Single terms:</i></u>", 100, 50, 0.0, 0.5);
+          lab = markup_label (_("<u><i>Single terms:</i></u>"), 100, 50, 0.0, 0.5);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 30);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
         }
         hbox = create_hbox (0);
-        str = g_strdup_printf (" <b><i>%s</i></b>", words[i]);
+        if (activef)
+        {
+          if (((obj == 1 || obj == 2) && key == FBONDS-1 && (i == 0 || i == 1))
+           || ((obj == 3 || obj == 4) && key == FANGLES-1 && (i == 0 || i == 1))
+           || ((obj == 5 || obj == 6) && (key == FDIHEDRAL-2 || key == FDIHEDRAL-1) && (i == 0 || i == 1))
+           || ((obj == 5 || obj == 6) && (key == 1 || key == 2) && i ==3))
+          {
+            str = g_strdup_printf (" <b><i>%s</i></b>", _(words[i]));
+          }
+          else
+          {
+            str = g_strdup_printf (" <b><i>%s</i></b>", words[i]);
+          }
+        }
+        else
+        {
+          str = g_strdup_printf (" <b><i>%s</i></b>", words[i]);
+        }
         lab = markup_label (str, 100, -1, 0.0, 0.5);
         g_free (str);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 50);
@@ -559,7 +576,7 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
         cross_vbox = create_vbox (BSEP);
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cross_vbox, FALSE, FALSE, 0);
         cross_hbox = create_hbox (0);
-        lab = markup_label ("<u><i>Cross terms with atom:</i></u>", 160, -1, 0.0, 0.5);
+        lab = markup_label (_("<u><i>Cross terms with atom:</i></u>"), 160, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cross_hbox, lab, FALSE, FALSE, 30);
         cross_box = combo_cross (tmp_fbody);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cross_hbox, cross_box, FALSE, FALSE, 0);
@@ -589,7 +606,7 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
     else
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("<i>Tabulated</i>");
+      str = g_strdup_printf (_("<i>Tabulated</i>"));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 30);
@@ -597,7 +614,9 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
     }
     if (obj == 9 && tmp_field -> type >= CFF91 && tmp_field -> type <= COMPASS)
     {
-      str = g_strdup_printf ("In %s, non-bonded interactions are evaluated using: \n%s\nTherefore the parameters provided by the force field are incompatible with the DL-POLY options.", field_acro[tmp_field -> type], get_this_vdw_string());
+      str = g_strdup_printf (_("In %s, non-bonded interactions are evaluated using: \n%s\n"
+                               "Therefore the parameters provided by the force field are incompatible with the DL-POLY options."), 
+                             field_acro[tmp_field -> type], get_this_vdw_string());
       hbox = create_hbox (0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, -1, -1, 0.5, 0.5), FALSE, FALSE, 50);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
@@ -607,18 +626,18 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
     {
       if (tmp_field -> type < CVFF)
       {
-        str = g_strdup_printf ("In %s, 12-6 non-bonded interactions are evaluated using: \n%s\n<i><b>A</b></i> and <i><b>B</b></i>"
-                               " are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters.",
+        str = g_strdup_printf (_("In %s, 12-6 non-bonded interactions are evaluated using: \n%s\n<i><b>A</b></i> and <i><b>B</b></i>"
+                                 " are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters."),
                                field_acro[tmp_field -> type], get_this_vdw_string());
         if (tmp_field -> type > AMBER99)
         {
-          str = g_strdup_printf ("%s\nScaled 1-4 exclusion parameters, provided by the %s force field, are ignored.", str, field_acro[tmp_field -> type]);
+          str = g_strdup_printf (_("%s\nScaled 1-4 exclusion parameters, provided by the %s force field, are ignored."), str, field_acro[tmp_field -> type]);
         }
       }
       else
       {
-        str = g_strdup_printf ("In %s, 12-6 non-bonded interactions are evaluated using: \n%s\n<i><b>A</b></i> and <i><b>B</b></i>"
-                               " are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters.",
+        str = g_strdup_printf (_("In %s, 12-6 non-bonded interactions are evaluated using: \n%s\n<i><b>A</b></i> and <i><b>B</b></i>"
+                                 " are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters."),
                                field_acro[tmp_field -> type], get_this_vdw_string());
       }
       hbox = create_hbox (0);
@@ -629,7 +648,7 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
     else if ((obj == 3 || obj == 4) && tmp_field -> type > AMBER99 && tmp_field -> type < CVFF)
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Urey-Bradley terms provided by the %s force field are ignored.\n", field_acro[tmp_field -> type]);
+      str = g_strdup_printf (_("Urey-Bradley terms provided by the %s force field are ignored.\n"), field_acro[tmp_field -> type]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, -1, -1, 0.5, 0.5), FALSE, FALSE, 50);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
       g_free (str);
@@ -647,10 +666,10 @@ GtkWidget * parameters_box (int obj, int key,  gchar ** words, float * data)
 */
 gchar * field_str (int a)
 {
-  gchar * str = g_strdup_printf ("External field");
+  gchar * str = g_strdup_printf (_("External field"));
   if (a > -1)
   {
-    str = g_strdup_printf ("%s: <b>%s</b>", str, fnames[activef][15][a]);
+    str = g_strdup_printf ("%s: <b>%s</b>", str, (activef) ? fnames[activef][15][a] : _(fnames[activef][15][a]));
   }
   return str;
 }
@@ -662,13 +681,13 @@ gchar * field_str (int a)
 */
 gboolean tersoff_question ()
 {
-  gchar * text = "Are you sure to want to change the type of Tersoff potential ?\n"
-                 "<i>Tersoff (ter)</i> and <i>KIHS (kihs)</i> forms cannot be mixed\n"
-                 "Therefore this choice will affect <b>all</b> Tersoff potential(s)"
-                 "Any previous parameters will be erased !";
+  gchar * text = _("Are you sure to change the type of Tersoff potential ?\n"
+                   "<i>Tersoff (ter)</i> and <i>KIHS (kihs)</i> forms cannot be mixed\n"
+                   "Therefore this choice will affect <b>all</b> Tersoff potential(s).\n"
+                   "Any previous parameters will be erased !");
   if (num_body_d > 1)
   {
-    return ask_yes_no ("Change Tersoff potential ?!", text, GTK_MESSAGE_QUESTION, field_assistant);
+    return ask_yes_no (_("Change Tersoff potential ?!"), text, GTK_MESSAGE_QUESTION, field_assistant);
   }
   else
   {
@@ -1038,7 +1057,6 @@ void select_atom_set_color (GtkCellRenderer * renderer, int i)
 void select_atom_set_cmv (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int h, i, j, k;
-  gchar * str = NULL;
   gtk_tree_model_get (mod, iter, 0, & h, -1);
   if (active_sel < 11)
   {
@@ -1057,17 +1075,13 @@ void select_atom_set_cmv (GtkTreeViewColumn * col, GtkCellRenderer * renderer, G
     case 1:
       if (active_sel > 10)
       {
-        gtk_tree_model_get (mod, iter, 1, & str, -1);
-        g_object_set (renderer, "markup", str, NULL, NULL);
-        g_free (str);
+        set_renderer_markup (mod, iter, renderer, 1);
         i = h;
       }
       gtk_cell_renderer_set_visible (renderer, i);
       break;
     case 2:
-      gtk_tree_model_get (mod, iter, 2, & str, -1);
-      g_object_set (renderer, "markup", str, NULL, NULL);
-      g_free (str);
+      set_renderer_markup (mod, iter, renderer, 2);
       gtk_cell_renderer_set_visible (renderer, i);
       break;
     case 3:
@@ -1167,8 +1181,8 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
   GtkTreeIter atom_level;
   GtkTreeViewColumn * ato_col[5];
   GtkCellRenderer * ato_cell[5];
-  gchar * ato_title[5] = {"Atom Id", "Fragment", "Atom", "Weight (1)", "Viz.3D & Select"};
-  gchar * nbd_title[5] = {"Atom Id", "Field atom", "Field molecule(s)", " ", "Viz.3D & Select"};
+  gchar * ato_title[5] = {i18n("Atom Id."), i18n("Fragment"), i18n("Atom"), i18n("Weight (1)"), i18n("Viz.3D & Select")};
+  gchar * nbd_title[5] = {i18n("Atom Id."), i18n("Field atom"), i18n("Field molecule(s)"), " ", i18n("Viz.3D & Select")};
   gchar * ctype[5]={"text", "text", "text", "text", "active"};
   GType col_type[2][5] = {{G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_FLOAT},
                           {G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT, G_TYPE_BOOLEAN}};
@@ -1181,73 +1195,73 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
   switch (active_sel)
   {
     case 0:
-      str = g_strdup_printf ("Please select the new atom(s)");
+      str = g_strdup_printf (_("Please select the new atom(s)"));
       o = -1;
       p = -1;
       break;
     case 1:
-      str = g_strdup_printf ("Please select the atom(s) to freeze / unfreeze");
+      str = g_strdup_printf (_("Please select the atom(s) to freeze / unfreeze"));
       o = -1;
       p = -1;
       break;
     case 2:
-      str = g_strdup_printf ("Please select the core atom");
+      str = g_strdup_printf (_("Please select the core atom"));
       o = tmp_fshell -> ia[0]-1;
       p = tmp_fshell -> ia[1]-1;
       break;
     case 3:
-      str = g_strdup_printf ("Please select the atom(s) to shell");
+      str = g_strdup_printf (_("Please select the atom(s) to shell"));
       o = tmp_fshell -> ia[1]-1;
       p = tmp_fshell -> ia[0]-1;
       break;
     case 4:
-      str = g_strdup_printf ("Please select the first atom");
+      str = g_strdup_printf (_("Please select the first atom"));
       o = tmp_fcons -> ia[0]-1;
       p = tmp_fcons -> ia[1]-1;
       break;
     case 5:
-      str = g_strdup_printf ("Please select the second atom");
+      str = g_strdup_printf (_("Please select the second atom"));
       o = tmp_fcons -> ia[1]-1;
       p = tmp_fcons -> ia[0]-1;
       break;
     case 6:
-      str = g_strdup_printf ("Please select the atom(s) in the first unit");
+      str = g_strdup_printf (_("Please select the atom(s) in the first unit"));
       break;
     case 7:
-      str = g_strdup_printf ("Please select the atom(s) in the second unit");
+      str = g_strdup_printf (_("Please select the atom(s) in the second unit"));
       break;
     case 8:
-      str = g_strdup_printf ("Please select the atom(s) in the rigid unit");
+      str = g_strdup_printf (_("Please select the atom(s) in the rigid unit"));
       p = -1;
       break;
     case 9:
-      str = g_strdup_printf ("Please select the tethered atom");
+      str = g_strdup_printf (_("Please select the tethered atom"));
       o = tmp_ftet -> num-1;
       p = -1;
       break;
     case 11:
       if (tmp_fbody -> bd == 2)
       {
-        str = g_strdup_printf ("Please select the type of field atom");
+        str = g_strdup_printf (_("Please select the type of field atom"));
       }
       else
       {
-        str = g_strdup_printf ("Please select the first type of field atom");
+        str = g_strdup_printf (_("Please select the first type of field atom"));
       }
       break;
     case 12:
-      str = g_strdup_printf ("Please select the second type of field atom");
+      str = g_strdup_printf (_("Please select the second type of field atom"));
       break;
     case 13:
-      str = g_strdup_printf ("Please select the third type of field atom");
+      str = g_strdup_printf (_("Please select the third type of field atom"));
       break;
     case 14:
-      str = g_strdup_printf ("Please select the fourth type of field atom");
+      str = g_strdup_printf (_("Please select the fourth type of field atom"));
       break;
   }
   GtkWidget * amol = dialogmodal (str, GTK_WINDOW(field_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(amol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(amol), _("Apply"), GTK_RESPONSE_APPLY);
   a_ato = 0;
   GtkTreeStore * add_model;
   if (active_sel < 11)
@@ -1280,11 +1294,11 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
     }
     if (active_sel < 11)
     {
-      ato_col[i] = gtk_tree_view_column_new_with_attributes (ato_title[k], ato_cell[i], ctype[k], i, NULL);
+      ato_col[i] = gtk_tree_view_column_new_with_attributes (_(ato_title[k]), ato_cell[i], ctype[k], i, NULL);
     }
     else
     {
-      ato_col[i] = gtk_tree_view_column_new_with_attributes (nbd_title[k], ato_cell[i], ctype[k], i, NULL);
+      ato_col[i] = gtk_tree_view_column_new_with_attributes ((k != 3) ? _(nbd_title[k]) : nbd_title[k], ato_cell[i], ctype[k], i, NULL);
     }
     gtk_tree_view_append_column (GTK_TREE_VIEW(add_tree), ato_col[i]);
     gtk_tree_view_column_set_alignment (ato_col[i], 0.5);
@@ -1300,11 +1314,11 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
   // fill model
   if (active_sel < 2)
   {
-    sel_at = allocdint(2, tmp_fat -> num/tmp_fmol -> multi);
+    sel_at = allocdint (2, tmp_fat -> num/tmp_fmol -> multi);
   }
   else if (active_sel < 11)
   {
-    sel_at = allocdint(2, tmp_fmol -> mol -> natoms);
+    sel_at = allocdint (2, tmp_fmol -> mol -> natoms);
   }
   else
   {
@@ -1316,7 +1330,7 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
                      get_active_atom (tmp_fbo -> ma[1][0], tmp_fbo -> a[1][0]) -> name) == 0) k ++;
       if (tmp_fbo -> next != NULL) tmp_fbo = tmp_fbo -> next;
     }
-    sel_at = allocdint(1, k);
+    sel_at = allocdint (1, k);
     num_field_objects = k;
   }
 
@@ -1565,15 +1579,16 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
 
   if (q && active_sel < 11)
   {
-    str = g_strdup_printf (" <b>(1)</b> if all 0.0 then atomic weight(s) will be used by DL-POLY");
+    str = g_strdup_printf (_(" <b>(1)</b> if all 0.0 then atomic weight(s) will be used by DL-POLY"));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
   if (active_sel < 2)
   {
-    str = g_strdup_printf ("The atom(s) above will be described\n"
-                           "in the force field using the parameters\n"
-                           "of the <b>%s</b> field atom.\n", tmp_fat -> name);
+    str = g_strdup_printf (_("The atom(s) above will be described\n"
+                             "in the force field using the parameters\n"
+                             "of the <b>%s</b> field atom.\n"),
+                           tmp_fat -> name);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
@@ -1587,7 +1602,7 @@ G_MODULE_EXPORT void select_atom_id_from_fied_molecule (GtkButton * but, gpointe
       run_this_gtk_dialog (amol, G_CALLBACK(run_select_atom_dialog), GINT_TO_POINTER(active_sel));
       if (active_sel == 1)
       {
-        str = g_strdup_printf ("%d atom(s)", tmp_fat -> frozen);
+        str = g_strdup_printf (_("%d atom(s)"), tmp_fat -> frozen);
         if (but) gtk_button_set_label (but, str);
       }
       break;
@@ -1631,7 +1646,7 @@ gchar * body_str (int a)
 {
   int i, j;
   j = body_at (a);
-  gchar * str = g_strdup_printf ("%s <b>", felemts[a+MOLIMIT+1]);
+  gchar * str = g_strdup_printf ("%s <b>", _(felemt[a+MOLIMIT+1]));
   for (i=0; i<j; i++)
   {
     if (tmp_fbody -> na[i] > -1)
@@ -1664,7 +1679,7 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=i-2;
     if (! tmp_fshell -> ia[j])
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
@@ -1680,7 +1695,7 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=i-4;
     if (! tmp_fcons -> ia[j])
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
@@ -1696,12 +1711,12 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=i-6;
     if (! tmp_fpmf -> num[j])
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
     {
-      stra = g_strdup_printf ("%d atom(s)", tmp_fpmf -> num[j]);
+      stra = g_strdup_printf (_("%d atom(s)"), tmp_fpmf -> num[j]);
       strb = g_strdup_printf (APPLY);
     }
   }
@@ -1710,12 +1725,12 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=0;
     if (! tmp_frig -> num)
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
     {
-      stra = g_strdup_printf ("%d atom(s)", tmp_frig -> num);
+      stra = g_strdup_printf (_("%d atom(s)"), tmp_frig -> num);
       strb = g_strdup_printf (APPLY);
     }
   }
@@ -1724,7 +1739,7 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=0;
     if (! tmp_ftet -> num)
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
@@ -1739,7 +1754,7 @@ G_MODULE_EXPORT void selection_button (GtkButton * but, gpointer data)
     j=i-11;
     if (tmp_fbody -> na[j] < 0)
     {
-      stra = g_strdup_printf ("Not picked yet !");
+      stra = g_strdup_printf (_("Not picked yet !"));
       strb = g_strdup_printf (DELETEB);
     }
     else
@@ -2048,7 +2063,7 @@ void adjust_vdw_interactions (gboolean add_shell)
   {
     gboolean add_vdw;
     gchar * str;
-    gchar ** to_be_vdw = g_malloc (i*sizeof*to_be_vdw);
+    gchar ** to_be_vdw = g_malloc0(i*sizeof*to_be_vdw);
     int * vdw_mlist = allocint (i);
     int ** vdw_aids = allocdint (i,i);
     int ** vdw_mids = allocdint (i,i);
@@ -2265,7 +2280,7 @@ G_MODULE_EXPORT void run_edit_parameters (GtkDialog * dialog, gint response_id, 
 */
 void edit_parameters (int f, int id)
 {
-  gchar * str = g_strdup_printf ("%s parameter(s)", felemts[f+1]);
+  gchar * str = g_strdup_printf (_("%s parameter(s)"), _(felemt[f+1]));
   GtkWidget * dialog = dialogmodal(str, GTK_WINDOW(field_assistant));
   GtkWidget * lab;
   GtkWidget * entry;
@@ -2275,11 +2290,11 @@ void edit_parameters (int f, int id)
   GtkWidget * box = dialog_get_content_area (dialog);
   gboolean show_it;
   gboolean use_it;
-  gchar * cs_name[3]={"Core atom: ", "Shell atom: ", "Selection: "};
-  gchar * cs_param[4]={"Mass:", "Charge:", "<i>k<sub>2</sub></i> ", "<i>k<sub>4</sub></i> "};
+  gchar * cs_name[3]={i18n("Core atom: "), i18n("Shell atom: "), i18n("Selection: ")};
+  gchar * cs_param[4]={i18n("Mass:"), i18n("Charge:"), "<i>k<sub>2</sub></i> ", "<i>k<sub>4</sub></i> "};
   gchar * cs_unit[4]={"g mol<sup>-1</sup>", " ", "&#xC5;<sup>-2</sup>", "&#xC5;<sup>-4</sup>"};
-  gchar * co_name[4]={"First atom: ", "Second atom: ", "Third atom: ", "Fourth atom: "};
-  gchar * pm_name[2]={"First unit: ", "Second unit: "};
+  gchar * co_name[4]={i18n("First atom: "), i18n("Second atom: "), i18n("Third atom: "), i18n("Fourth atom: ")};
+  gchar * pm_name[2]={i18n("First unit: "), i18n("Second unit: ")};
   int i, j, k, l, m;
   float v;
   gchar * ba;
@@ -2289,7 +2304,7 @@ void edit_parameters (int f, int id)
   if (f < MOLIMIT)
   {
    i = combo_get_active (combo_mol[f-1]);
-   lab = markup_label (g_strdup_printf ("\tMolecule: \t<b>%s</b>", get_active_field_molecule(i) -> name), -1, 30, 0.0, 0.5);
+   lab = markup_label (g_strdup_printf (_("\tMolecule: \t<b>%s</b>"), get_active_field_molecule(i) -> name), -1, 30, 0.0, 0.5);
    add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
    tmp_fmol = get_active_field_molecule (i);
   }
@@ -2299,10 +2314,10 @@ void edit_parameters (int f, int id)
       // Atom edit
       tmp_fat = get_active_atom(i, id);
       rep_atom_name = g_strdup_printf("%s", tmp_fat -> name);
-      lab = markup_label (g_strdup_printf ("\tAtom: \t\t<b>%s</b>", rep_atom_name), -1, 50, 0.0, 0.5);
+      lab = markup_label (g_strdup_printf (_("\tAtom: \t\t<b>%s</b>"), rep_atom_name), -1, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Element:");
+      str = g_strdup_printf (_("Element:"));
       lab = markup_label (str, 120, 30, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2312,20 +2327,20 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Field parameters:");
+      str = g_strdup_printf (_("Field parameters:"));
       lab = markup_label (str, 120, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       combo = create_combo ();
-      combo_text_append (combo, "Manual");
-      combo_text_append (combo, "Automatic");
+      combo_text_append (combo, _("Manual"));
+      combo_text_append (combo, _("Automatic"));
       combo_set_active (combo, (tmp_fat -> afid > -1) ? 1 : 0);
       widget_set_sensitive (combo, atoms_id[tmp_fat -> sp]);
       g_signal_connect (G_OBJECT(combo), "changed", G_CALLBACK(changed_atom_combo), GINT_TO_POINTER(0));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Force field type <sup>*</sup>:");
+      str = g_strdup_printf (_("Force field type <sup>*</sup>:"));
       lab = markup_label (str, 120, 30, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2347,7 +2362,7 @@ void edit_parameters (int f, int id)
       widget_set_sensitive (afftype, (tmp_fat -> afid > -1) ? TRUE : FALSE);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Name: ");
+      str = g_strdup_printf (_("Name: "));
       lab = markup_label (str, 120, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2356,7 +2371,7 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Mass: ");
+      str = g_strdup_printf (_("Mass: "));
       lab = markup_label (str, 120, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2365,7 +2380,7 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Charge: ");
+      str = g_strdup_printf (_("Charge: "));
       lab = markup_label (str, 120, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2374,11 +2389,11 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, entry, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Frozen: ");
+      str = g_strdup_printf (_("Frozen: "));
       lab = markup_label (str, 120, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
-      str = g_strdup_printf ("%d atom(s)", tmp_fat -> frozen);
+      str = g_strdup_printf (_("%d atom(s)"), tmp_fat -> frozen);
       but = create_button (str, IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(select_atom_id_from_fied_molecule), GINT_TO_POINTER(1));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
@@ -2386,17 +2401,17 @@ void edit_parameters (int f, int id)
     case 2:
       // Shell edit
       tmp_fshell = get_active_shell (i, id);
-      str = g_strdup_printf ("\tCore-Shell N°<b>%d</b>", tmp_fshell -> id+1);
+      str = g_strdup_printf (_("\tCore-Shell N°<b>%d</b>"), tmp_fshell -> id+1);
       lab = markup_label (str, 300, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
       for (k=0; k<2; k++)
       {
         hbox = create_hbox (0);
-        lab = markup_label (cs_name[k], 100, -1, 0.0, 0.5);
+        lab = markup_label (_(cs_name[k]), 100, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
         if (! tmp_fshell -> ia[k])
         {
-          str = g_strdup_printf ("Not picked yet !");
+          str = g_strdup_printf (_("Not picked yet !"));
           img_but[k] = stock_image (DELETEB);
         }
         else
@@ -2414,29 +2429,29 @@ void edit_parameters (int f, int id)
       /*for (k=0; k<3; k++)
       {
         shell_hbox[k] = create_hbox (0);
-        lab = markup_label (cs_name[k], 100, -1, 0.0, 0.5);
+        lab = markup_label (_(cs_name[k]), 100, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, shell_hbox[k], lab, FALSE, FALSE, 10);
         if ((k < 2 && tmp_fshell -> ia[k] == -1) || (k == 2 && ! tmp_fshell -> ib))
         {
-          str = g_strdup_printf ("Not picked yet !");
+          str = g_strdup_printf (_("Not picked yet !"));
           img_but[k] = stock_image (DELETEB);
         }
         else
         {
           if (k < 2)
           {
-            str = g_strdup_printf ("Selected !");
+            str = g_strdup_printf (_("Selected !"));
           }
           else
           {
-            str = g_strdup_printf ("%d atom(s) selected !", tmp_fshell -> ia[1]-1);
+            str = g_strdup_printf (_("%d atom(s) selected !"), tmp_fshell -> ia[1]-1);
           }
           img_but[k] = stock_image (APPLY);
         }
         if (k < 2)
         {
           shell_cbox[k] = create_combo ();
-          combo_text_append (shell_cbox[k], "Not picked yet !");
+          combo_text_append (shell_cbox[k], _("Not picked yet !"));
           switch (k)
           {
             case 0:
@@ -2448,8 +2463,8 @@ void edit_parameters (int f, int id)
               }
               break;
             case 1:
-              combo_text_append (shell_cbox[k], "All atoms");
-              combo_text_append (shell_cbox[k], "Selected atoms");
+              combo_text_append (shell_cbox[k], _("All Atoms"));
+              combo_text_append (shell_cbox[k], _("Selected Atoms"));
               break;
           }
           l = (! k) ? tmp_fshell -> ia[k]+1 : (tmp_fshell -> ia[k] < 1) ? tmp_fshell -> ia[k]+1 : 2;
@@ -2473,7 +2488,7 @@ void edit_parameters (int f, int id)
       for (k=0; k<4; k++)
       {
         hbox = create_hbox (0);
-        lab = markup_label (cs_param[k], 100, -1, 0.0, 0.5);
+        lab = markup_label ((k < 2) ? _(cs_param[k]) : cs_param[k], 100, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
         entry = create_entry (G_CALLBACK(update_atom_parameter), 150, 15, FALSE, GINT_TO_POINTER(2+k));
         v = (! k) ? tmp_fshell -> m : (k == 1) ? tmp_fshell -> z : (k == 2) ? tmp_fshell -> k2 : tmp_fshell -> k4;
@@ -2493,7 +2508,7 @@ void edit_parameters (int f, int id)
         add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       }
       hbox = create_hbox (0);
-      lab = markup_label("Use non-bonded: ", 185, 40, 0.0, 0.5);
+      lab = markup_label(_("Use non-bonded: "), 185, 40, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (NULL, -1, -1, tmp_fshell -> vdw, G_CALLBACK(shell_in_vdw), NULL), FALSE, FALSE, 30);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
@@ -2503,17 +2518,17 @@ void edit_parameters (int f, int id)
     case 3:
       // Constraint edit
       tmp_fcons = get_active_constraint (i, id);
-      str = g_strdup_printf ("\tBond constraint N°<b>%d</b>", tmp_fcons -> id+1);
+      str = g_strdup_printf (_("\tBond constraint N°<b>%d</b>"), tmp_fcons -> id+1);
       lab = markup_label (str, 300, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
       for (k=0; k<2; k++)
       {
         hbox = create_hbox (0);
-        lab = markup_label (co_name[k], 100, -1, 0.0, 0.5);
+        lab = markup_label (_(co_name[k]), 100, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
         if (! tmp_fcons -> ia[k])
         {
-          str = g_strdup_printf ("Not picked yet !");
+          str = g_strdup_printf (_("Not picked yet !"));
           img_but[k] = stock_image (DELETEB);
         }
         else
@@ -2529,7 +2544,7 @@ void edit_parameters (int f, int id)
         add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       }
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Av. distance (1): ");
+      str = g_strdup_printf (_("Av. distance (1): "));
       lab = markup_label (str, 100, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       av_lgt = markup_label ("", 150, 50, 0.5, 0.5);
@@ -2540,7 +2555,7 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 30);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Length: ");
+      str = g_strdup_printf (_("Length: "));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2558,22 +2573,22 @@ void edit_parameters (int f, int id)
     case 4:
       // Pmf edit
       tmp_fpmf = get_active_pmf (i, id);
-      str = g_strdup_printf ("\tMean force potential N°<b>%d</b>", tmp_fpmf -> id+1);
+      str = g_strdup_printf (_("\tMean force potential N°<b>%d</b>"), tmp_fpmf -> id+1);
       lab = markup_label (str, 300, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
       for (k=0; k<2; k++)
       {
         hbox = create_hbox (0);
-        lab = markup_label (pm_name[k], 100, -1, 0.0, 0.5);
+        lab = markup_label (_(pm_name[k]), 100, -1, 0.0, 0.5);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
         if (tmp_fpmf -> num[k] == 0)
         {
-          str = g_strdup_printf ("Not picked yet !");
+          str = g_strdup_printf (_("Not picked yet !"));
           img_but[k] = stock_image (DELETEB);
         }
         else
         {
-          str = g_strdup_printf ("%d atom(s)", tmp_fpmf -> num[k]);
+          str = g_strdup_printf (_("%d atom(s)"), tmp_fpmf -> num[k]);
           img_but[k] = stock_image (APPLY);
         }
         but = create_button (str, IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(selection_button), GINT_TO_POINTER(k+6));
@@ -2584,7 +2599,7 @@ void edit_parameters (int f, int id)
       }
 
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Av. d<sub>1-2</sub> (1): ");
+      str = g_strdup_printf (_("Av. d<sub>1-2</sub> (1): "));
       lab = markup_label (str, 100, 50, 0.0, 0.5);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       av_lgt = markup_label ("", 150, 50, 0.5, 0.5);
@@ -2596,7 +2611,7 @@ void edit_parameters (int f, int id)
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
 
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Length: ");
+      str = g_strdup_printf (_("Length: "));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2614,24 +2629,24 @@ void edit_parameters (int f, int id)
     case 5:
       // Rigid edit
       tmp_frig = get_active_rigid (i, id);
-      str = g_strdup_printf ("\tRigid unit N°<b>%d</b>", id+1);
+      str = g_strdup_printf (_("\tRigid unit N°<b>%d</b>"), id+1);
       lab = markup_label (str, 300, 50, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
 
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Atom(s): ");
+      str = g_strdup_printf (_("Atom(s): "));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       if (tmp_frig -> num == 0)
       {
-        str = g_strdup_printf ("Not picked yet !");
+        str = g_strdup_printf (_("Not picked yet !"));
         img_but[0] = stock_image (DELETEB);
       }
       else
       {
-        str = g_strdup_printf ("%d atom(s)", tmp_frig -> num);
+        str = g_strdup_printf (_("%d atom(s)"), tmp_frig -> num);
         img_but[0] = stock_image (APPLY);
       }
       but = create_button (str, IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(selection_button), GINT_TO_POINTER(8));
@@ -2645,19 +2660,19 @@ void edit_parameters (int f, int id)
     case 6:
       // Tethered
       tmp_ftet = get_active_tethered (i, id);
-      str = g_strdup_printf ("\tTethered atom N°<b>%d</b>", id+1);
+      str = g_strdup_printf (_("\tTethered atom N°<b>%d</b>"), id+1);
       lab = markup_label (str, 300, 50, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
 
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Atom: ");
+      str = g_strdup_printf (_("Atom: "));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       if (! tmp_ftet -> num)
       {
-        str = g_strdup_printf ("Not picked yet !");
+        str = g_strdup_printf (_("Not picked yet !"));
         img_but[0] = stock_image (DELETEB);
       }
       else
@@ -2686,10 +2701,10 @@ void edit_parameters (int f, int id)
         // Bond, angle, dihedral, improper, inversion edit
         tmp_fstr = get_active_struct (f-7, i, id);
         m = struct_id (f);
-        str = g_strdup_printf ("\t%s type N°<b>%d</b>\n\tField atoms: <b>", mo_title[f-7], id+1);
+        str = g_strdup_printf (_("\t%s type N°<b>%d</b>\n\tField atoms: <b>"), mo_title[f-7], id+1);
         for (k=0; k<m; k++)
         {
-          if (k == m-1) str = g_strdup_printf ("%s</b> and <b>", str);
+          if (k == m-1) str = g_strdup_printf (_("%s</b> and <b>"), str);
           str = g_strdup_printf ("%s%s", str, get_active_atom (i, tmp_fstr -> aid[k]) -> name);
           if (m > 2 && k < m-1) str = g_strdup_printf ("%s</b>, <b>", str);
         }
@@ -2698,12 +2713,12 @@ void edit_parameters (int f, int id)
         gtk_tree_model_get (GTK_TREE_MODEL(field_model[f]), & field_iter, 0, & is_moy, -1);
         if (! is_moy)
         {
-          str = g_strdup_printf ("%s\n\tBetween atoms: <b>", str);
+          str = g_strdup_printf (_("%s\n\tBetween atoms: <b>"), str);
           for (k=0; k<m; k++)
           {
             gtk_tree_model_get (GTK_TREE_MODEL(field_model[f]), & field_iter, k+1, & ba, -1);
             edit_atids[k] =  (int) string_to_double ((gpointer)ba) - 1;
-            if (k == m-1) str = g_strdup_printf ("%s</b> and <b>", str);
+            if (k == m-1) str = g_strdup_printf (_("%s</b> and <b>"), str);
             str = g_strdup_printf ("%s%s", str, ba);
             if (m > 2 && k < m-1) str = g_strdup_printf ("%s</b>, <b>", str);
           }
@@ -2750,16 +2765,16 @@ void edit_parameters (int f, int id)
             hbox = create_hbox (0);
             if (l == 2)
             {
-              lab = markup_label ("Tersoff atom: ", 100, -1, 0.0, 0.5);
+              lab = markup_label (_("Tersoff atom: "), 100, -1, 0.0, 0.5);
             }
             else
             {
-              lab = markup_label (co_name[k], 100, -1, 0.0, 0.5);
+              lab = markup_label (_(co_name[k]), 100, -1, 0.0, 0.5);
             }
             add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
             if (tmp_fbody -> na[k] < 0)
             {
-              str = g_strdup_printf ("Not picked yet !");
+              str = g_strdup_printf (_("Not picked yet !"));
               img_but[k] = stock_image (DELETEB);
             }
             else
@@ -2782,23 +2797,23 @@ void edit_parameters (int f, int id)
   if (f < SEXTERN)
   {
     hbox = create_hbox (0);
-    lab = markup_label("Visualize in the model: ", (f == 1) ? 150 : 185, 40, 0.0, 0.5);
+    lab = markup_label(_("Visualize in the model: "), (f == 1) ? 150 : 185, 40, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (NULL, -1, -1, show_it, G_CALLBACK(visualize_it), GINT_TO_POINTER(f)), FALSE, FALSE, 30);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
   }
   if (f == 1)
   {
-    str = g_strdup_printf ("<sup>*</sup> this will be used to adjust bonding, angles, etc ... accordingly,\n"
-                           "  providing that some parameters can be found in the force field data.\n"
-                           "  Please note that comments are directly imported from the force field file.");
+    str = g_strdup_printf (_("<sup>*</sup> this will be used to adjust bonding, angles, etc ... accordingly,\n"
+                             "  providing that some parameters can be found in the force field data.\n"
+                             "  Please note that comments are directly imported from the force field file."));
     lab = markup_label (str, -1, 75, 0.5, 0.5);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
   }
   if (f > 1)
   {
     hbox = create_hbox (0);
-    lab = markup_label("Use to create force field: ", 185, 40, 0.0, 0.5);
+    lab = markup_label(_("Use to create force field: "), 185, 40, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (NULL, -1, -1, use_it, G_CALLBACK(select_it), GINT_TO_POINTER(f)), FALSE, FALSE, 30);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
@@ -2809,31 +2824,31 @@ void edit_parameters (int f, int id)
         if (f != 15 || tmp_field -> type < CFF91 || tmp_field -> type > COMPASS)
         {
           hbox = create_hbox (0);
-          gchar * funits[5] ={"Ev", "kcal mol<sup>-1</sup>", "kJ mol<sup>-1</sup>", "K B<sup>-1</sup>", "DL_POLY internal units"};
-          str = g_strdup_printf ("Field parameters <sup>*</sup>:");
+          gchar * funits[5] ={"Ev", "kcal mol<sup>-1</sup>", "kJ mol<sup>-1</sup>", "K B<sup>-1</sup>", _("DL_POLY internal units")};
+          str = g_strdup_printf (_("Field parameters <sup>*</sup>:"));
           lab = markup_label (str, 120, -1, 0.0, 0.5);
           g_free (str);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_field_prop_combo (f, is_moy), FALSE, FALSE, 0);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 0);
-          str = g_strdup_printf ("<sup>*</sup> Available parameters with matching chemical species,\n"
-                                 "  %s force field energy related parameters in: %s \n"
-                                 "  if required conversion to FIELD file energy unit will be performed upon selection.\n"
-                                 "  Please note that comments are directly imported from the force field file.\n",
-                                 field_acro[tmp_field -> type], funits[ff_unit]);
+          str = g_strdup_printf (_("<sup>*</sup> Available parameters with matching chemical species,\n"
+                                   "  %s force field energy related parameters in: %s \n"
+                                   "  if required conversion to FIELD file energy unit will be performed upon selection.\n"
+                                   "  Please note that comments are directly imported from the force field file.\n"),
+                                 field_acro[tmp_field -> type], (ff_unit == 4) ? _(funits[ff_unit]) : funits[ff_unit]);
           lab = markup_label (str, -1, 75, 0.5, 0.5);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, box, lab, FALSE, FALSE, 0);
         }
       }
       hbox = create_hbox (0);
-      str = g_strdup_printf ("Potential: ");
+      str = g_strdup_printf (_("Potential: "));
       lab = markup_label (str, 100, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
       field_key_combo = create_combo ();
       for (j=0; j<fetypes[activef][f-5]; j++)
       {
-        str = g_strdup_printf ("%s (%s)", fnames[activef][f-5][j], exact_name(fkeysw[activef][f-5][j]));
+        str = g_strdup_printf ("%s (%s)", dlp_to_translate(activef,f-5,j) ? _(fnames[activef][f-5][j]) : fnames[activef][f-5][j], exact_name(fkeysw[activef][f-5][j]));
         combo_text_append (field_key_combo, str);
         g_free (str);
       }
@@ -2869,8 +2884,7 @@ void edit_parameters (int f, int id)
     else if (f == 3)
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("  <b>(1)</b> average distance between the 2 atoms\n"
-                             "\tas measured in the 3D model");
+      str = g_strdup_printf (_("  <b>(1)</b> average distance between the 2 atoms\n\tas measured in the 3D model"));
       lab = markup_label (str, 320, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2879,8 +2893,7 @@ void edit_parameters (int f, int id)
     else if (f == 4)
     {
       hbox = create_hbox (0);
-      str = g_strdup_printf ("  <b>(1)</b> average distance between the barycenters\n"
-                             "\tof units 1 and 2 as measured in the model");
+      str = g_strdup_printf (_("  <b>(1)</b> average distance between the barycenters\n\tof units 1 and 2 as measured in the model"));
       lab = markup_label (str, 320, -1, 0.0, 0.5);
       g_free (str);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, lab, FALSE, FALSE, 10);
@@ -2955,10 +2968,10 @@ void check_tersoffs (int id, int key)
     }
     if (cross)
     {
-      tmp_field -> cross = g_malloc (tmp_field -> nbody[2]*sizeof*tmp_field -> cross);
+      tmp_field -> cross = g_malloc0(tmp_field -> nbody[2]*sizeof*tmp_field -> cross);
       for (i=0; i<tmp_field -> nbody[2]; i++)
       {
-        tmp_field -> cross[i] = g_malloc (tmp_field -> nbody[2]*sizeof*tmp_field -> cross[i]);
+        tmp_field -> cross[i] = g_malloc0(tmp_field -> nbody[2]*sizeof*tmp_field -> cross[i]);
         for (j=0; j<tmp_field -> nbody[2]; j++) tmp_field -> cross[i][j] = duplicate_double (3, cross[i][j]);
       }
     }
@@ -2989,9 +3002,9 @@ G_MODULE_EXPORT void edit_field_prop (GSimpleAction * action, GVariant * paramet
       if (action == NULL)
       {
         tmp_fmol = get_active_field_molecule (row_id);
-        tmp = g_strdup_printf ("Please enter name for new molecule N°%d", tmp_field -> molecules);
+        tmp = g_strdup_printf (_("Please enter name for new molecule N°%d"), tmp_field -> molecules);
         tmp_fmol -> name = g_strdup_printf("MOL-%d", i);
-        tmp = cask (tmp, "Molecule name:", 0, tmp_fmol -> name, field_assistant);
+        tmp = cask (tmp, _("Molecule name:"), 0, tmp_fmol -> name, field_assistant);
         if (tmp != NULL)
         {
           tmp_fmol -> name = g_strdup_printf ("%s", tmp);
@@ -3001,8 +3014,8 @@ G_MODULE_EXPORT void edit_field_prop (GSimpleAction * action, GVariant * paramet
       else
       {
         tmp_fmol = get_active_field_molecule (row_id);
-        tmp = g_strdup_printf ("Please enter name for molecule N°%d", row_id+1);
-        tmp = cask (tmp, "Molecule name:", 0, tmp_fmol -> name, field_assistant);
+        tmp = g_strdup_printf (_("Please enter name for molecule N°%d"), row_id+1);
+        tmp = cask (tmp, _("Molecule name:"), 0, tmp_fmol -> name, field_assistant);
         if (tmp != NULL)
         {
           tmp_fmol -> name = g_strdup_printf ("%s", tmp);
@@ -3018,10 +3031,10 @@ G_MODULE_EXPORT void edit_field_prop (GSimpleAction * action, GVariant * paramet
         cross = NULL;
         if (tmp_field -> cross != NULL)
         {
-          cross = g_malloc (tmp_field -> nbody[2]*sizeof*cross);
+          cross = g_malloc0(tmp_field -> nbody[2]*sizeof*cross);
           for (j=0; j<tmp_field -> nbody[2]; j++)
           {
-            cross[j] = g_malloc (tmp_field -> nbody[2]*sizeof*cross[j]);
+            cross[j] = g_malloc0(tmp_field -> nbody[2]*sizeof*cross[j]);
             for (k=0; k<tmp_field -> nbody[2]; k++) cross[j][k] = duplicate_double (3, tmp_field -> cross[j][k]);
           }
         }
@@ -3064,7 +3077,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fshell = get_active_shell (j, fmol -> shells);
       tmp_fshell -> next = init_field_shell (fmol -> shells, 0, 0);
-      tmp_fshell -> next -> prev = g_malloc (sizeof*tmp_fshell -> next -> prev);
+      tmp_fshell -> next -> prev = g_malloc0(sizeof*tmp_fshell -> next -> prev);
       tmp_fshell -> next -> prev = tmp_fshell;
     }
     row_id = fmol -> shells;
@@ -3091,7 +3104,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fcons = get_active_constraint (j, fmol -> constraints);
       tmp_fcons -> next = init_field_constraint (fmol -> constraints, 0, 0);
-      tmp_fcons -> next -> prev = g_malloc0 (sizeof*tmp_fcons -> next -> prev);
+      tmp_fcons -> next -> prev = g_malloc0(sizeof*tmp_fcons -> next -> prev);
       tmp_fcons -> next -> prev = tmp_fcons;
     }
     row_id = fmol -> constraints;
@@ -3118,7 +3131,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fpmf = get_active_pmf (j, fmol -> pmfs);
       tmp_fpmf -> next = init_field_pmf (fmol -> pmfs, NULL, NULL, NULL);
-      tmp_fpmf -> next -> prev = g_malloc0 (sizeof*tmp_fpmf -> next -> prev);
+      tmp_fpmf -> next -> prev = g_malloc0(sizeof*tmp_fpmf -> next -> prev);
       tmp_fpmf -> next -> prev = tmp_fpmf;
     }
     row_id = fmol -> pmfs;
@@ -3150,7 +3163,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_frig = get_active_rigid (j, fmol -> rigids);
       tmp_frig -> next = init_field_rigid (fmol -> rigids, 0, NULL);
-      tmp_frig -> next -> prev = g_malloc0 (sizeof*tmp_frig -> next -> prev);
+      tmp_frig -> next -> prev = g_malloc0(sizeof*tmp_frig -> next -> prev);
       tmp_frig -> next -> prev = tmp_frig;
     }
     row_id = fmol -> rigids;
@@ -3177,7 +3190,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_ftet = get_active_tethered (j, fmol -> tethered);
       tmp_ftet -> next = init_field_tethered (fmol -> tethered, 0);
-      tmp_ftet -> next -> prev = g_malloc0 (sizeof*tmp_ftet -> next -> prev);
+      tmp_ftet -> next -> prev = g_malloc0(sizeof*tmp_ftet -> next -> prev);
       tmp_ftet -> next -> prev = tmp_ftet;
     }
     row_id = fmol -> tethered;
@@ -3204,7 +3217,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fext = get_active_external (tmp_field -> extern_fields-1);
       tmp_fext -> next = init_field_external (tmp_field -> extern_fields);
-      tmp_fext -> next -> prev = g_malloc0 (sizeof*tmp_fext -> next -> prev);
+      tmp_fext -> next -> prev = g_malloc0(sizeof*tmp_fext -> next -> prev);
       tmp_fext -> next -> prev = tmp_fext;
     }
     row_id = tmp_field -> extern_fields;
@@ -3232,7 +3245,7 @@ G_MODULE_EXPORT void add_field_prop (GSimpleAction * action, GVariant * paramete
     {
       tmp_fbody = get_active_body (tmp_field -> nbody[j], j);
       tmp_fbody -> next = init_field_nth_body (tmp_field -> nbody[j], j, NULL, NULL, NULL);
-      tmp_fbody -> next -> prev = g_malloc0 (sizeof*tmp_fbody -> next -> prev);
+      tmp_fbody -> next -> prev = g_malloc0(sizeof*tmp_fbody -> next -> prev);
       tmp_fbody -> next -> prev = tmp_fbody;
     }
     if (j == 2)
@@ -3292,11 +3305,11 @@ G_MODULE_EXPORT void remove_field_prop (GSimpleAction * action, GVariant * param
   {
     j = combo_get_active (combo_mol[i-1]);
     tmp_fmol = get_active_field_molecule (j);
-    str = g_strdup_printf ("Delete %s N°%d from molecule %s, is this correct ?", elemts[i], row_id+1, tmp_fmol -> name);
+    str = g_strdup_printf (_("Delete %s N°%d from molecule %s, is this correct ?"), _(elemts[i]), row_id+1, tmp_fmol -> name);
   }
   else
   {
-    str = g_strdup_printf ("Delete %s, is this correct ?", elemts[i]);
+    str = g_strdup_printf (_("Delete %s, is this correct ?"), _(elemts[i]));
   }
   selection_confirmed = FALSE;
   field_question (str, G_CALLBACK(confirm_selection), NULL);

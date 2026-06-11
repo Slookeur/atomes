@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_hist.c
@@ -75,14 +75,14 @@ int hist_get_data (int linec)
   this_word = strtok (NULL, " ");
   if (! this_word)
   {
-    add_reader_info ("Wrong file format - record <b>ii</b> line is corrupted !", 0);
+    add_reader_info (_("Wrong file format - record <b>ii</b> line is corrupted !"), 0);
     return 0;
   }
   this_reader -> lattice.pbc = (int)string_to_double ((gpointer)this_word);
   this_word = strtok (NULL, " ");
   if (! this_word)
   {
-    add_reader_info ("Wrong file format - record <b>ii</b> line is corrupted !", 0);
+    add_reader_info (_("Wrong file format - record <b>ii</b> line is corrupted !"), 0);
     return 0;
   }
   this_reader -> natomes = (int)string_to_double ((gpointer)this_word);
@@ -391,7 +391,7 @@ int hist_get_content ()
     }
     if (! add_spec)
     {
-      gchar * str = g_strdup_printf ("Cannot find species with a mass of %f !", this_reader -> z[i]);
+      gchar * str = g_strdup_printf (_("Cannot find species with a mass of %f !"), this_reader -> z[i]);
       add_reader_info (str, 0);
       g_free (str);
       return 0;
@@ -437,8 +437,8 @@ int open_hist_file (int linec)
   int i, j, k, l;
   if (hist_get_data(linec))
   {
-    reader_info ("hist", "Number of atoms", this_reader -> natomes);
-    reader_info ("hist", "Number of steps", this_reader -> steps);
+    reader_info ("hist", _("Number of atoms"), this_reader -> natomes);
+    reader_info ("hist", _("Number of steps"), this_reader -> steps);
     if (hist_get_content())
     {
       active_cell -> ltype = 2;

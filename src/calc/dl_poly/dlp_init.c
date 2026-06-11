@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_init.c
@@ -305,7 +305,7 @@ field_atom* init_field_atom (int id, int type, int at, int nat, int coo, int * l
 {
   int h, i, j, k, l, m, n;
   field_atom* ato;
-  ato = g_malloc0 (sizeof*ato);
+  ato = g_malloc0(sizeof*ato);
   ato -> id = id;
   ato -> type = type;
   ato -> num = nat;
@@ -394,7 +394,7 @@ field_atom* init_field_atom (int id, int type, int at, int nat, int coo, int * l
 field_shell * init_field_shell (int id, int ia, int ib)
 {
   field_shell * shell;
-  shell = g_malloc0 (sizeof*shell);
+  shell = g_malloc0(sizeof*shell);
   shell -> id = id;
   shell -> ia[0] = ia;
   shell -> ia[1] = ib;
@@ -419,7 +419,7 @@ field_shell * init_field_shell (int id, int ia, int ib)
 field_constraint * init_field_constraint (int id, int ia, int ib)
 {
   field_constraint * cons;
-  cons = g_malloc0 (sizeof*cons);
+  cons = g_malloc0(sizeof*cons);
   cons -> id = id;
   cons -> ia[0] = ia;
   cons -> ia[1] = ib;
@@ -445,7 +445,7 @@ field_constraint * init_field_constraint (int id, int ia, int ib)
 field_pmf * init_field_pmf (int id, int num[2], int * list[2], float * w[2])
 {
   field_pmf * pmf;
-  pmf = g_malloc0 (sizeof*pmf);
+  pmf = g_malloc0(sizeof*pmf);
   pmf -> id = id;
   pmf -> av = -1.0;
   pmf -> length = 0.0;
@@ -487,7 +487,7 @@ field_pmf * init_field_pmf (int id, int num[2], int * list[2], float * w[2])
 field_rigid * init_field_rigid (int id, int num, int * list)
 {
   field_rigid * rig;
-  rig = g_malloc0 (sizeof*rig);
+  rig = g_malloc0(sizeof*rig);
   rig -> id = id;
   rig -> num = num;
   rig -> list = NULL;
@@ -510,7 +510,7 @@ field_rigid * init_field_rigid (int id, int num, int * list)
 field_tethered * init_field_tethered (int id, int num)
 {
   field_tethered * tet;
-  tet = g_malloc0 (sizeof*tet);
+  tet = g_malloc0(sizeof*tet);
   tet -> id = id;
   tet -> num = num;
   tet -> key = 0;
@@ -535,7 +535,7 @@ field_tethered * init_field_tethered (int id, int num)
 field_prop * init_field_prop (int ti, int key, gboolean show, gboolean use)
 {
   field_prop * prop;
-  prop = g_malloc0 (sizeof*prop);
+  prop = g_malloc0(sizeof*prop);
   prop -> aid = allocint (struct_id(ti+7));
   prop -> key = key;
   prop -> pid = -1;
@@ -704,7 +704,7 @@ gboolean was_not_created_struct (int ids, int num, int * aid)
 field_struct * init_field_struct (int st, int ai, int an, int * aid)
 {
   field_struct * str;
-  str = g_malloc0 (sizeof*str);
+  str = g_malloc0(sizeof*str);
   str -> st = st;
   str -> id = ai;
   if (st == 6 || st == 7)
@@ -741,12 +741,12 @@ field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int *
 {
   int i, j;
   field_nth_body * nthbd;
-  nthbd = g_malloc0 (sizeof*nthbd);
+  nthbd = g_malloc0(sizeof*nthbd);
   nthbd -> id = bi;
   nthbd -> bd = bd;
   if (! bd)
   {
-    nthbd -> fpid = allocint(2);
+    nthbd -> fpid = allocint (2);
     nthbd -> fpid[0] = nthbd -> fpid[1] = -1;
   }
   j = body_at (bd);
@@ -762,10 +762,10 @@ field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int *
   }
   // Molecule id
   nthbd -> ma = NULL;
-  nthbd -> ma = g_malloc0 (j*sizeof*nthbd -> ma);
+  nthbd -> ma = g_malloc0(j*sizeof*nthbd -> ma);
   // Field atom id in molecule
   nthbd -> a = NULL;
-  nthbd -> a = g_malloc0 (j*sizeof*nthbd -> a);
+  nthbd -> a = g_malloc0(j*sizeof*nthbd -> a);
   for (i=0; i < j; i++)
   {
     if (ma != NULL) nthbd -> ma[i] = duplicate_int (na[i], ma[i]);
@@ -790,7 +790,7 @@ field_nth_body * init_field_nth_body (int bi, int bd, int * na, int ** ma, int *
 field_external * init_field_external (int bi)
 {
   field_external * nfext;
-  nfext = g_malloc0 (sizeof*nfext);
+  nfext = g_malloc0(sizeof*nfext);
   nfext -> id = bi;
   nfext -> key = -1;
   nfext -> val = NULL;
@@ -821,7 +821,7 @@ int prepare_field_atom (int i, int j, int k, int l, int m)
   else
   {
     tmp_fat -> next = init_field_atom (i, j, k, l, m, NULL);
-    tmp_fat -> next -> prev = g_malloc0 (sizeof*tmp_fat -> next -> prev);
+    tmp_fat -> next -> prev = g_malloc0(sizeof*tmp_fat -> next -> prev);
     tmp_fat -> next -> prev = tmp_fat;
     tmp_fat = tmp_fat -> next;
   }
@@ -1967,7 +1967,7 @@ void find_atom_id_in_field_molecule ()
   int seed = -1;
   assigned = 0;
 
-  coordnum = allocdint(tmp_proj -> nspec, tmp_coord -> totcoord[1]);
+  coordnum = allocdint (tmp_proj -> nspec, tmp_coord -> totcoord[1]);
   tmp_fat = tmp_fmol -> first_atom;
   while (tmp_fat)
   {
@@ -2179,7 +2179,7 @@ void init_all_field_struct (gboolean init)
   }
 
   // Bonds start
-  astr = g_malloc0 (2*sizeof*astr);
+  astr = g_malloc0(2*sizeof*astr);
   init_all_bonds ();
   g_free (astr);
 
@@ -2191,7 +2191,7 @@ void init_all_field_struct (gboolean init)
   // Bonds end
 
   // Angle start
-  astr = g_malloc0 (3*sizeof*astr);
+  astr = g_malloc0(3*sizeof*astr);
   init_all_angles ();
   g_free (astr);
   if (tmp_fmol -> nstruct[2] > 0)
@@ -2202,7 +2202,7 @@ void init_all_field_struct (gboolean init)
   // Angle end
 
   // Dihedral start
-  astr = g_malloc0 (4*sizeof*astr);
+  astr = g_malloc0(4*sizeof*astr);
   init_all_dihedrals ();
 
   // Torsional restraints
@@ -2240,10 +2240,10 @@ void init_field_molecule (int i)
 
   // Atoms start
   id_atom = -1;
-  tmp_fmol -> atoms_id = g_malloc (tmp_mol -> natoms*sizeof*tmp_fmol -> atoms_id);
+  tmp_fmol -> atoms_id = g_malloc0(tmp_mol -> natoms*sizeof*tmp_fmol -> atoms_id);
   for (j=0; j<tmp_mol -> natoms; j++)
   {
-    tmp_fmol -> atoms_id[j] = g_malloc0 (tmp_fmol -> multi*sizeof*tmp_fmol -> atoms_id[j]);
+    tmp_fmol -> atoms_id[j] = g_malloc0(tmp_fmol -> multi*sizeof*tmp_fmol -> atoms_id[j]);
     for (k=0; k<tmp_fmol -> multi; k++)
     {
       tmp_fmol -> atoms_id[j][k].a = -1;
@@ -2296,7 +2296,7 @@ int init_vdw (gboolean init)
     tmp_fmol = tmp_fmol -> next;
   }
   nvdw = i;
-  gchar ** to_be_vdw = g_malloc (nvdw*sizeof*to_be_vdw);
+  gchar ** to_be_vdw = g_malloc0(nvdw*sizeof*to_be_vdw);
   int * vdw_mlist = allocint (nvdw);
   int ** vdw_aids = allocdint (nvdw,nvdw);
   int ** vdw_mids = allocdint (nvdw,nvdw);
@@ -2975,7 +2975,7 @@ classical_field * create_force_field_data_structure (int ai)
 {
   int i;
   classical_field * new_field;
-  new_field = g_malloc0 (sizeof*new_field);
+  new_field = g_malloc0(sizeof*new_field);
   tmp_field = new_field;
   new_field -> energy_unit = 1;
   new_field -> atom_init = ai;
@@ -2989,7 +2989,7 @@ classical_field * create_force_field_data_structure (int ai)
       break;
   }
   new_field -> molecules = tmp_proj -> modelfc -> mol_by_step[0];
-  new_field -> first_molecule = g_malloc0 (sizeof*new_field -> first_molecule);
+  new_field -> first_molecule = g_malloc0(sizeof*new_field -> first_molecule);
   tmp_fmol = new_field -> first_molecule;
 #ifdef DEBUG
   g_debug ("Total num of molecules: %d", tmp_proj -> modelfc -> mol_by_step[0]);
@@ -3006,7 +3006,7 @@ classical_field * create_force_field_data_structure (int ai)
     init_field_molecule (i);
     if (i <  tmp_proj -> modelfc -> mol_by_step[0]-1)
     {
-      tmp_fmol -> next = g_malloc0 (sizeof*tmp_fmol -> next);
+      tmp_fmol -> next = g_malloc0(sizeof*tmp_fmol -> next);
       tmp_fmol = tmp_fmol -> next;
     }
   }

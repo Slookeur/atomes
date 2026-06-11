@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file title.c
@@ -30,9 +30,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  const gchar * default_title (int ax, int c);
+  const gchar * default_title (int ax, gpointer data);
 
-  void show_title (cairo_t * cr, project * this_proj, int rid, int cid);
+  void show_title (cairo_t * cr, Curve * this_curve);
 
 */
 
@@ -44,78 +44,76 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "curve.h"
 
 /*!
-  \fn const gchar * default_title (int ax, int c)
+  \fn const gchar * default_title (int ax, gpointer data)
 
   \brief default title string
 
   \param ax axis
-  \param c curve id
+  \param data the associated data pointer
 */
-const gchar * default_title (int ax, int c)
+const gchar * default_title (int ax, gpointer data)
 {
+  tint * pcc = (tint *)data;
+  project * this_proj = get_project_by_id (pcc -> a);
+  gchar * freq_unit[5]={" THz", " THz", " MHz", " KHz", " Hz"};
   if (ax == 0)
   {
-    if (activer == GR || activer == GK)
+    int rid = pcc -> b;
+    int cid = pcc -> c;
+    if (rid == MSD)
     {
-      return ("r [Å]");
+      if (this_proj -> tunit > -1)
+      {
+        return g_strdup_printf ("t [%s]", untime[this_proj -> tunit]);
+      }
+      else
+      {
+        return NULL;
+      }
     }
-    else if (activer == SQ || activer == SK)
+    else if (rid == SKT)
     {
-      return ("q [Å-1]");
-    }
-    else if (activer == BD)
-    {
-      return ("Dij [Å]");
-    }
-    else if (activer == AN)
-    {
-      return ("θ [°]");
-    }
-    else if (activer == RI)
-    {
-      return ("Size n of the ring [total number of nodes]");
-    }
-    else if (activer == CH)
-    {
-      return ("Size n of the chain [total number of nodes]");
-    }
-    else if (activer == SP)
-    {
-      return ("Ql");
+      if (cid < this_proj -> skt_sets)
+      {
+        return g_strdup_printf ("q [&#xC5;<sup>-1</sup>]");
+      }
+      else
+      {
+        return g_strdup_printf ("ω %s", freq_unit[this_proj -> tunit]);
+      }
     }
     else
     {
-      return g_strdup_printf ("t [%s]", untime[active_project -> tunit]);
+      return this_proj -> analysis[rid] -> x_title;
     }
   }
   else
   {
-    return active_project -> curves[activer][c] -> name;
+    return get_curve_from_pointer (data) -> name;
   }
 }
 
 /*!
-  \fn void show_title (cairo_t * cr, project * this_proj, int rid, int cid)
+  \fn void show_title (cairo_t * cr, Curve * this_curve)
 
   \brief draw title
 
   \param cr the cairo drawing context to use for the draw
-  \param this_proj the target project
-  \param rid the calculation id
-  \param cid the curve id
+  \param this_curve the target curve
 */
-void show_title (cairo_t * cr, project * this_proj, int rid, int cid)
+void show_title (cairo_t * cr, Curve * this_curve)
 {
   double x, y;
 
-  x = this_proj -> curves[rid][cid] -> title_pos[0] * resol[0];
-  y = this_proj -> curves[rid][cid] -> title_pos[1] * resol[1];
-  cairo_set_source_rgba (cr, this_proj -> curves[rid][cid] -> title_color.red,
-                             this_proj -> curves[rid][cid] -> title_color.green,
-                             this_proj -> curves[rid][cid] -> title_color.blue,
-                             this_proj -> curves[rid][cid] -> title_color.alpha);
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> title_font));
-  pango_layout_set_text (layout, this_proj -> curves[rid][cid] -> title, -1);
+  x = this_curve -> title_pos[0] * resol[0];
+  y = this_curve -> title_pos[1] * resol[1];
+  cairo_set_source_rgba (cr, this_curve -> title_color.red,
+                             this_curve -> title_color.green,
+                             this_curve -> title_color.blue,
+                             this_curve -> title_color.alpha);
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> title_font));
+  pango_layout_set_markup (layout, this_curve -> title, -1);
+  // pango_layout_set_text (layout, this_curve -> title, -1);
   cairo_move_to (cr, x, y);
   pango_cairo_update_layout (cr, layout);
   pango_cairo_show_layout (cr, layout);

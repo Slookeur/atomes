@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file w_volumes.c
@@ -477,7 +477,7 @@ void adjust_vol_md_step (project * this_proj, int geo)
   int i, j, k;
   k = this_proj -> modelgl -> volume_win -> sid[geo-2];
   gchar * str;
-  if (this_proj -> coord -> totcoord[geo] <= 10000)
+  if (this_proj -> coord -> totcoord[geo] < GTK_LIMIT)
   {
     for (i=0; i<FILLED_STYLES; i++)
     {
@@ -703,21 +703,21 @@ G_MODULE_EXPORT void set_md_step_vol (GtkSpinButton * res, gpointer data)
 */
 void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view, int geo)
 {
-  gchar * name_geo[2] = {"fragment", "molecule"};
-  gchar * fmo[2] = {"Fragment", "Molecule"};
+  gchar * name_geo[2] = {i18n("fragment"), i18n("molecule")};
+  gchar * fmo[2] = {i18n("Fragment"), i18n("Molecule")};
   GtkWidget * hbox;
   GtkWidget * hhbox;
   GtkWidget * fragtab;
   gchar * str;
   int i, j;
-  int ngeov = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> ngeov[geo-2] : this_proj -> coord -> totcoord[geo];
+  int ngeov = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> ngeov[geo-2] : this_proj -> coord -> totcoord[geo];
   if (geo == 3)
   {
-    str = g_strdup_printf ("<u>Mean volume(s) occupied by the atom(s) for each %s:</u>", name_geo[geo-2]);
+    str = g_strdup_printf (_("<u>Mean volume(s) occupied by the atom(s) for each %s:</u>"), _(name_geo[geo-2]));
   }
   else
   {
-    str = g_strdup_printf ("<u>Volume(s) occupied by the atom(s) for each %s:</u>", name_geo[geo-2]);
+    str = g_strdup_printf (_("<u>Volume(s) occupied by the atom(s) for each %s:</u>"), _(name_geo[geo-2]));
   }
   abox (vbox, str, 5);
   g_free (str);
@@ -730,8 +730,8 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   int geoid;
   for (i=0; i<ngeov; i++)
   {
-    geoid = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> geov_id[geo-2][i] : i;
-    str = g_strdup_printf ("%s N°%d", fmo[geo-2], geoid+1);
+    geoid = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> geov_id[geo-2][i] : i;
+    str = g_strdup_printf ("%s N°%d", _(fmo[geo-2]), geoid+1);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 5);
@@ -739,7 +739,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
     for (j=0; j<FILLED_STYLES; j++)
     {
       hbox = create_hbox (BSEP);
-      str = g_strdup_printf ("using <b>%s</b>: ", text_filled[j]);
+      str = g_strdup_printf (_("using <b>%s</b>: "), _(text_filled[j]));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 30);
       g_free (str);
       view -> frag_mol_volume[geo-2][j][0][geoid] = get_atoms_volume (this_proj, j, 0, geo, i);
@@ -753,11 +753,11 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   }
   if (geo == 3)
   {
-    str = g_strdup_printf ("<u>Mean smallest rectangle parallepiped volume(s) to englobe the atom(s) for each %s:</u>", name_geo[geo-2]);
+    str = g_strdup_printf (_("<u>Mean smallest rectangle parallepiped volume(s) to englobe the atom(s) for each %s:</u>"), _(name_geo[geo-2]));
   }
   else
   {
-    str = g_strdup_printf ("<u>Smallest rectangle parallepiped volume(s) to englobe the atom(s) for each %s:</u>", name_geo[geo-2]);
+    str = g_strdup_printf (_("<u>Smallest rectangle parallepiped volume(s) to englobe the atom(s) for each %s:</u>"), _(name_geo[geo-2]));
   }
   abox (vbox, str, 5);
   g_free (str);
@@ -768,7 +768,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
   add_container_child (CONTAINER_SCR, fragtab, vvbox);
   for (i=0; i<ngeov; i++)
   {
-    geoid = (this_proj -> coord -> totcoord[geo] > 10000) ? view -> volume_win -> geov_id[geo-2][i] : i;
+    geoid = (this_proj -> coord -> totcoord[geo] >= GTK_LIMIT) ? view -> volume_win -> geov_id[geo-2][i] : i;
     str = g_strdup_printf ("%s N°%d", fmo[geo-2], geoid+1);
     hbox = create_hbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
@@ -777,12 +777,12 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
     for (j=0; j<FILLED_STYLES; j++)
     {
       hbox = create_hbox (BSEP);
-      str = g_strdup_printf ("using <b>%s</b>: ", text_filled[j]);
+      str = g_strdup_printf (_("using <b>%s</b>: "), _(text_filled[j]));
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 30);
       g_free (str);
       hhbox = create_hbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 0);
-      view -> volume_win -> fm_compb[geo-2][j][geoid] = create_button ("Compute", IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(fm_molecular_volumes), & view -> gcid[geo][geoid][j]);
+      view -> volume_win -> fm_compb[geo-2][j][geoid] = create_button (_("Compute"), IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(fm_molecular_volumes), & view -> gcid[geo][geoid][j]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, view -> volume_win -> fm_compb[geo-2][j][geoid], FALSE, FALSE, 20);
       vof = 0.0;
       if (view -> frag_mol_ppvolume[geo-2][j]) vof = view -> frag_mol_ppvolume[geo-2][j][0][geoid];
@@ -794,7 +794,7 @@ void add_frag_mol_vol_data (GtkWidget * vbox, project * this_proj, glwin * view,
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> fm_hboxv[geo-2][j][geoid] , markup_label ("<b>&#xC5;<sup>3</sup></b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, view -> volume_win -> fm_hboxv[geo-2][j][geoid] , FALSE, FALSE, 0);
       view -> volume_win -> fm_hbvol[geo-2][j][geoid] = create_hbox (BSEP);
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> fm_hbvol[geo-2][j][geoid], check_button ("Show/Hide", 100, -1, view -> anim -> last -> img -> fm_show_vol[geo-2][j][geoid], G_CALLBACK(fm_show_volumes), & view -> gcid[geo][geoid][j]), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> fm_hbvol[geo-2][j][geoid], check_button (_("Show/Hide"), 100, -1, view -> anim -> last -> img -> fm_show_vol[geo-2][j][geoid], G_CALLBACK(fm_show_volumes), & view -> gcid[geo][geoid][j]), FALSE, FALSE, 0);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> fm_hbvol[geo-2][j][geoid], color_button (view -> anim -> last -> img -> fm_vol_col[geo-2][j][geoid], TRUE, 50, -1, G_CALLBACK(fm_set_volume_color), & view -> gcid[geo][geoid][j]), FALSE, FALSE, 5);
       widget_set_sensitive (view -> volume_win -> fm_hbvol[geo-2][j][geoid], view -> fm_comp_vol[geo-2][j][0][geoid]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, view -> volume_win -> fm_hbvol[geo-2][j][geoid], FALSE, FALSE, 5);
@@ -867,22 +867,22 @@ G_MODULE_EXPORT void update_vol_frag_mol_search (GtkEntry * res, gpointer data)
 GtkWidget * frag_mol_volume_search (project * this_proj, int g)
 {
   GtkWidget * frag_mol_search = create_vbox (BSEP);
-  gchar * obj[2] = {"fragment", "molecule"};
-  gchar * str = g_strdup_printf ("Too many <b>%ss</b> in your model !\n"
-                                 "  It is impossible to display the entire list ...\n"
-                                 "... instead you can look for %s(s) 'manually':\n", obj[g-2], obj[g-2]);
+  gchar * obj[2] = {i18n("fragment"), i18n("molecule")};
+  gchar * str = g_strdup_printf (_("Too many <b>%ss</b> in your model !\n"
+                                   "  It is impossible to display the entire list ...\n"
+                                   "... instead you can look for %s(s) individually:\n"), _(obj[g-2]), _(obj[g-2]));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, frag_mol_search, markup_label(str, 200, -1, 0.5, 0.5), FALSE, FALSE, 10);
   g_free (str);
-  gchar * search_item[2]={"Fragment ID:", "Molecule ID:"};
+  gchar * search_item[2]={i18n("Fragment Id.:"), i18n("Molecule Id.:")};
   GtkWidget * hbox;
   GtkWidget * entry;
   GtkWidget * label;
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, frag_mol_search, hbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(search_item[g-2], 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_(search_item[g-2]), 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
   entry = create_entry (G_CALLBACK(update_vol_frag_mol_search), 100, 15, FALSE, & this_proj -> modelgl -> colorp[g][0]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,entry, FALSE, FALSE, 0);
-  str = g_strdup_printf ("in [%d - %d]", 1, this_proj ->  coord -> totcoord[g]);
+  str = g_strdup_printf ("&#x2208; [%d - %d]", 1, this_proj ->  coord -> totcoord[g]);
   label = markup_label (str, 50, -1, 0.0, 0.5);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,label, FALSE, FALSE, 20);
   g_free (str);
@@ -910,7 +910,7 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
     gtk_widget_set_size_request (sbut, 25, -1);
     GtkWidget * fix = gtk_fixed_new ();
     gtk_fixed_put (GTK_FIXED (fix), sbut, 0, 10);
-    str = g_strdup_printf ("<u>Select MD step [1-%d]:</u>", this_proj -> steps);
+    str = g_strdup_printf (_("<u>Select MD step [1-%d]:</u>"), this_proj -> steps);
     hbox = abox (vbox, str, 5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fix, FALSE, FALSE, 20);
   }
@@ -949,23 +949,23 @@ GtkWidget * frag_mol_volume_tab (glwin * view, int geo)
     }
     if (! view -> volume_win -> fm_compb[geo-2][i])
     {
-      view -> volume_win -> fm_compb[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win ->fm_compb[geo-2][i]);
+      view -> volume_win -> fm_compb[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win ->fm_compb[geo-2][i]);
     }
     if (! view -> volume_win -> fm_hbvol[geo-2][i])
     {
-      view -> volume_win -> fm_hbvol[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hbvol[geo-2][i]);
+      view -> volume_win -> fm_hbvol[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hbvol[geo-2][i]);
     }
     if (! view -> volume_win -> fm_hboxv[geo-2][i])
     {
-      view -> volume_win -> fm_hboxv[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hboxv[geo-2][i]);
+      view -> volume_win -> fm_hboxv[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_hboxv[geo-2][i]);
     }
     if (! view -> volume_win -> fm_lab_vol[geo-2][i])
     {
-      view -> volume_win -> fm_lab_vol[geo-2][i] = g_malloc0 (this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_lab_vol[geo-2][i]);
+      view -> volume_win -> fm_lab_vol[geo-2][i] = g_malloc0(this_proj -> coord -> totcoord[geo]*sizeof*view -> volume_win -> fm_lab_vol[geo-2][i]);
     }
   }
   GtkWidget * fragtab;
-  if (this_proj -> coord -> totcoord[geo] >  10000)
+  if (this_proj -> coord -> totcoord[geo] >=  GTK_LIMIT)
   {
     fragtab = create_scroll (vbox, -1, -1, GTK_SHADOW_NONE);
     gtk_widget_set_hexpand (fragtab, TRUE);
@@ -1033,7 +1033,7 @@ G_MODULE_EXPORT void set_angular_precision (GtkComboBox * box, gpointer data)
 GtkWidget * vol_model_tab (glwin * view)
 {
   GtkWidget * vbox = create_vbox (BSEP);
-  abox (vbox, "<u>Volume(s) occupied by all the atom(s):</u>", 5);
+  abox (vbox, _("<u>Volume(s) occupied by all the atom(s):</u>"), 5);
   GtkWidget * hbox;
   int i, j;
   project * this_proj = get_project_by_id (view -> proj);
@@ -1043,7 +1043,7 @@ GtkWidget * vol_model_tab (glwin * view)
   for (i=0; i<FILLED_STYLES; i++)
   {
     hbox = create_hbox (BSEP);
-    str = g_strdup_printf ("using <b>%s</b>: ", text_filled[i]);
+    str = g_strdup_printf (_("using <b>%s</b>: "), _(text_filled[i]));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 30);
     g_free (str);
     if (! view -> atoms_volume[i]) view -> atoms_volume[i] = allocdouble (this_proj -> steps);
@@ -1058,13 +1058,13 @@ GtkWidget * vol_model_tab (glwin * view)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("<b>&#xC5;<sup>3</sup></b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 20);
     if (this_proj -> steps > 1)
     {
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label ("average by MD step", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (_("average by MD step"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     }
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   }
-  abox (vbox, "<u>Smallest rectangle parallepiped volume(s) to englobe all atom(s):</u>", 5);
+  abox (vbox, _("<u>Smallest rectangle parallepiped volume(s) to englobe all atom(s):</u>"), 5);
   hbox = create_hbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new("Angular precision: "), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_("Angular precision: ")), FALSE, FALSE, 10);
   GtkWidget * ang_combo = create_combo ();
   gchar * angpr[4] = {"°", "°/10", "°/100", "°/1000"};
   for (i=0; i<4; i++) combo_text_append (ang_combo, angpr[i]);
@@ -1076,7 +1076,7 @@ GtkWidget * vol_model_tab (glwin * view)
   for (i=0; i<FILLED_STYLES; i++)
   {
     hbox = create_hbox (BSEP);
-    str = g_strdup_printf ("using <b>%s</b>: ", text_filled[i]);
+    str = g_strdup_printf (_("using <b>%s</b>: "), _(text_filled[i]));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label (str, 200, -1, 0.0, 0.5), FALSE, FALSE, 30);
     g_free (str);
     hhbox = create_hbox (BSEP);
@@ -1090,7 +1090,7 @@ GtkWidget * vol_model_tab (glwin * view)
     if (! view -> atoms_ppvolume[i]) view -> atoms_ppvolume[i] = allocdouble (this_proj -> steps);
     if (! view -> volume_box[i]) view -> volume_box[i] = allocddouble (this_proj -> steps, 9);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, FALSE, FALSE, 0);
-    view -> volume_win -> compb[i] = create_button ("Compute", IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(molecular_volumes), & view -> colorp[i][0]);
+    view -> volume_win -> compb[i] = create_button (_("Compute"), IMG_NONE, NULL, 150, -1, GTK_RELIEF_NORMAL, G_CALLBACK(molecular_volumes), & view -> colorp[i][0]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, view -> volume_win -> compb[i], FALSE, FALSE, 20);
     vof = 0.0;
     for (j=0; j<this_proj -> steps; j++) vof += view -> atoms_ppvolume[i][j];
@@ -1103,7 +1103,7 @@ GtkWidget * vol_model_tab (glwin * view)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> hboxv[i], markup_label ("<b>&#xC5;<sup>3</sup></b>", 50, -1, 0.0, 0.5), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, view -> volume_win -> hboxv[i], FALSE, FALSE, 0);
     view -> volume_win -> hbvol[i] = create_hbox (BSEP);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> hbvol[i], check_button ("Show/Hide", 100, -1, view -> anim -> last -> img -> show_vol[i], G_CALLBACK(show_volumes), & view -> colorp[i][0]), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> hbvol[i], check_button (_("Show/Hide"), 100, -1, view -> anim -> last -> img -> show_vol[i], G_CALLBACK(show_volumes), & view -> colorp[i][0]), FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, view -> volume_win -> hbvol[i], color_button (view -> anim -> last -> img -> vol_col[i], TRUE, 50, -1, G_CALLBACK(set_volume_color), & view -> colorp[i][0]), FALSE, FALSE, 5);
     widget_set_sensitive (view -> volume_win -> hbvol[i], view -> comp_vol[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, view -> volume_win -> hbvol[i], FALSE, FALSE, 5);
@@ -1125,9 +1125,9 @@ G_MODULE_EXPORT void window_volumes (GtkWidget * widg, gpointer data)
   glwin * view = (glwin *) data;
   if (view -> volume_win == NULL)
   {
-    view -> volume_win = g_malloc0 (sizeof*view -> volume_win);
+    view -> volume_win = g_malloc0(sizeof*view -> volume_win);
     project * this_proj = get_project_by_id (view -> proj);
-    gchar * str = g_strdup_printf ("%s - volumes", this_proj -> name);
+    gchar * str = g_strdup_printf (_("%s - volumes"), this_proj -> name);
     view -> volume_win -> win = create_win (str, view -> win, FALSE, FALSE);
     gtk_widget_set_size_request (view -> volume_win -> win, 450, 420);
     g_free (str);
@@ -1135,9 +1135,9 @@ G_MODULE_EXPORT void window_volumes (GtkWidget * widg, gpointer data)
     add_container_child (CONTAINER_WIN, view -> volume_win -> win, vbox);
     GtkWidget * notebook = gtk_notebook_new ();
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, notebook, TRUE, TRUE, 0);
-    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vol_model_tab (view), gtk_label_new ("Model"));
-    if (view -> adv_bonding[0]) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), frag_mol_volume_tab (view, 2), gtk_label_new ("Fragment(s)"));
-    if (view -> adv_bonding[1]) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), frag_mol_volume_tab (view, 3), gtk_label_new ("Molecule(s)"));
+    gtk_notebook_append_page (GTK_NOTEBOOK(notebook), vol_model_tab (view), gtk_label_new (_("Model")));
+    if (view -> adv_bonding[0]) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), frag_mol_volume_tab (view, 2), gtk_label_new (_("Fragment(s)")));
+    if (view -> adv_bonding[1]) gtk_notebook_append_page (GTK_NOTEBOOK(notebook), frag_mol_volume_tab (view, 3), gtk_label_new (_("Molecule(s)")));
     add_gtk_close_event (view -> volume_win -> win, G_CALLBACK(hide_this_window), NULL);
     show_the_widgets (view -> volume_win -> win);
     int i;

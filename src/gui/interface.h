@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file interface.h
@@ -37,6 +37,7 @@ void show_info_ (double * valdij);
 void show_warning (char * warning, GtkWidget * win);
 void show_warning_ (char * warning, char * sub, char * tab);
 void show_error (char * error, int val, GtkWidget * win);
+void show_error_with_trace (gchar * error, atomes_error * this_error, int act, int val, GtkWidget * win);
 void show_error_ (char * error, char * sub, char * tab);
 gboolean ask_yes_no (gchar * title, gchar * text, int type, GtkWidget * widg);
 gchar * exact_name (gchar * name);
@@ -58,8 +59,8 @@ void init_data_ (int * nats, int * nspc, int * stps, int * cid);
 void update_after_calc (int calc);
 
 // In init.c:
-
 void prepostcalc (GtkWidget * widg, gboolean status, int run, int adv, double opc);
 void prep_calc_actions ();
-void initcwidgets ();
+
+void init_atomes_analysis (project * this_proj, gboolean apply_defaults);
 #endif

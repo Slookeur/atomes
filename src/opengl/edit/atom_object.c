@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_object.c
@@ -105,7 +105,7 @@ void correct_pos_and_get_dim (atomic_object * object, gboolean adjust)
 {
   int i;
   if (object -> baryc) g_free(object -> baryc);
-  object -> baryc = allocdouble(3);
+  object -> baryc = allocdouble (3);
   for (i=0; i<object -> atoms; i++)
   {
     object -> baryc[0] += object -> at_list[i].x;
@@ -214,7 +214,7 @@ void reconstruct_bonds (project * this_proj, int ifcl, int * bcid)
   l = 0;
   if (i)
   {
-    old_clo = g_malloc0 (i*sizeof*old_clo);
+    old_clo = g_malloc0(i*sizeof*old_clo);
     old_bid = allocdint (i, 2);
     for (i=0; i<this_proj -> modelgl -> bonds[o_step][1]; i++)
     {
@@ -236,7 +236,7 @@ void reconstruct_bonds (project * this_proj, int ifcl, int * bcid)
   if (l)
   {
     this_proj -> modelgl -> bondid[o_step][1] = allocdint (l, 2);
-    this_proj -> modelgl -> clones[o_step] = g_malloc0 (l*sizeof*this_proj -> modelgl -> clones[o_step]);
+    this_proj -> modelgl -> clones[o_step] = g_malloc0(l*sizeof*this_proj -> modelgl -> clones[o_step]);
     for (i=0; i<l; i++)
     {
       for (j=0; j<2; j++) this_proj -> modelgl -> bondid[o_step][1][i][j] = old_bid[i][j];
@@ -380,13 +380,13 @@ atomic_object * lib_object;
 */
 atomic_object * duplicate_atomic_object (atomic_object * old_obj)
 {
-  atomic_object * new_obj = g_malloc0 (sizeof*new_obj);
+  atomic_object * new_obj = g_malloc0(sizeof*new_obj);
   new_obj -> origin = old_obj -> origin;
   new_obj -> type = old_obj -> type;
   new_obj -> dim = old_obj -> dim;
   new_obj -> name = g_strdup_printf ("%s", old_obj -> name);
   new_obj -> atoms = old_obj -> atoms;
-  new_obj -> at_list = g_malloc0 (new_obj -> atoms*sizeof*new_obj -> at_list);
+  new_obj -> at_list = g_malloc0(new_obj -> atoms*sizeof*new_obj -> at_list);
   int i;
   for (i=0; i<new_obj -> atoms; i++)
   {
@@ -400,7 +400,7 @@ atomic_object * duplicate_atomic_object (atomic_object * old_obj)
   new_obj -> species = old_obj -> species;
   if (old_obj -> bonds)
   {
-    new_obj -> ibonds = g_malloc0 (old_obj -> bonds*sizeof*new_obj -> ibonds);
+    new_obj -> ibonds = g_malloc0(old_obj -> bonds*sizeof*new_obj -> ibonds);
     int i;
     for (i=0; i<old_obj -> bonds; i++)
     {
@@ -421,7 +421,7 @@ atomic_object * duplicate_atomic_object (atomic_object * old_obj)
 void create_object_from_library (int p)
 {
   int i, j;
-  lib_object = g_malloc0 (sizeof*lib_object);
+  lib_object = g_malloc0(sizeof*lib_object);
   project * other_proj = get_project_by_id (p);
   i = other_proj -> natomes;
   lib_object -> type = FROM_LIBRARY;
@@ -429,7 +429,7 @@ void create_object_from_library (int p)
   lib_object -> name = g_strdup_printf ("%s", other_proj -> name);
   lib_object -> coord = duplicate_coord_info (other_proj -> coord);
   lib_object -> atoms = i;
-  lib_object -> at_list = g_malloc0 (lib_object -> atoms*sizeof*lib_object -> at_list);
+  lib_object -> at_list = g_malloc0(lib_object -> atoms*sizeof*lib_object -> at_list);
   lib_object -> occ = 1.0;
   lib_object -> species = other_proj -> nspec;
   lib_object -> old_z = allocint (other_proj -> nspec);
@@ -623,7 +623,7 @@ void add_object_atoms (atomic_object * this_object, project * this_proj,
 {
   int i, j;
   this_object -> atoms = numa;
-  this_object -> at_list = g_malloc0 (this_object -> atoms*sizeof*this_object -> at_list);
+  this_object -> at_list = g_malloc0(this_object -> atoms*sizeof*this_object -> at_list);
   int * new_id = allocint (this_proj -> natomes);
   for (i=0; i<this_object -> atoms; i++)
   {
@@ -683,14 +683,14 @@ int * duplicate_z (int species, double * old_z)
 atomic_object * create_object_from_species (project * this_proj, int sid, atom_search * remove)
 {
   int i, j;
-  atomic_object * this_object =  g_malloc0 (sizeof*this_object);
+  atomic_object * this_object =  g_malloc0(sizeof*this_object);
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
   this_object -> name = g_strdup_printf ("%s", this_proj -> chemistry -> label[sid]);
   i = this_proj -> chemistry -> nsps[sid];
   this_object -> type = FROM_SPEC;
   this_object -> origin = this_proj -> id;
   this_object -> atoms = i;
-  this_object -> at_list = g_malloc0 (this_object -> atoms*sizeof*this_object -> at_list);
+  this_object -> at_list = g_malloc0(this_object -> atoms*sizeof*this_object -> at_list);
   this_object -> occ = 1.0;
   this_object -> coord = duplicate_coord_info (this_proj -> coord);
   this_object -> species = this_proj -> nspec;
@@ -724,9 +724,9 @@ atomic_object * create_object_from_species (project * this_proj, int sid, atom_s
 atomic_object * create_object_from_selection (project * this_proj)
 {
   int i, j;
-  atomic_object * this_object =  g_malloc0 (sizeof*this_object);
+  atomic_object * this_object =  g_malloc0(sizeof*this_object);
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
-  this_object -> name = g_strdup_printf ("From selection");
+  this_object -> name = g_strdup_printf (_("From selection"));
   i = 0;
   for (j=0; j<this_proj->natomes; j++)
   {
@@ -735,14 +735,14 @@ atomic_object * create_object_from_selection (project * this_proj)
   this_object -> type = FROM_DATA;
   this_object -> origin = this_proj -> id;
   this_object -> atoms = i;
-  this_object -> at_list = g_malloc0 (this_object -> atoms*sizeof*this_object -> at_list);
+  this_object -> at_list = g_malloc0(this_object -> atoms*sizeof*this_object -> at_list);
   this_object -> occ = 1.0;
   this_object -> coord = duplicate_coord_info (this_proj -> coord);
   this_object -> species = this_proj -> nspec;
   this_object -> old_z = duplicate_z (this_proj -> nspec, this_proj -> chemistry -> chem_prop[CHEM_Z]);
   i = 0;
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
   for (j=0; j<this_proj -> natomes; j++)
@@ -777,7 +777,7 @@ atomic_object * create_object_from_selection (project * this_proj)
 atomic_object * create_object_from_atom_coordination (project * this_proj, int coord, int aid, atom_search * remove)
 {
   int i, j, k;
-  atomic_object * this_object =  g_malloc0 (sizeof*this_object);
+  atomic_object * this_object =  g_malloc0(sizeof*this_object);
   gchar * str;
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
   i = this_proj -> atoms[o_step][aid].numv;
@@ -788,11 +788,11 @@ atomic_object * create_object_from_atom_coordination (project * this_proj, int c
     case 0:
       if (i > 0)
       {
-        str = g_strdup_printf ("%d-fold", i);
+        str = g_strdup_printf (_("%d-fold"), i);
       }
       else
       {
-        str = g_strdup_printf ("Isolated");
+        str = g_strdup_printf (_("Isolated"));
       }
       break;
     case 1:
@@ -804,7 +804,7 @@ atomic_object * create_object_from_atom_coordination (project * this_proj, int c
   this_object -> type = - (coord + 3);
   this_object -> origin = this_proj -> id;
   this_object -> atoms = i+1;
-  this_object -> at_list = g_malloc0 (this_object -> atoms*sizeof*this_object -> at_list);
+  this_object -> at_list = g_malloc0(this_object -> atoms*sizeof*this_object -> at_list);
   this_object -> occ = 1.0;
   this_object -> coord = duplicate_coord_info (this_proj -> coord);
   this_object -> species = this_proj -> nspec;
@@ -848,7 +848,7 @@ atomic_object * create_object_from_atom_coordination (project * this_proj, int c
 atomic_object * create_object_from_overall_coordination (project * this_proj, int coord, int aid, atom_search * remove)
 {
   int i, j, k, l, m, n;
-  atomic_object * this_object =  g_malloc0 (sizeof*this_object);
+  atomic_object * this_object =  g_malloc0(sizeof*this_object);
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
   this_object -> coord = duplicate_coord_info (this_proj -> coord);
   this_object -> species = this_proj -> nspec;
@@ -857,7 +857,7 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
   this_object -> origin = this_proj -> id;
   this_object -> occ = 1.0;
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gchar * str;
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
@@ -875,11 +875,11 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
       if (i)
       {
         bonding = TRUE;
-        str = g_strdup_printf ("%d-fold", i);
+        str = g_strdup_printf (_("%d-fold"), i);
       }
       else
       {
-        str = g_strdup_printf ("Isolated");
+        str = g_strdup_printf (_("Isolated"));
       }
       j = 0;
       for (k=0; k<this_proj -> natomes; k++)
@@ -908,7 +908,7 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
       str = g_strdup_printf ("%s", env_name(this_proj, l, aid, 1, NULL));
       break;
   }
-  this_object -> name = g_strdup_printf ("All %s - atom(s)", str);
+  this_object -> name = g_strdup_printf (_("All %s - atom(s)"), str);
   g_free (str);
   check_bonding = (j != this_proj -> natomes && bonding) ? TRUE : FALSE;
   add_object_atoms (this_object, this_proj, o_step, j, new_id, check_bonding, remove);
@@ -928,14 +928,14 @@ atomic_object * create_object_from_overall_coordination (project * this_proj, in
 atomic_object * create_object_from_frag_mol (project * this_proj, int coord, int geo, atom_search * remove)
 {
   int i, j;
-  atomic_object * this_object =  g_malloc0 (sizeof*this_object);
+  atomic_object * this_object =  g_malloc0(sizeof*this_object);
   if (coord == 2)
   {
-    this_object -> name = g_strdup_printf ("Fragment N°%d", geo+1);
+    this_object -> name = g_strdup_printf (_("Fragment N°%d"), geo+1);
   }
   else
   {
-    this_object -> name = g_strdup_printf ("Molecule N°%d", geo+1);
+    this_object -> name = g_strdup_printf (_("Molecule N°%d"), geo+1);
   }
   int o_step = this_proj -> modelgl -> anim -> last -> img -> step;
   this_object -> type = - (coord + 3);
@@ -945,7 +945,7 @@ atomic_object * create_object_from_frag_mol (project * this_proj, int coord, int
   this_object -> species = this_proj -> nspec;
   this_object -> old_z = duplicate_z (this_proj -> nspec, this_proj -> chemistry -> chem_prop[CHEM_Z]);
   int * new_id = NULL;
-  new_id = allocint(this_proj -> natomes);
+  new_id = allocint (this_proj -> natomes);
   gboolean check_bonding = FALSE;
   gboolean bonding = FALSE;
   i = 0;
@@ -1015,7 +1015,7 @@ void adjust_object_frag_coord (atomic_object * object)
 int create_object_from_open_project (project * this_proj, int p)
 {
   int i, j;
-  lib_object =  g_malloc0 (sizeof*lib_object);
+  lib_object =  g_malloc0(sizeof*lib_object);
   project * other_proj;
   other_proj = get_project_by_id (p);
   int o_step = other_proj -> modelgl -> anim -> last -> img -> step;
@@ -1023,21 +1023,21 @@ int create_object_from_open_project (project * this_proj, int p)
   {
     case 0:
       i = other_proj -> natomes - other_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
-      lib_object -> name = g_strdup_printf ("All non-selected atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All non-selected atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
     case 1:
       i = other_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
-      lib_object -> name = g_strdup_printf ("All selected atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All selected atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
     case 2:
       i = other_proj -> natomes;
-      lib_object -> name = g_strdup_printf ("All atom(s) from: %s", get_project_by_id(p) -> name);
+      lib_object -> name = g_strdup_printf (_("All atom(s) from: %s"), get_project_by_id(p) -> name);
       break;
   }
   lib_object -> type = FROM_PROJECT;
   lib_object -> origin = p;
   lib_object -> atoms = i;
-  lib_object -> at_list = g_malloc0 (lib_object -> atoms*sizeof*lib_object -> at_list);
+  lib_object -> at_list = g_malloc0(lib_object -> atoms*sizeof*lib_object -> at_list);
   lib_object -> occ = 1.0;
   lib_object -> coord = duplicate_coord_info (other_proj -> coord);
   lib_object -> species = other_proj -> nspec;
@@ -1280,12 +1280,12 @@ void to_insert_in_project (int stat, int orig, project * this_proj, atom_search 
   }
   if (stat > 0)
   {
-    lib_object = g_malloc0 (sizeof*lib_object);
+    lib_object = g_malloc0(sizeof*lib_object);
     lib_object -> type = stat;
     lib_object -> old_z = allocint (1);
     lib_object -> old_z[0] = (stat < 119) ? stat : 0.0;
     lib_object -> at_list = g_malloc0(sizeof*lib_object -> at_list);
-    lib_object -> coord = g_malloc0 (sizeof*lib_object -> coord);
+    lib_object -> coord = g_malloc0(sizeof*lib_object -> coord);
     lib_object -> coord -> species = 1;
     for (j=0; j<2; j++)
     {
@@ -1303,11 +1303,11 @@ void to_insert_in_project (int stat, int orig, project * this_proj, atom_search 
     lib_object -> dim = get_object_dim (lib_object);
     if (stat > 119)
     {
-      lib_object -> name = g_strdup_printf ("Empty position");
+      lib_object -> name = g_strdup_printf (_("Empty position"));
     }
     else
     {
-      lib_object -> name = g_strdup_printf ("%s atom", periodic_table_info[stat].lab);
+      lib_object -> name = g_strdup_printf (_("%s atom"), periodic_table_info[stat].lab);
     }
   }
 

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cell_shift.c
@@ -419,38 +419,38 @@ GtkWidget * create_cell_entries (project * this_proj, int i)
     m = (i < 9) ? 1 : 2;
     cedit -> edit_scale[i] = create_hscale (-l*this_proj -> cell.box[0].param[0][j]/k, m*this_proj -> cell.box[0].param[0][j]/k, 0.01, cedit -> cparam[i],
                                             GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("on <b>%s</b> axis [+/- &#xC5;]", axis[j]);
+    str = g_strdup_printf (_("on <b>%s</b> axis [+/- &#xC5;]"), axis[j]);
   }
   else if (i < 6)
   {
     cedit -> initbox[i-3] = cedit -> cparam[i] = this_proj -> cell.box[0].param[0][i-3];
     cedit -> edit_scale[i] = create_hscale (0.0, this_proj -> cell.box[0].param[0][i-3]*10.0, 0.01, cedit -> cparam[i],
                                             GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("Lattice <b>%s</b> [+/- &#xC5;]", box_prop[0][i-3]);
+    str = g_strdup_printf (_("Lattice <b>%s</b> [+/- &#xC5;]"), box_prop[0][i-3]);
   }
   else if (i == 12)
   {
     cedit -> edit_scale[i] = create_hscale (0.0, this_proj -> cell.box[0].param[0][0]*10.0, 0.01, cedit -> cparam[i],
                                               GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("Length [+/- &#xC5;]");
+    str = g_strdup_printf (_("Length [+/- &#xC5;]"));
   }
   else if (i > 14 && i < 18)
   {
     cedit -> edit_scale[i] = create_hscale (0.0, 180.0, 0.01, cedit -> cparam[i],
                                             GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("Angle <b>%s</b> [+/- °]", angl[i-15]);
+    str = g_strdup_printf (_("Angle <b>%s</b> [+/- °]"), angl[i-15]);
   }
   else if (i > 17)
   {
     cedit -> edit_scale[i] = create_hscale (-180, 180.0, 0.01, cedit -> cparam[i],
                                             GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("on <b>%s</b> axis [+/- °]", axis[i-18]);
+    str = g_strdup_printf (_("on <b>%s</b> axis [+/- °]"), axis[i-18]);
   }
   else
   {
     cedit -> edit_scale[i] = create_hscale (0.0, this_proj -> cell.box[0].param[0][0]*10.0, 0.01, cedit -> cparam[i],
                                             GTK_POS_TOP, 3, 200, G_CALLBACK(shift_coord), G_CALLBACK(scroll_shift_coord), & this_proj -> modelgl -> colorp[i][0]);
-    str = g_strdup_printf ("Radius [+/- &#xC5;]");
+    str = g_strdup_printf (_("Radius [+/- &#xC5;]"));
   }
 
   update_entry_double (GTK_ENTRY(cedit -> edit_entry[i]), cedit -> cparam[i]);
@@ -464,7 +464,7 @@ GtkWidget * create_cell_entries (project * this_proj, int i)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, FALSE, FALSE, 0);
   fixed = gtk_fixed_new ();
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, fixed, FALSE, FALSE, 5);
-  gtk_fixed_put (GTK_FIXED(fixed), lab, (i>2 && i<6) ? -50 : 0, 25);
+  gtk_fixed_put (GTK_FIXED(fixed), lab, (i<3) ? 0 : -50, 25);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   return vbox;
 }
@@ -480,9 +480,9 @@ GtkWidget * create_shift_box (project * this_proj)
 {
   GtkWidget * vbox = create_vbox (BSEP);
   int i;
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Shift the position of the cell center <sup>*</sup>: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("Shift the position of the cell center <sup>*</sup>: "), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
   for (i=0; i<3; i++) add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, create_cell_entries (this_proj, i), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("* requires all atoms to be wrapped in the unit cell", -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("* requires all atoms to be wrapped in the unit cell"), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
   widget_set_sensitive (vbox, this_proj -> modelgl -> wrapped);
   show_the_widgets (vbox);
   return vbox;
@@ -497,9 +497,9 @@ GtkWidget * create_shift_box (project * this_proj)
 */
 void wrapping (glwin * view)
 {
-  gchar * text = "You are about to put all the atoms back inside the model box\n"
-                 "This action is irreversible, proceed anyway ?";
-  if (ask_yes_no ("Wrap atomic coordinates in unit cell ?", text, GTK_MESSAGE_WARNING, view -> win))
+  gchar * text = _("You are about to put all the atoms back inside the model box\n"
+                   "This action is irreversible, proceed anyway ?");
+  if (ask_yes_no (_("Wrap atomic coordinates in unit cell ?"), text, GTK_MESSAGE_WARNING, view -> win))
   {
     shift_it (vec3 (0.0, 0.0, 0.0), 1, view -> proj);
     view -> wrapped = TRUE;
@@ -562,7 +562,7 @@ GtkWidget * shift_center_tab (project * this_proj)
   GtkWidget * layout = create_layout (350, 250);
   glwin * view = this_proj -> modelgl;
   view -> cell_win -> shift_box[0] = create_shift_box (this_proj);
-  view -> cell_win -> put_in_box = check_button ("Wrap atomic coordinates in unit cell", -1, -1, FALSE, G_CALLBACK(wrap_coord), view);
+  view -> cell_win -> put_in_box = check_button (_("Wrap atomic coordinates in unit cell"), -1, -1, FALSE, G_CALLBACK(wrap_coord), view);
   widget_set_sensitive (view -> cell_win -> put_in_box, ! view -> wrapped);
   if (view -> record) widget_set_sensitive (view -> cell_win -> put_in_box, FALSE);
   layout_add_widget (layout, view -> cell_win -> put_in_box, 20, 20);

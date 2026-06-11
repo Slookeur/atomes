@@ -29,7 +29,7 @@ BEGIN
 			VALUE "CompanyName", "CNRS - IPCMS - DMO"
 			VALUE "FileDescription", "@PACKAGE@_startup_testing @PACKAGE_VERSION@"
 			VALUE "FileVersion", "@PACKAGE_VERSION@"
-			VALUE "LegalCopyright", "\251 2025 S\351bastien Le Roux"
+			VALUE "LegalCopyright", "\251 2026 S\351bastien Le Roux"
 			VALUE "OriginalFileName", "@PACKAGE@_startup_testing.exe"
 			VALUE "ProductName", "@PACKAGE@_startup_testing @PACKAGE_VERSION@"
 			VALUE "ProductVersion", "@PACKAGE_VERSION@"

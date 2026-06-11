@@ -11,87 +11,83 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file writedata.F90
 !! @short Export curve data using data received from C
 !! @author Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
 
-CHARACTER (LEN=35) FUNCTION ylegend (job, nleg, idl)
+CHARACTER (LEN=36) FUNCTION ylegend (job, nleg, idl, snp)
 
 USE PARAMETERS
 
 IMPLICIT NONE
 
-INTEGER, INTENT(IN) :: job, nleg, idl
+INTEGER, INTENT(IN) :: job, nleg, idl, snp
 INTEGER :: DAL, DBL, DCL, DDL, DEL
 LOGICAL :: done
 
 ylegend = ''
 
+! Y axis legend if not spherical harmonics,
+
 if (job.eq.IDGR .or. job.eq.IDGRFFT) then
 
-  if (nleg < GRNUM) then
-    DEL=nleg
-  else
-    DEL=nleg-(GRNUM+SQNUM+SKNUM)
-  endif
-  if (DEL .eq. 0) then
+  if (nleg .eq. 0) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] Neutrons"""
+      ylegend = """g(r) Neutrons"""
     else
-      ylegend = "g(r)[tot] Neutrons"
+      ylegend = "g(r) Neutrons"
     endif
-  elseif (DEL .eq. 1) then
+  elseif (nleg .eq. 1) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] Neutrons - smoothed"""
+      ylegend = """g(r) Neutrons - smoothed"""
     else
-      ylegend = "g(r)[tot] Neutrons - smoothed"
+      ylegend = "g(r) Neutrons - smoothed"
     endif
-  elseif (DEL .eq. 2) then
+  elseif (nleg .eq. 2) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] Neutrons"""
+      ylegend = """G(r) Neutrons"""
     else
-      ylegend = "G(r)[tot] Neutrons"
+      ylegend = "G(r) Neutrons"
     endif
-  elseif (DEL .eq. 3) then
+  elseif (nleg .eq. 3) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] Neutrons - smoothed"""
+      ylegend = """G(r) Neutrons - smoothed"""
     else
-      ylegend = "G(r)[tot] Neutrons - smoothed"
+      ylegend = "G(r) Neutrons - smoothed"
     endif
-  elseif (DEL .eq. 4) then
+  elseif (nleg .eq. 4) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] X-rays"""
+      ylegend = """g(r) X-rays"""
     else
-      ylegend = "g(r)[tot] X-rays"
+      ylegend = "g(r) X-rays"
     endif
-  elseif (DEL .eq. 5) then
+  elseif (nleg .eq. 5) then
     if (idl .eq. 0) then
-      ylegend = """g(r)[tot] X-rays - smoothed"""
+      ylegend = """g(r) X-rays - smoothed"""
     else
-      ylegend = "g(r)[tot] X-rays - smoothed"
+      ylegend = "g(r) X-rays - smoothed"
     endif
-  elseif (DEL .eq. 6) then
+  elseif (nleg .eq. 6) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] X-rays"""
+      ylegend = """G(r) X-rays"""
     else
-      ylegend = "G(r)[tot] X-rays"
+      ylegend = "G(r) X-rays"
     endif
-  elseif (DEL .eq. 7) then
+  elseif (nleg .eq. 7) then
     if (idl .eq. 0) then
-      ylegend = """G(r)[tot] X-rays - smoothed"""
+      ylegend = """G(r) X-rays - smoothed"""
     else
-      ylegend = "G(r)[tot] X-rays - smoothed"
+      ylegend = "G(r) X-rays - smoothed"
     endif
-  elseif (DEL .ge. 8) then
-    DCL=7
+  elseif (nleg .ge. 8) then
+    DCL=8
     done=.false.
-    do DAL=1, NSP
-      do DBL=1, NSP
-        DCL=DCL+1
-        if (DCL.eq.DEL) then
+    do DAL=1, snp
+      do DBL=1, snp
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""g\sij\N(r)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -103,7 +99,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DEL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""g\sij\N(r)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"] - smoothed"""
@@ -115,7 +111,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DEL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""G\sij\N(r)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -127,7 +123,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DEL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""G\sij\N(r)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"] - smoothed"""
@@ -139,7 +135,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DEL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""dn\sij\N(r)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -150,12 +146,12 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
           done=.true.
           exit
         endif
+        DCL=DCL+1
       enddo
       if(done) exit
     enddo
-    if (NSP .eq. 2) then
-      DCL=DCL+1
-      if (DCL.eq.DEL) then
+    if (snp .eq. 2) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNN\N(r)"""
         else
@@ -163,7 +159,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DEL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNN\N(r) - smoothed"""
         else
@@ -171,7 +167,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DEL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNC\N(r)"""
         else
@@ -179,7 +175,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DEL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNC\N(r) - smoothed"""
         else
@@ -187,7 +183,7 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DEL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sCC\N(r)"""
         else
@@ -195,78 +191,73 @@ if (job.eq.IDGR .or. job.eq.IDGRFFT) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DEL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sCC\N(r) - smoothed"""
         else
           ylegend="BT[CC](r) - smoothed"
         endif
       endif
+      DCL=DCL+1
     endif
   endif
 
 else if (job.eq.IDSQ .or. job.eq.IDSK) then
 
-  if (nleg - (GRNUM+SQNUM) < 0) then
-    DDL = nleg - GRNUM
-  else
-    DDL = nleg - GRNUM-SQNUM
-  endif
-  if (DDL .eq. 0) then
+  if (nleg .eq. 0) then
     if (idl .eq. 0) then
       ylegend = """S(q)[total] Neutrons"""
     else
       ylegend = "S(q)[total] Neutrons"
     endif
-  elseif (DDL .eq. 1) then
+  elseif (nleg .eq. 1) then
     if (idl .eq. 0) then
       ylegend = """S(q) Neutrons - smoothed"""
     else
       ylegend = "S(q) Neutrons - smoothed"
     endif
-  elseif (DDL .eq. 2) then
+  elseif (nleg .eq. 2) then
     if (idl .eq. 0) then
       ylegend = """Q(q)[total] Neutrons"""
     else
       ylegend = "Q(q)[total] Neutrons"
     endif
-  elseif (DDL .eq. 3) then
+  elseif (nleg .eq. 3) then
     if (idl .eq. 0) then
       ylegend = """Q(q)[total] Neutrons - smoothed"""
     else
       ylegend = "Q(q)[total] Neutrons - smoothed"
     endif
-  elseif (DDL .eq. 4) then
+  elseif (nleg .eq. 4) then
     if (idl .eq. 0) then
       ylegend = """S(q)[total] X-rays"""
     else
       ylegend = "S(q)[total] X-rays"
     endif
-  elseif (DDL .eq. 5) then
+  elseif (nleg .eq. 5) then
     if (idl .eq. 0) then
       ylegend = """S(q) X-rays - smoothed"""
     else
       ylegend = "S(q) X-rays - smoothed"
     endif
-  elseif (DDL .eq. 6) then
+  elseif (nleg .eq. 6) then
     if (idl .eq. 0) then
       ylegend = """Q(q)[total] X-rays"""
     else
       ylegend = "Q(q)[total] X-rays"
     endif
-  elseif (DDL .eq. 7) then
+  elseif (nleg .eq. 7) then
     if (idl .eq. 0) then
       ylegend = """Q(q)[total] X-rays - smoothed"""
     else
       ylegend = "Q(q)[total] X-rays - smoothed"
     endif
-  elseif (DDL .ge. 8) then
-    DCL=7
+  elseif (nleg .ge. 8) then
+    DCL=8
     done=.false.
-    do DAL=1, NSP
-      do DBL=1, NSP
-        DCL=DCL+1
-        if (DCL.eq.DDL) then
+    do DAL=1, snp
+      do DBL=1, snp
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""AL\sij\N(q)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -278,7 +269,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DDL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""AL\sij\N(q)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"] - smoothed"""
@@ -289,13 +280,13 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
           done=.true.
           exit
         endif
+        DCL=DCL+1
       enddo
       if(done) exit
     enddo
-    do DAL=1, NSP
-      do DBL=1, NSP
-        DCL=DCL+1
-        if (DCL.eq.DDL) then
+    do DAL=1, snp
+      do DBL=1, snp
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""FZ\sij\N(q)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -307,7 +298,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
           exit
         endif
         DCL=DCL+1
-        if (DCL.eq.DDL) then
+        if (DCL.eq.nleg) then
           if (idl .eq. 0) then
             ylegend="""FZ\sij\N(q)["// &
             TL(DAL)(1:LEN_TRIM(TL(DAL)))//","//TL(DBL)(1:LEN_TRIM(TL(DBL)))//"] - smoothed"""
@@ -318,12 +309,12 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
           done=.true.
           exit
         endif
+        DCL=DCL+1
       enddo
       if(done) exit
     enddo
-    if (NSP .eq. 2) then
-      DCL=DCL+1
-      if (DCL.eq.DDL) then
+    if (snp .eq. 2) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNN\N(q)"""
         else
@@ -331,7 +322,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNN\N(q) - smoothed"""
         else
@@ -339,7 +330,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNC\N(q)"""
         else
@@ -347,7 +338,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sNC\N(q) - smoothed"""
         else
@@ -355,7 +346,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sCC\N(q)"""
         else
@@ -363,7 +354,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
      DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sCC\N(q) - smoothed"""
         else
@@ -371,7 +362,7 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sZZ\N(q)"""
         else
@@ -379,22 +370,23 @@ else if (job.eq.IDSQ .or. job.eq.IDSK) then
         endif
       endif
       DCL=DCL+1
-      if (DCL.eq.DDL) then
+      if (DCL.eq.nleg) then
         if (idl .eq. 0) then
           ylegend="""BT\sZZ\N(q) - smoothed"""
         else
           ylegend="BT[ZZ](q) - smoothed"
         endif
       endif
+      DCL=DCL+1
     endif
   endif
 
 else if (job .eq. IDBD) then
 
-  DDL = GRNUM+GQNUM+SQNUM+SKNUM
-  do DAL=1, NSP
-    do DBL=1, NSP
-      if (nleg .eq. DDL) then
+  DCL = 0
+  do DAL=1, snp
+    do DBL=1, snp
+      if (nleg .eq. DCL) then
         if (idl .eq. 0) then
           ylegend = """% Dij ["//TL(DAL)(1:LEN_TRIM(TL(DAL)))//"-" &
           //TL(DBL)(1:LEN_TRIM(TL(DBL)))//"]"""
@@ -407,16 +399,16 @@ else if (job .eq. IDBD) then
           exit
         endif
       endif
-      DDL=DDL+1
+      DCL=DCL+1
     enddo
   enddo
 
 else if (job .eq. IDAN) then
 
-  DDL = GRNUM+GQNUM+SQNUM+SKNUM+BDNUM
-  do DAL=1, NSP
-    do DBL=1, NSP
-      do DCL=1, NSP
+  DDL = 0
+  do DAL=1, snp
+    do DBL=1, snp
+      do DCL=1, snp
         if (nleg .eq. DDL) then
           if (idl .eq. 0) then
             ylegend = """% Angle ["//TL(DAL)(1:LEN_TRIM(TL(DAL)))//"-" &
@@ -430,17 +422,17 @@ else if (job .eq. IDAN) then
       enddo
     enddo
   enddo
-  do DAL=1, NSP
-    do DBL=1, NSP
-      do DCL=1, NSP
-        do DEL=1, NSP
+  do DAL=1, snp
+    do DBL=1, snp
+      do DCL=1, snp
+        do DEL=1, snp
           if (nleg .eq. DDL) then
             if (idl .eq. 0) then
-              ylegend = """% Diedral ["// &
+              ylegend = """% Dihedral ["// &
               TL(DAL)(1:LEN_TRIM(TL(DAL)))//"-"//TL(DBL)(1:LEN_TRIM(TL(DBL)))// &
               "-"//TL(DCL)(1:LEN_TRIM(TL(DCL)))//"-"//TL(DEL)(1:LEN_TRIM(TL(DEL)))//"]"""
             else
-              ylegend = "% Diedral ["// &
+              ylegend = "% Dihedral ["// &
               TL(DAL)(1:LEN_TRIM(TL(DAL)))//"-"//TL(DBL)(1:LEN_TRIM(TL(DBL)))// &
               "-"//TL(DCL)(1:LEN_TRIM(TL(DCL)))//"-"//TL(DEL)(1:LEN_TRIM(TL(DEL)))//"]"
             endif
@@ -453,26 +445,25 @@ else if (job .eq. IDAN) then
 
 else if (job .eq. IDRI) then
 
-  DDL = nleg-(GRNUM+GQNUM+SQNUM+SKNUM+BDNUM+ANNUM)
-  if (DDL.eq.0 .or. DDL.eq.4 .or. DDL.eq.8 .or. DDL.eq.12 .or. DDL.eq.16) then
+  if (nleg.eq.0 .or. nleg.eq.4 .or. nleg.eq.8 .or. nleg.eq.12 .or. nleg.eq.16) then
     if (idl .eq. 0) then
       ylegend= """R\sc\N(\f{Times-Italic}n\f{})"""
     else
       ylegend= "Rc(n)"
     endif
-  elseif (DDL.eq.1 .or. DDL.eq.5 .or. DDL.eq.9 .or. DDL.eq.13 .or. DDL.eq.17) then
+  elseif (nleg.eq.1 .or. nleg.eq.5 .or. nleg.eq.9 .or. nleg.eq.13 .or. nleg.eq.17) then
     if (idl .eq. 0) then
       ylegend= """P\sn\N(\f{Times-Italic}n\f{})"""
     else
       ylegend= "Pn(n)"
     endif
-  elseif (DDL.eq.2 .or. DDL.eq.6 .or. DDL.eq.10 .or. DDL.eq.14 .or. DDL.eq.18) then
+  elseif (nleg.eq.2 .or. nleg.eq.6 .or. nleg.eq.10 .or. nleg.eq.14 .or. nleg.eq.18) then
     if (idl .eq. 0) then
       ylegend= """P\smax\N(\f{Times-Italic}n\f{})"""
     else
       ylegend= "Pmax(n)"
     endif
-  elseif (DDL.eq.3 .or. DDL.eq.7 .or. DDL.eq.11 .or. DDL.eq.15 .or. DDL.eq.19) then
+  elseif (nleg.eq.3 .or. nleg.eq.7 .or. nleg.eq.11 .or. nleg.eq.15 .or. nleg.eq.19) then
     if (idl .eq. 0) then
       ylegend= """P\smin\N(\f{Times-Italic}n\f{})"""
     else
@@ -482,35 +473,33 @@ else if (job .eq. IDRI) then
 
 elseif (job .eq. IDCH) then
 
+  if (nleg.eq.0) then
+    if (idl .eq. 0) then
+      ylegend= """C\sc\N(\f{Times-Italic}n\f{})[All]"""
+    else
+      ylegend= "Cc(n)[All]"
+    endif
+  else
+    DDL = 1
+    do DAL=1, snp
+      if (nleg .eq. DDL) then
+        if (idl .eq. 0) then
+          ylegend= """C\sc\N(\f{Times-Italic}n\f{})["//TL(DAL)(1:LEN_TRIM(TL(DAL)))//"]"""
+        else
+          ylegend= "Cc(n)["//TL(DAL)(1:LEN_TRIM(TL(DAL)))//"]"
+        endif
+      endif
+      DDL=DDL+1
+    enddo
+  endif
 elseif (job .eq. IDSP) then
 
-  DDL = nleg-(GRNUM+GQNUM+SQNUM+SKNUM+BDNUM+ANNUM+RINUM+CHNUM)
-!  if (DDL .eq. 0) then
-!    if (idl .eq. 0) then
-!      ylegend= """Q\sl\N [average]"""
-!    else
-!      ylegend= "Ql [average]"
-!    endif
-  if (DDL.le.NSP-1) then
-    do DEL=1, NSP
-      if (idl .eq. 0) then
-        ylegend= """Q\sl\N ["//TL(DEL)(1:LEN_TRIM(TL(DEL)))//" atoms]"""
-      else
-        ylegend= "Ql ["//TL(DEL)(1:LEN_TRIM(TL(DEL)))//" atoms]"
-      endif
-    enddo
-  else
-    if (idl .eq. 0) then
-      ylegend= """Q\sl\N specific environment"""
-    else
-      ylegend= "Ql specific environment"
-    endif
-  endif
+  ! Nothing to be done here
 
 else
 
-  DDL = GRNUM+GQNUM+SQNUM+SKNUM+BDNUM+ANNUM+RINUM+CHNUM+SHNUM
-  do DAL=1, NSP
+  DDL = 0
+  do DAL=1, snp
     if (nleg .eq. DDL) then
       if (idl .eq. 0) then
         ylegend= """MSD ("//TL(DAL)(1:LEN_TRIM(TL(DAL)))//") [\cE\C\S2\N]"""
@@ -528,7 +517,7 @@ else
     endif
     DDL=DDL+1
   enddo
-  do DAL=1, NSP
+  do DAL=1, snp
     if (nleg .eq. DDL) then
       if (idl .eq. 0) then
         ylegend= """MSD [x]("//TL(DAL)(1:LEN_TRIM(TL(DAL)))//") [\cE\C\S2\N]"""
@@ -578,7 +567,7 @@ else
     endif
     DDL=DDL+1
   enddo
-  do DAL=1, NSP
+  do DAL=1, snp
     if (nleg .eq. DDL) then
       if (idl .eq. 0) then
         ylegend= """MSD [x/nac]("//TL(DAL)(1:LEN_TRIM(TL(DAL)))//") [\cE\C\S2\N]"""
@@ -680,13 +669,13 @@ endif
 
 END FUNCTION
 
-CHARACTER (LEN=65) FUNCTION xlegend (job, nleg, idl, cdc)
+CHARACTER (LEN=65) FUNCTION xlegend (job, nleg, idl, cdc, snp)
 
 USE PARAMETERS
 
 IMPLICIT NONE
 
-INTEGER, INTENT(IN) :: job, nleg, idl
+INTEGER, INTENT(IN) :: job, nleg, idl, snp
 DOUBLE PRECISION, INTENT(IN) :: cdc
 INTEGER :: il
 CHARACTER (LEN=6), DIMENSION(5) :: tpsunit = (/'t [fs]', 't [ps]', 't [ns]', 't [us]', 't [ms]' /)
@@ -699,12 +688,12 @@ xlegend = ''
 if (idl .eq. 0) then
   if (job.eq.IDGR .or. job.eq.IDGRFFT) then
     xlegend = "r[\cE\C]"""
-  elseif (job.eq.IDSQ .or. job.eq.IDSK) then
+  elseif (job.eq.IDSQ .or. job.eq.IDSK .or. job.eq.IDSKT) then
     xlegend = "q[\cE\C\S-1\N]"""
   elseif (job .eq. IDBD) then
     xlegend = "Dij[\cE\C\]"""
   elseif (job .eq. IDAN) then
-    if ( nleg .lt. GRNUM+GQNUM+SQNUM+SKNUM+BDNUM+NSP*NSP*NSP ) then
+    if (nleg .lt. snp*snp*snp) then
       xlegend = "Angles[\c:\C]"""
     else
       xlegend = "Dihedrals[\c:\C]"""
@@ -726,12 +715,12 @@ if (idl .eq. 0) then
 else
   if (job.eq.IDGR .or. job.eq.IDGRFFT) then
     xlegend = "r[Å]"
-  elseif (job.eq.IDSQ .or. job.eq.IDSK) then
+  elseif (job.eq.IDSQ .or. job.eq.IDSK .or. job.eq.IDSKT) then
     xlegend = "q[Å-1]"
   elseif (job .eq. IDBD) then
     xlegend = "Dij[Å]"
   elseif (job .eq. IDAN) then
-    if ( nleg .lt. GRNUM+GQNUM+SQNUM+SKNUM+BDNUM+NSP*NSP*NSP ) then
+    if (nleg .lt. snp*snp*snp) then
       xlegend = "Angles[°]"
     else
       xlegend = "Dihedrals[°]"
@@ -750,14 +739,14 @@ endif
 
 END FUNCTION
 
-SUBROUTINE prep_file (scf, sfi, tfile, &
+SUBROUTINE prep_file (scf, sfi, snp, tfile, &
                       scalex, scaley, mdc, rdc, idc) BIND (C,NAME='prep_file_')
 
 USE PARAMETERS
 
 IMPLICIT NONE
 
-INTEGER (KIND=c_int), INTENT(IN) :: scf, rdc, idc, tfile
+INTEGER (KIND=c_int), INTENT(IN) :: scf, rdc, snp, tfile, idc
 INTEGER (KIND=c_int), INTENT(IN) :: scalex, scaley
 CHARACTER (KIND=c_char), DIMENSION(*), INTENT(IN) :: sfi
 CHARACTER (LEN=scf) :: sfile
@@ -766,13 +755,13 @@ CHARACTER (LEN=5) :: xaxis="xaxis", yaxis="yaxis"
 CHARACTER (LEN=65) :: xlabel
 
 INTERFACE
-  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc)
-    INTEGER, INTENT(IN) :: job, nleg, idl
+  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc, snp)
+    INTEGER, INTENT(IN) :: job, nleg, idl, snp
     DOUBLE PRECISION, INTENT(IN) :: cdc
   END FUNCTION
 END INTERFACE
 
-xlabel = xlegend(rdc, idc, tfile, mdc)
+xlabel = xlegend(rdc, idc, tfile, mdc, snp)
 
 do i=1, scf
   sfile(i:i) = sfi(i)
@@ -813,14 +802,14 @@ endif
 END SUBROUTINE
 
 SUBROUTINE append_to_file (ndata, xdata, ydata, &
-                           mdc, tdata, rdc, idc, &
+                           mdc, tdata, rdc, idc, snp, &
                            tfile, nfile, afile, lcname, cstring) BIND (C,NAME='append_to_file_')
 
 USE PARAMETERS
 
 IMPLICIT NONE
 
-INTEGER (KIND=c_int), INTENT(IN) :: rdc, idc
+INTEGER (KIND=c_int), INTENT(IN) :: rdc, idc, snp
 INTEGER (KIND=c_int), INTENT(IN) :: ndata
 INTEGER (KIND=c_int), INTENT(IN) :: tfile, tdata
 INTEGER (KIND=c_int), INTENT(IN) :: nfile, afile, lcname
@@ -832,12 +821,9 @@ REAL (KIND=c_double), INTENT(IN) :: mdc
 REAL (KIND=c_double), DIMENSION(ndata), INTENT(IN) :: xdata, ydata
 CHARACTER (LEN=65) :: xlabel
 INTERFACE
-  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc)
-    INTEGER, INTENT(IN) :: job, nleg, idl
+  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc, snp)
+    INTEGER, INTENT(IN) :: job, nleg, idl, snp
     DOUBLE PRECISION, INTENT(IN) :: cdc
-  END FUNCTION
-  CHARACTER (LEN=35) FUNCTION ylegend (job, nleg, idl)
-    INTEGER, INTENT(IN) :: job, nleg, idl
   END FUNCTION
 END INTERFACE
 
@@ -845,8 +831,7 @@ do i=1, lcname
   cname(i:i) = cstring(i)
 enddo
 
-! ylabel = ylegend(rdc, idc, tfile)
-xlabel = xlegend(rdc, idc, tfile, mdc)
+xlabel = xlegend(rdc, idc, tfile, mdc, snp)
 
 step=1
 start=1
@@ -879,7 +864,7 @@ if (nfile  .eq. afile-1) close(200)
 
 013 FORMAT ("@type xy")
 014 FORMAT (f20.10,3x,f20.10)
-015 FORMAT ("# ",A65," ",A35)
+015 FORMAT ("# ",A65," ",A36)
 019 FORMAT ("@type bar")
 
 END SUBROUTINE
@@ -887,13 +872,13 @@ END SUBROUTINE
 SUBROUTINE save_to_file (scf, sfi, &
                          ndata, xdata, ydata, &
                          scalex, scaley, tdata, &
-                         mdc, rdc, idc, tfile, lcname, cstring) BIND (C,NAME='save_to_file_')
+                         mdc, rdc, idc, snp, tfile, lcname, cstring) BIND (C,NAME='save_to_file_')
 
 USE PARAMETERS
 
 IMPLICIT NONE
 
-INTEGER (KIND=c_int), INTENT(IN) :: scf, rdc, idc, tfile
+INTEGER (KIND=c_int), INTENT(IN) :: scf, rdc, idc, snp, tfile
 INTEGER (KIND=c_int), INTENT(IN) :: ndata, scalex, scaley, tdata, lcname
 CHARACTER (KIND=c_char), DIMENSION(*), INTENT(IN) :: cstring
 CHARACTER (KIND=c_char), DIMENSION(*), INTENT(IN) :: sfi
@@ -905,21 +890,22 @@ REAL (KIND=c_double), DIMENSION(ndata), INTENT(IN) :: xdata, ydata
 INTEGER :: WA, WB
 CHARACTER (LEN=5) :: xaxis="xaxis", yaxis="yaxis"
 CHARACTER (LEN=65) :: xlabel
+CHARACTER (LEN=36) :: ylabel
 INTERFACE
-  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc)
-    INTEGER, INTENT(IN) :: job, nleg, idl
+  CHARACTER(LEN=65) FUNCTION xlegend (job, nleg, idl, cdc, snp)
+    INTEGER, INTENT(IN) :: job, nleg, idl, snp
     DOUBLE PRECISION, INTENT(IN) :: cdc
   END FUNCTION
-  CHARACTER (LEN=35) FUNCTION ylegend (job, nleg, idl)
-    INTEGER, INTENT(IN) :: job, nleg, idl
+  CHARACTER (LEN=36) FUNCTION ylegend (job, nleg, idl, snp)
+    INTEGER, INTENT(IN) :: job, nleg, idl, snp
   END FUNCTION
 END INTERFACE
 
-!ylabel = ylegend(rdc, idc, tfile)
+ylabel = ylegend(rdc, idc, tfile, snp)
 do i=1, lcname
   cname(i:i) = cstring(i)
 enddo
-xlabel = xlegend(rdc, idc, tfile, mdc)
+xlabel = xlegend(rdc, idc, tfile, mdc, snp)
 
 start=1
 step=1
@@ -945,6 +931,7 @@ if (tfile .eq. 0) then
   write (100, 005) xaxis, 0.5
   write (100, 007) xaxis
   write (100, 008) xaxis
+  write (100, 002) yaxis, ylabel
   write (100, 006) yaxis, cname
   write (100, 003) yaxis
   if (scaley .eq. 1) write (100, 017)
@@ -1051,7 +1038,7 @@ close(100)
 003 FORMAT ("@    ",A5," tick on")
 004 FORMAT ("@    ",A5," tick major size ",f8.6)
 005 FORMAT ("@    ",A5," tick minor size ",f8.6)
-006 FORMAT ("@    ",A5," label ",A35)
+006 FORMAT ("@    ",A5," label ",A36)
 007 FORMAT ("@    ",A5," ticklabel on")
 008 FORMAT ("@    ",A5," ticklabel char size 0.800000")
 009 FORMAT ("@    legend on")
@@ -1060,7 +1047,7 @@ close(100)
 012 FORMAT ("@target G0.S0")
 013 FORMAT ("@type xy")
 014 FORMAT (f20.10,3x,f20.10)
-015 FORMAT ("# ",A65," ",A35)
+015 FORMAT ("# ",A65," ",A36)
 016 FORMAT ("@    xaxes scale Logarithmic")
 017 FORMAT ("@    yaxes scale Logarithmic")
 018 FORMAT (i4,5x,f20.10)

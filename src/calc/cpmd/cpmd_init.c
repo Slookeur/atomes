@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd_init.c
@@ -110,22 +110,22 @@ gchar * cpmd_elements[MAXDATAQM] = {"INFO",
                                     "SYSTEM",
                                     "ATOMS"};
 
-gchar * cdescr[MAXDATAQM] = {"provides an informal description of the system and the calculation to be performed",
-                             "provides the general control parameters for the calculation to be performed",
-                             "provides the exchange and correlation functional (DFT) parameters",
-                             "describes the implementation of the van der Waals interactions",
-                             "provides details about the physical properties to be calculated",
-                             "describes the symmetry and periodicity of the system",
-                             "describes the atomic species, pseudo-potentials and coordinates"};
+gchar * cdescr[MAXDATAQM] = {i18n("provides an informal description of the system and the calculation to be performed"),
+                             i18n("provides the general control parameters for the calculation to be performed"),
+                             i18n("provides the exchange and correlation functional (DFT) parameters"),
+                             i18n("describes the implementation of the van der Waals interactions"),
+                             i18n("provides details about the physical properties to be calculated"),
+                             i18n("describes the symmetry and periodicity of the system"),
+                             i18n("describes the atomic species, pseudo-potentials and coordinates")};
 
 double default_cpmd_options[17] = {400.0, 0.0, 0.0, 4.0, 0.000001, 0.0, 0.0, 0.0, 0.0, 0.0, 70.0, 0.0, -1.0, 0.0, 0.0, 1.0, 1.0};
 
-gchar * default_opts[MAXDATAQM-1][NSECOP]= {{"Fictitious electronic mass:", "Local Spin Density", "Van der Walls interactions", " ", " ", " "},
-                                            {"DFT functional:", "Density cutoff<sup>*</sup>:", " ", " ", " ", " "},
+gchar * default_opts[MAXDATAQM-1][NSECOP]= {{i18n("Fictitious electronic mass:"), i18n("Local Spin Density"), i18n("van der Walls interactions"), " ", " ", " "},
+                                            {i18n("DFT functional:"), i18n("Density cutoff<sup>*</sup>:"), " ", " ", " ", " "},
                                             {" ", " ", " ", " ", " ", " "},
                                             {" ", " ", " ", " ", " ", " "},
-                                            {"Use Angströms (default a.u.)", "Lattice:", "Symmetry:", "Parameters:", "Angles:", "Cutoff for the plane wave basis:"},
-                                            {"Use constraints", "Fix:", "Use dummy atoms:", "Atom type:", "Maximum angular momentum <i>l</i>:", "Local angular momentum <i>l</i>:"}};
+                                            {i18n("Use Angströms (default a.u.)"), i18n("Lattice:"), i18n("Symmetry:"), i18n("Parameters:"), i18n("Angles:"), i18n("Cutoff for the plane wave basis:")},
+                                            {i18n("Use constraints"), i18n("Freeze:"), i18n("Use dummy atoms:"), i18n("Atom type:"), i18n("Maximum angular momentum <i>l</i>:"), i18n("Local angular momentum <i>l</i>:")}};
 
 // 0 = None, 1 = Entry, 2 = Combo, 3 = yes/no
 int default_opts_type[MAXDATAQM-1][NSECOP] = {{1, 3, 3, 0, 0, 0},
@@ -147,15 +147,15 @@ gchar * default_keywords[9][NDFT] = {{"SONLY", "LDA", "BONLY", "BP", "BLYP", "XL
                                      {"S", "P", "D", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                      {"S", "P", "D", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "}};
 
-gchar * default_text[9][NDFT] = {{"Slater exchange only", "Local Density Approximation","Becke 88", "Becke + Perdew", "Becke + Lee-Yang-Parr", "Extended B88+PW91+LYP88", "Perdew + Wang 91",
-                                  "Perdew + Burke-Ernzerhof", "PBE revised for solids", "Revised - PBE", "Hamprecht-Cohen-Tozer-Handy", "Optimized Becke 88", "Handy-Cohen + LYP",
-                                  "Tao-Perdew-Staroverov-Scuseria", "Parameter-free PBE", "Becke one-parameter hybrid + LYP", "Becke three-parameters hybrid + LYP", "Extend hybrid + LYP",  "Heyd-Scuseria-Ernzerhof 06"},
-                                 {"Box parameters (a,b,c and α,β,γ)", "Lattice vectors", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                                 {"Isolated", "Cubic", "Face centered cubic (FCC)", "Body centered cubic (BCC)", "Hexagonal", "Trigonal",
-                                  "Tetragonal", "Body centered tetragonal (BCT)", "Orthorombic", "Monoclinic", "Triclinic",  " ", " ", " ", " ", " ", " ", " ", " "},
-                                 {"Default (a, b/a, c/a)", "Absolute (a, b, c)", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                                 {"Default (cos α, cos β, cos γ)", "Degrees (α, β, γ)", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                                 {"All atoms", "Some atoms", "Some coordinates", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+gchar * default_text[9][NDFT] = {{i18n("Slater Exchange Only"), i18n("Local Density Approximation"), "Becke 88", "Becke + Perdew", "Becke + Lee-Yang-Parr", i18n("Extended B88+PW91+LYP88"), "Perdew + Wang 91",
+                                  "Perdew + Burke-Ernzerhof", i18n("PBE Revised for Solids"), i18n("Revised - PBE"), "Hamprecht-Cohen-Tozer-Handy", i18n("Optimized Becke 88"), "Handy-Cohen + LYP",
+                                  "Tao-Perdew-Staroverov-Scuseria", i18n("Parameter-free PBE"), i18n("Becke One-parameter Hybrid + LYP"), i18n("Becke Three-parameters Hybrid + LYP"), i18n("Extended Hybrid + LYP"),  "Heyd-Scuseria-Ernzerhof 06"},
+                                 {i18n("Box Parameters (a,b,c and α,β,γ)"), i18n("Lattice Vectors"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                                 {i18n("Isolated"), i18n("Cubic"), i18n("Face Centered Cubic (FCC)"), i18n("Body Centered Cubic (BCC)"), i18n("Hexagonal"), i18n("Trigonal"),
+                                  i18n("Tetragonal"), i18n("Body Centered Tetragonal (BCT)"), i18n("Orthorombic"), i18n("Monoclinic"), i18n("Triclinic"),  " ", " ", " ", " ", " ", " ", " ", " "},
+                                 {i18n("Default (a, b/a, c/a)"), i18n("Absolute (a, b, c)"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                                 {i18n("Default (cos α, cos β, cos γ)"), i18n("Degrees (α, β, γ)"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                                 {i18n("All Atoms"), i18n("Some Atoms"), i18n("Some Coordinates"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                  {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                  {"s", "p", "d", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                  {"s", "p", "d", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "}};
@@ -166,12 +166,12 @@ double default_calc_options[24] = {0.00001, 0.0, 10000.0, 3.0,
                                    10000.0, 5.0, 0.0, 0.0, 0.9,
                                    50.0, 0.0, 0.0, 0.0};
 
-gchar * calc_opts[NCPMDCALC][NOPTPC]={{"Convergence criteria<sup>*</sup>:", "Optimizer:", "Max steps:", "Integration step:", " ", " ", " "},
-                                      {"Convergence criteria<sup>*</sup>:", "Optimizer:", "Max steps:", "Integration step:", " ", " ", " "},
-                                      {"Max MD steps: ", "Time step:", "Barostat:", "Ions", "Factor:", "Fictitious electrons", "Factor:"},
-                                      {"Max MD steps: ", "Time step:", "Barostat:", "Ions", "Factor:", " ", " "},
-                                      {"Number of unoccupied states:", "3D visualization<sup>*</sup>", "Number of objects<sup>**</sup>:", " ", " ", " ", " "},
-                                      {"Property to compute:", " ", " ", " ", " ", " ", " "}};
+gchar * cpmd_calc_opts[NCPMDCALC][NOPTPC]={{i18n("Convergence criteria<sup>*</sup>:"), i18n("Optimizer:"), i18n("Max steps:"), i18n("Integration step:"), " ", " ", " "},
+                                           {i18n("Convergence criteria<sup>*</sup>:"), i18n("Optimizer:"), i18n("Max steps:"), i18n("Integration step:"), " ", " ", " "},
+                                           {i18n("Max MD steps: "), i18n("Time step:"), i18n("Barostat:"), i18n("Ions"), i18n("Factor:"), i18n("Fictitious electrons"), i18n("Factor:")},
+                                           {i18n("Max MD steps: "), i18n("Time step:"), i18n("Barostat:"), i18n("Ions"), i18n("Factor:"), " ", " "},
+                                           {i18n("Number of unoccupied states:"), i18n("3D visualization<sup>*</sup>"), i18n("Number of objects<sup>**</sup>:"), " ", " ", " ", " "},
+                                           {i18n("Property to compute:"), " ", " ", " ", " ", " ", " "}};
 
 int default_type[NCPMDCALC][NOPTPC]={{1, 2, 1, 1, 0, 0, 0},
                                      {1, 2, 1, 1, 0, 0, 0},
@@ -189,21 +189,21 @@ gchar * calc_kw[NCPMDCALC]= {"OPTIMIZE WAVEFUNCTION",
                              "VIBRATIONAL ANALYSIS",
                              "PROPERTIES"};
 
-gchar * calc_ds[NCPMDCALC]= {"Wavefunction optimization",
-                             "Geometry optimization",
-                             "CPMD Molecular Dynamics",
-                             "Born-Oppenheimer Molecular Dynamics",
-                             "Kohn-Sham eigen values",
-                             "Vibrational analysis",
-                             "Calculation of physical properties"};
+gchar * calc_ds[NCPMDCALC]= {i18n("Wavefunction Optimization"),
+                             i18n("Geometry Optimization"),
+                             i18n("CPMD Molecular Dynamics"),
+                             i18n("Born-Oppenheimer Molecular Dynamics"),
+                             i18n("Kohn-Sham Eigen Values"),
+                             i18n("Vibrational Analysis"),
+                             i18n("Calculation of Physical Properties")};
 
 int calc_box_num[NCACOMBO]={2, 2, 3, 3, 3};
 
-gchar * calc_box_name[NCACOMBO][3] = {{"Preconditioned Gradient", "Direct Inversion of Iterative Subspace", " "},
-                                      {"Quasi-Newton method", "Direct Inversion of Iterative Subspace", " "},
-                                      {"None", "Parrinello-Rahman", "Parrinello-Rahman + NPT"},
-                                      {"None", "Parrinello-Rahman", "Parrinello-Rahman + NPT"},
-                                      {"Finite differences of first derivatives", "Linear response of ionic displacement", "Precalculated Hessian"}};
+gchar * calc_box_name[NCACOMBO][3] = {{i18n("Preconditioned Gradient"), i18n("Direct Inversion of Iterative Subspace"), " "},
+                                      {i18n("Quasi-Newton method"), i18n("Direct Inversion of Iterative Subspace"), " "},
+                                      {i18n("None"), "Parrinello-Rahman", "Parrinello-Rahman + NPT"},
+                                      {i18n("None"), "Parrinello-Rahman", "Parrinello-Rahman + NPT"},
+                                      {i18n("Finite differences of first derivatives"), i18n("Linear response of ionic displacement"), i18n("Precalculated Hessian")}};
 
 gchar * calc_box_keys[NCACOMBO][3] = {{"PCG", "ODIIS", " "},
                                       {"BFGS", "GDIIS", " "},
@@ -211,15 +211,11 @@ gchar * calc_box_keys[NCACOMBO][3] = {{"PCG", "ODIIS", " "},
                                       {" ", "PARRINELLO-RAHMAN", "PARRINELLO-RAHMAN NPT"},
                                       {"FD", "LR", "IN"}};
 
-gchar * rest_kw[2] = {"RANDOM", "ATOMS"};
-gchar * rest_opts[3] = {"Random", "Atomic pseudo wavefunctions", "Use a RESTART.* file"};
-gchar * nosetype[3] = {"Gobal", "Local", "Molecule"};
-gchar * nosekey[2] = {" ", "LOCAL"};
-gchar * thermo_name[2][5] = {{"None", "Controlled", "Nosé-Hoover chains", " ", " "},
-                             {"None", "Adaptive Langevin", "Canonical sampling through velocity rescaling", "GLE", "Nosé-Hoover chains"}};
+gchar * nosetype[3] = {i18n("Gobal"), i18n("Local"), i18n("Molecule")};
+gchar * thermo_name[2][5] = {{i18n("None"), i18n("Controlled"), i18n("Nosé-Hoover chains"), " ", " "},
+                             {i18n("None"), i18n("Adaptive Langevin"), i18n("Canonical sampling through velocity rescaling"), "GLE", i18n("Nosé-Hoover chains")}};
 int num_thermo[2] = {3, 5};
 int type_thermo[2] = {2, 2};
-gchar * termoke[2] = {"TEMPCONTROL", "NOSE"};
 
 GtkWidget * qm_preview_but;
 GtkWidget * calc_combo;
@@ -428,29 +424,39 @@ GtkWidget * prepare_qm_option_box (int s)
   GtkWidget * hbox;
   GtkWidget * widg;
   gchar * str;
-  gchar * atom_but[2] = {"Configure constraints", "Configure dummy atoms"};
   GtkWidget * vbox = create_vbox (BSEP);
   for (i=0; i<NSECOP; i++)
   {
     if (default_opts_type[s][i] > 0)
     {
-      ident ++;
-      if (ident == DEFAB || ident == DEFDG || ident == DEFSY)
+      if ((s == 0 && (i == 0 || i == 1 || i == 2))
+       || (s == 1 && (i == 0 || i == 1))
+       || (s == 4) || (s == 5))
       {
-        hbox = cpmd_box (latbox, default_opts[s][i], 5, 20, (s == 1) ? 150 : 220);
-      }
-      else if (ident == DEFCO || ident == DEFDU)
-      {
-        hbox = cpmd_box (vbox, default_opts[s][i], 20, 20, 180);
-      }
-      else if (ident == DEFLM || ident == DEFLO)
-      {
-        hbox = cpmd_box (spatbox, default_opts[s][i], 5, 20, 220);
+        str = g_strdup_printf ("%s", _(default_opts[s][i]));
       }
       else
       {
-        hbox = cpmd_box (vbox, default_opts[s][i], (ident == DEFSP) ? 20 : 5, 5, (s == 1) ? 150 : 220);
+        str = g_strdup_printf ("%s", default_opts[s][i]);
       }
+      ident ++;
+      if (ident == DEFAB || ident == DEFDG || ident == DEFSY)
+      {
+        hbox = cpmd_box (latbox, str, 5, 20, (s == 1) ? 150 : 220);
+      }
+      else if (ident == DEFCO || ident == DEFDU)
+      {
+        hbox = cpmd_box (vbox, str, 20, 20, 180);
+      }
+      else if (ident == DEFLM || ident == DEFLO)
+      {
+        hbox = cpmd_box (spatbox, str, 5, 20, 220);
+      }
+      else
+      {
+        hbox = cpmd_box (vbox, str, (ident == DEFSP) ? 20 : 5, 5, (s == 1) ? 150 : 220);
+      }
+      g_free (str);
       j = ident;
       switch (default_opts_type[s][i])
       {
@@ -480,15 +486,22 @@ GtkWidget * prepare_qm_option_box (int s)
           {
             if (icomb == 0)
             {
-              str = g_strdup_printf ("%s (%s)", default_text[0][k], default_keywords[0][k]);
+              if (k == 0 || k == 1 || k == 5 || k == 8 || k == 9 || k == 11 || k == 14 || k == 15 || k == 16 || k == 17)
+              {
+                str = g_strdup_printf ("%s (%s)", _(default_text[0][k]), default_keywords[0][k]);
+              }
+              else
+              {
+                str = g_strdup_printf ("%s (%s)", default_text[0][k], default_keywords[0][k]);
+              }
             }
             else if (ident == DEFSP)
             {
-              str = g_strdup_printf ("%s atom(s)", qm_proj -> chemistry -> label[k]);
+              str = g_strdup_printf (_("%s atom(s)"), qm_proj -> chemistry -> label[k]);
             }
             else
             {
-              str = g_strdup_printf ("%s", default_text[icomb][k]);
+              str = g_strdup_printf ("%s", (icomb < 6) ? _(default_text[icomb][k]) : default_text[icomb][k]);
             }
             if (ident == DEFLM || ident == DEFLO)
             {
@@ -544,7 +557,8 @@ GtkWidget * prepare_qm_option_box (int s)
       else if (j == DEFCO || j == DEFDU)
       {
         k = (j==DEFCO) ? 0 : 1;
-        but_at[k] = create_button (atom_but[k], IMG_NONE, NULL, 175, -1, GTK_RELIEF_NORMAL, G_CALLBACK(atom_button), GINT_TO_POINTER(j));
+        but_at[k] = create_button ((j == DEFCO) ? _("Configure constraints") : _("Configure dummy atoms"), 
+                                   IMG_NONE, NULL, 175, -1, GTK_RELIEF_NORMAL, G_CALLBACK(atom_button), GINT_TO_POINTER(j));
         widget_set_sensitive (but_at[k], (int)tmp_cpmd -> default_opts[j]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but_at[k], FALSE, FALSE, 20);
         if (j == DEFCO)
@@ -667,21 +681,21 @@ GtkWidget * calc_qm_option_box (int c)
       l = 0;
       if (idopt == ANNIC || idopt == ANNIB)
       {
-        hbox = cpmd_box (vbox, "Annealing:", 0, 5, 220);
+        hbox = cpmd_box (vbox, _("Annealing:"), 0, 5, 220);
       }
       if (idopt == ANNIC || idopt == ANNEC || idopt == ANNIB)
       {
-        hbox = cpmd_box (vbox, calc_opts[c][i], 0, 25, 120);
+        hbox = cpmd_box (vbox, _(cpmd_calc_opts[c][i]), 0, 25, 120);
         l = 30;
       }
       else if (idopt == AFAIC || idopt == AFAEC || idopt == AFAIB)
       {
-        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(calc_opts[c][i]), FALSE, FALSE, 10);
+        add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_(cpmd_calc_opts[c][i])), FALSE, FALSE, 10);
         l = 30;
       }
       else
       {
-        hbox = cpmd_box (vbox, calc_opts[c][i], 0, 5, 220);
+        hbox = cpmd_box (vbox, _(cpmd_calc_opts[c][i]), 0, 5, 220);
       }
       j = idopt;
       switch (default_type[c][i])
@@ -702,7 +716,18 @@ GtkWidget * calc_qm_option_box (int c)
           widg = create_combo ();
           for (k=0; k<calc_box_num[icalc]; k++)
           {
-            str = g_strdup_printf ("%s", calc_box_name[icalc][k]);
+            if ((icalc == 0 && (k == 0 || k == 1))
+             || (icalc == 1 && (k == 0 || k == 1))
+             || (icalc == 2 && k == 0)
+             || (icalc == 3 && k == 0)
+             || (icalc == 4))
+            {
+              str = g_strdup_printf ("%s", _(calc_box_name[icalc][k]));
+            }
+            else
+            {
+              str = g_strdup_printf ("%s", calc_box_name[icalc][k]);
+            }
             combo_text_append (widg, str);
             g_free (str);
           }
@@ -720,9 +745,9 @@ GtkWidget * calc_qm_option_box (int c)
       }
       else if (j==NBAND)
       {
-        gchar * ksout = "\t * electronic density(ies) or/and wavefunction(s)\n"
-                        "\t ** as many index(es) to be supplied on the next line:\n"
-                        "\t\t &gt; 0 for electronic density\n\t\t &lt; 0 for wavefunction";
+        gchar * ksout = _("\t * electronic density(ies) or/and wavefunction(s)\n"
+                          "\t ** as many index(es) to be supplied on the next line:\n"
+                          "\t\t &gt; 0 for electronic density\n\t\t &lt; 0 for wavefunction");
         add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(ksout, -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
       }
     }
@@ -744,7 +769,7 @@ G_MODULE_EXPORT void changed_calc_box (GtkComboBox * box, gpointer data)
   i = combo_get_active ((GtkWidget *)box);
   if (i != tmp_cpmd -> calc_type)
   {
-    gtk_label_set_text (GTK_LABEL(calc_label), g_strdup_printf ("<u>%s option(s)</u>", calc_ds[i]));
+    gtk_label_set_text (GTK_LABEL(calc_label), g_strdup_printf (_("<u>%s option(s)</u>"), _(calc_ds[i])));
     gtk_label_set_use_markup (GTK_LABEL(calc_label), TRUE);
     hide_the_widgets (calc_box[tmp_cpmd -> calc_type]);
     show_the_widgets (calc_box[i]);
@@ -825,14 +850,14 @@ GtkWidget * section_box (int s)
     ident = -1;
     icomb = -1;
     hbox = create_hbox (0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>Calculation to be performed:</b>", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>Calculation to be performed:</b>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
     calc_combo = create_combo ();
-    for (i=0; i<NCPMDCALC; i++) combo_text_append (calc_combo, calc_ds[i]);
+    for (i=0; i<NCPMDCALC; i++) combo_text_append (calc_combo, _(calc_ds[i]));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, calc_combo, FALSE, FALSE, 10);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
 
     /* Calc related options: */
-    str = g_strdup_printf ("<u>%s option(s)</u>", calc_ds[tmp_cpmd -> calc_type]);
+    str = g_strdup_printf (_("<u>%s option(s)</u>"), _(calc_ds[tmp_cpmd -> calc_type]));
     calc_label = markup_label(str, -1, -1, 0.0, 0.5);
     g_free (str);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, calc_label, FALSE, FALSE, 10);
@@ -860,7 +885,7 @@ GtkWidget * section_box (int s)
   if (s > 0 && s != 2 && s != 3)
   {
     i = (s == 1) ? s : s - 2;
-    str = g_strdup_printf ("<u>General %s section option(s)</u>",cpmd_elements[i]);
+    str = g_strdup_printf (_("<u>General %s section option(s)</u>"),cpmd_elements[i]);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, 525, -1, 0.0, 0.5), FALSE, FALSE, 10);
     g_free (str);
     qm_option_box[i-1] = prepare_qm_option_box (i-1);
@@ -908,15 +933,15 @@ gchar * section_name (int p)
 {
   if (p > 0 && p < 4)
   {
-    return g_strdup_printf ("Details of the <b>%s</b> section that %s", cpmd_elements[1], cdescr[1]);
+    return g_strdup_printf (_("Details of the <b>%s</b> section that %s"), cpmd_elements[1], _(cdescr[1]));
   }
   else if (p == 0)
   {
-    return g_strdup_printf ("Details of the <b>%s</b> section that %s", cpmd_elements[p], cdescr[p]);
+    return g_strdup_printf (_("Details of the <b>%s</b> section that %s"), cpmd_elements[p], _(cdescr[p]));
   }
   else
   {
-    return g_strdup_printf ("Details of the <b>%s</b> section that %s", cpmd_elements[p-2], cdescr[p-2]);
+    return g_strdup_printf (_("Details of the <b>%s</b> section that %s"), cpmd_elements[p-2], _(cdescr[p-2]));
   }
 }
 
@@ -956,24 +981,24 @@ gchar * page_name (int p)
   {
     if (p == 1)
     {
-      return g_strdup_printf ("The %s section - Calculation options", cpmd_elements[1]);
+      return g_strdup_printf (_("The %s section - Calculation options"), cpmd_elements[1]);
     }
     else if (p == 2)
     {
-      return g_strdup_printf ("The %s section - Thermostat options", cpmd_elements[1]);
+      return g_strdup_printf (_("The %s section - Thermostat options"), cpmd_elements[1]);
     }
     else
     {
-      return g_strdup_printf ("The %s section - RESTART options", cpmd_elements[1]);
+      return g_strdup_printf (_("The %s section - RESTART options"), cpmd_elements[1]);
     }
   }
   else if (p == 0)
   {
-    return g_strdup_printf ("The %s section", cpmd_elements[p]);
+    return g_strdup_printf (_("The %s section"), cpmd_elements[p]);
   }
   else
   {
-    return g_strdup_printf ("The %s section", cpmd_elements[p-2]);
+    return g_strdup_printf (_("The %s section"), cpmd_elements[p-2]);
   }
 }
 
@@ -1005,12 +1030,12 @@ void add_cpmd_pages ()
   }
 
   GtkWidget * conclu = create_vbox (BSEP);
-  info = g_strdup_printf ("<b>   Finalize the creation of the CPMD input file now !</b>");
+  info = g_strdup_printf (_("<b>   Finalize the creation of the CPMD input file now !</b>"));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label(info, -1, -1, 0.5, 0.5), TRUE, TRUE, 100);
   g_free (info);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label("\n \t<b>Note: </b>You can re-open this assitant later if required to adjust your choices\n", -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, conclu, markup_label(_("\n \t<b>Note: </b>You can re-open this assitant later if required to adjust your choices\n"), -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   gtk_assistant_append_page (assist, conclu);
-  gtk_assistant_set_page_title (assist, conclu, "Create the input file now !");
+  gtk_assistant_set_page_title (assist, conclu, _("Create the input file now !"));
   gtk_assistant_set_page_type (assist, conclu, GTK_ASSISTANT_PAGE_CONFIRM);
   gtk_assistant_set_page_complete (assist, conclu, TRUE);
   gtk_assistant_update_buttons_state (assist);
@@ -1185,10 +1210,10 @@ G_MODULE_EXPORT void on_qm_assistant_prepare (GtkAssistant * assistant, GtkWidge
   switch (i)
   {
     case 0:
-      if (is_the_widget_visible(qm_preview_but)) hide_the_widgets (qm_preview_but);
+      hide_the_widgets (qm_preview_but);
       break;
     default:
-      if (! is_the_widget_visible(qm_preview_but)) show_the_widgets (qm_preview_but);
+      show_the_widgets (qm_preview_but);
       break;
   }
 }
@@ -1221,10 +1246,11 @@ gboolean go_for_it (int i, int j, gboolean print[2])
 */
 G_MODULE_EXPORT void show_qm_file_preview (GtkButton * but, gpointer data)
 {
-  int i, j, k, c;
+  int i, j, k, l, c;
   c = GPOINTER_TO_INT(data);
-  gchar * ptitle[5] = {"CP2K input file", "forces.inc", "system.inc", "motion.inc", "coord.inc"};
-  gchar * wtite[2] = {" input file preview", " input files preview"};
+  gchar * ptitle[5] = {i18n("CP2K input file"),
+                       "forces.inc", "system.inc", "motion.inc", "coord.inc"};
+  gchar * wtite[2] = {i18n(" input file preview"), i18n(" input files preview")};
   gchar * str;
   GtkWidget * scrollsets;
   GtkWidget * aview;
@@ -1236,14 +1262,7 @@ G_MODULE_EXPORT void show_qm_file_preview (GtkButton * but, gpointer data)
     j = 6;
     notebook = gtk_notebook_new ();
     if (tmp_cp2k -> opts[CP2RUN] > 1.0 && tmp_cp2k -> opts[CP2RUN] < 4.0) k = 1;
-    if (tmp_cp2k -> input_type)
-    {
-      str = g_strdup_printf ("%s %s", co_type[c], wtite[1]);
-    }
-    else
-    {
-      str = g_strdup_printf ("%s %s", co_type[c], wtite[0]);
-    }
+    str = g_strdup_printf ("%s %s", co_type[c], _(wtite[tmp_cp2k -> input_type]));
     print[0] = print[1] = FALSE;
     for (i=0; i<qm_proj -> nspec; i++)
     {
@@ -1265,7 +1284,7 @@ G_MODULE_EXPORT void show_qm_file_preview (GtkButton * but, gpointer data)
   else
   {
     j = 1;
-    str = g_strdup_printf ("%s %s", co_type[c], wtite[0]);
+    str = g_strdup_printf ("%s %s", co_type[c], _(wtite[0]));
   }
   GtkWidget * preview = dialogmodal (str, GTK_WINDOW (qm_assistant));
   g_free (str);
@@ -1292,7 +1311,8 @@ G_MODULE_EXPORT void show_qm_file_preview (GtkButton * but, gpointer data)
         }
         else
         {
-          str = g_strdup_printf ("%s", ptitle[(i == j-3+k) ? 4 : i]);
+          l = (i == j-3+k) ? 4 : i;
+          str = g_strdup_printf ("%s", (l) ? ptitle[l] : _(ptitle[l]));
         }
         gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrollsets, gtk_label_new (str));
         g_free (str);
@@ -1394,7 +1414,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
                   g_object_unref (buffer);
                   if (! result && err)
                   {
-                    show_error (g_strdup_printf ("Error while saving input file: %s\n Error: %s", filename, err -> message), 0, qm_assistant);
+                    show_error (g_strdup_printf (_("Error while saving input file: %s\n Error: %s"), filename, err -> message), 0, qm_assistant);
                     g_error_free (err);
                   }
                   g_free (filename);
@@ -1419,7 +1439,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
           if (! result && err)
           {
             /* error saving file, show message to user */
-            show_error (g_strdup_printf ("Error while saving input file: %s\n Error: %s", filename, err -> message), 0, qm_assistant);
+            show_error (g_strdup_printf (_("Error while saving input file: %s\n Error: %s"), filename, err -> message), 0, qm_assistant);
             g_error_free (err);
           }
           g_free (filename);
@@ -1440,7 +1460,7 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
             if (! result && err)
             {
               /* error saving file, show message to user */
-              show_error (g_strdup_printf ("Error while saving file %s: %s", cp2sp[i], err -> message), 0, qm_assistant);
+              show_error (g_strdup_printf (_("Error while saving file %s: %s"), cp2sp[i], err -> message), 0, qm_assistant);
               g_error_free (err);
               break;
             }
@@ -1468,24 +1488,27 @@ G_MODULE_EXPORT void run_saving_qm (GtkDialog * info, gint response_id, gpointer
     {
       if (tmp_cp2k -> opts[CP2RUN] > 1.0 && tmp_cp2k -> opts[CP2RUN] < 4.0)
       {
-        show_info ("The input files 'forces.inc', 'system.inc', 'motion.inc' and 'coord.inc'\n"
-                   "as well as the files 'basis.inc' and 'pseudo.inc'\n"
-                   "for the atomic basis set and peudo-potentials\n"
-                   "were saved in the same directory as the main input file.", 0, qm_assistant);
+        show_info (_("The input files 'forces.inc', 'system.inc', 'motion.inc' and 'coord.inc'\n"
+                     "as well as the files 'basis.inc' and 'pseudo.inc'\n"
+                     "for the atomic basis set and peudo-potentials\n"
+                     "were saved in the same directory as the main input file."),
+                   0, qm_assistant);
       }
       else
       {
-        show_info ("The input files 'forces.inc', 'system.inc', and 'coord.inc'\n"
-                   "as well as the files 'basis.inc' and 'pseudo.inc'\n"
-                   "for the atomic basis set and peudo-potentials\n"
-                   "were saved in the same directory as the main input file.", 0, qm_assistant);
+        show_info (_("The input files 'forces.inc', 'system.inc', and 'coord.inc'\n"
+                     "as well as the files 'basis.inc' and 'pseudo.inc'\n"
+                     "for the atomic basis set and peudo-potentials\n"
+                     "were saved in the same directory as the main input file."),
+                   0, qm_assistant);
       }
     }
     else
     {
-      show_info ("The files 'basis.inc' and 'pseudo.inc'\n"
-                 "for the atomic basis set and peudo-potentials\n"
-                 "were saved in the same directory as the main input file.", 0, qm_assistant);
+      show_info (_("The files 'basis.inc' and 'pseudo.inc'\n"
+                   "for the atomic basis set and peudo-potentials\n"
+                   "were saved in the same directory as the main input file."),
+                 0, qm_assistant);
     }
   }
 }
@@ -1509,14 +1532,14 @@ G_MODULE_EXPORT void on_qm_assistant_apply (GtkAssistant * assistant, gpointer d
 #endif
   GtkFileFilter * filter1, * filter2;
   gchar * qm_type[2] = {"CPMD", "CP2K"};
-  const gchar * qm_name[2] = {"CPMD input file (*.in)", "CP2K input file (*.inp)"};
+  const gchar * qm_name[2] = {i18n("CPMD input file (*.in)"), i18n("CP2K input file (*.inp)")};
   const gchar * qm_ext[2] = {".in", ".inp"};
 
-  text = g_strdup_printf ("Saving %s input file(s)", qm_type[c]);
+  text = g_strdup_printf (_("Saving %s input file(s)"), qm_type[c]);
   info = create_file_chooser (text,
                               GTK_WINDOW(assistant),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
-                              "Save");
+                              _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
   g_free (text);
 #ifdef GTK3
@@ -1524,13 +1547,13 @@ G_MODULE_EXPORT void on_qm_assistant_apply (GtkAssistant * assistant, gpointer d
 #endif
   file_chooser_set_current_folder (chooser);
   filter1 = gtk_file_filter_new();
-  gtk_file_filter_set_name (GTK_FILE_FILTER(filter1), qm_name[c]);
+  gtk_file_filter_set_name (GTK_FILE_FILTER(filter1), _(qm_name[c]));
   text = g_strdup_printf ("*%s", qm_ext[c]);
   gtk_file_filter_add_pattern (GTK_FILE_FILTER(filter1), text);
   g_free (text);
   gtk_file_chooser_add_filter (chooser, filter1);
   filter2 = gtk_file_filter_new();
-  gtk_file_filter_set_name (GTK_FILE_FILTER(filter2), "All files (*)");
+  gtk_file_filter_set_name (GTK_FILE_FILTER(filter2), _("All files (*)"));
   gtk_file_filter_add_pattern (GTK_FILE_FILTER(filter2), "*");
   gtk_file_chooser_add_filter (chooser, filter2);
   text = g_strdup_printf ("%s%s", prepare_for_title(qm_proj -> name), qm_ext[c]);
@@ -1555,7 +1578,7 @@ G_MODULE_EXPORT void on_qm_assistant_apply (GtkAssistant * assistant, gpointer d
 */
 void create_qm_input_file (int c, int p, int s)
 {
-  gchar * qm_type[2] = {"first-principles", "QM-MM"};
+  gchar * qm_type[2] = {i18n("first-principles"), "QM-MM"};
   qm_assistant = gtk_assistant_new ();
   gtk_widget_set_size_request (qm_assistant, 800, 600);
   int i, j;
@@ -1570,7 +1593,7 @@ void create_qm_input_file (int c, int p, int s)
     is_cpmd = TRUE;
     if (qm_proj -> cpmd_input[s] == NULL)
     {
-      qm_proj -> cpmd_input[s] = g_malloc0 (sizeof*qm_proj -> cpmd_input[s]);
+      qm_proj -> cpmd_input[s] = g_malloc0(sizeof*qm_proj -> cpmd_input[s]);
       qm_proj -> cpmd_input[s] -> calc_type = 0;
       qm_proj -> cpmd_input[s] -> thermostats = 0;
       qm_proj -> cpmd_input[s] -> ions_thermostat = NULL;
@@ -1591,9 +1614,9 @@ void create_qm_input_file (int c, int p, int s)
       for (i=0; i<24; i++) qm_proj -> cpmd_input[s] -> calc_opts[i] = default_calc_options[i];
       qm_proj -> cpmd_input[s] -> pp = allocdint (qm_proj -> nspec, 2);
       for (i=0; i<qm_proj -> nspec; i++) qm_proj -> cpmd_input[s] -> pp[i][0] = qm_proj -> cpmd_input[s] -> pp[i][1] = 1;
-      qm_proj -> cpmd_input[s] -> info = g_strdup_printf ("  Project name: %s\n"
-                                                          "  Total number of atoms:      %d\n"
-                                                          "  Number of chemical species: %d",
+      qm_proj -> cpmd_input[s] -> info = g_strdup_printf (_("  Project name: %s\n"
+                                                            "  Total number of atoms:      %d\n"
+                                                            "  Number of chemical species: %d"),
                                                           prepare_for_title(qm_proj -> name), qm_proj -> natomes, qm_proj -> nspec);
     }
     tmp_cpmd = qm_proj -> cpmd_input[s];
@@ -1603,7 +1626,7 @@ void create_qm_input_file (int c, int p, int s)
     is_cpmd = FALSE;
     if (qm_proj -> cp2k_input[s] == NULL)
     {
-      qm_proj -> cp2k_input[s] = g_malloc0 (sizeof*qm_proj -> cp2k_input[s]);
+      qm_proj -> cp2k_input[s] = g_malloc0(sizeof*qm_proj -> cp2k_input[s]);
       qm_proj -> cp2k_input[s] -> input_type = 0;
       for (i=0; i<2; i++)
       {
@@ -1621,13 +1644,13 @@ void create_qm_input_file (int c, int p, int s)
         for (j=0;j<4;j++) qm_proj -> cp2k_input[s] -> extra_opts[i][j] = default_cp2k_extra[i][j];
         if (i == 0) qm_proj -> cp2k_input[s] -> extra_opts[i][2] = default_vdw_cut[0];
       }
-      qm_proj -> cp2k_input[s] -> spec_data = allocdint(qm_proj -> nspec, 2);
-      qm_proj -> cp2k_input[s] -> spec_files = g_malloc (qm_proj -> nspec*sizeof*qm_proj -> cp2k_input[s] -> spec_files);
+      qm_proj -> cp2k_input[s] -> spec_data = allocdint (qm_proj -> nspec, 2);
+      qm_proj -> cp2k_input[s] -> spec_files = g_malloc0(qm_proj -> nspec*sizeof*qm_proj -> cp2k_input[s] -> spec_files);
       for (i=0; i<qm_proj -> nspec; i++)
       {
         qm_proj -> cp2k_input[s] -> spec_data[i][0] = cp2k_is_basis_in_database (i);
         qm_proj -> cp2k_input[s] -> spec_data[i][1] = cp2k_is_pseudo_in_database (i);
-        qm_proj -> cp2k_input[s] -> spec_files[i] = g_malloc0 (2*sizeof*qm_proj -> cp2k_input[s] -> spec_files[i]);
+        qm_proj -> cp2k_input[s] -> spec_files[i] = g_malloc0(2*sizeof*qm_proj -> cp2k_input[s] -> spec_files[i]);
         qm_proj -> cp2k_input[s] -> spec_files[i][0] = NULL;
         qm_proj -> cp2k_input[s] -> spec_files[i][1] = NULL;
       }
@@ -1643,9 +1666,9 @@ void create_qm_input_file (int c, int p, int s)
           }
         }
       }
-      qm_proj -> cp2k_input[s] -> info = g_strdup_printf ("  Project name: %s\n"
-                                                          "  Total number of atoms:      %d\n"
-                                                          "  Number of chemical species: %d",
+      qm_proj -> cp2k_input[s] -> info = g_strdup_printf (_("  Project name: %s\n"
+                                                            "  Total number of atoms:      %d\n"
+                                                            "  Number of chemical species: %d"),
                                                           prepare_for_title(qm_proj -> name), qm_proj -> natomes, qm_proj -> nspec);
     }
     tmp_cp2k = qm_proj -> cp2k_input[s];
@@ -1655,23 +1678,23 @@ void create_qm_input_file (int c, int p, int s)
 
   gtk_window_set_resizable (GTK_WINDOW (qm_assistant), FALSE);
   gtk_window_set_modal (GTK_WINDOW (qm_assistant), TRUE);
-  gchar * str = g_strdup_printf ("Basic %s - %s - calculation assistant", co_type[c], qm_type[s]);
+  gchar * str = g_strdup_printf (_("Basic %s - %s - calculation assistant"), co_type[c], (s) ? qm_type[s] : _(qm_type[s]));
   gtk_window_set_title (GTK_WINDOW(qm_assistant), str);
   g_free (str);
 
   GtkWidget * intro = create_vbox (BSEP);
-  gchar * info = g_strdup_printf ("\t<b>This assistant will help you to setup a %s %s\n"
-                                  "\tcalculation using <i>%s</i> 3D model as starting point</b>\n"
-                                  "\nPlease note that the %s code offers so many calculation options that it is not possible\n"
-                                  "to provide a description and offer a comprehensive usage guide for each of them. \n"
-                                  "Therefore this assistant only provides help towards basics and / or frequently used %s instructions. \n\n"
-                                  "<b>In any case if you intent to use the %s code please refer to the user manual.</b>",
-                                  qm_type[s], co_type[c], qm_proj -> name, co_type[c], co_type[c], co_type[c]);
+  gchar * info = g_strdup_printf (_("\t<b>This assistant will help you to setup a %s %s\n"
+                                    "\tcalculation using <i>%s</i> 3D model as starting point</b>\n"
+                                    "\nPlease note that the %s code offers so many calculation options that it is not possible\n"
+                                    "to provide a description and offer a comprehensive usage guide for each of them. \n"
+                                    "Therefore this assistant only provides help towards basics and / or frequently used %s instructions. \n\n"
+                                    "<b>In any case if you intent to use the %s code please refer to the user manual.</b>"),
+                                  (s) ? qm_type[s] : _(qm_type[s]), co_type[c], qm_proj -> name, co_type[c], co_type[c], co_type[c]);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, intro, markup_label(info, -1, -1, 0.5, 0.5), TRUE, TRUE, 50);
   g_free (info);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, intro,
-                       markup_label("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n", -1, -1, 0.0, 0.5),
+                       markup_label(_("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"), -1, -1, 0.0, 0.5),
                        FALSE, FALSE, 0);
   gtk_assistant_append_page (GTK_ASSISTANT (qm_assistant), intro);
   str = g_strdup_printf ("%s calculation set-up", co_type[c]);
@@ -1688,7 +1711,7 @@ void create_qm_input_file (int c, int p, int s)
     add_cp2k_pages ();
   }
   gtk_assistant_set_forward_page_func (GTK_ASSISTANT (qm_assistant), on_qm_assistant_go_forward, GINT_TO_POINTER(c), NULL);
-  qm_preview_but = create_button ("Preview", IMG_STOCK, EDITF, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_qm_file_preview), GINT_TO_POINTER(c));
+  qm_preview_but = create_button (_("Preview"), IMG_STOCK, EDITF, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_qm_file_preview), GINT_TO_POINTER(c));
   gtk_assistant_add_action_widget (GTK_ASSISTANT (qm_assistant), qm_preview_but);
   g_signal_connect (G_OBJECT (qm_assistant), "prepare", G_CALLBACK(on_qm_assistant_prepare), GINT_TO_POINTER(c));
   g_signal_connect (G_OBJECT (qm_assistant), "cancel", G_CALLBACK(on_qm_assistant_cancel), GINT_TO_POINTER(c));

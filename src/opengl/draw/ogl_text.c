@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file ogl_text.c
@@ -188,13 +188,13 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
   double x, y;
   object_3d * new_string;
 
-  new_string = g_malloc0 (sizeof*new_string);
+  new_string = g_malloc0(sizeof*new_string);
   if (! new_string) return NULL;
 
   int csize = cwidth * cheight;
 
   int * rawbitmap;
-  rawbitmap = allocint(csize);
+  rawbitmap = allocint (csize);
   if (! rawbitmap) return NULL;
 
   n = 0;
@@ -241,7 +241,7 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
   GLubyte * channels[2];
   for (i=0; i<2; i++)
   {
-    channels[i] = g_malloc (csize*sizeof*channels[i]);
+    channels[i] = g_malloc0(csize*sizeof*channels[i]);
     if (! channels[i]) return NULL;
   }
 
@@ -275,13 +275,15 @@ object_3d * create_string_texture (int cwidth, int cheight, int * pixels)
                   GL_UNSIGNED_BYTE,
                   channels[i]);
 
-    glTexParameteri (ogl_texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri (ogl_texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (ogl_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri (ogl_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri (ogl_texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glBindTexture (ogl_texture, 0);
   }
+  for (i=0; i<2; i++) g_free (channels[i]);
+  g_free (rawbitmap);
   return new_string;
 }
 
@@ -314,16 +316,17 @@ object_3d * gl_pango_render_layout (PangoLayout * layout, GLenum texture, int id
 
   bitmap.pitch = cwidth;
   csize = cheight*cwidth;
-  bitmap.buffer = g_malloc (csize);
+  bitmap.buffer = g_malloc0(csize);
   memset (bitmap.buffer, 0, csize);
 
   bitmap.num_grays = 256;
   bitmap.pixel_mode = ft_pixel_mode_grays;
   pango_ft2_render_layout (& bitmap, layout, PANGO_PIXELS (-prect.x)+OUTLINE_WIDTH, OUTLINE_WIDTH);
   pixels = paint_bitmap (vec4(1.0,0.0,0.0,0.0), 1.0, cwidth, cheight, bitmap.buffer);
+  g_free (bitmap.buffer);
   if (! plot -> labels[id].render)
   {
-    new_string = g_malloc0 (sizeof*new_string);
+    new_string = g_malloc0(sizeof*new_string);
     new_string -> texture = -1;
     glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
     glGenTextures (1, & new_string -> texture);
@@ -398,7 +401,7 @@ object_3d * gl_pango_render_layout (PangoLayout * layout, GLenum texture, int id
 */
 ColRGBA * opposite_color (ColRGBA col)
 {
-  ColRGBA * ocol = g_malloc0 (sizeof*ocol);
+  ColRGBA * ocol = g_malloc0(sizeof*ocol);
   ocol -> red   = (1.0-col.red)/2.5;
   ocol -> green = (1.0-col.green)/2.5;
   ocol -> blue  = (1.0-col.blue)/2.5;
@@ -434,7 +437,6 @@ void render_string (int glsl, int id, screen_string * this_string)
   j = pango_font_description_get_size (pfont);
   font_size = j / PANGO_SCALE;
 
-  //g_debug ("Zoom = %f, gnear= %f, p_moy= %f, p_depth= %f", plot -> zoom, plot -> gnear, wingl -> p_moy, plot -> p_depth);
   if (plot -> labels[id].scale) font_size *= ((ZOOM/plot -> zoom)*(plot -> gnear/6.0)*(wingl -> p_moy/plot -> p_depth));
   if (in_movie_encoding)
   {
@@ -443,12 +445,11 @@ void render_string (int glsl, int id, screen_string * this_string)
   }
   pango_font_description_set_absolute_size (pfont, font_size*PANGO_SCALE);
   pango_layout_set_font_description (playout, pfont);
-  pango_layout_set_text (playout, this_string -> word, strlen(this_string -> word));
+  pango_layout_set_markup (playout, this_string -> word, strlen(this_string -> word));
   string_to_render = gl_pango_render_layout (playout, ogl_texture, id, this_string);
   if (string_to_render == NULL)
   {
-    g_warning ("TEXT_RENDER:: For some reason it is impossible to render");
-    g_warning ("TEXT_RENDER:: this string: '%s', using this font: %s", this_string -> word, plot -> labels[id].font);
+    g_warning (_("Error in text rendering : for some reason it is impossible to render\n - this string : '%s' \n - using this font: %s"), this_string -> word, plot -> labels[id].font);
   }
   else
   {
@@ -508,11 +509,13 @@ void render_string (int glsl, int id, screen_string * this_string)
         wingl -> ogl_glsl[glsl][shid][j+1] -> col = duplicate_color(1, & (this_string -> col));
       }
     }
-    g_free (string_to_render);
+    free_object_3d (string_to_render);
   }
   pango_font_description_free (pfont);
-  g_object_unref (G_OBJECT(pcontext));
-  g_object_unref (G_OBJECT(playout));
+  // g_object_unref (pcontext);
+  g_clear_object (& pcontext);
+  // g_object_unref (playout);
+  g_clear_object (& playout);
 }
 
 /*!
@@ -656,12 +659,12 @@ void add_string (char * text, int id, ColRGBA col, vec3_t pos, float lshift[3], 
 {
   if (plot -> labels[id].list == NULL)
   {
-    plot -> labels[id].list = g_malloc0 (sizeof*plot -> labels[id].list);
+    plot -> labels[id].list = g_malloc0(sizeof*plot -> labels[id].list);
     plot -> labels[id].list -> last = plot -> labels[id].list;
   }
   else
   {
-    screen_string * s_tring = g_malloc0 (sizeof*s_tring);
+    screen_string * s_tring = g_malloc0(sizeof*s_tring);
     s_tring -> prev = plot -> labels[id].list -> last;
     s_tring -> id = plot -> labels[id].list -> last -> id + 1;
     plot -> labels[id].list -> last = s_tring;

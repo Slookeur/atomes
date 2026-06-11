@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file main.c
@@ -32,8 +32,18 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
+  int test_this_ext (int len, gchar * arg);
   int test_this_arg (gchar * arg);
+  int get_style_from_string (gchar * style_string);
+  int get_rep_from_string (gchar * rep_string);
+  int get_box_axis_from_string (gchar * box_axis_string);
+  int get_color_map_from_string (gchar * col_string);
+  int get_gradient_from_string (gchar * grad_string);
+  int check_for_atomes_file_options (int start, int end, char *argv[]);
+  int parse_command_line (int argc, char *argv[])
   int main (int argc, char *argv[]);
+
+  ColRGBA * get_color_from_hexa_string (gchar * color_string);
 
   gboolean destroy_func (gpointer user_data);
 
@@ -48,12 +58,17 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   GtkWidget * create_splash_window ();
 
+*
+* Notes:
+*
+
+  LLM tools (Le Chat) were used at few occasions to prepare some sections of this file, including:
+    - To write of the function to convert hexadecimal chain to color
+
 */
 
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
+#include <getopt.h>
+#include <ctype.h>
 #include "version.h"
 #include "global.h"
 #include "bind.h"
@@ -62,6 +77,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "interface.h"
 #include "project.h"
 #include "workspace.h"
+#include "glview.h"
+#include "movie.h"
 
 #ifdef G_OS_WIN32
 #define APP_EXTENSION ".exe"
@@ -84,89 +101,95 @@ struct file_list * flist = NULL;
 struct file_list * ftmp = NULL;
 gboolean with_workspace = FALSE;
 
-/*!
-  \fn int test_this_arg (gchar * arg)
-
-  \brief test an argument from the command line
-
-  \param arg the argument to test
-*/
-int test_this_arg (gchar * arg)
-{
-  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
-  int i, j;
-  i = strlen(arg);
-  gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<15; j++) if (g_strcmp0 (str, fext[j]) == 0) return j+1;
-  gchar * aext = g_strdup_printf ("%c%c%c%c", str[i-4], str[i-3], str[i-2], str[i-1]);
-  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
-  for (j=0; j<15; j++) if (g_strcmp0 (aext, eext[j]) == 0) return -(j+1);
-  g_free (str);
-  g_free (aext);
-  return 0;
-}
+gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks",
+                       "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
+                       "ball_and_sticks", "balls_and_sticks", "balls_and_stick", "ball_and_stick",
+                       "ballsandsticks", "ballsandstick", "ballanddsticks", "ballandstick",
+                       "b&s", "b_and_s", "bs", "b", NULL};
+gchar * wi_styles[] = {"wireframe", "wireframes", "wires", "wire", "wi", "w", NULL};
+gchar * co_styles[] = {"covalent_radius", "covalent", "cov_rad", "cov", "co", "cr", NULL};
+gchar * io_styles[] = {"ionic_radius", "ionic_rad", "ionic", "ion", "ir", NULL};
+gchar * vw_styles[] = {"vdw_radius", "van_der_waals_radius", "van_der_waals", "vdw_radius", "vdw_rad", "vdw", "vr", NULL};
+gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_radius", "cryst", "crystal_rad", "cr", NULL};
+gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", "S", NULL};
+gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", "c", NULL};
+gchar * do_styles[] = {"dot", "dots", "d", NULL};
 
 /*!
-  \fn void printhelp()
+  \fn void print_help()
 
   \brief print basic help
 */
-void printhelp()
+void print_help()
 {
-  char * help    = "\nUsage: ATOMES [OPTION]\n"
-                   "       ATOMES [FILE]\n"
-                   "       ATOMES [OPTION] [FILE]\n"
-                   "       ATOMES [FILE1] [FILE2] ...\n"
-                   "       ATOMES [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
-                   "3D atomistic model analysis, creation/edition and post-processing tool\n\n"
-                   "options:\n"
-                   "  -v, --version             version information\n"
-                   "  -h, --help                display this help message\n\n"
-                   "files, any number, in any order, in the following formats:\n\n"
-                   "  Atomes workspace file: .awf\n"
-                   "  Atomes prject file: .apf\n"
-                   "  XYZ coordinates file: .xyz\n"
-                   "  Chem3D coordinates file: .c3d\n"
-                   "  CPMD trajectory: .trj\n"
-                   "  VASP trajectory: .xdatcar\n"
-                   "  PDB coordinates: .pdb, .ent\n"
-                   "  Crystallographic Information File: .cif\n"
-                   "  DL-POLY history file: .hist\n"
-                   "  ISAACS project file: .ipf\n\n"
-                   " alternatively specify the file format using:\n\n"
-                   " -awf FILE\n"
-                   " -apf FILE\n"
-                   " -xyz FILE\n"
-                   " -c3d FILE\n"
-                   " -trj FILE\n"
-                   " -xdatcar FILE\n"
-                   " -pdb FILE, or, -ent FILE\n"
-                   " -cif FILE\n"
-                   " -hist FILE\n"
-                   " -ipf FILE\n\n"
-                   "ex:\n\n"
-                   " atomes -pdb this.f file.awf -cif that.f *.xyz\n";
-  char bug[20] = "\nReport a bug to <";
-  char eh[4] = ">\n";
-
-  printf("%s", help);
-  printf("%s", bug);
-  printf("%s", PACKAGE_BUGREPORT);
-  printf("%s\n", eh);
+  printf (_("\nUsage: atomes [OPTION]\n"
+            "       atomes [FILE]\n"
+            "       atomes [OPTION] [FILE]\n"
+            "       atomes [FILE1] [FILE2] ...\n"
+            "       atomes [OPTION1] [FILE1] [OPTION2] [FILE2] ...\n\n"
+            "3D atomic-scale models analysis, creation/edition and post-processing tool\n\n"
+            "options:\n"
+            "  -v, --version             version information\n"
+            "  -h, --help                display this help message\n\n"
+            "files, any number, in any order, in the following formats:\n\n"
+            "  atomes workspace file             : .awf\n"
+            "  atomes project file               : .apf\n"
+            "  XYZ coordinates file              : .xyz\n"
+            "  Chem3D coordinates file           : .c3d\n"
+            "  CPMD trajectory                   : .trj\n"
+            "  VASP trajectory                   : .xdatcar\n"
+            "  PDB coordinates                   : .pdb, .ent\n"
+            "  Crystallographic Information File : .cif\n"
+            "  DL-POLY history file              : .hist\n"
+            "  ISAACS project file               : .ipf\n\n"
+            " alternatively specify the file format using:\n\n"
+            " -awf [FILE]\n"
+            " -apf [FILE]\n"
+            " -xyz [FILE]\n"
+            " -c3d [FILE]\n"
+            " -trj [FILE]\n"
+            " -xdatcar [FILE]\n"
+            " -pdb [FILE], or, -ent [FILE]\n"
+            " -cif [FILE]\n"
+            " -hist [FILE]\n"
+            " -ipf [FILE]\n\n"
+            "ex:\n\n"
+            " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
+            "Image rendering from the command line:\n\n"
+            "Usage: atomes [IMAGE_OPTIONS]\n"
+            "  -p, --png, --render-png    render image in PNG format\n"
+            "  -j, --jpg, --render-jpg    render image in JPEG format\n"
+            "  -o, --output=[FILE]        image file name\n"
+            "  -W, --width=[XSIZE]        image width\n"
+            "  -H, --height=[YSIZE]       image height\n"
+            "  -s, --style=[STYLE]        rendering style\n"
+            "  -r, --rep=[REP]            representation type\n"
+            "  -b, --box=[STYLE]          box style\n"
+            "  -a, --axis=[STYLE]         axis style\n"
+            "  -e, --acolor=[MAP]         atoms and bonds color map\n"
+            "  -t, --pcolor=[MAP]         ployhedra color map\n"
+            "  -C, --box_color=[COLOR]    box color\n"
+            "  -G, --back_grad=[GRAD]     background gradient type\n"
+            "  -B, --back_color=[COLOR]   background color\n"
+            "  -D, --back_dir=[DIR]       background gradient direction\n"
+            "  -P, --back_pos=[POS]       colors mixed position\n"
+            "  -U, --grad_col_a=[COL]     gradient initial color\n"
+            "  -V, --grad_col_b=[COL]     gradient final color\n\n"
+            "ex:\n\n"
+            " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
+            " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"));
+  printf ("%s", _("\nReport a bug to <"));
+  printf ("%s>\n\n", PACKAGE_BUGREPORT);
 }
 
 /*!
-  \fn void printversion ()
+  \fn void print_version ()
 
   \brief print version information
 */
-void printversion ()
+void print_version ()
 {
-  char scanid[80]="\n3D atomistic model analysis, creation/edition and post-processing tool\n";
-  char bug[20] = "\nReport a bug to <";
-  char eh[4] = ">\n";
-
-  printf ("%s", scanid);
+  printf ("%s", _("\n3D atomic scale model analysis, creation/edition and post-processing tool\n"));
   printf ("\n%s version         : %s\n", PACKAGE, VERSION);
   printf ("\nGTK+ version           : %1d.%1d.%1d\n",
           GTK_MAJOR_VERSION,
@@ -189,7 +212,7 @@ void printversion ()
           LIBSWSCALE_VERSION_MINOR,
           LIBSWSCALE_VERSION_MICRO);
 #ifdef OPENMP
-  float v;
+  float v = 0.0;
   char * v_string;
   switch (_OPENMP)
   {
@@ -221,6 +244,13 @@ void printversion ()
       v = 5.1;
       v_string = "2020-11";
       break;
+    case 202111:
+      v = 5.2;
+      v_string = "2021-11";
+      break;
+    default:
+      v_string = "unknown";
+      break;
   }
   printf ("OpenMP version         : %1.1f (%s)\n", v, v_string);
 #endif
@@ -229,9 +259,498 @@ void printversion ()
   printf ("C     Compiler         : %s\n", CC);
   printf ("C     Compiler flags   : %s\n", CFLAGS);
 
-  printf ("%s", bug);
-  printf ("%s", PACKAGE_BUGREPORT);
-  printf ("%s\n", eh);
+  printf ("%s", _("\nReport a bug to <"));
+  printf ("%s>\n\n", PACKAGE_BUGREPORT);
+}
+
+/*!
+  \fn int test_this_ext (int len, gchar * arg)
+
+  \brief test extension of an argument from the command line
+
+  \param len argument string length
+  \param arg the argument to test
+*/
+int test_this_ext (int len, gchar * arg)
+{
+  int i;
+  gchar * aext = g_strdup_printf ("%c%c%c%c", arg[len-4], arg[len-3], arg[len-2], arg[len-1]);
+  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
+  for (i=0; i<15; i++) if (g_strcmp0 (aext, eext[i]) == 0)
+  {
+    g_free (aext);
+    return -(i+1);
+  }
+  g_free (aext);
+  return 0;
+}
+
+/*!
+  \fn int test_this_arg (gchar * arg)
+
+  \brief test an argument from the command line
+
+  \param arg the argument to test
+*/
+int test_this_arg (gchar * arg)
+{
+  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
+  int i, j;
+  i = strlen(arg);
+  gchar * str = g_ascii_strdown (arg, i);
+  for (j=0; j<15; j++)
+  {
+    if (g_strcmp0 (str, fext[j]) == 0)
+    {
+      g_free (str);
+      return j+1;
+    }
+  }
+  j = test_this_ext (i, str);
+  g_free (str);
+  return (j) ? j : 0;
+}
+
+/*!
+  \fn gboolean is_string_in_string_list (gchar * string, gchar ** list)
+
+  \brief check if a string is in a list of strings
+
+  \param string the string to search for
+  \param list the string list
+*/
+gboolean is_string_in_string_list (gchar * string, gchar ** list)
+{
+  if (string != NULL)
+  {
+    while (* list != NULL)
+    {
+      if (g_strcmp0(* list, string) == 0)
+      {
+        return TRUE;
+      }
+      list ++;
+    }
+  }
+  return FALSE;
+}
+
+/*!
+  \fn int get_style_from_string (gchar * style_string)
+
+  \brief retrieve style from command line string
+
+  \param style_string the style keyword from command line
+*/
+int get_style_from_string (gchar * style_string)
+{
+  if (is_string_in_string_list(style_string, bs_styles)) return BALL_AND_STICK;
+  if (is_string_in_string_list(style_string, wi_styles)) return WIREFRAME;
+  if (is_string_in_string_list(style_string, co_styles)) return OGL_STYLES;
+  if (is_string_in_string_list(style_string, io_styles)) return OGL_STYLES+1;
+  if (is_string_in_string_list(style_string, vw_styles)) return OGL_STYLES+2;
+  if (is_string_in_string_list(style_string, cr_styles)) return OGL_STYLES+3;
+  if (is_string_in_string_list(style_string, sp_styles)) return SPHERES;
+  if (is_string_in_string_list(style_string, cy_styles)) return CYLINDERS;
+  if (is_string_in_string_list(style_string, do_styles)) return PUNT;
+  return NONE;
+}
+
+/*!
+  \fn int get_rep_from_string (gchar * rep_string)
+
+  \brief retrieve representation style from command line string
+
+  \param rep_string the representation keyword from command line
+*/
+int get_rep_from_string (gchar * rep_string)
+{
+  gchar * ortho_keys[] = {"orthographic", "ortho", "o", "0", NULL};
+  gchar * persp_keys[] = {"perspective", "persp", "p", "1", NULL};
+  if (is_string_in_string_list(rep_string, ortho_keys)) return ORTHOGRAPHIC;
+  if (is_string_in_string_list(rep_string, persp_keys)) return PERSPECTIVE;
+  return NONE;
+}
+
+/*!
+  \fn int get_box_axis_from_string (gchar * box_axis_string)
+
+  \brief retrieve box or axis style from command line string
+
+  \param box_axis_string the axis keyword from command line
+*/
+int get_box_axis_from_string (gchar * box_axis_string)
+{
+  if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
+  if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
+  return NONE;
+}
+
+/*!
+  \fn int get_color_map_from_string (gchar * col_string)
+
+  \brief retrieve color map from command line string
+
+  \param col_string the color map keyword from command line
+*/
+int get_color_map_from_string (gchar * col_string)
+{
+  gchar * sp_keys[] = {"species", "spec", "sp", "0", NULL};
+  gchar * pt_keys[] = {"total_coordinations", "total_coordination", "total_coord", "total", "tc", "t", "1", NULL};
+  gchar * pc_keys[] = {"partial_coordinations", "partial_coordination", "partial_coord", "partial", "pc", "p", "2", NULL};
+  gchar * fg_keys[] = {"fragments", "fragment", "frag", "fg", "f", "3", NULL};
+  gchar * mo_keys[] = {"molecules", "molecule", "mol", "mo", "m", "4", NULL};
+  if (is_string_in_string_list(col_string, sp_keys)) return 0;
+  if (is_string_in_string_list(col_string, pt_keys)) return 1;
+  if (is_string_in_string_list(col_string, pc_keys)) return 2;
+  if (is_string_in_string_list(col_string, fg_keys)) return 3;
+  if (is_string_in_string_list(col_string, mo_keys)) return 4;
+  return NONE;
+}
+
+/*!
+  \fn ColRGBA * get_color_from_hexa_string (gchar * color_string)
+
+  \brief convert Hexadecimal string to ColRGBA
+
+  \param color_string the color keyword from command line (formats: #RGB, RGB, #RGBA, RGBA, #RRGGBB, RRGGBB, #RRGGBBAA, RRGGBBAA).
+*/
+ColRGBA * get_color_from_hexa_string (gchar * color_string)
+{
+   ColRGBA * col = NULL;
+  const char * color = color_string;
+  // Ignorer le '#' si présent au début
+  if (color[0] == '#') color ++;
+
+  size_t len = strlen(color);
+  if (len != 3 && len != 4 && len != 6 && len != 8)
+  {
+    // longueur de chaîne incompatible
+    return NULL;
+  }
+  // Format long ?
+  int is_long = (len == 6 || len == 8) ? TRUE : FALSE;
+  float ratio = (is_long) ? 255.0 : 15.0;
+  int incr = (is_long) ? 2 : 1;
+  col = g_malloc0(sizeof*col);
+  col -> alpha = 1.0;
+  char buf[3] = {0}; // pour les caractères à examiner
+  // Format court (#RGB ou #RGBA)
+  buf[incr] = '\0';
+  buf[0] = color[0];
+  if (is_long) buf[1] = color[1];
+  col->red = strtol(buf, NULL, 16) / ratio;
+  buf[0] = color[incr];
+  if (is_long) buf[1] = color[incr+1];
+  col->green = strtol(buf, NULL, 16) / ratio;
+  buf[0] = color[2*incr];
+  if (is_long) buf[1] = color[2*incr+1];
+  col->blue = strtol(buf, NULL, 16) / ratio;
+  if (len == 4 || len == 8)
+  {
+    buf[0] = color[3*incr];
+    if (is_long) buf[1] = color[3*incr+1];
+    col->alpha = strtol(buf, NULL, 16) / ratio;
+  }
+
+  // Safety net
+  if (col -> red < 0.0 || col -> red > 1.0 ||
+      col -> green < 0.0 || col -> green > 1.0 ||
+      col -> blue < 0.0 || col -> blue > 1.0 ||
+      col -> alpha < 0.0 || col -> alpha > 1.0)
+  {
+    g_free(col);
+    return NULL;
+  }
+  return col;
+}
+
+/*!
+  \fn int get_gradient_from_string (gchar * grad_string)
+
+  \brief retrieve background gradient from command line string
+
+  \param grad_string the color map keyword from command line
+*/
+int get_gradient_from_string (gchar * grad_string)
+{
+  gchar * no_keys[] = {"none", "no", "n", "0", NULL};
+  gchar * li_keys[] = {"linear", "lin", "li", "l", "1", NULL};
+  gchar * ci_keys[] = {"circular", "circ", "ci", "c", "2", NULL};
+  if (is_string_in_string_list(grad_string, no_keys)) return 0;
+  if (is_string_in_string_list(grad_string, li_keys)) return 1;
+  if (is_string_in_string_list(grad_string, ci_keys)) return 2;
+  return NONE;
+}
+
+/*!
+  \fn int check_for_atomes_file_options (int start, int end, char *argv[])
+
+  \brief retrieve the list of files to read from the command line
+         leave out all other options
+
+  \param start starting position on the command line
+  \param end ending position on the command line
+  \param *argv[] list of argument(s) on the command line
+*/
+int check_for_atomes_file_options (int start, int end, char *argv[])
+{
+  int i, j, k;
+  i=0;
+  for (j=start; j<end; j++)
+  {
+    k = test_this_arg (argv[j]);
+    if (k > 0 && j < end-1)
+    {
+      if (! (k == 1 && with_workspace))
+      {
+        if (! flist)
+        {
+          flist = g_malloc0(sizeof*flist);
+          ftmp = flist;
+        }
+        else
+        {
+          ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+          ftmp = ftmp -> next;
+        }
+        ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
+        ftmp -> file_type = k;
+        argv[j] = argv[j+1] = g_strdup_printf (" ");
+        j ++;
+        i ++;
+        if (k == 1) with_workspace = TRUE;
+      }
+    }
+  }
+  return i;
+}
+
+/*!
+  \fn int parse_command_line (int argc, char *argv[])
+
+  \brief test command line arguments
+
+  \param argc number of argument(s) on the command line
+  \param *argv[] list of argument(s) on the command line
+*/
+int parse_command_line (int argc, char *argv[])
+{
+  struct option atomes_options[] = {{"help", no_argument, 0, 'h'},
+                                    {"version", no_argument, 0, 'v'},
+                                    {"libreoffice", no_argument, 0, 'l'},
+                                    {"render-png", no_argument, 0, 'p'},
+                                    {"png", no_argument, 0, 'p'},
+                                    {"render-jpg", no_argument, 0, 'j'},
+                                    {"jpg", no_argument, 0, 'j'},
+                                    {"width", required_argument, 0, 'W'},
+                                    {"height", required_argument, 0, 'H'},
+                                    {"output", required_argument, 0, 'o'},
+                                    {"style", required_argument, 0, 's'},
+                                    {"atoms", required_argument, 0, 'e'},
+                                    {"poly", required_argument, 0, 't'},
+                                    {"axis", required_argument, 0, 'a'},
+                                    {"box", required_argument, 0, 'b'},
+                                    {"box_color", required_argument, 0, 'C'},
+                                    {"back_color", required_argument, 0, 'B'},
+                                    {"back_grad", required_argument, 0, 'G'},
+                                    {"back_dir", required_argument, 0, 'D'},
+                                    {"back_pos", required_argument, 0, 'P'},
+                                    {"grad_col_a", required_argument, 0, 'U'},
+                                    {"grad_col_b", required_argument, 0, 'V'},
+                                    {"rep", required_argument, 0, 'r'},
+                                    // {"debug", no_argument, 0, 'd'},
+                                    {0, 0, 0, 0}};
+  int opt;
+  int index = -1;
+  int i, j;
+  double v;
+  gchar * image_x = NULL;
+  gchar * image_y = NULL;
+  int img_opt = 0;
+
+  for (i=0; i<2; i++) render_image_grad_color[i] = NULL;
+  /* We want to parse the command line using GNU getopt, but then
+     some options that are atomes specific and not GNU getopt compatible
+     might disappear, to prevent that it is mandatory to prepare
+     the information to be given to GNU getopt */
+  int files_to_read = check_for_atomes_file_options (1, argc, argv);
+
+  /* Letter follow by : means that the command requires an argument
+     No letter if the option is only in long format, ex : --width
+     If the long name is empty the command is only in short format */
+  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
+  {
+    switch (opt)
+    {
+      case 'h':
+        print_help();
+        return FALSE;
+        break;
+      case 'v':
+        print_version();
+        return FALSE;
+        break;
+      case 'e':
+        render_image_acolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        trigger_fragment_analysis = (render_image_acolor > 2) ? TRUE : FALSE;
+        trigger_molecule_analysis = (render_image_acolor > 3) ? TRUE : FALSE;
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 't':
+        render_image_pcolor = get_color_map_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        trigger_fragment_analysis = (render_image_pcolor > 2) ? TRUE : FALSE;
+        trigger_molecule_analysis = (render_image_pcolor > 3) ? TRUE : FALSE;
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'l':
+        atomes_from_libreoffice = TRUE;
+        render_image_format = 0;
+        break;
+      case 'p':
+        atomes_render_image = TRUE;
+        render_image_format = 0;
+        img_opt ++;
+        break;
+      case 'j':
+        atomes_render_image = TRUE;
+        render_image_format = 1;
+        img_opt ++;
+        break;
+      case 'o':
+        render_image_output = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'W':
+        image_x = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'H':
+        image_y = g_strdup_printf ("%s", optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 's':
+        render_image_style = get_style_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'a':
+        render_image_axis = get_box_axis_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'b':
+        render_image_box = get_box_axis_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'r':
+        render_image_rep = get_rep_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'C':
+        render_image_box_color = get_color_from_hexa_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'B':
+        render_image_back_color = get_color_from_hexa_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'G':
+        render_image_back_grad = get_gradient_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'D':
+        if (isdigit(optarg[0]))
+        {
+          render_image_back_dir = ((optarg[0] - '0') < 9) ? optarg[0] - '0' : NONE;
+        }
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'P':
+        v = string_to_double(optarg);
+        render_image_back_pos = (v >= 0.0 && v <= 1.0) ? v : NONE;
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'U':
+        render_image_grad_color[0] = get_color_from_hexa_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+      case 'V':
+        render_image_grad_color[1] = get_color_from_hexa_string (optarg);
+        img_opt ++;
+        img_opt += (index == -1) ? 1 : 0;
+        break;
+    }
+    index = -1;
+  }
+  if (atomes_from_libreoffice) atomes_render_image = FALSE;
+  if (atomes_render_image)
+  {
+    if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");
+    if (argc == img_opt + 2)
+    {
+      if (image_x || image_y)
+      {
+        render_image_pixels = allocint(2);
+        int pix;
+        if (image_x)
+        {
+          pix = (int) string_to_double(image_x);
+          if (pix > 0) render_image_pixels[0] = pix;
+        }
+        if (image_y)
+        {
+          pix = (int) string_to_double(image_y);
+          if (pix > 0) render_image_pixels[1] = pix;
+        }
+      }
+    }
+    else
+    {
+      return FALSE;
+    }
+  }
+
+  for (i=optind; i<argc; i++)
+  {
+    j = test_this_arg (argv[i]);
+    if (! (j == -1 && with_workspace))
+    {
+      if (j < 0)
+      {
+        if (! flist)
+        {
+          flist = g_malloc0(sizeof*flist);
+          ftmp = flist;
+        }
+        else
+        {
+          ftmp -> next = g_malloc0(sizeof*ftmp -> next);
+          ftmp = ftmp -> next;
+        }
+        ftmp -> file_name = g_strdup_printf ("%s", argv[i]);
+        ftmp -> file_type = -j;
+        files_to_read ++;
+        if (atomes_from_libreoffice) projfile = g_strdup_printf ("%s", argv[i]);
+        if (j == -1) with_workspace = TRUE;
+      }
+    }
+  }
+
+  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? FALSE : TRUE;
 }
 
 /*!
@@ -317,7 +836,7 @@ void read_this_file (int file_type, gchar * this_file)
     int i = open_save_workspace (fp, 0);
     if (i != 0)
     {
-      gchar * err = g_strdup_printf ("Error while reading workspace file\n%s\nError code: %d\n", this_file, i);
+      gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\n"), this_file);
       show_error (err, 0, MainWindow);
       g_free (err);
     }
@@ -325,7 +844,9 @@ void read_this_file (int file_type, gchar * this_file)
   else
   {
     init_project (FALSE);
-    open_save (fp, 0, activep, activep, 0, this_file);
+    reading_project = TRUE;
+    open_save (fp, 0, 0, activep, activep, this_file);
+    reading_project = FALSE;
   }
   fclose (fp);
 }
@@ -489,6 +1010,10 @@ void open_this_data_file (int file_type, gchar * file_name)
 */
 G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
 {
+  /* GTK re-initializes the locale during startup (gtk_init calls setlocale(LC_ALL, "")),
+     which overrides the LC_NUMERIC = "C" set in main(). We must enforce it again here
+     to ensure floating-point parsing/formatting always uses the English (dot) convention. */
+  setlocale (LC_NUMERIC, "C");
   GtkSettings * default_settings = gtk_settings_get_default ();
 /*
 #ifndef G_OS_WIN32
@@ -516,17 +1041,21 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
   gtkosx_application_ready (ProgOSX);
 #endif
 #ifdef DEBUG
-  printversion ();
+  print_version ();
 #endif // DEBUG
-  MainWindow = create_main_window (app);
-  GtkWidget * isplash = create_splash_window ();
-  if (isplash == NULL)
+
+  if (! atomes_render_image)
   {
-    g_print ("Impossible to load the splash screen\n");
-  }
-  else
-  {
-    g_timeout_add_seconds (1, destroy_func, isplash);
+    MainWindow = create_main_window (app);
+    GtkWidget * isplash = create_splash_window ();
+    if (isplash == NULL)
+    {
+      g_warning (_("Impossible to load the splash screen\n"));
+    }
+    else
+    {
+      g_timeout_add_seconds (1, destroy_func, isplash);
+    }
   }
   if (flist)
   {
@@ -611,10 +1140,10 @@ int check_opengl_rendering ()
 #ifdef DEBUG
   g_debug ("Exit status of atomes_startup_testing = %d", res);
 #endif
-  g_clear_object (& proc);
+  g_object_unref (proc);
 #ifndef CODEBLOCKS
 #ifndef OSX
-  g_clear_object (& proc_launch);
+  g_object_unref (proc_launch);
 #endif
 #endif
   g_free (proc_path);
@@ -623,13 +1152,13 @@ int check_opengl_rendering ()
   switch (res)
   {
     case 1:
-      ogl_info = g_strdup_printf ("Fatal error on OpenGL initialization: trying to adjust environment !");
+      ogl_info = g_strdup_printf (_("Fatal error on OpenGL initialization: trying to adjust environment !"));
       break;
     case -2:
-      ogl_info = g_strdup_printf ("Impossible to initialize the OpenGL 3D rendering !");
+      ogl_info = g_strdup_printf (_("Impossible to initialize the OpenGL 3D rendering !"));
       break;
     case -1:
-      ogl_info = g_strdup_printf ("GDK visual must be modified to initialize the OpenGL context !");
+      ogl_info = g_strdup_printf (_("GDK visual must be modified to initialize the OpenGL context !"));
       break;
     default:
       break;
@@ -657,6 +1186,7 @@ int main (int argc, char *argv[])
 
 #ifdef G_OS_WIN32
   PACKAGE_PREFIX = g_win32_get_package_installation_directory_of_module (NULL);
+  PACKAGE_LOCALE = g_build_filename (PACKAGE_PREFIX, "locale", NULL);
   // g_win32_get_package_installation_directory (NULL, NULL);
 #endif
   PACKAGE_LIB_DIR = g_build_filename (PACKAGE_PREFIX, "library", NULL);
@@ -672,14 +1202,6 @@ int main (int argc, char *argv[])
   PACKAGE_BMP = g_build_filename (PACKAGE_PREFIX, "pixmaps/bmp.png", NULL);
   PACKAGE_TIFF = g_build_filename (PACKAGE_PREFIX, "pixmaps/tiff.png", NULL);
   PACKAGE_VOID = g_build_filename (PACKAGE_PREFIX, "pixmaps/void.png", NULL);
-  PACKAGE_GR = g_build_filename (PACKAGE_PREFIX, "pixmaps/gr.png", NULL);
-  PACKAGE_SQ = g_build_filename (PACKAGE_PREFIX, "pixmaps/sq.png", NULL);
-  PACKAGE_BD = g_build_filename (PACKAGE_PREFIX, "pixmaps/bd.png", NULL);
-  PACKAGE_AN = g_build_filename (PACKAGE_PREFIX, "pixmaps/an.png", NULL);
-  PACKAGE_RI = g_build_filename (PACKAGE_PREFIX, "pixmaps/ri.png", NULL);
-  PACKAGE_CH = g_build_filename (PACKAGE_PREFIX, "pixmaps/ch.png", NULL);
-  PACKAGE_SP = g_build_filename (PACKAGE_PREFIX, "pixmaps/sp.png", NULL);
-  PACKAGE_MS = g_build_filename (PACKAGE_PREFIX, "pixmaps/ms.png", NULL);
   PACKAGE_TD = g_build_filename (PACKAGE_PREFIX, "pixmaps/td.png", NULL);
   PACKAGE_MOL = g_build_filename (PACKAGE_PREFIX, "pixmaps/molecule.png", NULL);
   PACKAGE_OGL = g_build_filename (PACKAGE_PREFIX, "pixmaps/opengl.png", NULL);
@@ -718,82 +1240,13 @@ int main (int argc, char *argv[])
   PACKAGE_SGMI = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Monoclinic-I.png", NULL);
   PACKAGE_SGTC = g_build_filename (PACKAGE_PREFIX, "pixmaps/bravais/Triclinic.png", NULL);
 
-  int i, j, k;
   switch (argc)
   {
     case 1:
-      RUNC=TRUE;
-      break;
-    case 2:
-      if (g_strcmp0 (argv[1], "-h") == 0 || g_strcmp0 (argv[1], "--help") == 0)
-      {
-        printhelp();
-        RUNC=FALSE;
-      }
-      else if (g_strcmp0 (argv[1], "-v") == 0 || g_strcmp0 (argv[1], "--version") == 0)
-      {
-        printversion();
-        RUNC=FALSE;
-      }
-      else
-      {
-        RUNC=TRUE;
-        i = test_this_arg (argv[1]);
-        if (i !=0)
-        {
-          flist = g_malloc0(sizeof*flist);
-          flist -> file_name = g_strdup_printf ("%s", argv[1]);
-          flist -> file_type = -i;
-          if (flist -> file_type == 1) with_workspace = TRUE;
-        }
-      }
+      RUNC = TRUE;
       break;
     default:
-      RUNC=TRUE;
-      i=0;
-      for (j=1; j<argc; j++)
-      {
-        k = test_this_arg (argv[j]);
-        if (! (abs(k) == 1 && with_workspace))
-        {
-          if (k > 0 && j < argc-1)
-          {
-            if (! flist)
-            {
-              flist = g_malloc0(sizeof*flist);
-              ftmp = flist;
-            }
-            else
-            {
-              ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-              ftmp = ftmp -> next;
-            }
-            ftmp -> file_name = g_strdup_printf ("%s", argv[j+1]);
-            ftmp -> file_type = k;
-            j ++;
-          }
-          else if (k < 0)
-          {
-            if (! flist)
-            {
-              flist = g_malloc0(sizeof*flist);
-              ftmp = flist;
-            }
-            else
-            {
-              ftmp -> next = g_malloc0(sizeof*ftmp -> next);
-              ftmp = ftmp -> next;
-            }
-            ftmp -> file_name = g_strdup_printf ("%s", argv[j]);
-            ftmp -> file_type = -k;
-          }
-          if (abs(k) == 1) with_workspace = TRUE;
-        }
-        else if (k == 1)
-        {
-          j ++;
-        }
-      }
+      RUNC = parse_command_line (argc, argv);
       break;
   }
 
@@ -833,7 +1286,7 @@ int main (int argc, char *argv[])
     HRESULT hr = SHGetKnownFolderPath (& FOLDERID_LocalAppData, 0, NULL, & localPath);
     if (FAILED(hr))
     {
-      fprintf (stderr, "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s", hr);
+      fprintf (stderr, _("Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"), hr);
       ATOMES_CONFIG_DIR = NULL;
       ATOMES_CONFIG = NULL;
     }
@@ -851,9 +1304,13 @@ int main (int argc, char *argv[])
     ATOMES_CONFIG_DIR = g_strdup_printf ("%s/.config/atomes", pw -> pw_dir);
     ATOMES_CONFIG = g_strdup_printf ("%s/atomes.pml", ATOMES_CONFIG_DIR);
 #endif
+
+    bindtextdomain (PACKAGE, PACKAGE_LOCALE);
+    textdomain (PACKAGE);
+    bind_textdomain_codeset(PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
+
     set_atomes_preferences ();
-    // setlocale(LC_ALL,"en_US");
-    gtk_disable_setlocale ();
+
 #if GLIB_MINOR_VERSION < 74
     AtomesApp = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
 #else

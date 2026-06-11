@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initring.c
@@ -77,7 +77,7 @@ void send_atom_rings_id_opengl_ (int * st, int * at, int * id, int * ta, int * n
   if (ring != NULL)
   {
     int i;
-    active_project -> atoms[* st][* at].rings[* id][* ta] = allocint(* num + 1);
+    active_project -> atoms[* st][* at].rings[* id][* ta] = allocint (* num + 1);
     active_project -> atoms[* st][* at].rings[* id][* ta][0] = * num;
     for (i=0; i < * num; i++)
     {

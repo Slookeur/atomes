@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file dmtx.F90
@@ -129,6 +129,7 @@ DOUBLE PRECISION :: MPSIZE
 DOUBLE PRECISION :: NEW_MPSIZE
 DOUBLE PRECISION :: TARGETDP
 DOUBLE PRECISION :: RHONUM
+INTEGER :: MEMOID
 
 if (.not.PBC) then
   do PIA=1, 3
@@ -174,7 +175,7 @@ do PIA=1, NSP
     ICUT=max(ICUT,Gr_TMP(PIA,PIB))
   enddo
 enddo
-ICUT=sqrt(ICUT)
+ICUT = sqrt(ICUT)
 ICUT = ICUT + 1.0d0
 ! The pixel size must be larger than the cutoff
 ! If the system is large with a low density the pixel box can be too big in number of pixels,
@@ -185,15 +186,15 @@ ICUT = ICUT + 1.0d0
 ! That is an extremely low number density, thus we need to check that as well.
 TARGETDP=1.85d0
 MPSIZE=1.0d0
+! Always adjust cutoff if periodicity is not applied
 ADAPT_CUT=2
-if (PBC) then
+
 ! Number density
-  RHONUM=NP
-  do PIA=1, 3
-    RHONUM=RHONUM/(THE_BOX(1)%modv(PIA))
-  enddo
-  if (RHONUM.lt.0.01) ADAPT_CUT=1
-endif
+RHONUM=NP
+do PIA=1, 3
+  RHONUM=RHONUM/pmax(PIA)
+enddo
+if (RHONUM.gt.0.01) ADAPT_CUT=1
 
 do TPIXD=1, ADAPT_CUT
 
@@ -202,11 +203,7 @@ do TPIXD=1, ADAPT_CUT
   CUTF=1.0d0/CUTF
   do PIA=1, 3
     isize(PIA) = INT(abs(pmax(PIA))*CUTF)
-    if (PBC) then
-      if (isize(PIA) .lt. 3) isize(PIA) = 1
-    else
-      if (isize(PIA) .eq. 0) isize(PIA) = 1
-    endif
+    if (isize(PIA) .lt. 3) isize(PIA) = 1
   enddo
 
   GETNBX = 1
@@ -228,16 +225,37 @@ do TPIXD=1, ADAPT_CUT
     INID = INID/PIA
     NEW_MPSIZE = (TARGETDP/INID)**(1.0/3.0)
     if (NEW_MPSIZE .gt. MPSIZE) then
-      ! Adpatation only if the cutoff increases
-      ! Otherwise we add more pixels
+      ! Adaptation only if the cutoff increases
+      ! Otherwise we would increase the number of pixels
       MPSIZE = NEW_MPSIZE
     endif
   endif
 enddo
 
 #ifdef DEBUG
+
   write (6, '("NBX= ",i10)') GETNBX
   write (6, '("isize:: x= ",I4,", y= ",I4,", z= ",I4)') isize(1), isize(2), isize(3)
+  MEMOID = GUESS_GRID_MEMORY_SIZE(isize(1)*isize(2)*isize(3))
+  write (6, '("Estimated memory required to store the entire pixel grid in Mb : ",f15.10)') MEMOID/1000000.0d0
+  write (6, '("Estimated memory required to store the entire pixel grid in Mo : ",f15.10)') MEMOID/8000000.0d0
+
+  CONTAINS
+
+     INTEGER FUNCTION GUESS_GRID_MEMORY_SIZE (abc)
+
+       INTEGER, INTENT(IN) :: abc
+
+       allocate(THEPIX(1))
+       allocate(THEPIX(1)%ATOM_ID(50))
+
+       GUESS_GRID_MEMORY_SIZE = storage_size(THEPIX)*abc
+
+       deallocate(THEPIX(1)%ATOM_ID)
+       deallocate(THEPIX)
+
+     END FUNCTION
+
 #endif
 
 END FUNCTION
@@ -439,7 +457,7 @@ enddo
 NBX = GETNBX (NAN, NS)
 
 if (PBC) then
-  NNA=NBX**3*NAN
+  NNA = NBX**3*NAN
 else
   NNA = NAN
 endif
@@ -567,8 +585,12 @@ if (DOATOMS) then
     do RA=1, NNA
       if (.not. PBC) then
         do RB=1, 3
-          pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
-          if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          if (isize(RB) .eq. 1) then
+            pixpos(RB) = 0
+          else
+            pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
+            if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          endif
         enddo
       else
         if (NBX .gt. 1) then
@@ -837,7 +859,12 @@ if (DOATOMS) then
     002 continue
     !$OMP END PARALLEL
 
-    if (allocated(THEPIX)) deallocate(THEPIX)
+    if (allocated(THEPIX)) then
+      do RC=1, abc
+        if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+      enddo
+      deallocate(THEPIX)
+    endif
     if (allocated(ATPIX)) deallocate(ATPIX)
     if (.not.DISTMTX) then
       goto 001
@@ -1065,8 +1092,12 @@ else
     do RA=1, NNA
       if (.not. PBC) then
         do RB=1, 3
-          pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
-          if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          if (isize(RB) .eq. 1) then
+            pixpos(RB) = 0
+          else
+            pixpos(RB) = INT((FULLPOS(RA,RB,SAT) - pmin(RB))*CUTF)
+            if (pixpos(RB) .eq. isize(RB)) pixpos(RB) = pixpos(RB)-1
+          endif
         enddo
       else
         if (NBX .gt. 1) then
@@ -1505,8 +1536,13 @@ else
   !$OMP END DO NOWAIT
 
   006 continue
-  if (allocated(THEPIX)) deallocate(THEPIX)
 
+  if (allocated(THEPIX)) then
+    do RC=1, abc
+      if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+    enddo
+    deallocate(THEPIX)
+  endif
   !$OMP END PARALLEL
 
   if (.not.DISTMTX) goto 001
@@ -1535,7 +1571,12 @@ if (ALC) then
 endif
 if (PIXR) call PIXOUT (POUT)
 
-if (allocated(THEPIX)) deallocate(THEPIX)
+if (allocated(THEPIX)) then
+  do RC=1, abc
+    if (allocated(THEPIX(RC)%ATOM_ID)) deallocate(THEPIX(RC)%ATOM_ID)
+  enddo
+  deallocate(THEPIX)
+endif
 if (allocated(POA)) deallocate(POA)
 if (allocated(BA)) deallocate(BA)
 if (allocated(BB)) deallocate(BB)

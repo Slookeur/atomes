@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file m_poly.c
@@ -231,7 +231,7 @@ GtkWidget * mpoly (glwin * view, int jd, int id)
   GtkWidget * menup = gtk_menu_new ();
   if (is_coord_in_menu(id, this_proj))
   {
-    GtkWidget * pshow = create_menu_item (FALSE, "Show/Hide");
+    GtkWidget * pshow = create_menu_item (FALSE, _("Show/Hide"));
     GtkWidget * widg;
     gtk_menu_shell_append ((GtkMenuShell *)menup, pshow);
     GtkWidget * menus = gtk_menu_new ();
@@ -296,13 +296,13 @@ GtkWidget * menupoly (glwin * view, int jd, int id, gchar * poln)
         {
           if (jd == 0)
           {
-            view -> ogl_rings[7+i] = create_menu_item (TRUE, rings_type[i]);
+            view -> ogl_rings[7+i] = create_menu_item (TRUE, _(rings_type[i]));
             gtk_menu_item_set_submenu ((GtkMenuItem *)view -> ogl_rings[7+i], mpoly(view, jd, 4+i));
             gtk_menu_shell_append ((GtkMenuShell *)menui, view -> ogl_rings[7+i]);
           }
           else
           {
-            item = create_menu_item (TRUE, rings_type[i]);
+            item = create_menu_item (TRUE, _(rings_type[i]));
             gtk_menu_shell_append ((GtkMenuShell *)menui, item);
             gtk_menu_item_set_submenu ((GtkMenuItem *)item, mpoly(view, jd, 4+i));
           }
@@ -330,21 +330,21 @@ GtkWidget * menupoly (glwin * view, int jd, int id, gchar * poln)
 GtkWidget * menu_poly (glwin * view, int id)
 {
   GtkWidget * menup = gtk_menu_new ();
-  gtk_menu_shell_append ((GtkMenuShell *)menup, menupoly(view, id, 0, "Total Coordination(s)"));
-  gtk_menu_shell_append ((GtkMenuShell *)menup, menupoly(view, id, 1, "Partial Coordination(s)"));
+  gtk_menu_shell_append ((GtkMenuShell *)menup, menupoly(view, id, 0, _("Total Coordination(s)")));
+  gtk_menu_shell_append ((GtkMenuShell *)menup, menupoly(view, id, 1, _("Partial Coordination(s)")));
   if (id == 0)
   {
     gtk_menu_shell_append ((GtkMenuShell *)menup, view -> ogl_rings[6]);
     widget_set_sensitive (view -> ogl_rings[6], view -> rings);
-    view -> ogl_clones[5] = gtk3_menu_item (menup, "Cloned Polyhedra", IMG_NONE, NULL, G_CALLBACK(cloned_poly), view, FALSE, 0, 0, TRUE, FALSE, view -> anim -> last -> img -> cloned_poly);
+    view -> ogl_clones[5] = gtk3_menu_item (menup, _("Cloned Polyhedra"), IMG_NONE, NULL, G_CALLBACK(cloned_poly), view, FALSE, 0, 0, TRUE, FALSE, view -> anim -> last -> img -> cloned_poly);
   }
   else
   {
-    GtkWidget * item = create_menu_item (FALSE, "Ring(s)");
+    GtkWidget * item = create_menu_item (FALSE, _("Ring(s)"));
     gtk_menu_item_set_submenu ((GtkMenuItem *)item, menupoly(view, id, 2, NULL));
     gtk_menu_shell_append ((GtkMenuShell *)menup, item);
     widget_set_sensitive (item, view -> rings);
-    GtkWidget * cloned_p =  gtk3_menu_item (menup, "Cloned Polyhedra", IMG_NONE, NULL, G_CALLBACK(cloned_poly), view, FALSE, 0, 0, TRUE, FALSE, view -> anim -> last -> img -> cloned_poly);
+    GtkWidget * cloned_p =  gtk3_menu_item (menup, _("Cloned Polyhedra"), IMG_NONE, NULL, G_CALLBACK(cloned_poly), view, FALSE, 0, 0, TRUE, FALSE, view -> anim -> last -> img -> cloned_poly);
     widget_set_sensitive ((cloned_p), get_project_by_id(view -> proj) -> cell.pbc);
   }
   return menup;
@@ -405,7 +405,7 @@ GMenu * menu_show_coord_poly (glwin * view, int popm, int id)
 /*!
   \fn GMenu * menu_show_rings_poly (glwin * view, int popm, int id)
 
-  \brief create the 'Rings(s) -> Show/Hide' subemnus - GTK4
+  \brief create the 'Ring(s) -> Show/Hide' subemnus - GTK4
 
   \param view the target glwin
   \param popm main app (0) or popup (1)
@@ -446,13 +446,13 @@ GMenu * add_menu_poly (glwin * view, int popm, int aid)
   GMenu * menu = g_menu_new ();
   if (aid < 2)
   {
-    append_submenu (menu, "Show/Hide", menu_show_coord_poly (view, popm, aid));
+    append_submenu (menu, _("Show/Hide"), menu_show_coord_poly (view, popm, aid));
   }
   else
   {
-    append_submenu (menu, "Show/Hide", menu_show_rings_poly (view, popm, aid));
+    append_submenu (menu, _("Show/Hide"), menu_show_rings_poly (view, popm, aid));
   }
-  append_opengl_item (view, menu, "Advanced", "adv-p", popm, aid, NULL, IMG_STOCK, (gpointer)DPROPERTIES, FALSE,
+  append_opengl_item (view, menu, _("Advanced"), "adv-p", popm, aid, NULL, IMG_STOCK, (gpointer)DPROPERTIES, FALSE,
                       G_CALLBACK(to_coord_properties), & view -> colorp[aid][0], FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
@@ -473,7 +473,7 @@ GMenu * menu_poly_rings (glwin * view, int popm)
   {
     if (view -> ring_max[i])
     {
-       append_submenu (menu, rings_type[i], add_menu_poly(view, popm, 4+i));
+       append_submenu (menu, _(rings_type[i]), add_menu_poly(view, popm, 4+i));
     }
   }
   return menu;
@@ -490,17 +490,17 @@ GMenu * menu_poly_rings (glwin * view, int popm)
 GMenu * menu_poly (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Total Coordination(s)", add_menu_poly (view, popm, 0));
-  append_submenu (menu, "Partial Coordination(s)", add_menu_poly (view, popm, 1));
+  append_submenu (menu, _("Total Coordination(s)"), add_menu_poly (view, popm, 0));
+  append_submenu (menu, _("Partial Coordination(s)"), add_menu_poly (view, popm, 1));
   if (view -> rings)
   {
-    append_submenu (menu, "Rings(s)", menu_poly_rings (view, popm));
+    append_submenu (menu, _("Ring(s)"), menu_poly_rings (view, popm));
   }
   else
   {
-    append_menu_item (menu, "Ring(s)", "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
+    append_menu_item (menu, _("Ring(s)"), "None", NULL, NULL, IMG_NONE, NULL, FALSE, FALSE, FALSE, NULL);
   }
-  append_opengl_item (view, menu, "Cloned Polyhedra", "cloned-poly", popm, popm, NULL, IMG_NONE, NULL, FALSE,
+  append_opengl_item (view, menu, _("Cloned Polyhedra"), "cloned-poly", popm, popm, NULL, IMG_NONE, NULL, FALSE,
                       G_CALLBACK(cloned_poly), view, TRUE, view -> anim -> last -> img -> cloned_poly, FALSE, view -> allbonds[1]);
   return menu;
 }

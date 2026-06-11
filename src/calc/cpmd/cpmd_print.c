@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd_print.c
@@ -62,7 +62,7 @@ int cpmd_sym[NSYM] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 14};
 */
 void print_info_section (GtkTextBuffer * buf)
 {
-  gchar * str = g_strdup_printf ("  This input was prepared using %s\n\n", PACKAGE);
+  gchar * str = g_strdup_printf (_("  This input file was prepared using %s\n\n"), PACKAGE);
   print_info (str, NULL, buf);
   g_free (str);
   if (tmp_cpmd -> info != NULL) print_info (tmp_cpmd -> info, NULL, buf);
@@ -81,8 +81,9 @@ void print_info_section (GtkTextBuffer * buf)
 void print_this_thermostat (thermostat * thermo, int id, GtkTextBuffer * buf)
 {
   int i, j, k, l, m;
-  gchar * temp[2]={"TEMPERATURE", "TEMPERATURE ELECTRONS"};
-  gchar * tobj[2]={"IONS", "ELECTRONS"};
+  gchar * temp[2] = {"TEMPERATURE", "TEMPERATURE ELECTRONS"};
+  gchar * tobj[2] = {"IONS", "ELECTRONS"};
+  gchar * tkey[2] = {"TEMPCONTROL", "NOSE"};
   gchar * str = NULL;
 
   if (thermo -> type == 0)
@@ -98,11 +99,11 @@ void print_this_thermostat (thermostat * thermo, int id, GtkTextBuffer * buf)
   {
     if (thermo -> sys == GLOBAL)
     {
-      str = g_strdup_printf ("\n\n  %s %s\n", termoke[thermo -> type-1], tobj[id]);
+      str = g_strdup_printf ("\n\n  %s %s\n", tkey[thermo -> type-1], tobj[id]);
     }
     else if (thermo -> sys == LOCAL)
     {
-      str = g_strdup_printf ("\n\n  %s %s %s\n", termoke[thermo -> type-1], tobj[id], nosekey[1]);
+      str = g_strdup_printf ("\n\n  %s %s %s\n", tkey[thermo -> type-1], tobj[id], "LOCAL");
     }
     print_info (str, NULL, buf);
     g_free (str);
@@ -217,9 +218,10 @@ void print_thermostat (GtkTextBuffer * buf)
 void print_restart (GtkTextBuffer * buf)
 {
   gchar * str;
+  gchar * rest_keys[2] = {"RANDOM", "ATOMS"};
   if (tmp_cpmd -> restart[0] < 2)
   {
-    str = g_strdup_printf ("\n\n  INITIALIZE WAVEFUNCTION %s", rest_kw[tmp_cpmd -> restart[0]]);
+    str = g_strdup_printf ("\n\n  INITIALIZE WAVEFUNCTION %s", rest_keys[tmp_cpmd -> restart[0]]);
     print_info (str, NULL, buf);
     g_free (str);
   }

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_ff_match.c
@@ -307,7 +307,8 @@ gchar * get_this_prop_param (int sid, int key, int calc, int newp, float * val)
       break;
   }
 
-  return g_strdup_printf ("%s pot. (%s)", fnames[activef][(sid > 7) ? 10 : sid+2][key],
+  return g_strdup_printf ("%s pot. (%s)",
+                          dlp_to_translate(activef,(sid > 7) ? 10 : sid+2, key) ? _(fnames[activef][(sid > 7) ? 10 : sid+2][key]) : fnames[activef][(sid > 7) ? 10 : sid+2][key],
                           parameters_info ((sid > 7) ? 9 : sid+1, key, vars, val));
 }
 
@@ -373,7 +374,7 @@ gchar * get_this_prop_string (int sid, int oid, int type, int calc)
 */
 field_object_match * duplicate_match (field_object_match * old_m)
 {
-  field_object_match * new_m = g_malloc0 (sizeof*new_m);
+  field_object_match * new_m = g_malloc0(sizeof*new_m);
   new_m -> id = old_m -> id;
   new_m -> obj = old_m -> obj;
   new_m -> oid = old_m -> oid;
@@ -459,35 +460,35 @@ void fill_update_model (GtkTreeStore * store)
       {
         if (i == 3 && tmp_field -> type > AMBER99 && tmp_field -> type < CVFF_AUG)
         {
-          str = g_strdup_printf ("<b>%s(s)</b> <sup>(2,3)</sup>", felemts[8+g]);
+          str = g_strdup_printf ("<b>%s</b> <sup>(2,3)</sup>", _(felemts[8+g]));
         }
         else
         {
-          str = g_strdup_printf ("<b>%s(s)</b> <sup>(2)</sup>", felemts[8+g]);
+          str = g_strdup_printf ("<b>%s</b> <sup>(2)</sup>", _(felemts[8+g]));
         }
       }
       else if (i < 8)
       {
         if (i == 2 && tmp_field -> type > AMBER99 && tmp_field -> type < CVFF_AUG)
         {
-          str = g_strdup_printf ("<b>%s(s)</b> <sup>(3)</sup>", felemts[8+g]);
+          str = g_strdup_printf ("<b>%s</b> <sup>(3)</sup>", _(felemts[8+g]));
         }
         else
         {
-          str = g_strdup_printf ("<b>%s(s)</b>", felemts[8+g]);
+          str = g_strdup_printf ("<b>%s</b>", _(felemts[8+g]));
         }
       }
       else if (tmp_field -> type <= AMBER99 || tmp_field -> type > COMPASS)
       {
-        str = g_strdup_printf ("<b>%s(s)</b> <sup>(3)</sup>", felemts[8+i]);
+        str = g_strdup_printf ("<b>%s</b> <sup>(3)</sup>", _(felemts[8+i]));
       }
       else if (tmp_field -> type <= CHARMMSI)
       {
-        str = g_strdup_printf ("<b>%s(s)</b> <sup>(4)</sup>", felemts[8+i]);
+        str = g_strdup_printf ("<b>%s</b> <sup>(4)</sup>", _(felemts[8+i]));
       }
       else
       {
-        str = g_strdup_printf ("<b>%s(s)</b>", felemts[8+i]);
+        str = g_strdup_printf ("<b>%s</b>", _(felemts[8+i]));
       }
       gtk_tree_store_append (store, & prop_level, NULL);
       gtk_tree_store_set (store, & prop_level, 0, -(i+1),
@@ -552,7 +553,7 @@ void fill_update_model (GtkTreeStore * store)
         }
         else
         {
-          strd = g_strdup_printf ("Select ...");
+          strd = g_strdup_printf (_("Select ..."));
         }
 
         if (i < 8)
@@ -609,7 +610,7 @@ GtkTreeModel * global_render_tree ()
   gchar * str;
   store = gtk_tree_store_new (1, G_TYPE_STRING);
   gtk_tree_store_append (store, & iter, NULL);
-  gtk_tree_store_set (store, & iter, 0, "Select ...", -1);
+  gtk_tree_store_set (store, & iter, 0, _("Select ..."), -1);
   for (i=0; i<9; i++)
   {
     if (up_match[i])
@@ -910,10 +911,7 @@ void field_set_markup_and_visible (GtkTreeViewColumn * col, GtkCellRenderer * re
   gtk_cell_renderer_set_visible (renderer,  (i == 2) ? ! k : k);
   if ((j < 0 && i == 2) || (j>-1 && i != 7))
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, i, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, i);
   }
 }
 
@@ -926,7 +924,7 @@ GtkWidget * create_update_tree ()
 {
   int i;
   gchar * str;
-  gchar * up_title[NUCOL]={" ", " ", "Property", "Atoms", "Species",  "parameters (1)", "Actual parameters (1)", "Update ?"};
+  gchar * up_title[NUCOL]={" ", " ", i18n("Property"), i18n("Atoms"), i18n("Species"),  i18n("parameters (1)"), i18n("Actual parameters (1)"), i18n("Update ?")};
   GType up_type[NUCOL] = {G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN};
 
   update_model = gtk_tree_store_newv (NUCOL, up_type);
@@ -935,11 +933,11 @@ GtkWidget * create_update_tree ()
   {
     if (i == 5)
     {
-      str =  g_strdup_printf ("%s %s", field_acro[tmp_field -> type], up_title[i]);
+      str =  g_strdup_printf ("%s %s", field_acro[tmp_field -> type], _(up_title[i]));
     }
     else
     {
-      str = g_strdup_printf ("%s", up_title[i]);
+      str = g_strdup_printf ("%s", (i > 1) ? _(up_title[i]) : up_title[i]);
     }
     if (i == 5)
     {
@@ -1011,20 +1009,20 @@ void win_update_tree (GtkWidget * vbx)
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, scrollsets, FALSE, FALSE, 20);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, hbox, FALSE, FALSE, 20);
-  gchar * funits[5] ={"Ev", "kcal mol<sup>-1</sup>", "kJ mol<sup>-1</sup>", "K B<sup>-1</sup>", "DL_POLY internal units"};
-  gchar * str = g_strdup_printf ("\t<b>(*)</b> Each force field element can be tuned separately, if not this <b>default</b> parameters will be used.\n"
-                                 "\t<b>(1)</b> %s energy unit: %s, if required conversion to FIELD file energy unit will be performed upon selection.\n"
-                                 "\t<b>(2)</b> Restraint parameters are duplicates of the non-restraint parameters.\n",
-                                 field_acro[tmp_field -> type], funits[ff_unit]);
+  gchar * funits[5] ={"Ev", "kcal mol<sup>-1</sup>", "kJ mol<sup>-1</sup>", "K B<sup>-1</sup>", i18n("DL_POLY internal units")};
+  gchar * str = g_strdup_printf (_("\t<b>(*)</b> Each force field element can be tuned separately, if not this <b>default</b> parameters will be used.\n"
+                                   "\t<b>(1)</b> %s energy unit: %s, if required conversion to FIELD file energy unit will be performed upon selection.\n"
+                                   "\t<b>(2)</b> Restraint parameters are duplicates of the non-restraint parameters.\n"),
+                                 field_acro[tmp_field -> type], (ff_unit == 4) ? _(funits[ff_unit]) : funits[ff_unit]);
   i = 3;
   if (tmp_field -> type > AMBER99 && tmp_field -> type < CVFF)
   {
-    str = g_strdup_printf ("%s\t<b>(%d)</b> Urey-Bradley terms provided by the %s force field are ignored.\n", str, i, field_acro[tmp_field -> type]);
+    str = g_strdup_printf (_("%s\t<b>(%d)</b> Urey-Bradley terms provided by the %s force field are ignored.\n"), str, i, field_acro[tmp_field -> type]);
     i ++;
   }
   if (tmp_field -> type <= CVFF_AUG || tmp_field -> type > COMPASS)
   {
-    str = g_strdup_printf ("%s\t<b>(%d)</b> In %s, 12-6 non-bonded interactions are evaluated using:", str, i, field_acro[tmp_field -> type]);
+    str = g_strdup_printf (_("%s\t<b>(%d)</b> In %s, 12-6 non-bonded interactions are evaluated using:"), str, i, field_acro[tmp_field -> type]);
   }
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   g_free (str);
@@ -1034,15 +1032,15 @@ void win_update_tree (GtkWidget * vbx)
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbx, hbox, FALSE, FALSE, 0);
     if (tmp_field -> type < CVFF || tmp_field -> type > COMPASS)
     {
-      str = g_strdup_printf ("%s\n<i><b>A</b></i> and <i><b>B</b></i> are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters.", get_this_vdw_string());
+      str = g_strdup_printf (_("%s\n<i><b>A</b></i> and <i><b>B</b></i> are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters."), get_this_vdw_string());
       if (tmp_field -> type > AMBER99)
       {
-        str = g_strdup_printf ("%s\nScaled 1-4 exclusion parameters, provided by the %s force field, are ignored.", str, field_acro[tmp_field -> type]);
+        str = g_strdup_printf (_("%s\nScaled 1-4 exclusion parameters, provided by the %s force field, are ignored."), str, field_acro[tmp_field -> type]);
       }
     }
     else
     {
-      str = g_strdup_printf ("%s\n<i><b>A</b></i> and <i><b>B</b></i> are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters.", get_this_vdw_string());
+      str = g_strdup_printf (_("%s\n<i><b>A</b></i> and <i><b>B</b></i> are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters."), get_this_vdw_string());
     }
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 200);
     g_free (str);
@@ -1076,12 +1074,12 @@ void look_up_this_field_object (int fsid, int fpid, int ssid, int nat, int * fsp
       {
         if (up_match[fsid] == NULL)
         {
-          up_match[fsid] = g_malloc0 (sizeof*up_match[fsid]);
+          up_match[fsid] = g_malloc0(sizeof*up_match[fsid]);
           tmp_match = up_match[fsid];
         }
         else
         {
-          tmp_match -> next = g_malloc0 (sizeof*tmp_match);
+          tmp_match -> next = g_malloc0(sizeof*tmp_match);
           tmp_match = tmp_match -> next;
         }
         tmp_match -> id = ssid;
@@ -1132,8 +1130,8 @@ void check_this_fprop (int fsid, int fpid, int ssid, int * fat, int * fsp)
   {
     // Is there any field data available ?
     // Check the field data for available parameters
-    ffat = allocint(i);
-    ffsp = allocint(i);
+    ffat = allocint (i);
+    ffsp = allocint (i);
     for (j=0; j<i; j++)
     {
       ffat[j] = get_active_atom (tmp_fmol -> id, fat[j]) -> afid;
@@ -1321,7 +1319,7 @@ void check_atom_for_updates ()
       if (get_ff_data(i, 0) && tmp_field -> afp[i+15])
       {
         k = struct_id(i+7);
-        fsp = allocint(k);
+        fsp = allocint (k);
         tmp_fstr = tmp_fmol -> first_struct[i];
         while (tmp_fstr != NULL)
         {
@@ -1367,12 +1365,12 @@ void check_atom_for_updates ()
           {
             if (up_match[8] == NULL)
             {
-              up_match[8] = g_malloc0 (sizeof*up_match[8]);
+              up_match[8] = g_malloc0(sizeof*up_match[8]);
               tmp_match = up_match[8];
             }
             else
             {
-              tmp_match -> next = g_malloc0 (sizeof*tmp_match);
+              tmp_match -> next = g_malloc0(sizeof*tmp_match);
               tmp_match = tmp_match -> next;
             }
             tmp_match -> id = 8;
@@ -1397,7 +1395,7 @@ void check_atom_for_updates ()
   }
   if (update_this)
   {
-    gchar * str = g_strdup_printf ("Update FIELD file with %s parameters using \"%s\" atom(s)", field_acro[tmp_field -> type], exact_name(ff_atoms[tmp_fat -> afid][2]));
+    gchar * str = g_strdup_printf (_("Update FIELD file with %s parameters using \"%s\" atom(s)"), field_acro[tmp_field -> type], exact_name(ff_atoms[tmp_fat -> afid][2]));
     GtkWidget * dial = dialog_cancel_apply (str, field_assistant, FALSE);
     g_free (str);
     GtkWidget * vbox = dialog_get_content_area (dial);
@@ -1474,7 +1472,7 @@ G_MODULE_EXPORT void changed_field_prop_combo (GtkComboBox * box, gpointer data)
       tmp_fbody -> fpid[prop -> b] = -1;
     }
   }
-  if (prop -> a == 15)
+  if (prop -> a == 15 && i)
   {
     float * vcl;
     float eij;
@@ -1537,7 +1535,7 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
   gchar * str;
   h = (f == 15) ? 2 : struct_id(f);
   i = (f == 15) ? 2 : 1;
-  for (j=0; j<i; j++) up_match[j] = g_malloc0 (sizeof*up_match[j]);
+  for (j=0; j<i; j++) up_match[j] = g_malloc0(sizeof*up_match[j]);
   int * spec_z = allocint (h);
   vbox = create_vbox (BSEP);
   if (f == 15)
@@ -1562,16 +1560,16 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
       hbox = create_hbox(0);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
       ff_p_combo[j] = create_combo ();
-      combo_text_append (ff_p_combo[j], "Manual");
+      combo_text_append (ff_p_combo[j], _("Manual"));
       l = tmp_fbody -> ma[j][0];
       m = tmp_fbody -> a[j][0];
       if (i == 1)
       {
-        str = g_strdup_printf ("Atom (1 and 2) <b>%s</b>", str_vdw[j]);
+        str = g_strdup_printf (_("Atom (1 and 2) <b>%s</b>"), str_vdw[j]);
       }
       else
       {
-        str = g_strdup_printf ("Atom (%d) <b>%s</b>", j+1, str_vdw[j]);
+        str = g_strdup_printf (_("Atom (%d) <b>%s</b>"), j+1, str_vdw[j]);
       }
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 150, -1, 0.0, 0.5), FALSE, FALSE, 10);
       g_free (str);
@@ -1584,7 +1582,7 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
     ff_p_combo[0] = create_combo ();
-    combo_text_append (ff_p_combo[0], "Manual");
+    combo_text_append (ff_p_combo[0], _("Manual"));
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ff_p_combo[0], FALSE, FALSE, 10);
     for (j=0; j<h; j++)
     {
@@ -1637,12 +1635,12 @@ GtkWidget * create_field_prop_combo (int f, int is_moy)
           g_free (str);
           if (up_match[j] == NULL)
           {
-            up_match[j] = g_malloc0 (sizeof*up_match[j]);
+            up_match[j] = g_malloc0(sizeof*up_match[j]);
             tmp_match = up_match[j];
           }
           else
           {
-            tmp_match -> next = g_malloc0 (sizeof*tmp_match -> next);
+            tmp_match -> next = g_malloc0(sizeof*tmp_match -> next);
             tmp_match -> next -> id = tmp_match -> id + 1;
             tmp_match = tmp_match -> next;
           }

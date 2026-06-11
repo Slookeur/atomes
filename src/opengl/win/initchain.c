@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initchain.c
@@ -79,7 +79,7 @@ void send_atom_chains_id_opengl_ (int * st, int * at, int * ta, int * num, int n
   if (nchain != NULL)
   {
     int i;
-    active_project -> atoms[* st][* at].chain[* ta - 1] = allocint(* num + 1);
+    active_project -> atoms[* st][* at].chain[* ta - 1] = allocint (* num + 1);
     active_project -> atoms[* st][* at].chain[* ta - 1][0] = * num;
     for (i=0; i < * num; i++)
     {

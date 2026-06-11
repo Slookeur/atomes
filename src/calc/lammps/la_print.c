@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file la_print.c
@@ -139,7 +139,7 @@ int print_lammps_dihedral (int did, int di, GtkTextBuffer * buf, field_struct * 
     same_atom = TRUE;
     already_done = allocbool (tmp_fmol -> mol -> natoms);
   }
-  int * ids = allocint(4);
+  int * ids = allocint (4);
   for (i=0; i<tmp_fat -> num; i++)
   {
     j = tmp_fat -> list[i];
@@ -201,7 +201,7 @@ int print_lammps_angle (int aid, int ai, GtkTextBuffer * buf, field_struct * an)
   int i, j, k, l, m, o, p, q;
   gchar * str;
   field_prop * tp_prop;
-  int * ids = allocint(3);
+  int * ids = allocint (3);
   gboolean same_atom = FALSE;
   gboolean * already_done;
   if (tmp_fat -> id == tmp_fct -> id)
@@ -263,7 +263,7 @@ int print_lammps_bond (int bid, int bi, GtkTextBuffer * buf, field_struct * bd)
   int i, j, k, l, m, n;
   gchar * str;
   field_prop * tp_prop;
-  int * ids = allocint(2);
+  int * ids = allocint (2);
   gboolean same_atom = FALSE;
   gboolean * already_done;
   if (tmp_fat -> id == tmp_fbt -> id)
@@ -468,7 +468,7 @@ int get_different_atoms ()
 void print_lammps_mass (GtkTextBuffer * buf)
 {
   gchar * str;
-  print_info ("\nMasses\n\n", "bold", buf);
+  print_info ("\nMass\n\n", "bold", buf);
   tmp_fat = all_at;
   while (tmp_fat)
   {

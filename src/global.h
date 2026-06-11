@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file global.h
@@ -42,12 +42,15 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #define GLOBAL_H_
 
-#include <glib.h>
-#include <glib/gi18n.h>
+#define i18n(String) String
+
+#include <libintl.h>
 #include <locale.h>
 #ifdef OSX
 #include <xlocale.h>
 #endif
+#include <glib.h>
+#include <glib/gi18n.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -63,6 +66,15 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+
+/*! \def GTK_LIMIT
+
+  \brief maximum number of elements in GTK widgets like GtkTreeView, GtkTreeStore or similar
+         rendering widgets can be an issue if the number of items to display is too high
+         if the number of element to display is < GTK_LIMIT then the widget is rendered,
+         otherwise a search engine is (or should be) used
+*/
+#define GTK_LIMIT 10000
 
 #include <pango/pangoft2.h>
 
@@ -126,6 +138,8 @@ struct ColRGBA
   float blue;
   float alpha;
 };
+
+#include "cedit.h"
 
 /*! \typedef shortcuts
 
@@ -276,7 +290,7 @@ enum ImageFormats {
 /*!< \def STEP_LIMIT
   \brief MD step number limit to compute fragment(s) and molecule(s) analysis automatically
 */
-#define STEP_LIMIT 10000
+#define STEP_LIMIT 1000
 
 #define OK            0
 #define ERROR_RW      1
@@ -291,6 +305,9 @@ enum ImageFormats {
 #define ERROR_RINGS  10
 #define ERROR_CHAINS 11
 #define ERROR_MOL    12
+#define ERROR_ANA    13
+#define ERROR_QM     14
+#define ERROR_FIELD  15
 
 /*!< \def CHEM_PARAMS
   \brief number of chemical parameters
@@ -307,32 +324,29 @@ enum ImageFormats {
 /*!< \def NCALCS
   \brief number of analysis
 */
-#define NCALCS 12
-
-/*!< \def NGRAPHS
-  \brief number of analysis with results in curve window(s)
-*/
-#define NGRAPHS 10
+#define NCALCS 10
 
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
 */
 #define NCFORMATS 13
 
-#define NITEMS 16
+#define NITEMS 4
+
 #define OT 4
-#define GR 0
-#define SQ 1
-#define SK 2
-#define GK 3
-#define BD 4
-#define AN 5
-#define RI 6
-#define CH 7
-#define SP 8
-#define MS 9
-#define BV 10
-#define FF 12
+#define GDR 0
+#define SQD 1
+#define SKD 2
+#define GDK 3
+#define BND 4
+#define ANG 5
+#define RIN 6
+#define CHA 7
+#define SPH 8
+#define MSD 9
+#define SKT 10
+
+// #define FF 12
 
 #define DEFAULT_FONT_SIZE 8
 #define DEFAULT_ALPHA 0.75
@@ -341,6 +355,7 @@ enum ImageFormats {
 #ifdef G_OS_WIN32
 extern gchar * PACKAGE_PREFIX;
 extern gchar * PACKAGE_LIBEXEC;
+extern gchar * PACKAGE_LOCALE;
 #endif
 extern gchar * PACKAGE_LIB_DIR;
 extern gchar * PACKAGE_IMP;
@@ -354,14 +369,6 @@ extern gchar * PACKAGE_JPG;
 extern gchar * PACKAGE_BMP;
 extern gchar * PACKAGE_TIFF;
 extern gchar * PACKAGE_VOID;
-extern gchar * PACKAGE_GR;
-extern gchar * PACKAGE_SQ;
-extern gchar * PACKAGE_BD;
-extern gchar * PACKAGE_AN;
-extern gchar * PACKAGE_RI;
-extern gchar * PACKAGE_CH;
-extern gchar * PACKAGE_SP;
-extern gchar * PACKAGE_MS;
 extern gchar * PACKAGE_TD;
 extern gchar * PACKAGE_MOL;
 extern gchar * PACKAGE_OGL;
@@ -404,7 +411,7 @@ extern gchar * ATOMES_CONFIG;
 extern gchar * ATOMES_URL;
 
 extern gchar * mode_name[2];
-extern gchar * graph_img[NGRAPHS];
+extern gchar * graph_img[NCALCS];
 extern gchar * dots[NDOTS];
 extern gchar * bravais_img[14];
 extern gchar * ifield[8];
@@ -412,8 +419,8 @@ extern gchar * projfile;
 extern char * ifbug;
 extern char * coord_files[NCFORMATS+1];
 extern char * coord_files_ext[NCFORMATS+1];
-extern char * calc_name[NCALCS-2];
-extern char * graph_name[NGRAPHS] ;
+extern char * calc_name[];
+extern char * graph_name[];
 extern char * rings_type[5];
 extern char * untime[5];
 extern gchar * workspacefile;
@@ -428,6 +435,7 @@ extern int statusval;
 extern int atomes_visual;
 extern int dialog_id;
 
+extern int reading_step_limit;
 extern int bonds_update;
 extern int frag_update;
 extern int mol_update;
@@ -448,6 +456,9 @@ extern gboolean object_motion;
 extern gboolean selected_status;
 extern gboolean silent_input;
 extern gboolean cif_use_symmetry_positions;
+
+extern gboolean atomes_from_libreoffice;
+extern gboolean atomes_render_image;
 
 extern struct timespec start_time;
 extern struct timespec stop_time;
@@ -483,8 +494,35 @@ extern GdkPixbuf * OGLC;
 extern GdkPixbuf * RUN;
 extern tint cut_sel;
 
-// Data structures
 #define LINE_SIZE 160
+
+// Data structures
+
+/*! \typedef atomes_error_signal
+
+  \brief atomes_error_signal data structure
+ */
+typedef struct atomes_error_signal atomes_error_signal;
+struct atomes_error_signal
+{
+  int id;
+  gchar * message;
+};
+
+/*! \typedef atomes_error
+
+  \brief atomes_error information data structure
+ */
+typedef struct atomes_error atomes_error;
+struct atomes_error
+{
+  atomes_error_signal error_signal;
+  gchar * error_file;
+  gchar * error_func;
+  int error_line;
+  int trace_id;
+  gchar * error_trace;
+};
 
 /*! \typedef line_node */
 typedef struct line_node line_node;
@@ -689,7 +727,42 @@ struct Curve
   gchar * path;                  /*!< Path for the toolbox tree */
   int action_id;                 /*!< Unique Id to identify actions */
   CurveState state;              /*!< Curve state */
+  curve_edition * curve_edit;    /*!< curve edition data structure - cedit.h */
   GSimpleActionGroup * action_group;
+};
+
+/*! \typedef atomes_analysis
+
+  \brief analysis data structure
+*/
+typedef struct atomes_analysis atomes_analysis;
+struct atomes_analysis
+{
+  /*
+     Analysis default structure and parameters
+  */
+  int aid;                      /*!< Analysis type: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd, \n 10 = s(k,t) */
+  gchar * name;                 /*!< Analysis name for menu item */
+  gboolean avail_ok;            /*!< Analysis calculation availability */
+  gboolean init_ok;             /*!< Curves initialization */
+  gboolean calc_ok;             /*!< Analysis calculation confirmation */
+  gboolean requires_md;         /*!< Analysis requires multiple configurations */
+  gchar * x_title;              /*!< x axis default title, ex: "r [Å] */
+  double calc_time;             /*!< Calculation time */
+  int num_delta;                /*!< Number of intervals */
+  double delta;                 /*!< Size of an interval */
+  double min;                   /*!< Minimum x value */
+  double max;                   /*!< Maximum x value */
+  double fact;                  /*!< Gaussian smoothing factor, if available */
+  int other_params;             /*!< Number of other parameters for this analysis */
+  double * o_params;            /*!< List of other parameters */
+  GtkTextBuffer * calc_buffer;  /*!< The text buffer for the calculation */
+  gboolean graph_res;           /*!< Results to be displayed using graphs ? */
+  int numc;                     /*!< Number of curves, if any */
+  int c_sets;                   /*!< Number of compatible sets */
+  int * compat_id;              /*!< List of compatible sets */
+  Curve ** curves;              /*!< The curves, graph for the results of the calculations, if any */
+  tint * idcc;                  /*!< Pointers for the curves */
 };
 
 /*! \def MAXDATC
@@ -716,7 +789,7 @@ struct classical_field
   int nbody[5];
   struct field_nth_body * first_body[5];
   // Tersoff potential cross terms
-  double *** cross; /*!< Tersoff potential cross termms */
+  double *** cross; /*!< Tersoff potential cross terms */
   int extern_fields;
   struct field_external * first_external;
 
@@ -917,7 +990,7 @@ struct atom
   int ** rings[5];                /*!< Ring statistics information: \n
     0 = All, \n
     1 = King's, \n
-    2 = Guttman, \n
+    2 = Guttman's, \n
     3 = Primitive, \n
     4 = Strong
    */ // Rings statistics information
@@ -947,7 +1020,7 @@ struct project
   char * name;                         /*!< Project name */
   char * projfile;                     /*!< Name of the project file, if any */
   char * coordfile;                    /*!< Name of atomic coordinates file, if any */
-  char * bondfile;                     /*!< Name of the file to ouput bonding information, if any */
+  char * bondfile;                     /*!< Name of the file to output bonding information, if any */
   gboolean newproj;                    /*!< New project ? yes / no */
   gboolean run;                        /*!< Run this project ? yes / no */
   gboolean dmtx;                       /*!< Trigger the calculation of the distance matrix ? yes / no */
@@ -960,22 +1033,17 @@ struct project
   chemical_data * chemistry;           /*!< Chemical data */
   coord_info * coord;                  /*!< Coordination(s) data */
   cell_info cell;                      /*!< Periodicity data */
-  atom ** atoms;                /*!< Atom list: atoms[steps][natomes] */
+  atom ** atoms;                       /*!< Atom list: atoms[steps][natomes] */
   /*
      Analysis related parameters
   */
-  gboolean runok[NGRAPHS];             /*!< Analysis calculation availability */
-  gboolean initok[NGRAPHS];            /*!< Curves initizalization  */
-  gboolean visok[NGRAPHS];             /*!< Analysis calculation confirmation */
-  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
+  /*!< Analysis: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd \n 10 = skt */
+  atomes_analysis ** analysis;         /*!< The analysis data and results */
+
+  // Some parameters cannot be easily stored in a generic data structure
   gboolean runc[3];                    /*!< Trigger to run bonds, angles and molecules analysis */
-  // gr, sq, sk, gftt, bd, an, frag-mol, ch, sp, msd
-  int numc[NGRAPHS];                   /*!< Number of curves: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  int num_delta[NGRAPHS];              /*!< Number of x points: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double calc_time[NGRAPHS];           /*!< Calculation time: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double delta[NGRAPHS];               /*!< Discretization: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double min[NGRAPHS];                 /*!< Minimum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
-  double max[NGRAPHS];                 /*!< Maximum x value: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt, \n 4 = bd, \n 5 = an, \n 6 = frag-mol, \n 7 = ch, \n 8 = sp, \n 9 = msd */
+  int xcor;                            /*!< S(q) X-rays type of calculation: f(q) (1) or approximated (0) */
+  // Ring statistics parameters
   // 0 = Search type, 1 = NUMA
   int rsearch[2];                      /*!< Ring statistics parameters: 0 = Search type, 1 = Ring's allocation parameter NUMA */
   // First col : search type (up to chains stat). Second col: search info
@@ -993,6 +1061,7 @@ struct project
                                             2 = Number of ring(s) with size > Rmax that potentially exist per MD step: RpE, \n
                                             3 = Standard deviation for RpE, \n
                                             4 = calculation time for the analysis */
+  // Chain statistics parameters
   int csearch;                         /*!< Chain statistics allocation parameter: CNUMA */
   // 0 = Initnode, 1 = AAAA, 2 = ABAB, 3 = Homo, 4 = 1221, 5 = RMAX, 6 = Done + Chains
   int csparam[7];                      /*!< Chain statistics parameters: \n
@@ -1006,12 +1075,20 @@ struct project
   double csdata[2];                    /*!< Results for the chain statistics: \n
                                             0 = Total number of chains) per MD step: CpS, \n
                                             1 = Standard deviation for CpS */
-  double fact[4];                      /*!< Gaussian smoothing factors: \n 0 = gr, \n 1 = sq, \n 2 = sk, \n 3 = gftt */
-  double sk_advanced[2];               /*!< */
-  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for the results of the calculations */
-  tint * idcc[NGRAPHS];                /*!< Pointers for the curves */
-  int numwid;                          /*!< total number of curves for this project */
-  Curve ** curves[NGRAPHS];            /*!< The curves, graph for the results of the calculations */
+  // F(k,t) and S(q,w) parameters
+  double sk_advanced[2][2];            /*!< Probability triggered k sampling, 0 = SKD, 1 = SKT */
+  int skt_sets;                        /*!< Total number of S(k,t) curves */
+  int skt_corr_threshold;              /*!< Minium number of correlated configurations to compute S(k,t) */
+  gboolean skt_all_sets;               /*!< Output calculation results for all t steps */
+  int skt_n_data_sets;                 /*!< Number of configuration(s) to save when computing S(k,t) */
+  int * skt_step_id;                   /*!< List of t step(s) to save when computing S(k,t) */
+  int sqw_sets;                        /*!< Total number of S(q,w) curves */
+  int sqw_n_data_sets;                 /*!< Number of q vector(s) to compute S(q,w) */
+  double * sqw_q_id;                   /*!< List of q vector(s) to compute S(q,w) */
+  int sqw_freq;                        /*!< Frequency intervals */
+
+  GtkTextBuffer * text_buffer[NITEMS]; /*!< The text buffer for general information */
+
   /*
      OpenGL related parameters
   */
@@ -1052,9 +1129,8 @@ struct workspace
 
 extern atomes_action edition_acts[];
 extern atomes_action analyze_acts[];
-extern GSimpleAction * edition_actions[3];
-extern GSimpleAction * analyze_actions[9];
-extern void add_action (GSimpleAction * action);
+extern GSimpleAction * edition_actions[];
+extern void add_analysis_action (int act);
 extern void remove_action (gchar * action_name);
 extern void remove_edition_actions ();
 extern void remove_edition_and_analyze_actions ();
@@ -1265,6 +1341,7 @@ extern ColRGBA get_button_color (GtkColorChooser * colob);
 extern ColRGBA get_window_color (GtkWidget * color_win);
 extern void set_color_chooser_color (GtkWidget * color_win, ColRGBA col);
 extern void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col);
+extern void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col);
 
 extern void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
 
@@ -1305,6 +1382,9 @@ extern gchar * calculation_time (gboolean modelv, double ctime);
 
 extern int get_widget_width (GtkWidget * widg);
 extern int get_widget_height (GtkWidget * widg);
+
+extern int signal_error (const char * file, const char * func, int error_line, int error_id);
+extern void update_error_trace (const char * file, const char * func, int trace_line);
 
 typedef struct {
   GCallback handler;

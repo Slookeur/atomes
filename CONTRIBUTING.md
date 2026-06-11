@@ -8,19 +8,13 @@ If your are interested in helping to improve [atomes][atomes] you are welcome to
 
 ## Software development 
 
-To get started with [atomes][atomes] development, give a look to the code source documentation: 
-
-[https://slookeur.github.io/atomes-doxygen/index.html](https://slookeur.github.io/atomes-doxygen/index.html)
-
-Please consider that: 
-
-  - Any new file / function should include approriate description and commentary in the [Doxygen](https://www.doxygen.nl/) format
-  - Changes to atomes should be submitted for review through pull-request. 
+To get started with [atomes][atomes] development give a look to the [DEVELOPER.md](./DEVELOPER.md) file. 
 
 ## Contributions other than software development
 
 There are many possible task: 
 
+  - Translate in your native language.
   - Testing the features, reporting any bugs you find.
   - Improving the documentation.
   - Graphics design.

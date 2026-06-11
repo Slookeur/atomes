@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_geo.c
@@ -346,7 +346,7 @@ void check_coord_modification (project * this_proj, int * old_id, atom * new_lis
   }
 
   // first create a dummy coord structure to store an atom individual data
-  coord_info * new_coord = g_malloc0 (sizeof*new_coord);
+  coord_info * new_coord = g_malloc0(sizeof*new_coord);
   for (i=0; i<2; i++)
   {
     new_coord -> totcoord[i] = 1;

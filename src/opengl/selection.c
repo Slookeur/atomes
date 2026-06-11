@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file selection.c
@@ -229,7 +229,7 @@ void save_dihedral_selection (glwin * view, int pi)
   {
     objects[2] = i = num_dihedrals (img -> selected[pi] -> selected);
     tmp_object_id[2] = allocdint (i, 4);
-    object_was_selected[2] = allocint(i);
+    object_was_selected[2] = allocint (i);
     for (j=0; j<i; j++) object_was_selected[2][j] = img -> selected[pi] -> selected_dihedrals[j];
     dihedrals_loop (view, -2, pi, NULL);
     g_free (img -> selected[pi] -> selected_dihedrals);
@@ -276,7 +276,7 @@ void save_angle_selection (glwin * view, int pi)
   {
     objects[1] = i = num_angles (img -> selected[pi] -> selected);
     tmp_object_id[1] = allocdint (i, 3);
-    object_was_selected[1] = allocint(i);
+    object_was_selected[1] = allocint (i);
     for (j=0; j<i; j++) object_was_selected[1][j] = img -> selected[pi] -> selected_angles[j];
     angles_loop (view, -2, pi, NULL);
     g_free (img -> selected[pi] -> selected_angles);
@@ -323,7 +323,7 @@ void save_bond_selection (glwin * view, int pi)
   {
     objects[0] = i = num_bonds (img -> selected[pi] -> selected);
     tmp_object_id[0] = allocdint (i, 2);
-    object_was_selected[0] = allocint(i);
+    object_was_selected[0] = allocint (i);
     for (j=0; j<i; j++) object_was_selected[0][j] = img -> selected[pi] -> selected_bonds[j];
     bonds_loop (view, -2, pi, NULL);
     g_free (img -> selected[pi] -> selected_bonds);
@@ -427,7 +427,7 @@ void update_all_selections (glwin * view, int pi)
 */
 atom_in_selection * new_atom_in_selection (int id, int sp)
 {
-  atom_in_selection * new_sel = g_malloc0 (sizeof*new_sel);
+  atom_in_selection * new_sel = g_malloc0(sizeof*new_sel);
   new_sel -> id = id;
   new_sel -> sp = sp;
   return new_sel;

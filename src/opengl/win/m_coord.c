@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file m_coord.c
@@ -291,7 +291,7 @@ GtkWidget * add_menu_coord (glwin * view, int id, int jd)
   if (is_coord_in_menu(jd, this_proj))
   {
     if (jd == 2 || jd == 3) detach_frag_mol_menu(view, id, jd);
-    GtkWidget * colt = create_menu_item (TRUE, "Show/Hide");
+    GtkWidget * colt = create_menu_item (TRUE, _("Show/Hide"));
     gtk_menu_shell_append ((GtkMenuShell *)menuct, colt);
     if (jd < 2 || jd > 3)
     {
@@ -301,11 +301,11 @@ GtkWidget * add_menu_coord (glwin * view, int id, int jd)
       {
         if (jd == 9)
         {
-          colt = create_menu_item (FALSE, "Atoms in chain(s) of size");
+          colt = create_menu_item (FALSE, _("Atoms in Chain(s) of Size"));
         }
         else
         {
-          colt = create_menu_item (FALSE, "Atoms in ring(s) of size");
+          colt = create_menu_item (FALSE, _("Atoms in Ring(s) of Size"));
         }
         gtk_menu_shell_append ((GtkMenuShell *)menucts, colt);
         menucts = gtk_menu_new ();
@@ -357,7 +357,7 @@ GtkWidget * add_menu_coord (glwin * view, int id, int jd)
     }
     if (jd != 9)
     {
-      colt = create_menu_item (FALSE, "Color(s)");
+      colt = create_menu_item (FALSE, _("Color(s)"));
       gtk_menu_shell_append ((GtkMenuShell *)menuct, colt);
     }
     if (jd < 2)
@@ -422,12 +422,12 @@ GtkWidget * add_menu_coord (glwin * view, int id, int jd)
 */
 GtkWidget * menu_coord (glwin * view, int id)
 {
-  GtkWidget * menuco = create_menu_item (FALSE, "Coordination");
+  GtkWidget * menuco = create_menu_item (FALSE, _("Coordination"));
   GtkWidget * menuc = gtk_menu_new ();
   gtk_menu_item_set_submenu ((GtkMenuItem *)menuco, menuc);
 
-  gtk_menu_shell_append ((GtkMenuShell *)menuc, menu_item_new_with_submenu ("Total(s)", TRUE, add_menu_coord(view, id, 0)));
-  gtk_menu_shell_append ((GtkMenuShell *)menuc, menu_item_new_with_submenu ("Partial(s)", TRUE, add_menu_coord(view, id, 1)));
+  gtk_menu_shell_append ((GtkMenuShell *)menuc, menu_item_new_with_submenu (_("Total(s)"), TRUE, add_menu_coord(view, id, 0)));
+  gtk_menu_shell_append ((GtkMenuShell *)menuc, menu_item_new_with_submenu (_("Partial(s)"), TRUE, add_menu_coord(view, id, 1)));
   return menuco;
 }
 
@@ -451,12 +451,12 @@ GtkWidget * menu_rings (glwin * view, int id)
       {
         if (id == 0)
         {
-          view -> ogl_rings[i+1] = menu_item_new_with_submenu (rings_type[i], TRUE, add_menu_coord (view, id, 4+i));
+          view -> ogl_rings[i+1] = menu_item_new_with_submenu (_(rings_type[i]), TRUE, add_menu_coord (view, id, 4+i));
           gtk_menu_shell_append ((GtkMenuShell *)menuco, view -> ogl_rings[i+1]);
         }
         else
         {
-          gtk_menu_shell_append ((GtkMenuShell *)menuco, menu_item_new_with_submenu (rings_type[i], TRUE, add_menu_coord (view, id, 4+i)));
+          gtk_menu_shell_append ((GtkMenuShell *)menuco, menu_item_new_with_submenu (_(rings_type[i]), TRUE, add_menu_coord (view, id, 4+i)));
         }
       }
     }
@@ -480,7 +480,7 @@ GMenu * color_item (glwin * view, gchar * act, int popm, int id, GCallback handl
 {
   GMenu *  menu = g_menu_new ();
   append_opengl_item (view, menu, act, act, popm, id, NULL, IMG_NONE, NULL, TRUE, NULL, NULL, FALSE, FALSE, FALSE, FALSE);
-  append_opengl_item (view, menu, "More colors ...", act, popm, id, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("More Colors ..."), act, popm, id, NULL, IMG_NONE, NULL, FALSE, handler, data, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -579,7 +579,7 @@ GMenu * menu_show_frag_mol (glwin * view, int popm, int id, int mid)
     int i;
     for (i=0; i < this_proj -> coord -> totcoord[id]; i++)
     {
-      stra = g_strdup_printf ("%s N°%d", (id == 2) ? "Fragment" : "Molecule", i+1);
+      stra = g_strdup_printf ("%s N°%d", (id == 2) ? _("Fragment") : _("Molecule"), i+1);
       strb = g_strdup_printf ("%s-%d", (id == 2) ? "frag" : "mol", i+1);
       if (! mid)
       {
@@ -594,7 +594,7 @@ GMenu * menu_show_frag_mol (glwin * view, int popm, int id, int mid)
       g_free (strb);
     }
   }
-  // append_opengl_item (view, menu, "All", "all-fm", popm, id, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_coord_properties), & view -> colorp[id][1], FALSE, FALSE, FALSE, TRUE);
+  // append_opengl_item (view, menu, _("All"), "all-fm", popm, id, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_coord_properties), & view -> colorp[id][1], FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -615,7 +615,7 @@ GMenu * menu_show_rings (glwin * view, int popm, int id, int mid)
   if (! mid)
   {
     menus = g_menu_new ();
-    append_submenu (menu, (id < 9) ? "Atoms In Ring(s) of Size " : "Atoms In Chain(s) of Size ", menus);
+    append_submenu (menu, (id < 9) ? _("Atoms in Ring(s) of Size") : _("Atoms in Chain(s) of Size"), menus);
   }
   project * this_proj = get_project_by_id (view -> proj);
   gchar * stra, * strb;
@@ -653,7 +653,7 @@ GMenu * add_menu_coord (glwin * view, int popm, int id)
 {
   GMenu * menu = g_menu_new ();
   project * this_proj = get_project_by_id (view -> proj);
-  gchar * menu_name[2] = {"Show/Hide", "Color"};
+  gchar * menu_name[2] = {i18n("Show/Hide"), i18n("Color")};
   if (is_coord_in_menu(id, this_proj))
   {
     int i;
@@ -661,18 +661,18 @@ GMenu * add_menu_coord (glwin * view, int popm, int id)
     {
       if (id < 2)
       {
-        append_submenu (menu, menu_name[i], menu_show_coord(view, popm, id, i));
+        append_submenu (menu, _(menu_name[i]), menu_show_coord(view, popm, id, i));
       }
       else if (id < 4)
       {
-        append_submenu (menu, menu_name[i], menu_show_frag_mol(view, popm, id, i));
+        append_submenu (menu, _(menu_name[i]), menu_show_frag_mol(view, popm, id, i));
       }
       else if (id < 10)
       {
-        append_submenu (menu, menu_name[i], menu_show_rings(view, popm, id, i));
+        append_submenu (menu, _(menu_name[i]), menu_show_rings(view, popm, id, i));
       }
     }
-    append_opengl_item (view, menu, "Advanced", "adv-c", popm, id, NULL, IMG_STOCK, (gpointer)DPROPERTIES, FALSE,
+    append_opengl_item (view, menu, _("Advanced"), "adv-c", popm, id, NULL, IMG_STOCK, (gpointer)DPROPERTIES, FALSE,
                         G_CALLBACK(to_coord_properties), & view -> colorp[id][1], FALSE, FALSE, FALSE, TRUE);
   }
   return menu;
@@ -689,8 +689,8 @@ GMenu * add_menu_coord (glwin * view, int popm, int id)
 GMenu * menu_coord (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Total(s)", add_menu_coord(view, popm, 0));
-  append_submenu (menu, "Partial(s)", add_menu_coord(view, popm, 1));
+  append_submenu (menu, _("Total(s)"), add_menu_coord(view, popm, 0));
+  append_submenu (menu, _("Partial(s)"), add_menu_coord(view, popm, 1));
   return menu;
 }
 
@@ -712,7 +712,7 @@ GMenu * menu_rings (glwin * view, int popm)
     {
       if (view -> ring_max[i])
       {
-        append_submenu (menu, rings_type[i], add_menu_coord (view, popm, 4+i));
+        append_submenu (menu, _(rings_type[i]), add_menu_coord (view, popm, 4+i));
       }
     }
   }

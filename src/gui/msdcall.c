@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file msdcall.c
@@ -30,7 +30,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initmsd ();
+  void init_msd (project * this_proj);
+  void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer);
   void update_msd_view (project * this_proj);
 
   G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data);
@@ -49,68 +50,95 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "project.h"
 
 /*!
-  \fn void initmsd ()
+  \fn void init_msd (project * this_proj)
 
   \brief initialize the curve widgets for the MSD
+
+  \param this_proj the target project
 */
-void initmsd ()
+void init_msd (project * this_proj)
 {
   int i, j;
-
   j = 0;
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
   }
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(x)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(x)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(y)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(y)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(z)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(z)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(xy)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xy)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(xz)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xz)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(yz)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(yz)[%s]", _("MSD"), active_chem -> label[i]);
     j=j+1;
   }
-  for ( i = 0 ; i < active_project -> nspec ; i++ )
+  for ( i = 0 ; i < this_proj -> nspec ; i++ )
   {
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(x/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(x/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(y/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(y/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(z/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(z/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(xy/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xy/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(xz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(xz/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
-    active_project -> curves[MS][j] -> name = g_strdup_printf ("MSD(yz/nac)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s(yz/%s)[%s]", _("MSD"), _("nac"), active_chem -> label[i]);
     j=j+1;
   }
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Correction[x]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[x]", _("Correction"));
   j=j+1;
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Correction[y]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[y]", _("Correction"));
   j=j+1;
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Correction[z]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[z]", _("Correction"));
   j=j+1;
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Drift[x]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[x]", _("Drift"));
   j=j+1;
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Drift[y]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[y]", _("Drift"));
   j=j+1;
-  active_project -> curves[MS][j] -> name = g_strdup_printf ("Drift[z]");
+  this_proj -> analysis[MSD] -> curves[j] -> name = g_strdup_printf ("%s[z]", _("Drift"));
 
-  addcurwidgets (activep, MS, 0);
-  active_project -> initok[MS]=TRUE;
+  add_curve_widgets (this_proj, MSD);
+  this_proj -> analysis[MSD] -> init_ok = TRUE;
 }
 
+/*!
+  \fn void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer)
+
+  \brief print molecular dynamics information
+
+  \param this_proj the target project
+  \param calc_buffer the GtkTextBuffer to print into
+*/
+void update_dynamic_view (project * this_proj, GtkTextBuffer * calc_buffer)
+{
+  gchar * str;
+  print_info (_("\t - Number of configurations: "), "bold", calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> steps);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info (_("\n\n\t - Number of time steps between each configuration: "), "bold", calc_buffer);
+  str = g_strdup_printf ("%d", this_proj -> analysis[MSD] -> num_delta);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info (_("\n\n\t - Time step δt used to integrate Newton's equations of motion: "), "bold", calc_buffer);
+  str = g_strdup_printf ("%f", this_proj -> analysis[MSD] -> delta);
+  print_info (str, "bold_blue", calc_buffer);
+  g_free (str);
+  print_info (" ", "bold", calc_buffer);
+  print_info (untime[this_proj -> tunit], "bold_red", calc_buffer);
+}
 /*!
   \fn void update_msd_view (project * this_proj)
 
@@ -120,26 +148,13 @@ void initmsd ()
 */
 void update_msd_view (project * this_proj)
 {
-  gchar * str;
-  if (this_proj -> text_buffer[MS+OT] == NULL) this_proj -> text_buffer[MS+OT] = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> text_buffer[MS+OT]);
-  print_info ("\n\nMean Square Displacement\n\n", "heading", this_proj -> text_buffer[MS+OT]);
-  print_info ("Calculation details:\n\n", NULL, this_proj -> text_buffer[MS+OT]);
-  print_info ("\t - Number of configurations: ", "bold", this_proj -> text_buffer[MS+OT]);
-  str = g_strdup_printf ("%d", this_proj -> steps);
-  print_info (str, "bold_blue", this_proj -> text_buffer[MS+OT]);
-  g_free (str);
-  print_info ("\n\n\t - Number of time steps between each configuration: ", "bold", this_proj -> text_buffer[MS+OT]);
-  str = g_strdup_printf ("%d", this_proj -> num_delta[MS]);
-  print_info (str, "bold_blue", this_proj -> text_buffer[MS+OT]);
-  g_free (str);
-  print_info ("\n\n\t - Time step δt used to integrate Newton's equations of motion: ", "bold", this_proj -> text_buffer[MS+OT]);
-  str = g_strdup_printf ("%f", this_proj -> delta[MS]);
-  print_info (str, "bold_blue", this_proj -> text_buffer[MS+OT]);
-  g_free (str);
-  print_info (" ", "bold", this_proj -> text_buffer[MS+OT]);
-  print_info (untime[this_proj -> tunit], "bold_red", this_proj -> text_buffer[MS+OT]);
-  print_info (calculation_time(TRUE, this_proj -> calc_time[MS]), NULL, this_proj -> text_buffer[MS+OT]);
+  if (this_proj -> analysis[MSD] -> calc_buffer == NULL) this_proj -> analysis[MSD] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[MSD] -> calc_buffer);
+  print_info (_("\n\nMean Square Displacement\n\n"), "heading", this_proj -> analysis[MSD] -> calc_buffer);
+  print_info (_("Calculation details:\n\n"), NULL, this_proj -> analysis[MSD] -> calc_buffer);
+  update_dynamic_view (this_proj, this_proj -> analysis[MSD] -> calc_buffer);
+  print_info ("\n", NULL, this_proj -> analysis[MSD] -> calc_buffer);
+  print_info (calculation_time(TRUE, this_proj -> analysis[MSD] -> calc_time), NULL, this_proj -> analysis[MSD] -> calc_buffer);
 }
 
 /*!
@@ -153,20 +168,16 @@ void update_msd_view (project * this_proj)
 G_MODULE_EXPORT void on_calc_msd_released (GtkWidget * widg, gpointer data)
 {
   int i;
-
-  if (! active_project -> initok[MS])  initmsd ();
-  clean_curves_data (MS, 0, active_project -> numc[MS]);
-  prepostcalc (widg, FALSE, MS, 0, opac);
-  active_project -> min[MS] = active_project -> delta[MS]*active_project -> num_delta[MS];
-  active_project -> max[MS] = (active_project -> steps -1)*active_project -> delta[MS]*active_project -> num_delta[MS];
-  clock_gettime (CLOCK_MONOTONIC, & start_time);
-  i = msd_ (& active_project -> delta[MS], & active_project -> num_delta[MS]);
-  clock_gettime (CLOCK_MONOTONIC, & stop_time);
-  active_project -> calc_time[MS] = get_calc_time (start_time, stop_time);
-  prepostcalc (widg, TRUE, MS, i, 1.0);
+  if (! active_project -> analysis[MSD] -> init_ok) init_msd (active_project);
+  clean_curves_data (MSD, 0, active_project -> analysis[MSD] -> numc);
+  prepostcalc (widg, FALSE, MSD, 0, opac);
+  active_project -> analysis[MSD] -> min = active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
+  active_project -> analysis[MSD] -> max = (active_project -> steps - 1)*active_project -> analysis[MSD] -> delta*active_project -> analysis[MSD] -> num_delta;
+  i = msd_ (& active_project -> analysis[MSD] -> delta, & active_project -> analysis[MSD] -> num_delta);
+  prepostcalc (widg, TRUE, MSD, i, 1.0);
   if (! i)
   {
-    show_error ("The MSD calculation has failed", 0, widg);
+    show_error (_("The MSD calculation has failed"), 0, widg);
   }
   else
   {

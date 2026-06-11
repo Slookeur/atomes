@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_isaacs.c
@@ -111,9 +111,6 @@ int XmlwriterFilename (const char * uri)
   int i, j;
   xmlTextWriterPtr writer;
 
-  char isaacinfo[16] = " I.S.A.A.C.S. v";
-  char xmlinfo[11]=" XML file ";
-  const xmlChar intro[50]="";
   char * val;
   char * ncut;
   size_t lgt;
@@ -129,11 +126,7 @@ int XmlwriterFilename (const char * uri)
   rc = xmlTextWriterStartDocument(writer, NULL, MY_ENCODING, NULL);
   if (rc < 0) return 0;
 
-
-  strcpy((char *)intro, isaacinfo);
-  strcat((char *)intro, "1.0");
-  strcat((char *)intro, xmlinfo);
-  rc = xmlTextWriterWriteComment(writer, intro);
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" I.S.A.A.C.S. v1.0 XML file "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST "isaacs-xml");
   if (rc < 0) return 0;
@@ -145,7 +138,7 @@ int XmlwriterFilename (const char * uri)
 	  <file> <file>
    </data>*/
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Data format and file containing the configuration(s) ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Data format and file containing the configuration(s) "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"data");
   if (rc < 0) return 0;
@@ -200,7 +193,7 @@ int XmlwriterFilename (const char * uri)
     </element>
   </chemistry> */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Chemistry information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Chemistry information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"chemistry");
   if (rc < 0) return 0;
@@ -274,7 +267,7 @@ int XmlwriterFilename (const char * uri)
     </vectors>
   </box> */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Box information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Box information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"box");
   if (rc < 0) return 0;
@@ -380,7 +373,7 @@ int XmlwriterFilename (const char * uri)
   </pbc>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" PBC information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" PBC information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"pbc");
   if (rc < 0) return 0;
@@ -416,7 +409,7 @@ int XmlwriterFilename (const char * uri)
   </cutoffs>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Cutoffs information ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Cutoffs information "));
   if (rc < 0) return 0;
   rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"cutoffs");
   if (rc < 0) return 0;
@@ -430,7 +423,7 @@ int XmlwriterFilename (const char * uri)
     {
       lgt = 10;
       lgt += strfind (active_chem -> label[i]) + strlen("-") + strfind(active_chem -> label[j]);
-      ncut = g_malloc0 (lgt*sizeof*ncut);
+      ncut = g_malloc0(lgt*sizeof*ncut);
       strncpy (ncut, active_chem -> label[i], strfind(active_chem -> label[i]));
       strcat (ncut, "-");
       strncat (ncut, active_chem -> label[j], strfind(active_chem -> label[j]));
@@ -455,7 +448,7 @@ int XmlwriterFilename (const char * uri)
 
   if (active_project -> steps > 1)
   {
-    rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Time series ");
+    rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Time series "));
     if (rc < 0) return 0;
     rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"time-series");
     if (rc < 0) return 0;
@@ -473,7 +466,7 @@ int XmlwriterFilename (const char * uri)
   <project></project>
   */
 
-  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)" Apply project ");
+  rc = xmlTextWriterWriteComment(writer, (const xmlChar *)_(" Apply project "));
   if (rc < 0) return 0;
   if (active_project -> run)
   {
@@ -606,6 +599,7 @@ int setprop (xmlNodePtr pnode)
     idn = pspec -> children;
     data = xmlNodeGetContent(idn);
     res = get_spec_from_data(data);
+    xmlFree (data);
     if (res < 0)
     {
       res=6;
@@ -621,61 +615,70 @@ int setprop (xmlNodePtr pnode)
     data = xmlNodeGetContent(ptn);
     if (g_strcmp0 (exact_name((char *)data), active_chem -> element[res]) != 0)
     {
+      xmlFree (data);
       res=6;
       goto pend;
     }
+    xmlFree (data);
     ptn = findnode(ptnode, "z");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     if ((int)active_chem -> chem_prop[CHEM_Z][res] != (int)string_to_double ((gpointer)data))
     {
+      xmlFree (data);
       res=6;
       goto pend;
     }
+    xmlFree (data);
     ptn = findnode(ptnode, "mass");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_M][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "rad");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     // val = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "radius");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_R][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "nscatt");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_N][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptn = findnode(ptnode, "xscatt");
     if (ptn == NULL)
     {
       res=6;
       goto pend;
     }
-    data= xmlNodeGetContent(ptn);
+    data = xmlNodeGetContent(ptn);
     active_chem -> chem_prop[CHEM_X][res] = string_to_double ((gpointer)data);
+    xmlFree (data);
     ptnode = ptnode -> parent;
     ptnode = ptnode -> next;
   }
@@ -747,7 +750,7 @@ int testopening (char * tdata, char * tfichier)
     else
     {
       j=4;
-      err=g_strdup_printf("The %s\n %s\n from the XML file does not exist\n", tdata, tfichier);
+      err=g_strdup_printf(_("The %s\n %s\n from the XML file does not exist\n"), tdata, tfichier);
       show_error (err, 0, MainWindow);
       g_free (err);
       return j;
@@ -755,7 +758,7 @@ int testopening (char * tdata, char * tfichier)
   }
   else
   {
-    show_error ("Unknown data format in XML file\n", 0, MainWindow);
+    show_error (_("Unknown data format in XML file\n"), 0, MainWindow);
     j=4;
     return j;
   }
@@ -788,11 +791,11 @@ int setchemistry (xmlNodePtr xsnode)
   ats = val;
   if (ats != active_project -> natomes)
   {
-    show_warning ("The number of atoms in the XML file\n"
-                  "is not the same that the number of atoms\n"
-                  "in the file containing the coordinates.\n"
-                  "Other information from the XML file\n"
-                  "will be ignored\n", MainWindow);
+    show_warning (_("The number of atoms in the XML file\n"
+                    "is not the same that the number of atoms\n"
+                    "in the file containing the coordinates.\n"
+                    "Other information from the XML file\n"
+                    "will be ignored\n"), MainWindow);
     res=5;
     goto xend;
   }
@@ -811,9 +814,9 @@ int setchemistry (xmlNodePtr xsnode)
     ats = val;
     if (ats != active_project -> nspec)
     {
-      show_warning ("The number of chemical species in the XML file\n"
-                    "is not the same that the number of chemical species\n"
-                    "in the file that contains the atomic coordinates.\n", MainWindow);
+      show_warning (_("The number of chemical species in the XML file\n"
+                      "is not the same that the number of chemical species\n"
+                      "in the file that contains the atomic coordinates.\n"), MainWindow);
       res = 5;
       goto xend;
     }
@@ -1075,6 +1078,7 @@ int setpbc (xmlNodePtr pbcnode)
   {
     active_cell -> pbc = 1;
   }
+  xmlFree (data);
   bnode=findnode(pnode, "fractional");
   if (bnode == NULL)
   {
@@ -1085,6 +1089,7 @@ int setpbc (xmlNodePtr pbcnode)
   active_cell -> frac = 0;
   if (g_strcmp0 ((char *)data, (char *)"TRUE") == 0)
   {
+    xmlFree (data);
     bnode=findnode(pnode, "fractype");
     if (bnode == NULL)
     {
@@ -1094,6 +1099,7 @@ int setpbc (xmlNodePtr pbcnode)
     data = xmlNodeGetContent(bnode);
     //val=string_to_double ((gpointer)data);
     //j = val;
+    xmlFree (data);
     active_cell -> frac = 1;
   }
   pbc=0;
@@ -1128,6 +1134,7 @@ int setcutoffs (xmlNodePtr cutnode)
   }
   data = xmlNodeGetContent(cn);
   val=string_to_double ((gpointer)data);
+  xmlFree (data);
   active_chem -> grtotcutoff = val;
   cn = findnode(cnode, "partials");
   if (cn == NULL)
@@ -1142,7 +1149,7 @@ int setcutoffs (xmlNodePtr cutnode)
     {
       lgt=10;
       lgt+=strfind(active_chem -> label[i]) + strlen("-") + strfind(active_chem -> label[j]);
-      ncut = g_malloc0 (lgt*sizeof*ncut);
+      ncut = g_malloc0(lgt*sizeof*ncut);
       strncpy (ncut, active_chem -> label[i], strfind(active_chem -> label[i]));
       strcat (ncut, "-");
       strncat (ncut, active_chem -> label[j], strfind(active_chem -> label[j]));
@@ -1153,10 +1160,11 @@ int setcutoffs (xmlNodePtr cutnode)
         goto cend;
       }
       data = xmlNodeGetContent(cn);
-      val=string_to_double ((gpointer)data);
+      val = string_to_double ((gpointer)data);
+      xmlFree (data);
       active_chem -> cutoffs[i][j] = val;
       g_free (ncut);
-      ncut=NULL;
+      ncut = NULL;
     }
   }
   cut=0;
@@ -1191,6 +1199,7 @@ int settime(xmlNodePtr timenode)
   data = xmlNodeGetContent(tn);
   //val = string_to_double ((gpointer)data);
   //delta_t = val;
+  xmlFree (data);
   tn = findnode(tnode, "unit");
   if (tn == NULL)
   {
@@ -1203,6 +1212,7 @@ int settime(xmlNodePtr timenode)
   {
     if (g_strcmp0 ((char *)data, g_strdup_printf ("t [%s]", untime[i])) == 0) j=i;
   }
+  xmlFree (data);
   if (j == -1)
   {
     tps=10;
@@ -1218,6 +1228,7 @@ int settime(xmlNodePtr timenode)
     data = xmlNodeGetContent(tn);
     //val = string_to_double ((gpointer)data);
     //ndtbs = val;
+    xmlFree (data);
   }
   tps=0;
 
@@ -1237,7 +1248,6 @@ int check_xml (const char * filetocheck)
   int res;
   xmlDoc * doc;
   xmlTextReaderPtr reader;
-  const xmlChar xisaacs[11]="isaacs-xml";
   xmlChar * cdata, * cfichier;
   xmlNodePtr racine, node;
   /*
@@ -1256,7 +1266,7 @@ int check_xml (const char * filetocheck)
     else
     {
       racine = xmlDocGetRootElement(doc);
-      if (g_strcmp0 ((char *)(racine->name), (char *)xisaacs) != 0)
+      if (g_strcmp0 ((char *)(racine->name), "isaacs-xml") != 0)
       {
         res=2;
         goto end;
@@ -1281,11 +1291,14 @@ int check_xml (const char * filetocheck)
         node = findnode(node, "file");
         if (node == NULL)
         {
+          xmlFree (cdata);
           res=3;
           goto end;
         }
         cfichier = xmlNodeGetContent(node);
         res= testopening((char *)cdata, (char *)cfichier);
+        xmlFree (cdata);
+        xmlFree (cfichier);
         if (res != 0)
         {
           goto end;
@@ -1365,7 +1378,7 @@ int check_xml (const char * filetocheck)
             res=3;
             goto end;
           }
-          cdata=xmlNodeGetContent(node);
+          cdata = xmlNodeGetContent(node);
           if (g_strcmp0 ((char *)cdata, (char *)"TRUE") == 0)
           {
             active_project -> run = 1;
@@ -1374,6 +1387,7 @@ int check_xml (const char * filetocheck)
           {
             active_project -> run = 0;
           }
+          xmlFree (cdata);
         }
       }
     }
@@ -1411,34 +1425,34 @@ gchar * open_xml (const char * filetoread)
   switch(oxml)
   {
     case 1:
-      return ("Impossible to open the Isaacs project file (XML) file\n");
+      return (_("Impossible to open the ISAACS project file (XML) file\n"));
       break;
     case 2:
-      return ("The file is not a valid Isaacs project file (XML) file\n");
+      return (_("The file is not a valid ISAACS project file (XML) file\n"));
       break;
     case 3:
-      return ("The Isaacs project file (XML) file is incomplete\n");
+      return (_("The ISAACS project file (XML) file is incomplete\n"));
       break;
     case 4:
-      return ("Problem(s) in the &lt;data&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;data&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 5:
-      return ("Problem(s) in the &lt;chemistry&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;chemistry&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 6:
-      return ("Problem(s) in the &lt;element&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;element&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 7:
-      return ("Problem(s) in the &lt;box&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;box&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 8:
-      return ("Problem(s) in the &lt;pbc&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;pbc&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 9:
-      return ("Problem(s) in the &lt;cutoffs&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;cutoffs&gt; section of the ISAACS project file (XML)\n"));
       break;
     case 10:
-      return ("Problem(s) in the &lt;time-series&gt; section of the Isaacs project file (XML)\n");
+      return (_("Problem(s) in the &lt;time-series&gt; section of the ISAACS project file (XML)\n"));
       break;
     default:
       return NULL;

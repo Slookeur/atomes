@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_npt.c
@@ -94,8 +94,8 @@ int cell_get_lattice (int format)
   if (i) return 0;
   if (k != active_project -> steps)
   {
-    add_cell_info (g_strdup_printf ("Wrong file format - %d steps in coordinates file", active_project -> steps));
-    add_cell_info (g_strdup_printf ("Wrong file format - %d steps found in cell file", k));
+    add_cell_info (g_strdup_printf (_("Wrong file format - %d steps in coordinates file"), active_project -> steps));
+    add_cell_info (g_strdup_printf (_("Wrong file format - %d steps found in cell file"), k));
     return 0;
   }
   rewind (cellp);
@@ -119,7 +119,7 @@ int cell_get_lattice (int format)
         k = 0;
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].param[j][k] = string_to_double ((gpointer)this_word);
@@ -127,7 +127,7 @@ int cell_get_lattice (int format)
         this_word = strtok (NULL, " ");
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].param[j][k] = string_to_double ((gpointer)this_word);
@@ -135,7 +135,7 @@ int cell_get_lattice (int format)
         this_word = strtok (NULL, " ");
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].param[j][k] = string_to_double ((gpointer)this_word);
@@ -158,7 +158,7 @@ int cell_get_lattice (int format)
         k = 0;
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].vect[j][k] = string_to_double ((gpointer)this_word);
@@ -166,7 +166,7 @@ int cell_get_lattice (int format)
         this_word = strtok (NULL, " ");
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].vect[j][k] = string_to_double ((gpointer)this_word);
@@ -174,7 +174,7 @@ int cell_get_lattice (int format)
         this_word = strtok (NULL, " ");
         if (! this_word)
         {
-          add_cell_info (g_strdup_printf ("Wrong file format - error at step %d !", i+1));
+          add_cell_info (g_strdup_printf (_("Wrong file format - error at step %d !"), i+1));
           return 0;
         }
         this_cell -> lattice.box[i].vect[j][k] = string_to_double ((gpointer)this_word);

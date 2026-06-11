@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file gtk-misc.c
@@ -78,6 +78,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void setup_text_tags (GtkTextBuffer * buffer);
   void add_menu_separator (GtkWidget * menu);
   void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col);
+  void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col);
   void button_set_image (GtkButton * but, gchar * text, int format, gpointer image);
   void adjust_label (GtkWidget * lab, int dimx, int dimy, float ax, float ay);
   void set_image_from_icon_name (GtkWidget * widg, gchar * icon);
@@ -173,6 +174,25 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern void adjust_preferences_window ();
 
 /*!
+  \fn gboolean is_the_widget_visible (GtkWidget * widg)
+
+  \brief test if a GtkWidget exist, then return if it is visible or not
+
+  \param widg the GtkWidget
+*/
+gboolean is_the_widget_visible (GtkWidget * widg)
+{
+  if (GTK_IS_WIDGET(widg))
+  {
+    return gtk_widget_is_visible (widg);
+  }
+  else
+  {
+    return FALSE;
+  }
+}
+
+/*!
   \fn void show_the_widgets (GtkWidget * widg)
 
   \brief show GtkWidget
@@ -181,11 +201,17 @@ extern void adjust_preferences_window ();
 */
 void show_the_widgets (GtkWidget * widg)
 {
+  if (widg)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
 #ifdef GTK4
-  gtk_widget_set_visible (widg, TRUE);
+      gtk_widget_set_visible (widg, TRUE);
 #else
-  gtk_widget_show_all (widg);
+      gtk_widget_show_all (widg);
 #endif
+    }
+  }
 }
 
 /*!
@@ -197,11 +223,17 @@ void show_the_widgets (GtkWidget * widg)
 */
 void hide_the_widgets (GtkWidget * widg)
 {
+  if (widg != NULL)
+  {
+    if (GTK_IS_WIDGET(widg))
+    {
 #ifdef GTK4
-  gtk_widget_set_visible (widg, FALSE);
+      gtk_widget_set_visible (widg, FALSE);
 #else
-  gtk_widget_hide (widg);
+      gtk_widget_hide (widg);
 #endif
+    }
+  }
 }
 
 /*!
@@ -550,6 +582,19 @@ GtkWidget * message_dialogmodal (gchar * message, gchar * title, GtkMessageType 
     win = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, mtype, buttons, NULL);
   }
   gtk_message_dialog_set_markup (GTK_MESSAGE_DIALOG (win), message);
+
+  GtkWidget * content_area = gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(win));
+  GtkWidget * label;
+#ifdef GTK4
+  label = gtk_widget_get_first_child(content_area);
+#else
+  GList * children = gtk_container_get_children(GTK_CONTAINER(content_area));
+  label = GTK_WIDGET(children -> data);
+  g_list_free(children);
+#endif
+  gtk_label_set_use_markup (GTK_LABEL(label), TRUE);
+  gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+
   gtk_window_set_title (GTK_WINDOW(win), title);
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
 #ifdef GTK3
@@ -571,7 +616,7 @@ GtkWidget * message_dialogmodal (gchar * message, gchar * title, GtkMessageType 
 GtkWidget * dialog_cancel_apply (gchar * title, GtkWidget * parent, gboolean resiz)
 {
   GtkWidget * dca = gtk_dialog_new_with_buttons (title, GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                 "Cancel", GTK_RESPONSE_CANCEL, "Apply", GTK_RESPONSE_APPLY, NULL);
+                                                 _("Cancel"), GTK_RESPONSE_CANCEL, _("Apply"), GTK_RESPONSE_APPLY, NULL);
   gtk_window_set_resizable (GTK_WINDOW(dca), resiz);
 #ifdef GTK3
   gtk_window_set_icon (GTK_WINDOW (dca), THETD);
@@ -712,25 +757,6 @@ void gtk_label_align (GtkWidget * lab, float ax, float ay)
 {
   gtk_label_set_xalign (GTK_LABEL (lab), ax);
   gtk_label_set_yalign (GTK_LABEL (lab), ay);
-}
-
-/*!
-  \fn gboolean is_the_widget_visible (GtkWidget * widg)
-
-  \brief test if a GtkWidget exist, then return if it is visible or not
-
-  \param widg the GtkWidget
-*/
-gboolean is_the_widget_visible (GtkWidget * widg)
-{
-  if (GTK_IS_WIDGET(widg))
-  {
-    return gtk_widget_is_visible (widg);
-  }
-  else
-  {
-    return FALSE;
-  }
 }
 
 /*!
@@ -1616,7 +1642,7 @@ GtkWidget * gtk3_menu_item (GtkWidget * menu, gchar * name,
 */
 GtkWidget * add_advanced_item (GtkWidget * menu, GCallback handler, gpointer data, gboolean accel, guint key, GdkModifierType mod)
 {
-  return gtk3_menu_item (menu, "Advanced", IMG_STOCK, (gpointer)DPROPERTIES, handler, data, accel, key, mod, FALSE, FALSE, FALSE);
+  return gtk3_menu_item (menu, _("Advanced"), IMG_STOCK, (gpointer)DPROPERTIES, handler, data, accel, key, mod, FALSE, FALSE, FALSE);
 }
 
 /*!
@@ -1662,7 +1688,7 @@ GtkWidget * markup_label (gchar * text, int dimx, int dimy, float ax, float ay)
 */
 ColRGBA * duplicate_color (int num, ColRGBA * col)
 {
-  ColRGBA * new_col = g_malloc0 (num*sizeof*new_col);
+  ColRGBA * new_col = g_malloc0(num*sizeof*new_col);
   int i;
   for (i=0; i<num; i++) new_col[i] = col[i];
   return new_col;
@@ -1723,6 +1749,24 @@ void set_renderer_color (int tocol, GtkCellRenderer * renderer, ColRGBA col)
   {
     g_object_set(renderer, "foreground-set", FALSE, "weight", FALSE, NULL);
   }
+}
+
+/*!
+  \fn void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col)
+
+  \brief set Pango text markup for a GtkCellRenderer
+
+  \param mod the target tree model
+  \param iter the target tree iter
+  \param renderer the target GtkCellRenderer
+  \param col column number
+*/
+void set_renderer_markup (GtkTreeModel * mod, GtkTreeIter * iter, GtkCellRenderer * renderer, int col)
+{
+  gchar * str = NULL;
+  gtk_tree_model_get (mod, iter, col, & str, -1);
+  g_object_set (renderer, "markup", str, NULL, NULL);
+  g_free (str);
 }
 
 /*!
@@ -2168,25 +2212,16 @@ void provide_gtk_css (gchar * css)
 */
 GtkWidget * destroy_this_widget (GtkWidget * widg)
 {
+  hide_the_widgets (widg);
+#ifdef GTK3
   if (widg != NULL)
   {
     if (GTK_IS_WIDGET(widg))
     {
-      if (is_the_widget_visible(widg)) hide_the_widgets (widg);
-#ifdef GTK3
       gtk_widget_destroy (widg);
-#else
-      /* GtkWidget * wid = gtk_widget_get_parent (widg);
-      if (wid != NULL)
-      {
-        if (GTK_IS_WIDGET(wid))
-        {
-          gtk_widget_unparent (widg);
-        }
-      } */
-#endif
     }
   }
+#endif
   return NULL;
 }
 
@@ -2307,7 +2342,7 @@ gboolean file_chooser_set_file_name (GtkFileChooser * chooser, gchar * filename)
   gboolean res = gtk_file_chooser_set_file (chooser, default_file_for_saving, NULL);
   if (! res)
   {
-    gchar * str = g_strdup_printf ("Impossible to locate file: %s", filename);
+    gchar * str = g_strdup_printf (_("Impossible to locate file: %s"), filename);
     show_error (str, 0, (GtkWidget *)chooser);
   }
   return res;
@@ -2342,7 +2377,7 @@ void file_chooser_set_current_folder (GtkFileChooser * chooser)
 */
 GtkFileChooserNative * create_file_chooser (const gchar * title, GtkWindow * parent, GtkFileChooserAction act, const gchar * act_name)
 {
-  return gtk_file_chooser_native_new (title, parent, act, act_name, "Cancel");
+  return gtk_file_chooser_native_new (title, parent, act, act_name, _("Cancel"));
 }
 #else
 /*!
@@ -2357,7 +2392,7 @@ GtkFileChooserNative * create_file_chooser (const gchar * title, GtkWindow * par
 */
 GtkWidget * create_file_chooser (const gchar * title, GtkWindow * parent, GtkFileChooserAction act, const gchar * act_name)
 {
-  return gtk_file_chooser_dialog_new (title, parent, act, "Cancel", GTK_RESPONSE_CANCEL, act_name, GTK_RESPONSE_ACCEPT, NULL);
+  return gtk_file_chooser_dialog_new (title, parent, act, _("Cancel"), GTK_RESPONSE_CANCEL, act_name, GTK_RESPONSE_ACCEPT, NULL);
 }
 #endif
 

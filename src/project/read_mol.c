@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file read_mol.c
@@ -69,17 +69,17 @@ int read_atom_m (FILE * fp, int s, int a)
 */
 int read_this_mol (FILE * fp, molecule * tmp)
 {
-  if (fread (& tmp -> id, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> md, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> multiplicity, sizeof(int), 1, fp) != 1) return 0;
-  if (! tmp -> multiplicity) return 0;
-  tmp -> fragments = allocint(tmp -> multiplicity);
-  if (fread (tmp -> fragments, sizeof(int), tmp -> multiplicity, fp) != tmp -> multiplicity) return 0;
-  if (fread (& tmp -> natoms, sizeof(int), 1, fp) != 1) return 0;
-  if (fread (& tmp -> nspec, sizeof(int), 1, fp) != 1) return 0;
-  tmp -> species = allocint(active_project -> nspec);
-  if (fread (tmp -> species, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return 0;
-  return 1;
+  if (fread (& tmp -> id, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> md, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> multiplicity, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (! tmp -> multiplicity) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  tmp -> fragments = allocint (tmp -> multiplicity);
+  if (fread (tmp -> fragments, sizeof(int), tmp -> multiplicity, fp) != tmp -> multiplicity) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> natoms, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  if (fread (& tmp -> nspec, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  tmp -> species = allocint (active_project -> nspec);
+  if (fread (tmp -> species, sizeof(int), active_project -> nspec, fp) != active_project -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+  return OK;
 }
 
 /*!
@@ -92,21 +92,21 @@ int read_this_mol (FILE * fp, molecule * tmp)
 int read_mol (FILE * fp)
 {
   int i, j;
-  if (fread (& i, sizeof(int), 1, fp) != 1) return ERROR_MOL;
+  if (fread (& i, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
   if (! i) return OK;
-  active_project -> modelfc = g_malloc0 (sizeof*active_project -> modelfc);
+  active_project -> modelfc = g_malloc0(sizeof*active_project -> modelfc);
   for (i=1; i<4; i++)
   {
-    if (fread (& j, sizeof(int), 1, fp) != 1) return ERROR_MOL;
-    if (i == 1 && j != active_coord -> totcoord[1]) return ERROR_MOL;
+    if (fread (& j, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
+    if (i == 1 && j != active_coord -> totcoord[1]) return signal_error (__FILE__, __func__, __LINE__, ERROR_MOL);
     if (i > 1) active_coord -> totcoord[i] = j;
   }
-  active_project -> modelfc -> mol_by_step = allocint(active_project -> steps);
+  active_project -> modelfc -> mol_by_step = allocint (active_project -> steps);
   if (fread (active_project -> modelfc -> mol_by_step, sizeof(int), active_project -> steps, fp) != active_project -> steps) return ERROR_MOL;
-  active_project -> modelfc -> mols = g_malloc0 (active_project -> steps*sizeof*active_project -> modelfc -> mols);
+  active_project -> modelfc -> mols = g_malloc0(active_project -> steps*sizeof*active_project -> modelfc -> mols);
   for (i=0; i<active_project -> steps; i++)
   {
-    active_project -> modelfc -> mols[i] = g_malloc0 (active_project -> modelfc -> mol_by_step[i]*sizeof*active_project -> modelfc -> mols[i]);
+    active_project -> modelfc -> mols[i] = g_malloc0(active_project -> modelfc -> mol_by_step[i]*sizeof*active_project -> modelfc -> mols[i]);
   }
 
   molecule * tmp = g_malloc0(sizeof*tmp);
@@ -114,14 +114,22 @@ int read_mol (FILE * fp)
   {
     for (j=0; j<active_project -> modelfc -> mol_by_step[i]; j++)
     {
-      if (! read_this_mol(fp, & active_project -> modelfc -> mols[i][j])) return ERROR_MOL;
+      if (read_this_mol(fp, & active_project -> modelfc -> mols[i][j]) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_MOL;
+      }
     }
   }
   for (i=0; i<active_project -> steps; i++)
   {
     for (j=0; j< active_project -> natomes; j++)
     {
-      if (read_atom_m (fp, i, j) != OK) return ERROR_MOL;
+      if (read_atom_m (fp, i, j) != OK)
+      {
+        update_error_trace (__FILE__, __func__, __LINE__-2);
+        return ERROR_MOL;
+      }
     }
   }
 
@@ -138,8 +146,8 @@ int read_mol (FILE * fp)
     }
 
     active_glwin -> ogl_coord[i+1] = destroy_this_widget (active_glwin -> ogl_coord[i+1]);
-    if (i == 2) active_glwin -> ogl_coord[3] = menu_item_new_with_submenu ("Fragment(s)", active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 2));
-    if (i == 3) active_glwin -> ogl_coord[4] = menu_item_new_with_submenu ("Molecule(s)", active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 3));
+    if (i == 2) active_glwin -> ogl_coord[3] = menu_item_new_with_submenu (_("Fragment(s)"), active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 2));
+    if (i == 3) active_glwin -> ogl_coord[4] = menu_item_new_with_submenu (_("Molecule(s)"), active_project -> coord -> totcoord[2], add_menu_coord (active_glwin, 0, 3));
     GtkWidget * cmenu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (active_glwin -> ogl_coord[0]));
     gtk_menu_shell_insert (GTK_MENU_SHELL(cmenu), active_glwin -> ogl_coord[i+1], i+2);
   }

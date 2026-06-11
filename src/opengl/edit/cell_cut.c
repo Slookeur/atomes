@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cell_cut.c
@@ -68,7 +68,7 @@ G_MODULE_EXPORT void setup_passivate (GtkButton * but, gpointer data)
 {
   project * this_proj = (project *)data;
 
-  gchar * str = g_strdup_printf ("Cell edition - %s: surface passivation", this_proj -> name);
+  gchar * str = g_strdup_printf (_("Cell edition - %s: surface passivation"), this_proj -> name);
   GtkWidget * dial = dialogmodal (prepare_for_title(str), GTK_WINDOW(this_proj -> modelgl -> cell_win -> win));
   g_free (str);
   this_proj -> modelgl -> search_widg[8] -> passivating = TRUE;
@@ -78,8 +78,8 @@ G_MODULE_EXPORT void setup_passivate (GtkButton * but, gpointer data)
   widget_set_sensitive (this_proj -> modelgl -> search_widg[8]  -> object_box, 0);
   gtk_widget_set_size_request (scrollsets, 760, 350);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, scrollsets, FALSE, FALSE, 10);
-  GtkWidget * info = markup_label ("Select any object(s) <b>A</b> to be replaced when creating the slab, then select the object(s) <b>B</b> to insert in its place.\n"
-                                   "When cutting into the model any bond to <b>A</b> with the new surface, will be passivated by <b>B</b>", -1, -1, 0.5, 0.5);
+  GtkWidget * info = markup_label (_("Select any object(s) <b>A</b> to be replaced when creating the slab, then select the object(s) <b>B</b> to insert in its place.\n"
+                                     "When cutting into the model any bond to <b>A</b> with the new surface, will be passivated by <b>B</b>"), -1, -1, 0.5, 0.5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, info, FALSE, FALSE, 20);
   show_the_widgets (dial);
   if (! this_proj -> modelgl -> search_widg[8] -> in_selection)
@@ -113,14 +113,14 @@ void create_slab_info (project * this_proj)
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, this_proj -> modelgl -> cell_win -> slab_info, hbox, FALSE, FALSE, 5);
   gchar * str;
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("- Volume: ", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("- Volume: "), 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
   str = g_strdup_printf ("<b>%f</b>", this_proj -> modelgl -> cell_win -> slab_vol);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 90, -1, 0.0, 0.5), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("&#xC5;<sup>3</sup>", 20, -1, 0.5, 0.5), FALSE, FALSE, 0);
   g_free (str);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, this_proj -> modelgl -> cell_win -> slab_info, hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("- Atom(s) in slab: ", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("- Atom(s) in slab: "), 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
   str = g_strdup_printf ("<b>%d</b>", this_proj -> modelgl -> cell_win -> slab_atoms);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 20);
   g_free (str);
@@ -129,7 +129,7 @@ void create_slab_info (project * this_proj)
   {
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, this_proj -> modelgl -> cell_win -> slab_info, hbox, FALSE, FALSE, 0);
-    str = g_strdup_printf ("\t - %s atom(s) in slab: ", this_proj -> chemistry -> label[i]);
+    str = g_strdup_printf (_("\t - %s atom(s) in slab: "), this_proj -> chemistry -> label[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
     str = g_strdup_printf ("<b>%d</b>", this_proj -> modelgl -> cell_win -> slab_lot[i]);
@@ -222,14 +222,14 @@ G_MODULE_EXPORT void set_slab_property (GtkToggleButton * but, gpointer data)
 */
 GtkWidget * prepare_slab_box (int sid, project * this_proj)
 {
-  gchar * option[6]={"- Position the center of the slab: ", // 6, 7, 8
-                     "- Size of the slab: ",                // 9, 10, 11
-                     "- Size of the slab: ",                // 12, 13
-                     "- Size of the slab: ",                // 14
-                     "- Parallelepiped Angles: ",           // 15, 16, 17
-                     "- Slab rotation: "};                  // 18, 19, 20
+  gchar * option[6]={i18n("- Position the center of the slab: "), // 6, 7, 8
+                     i18n("- Size of the slab: "),                // 9, 10, 11
+                     i18n("- Size of the slab: "),                // 12, 13
+                     i18n("- Size of the slab: "),                // 14
+                     i18n("- Parallelepiped angles: "),           // 15, 16, 17
+                     i18n("- Slab rotation: ")};                  // 18, 19, 20
   GtkWidget * vbox = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(option[sid], 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_(option[sid]), 200, -1, 0.0, 0.5), FALSE, FALSE, 5);
   int i;
   switch (sid)
   {
@@ -304,13 +304,13 @@ G_MODULE_EXPORT void set_slab_option (GtkComboBox * box, gpointer data)
 GtkWidget * create_slab_param_combo (int sid, project * this_proj)
 {
   GtkWidget * combo = create_combo ();
-  gchar * options[4] = {"Position", "Size", "Angles", "Rotation"};
+  gchar * options[4] = {i18n("Position"), i18n("Size"), i18n("Angles"), i18n("Rotation")};
   int i, j, k;
   i = 4 - sid;
   for (j=0; j<i; j++)
   {
     k = (! sid) ? j : (sid == 1 && j == 2) ? 3 : j;
-    combo_text_append (combo, options[k]);
+    combo_text_append (combo, _(options[k]));
   }
   combo_set_active (combo, 0);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_slab_option), this_proj);
@@ -407,7 +407,7 @@ void invert_selection (project * this_proj)
     i = this_proj -> modelgl -> anim -> last -> img -> selected[0] -> selected;
     if (i < this_proj -> natomes)
     {
-      saved_c = g_malloc0 ((this_proj -> natomes - i)*sizeof*saved_c);
+      saved_c = g_malloc0((this_proj -> natomes - i)*sizeof*saved_c);
       k = 0;
       for (j=0; j<this_proj -> natomes; j++)
       {
@@ -425,7 +425,7 @@ void invert_selection (project * this_proj)
     this_proj -> modelgl -> saved_coord[1] = NULL;
     if (saved_c)
     {
-      this_proj -> modelgl -> saved_coord[1] = g_malloc0 ((this_proj -> natomes - i)*sizeof*this_proj -> modelgl -> saved_coord[1]);
+      this_proj -> modelgl -> saved_coord[1] = g_malloc0((this_proj -> natomes - i)*sizeof*this_proj -> modelgl -> saved_coord[1]);
       for (j=0; j<this_proj -> natomes - i; j++)
       {
         this_proj -> modelgl -> saved_coord[1][j] = duplicate_double(3, saved_c[j]);
@@ -495,8 +495,8 @@ G_MODULE_EXPORT void cut_this_slab (GtkButton * but, gpointer data)
     {
       is_out = this_proj -> modelgl -> cell_win -> slab_out;
       if (this_proj -> modelgl -> search_widg[8]) this_proj -> modelgl -> search_widg[8] -> passivating = FALSE;
-      gchar * infom[2] = {"Cut and modify model ?\n This is irreversible !", "Cut and create new project ?"};
-      if (ask_yes_no("Cut", infom[is_out], GTK_MESSAGE_WARNING, this_proj -> modelgl -> cell_win -> win))
+      gchar * infom[2] = {i18n("Cut and modify model ?\n This is irreversible !"), i18n("Cut and create new project ?")};
+      if (ask_yes_no(_("Cut"), _(infom[is_out]), GTK_MESSAGE_WARNING, this_proj -> modelgl -> cell_win -> win))
       {
         this_proj -> modelgl -> cell_win -> cut_this_slab = TRUE;
         if (is_out) preserve_ogl_selection (this_proj -> modelgl);
@@ -635,12 +635,12 @@ G_MODULE_EXPORT void cut_this_slab (GtkButton * but, gpointer data)
     }
     else
     {
-      show_info ("Nothing to passivate the bond(s) to be broken:\nDeactivate passivating or adjust option(s) properly !", 0, this_proj -> modelgl -> cell_win -> win);
+      show_info (_("Nothing to passivate the bond(s) to be broken:\nDeactivate passivating or adjust option(s) properly !"), 0, this_proj -> modelgl -> cell_win -> win);
     }
   }
   else
   {
-    show_info ("The slab is empty, nothing to do !", 0, this_proj -> modelgl -> cell_win -> win);
+    show_info (_("The slab is empty, nothing to do !"), 0, this_proj -> modelgl -> cell_win -> win);
   }
 }
 
@@ -663,17 +663,17 @@ GtkWidget * cut_in_model (project * this_proj)
 #endif
   GtkWidget * box = create_vbox (BSEP);
   layout_add_widget (layout, box, 10, 10);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, box, markup_label("Cut slab in the simulation box: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, box, markup_label(_("Cut slab in the simulation box: "), -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
 
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("<b>Show/Hide slab</b>", 25, -1, this_proj -> modelgl -> cell_win -> slab_show,
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("<b>Show/Hide slab</b>"), 25, -1, this_proj -> modelgl -> cell_win -> slab_show,
                                                    G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[0]), FALSE, FALSE, 20);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Use PBC to select atoms", 25, -1, this_proj -> modelgl -> cell_win -> slab_pbc,
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Use PBC to select atoms"), 25, -1, this_proj -> modelgl -> cell_win -> slab_pbc,
                                                    G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[1]), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Invert cutting (all but the slab)", 25, -1, this_proj -> modelgl -> cell_win -> slab_act,
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Invert cutting (all but the slab)"), 25, -1, this_proj -> modelgl -> cell_win -> slab_act,
                                                    G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[2]), FALSE, FALSE, 20);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button ("Export in new project", 25, -1, this_proj -> modelgl -> cell_win -> slab_out,
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_button (_("Export in new project"), 25, -1, this_proj -> modelgl -> cell_win -> slab_out,
                                                    G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[3]), FALSE, FALSE, 0);
 
   hbox = create_hbox (0);
@@ -681,21 +681,21 @@ GtkWidget * cut_in_model (project * this_proj)
   GtkWidget * hox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hox, FALSE, FALSE, 0);
   GtkWidget * combo = create_combo ();
-  gchar * type[3] = {"Parallelepiped", "Cylinder", "Sphere"};
-  for (i=0; i<3; i++) combo_text_append (combo, type[i]);
+  gchar * type[3] = {i18n("Parallelepiped"), i18n("Cylinder"), i18n("Sphere")};
+  for (i=0; i<3; i++) combo_text_append (combo, _(type[i]));
   combo_set_active (combo, this_proj -> modelgl -> cell_win -> slab_type);
   g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_slab_type), this_proj);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, markup_label("- Shape of the slab: ", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, markup_label(_("- Shape of the slab: "), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, combo, FALSE, FALSE, 5);
 
   // Passivation
   hox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hox, FALSE, FALSE, 100);
-  GtkWidget * but = check_button ("Passivate surface", -1, -1, this_proj -> modelgl -> cell_win -> slab_passivate,
-                                 G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[4]);
+  GtkWidget * but = check_button (_("Passivate surface"), -1, -1, this_proj -> modelgl -> cell_win -> slab_passivate,
+                                  G_CALLBACK(set_slab_property), & this_proj -> modelgl -> cell_win -> slab_pointer[4]);
   // widget_set_sensitive (but, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, but, FALSE, FALSE, 20);
-  this_proj -> modelgl -> cell_win -> passivate = create_button ("Options", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(setup_passivate), this_proj);
+  this_proj -> modelgl -> cell_win -> passivate = create_button (_("Options"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(setup_passivate), this_proj);
   widget_set_sensitive (this_proj -> modelgl -> cell_win -> passivate, this_proj -> modelgl -> cell_win -> slab_passivate);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hox, this_proj -> modelgl -> cell_win -> passivate, FALSE, FALSE, 0);
 
@@ -709,7 +709,7 @@ GtkWidget * cut_in_model (project * this_proj)
   {
     this_proj -> modelgl -> cell_win -> slab_hbox[i] = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, this_proj -> modelgl -> cell_win -> slab_opts, this_proj -> modelgl -> cell_win -> slab_hbox[i], FALSE, FALSE, 5);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_proj -> modelgl -> cell_win -> slab_hbox[i], markup_label("- Select option to tweak: ", 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_proj -> modelgl -> cell_win -> slab_hbox[i], markup_label(_("- Select option to tweak: "), 200, -1, 0.0, 0.5), FALSE, FALSE, 0);
     this_proj -> modelgl -> cell_win -> slab_param[i] = create_slab_param_combo (i, this_proj);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_proj -> modelgl -> cell_win -> slab_hbox[i], this_proj -> modelgl -> cell_win -> slab_param[i], FALSE, FALSE, 5);
   }
@@ -723,10 +723,10 @@ GtkWidget * cut_in_model (project * this_proj)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, vbox, FALSE, FALSE, 40);
   GtkWidget * vvbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 20);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label("<u>Slab information:</u>", -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, markup_label(_("<u>Slab information:</u>"), -1, -1, 0.0, 0.5), FALSE, FALSE, 10);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("- Opacity: ", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("- Opacity: "), 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_hscale (0.0, 1.0, 0.01, this_proj -> modelgl -> cell_win -> slab_alpha, GTK_POS_LEFT, 2, 150,
                                             G_CALLBACK(set_slab_alpha), G_CALLBACK(scroll_set_slab_alpha), this_proj -> modelgl), FALSE, FALSE, 10);
   this_proj -> modelgl -> cell_win -> slab_info_box = create_vbox (BSEP);
@@ -735,9 +735,9 @@ GtkWidget * cut_in_model (project * this_proj)
 
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, box, hbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Select atom(s) in this slab !", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(select_this_slab), this_proj), FALSE, FALSE, 100);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<b>or</b>", 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button ("Cut this slab now !", IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cut_this_slab), this_proj), FALSE, FALSE, 30);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button (_("Select atom(s) in this slab !"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(select_this_slab), this_proj), FALSE, FALSE, 100);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>or</b>"), 100, -1, 0.0, 0.5), FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button (_("Cut this slab now !"), IMG_NONE, NULL, 100, -1, GTK_RELIEF_NORMAL, G_CALLBACK(cut_this_slab), this_proj), FALSE, FALSE, 30);
 
   show_the_widgets (layout);
   return layout;

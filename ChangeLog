@@ -1,23 +1,50 @@
+2026-06-10 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+         Release of version 1.3.0
+         * New features:
+		New code structure to facilitate the use of the 2D graph system
+		New 'analysis' data structure
+		New version and structure of the projet file
+		New OpenGL shaders for ray tracing rendering
+		Image rendering from the command line
+		Error backtrace for reading and saving atomes files (apf and awf)
+		Internationalisation (Fr + En): atomes interface is now translatable
+         * Improvements:
+		Improved command line parsing and capabilities
+		OpenGL tilted font rendering improvement
+		New pango markup instructions for 2D graph and 3D text
+		Improvement memory management when searching for molecules
+         * Bug corrections:
+		OpenGL shaders lightning bug correction 'w_advanced.c'
+		Curve draw order 'tab-2.c'
+		Spinning and closing project 'w_spiner.c' / 'close_p.c'
+		Chain statistics 'chainscall.c'
+		Chain statistics calc menu 'calc_menu.c' 
+		DL-POLY field match for vdW potentials 'dlp_ff_match.c'
+		Many, many, others
+         * Extra:
+		New LibreOffice extension
+		Improved developer documentation with examples
+
 2025-09-30 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.2.1
          * Bug corrections:
-	        Linux package fix
-	        Windows bug fix to read preferences file 'preferences.c'
+		Linux package fix
+		Windows bug fix to read preferences file 'preferences.c'
 
 2025-09-05 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.2.0
          * New features:
-	        New user preferences window and associated features:
+		New user preferences window and associated features:
 		  - Set global user preferences
 		  - Save preferences in 'atomes.pml' configuration file
 		Gradient backgrounds
          * Improvements: 
-	        Reading of CIF files 'read_cif.c' 
+	  Reading of CIF files 'read_cif.c' 
 		  - better occupancy treatment
 		  - multiconfiguration CIF files
 		Representation window 'm_rep.c'
          * Bug corrections:
-	        Several issues fixed for advanced OpenGL rendering 'w_advance.c'
+		Several issues fixed for advanced OpenGL rendering 'w_advance.c'
 
 2025-05-15 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.18
@@ -30,13 +57,13 @@
 2025-02-20 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.17
          * Bug corrections:
-	 	OpenGL window shortcuts bug correction 'glwindow.c'
+		OpenGL window shortcuts bug correction 'glwindow.c'
 		OpenGL window, GTK3 menu bar fix 'glwindow.c', 'm_atoms.c'
 		OpenGL window contextual menu fix 'popup.c'
 		Crystal building, few minor bug corrections and code cleaning 'cbuild_action.c'
 		Supercell: bug fix to restore coordination and polyhedra data 'cell_super.c'
          * Improvement:
-	 	Distance matrix calculation 'dmtx.F90' minor adjustments and improvements
+		Distance matrix calculation 'dmtx.F90' minor adjustments and improvements
 
 2024-12-18 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.16
@@ -53,14 +80,14 @@
 		OpenGL testing utility implemented at startup
 		Shorcuts information dialog for all windows with shorcuts 
 		GTK4 forward transition code wide
-		MacOS beta version
+	 	MacOS beta version
 
 2024-03-20 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.14
          * Bug corrections:
-	 	X-rays g(r): 'CHEM_X' parameter was 0.0
+		X-rays g(r): 'CHEM_X' parameter was 0.0
          * Improvements:
-	 	Option to build model from CIF file using symmetry positions when available 'read_cif.c'
+		Option to build model from CIF file using symmetry positions when available 'read_cif.c'
 		Object(s) can be used to fill CIF file unknown positions 'read_cif.c' and 'cbuild_action.c'
 		Distance matrix calculation 'dmtx.F90' minor adjustments and improvements
 		Improvement of the automatic evaluation of the OpenGL model depth 'bonds.F90'
@@ -71,11 +98,11 @@
 2024-02-28 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.1.13
          * Bug corrections:
-	 	Surface passivation: 'cell_cut.c' and 'atom_action.c'
-	 	Atomic object managment: 'src/opengl/edit/atom_*.c'
+		Surface passivation: 'cell_cut.c' and 'atom_action.c'
+		Atomic object managment: 'src/opengl/edit/atom_*.c'
 		Atom search window: 'w_search.c'
          * Improvements:
-	 	Handling unknown chemical species when reading coordinates files
+		Handling unknown chemical species when reading coordinates files
 		Keyboard shortcuts added for styles and selection modes for the OpenGL window 
 		Re-compute bonding properties of edition with the model edition window
 
@@ -95,9 +122,9 @@
 			Periodic table focus on mouse motion fixed: 'w_periodic.c'
 			OpenGL window main menu and contextual menus corrections
          * Improvements:
-	 	Massive code cleaning
+		Massive code cleaning
 		Massive addition of comments in the C sources
-	 	Code cleaning to remove older APF version compatibilities on open project
+		Code cleaning to remove older APF version compatibilities on open project
 		File associations added for standards atomic coordinates file formats
 		BASH completion adapted accordingly
 		Separate 'Makefile.am' for architecture independent data

@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId=4DA2F2FC-AD2D-414A-8197-0DD52F1593D2
 AppName=atomes
-AppVerName=atomes 1.2.1
+AppVerName=atomes 1.3.0
 AppPublisher=CNRS
 AppPublisherURL=https://atomes.ipcms.fr/
 AppSupportURL=https://atomes.ipcms.fr/
@@ -51,7 +51,7 @@ begin
   patch := 0;
   while (maj <= 1) do
   begin
-    while (min <= 2) do
+    while (min <= 3) do
     begin
       while (patch <= 18) do
       begin
@@ -72,15 +72,15 @@ end;
 
 [Registry]
 Root: HKLM; Subkey: "Software\IPCMS\ATOMES"; Flags: uninsdeletekeyifempty
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.2.1"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Version"; ValueData: "1.2.1"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.3.0"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Path"; ValueData: "{app}\bin"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Version"; ValueData: "1.3.0"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\IPCMS\ATOMES"; Flags: uninsdeletekeyifempty
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.2.1"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Version"; ValueData: "1.2.1"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Name"; ValueData: "atomes"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.2.1"; ValueType: string; ValueName: "Company"; ValueData: "Institut de Physique et Chimie des Matériaux de Strasbourg"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.3.0"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Path"; ValueData: "{app}\bin"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Version"; ValueData: "1.3.0"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Name"; ValueData: "atomes"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\IPCMS\ATOMES\1.3.0"; ValueType: string; ValueName: "Company"; ValueData: "Institut de Physique et Chimie des Matériaux de Strasbourg"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\.awf\OpenWithProgids"; ValueType: string; ValueName: "atomesWorkspaceFile.awf"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\atomesWorkspaceFile.awf"; ValueType: string; ValueName: ""; ValueData: "atomes Workspace File"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\atomesWorkspaceFile.awf\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "atomes-workspace.ico"; Flags: uninsdeletekey
@@ -131,7 +131,7 @@ Root: HKA; Subkey: "Software\Classes\atomesAtomicCoord-HIST"; ValueType: string;
 Root: HKA; Subkey: "Software\Classes\atomesAtomicCoord-HIST\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "atomes-coordinates.ico"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\atomesAtomicCoord-HIST\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\bin\atomes.exe"" ""%1"""
 Root: HKA; Subkey: "Software\Classes\Applications\atomes.exe\SupportedTypes"; ValueType: string; ValueName: ".hist"; ValueData: ""; Flags: uninsdeletekey
-Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\"; ValueType: string; ValueName: "Path"; ValueData: "{reg:HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment\,Path};{app}"
+Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\"; ValueType: string; ValueName: "Path"; ValueData: "{reg:HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment\,Path};{app}\bin"
 
 
 [Code]
@@ -168,6 +168,7 @@ Source: "atomes\etc\*"; DestDir: "{app}\etc\"; Components: main; Flags: ignoreve
 Source: "atomes\lib\*"; DestDir: "{app}\lib\"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "atomes\share\*"; DestDir: "{app}\share\"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "atomes\var\*";  DestDir: "{app}\var\"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "atomes\locale\*";  DestDir: "{app}\locale\"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "atomes.ico"; DestDir: "{app}"; Components: main; Flags: ignoreversion
 Source: "setup.ico"; DestDir: "{app}"; Components: main; Flags: ignoreversion
 Source: "atomes-workspace.ico"; DestDir: "{app}"; Components: main; Flags: ignoreversion

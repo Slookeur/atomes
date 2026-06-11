@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file m_rep.c
@@ -73,7 +73,7 @@ extern G_MODULE_EXPORT void set_full_screen (GSimpleAction * action, GVariant * 
 extern G_MODULE_EXPORT void set_full_screen (GtkWidget * widg, gpointer data);
 #endif
 
-gchar * text_reps[OGL_REPS] = {"Orthographic", "Perspective"};
+gchar * text_reps[OGL_REPS] = {i18n("Orthographic"), i18n("Perspective")};
 
 /*!
   \fn void update_labels (glwin * view)
@@ -245,7 +245,7 @@ G_MODULE_EXPORT void reset_view (GtkButton * but, gpointer data)
     glwin * view = (glwin *)data;
     i = view -> mode;
     view -> mode = ANALYZE;
-    init_camera (get_project_by_id(view -> proj), FALSE);
+    init_camera (get_project_by_id(view -> proj));
     view -> mode = i;
     update_labels (view);
     update (view);
@@ -376,6 +376,7 @@ G_MODULE_EXPORT void set_rep_combo (GtkComboBox * box, gpointer data)
     view = (glwin *)data;
     the_rep = view -> rep_win;
     view -> anim -> last -> img -> rep = rep;
+    update (view);
   }
   int i;
   for (i=1; i<3; i++)
@@ -423,9 +424,9 @@ G_MODULE_EXPORT void set_projection_combo (GtkComboBox * box, gpointer data)
 */
 G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
 {
-  gchar * cam_opts[7]={"Zoom", "<b>P</b>erspective depth", "<b>C</b>amera depth",
-                       "Camera pitch", "Camera heading",
-                       "Camera right/left", "Camera up/down"};
+  gchar * cam_opts[7]={_("Zoom"), _("<b>P</b>erspective depth"), _("<b>C</b>amera depth"),
+                       _("Camera pitch"), _("Camera heading"),
+                       _("Camera right/left"), _("Camera up/down")};
   gchar * str;
   double smax[7] = {1.0, 100.0, 100.0, 180.0, 180.0, 100.0, 100.0};
   double smin[7] = {-2.0, 0.0, 0.0, -180.0, -180.0, -100.0, -100.0};
@@ -465,7 +466,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     {
       view -> rep_win =  g_malloc0(sizeof*view -> rep_win);
       the_rep = view -> rep_win;
-      str = g_strdup_printf ("%s - OpenGL camera set-up", get_project_by_id(view -> proj)->name);
+      str = g_strdup_printf (_("%s - OpenGL scene set-up"), get_project_by_id(view -> proj)->name);
       the_rep -> win =  create_win (str, view -> win, FALSE, FALSE);
       g_free (str);
       add_container_child (CONTAINER_WIN, the_rep -> win, vbox);
@@ -474,7 +475,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
   }
   if (build_win)
   {
-    adv_box (vbox, "<b>Projection</b>", 10, 120, 0.0);
+    adv_box (vbox, _("<b>Projection</b>"), 10, 120, 0.0);
     if (preferences)
     {
       phbox = create_hbox (BSEP);
@@ -482,8 +483,8 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
       pvbox = create_vbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
     }
-    gchar * projection[6]={"Right [1, 0, 0]", "Left [-1, 0, 0]", "Top [0, 1, 0]", "Bottom [0, -1, 0]", "Front [0, 0, 1]", "Back [0, 0, -1]"};
-    hbox = abox ((preferences) ? pvbox : vbox, "Select", 0);
+    gchar * projection[6]={_("Right [1, 0, 0]"), _("Left [-1, 0, 0]"), _("Top [0, 1, 0]"), _("Bottom [0, -1, 0]"), _("Front [0, 0, 1]"), _("Back [0, 0, -1]")};
+    hbox = abox ((preferences) ? pvbox : vbox, _("Select"), 0);
     GtkWidget * combo = create_combo ();
     combo = create_combo ();
     for (i=0; i<6; i++) combo_text_append (combo, projection[i]);
@@ -492,7 +493,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_projection_combo), (preferences) ? NULL : view);
 
-    adv_box (vbox, "<b>Representation</b>", 10, 120, 0.0);
+    adv_box (vbox, _("<b>Representation</b>"), 10, 120, 0.0);
     if (preferences)
     {
       phbox = create_hbox (BSEP);
@@ -500,16 +501,16 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
       pvbox = create_vbox (BSEP);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, phbox, pvbox, FALSE, FALSE, 30);
     }
-    hbox = abox ((preferences) ? pvbox : vbox, "Mode", 0);
+    hbox = abox ((preferences) ? pvbox : vbox, _("Mode"), 0);
 
     combo = create_combo ();
-    for (i=0; i<OGL_REPS; i++) combo_text_append (combo, text_reps[i]);
+    for (i=0; i<OGL_REPS; i++) combo_text_append (combo, _(text_reps[i]));
     combo_set_active (combo, rep);
     gtk_widget_set_size_request (combo, 150, -1);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo, FALSE, FALSE, 10);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK(set_rep_combo), (preferences) ? NULL : view);
 
-    adv_box (vbox, "<b>OpenGL camera set-up</b>", 10, 120, 0.0);
+    adv_box (vbox, _("<b>OpenGL camera set-up</b>"), 10, 120, 0.0);
     if (preferences)
     {
       phbox = create_hbox (BSEP);
@@ -553,20 +554,20 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
             break;
         }
         if (the_rep -> camera_widg[i]) the_rep -> camera_widg[i] = destroy_this_widget (the_rep -> camera_widg[i]);
-        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 10000.0 : smax[i];
+        v_max = (i == 1) ? max_depth : (preferences && i == 2) ? 1000.0 : smax[i];
         the_rep -> camera_widg[i] = spin_button (G_CALLBACK(set_camera_spin), v, smin[i], v_max, sdel[i], sdig[i], 150, (preferences) ? & pref_pointer[i] : & view -> colorp[i][0]);
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, the_rep -> camera_widg[i], FALSE, FALSE, 10);
         if (i > 2 || i == 0)
         {
-          str = g_strdup_printf ("in [%.1f, %.1f]", smin[i], smax[i]);
+          str = g_strdup_printf ("&#x2208; [%.1f, %.1f]", smin[i], smax[i]);
         }
         else if (i == 1)
         {
-          str = g_strdup_printf ("in [<b>C</b>. depth, %.1f]", max_depth);
+          str = g_strdup_printf (_("&#x2208; [<b>C</b>. depth, %.1f]"), max_depth);
         }
         else
         {
-          str = (preferences) ? g_strdup_printf ("in [%.1f, <b>P</b>. depth<sup>*</sup>]", smin[i]) : g_strdup_printf ("in [%.1f, <b>P</b>. depth]", smin[i]);
+          str = (preferences) ? g_strdup_printf (_("&#x2208; [%.1f, <b>P</b>. depth<sup>*</sup>]"), smin[i]) : g_strdup_printf (_("&#x2208; [%.1f, <b>P</b>. depth]"), smin[i]);
         }
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 25, -1, 0.0, 0.5), FALSE, FALSE, 5);
         g_free (str);
@@ -575,7 +576,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     }
     hbox = create_hbox(0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? "Reset" : "Reset view", IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, create_button((preferences) ? _("Reset") : _("Reset View"), IMG_NONE, NULL, 100, 25, GTK_RELIEF_NORMAL, G_CALLBACK(reset_view), view), FALSE, FALSE, 200);
     if (! preferences)
     {
       add_gtk_close_event (the_rep -> win, G_CALLBACK(on_rep_delete), view);
@@ -583,7 +584,7 @@ G_MODULE_EXPORT void representation_advanced (GtkWidget * widg, gpointer data)
     }
     else
     {
-      append_comments (the_rep -> win, "<sup>*</sup>", "Perspective depth evaluated from the model");
+      append_comments (the_rep -> win, "<sup>*</sup>", _("Perspective depth evaluated from the model"));
     }
   }
 }
@@ -659,14 +660,14 @@ GtkWidget * menu_rep (glwin * view, int id)
   {
     for (i=0; i<OGL_REPS; i++)
     {
-      view -> ogl_rep[i] = gtk3_menu_item (menur, text_reps[i], IMG_NONE, NULL, G_CALLBACK(set_rep), & view -> colorp[i][0], FALSE, 0, 0, TRUE, TRUE, (i == j) ? TRUE : FALSE);
+      view -> ogl_rep[i] = gtk3_menu_item (menur, _(text_reps[i]), IMG_NONE, NULL, G_CALLBACK(set_rep), & view -> colorp[i][0], FALSE, 0, 0, TRUE, TRUE, (i == j) ? TRUE : FALSE);
     }
   }
   else
   {
     for (i=0; i<OGL_REPS; i++)
     {
-      gtk3_menu_item (menur, text_reps[i], IMG_NONE, NULL, G_CALLBACK(set_rep), & view -> colorp[i][0], FALSE, 0, 0, TRUE, TRUE, (i == j) ? TRUE : FALSE);
+      gtk3_menu_item (menur, _(text_reps[i]), IMG_NONE, NULL, G_CALLBACK(set_rep), & view -> colorp[i][0], FALSE, 0, 0, TRUE, TRUE, (i == j) ? TRUE : FALSE);
     }
   }
   add_advanced_item (menur, G_CALLBACK(representation_advanced), (gpointer)view, FALSE, 0, 0);
@@ -746,9 +747,9 @@ GMenu * menu_rep (glwin * view, int popm)
   i = view -> anim -> last -> img -> rep;
   for (j=0; j<OGL_REPS; j++)
   {
-    append_opengl_item (view, menu, text_reps[j], "rep", popm, j, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(change_rep_radio), (gpointer)view, FALSE, (i == j) ? TRUE : FALSE, TRUE, TRUE);
+    append_opengl_item (view, menu, _(text_reps[j]), "rep", popm, j, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(change_rep_radio), (gpointer)view, FALSE, (i == j) ? TRUE : FALSE, TRUE, TRUE);
   }
-  append_opengl_item (view, menu, "Advanced", "rep-adv", popm, j, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_rep_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Advanced"), "rep-adv", popm, j, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_rep_advanced), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -777,8 +778,8 @@ G_MODULE_EXPORT void to_center_molecule (GSimpleAction * action, GVariant * para
 GMenu * menu_reset (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Reset view", "reset-view", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
-  append_opengl_item (view, menu, "Center molecule", "center-mol", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_center_molecule), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Reset View"), "reset-view", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_reset_view), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Center Molecule"), "center-mol", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_center_molecule), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -793,7 +794,7 @@ GMenu * menu_reset (glwin * view, int popm)
 GMenu * menu_fullscreen (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "Fullscreen", "full", popm, popm, "<CTRL>F", IMG_STOCK, (gpointer)FULLSCREEN, FALSE, G_CALLBACK(set_full_screen), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Fullscreen"), "full", popm, popm, "<CTRL>F", IMG_STOCK, (gpointer)FULLSCREEN, FALSE, G_CALLBACK(set_full_screen), (gpointer)view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 
@@ -808,9 +809,9 @@ GMenu * menu_fullscreen (glwin * view, int popm)
 GMenu * menu_view (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_submenu (menu, "Representation", menu_rep(view, popm));
-  append_submenu (menu, "Projection", menu_proj(view, popm));
-  append_submenu (menu, "Background", menu_back(view, popm));
+  append_submenu (menu, _("Representation"), menu_rep(view, popm));
+  append_submenu (menu, _("Projection"), menu_proj(view, popm));
+  append_submenu (menu, _("Background"), menu_back(view, popm));
   if (get_project_by_id(view -> proj) -> nspec) g_menu_append_item (menu, menu_box_axis (view, popm, 1));
   if (! popm)
   {

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file tab-1.c
@@ -79,20 +79,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "callbacks.h"
 #include "project.h"
 #include "curve.h"
-#include "cedit.h"
 
 extern void set_data_style (gpointer data);
 
-GtkWidget * title_box = NULL;
-GtkWidget * frame[11];
-GtkWidget * frame_box = NULL;
-GtkWidget * frame_style_area = NULL;
-GtkWidget * frame_pix_box = NULL;
-char * ctext[2];
-qint dataxe[2];
-qint framxe[4];
-GtkWidget * custom_title = NULL;
-int a, b, c, d;
+char * ctext[2] = {"x &#x2208; [0.0, 1.0]", "y &#x2208; [0.0, 1.0]"};
 
 /*!
   \fn G_MODULE_EXPORT void set_window_size (GtkEntry * maj, gpointer data)
@@ -108,36 +98,31 @@ G_MODULE_EXPORT void set_window_size (GtkEntry * maj, gpointer data)
   char * text[2];
   int i;
   qint * ad = (qint *)data;
-
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  d = ad -> d;
-  project * this_proj = get_project_by_id(a);
-  int shift = get_curve_shift (this_proj, b, c);
-  text[0] = "X size must be > 0";
-  text[1] = "Y size must be > 0";
+  Curve * this_curve = get_project_by_id (ad -> a) -> analysis[ad -> b] -> curves[ad -> c];
+  int shift = get_curve_shift (this_curve);
+  text[0] = i18n("X size must be > 0");
+  text[1] = i18n("Y size must be > 0");
   m = entry_get_text (maj);
 
   i = string_to_double ((gpointer)m);
   if (i > 0)
   {
-    switch (d)
+    switch (ad -> d)
     {
       case 0:
-        resize_this_window (this_proj -> curves[b][c] -> window, i, this_proj -> curves[b][c] -> wsize[1] + shift);
+        resize_this_window (this_curve -> window, i, this_curve -> wsize[1] + shift);
         break;
       case 1:
-        resize_this_window (this_proj -> curves[b][c] -> window, this_proj -> curves[b][c] -> wsize[0], i + shift);
+        resize_this_window (this_curve -> window, this_curve -> wsize[0], i + shift);
         break;
     }
-    this_proj -> curves[b][c] -> wsize[d] = i;
+    this_curve -> wsize[ad -> d] = i;
   }
   else
   {
-    show_warning (text[d], this_proj -> curves[b][c] -> window);
+    show_warning (_(text[ad -> d]), this_curve -> window);
   }
-  update_entry_int (maj, this_proj -> curves[b][c] -> wsize[d]);
+  update_entry_int (maj, this_curve -> wsize[ad -> d]);
 }
 
 /*!
@@ -203,13 +188,9 @@ G_MODULE_EXPORT void set_title (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void set_title (GtkToggleButton * but, gpointer data)
 #endif
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> show_title = button_get_status ((GtkWidget *)but);
-  widget_set_sensitive (title_box, this_proj -> curves[b][c] -> show_title);
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> show_title = button_get_status ((GtkWidget *)but);
+  widget_set_sensitive (this_curve -> curve_edit -> title_box, this_curve -> show_title);
   update_curve (data);
 }
 
@@ -235,19 +216,15 @@ G_MODULE_EXPORT void set_title_default (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void set_title_default (GtkToggleButton * but, gpointer data)
 #endif
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> default_title = button_get_status ((GtkWidget *)but);
-  widget_set_sensitive (custom_title, ! this_proj -> curves[b][c] -> default_title);
-  if (this_proj -> curves[b][c] -> default_title)
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> default_title = button_get_status ((GtkWidget *)but);
+  widget_set_sensitive (this_curve -> curve_edit -> custom_title, ! this_curve -> default_title);
+  if (this_curve -> default_title)
   {
-    g_free (this_proj -> curves[b][c] -> title);
-    this_proj -> curves[b][c] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[b][c] -> name);
+    g_free (this_curve -> title);
+    this_curve -> title = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(((tint *)data) -> a) -> name), this_curve -> name);
   }
-  update_entry_text (GTK_ENTRY(custom_title), this_proj -> curves[b][c] -> title);
+  update_entry_text (GTK_ENTRY(this_curve -> curve_edit -> custom_title), this_curve -> title);
   update_curve (data);
 }
 
@@ -261,14 +238,10 @@ G_MODULE_EXPORT void set_title_default (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void set_title_custom (GtkEntry * tit, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  g_free (this_proj -> curves[b][c] -> title);
-  this_proj -> curves[b][c] -> title = g_strdup_printf ("%s", entry_get_text (tit));
-  update_entry_text (tit, this_proj -> curves[b][c] -> title);
+  Curve * this_curve = get_curve_from_pointer (data);
+  g_free (this_curve -> title);
+  this_curve -> title = g_strdup_printf ("%s", entry_get_text (tit));
+  update_entry_text (tit, this_curve -> title);
   update_curve (data);
 }
 
@@ -282,13 +255,9 @@ G_MODULE_EXPORT void set_title_custom (GtkEntry * tit, gpointer data)
 */
 G_MODULE_EXPORT void set_title_font (GtkFontButton * fontb, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  g_free (this_proj -> curves[b][c] -> title_font);
-  this_proj -> curves[b][c] -> title_font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
+  Curve * this_curve = get_curve_from_pointer (data);
+  g_free (this_curve -> title_font);
+  this_curve -> title_font = g_strdup_printf ("%s", gtk_font_chooser_get_font (GTK_FONT_CHOOSER(fontb)));
   update_curve (data);
 }
 
@@ -302,12 +271,7 @@ G_MODULE_EXPORT void set_title_font (GtkFontButton * fontb, gpointer data)
 */
 G_MODULE_EXPORT void set_title_color (GtkColorChooser * colob, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> title_color = get_button_color (colob);
+  get_curve_from_pointer (data) -> title_color = get_button_color (colob);
   update_curve (data);
 }
 
@@ -325,25 +289,22 @@ G_MODULE_EXPORT void set_title_pos (GtkEntry * entry, gpointer data)
   double v;
   qint * ad = (qint *)data;
   tint cd;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  d = ad -> d;
-  project * this_proj = get_project_by_id(a);
+  cd.a = ad -> a;
+  cd.b = ad -> b;
+  cd.c = ad -> c;
+  Curve * this_curve = get_curve_from_pointer ((gpointer)& cd);
   p = entry_get_text (entry);
   v = string_to_double ((gpointer)p);
   if (v >= 0.0 && v <= 1.0)
   {
-    this_proj -> curves[b][c] -> title_pos[d] = v;
+    this_curve -> title_pos[ad -> d] = v;
   }
   else
   {
-    show_warning (ctext[ad -> d], this_proj -> curves[b][c] -> window);
+    show_warning (ctext[ad -> d], this_curve -> window);
   }
-  update_entry_double (entry, this_proj -> curves[b][c] -> title_pos[d]);
-  cd.a = ad -> a;
-  cd.b = ad -> b;
-  cd.c = ad -> c;
+  update_entry_double (entry, this_curve -> title_pos[ad -> d]);
+
   update_curve ((gpointer)& cd);
 }
 
@@ -357,27 +318,23 @@ G_MODULE_EXPORT void set_title_pos (GtkEntry * entry, gpointer data)
 void set_frame_style (gpointer data)
 {
   cairo_surface_t * surf;
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  surf = draw_frame_surface (this_proj -> curves[b][c] -> frame_type,
-                             this_proj -> curves[b][c] -> frame_dash,
-                             this_proj -> curves[b][c] -> frame_thickness,
-                             this_proj -> curves[b][c] -> frame_pos[0],
-                             this_proj -> curves[b][c] -> frame_pos[1],
-                             this_proj -> curves[b][c] -> frame_color,
-                             this_proj -> curves[b][c] -> backcolor);
-  frame_style_area = destroy_this_widget (frame_style_area);
-  frame_style_area = create_image_from_data (IMG_SURFACE, (gpointer)surf);
+  Curve * this_curve = get_curve_from_pointer (data);
+  surf = draw_frame_surface (this_curve -> frame_type,
+                             this_curve -> frame_dash,
+                             this_curve -> frame_thickness,
+                             this_curve -> frame_pos[0],
+                             this_curve -> frame_pos[1],
+                             this_curve -> frame_color,
+                             this_curve -> backcolor);
+  this_curve -> curve_edit -> frame_style_area = destroy_this_widget (this_curve -> curve_edit -> frame_style_area);
+  this_curve -> curve_edit -> frame_style_area = create_image_from_data (IMG_SURFACE, (gpointer)surf);
   cairo_surface_destroy (surf);
-  widget_set_sensitive (frame_style_area, this_proj -> curves[b][c] -> show_frame);
-  show_the_widgets (frame_style_area);
+  widget_set_sensitive (this_curve -> curve_edit -> frame_style_area, this_curve -> show_frame);
+  show_the_widgets (this_curve -> curve_edit -> frame_style_area);
 #ifdef GTK4
-  gtk_widget_set_hexpand (frame_style_area, TRUE);
+  gtk_widget_set_hexpand (this_curve -> curve_edit -> frame_style_area, TRUE);
 #endif
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, frame_pix_box, frame_style_area, TRUE, TRUE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, this_curve -> curve_edit -> frame_pix_box, this_curve -> curve_edit -> frame_style_area, TRUE, TRUE, 20);
   update_curve (data);
 }
 
@@ -403,13 +360,9 @@ G_MODULE_EXPORT void set_show_frame (GtkCheckButton * but, gpointer data)
 G_MODULE_EXPORT void set_show_frame (GtkToggleButton * but, gpointer data)
 #endif
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> show_frame = button_get_status ((GtkWidget *)but);
-  widget_set_sensitive (frame_box, this_proj -> curves[b][c] -> show_frame);
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> show_frame = button_get_status ((GtkWidget *)but);
+  widget_set_sensitive (this_curve -> curve_edit -> frame_box, this_curve -> show_frame);
   update_curve (data);
 }
 
@@ -423,12 +376,7 @@ G_MODULE_EXPORT void set_show_frame (GtkToggleButton * but, gpointer data)
 */
 G_MODULE_EXPORT void set_background_color (GtkColorChooser * colob, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> backcolor = get_button_color (colob);
+  get_curve_from_pointer (data) -> backcolor = get_button_color (colob);
   set_data_style (data);
 }
 
@@ -442,11 +390,7 @@ G_MODULE_EXPORT void set_background_color (GtkColorChooser * colob, gpointer dat
 */
 G_MODULE_EXPORT void set_frame_type (GtkComboBox * fbox, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_type = combo_get_active ((GtkWidget *)fbox);
+  get_curve_from_pointer (data) -> frame_type = combo_get_active ((GtkWidget *)fbox);
   set_frame_style (data);
 }
 
@@ -460,11 +404,7 @@ G_MODULE_EXPORT void set_frame_type (GtkComboBox * fbox, gpointer data)
 */
 G_MODULE_EXPORT void set_frame_line (GtkComboBox * fbox, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  get_project_by_id(a) -> curves[b][c] -> frame_dash = combo_get_active ((GtkWidget *)fbox) + 1;
+  get_curve_from_pointer (data) -> frame_dash = combo_get_active ((GtkWidget *)fbox) + 1;
   set_frame_style (data);
 }
 
@@ -479,14 +419,10 @@ G_MODULE_EXPORT void set_frame_line (GtkComboBox * fbox, gpointer data)
 G_MODULE_EXPORT void set_frame_thickness (GtkEntry * entry, gpointer data)
 {
   const gchar * str;
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
   str = entry_get_text (entry);
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> frame_thickness = string_to_double ((gpointer)str);
-  update_entry_double (entry, this_proj -> curves[b][c] -> frame_thickness);
+  Curve * this_curve = get_curve_from_pointer (data);
+  this_curve -> frame_thickness = string_to_double ((gpointer)str);
+  update_entry_double (entry, this_curve -> frame_thickness);
   set_frame_style (data);
 }
 
@@ -500,12 +436,7 @@ G_MODULE_EXPORT void set_frame_thickness (GtkEntry * entry, gpointer data)
 */
 G_MODULE_EXPORT void set_frame_color (GtkColorChooser * colob, gpointer data)
 {
-  tint * ad = (tint *)data;
-  a = ad -> a;
-  b = ad -> b;
-  c = ad -> c;
-  project * this_proj = get_project_by_id(a);
-  this_proj -> curves[b][c] -> frame_color = get_button_color (colob);
+  get_curve_from_pointer (data) -> frame_color = get_button_color (colob);
   set_frame_style (data);
 }
 
@@ -523,80 +454,77 @@ G_MODULE_EXPORT void set_frame_pos (GtkEntry * fen, gpointer data)
   int k;
   const gchar * m;
   double z;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  d = cd -> d;
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (data);
   m = entry_get_text (fen);
-  z= string_to_double ((gpointer)m);
-  if (d < 2)
+  z = string_to_double ((gpointer)m);
+  if (cd -> d < 2)
   {
-    if (d == 0)
+    if (cd -> d == 0)
     {
       k = 0;
-      if (z < this_proj -> curves[b][c] -> frame_pos[0][1])
+      if (z < this_curve -> frame_pos[0][1])
       {
-        this_proj -> curves[b][c] -> frame_pos[0][0] = z;
+        this_curve -> frame_pos[0][0] = z;
       }
       else
       {
-        show_warning ("Frame x min must be < to frame x max", this_proj -> curves[b][c] -> window);
+        show_warning (_("Frame x min must be < to frame x max"), this_curve -> window);
       }
     }
-    else if (d == 1)
+    else if (cd -> d == 1)
     {
       k = 1;
-      if (z > this_proj -> curves[b][c] -> frame_pos[0][0])
+      if (z > this_curve -> frame_pos[0][0])
       {
-        this_proj -> curves[b][c] -> frame_pos[0][1] = z;
+        this_curve -> frame_pos[0][1] = z;
       }
       else
       {
-        show_warning ("Frame x max must be > to frame x min", this_proj -> curves[b][c] -> window);
+        show_warning (_("Frame x max must be > to frame x min"), this_curve -> window);
       }
     }
-    update_entry_double (fen, this_proj -> curves[b][c] -> frame_pos[0][k]);
+    update_entry_double (fen, this_curve -> frame_pos[0][k]);
   }
   else
   {
-    if (d == 2)
+    if (cd -> d == 2)
     {
       k = 0;
-      if (z > this_proj -> curves[b][c] -> frame_pos[1][1])
+      if (z > this_curve -> frame_pos[1][1])
       {
-        this_proj -> curves[b][c] -> frame_pos[1][0] = z;
+        this_curve -> frame_pos[1][0] = z;
       }
       else
       {
-        show_warning ("Frame y min must be > to frame y max", this_proj -> curves[b][c] -> window);
+        show_warning (_("Frame y min must be > to frame y max"), this_curve -> window);
       }
     }
     else
     {
       k = 1;
-      if (z < this_proj -> curves[b][c] -> frame_pos[1][0])
+      if (z < this_curve -> frame_pos[1][0])
       {
-        this_proj -> curves[b][c] -> frame_pos[1][1] = z;
+        this_curve -> frame_pos[1][1] = z;
       }
       else
       {
-        show_warning ("Frame y max must be < to frame y min", this_proj -> curves[b][c] -> window);
+        show_warning (_("Frame y max must be < to frame y min"), this_curve -> window);
       }
     }
-    update_entry_double (fen, this_proj -> curves[b][c] -> frame_pos[1][k]);
+    update_entry_double (fen, this_curve -> frame_pos[1][k]);
   }
   set_frame_style (data);
 }
 
 /*!
-  \fn GtkWidget * create_tab_1 (gpointer data)
+  \fn GtkWidget * create_tab_1 (curve_edition * cedit, gpointer data)
 
   \brief handle the creation of the 1st tab of the curve edition dialog
 
+  \param cedit the target curve_edition pointer
   \param data the associated data pointer
 */
-GtkWidget * create_tab_1 (gpointer data)
+GtkWidget * create_tab_1 (curve_edition * cedit, gpointer data)
 {
   GtkWidget * graphbox;
   GtkWidget * fbox;
@@ -612,122 +540,112 @@ GtkWidget * create_tab_1 (gpointer data)
   gchar * axl[2];
   axl[0] = "x";
   axl[1] = "y";
-  gchar * ftb[5];
-  ftb[0] = "closed";
-  ftb[1] = "top open";
-  ftb[2] = "right open";
-  ftb[3] = "left open";
-  ftb[4] = "open";
+  gchar * ftb[5] = {i18n("Closed"), i18n("Top Open"), i18n("Right Open"), i18n("Left Open"), i18n("Open ")};
   int xlgt, ylgt;
   int i, j, k;
 
-  tint * cd = (tint *) data;
-  a = cd -> a;
-  b = cd -> b;
-  c = cd -> c;
-  project * this_proj = get_project_by_id(a);
+  Curve * this_curve = get_curve_from_pointer (data);
   // Axis related signals
   for ( i=0 ; i < 2 ; i++ )
   {
-    dataxe[i].a = a;
-    dataxe[i].b = b;
-    dataxe[i].c = c;
-    dataxe[i].d = i;
-    xyp[i] = create_entry (G_CALLBACK(set_window_size), 100, 10, FALSE, (gpointer)& dataxe[i]);
+    cedit -> dataxe[i].a = ((tint *)data) -> a;
+    cedit -> dataxe[i].b = ((tint *)data) -> b;
+    cedit -> dataxe[i].c = ((tint *)data) -> c;
+    cedit -> dataxe[i].d = i;
+    cedit -> xyp[i] = create_entry (G_CALLBACK(set_window_size), 100, 10, FALSE, (gpointer)& cedit -> dataxe[i]);
   }
   graphbox = create_vbox (BSEP);
   ghbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, ghbox, FALSE, FALSE, 15);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label("Size:", 50, 35, 1.0, 0.5), FALSE, FALSE, 20);
-  xlgt = get_widget_width (this_proj -> curves[b][c] -> plot);
-  ylgt = get_widget_height (this_proj -> curves[b][c] -> plot);
-  update_entry_int (GTK_ENTRY(xyp[0]), xlgt);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, xyp[0], FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label(_("Size:"), 50, 35, 1.0, 0.5), FALSE, FALSE, 20);
+  xlgt = get_widget_width (this_curve -> plot);
+  ylgt = get_widget_height (this_curve -> plot);
+  update_entry_int (GTK_ENTRY(cedit -> xyp[0]), xlgt);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, cedit -> xyp[0], FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label("x", -1, -1, 0.5, 0.5), FALSE, FALSE, 10);
-  update_entry_int (GTK_ENTRY(xyp[1]), ylgt);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, xyp[1], FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label("pixels", -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
+  update_entry_int (GTK_ENTRY(cedit -> xyp[1]), ylgt);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, cedit -> xyp[1], FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label(_("pixels"), -1, -1, 0.0, 0.5), FALSE, FALSE, 20);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox,
-                       check_button ("Insert title", -1, -1, this_proj -> curves[b][c] -> show_title, G_CALLBACK(set_title), data),
+                       check_button (_("Insert title"), -1, -1, this_curve -> show_title, G_CALLBACK(set_title), data),
                        FALSE, FALSE, 10);
 
-  title_box = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, title_box, FALSE, FALSE, 0);
-
+  cedit -> title_box = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, cedit -> title_box, FALSE, FALSE, 0);
   ghbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, title_box, ghbox, FALSE, FALSE, 2);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> title_box, ghbox, FALSE, FALSE, 2);
   gvbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, gvbox, FALSE, FALSE, 0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, gvbox,
-                       check_button ("Default title", 100, 35, this_proj -> curves[b][c] -> default_title, G_CALLBACK(set_title_default), data),
+                       check_button (_("Default title"), 100, 35, this_curve -> default_title, G_CALLBACK(set_title_default), data),
                        FALSE, FALSE, 40);
-  custom_title = create_entry (G_CALLBACK(set_title_custom), 200, 15, TRUE, data);
-  gtk_entry_set_alignment (GTK_ENTRY(custom_title), 0.0);
-  if (this_proj -> curves[b][c] -> show_title)
+  cedit -> custom_title = create_entry (G_CALLBACK(set_title_custom), 200, 15, TRUE, data);
+  gtk_entry_set_alignment (GTK_ENTRY(cedit -> custom_title), 0.0);
+  if (this_curve -> show_title)
   {
-    widget_set_sensitive (custom_title, ! this_proj -> curves[b][c] -> default_title);
+    widget_set_sensitive (cedit -> custom_title, ! this_curve -> default_title);
   }
   else
   {
-    widget_set_sensitive (custom_title, 0);
+    widget_set_sensitive (cedit -> custom_title, 0);
   }
-  update_entry_text (GTK_ENTRY(custom_title), this_proj -> curves[b][c] -> title);
-  add_box_child_end (gvbox, custom_title, FALSE, FALSE, 0);
+  update_entry_text (GTK_ENTRY(cedit -> custom_title), this_curve -> title);
+  add_box_child_end (gvbox, cedit -> custom_title, FALSE, FALSE, 0);
 
-  add_box_child_end (bbox (title_box, "Font:"),
-                     font_button (this_proj -> curves[b][c] -> title_font, 150, 35, G_CALLBACK(set_title_font), data),
+  add_box_child_end (bbox (cedit -> title_box, _("Font:")),
+                     font_button (this_curve -> title_font, 150, 35, G_CALLBACK(set_title_font), data),
                      FALSE, FALSE, 0);
 
-  add_box_child_end (bbox (title_box, "Color:"),
-                     color_button (this_proj -> curves[b][c] -> title_color, TRUE, 150, 30, G_CALLBACK(set_title_color), data),
+  add_box_child_end (bbox (cedit -> title_box, _("Color:")),
+                     color_button (this_curve -> title_color, TRUE, 150, 30, G_CALLBACK(set_title_color), data),
                      FALSE, FALSE, 0);
 
-  ghbox = bbox (title_box, "Position:");
+  ghbox = bbox (cedit -> title_box, _("Position:"));
   GtkWidget * txyc;
   for ( i=0 ; i < 2 ; i++ )
   {
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label(lapos[i], (i==0)?10:30, -1, 1.0, 0.5), FALSE, FALSE, 5);
-    txyc = create_entry (G_CALLBACK(set_title_pos), 100, 10, FALSE, (gpointer)& dataxe[i]);
-    update_entry_double (GTK_ENTRY(txyc), this_proj -> curves[b][c] -> title_pos[i]);
+    txyc = create_entry (G_CALLBACK(set_title_pos), 100, 10, FALSE, (gpointer)& cedit -> dataxe[i]);
+    update_entry_double (GTK_ENTRY(txyc), this_curve -> title_pos[i]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, txyc, FALSE, FALSE, 5);
   }
-  widget_set_sensitive (title_box, this_proj -> curves[b][c] -> show_title);
+  widget_set_sensitive (cedit -> title_box, this_curve -> show_title);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 10);
 
   ghbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, ghbox, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label("Background color:", 120, 30, 0.0, 0.5), FALSE, FALSE, 40);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, markup_label(_("Background color:"), 120, 30, 0.0, 0.5), FALSE, FALSE, 40);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox,
-                      color_button (this_proj -> curves[b][c] -> backcolor, TRUE, 100, -1, G_CALLBACK(set_background_color), data),
+                      color_button (this_curve -> backcolor, TRUE, 100, -1, G_CALLBACK(set_background_color), data),
                       FALSE, FALSE, 40);
 
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 10);
 
 // Frame
   add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox,
-                      check_button ("Show/hide frame", -1, -1, this_proj -> curves[b][c] -> show_frame, G_CALLBACK(set_show_frame), data),
-                      FALSE, FALSE, 10);
+                       check_button (_("Show/Hide frame"), -1, -1, this_curve -> show_frame, G_CALLBACK(set_show_frame), data),
+                       FALSE, FALSE, 10);
 
-  frame_box = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, frame_box, FALSE, FALSE, 0);
-  frame_pix_box = create_hbox (0);
+  cedit -> frame_box = create_vbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, graphbox, cedit -> frame_box, FALSE, FALSE, 0);
+  cedit -> frame_pix_box = create_hbox (0);
   frame_style_box = create_vbox (BSEP);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, frame_box, frame_pix_box, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, frame_pix_box, frame_style_box, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> frame_box, cedit -> frame_pix_box, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> frame_pix_box, frame_style_box, FALSE, FALSE, 0);
 
 // Frame style
   fbox = create_combo ();
   for (i=0; i<5; i++)
   {
-    combo_text_append (fbox, ftb[i]);
+    combo_text_append (fbox, _(ftb[i]));
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_type);
+  combo_set_active (fbox, this_curve -> frame_type);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_type), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Type:"), fbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, _("Type:")), fbox, FALSE, FALSE, 0);
 
 // Frame line style
   fbox = create_combo ();
@@ -736,61 +654,61 @@ GtkWidget * create_tab_1 (gpointer data)
      combo_text_append (fbox, g_strdup_printf("%d", i));
   }
   gtk_widget_set_size_request (fbox, 150, 30);
-  combo_set_active (fbox, this_proj -> curves[b][c] -> frame_dash - 1);
+  combo_set_active (fbox, this_curve -> frame_dash - 1);
   g_signal_connect (G_OBJECT(fbox), "changed", G_CALLBACK(set_frame_line), data);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Line style:"), fbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, _("Line style:")), fbox, FALSE, FALSE, 0);
 
 // Frame line width
   frame_thickness = create_entry (G_CALLBACK(set_frame_thickness), -1, 10, FALSE, data);
-  update_entry_double (GTK_ENTRY(frame_thickness), this_proj -> curves[b][c] -> frame_thickness);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Line width:"), frame_thickness, FALSE, FALSE, 0);
+  update_entry_double (GTK_ENTRY(frame_thickness), this_curve -> frame_thickness);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, _("Line width:")), frame_thickness, FALSE, FALSE, 0);
 
 // Frame color
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, "Color:"),
-                       color_button (this_proj -> curves[b][c] -> frame_color, TRUE, 150, 30, G_CALLBACK(set_frame_color), data),
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, bbox (frame_style_box, _("Color:")),
+                       color_button (this_curve -> frame_color, TRUE, 150, 30, G_CALLBACK(set_frame_color), data),
                        FALSE, FALSE, 0);
 
 // Frame pix
-  cairo_surface_t * frame = draw_frame_surface (this_proj -> curves[b][c] -> frame_type,
-                                                this_proj -> curves[b][c] -> frame_dash,
-                                                this_proj -> curves[b][c] -> frame_thickness,
-                                                this_proj -> curves[b][c] -> frame_pos[0],
-                                                this_proj -> curves[b][c] -> frame_pos[1],
-                                                this_proj -> curves[b][c] -> frame_color,
-                                                this_proj -> curves[b][c] -> backcolor);
-  frame_style_area = create_image_from_data (IMG_SURFACE, (gpointer)frame);
+  cairo_surface_t * frame = draw_frame_surface (this_curve -> frame_type,
+                                                this_curve -> frame_dash,
+                                                this_curve -> frame_thickness,
+                                                this_curve -> frame_pos[0],
+                                                this_curve -> frame_pos[1],
+                                                this_curve -> frame_color,
+                                                this_curve -> backcolor);
+  cedit -> frame_style_area = create_image_from_data (IMG_SURFACE, (gpointer)frame);
   cairo_surface_destroy (frame);
 
-  gtk_widget_set_size_request (frame_pix_box, -1, 150);
+  gtk_widget_set_size_request (cedit -> frame_pix_box, -1, 150);
 #ifdef GTK4
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, frame_pix_box, markup_label(" ", 20, -1, 0.0, 0.0), FALSE, FALSE, 0);
-  gtk_widget_set_hexpand (frame_style_area, TRUE);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> frame_pix_box, markup_label(" ", 20, -1, 0.0, 0.0), FALSE, FALSE, 0);
+  gtk_widget_set_hexpand (cedit -> frame_style_area, TRUE);
 #endif
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, frame_pix_box, frame_style_area, FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, cedit -> frame_pix_box, cedit -> frame_style_area, FALSE, FALSE, 20);
 
-  bbox (frame_box, "Position: ");
+  bbox (cedit -> frame_box, _("Position: "));
   GtkWidget * fxyc;
   k = -1;
   for (i=0; i<2; i++)
   {
     ghbox = create_hbox (0);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, frame_box, ghbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, cedit -> frame_box, ghbox, FALSE, FALSE, 0);
     for (j=0; j<2; j++)
     {
       k = k + 1;
-      framxe[k].a = a;
-      framxe[k].b = b;
-      framxe[k].c = c;
-      framxe[k].d = k;
+      cedit -> framxe[k].a = ((tint *)data) -> a;
+      cedit -> framxe[k].b = ((tint *)data) -> b;
+      cedit -> framxe[k].c = ((tint *)data) -> c;
+      cedit -> framxe[k].d = k;
       xyf = markup_label (g_strdup_printf ("%s %s: ",axl[i], str[j]), 70, -1, 1.0, 0.5);
-      widget_set_sensitive (xyf, this_proj -> curves[b][c] -> show_frame);
+      widget_set_sensitive (xyf, this_curve -> show_frame);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, xyf, FALSE, FALSE, 20);
-      fxyc = create_entry (G_CALLBACK(set_frame_pos), 100, 10, FALSE, (gpointer)& framxe[k]);
+      fxyc = create_entry (G_CALLBACK(set_frame_pos), 100, 10, FALSE, (gpointer)& cedit -> framxe[k]);
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, ghbox, fxyc, FALSE, FALSE, 0);
-      update_entry_double (GTK_ENTRY(fxyc), this_proj -> curves[b][c] -> frame_pos[i][j]);
+      update_entry_double (GTK_ENTRY(fxyc), this_curve -> frame_pos[i][j]);
     }
   }
 
-  widget_set_sensitive (frame_box, this_proj -> curves[b][c] -> show_frame);
+  widget_set_sensitive (cedit -> frame_box, this_curve -> show_frame);
   return graphbox;
 }

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file w_sequencer.c
@@ -69,7 +69,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 void set_player_title (glwin * view)
 {
   int step = view -> anim -> last -> img -> step + 1;
-  gchar * str = g_strdup_printf ("%s - player - step %d", prepare_for_title (get_project_by_id(view -> proj) -> name), step);
+  gchar * str = g_strdup_printf (_("%s - player - step %d"), prepare_for_title (get_project_by_id(view -> proj) -> name), step);
   gtk_window_set_title (GTK_WINDOW(view -> player -> win), str);
   g_free (str);
 }
@@ -260,11 +260,11 @@ G_MODULE_EXPORT void seq_go_to (GtkEntry * res, gpointer data)
 G_MODULE_EXPORT void seq_jump (GtkButton * but, gpointer data)
 {
   glwin * view = (glwin *) data;
-  GtkWidget * win = dialogmodal ("Enter a step number", GTK_WINDOW(view -> player -> win));
+  GtkWidget * win = dialogmodal (_("Enter a step number"), GTK_WINDOW(view -> player -> win));
   GtkWidget * vbox = dialog_get_content_area (win);
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, TRUE, TRUE, 0);
-  gchar * str = g_strdup_printf ("Step number [%d-%d]: ", 1, get_project_by_id(view -> proj) -> steps);
+  gchar * str = g_strdup_printf (_("Step number [%d-%d]: "), 1, get_project_by_id(view -> proj) -> steps);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new (str), TRUE, TRUE, 0);
   g_free (str);
   GtkWidget * step = create_entry (G_CALLBACK(seq_go_to), 100, 15, TRUE, (gpointer)view);
@@ -457,7 +457,7 @@ G_MODULE_EXPORT void window_sequencer (GtkWidget * widg, gpointer data)
   if (view -> player == NULL)
   {
     //p = view -> proj;
-    view -> player = g_malloc0 (sizeof*view -> player);
+    view -> player = g_malloc0(sizeof*view -> player);
     view -> player -> win = create_win (" ", view -> win, FALSE, FALSE);
     set_player_title (view);
     GtkWidget * vbox = create_vbox (BSEP);
@@ -466,38 +466,38 @@ G_MODULE_EXPORT void window_sequencer (GtkWidget * widg, gpointer data)
     GtkWidget * hboxa = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hboxa, TRUE, TRUE, 0);
     // First
-    view -> player -> first = create_button ("First", IMG_STOCK, MEDIA_FIRST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_first), view);
+    view -> player -> first = create_button (_("First"), IMG_STOCK, MEDIA_FIRST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_first), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, view -> player -> first, TRUE, TRUE, 0);
     // Previous
-    view -> player -> prev = create_button ("Previous", IMG_STOCK, MEDIA_PREV, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_previous), view);
+    view -> player -> prev = create_button (_("Previous"), IMG_STOCK, MEDIA_PREV, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_previous), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, view -> player -> prev, TRUE, TRUE, 0);
     // Next
-    view -> player -> next = create_button ("Next", IMG_STOCK, MEDIA_NEXT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_next), view);
+    view -> player -> next = create_button (_("Next"), IMG_STOCK, MEDIA_NEXT, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_next), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, view -> player -> next, TRUE, TRUE, 0);
     // Last
-    view -> player -> last = create_button ("Last", IMG_STOCK, MEDIA_LAST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_last), view);
+    view -> player -> last = create_button (_("Last"), IMG_STOCK, MEDIA_LAST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_go_last), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, view -> player -> last, TRUE, TRUE, 0);
     // JumpTo
-    view -> player -> jump = create_button ("Go to", IMG_STOCK, MEDIA_GOTO, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_jump), view);
+    view -> player -> jump = create_button (_("Go to"), IMG_STOCK, MEDIA_GOTO, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_jump), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxa, view -> player -> jump, TRUE, TRUE, 0);
 
     // Second line
     GtkWidget * hboxb = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hboxb, TRUE, TRUE, 0);
     // Play
-    view -> player -> play = create_button ("Play", IMG_STOCK, MEDIA_PLAY, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_play), view);
+    view -> player -> play = create_button (_("Play"), IMG_STOCK, MEDIA_PLAY, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_play), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxb, view -> player -> play, TRUE, TRUE, 0);
     // Stop
-    view -> player -> stop = create_button ("Stop", IMG_STOCK, MEDIA_STOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_stop), view);
+    view -> player -> stop = create_button (_("Stop"), IMG_STOCK, MEDIA_STOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_stop), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxb, view -> player -> stop, TRUE, TRUE, 0);
     // Loop
-    view -> player -> loop = create_button ("Loop", IMG_STOCK, MEDIA_LOOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_loop), view);
+    view -> player -> loop = create_button (_("Loop"), IMG_STOCK, MEDIA_LOOP, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_loop), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxb, view -> player -> loop, TRUE, TRUE, 0);
     // Faster
-    view -> player -> fast = create_button ("Faster", IMG_STOCK, MEDIA_FAST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_faster), view);
+    view -> player -> fast = create_button (_("Faster"), IMG_STOCK, MEDIA_FAST, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_faster), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxb, view -> player -> fast, TRUE, TRUE, 0);
     // Slower
-    view -> player -> slow =  create_button ("Slower", IMG_STOCK, MEDIA_SLOW, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_slower), view);
+    view -> player -> slow =  create_button (_("Slower"), IMG_STOCK, MEDIA_SLOW, -1, -1, GTK_RELIEF_NONE, G_CALLBACK(seq_slower), view);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hboxb, view -> player -> slow, TRUE, TRUE, 0);
     add_gtk_close_event (view -> player -> win, G_CALLBACK(hide_this_window), NULL);
     show_the_widgets (view -> player -> win);

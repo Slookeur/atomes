@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file ogl_draw.c
@@ -43,7 +43,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void draw (glwin * view);
 
   screen_string * duplicate_screen_string (screen_string * old_s);
+
   atom * duplicate_atom (atom * at);
+  atom * free_atom (atom * at);
 
   image * duplicate_image (image * old_img);
 
@@ -56,7 +58,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include <time.h>
 
 extern ColRGBA init_color (int id, int numid);
-extern Light * copy_light_sources (int dima, int dimb, Light * old_sp);
+extern Light ** copy_light_sources (int dima, int dimb, Light ** old_sp);
 extern atom_selection * duplicate_ogl_selection (atom_selection * old_sel);
 double x, y, z;
 GLUquadricObj * quadric;
@@ -162,13 +164,13 @@ void unrotate_camera ()
 */
 screen_string * duplicate_screen_string (screen_string * old_s)
 {
-  screen_string * new_s = g_malloc0 (sizeof*new_s);
+  screen_string * new_s = g_malloc0(sizeof*new_s);
   new_s -> word = g_strdup_printf ("%s", old_s -> word);
   new_s -> col = old_s -> col;
   int i;
   for (i=0; i<3; i++) new_s -> shift[i] = old_s -> shift[i];
   new_s -> num_instances = old_s -> num_instances;
-  new_s -> instances = duplicate_float (old_s -> num_instances*4, old_s -> instances);
+  new_s -> instances = duplicate_float (old_s -> num_instances, old_s -> instances);
   new_s -> prev = NULL;
   new_s -> last = NULL;
   return new_s;
@@ -279,13 +281,17 @@ void duplicate_screen_label (screen_label * new_lab, screen_label * old_lab)
 image * duplicate_image (image * old_img)
 {
   int i, j, k, l, m;
-  image * new_img = g_malloc0 (sizeof*new_img);
+  image * new_img = g_malloc0(sizeof*new_img);
 
   // This line will copy all the stuff that is not dynamically allocated
   * new_img = * old_img;
 
   new_img -> back = g_malloc0(sizeof*new_img -> back);
   duplicate_background_data (new_img -> back, old_img -> back);
+  new_img -> xyz = g_malloc0(sizeof*new_img -> xyz);
+  duplicate_axis_data (new_img -> xyz, old_img -> xyz);
+  new_img -> abc = g_malloc0(sizeof*new_img -> abc);
+  duplicate_box_data (new_img -> abc, old_img -> abc);
   j = proj_gl -> nspec;
   for (i=0; i<2; i++)
   {
@@ -297,8 +303,8 @@ image * duplicate_image (image * old_img)
   new_img -> sphererad = duplicate_double(2*j, old_img -> sphererad);
   new_img -> pointrad = duplicate_double(2*j, old_img -> pointrad);
   new_img -> atomicrad = duplicate_double(2*j, old_img -> atomicrad);
-  new_img -> bondrad = g_malloc0 (2*j*sizeof*new_img -> bondrad);
-  new_img -> linerad = g_malloc0 (2*j*sizeof*new_img -> linerad);
+  new_img -> bondrad = g_malloc0(2*j*sizeof*new_img -> bondrad);
+  new_img -> linerad = g_malloc0(2*j*sizeof*new_img -> linerad);
   new_img -> at_color = duplicate_color (2*j, old_img -> at_color);
   for (i=0; i<2*j; i++)
   {
@@ -306,18 +312,30 @@ image * duplicate_image (image * old_img)
     new_img -> linerad[i] = duplicate_double(2*j, old_img -> linerad[i]);
   }
 
-  for (i=0; i<9; i++)
+  for (i=0; i<10; i++)
   {
-    new_img -> show_coord[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_coord[i]);
-    if (i < 2 || i > 3) new_img -> show_poly[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_poly[i]);
-    k = (i < 2) ? proj_gl -> nspec : 1;
-    new_img -> spcolor[i] = g_malloc (k*sizeof*new_img -> spcolor[i]);
-    for (j=0; j<k; j++)
+    if (old_img -> show_coord[i])
     {
-     new_img -> spcolor[i][j] = duplicate_color (coord_gl -> totcoord[i], old_img -> spcolor[i][j]);
+      new_img -> show_coord[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_coord[i]);
+    }
+    if (i < 2 || (i > 3 && i < 9))
+    {
+      if (old_img -> show_poly[i])
+      {
+        new_img -> show_poly[i] = duplicate_bool(coord_gl -> totcoord[i], old_img -> show_poly[i]);
+      }
+    }
+    k = (i < 2) ? proj_gl -> nspec : 1;
+    if (old_img -> spcolor[i])
+    {
+      new_img -> spcolor[i] = g_malloc0(k*sizeof*new_img -> spcolor[i]);
+      for (j=0; j<k; j++)
+      {
+       new_img -> spcolor[i][j] = duplicate_color (coord_gl -> totcoord[i], old_img -> spcolor[i][j]);
+      }
     }
   }
-  new_img -> at_data = g_malloc0 (proj_gl -> natomes*sizeof*new_img -> at_data);
+  new_img -> at_data = g_malloc0(proj_gl -> natomes*sizeof*new_img -> at_data);
   for (i=0; i<proj_gl -> natomes; i++)
   {
     new_img -> at_data[i].show[0] = proj_gl -> atoms[step][i].show[0];
@@ -327,16 +345,6 @@ image * duplicate_image (image * old_img)
     new_img -> at_data[i].pick[0] = proj_gl -> atoms[step][i].pick[0];
     new_img -> at_data[i].cloned = proj_gl -> atoms[step][i].cloned;
     new_img -> at_data[i].style = proj_gl -> atoms[step][i].style;
-  }
-
-  for (i=0; i<3; i++)
-  {
-    new_img -> xyz -> title[i] = g_strdup_printf ("%s", old_img -> xyz -> title[i]);
-  }
-  new_img -> xyz -> color = NULL;
-  if (old_img -> xyz -> color != NULL)
-  {
-    new_img -> xyz -> color = duplicate_color (3, old_img -> xyz -> color);
   }
 
   for (i=0; i<5; i++) duplicate_screen_label (& new_img -> labels[i], & old_img -> labels[i]);
@@ -409,10 +417,8 @@ image * duplicate_image (image * old_img)
 */
 void add_image ()
 {
-  snapshot * nextsnap = g_malloc0 (sizeof*nextsnap);
+  snapshot * nextsnap = g_malloc0(sizeof*nextsnap);
   nextsnap -> img = duplicate_image (plot);
-  nextsnap -> img -> id ++;
-
   // Now the pointers
   if (wingl -> anim -> frames == 0)
   {
@@ -420,7 +426,6 @@ void add_image ()
     wingl -> anim -> last = nextsnap;
     wingl -> anim -> last -> prev = NULL;
     wingl -> anim -> first = nextsnap;
-
   }
   else
   {
@@ -429,7 +434,7 @@ void add_image ()
     wingl -> anim -> last = wingl -> anim -> last -> next;
     wingl -> anim -> last -> img -> id = wingl -> anim -> frames;
   }
-  wingl -> anim -> frames += 1;
+  wingl -> anim -> frames ++;
 }
 
 extern void update_gl_pick_colors ();
@@ -443,7 +448,7 @@ extern void update_gl_pick_colors ();
 */
 atom * duplicate_atom (atom * at)
 {
-  atom * bt = g_malloc0 (sizeof*bt);
+  atom * bt = g_malloc0(sizeof*bt);
   bt -> x = at -> x;
   bt -> y = at -> y;
   bt -> z = at -> z;
@@ -467,6 +472,20 @@ atom * duplicate_atom (atom * at)
   bt -> faid = at -> faid;
   if (bt -> numv) bt -> vois = duplicate_int (bt -> numv, at -> vois);
   return bt;
+}
+
+/*!
+  \fn atom * free_atom (atom * at)
+
+  \brief free an atom data structure
+
+  \param at the target atom data structure to free
+*/
+atom * free_atom (atom * at)
+{
+  if (at -> vois) g_free (at -> vois);
+  g_free (at);
+  return NULL;
 }
 
 /*!
@@ -536,7 +555,7 @@ void draw (glwin * view)
     if (wingl -> create_shaders[SELEC] && wingl -> n_shaders[SELEC][step] < 0) wingl -> n_shaders[SELEC][step] = create_selection_lists ();
     if (wingl -> create_shaders[POLYS] && wingl -> n_shaders[POLYS][step] < 0) create_poly_lists ();
     if (wingl -> create_shaders[RINGS] && wingl -> n_shaders[RINGS][step] < 0) create_ring_lists ();
-    if (wingl -> create_shaders[PICKS]) wingl -> n_shaders[PICKS][0] = create_pick_lists ();
+    if (wingl -> create_shaders[PICKS] && ! atomes_render_image) wingl -> n_shaders[PICKS][0] = create_pick_lists ();
     if (wingl -> create_shaders[SLABS]) create_slab_lists (proj_gl);
     if (wingl -> create_shaders[VOLMS] && wingl -> n_shaders[VOLMS][step] < 0) create_volumes_lists ();
     if (wingl -> create_shaders[LABEL]) wingl -> n_shaders[LABEL][0] = create_label_lists ();
@@ -582,18 +601,14 @@ void draw (glwin * view)
     // Gradient background
     draw_vertices (BACKG);
 
-    // We want to draw the elements by reverse order
-    // so that atoms will be last and and will appear on
-    // top of bonds and so on
-
     // Box
     draw_vertices (MDBOX);
 
-    // The bonds
-    draw_vertices (BONDS);
-
     // Now the atoms
     draw_vertices (ATOMS);
+
+    // The bonds
+    draw_vertices (BONDS);
 
     // The selected atoms/bonds
     draw_vertices (SELEC);

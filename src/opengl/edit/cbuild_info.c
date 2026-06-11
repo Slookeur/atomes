@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cbuild_info.c
@@ -84,23 +84,23 @@ gchar * get_bravais (int spg)
 {
   if (groups[spg-1][0] == 'A' || groups[spg-1][0] == 'C')
   {
-    return "Base-centered";
+    return _("Base-centered");
   }
   else if (groups[spg-1][0] == 'F')
   {
-    return "Face-centered";
+    return _("Face-centered");
   }
   else if (groups[spg-1][0] == 'I')
   {
-    return "Body-centered";
+    return _("Body-centered");
   }
   else if (groups[spg-1][0] == 'P')
   {
-    return "Primitive";
+    return _("Primitive ");
   }
   else if (groups[spg-1][0] == 'R')
   {
-    return "Rhombohedral";
+    return _("Rhombohedral");
   }
   else
   {
@@ -346,10 +346,7 @@ void set_wisible (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeMo
   gtk_tree_model_get (mod, iter, 0, & j, -1);
   if ((j && (i > 1 && i < 5)) || (!j && i==5))
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, i, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, i);
   }
   gtk_cell_renderer_set_visible (renderer, (i<5) ? j : ! j);
 }
@@ -366,15 +363,15 @@ GtkWidget * create_wyckoff_tree (space_group * spg)
   int i;
   GtkTreeViewColumn * wcol[6];
   GtkCellRenderer * wcell[6];
-  gchar * witle[6] = {" ", "Id.", "Multiplicity", "Letter", "Symmetry", "Coordinates"};
-  gchar * wtype[6]={"text", "text", "text", "text", "text", "text"};
+  gchar * wtitle[6] = {" ", i18n("Id."), i18n("Multiplicity"), i18n("Letter"), i18n("Symmetry"), i18n("Coordinates")};
+  gchar * wtype[6] = {"text", "text", "text", "text", "text", "text"};
   GType w_type[6] = {G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING};
   GtkTreeStore * wmodel = gtk_tree_store_newv (6, w_type);
   GtkWidget * wtree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(wmodel));
   for (i=0; i<6; i++)
   {
     wcell[i] = gtk_cell_renderer_text_new();
-    wcol[i] =  gtk_tree_view_column_new_with_attributes(witle[i], wcell[i], wtype[i], i, NULL);
+    wcol[i] =  gtk_tree_view_column_new_with_attributes((i) ? _(wtitle[i]) : wtitle[i], wcell[i], wtype[i], i, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(wtree), wcol[i]);
     gtk_tree_view_column_set_cell_data_func (wcol[i], wcell[i], set_wisible, GINT_TO_POINTER(i), NULL);
     if (!i) gtk_tree_view_column_set_visible (wcol[i], FALSE);
@@ -498,7 +495,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
 {
   tint * id = (tint *) data;
   space_group * spg = get_project_by_id(id -> a) -> modelgl -> builder_win -> cell.sp_group;
-  gchar * str = g_strdup_printf ("%s info", groups[spg -> id-1]);
+  gchar * str = g_strdup_printf (_("%s info"), groups[spg -> id-1]);
   str = substitute_string (str, "<sub>", NULL);
   str = substitute_string (str, "</sub>", NULL);
   GtkWidget * info = dialogmodal (str, GTK_WINDOW(get_project_by_id(id -> a) -> modelgl -> builder_win -> win));
@@ -516,14 +513,14 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   }
 
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Space group: ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Space group: "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   str = g_strdup_printf ("<b>%s</b>", groups[spg -> id-1]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (str);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ivbox[0], hbox, FALSE, FALSE, 5);
 
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Number: ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Number: "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   str = g_strdup_printf ("<b>%d</b>", spg -> id);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (str);
@@ -537,7 +534,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, ivbox[0], hbox, FALSE, FALSE, 5);
 
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Crystal system: ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Crystal system: "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   str = g_strdup_printf ("<b>%s</b>", spg -> bravais);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (str);
@@ -547,7 +544,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   if (str)
   {
     hbox = create_hbox (0);
-    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Bravais lattice: ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Bravais lattice: "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
     str = g_strdup_printf ("<b>%s</b>", str);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 100, -1, 0.0, 0.5), FALSE, FALSE, 5);
     g_free (str);
@@ -555,7 +552,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   }
 
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Lattice constraints: ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Lattice constraints: "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   str = g_strdup_printf ("<b>%s</b>", latt_info[get_crystal_id (spg -> id)]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, 150, -1, 0.0, 0.5), FALSE, FALSE, 5);
   g_free (str);
@@ -571,7 +568,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
 
   info_hsbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, info_hsbox, FALSE, FALSE, 5);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, info_hsbox, markup_label("Setting(s): ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, info_hsbox, markup_label(_("Setting(s): "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   if (spg -> nums > 1)
   {
     GtkTreeModel * model = so_combo_tree (spg);
@@ -595,7 +592,7 @@ G_MODULE_EXPORT void show_sg_info (GtkWidget * but, gpointer data)
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, info_hsbox, info_vs, FALSE, FALSE, 0);
 
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Wyckoff position(s): ", xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Wyckoff position(s): "), xsize, -1, 0.0, 0.5), FALSE, FALSE, 5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   wypts_vbox = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, wypts_vbox, FALSE, FALSE, 5);

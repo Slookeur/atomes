@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_mol.c
@@ -83,30 +83,26 @@ gchar * remove_text (int i, int j, gchar * str)
   switch (i)
   {
     case -2:
-      return g_strdup_printf ("The description of atom <b>%s</b> will be deleted\n"
-                              "and merged with the one of the selected field atom.\n"
-                              "Field object(s) using atom <b>%s</b> will also be deleted\n"
-                              "and the force field parameter(s) will be updated accordingly.",
+      return g_strdup_printf (_("The description of atom <b>%s</b> will be deleted\n"
+                                "and merged with the one of the selected field atom.\n"
+                                "Field object(s) using atom <b>%s</b> will also be deleted\n"
+                                "and the force field parameter(s) will be updated accordingly."),
                               str, str);
       break;
     case -1:
-      return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\n"
-                              "and merged with the one of the selected molecule.",
-                              str);
+      return g_strdup_printf (_("The description of molecule <b>%s</b> will be deleted\nand merged with the one of the selected molecule."), str);
       break;
     default:
       switch (j)
       {
         case -1:
-          return g_strdup_printf ("The description of molecule <b>%s</b> will be deleted\n"
-                                  "and merged with the one of molecule <b>%s</b>",
-                                  str, get_active_field_molecule(i) -> name);
+          return g_strdup_printf (_("The description of molecule <b>%s</b> will be deleted\nand merged with the one of molecule <b>%s</b>"), str, get_active_field_molecule(i) -> name);
           break;
         default:
-          return g_strdup_printf ("The description of atom <b>%s</b> will be deleted\n"
-                                  "and merged with the one of field atom <b>%s</b>\n"
-                                  "Field object(s) using atom <b>%s</b> will also be deleted\n"
-                                  "and the force field parameter(s) will be updated accordingly.",
+          return g_strdup_printf (_("The description of atom <b>%s</b> will be deleted\n"
+                                    "and merged with the one of field atom <b>%s</b>\n"
+                                    "Field object(s) using atom <b>%s</b> will also be deleted\n"
+                                    "and the force field parameter(s) will be updated accordingly."),
                                   str, get_active_atom(i,j) -> name, str);
           break;
       }
@@ -331,7 +327,7 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
       {
         if (a_mol > 1)
         {
-          str = g_strdup_printf ("Fragments N°%d", new_mol[0]+1);
+          str = g_strdup_printf (_("Fragments N°%d"), new_mol[0]+1);
           if (a_mol > 2)
           {
             for (i=1; i<a_mol-1; i++)
@@ -339,13 +335,13 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
               str = g_strdup_printf ("%s, %d", str, new_mol[i]+1);
             }
           }
-          str = g_strdup_printf ("%s and %d have been selected !", str, new_mol[a_mol-1]+1);
-          str = g_strdup_printf ("%s\nConfirm this choice and create a new field molecule to describe these fragments ?", str);
+          str = g_strdup_printf (_("%s and %d have been selected !"), str, new_mol[a_mol-1]+1);
+          str = g_strdup_printf (_("%s\nConfirm this choice and create a new field molecule to describe these fragments ?"), str);
         }
         else
         {
-          str = g_strdup_printf ("Fragment N°%d has been selected !", new_mol[0]+1);
-          str = g_strdup_printf ("%s\nConfirm this choice and create a new field molecule to describe this fragment ?", str);
+          str = g_strdup_printf (_("Fragment N°%d has been selected !"), new_mol[0]+1);
+          str = g_strdup_printf (_("%s\nConfirm this choice and create a new field molecule to describe this fragment ?"), str);
         }
         selection_confirmed = FALSE;
         field_question (str, G_CALLBACK(confirm_selection), NULL);
@@ -360,13 +356,13 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           next_fmol -> id = tmp_field -> molecules;
           next_fmol -> multi = a_mol;
           next_fmol -> fragments = NULL;
-          next_fmol -> fragments = allocint(a_mol);
+          next_fmol -> fragments = allocint (a_mol);
           for (i=0; i<a_mol; i++) next_fmol -> fragments[i] = new_mol[i];
           // Atoms_id and field atoms
-          atomd_id_save = g_malloc (next_fmol-> mol -> natoms*sizeof*atomd_id_save);
+          atomd_id_save = g_malloc0(next_fmol-> mol -> natoms*sizeof*atomd_id_save);
           for (i=0; i<next_fmol-> mol -> natoms; i++)
           {
-            atomd_id_save[i] = g_malloc (next_fmol -> multi*sizeof*atomd_id_save[i]);
+            atomd_id_save[i] = g_malloc0(next_fmol -> multi*sizeof*atomd_id_save[i]);
           }
           tmp_fat = next_fmol -> first_atom;
           for (i=0; i < next_fmol -> atoms; i++)
@@ -377,10 +373,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           }
           g_free (next_fmol -> atoms_id);
           next_fmol -> atoms_id = NULL;
-          next_fmol -> atoms_id = g_malloc (next_fmol-> mol -> natoms*sizeof*next_fmol -> atoms_id);
+          next_fmol -> atoms_id = g_malloc0(next_fmol-> mol -> natoms*sizeof*next_fmol -> atoms_id);
           for (i=0; i<next_fmol-> mol -> natoms; i++)
           {
-            next_fmol -> atoms_id[i] = g_malloc (next_fmol -> multi*sizeof*next_fmol -> atoms_id[i]);
+            next_fmol -> atoms_id[i] = g_malloc0(next_fmol -> multi*sizeof*next_fmol -> atoms_id[i]);
             for (j=0; j<next_fmol -> multi; j++)
             {
               next_fmol -> atoms_id[i][j].a = atomd_id_save[i][j].a;
@@ -388,7 +384,7 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
             }
           }
           g_free (atomd_id_save);
-          old_mol = allocint(old_fmol -> multi - a_mol);
+          old_mol = allocint (old_fmol -> multi - a_mol);
           k = -1;
           for (i=0; i<old_fmol -> multi; i++)
           {
@@ -409,10 +405,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           }
           new_mol = NULL;
           // Now we deal with atoms_id and the field atoms
-          atomd_id_save = g_malloc (old_fmol-> mol -> natoms*sizeof*atomd_id_save);
+          atomd_id_save = g_malloc0(old_fmol-> mol -> natoms*sizeof*atomd_id_save);
           for (i=0; i<old_fmol -> mol -> natoms; i++)
           {
-            atomd_id_save[i] = g_malloc ((old_fmol -> multi - a_mol)*sizeof*atomd_id_save[i]);
+            atomd_id_save[i] = g_malloc0((old_fmol -> multi - a_mol)*sizeof*atomd_id_save[i]);
           }
           tmp_fat = old_fmol -> first_atom;
           for (i=0; i < old_fmol -> atoms; i++)
@@ -423,10 +419,10 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           old_fmol -> multi -= a_mol;
           g_free (old_fmol -> atoms_id);
           old_fmol -> atoms_id = NULL;
-          old_fmol -> atoms_id = g_malloc (old_fmol-> mol -> natoms*sizeof*old_fmol -> atoms_id);
+          old_fmol -> atoms_id = g_malloc0(old_fmol-> mol -> natoms*sizeof*old_fmol -> atoms_id);
           for (i=0; i<old_fmol-> mol -> natoms; i++)
           {
-            old_fmol -> atoms_id[i] = g_malloc (old_fmol -> multi*sizeof*old_fmol -> atoms_id[i]);
+            old_fmol -> atoms_id[i] = g_malloc0(old_fmol -> multi*sizeof*old_fmol -> atoms_id[i]);
             for (j=0; j<old_fmol -> multi; j++)
             {
               old_fmol -> atoms_id[i][j].a = atomd_id_save[i][j].a;
@@ -435,7 +431,7 @@ G_MODULE_EXPORT void run_add_molecule_to_field (GtkDialog * dialog, gint respons
           }
           g_free (atomd_id_save);
           old_fmol -> fragments = NULL;
-          old_fmol -> fragments = allocint(old_fmol -> multi);
+          old_fmol -> fragments = allocint (old_fmol -> multi);
           for (i=0; i<old_fmol -> multi; i++) old_fmol -> fragments[i] = old_mol[i];
           old_mol = NULL;
           row_id = tmp_field -> molecules;
@@ -471,15 +467,15 @@ G_MODULE_EXPORT void add_molecule_to_field (GSimpleAction * action, GVariant * p
 {
   int i;
   field_object = 0;
-  gchar * str = g_strdup_printf ("Please select the fragment(s) of the new molecule");
+  gchar * str = g_strdup_printf (_("Please select the fragment(s) of the new molecule"));
   GtkWidget * amol = dialogmodal (str, GTK_WINDOW(field_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(amol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(amol), _("Apply"), GTK_RESPONSE_APPLY);
   GtkWidget * add_tree =  NULL;
   GtkTreeIter iter;
   GtkTreeViewColumn * mol_col[2];
   GtkCellRenderer * mol_cell[2];
-  gchar * mol_title[2] = {"Fragment", "Viz.3D & Select"};
+  gchar * mol_title[2] = {i18n("Fragment"), i18n("Viz.3D & Select")};
   gchar * ctype[2]={"text", "active"};
   GType col_type[2] = {G_TYPE_INT, G_TYPE_BOOLEAN};
 
@@ -499,7 +495,7 @@ G_MODULE_EXPORT void add_molecule_to_field (GSimpleAction * action, GVariant * p
       mol_cell[i] = gtk_cell_renderer_toggle_new ();
       g_signal_connect (G_OBJECT(mol_cell[i]), "toggled", G_CALLBACK(select_mol), & add_model);
     }
-    mol_col[i] = gtk_tree_view_column_new_with_attributes (mol_title[i], mol_cell[i], ctype[i], i, NULL);
+    mol_col[i] = gtk_tree_view_column_new_with_attributes (_(mol_title[i]), mol_cell[i], ctype[i], i, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(add_tree), mol_col[i]);
     gtk_tree_view_column_set_alignment (mol_col[i], 0.5);
     if (i == 0)
@@ -613,7 +609,7 @@ void prepare_atoms_to_merge (field_atom* at, field_molecule * new_mol, field_mol
 field_atom* new_atom_to_merge (int id, field_molecule * fmol)
 {
   field_atom* fat, * fbt;
-  fat = g_malloc (sizeof*fat);
+  fat = g_malloc0(sizeof*fat);
   fat -> id = id;
   fat -> sp = -1;
   fat -> num = fmol -> mol -> natoms * fmol -> multi;
@@ -665,10 +661,10 @@ G_MODULE_EXPORT void run_remove_molecule_from_field (GtkDialog * rmol, gint resp
         {
           to_merge -> fragments[i] = to_remove -> fragments[i - to_merge -> multi];
         }
-        atomd_id_save = g_malloc (to_merge -> mol -> natoms*sizeof*atomd_id_save);
+        atomd_id_save = g_malloc0(to_merge -> mol -> natoms*sizeof*atomd_id_save);
         for (i=0; i<to_merge -> mol -> natoms; i++)
         {
-          atomd_id_save[i] = g_malloc ((to_merge -> multi+to_remove -> multi)*sizeof*atomd_id_save[i]);
+          atomd_id_save[i] = g_malloc0((to_merge -> multi+to_remove -> multi)*sizeof*atomd_id_save[i]);
           for (j=0; j<to_merge -> multi; j++)
           {
             atomd_id_save[i][j].a = to_merge -> atoms_id[i][j].a;
@@ -682,10 +678,10 @@ G_MODULE_EXPORT void run_remove_molecule_from_field (GtkDialog * rmol, gint resp
         }
         to_merge -> multi += to_remove -> multi;
         g_free (to_merge -> atoms_id);
-        to_merge -> atoms_id = g_malloc (to_merge -> mol -> natoms*sizeof*to_merge -> atoms_id);
+        to_merge -> atoms_id = g_malloc0(to_merge -> mol -> natoms*sizeof*to_merge -> atoms_id);
         for (i=0; i<to_merge -> mol -> natoms; i++)
         {
-          to_merge -> atoms_id[i] = g_malloc (to_merge -> multi*sizeof*to_merge -> atoms_id[i]);
+          to_merge -> atoms_id[i] = g_malloc0(to_merge -> multi*sizeof*to_merge -> atoms_id[i]);
           for (j=0; j<to_merge -> multi; j++)
           {
             to_merge -> atoms_id[i][j].a = atomd_id_save[i][j].a;
@@ -754,21 +750,21 @@ G_MODULE_EXPORT void remove_molecule_from_field (GSimpleAction * action, GVarian
   to_remove = (field_molecule *) data;
   int i, j;
   field_object = 0;
-  gchar * str = g_strdup_printf ("Select the molecule to merge molecule \"%s\" with", to_remove -> name);
+  gchar * str = g_strdup_printf (_("Select the molecule to merge molecule \"%s\" with"), to_remove -> name);
   GtkWidget * rmol = dialogmodal (str, GTK_WINDOW(field_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(rmol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(rmol), _("Apply"), GTK_RESPONSE_APPLY);
 
   GtkWidget * remove_tree =  NULL;
   GtkTreeIter iter;
 
-  gchar * mol_title[4] = {"Id", "Name", "Multiplicity", "Viz.3D & Merge with"};
+  gchar * mol_title[4] = {i18n("Id."), i18n("Name"), i18n("Multiplicity"), i18n("Viz.3D & Merge with")};
   gchar * ctype[4]={"text", "text", "text", "active"};
   GType col_type[4] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN};
 
   active_col = 3;
   a_mol = 0;
-  new_mol = allocint(1);
+  new_mol = allocint (1);
   GtkTreeStore * remove_model = gtk_tree_store_newv (4, col_type);
   remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   for (i=0; i<4; i++)
@@ -783,7 +779,7 @@ G_MODULE_EXPORT void remove_molecule_from_field (GSimpleAction * action, GVarian
       gtk_cell_renderer_toggle_set_radio (GTK_CELL_RENDERER_TOGGLE(remove_renderer[i]), TRUE);
       g_signal_connect (G_OBJECT(remove_renderer[i]), "toggled", G_CALLBACK(select_mol), & remove_model);
     }
-    remove_col[i] = gtk_tree_view_column_new_with_attributes (mol_title[i], remove_renderer[i], ctype[i], i, NULL);
+    remove_col[i] = gtk_tree_view_column_new_with_attributes (_(mol_title[i]), remove_renderer[i], ctype[i], i, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(remove_tree), remove_col[i]);
     if (i < 3)
     {

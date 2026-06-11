@@ -11,7 +11,7 @@
 ! You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 ! If not, see <https://www.gnu.org/licenses/>
 !
-! Copyright (C) 2022-2025 by CNRS and University of Strasbourg
+! Copyright (C) 2022-2026 by CNRS and University of Strasbourg
 !
 !>
 !! @file molecules.F90
@@ -247,6 +247,18 @@ do i=1, NS
 #ifdef OPENMP
   if (molecules .eq.0) goto 004
 #endif
+  allocate(TMPMOL, STAT=ERR)
+  if (ERR .ne. 0) then
+    ALC_TAB="TMPMOL"
+    ALC=.true.
+    molecules = 0
+#ifdef OPENMP
+    goto 004
+#else
+    goto 001
+#endif
+  endif
+
   TOGL(:)=0
   THEMOL%MID = 1
   THEMOL%STEP = i
@@ -272,6 +284,7 @@ do i=1, NS
   TOTMOL = 0
   MTMBS(i)=0
   MOLCOUNTER=0
+
   TMPMOL => THEMOL
   n = 1
   002 continue
@@ -342,7 +355,6 @@ do i=1, NS
     TMPMOL => THEMOL
     call allocate_mol_for_step (i, MTMBS(i))
     do j=1, MTMBS(i)
-      if (allocated(ATMOL)) deallocate(ATMOL)
       allocate(ATMOL(TMPMOL%ATOMES), STAT=ERR)
       if (ERR .ne. 0) then
         ALC_TAB="ATMOL"
@@ -354,35 +366,37 @@ do i=1, NS
         goto 001
 #endif
       endif
-      if (associated(TMPAT)) deallocate (TMPAT)
-      allocate(TMPAT, STAT=ERR)
-      if (ERR .ne. 0) then
-        ALC_TAB="TMPAT"
-        ALC=.true.
-        molecules = 0
-#ifdef OPENMP
-        goto 004
-#else
-        goto 001
-#endif
-      endif
-      TMPAT = TMPMOL%FIRST_AT
-      do k=1, TMPMOL%ATOMES
-        ATMOL(k) = TMPAT%IND
-        if (k < TMPMOL%ATOMES) then
-          TMPAT => TMPAT%NEXT
-          deallocate (TMPAT%PREV)
-        else
-          deallocate (TMPAT)
-        endif
-      enddo
 
+      if (TMPMOL%ATOMES .gt. 1) then
+        allocate(TMPAT, STAT=ERR)
+        if (ERR .ne. 0) then
+          ALC_TAB="TMPAT"
+          ALC=.true.
+          molecules = 0
+#ifdef OPENMP
+          goto 004
+#else
+          goto 001
+#endif
+        endif
+        TMPAT = TMPMOL%FIRST_AT
+        do k=1, TMPMOL%ATOMES
+          ATMOL(k) = TMPAT%IND
+          if (k < TMPMOL%ATOMES) then
+            TMPAT => TMPAT%NEXT
+            deallocate (TMPAT%PREV)
+          endif
+        enddo
+        deallocate (TMPAT)
+      else
+        ATMOL(1) = TMPMOL%FIRST_AT%IND
+        deallocate (TMPMOL%FIRST_AT)
+      endif
       call send_mol_details (TMPMOL%STEP, TMPMOL%MID, TMPMOL%ATOMES, NSP, TMPMOL%BSP, ATMOL)
       if (TMPMOL%ATOMES .gt. 1) then
         do l=1, TMPMOL%ATOMES
           m = ATMOL(l)
           n = CONTJ(m,TMPMOL%STEP)
-          if (allocated(ATVS)) deallocate(ATVS)
           allocate(ATVS(n), STAT=ERR)
           if (ERR .ne. 0) then
             ALC_TAB="ATVS"
@@ -398,26 +412,31 @@ do i=1, NS
             ATVS(o)= VOISJ(o,m,TMPMOL%STEP)
           enddo
           call send_mol_neighbors (TMPMOL%STEP, TMPMOL%MID, m, n, ATVS)
+          deallocate(ATVS)
         enddo
       endif
-      if (allocated(ATVS)) deallocate(ATVS)
-      if (allocated(ATMOL)) deallocate(ATMOL)
-      if (allocated(TMPMOL%BSP)) deallocate (TMPMOL%BSP)
+      deallocate(ATMOL)
 
       if (j .lt. MTMBS(i)) TMPMOL => TMPMOL%NEXT
 
     enddo
     call setup_molecules (i)
   endif
-  call setup_fragments (i, TOGL)
+
   do while (TMPMOL%MID .gt. 1)
     TMPMOL => TMPMOL%PREV
+    deallocate (TMPMOL%NEXT%BSP)
     deallocate (TMPMOL%NEXT)
   enddo
+  deallocate (TMPMOL%BSP)
+
+  call setup_fragments (i, TOGL)
+
 #ifdef OPENMP
   004 continue
 #endif
 enddo
+
 #ifdef OPENMP
 !$OMP END DO NOWAIT
 005 continue

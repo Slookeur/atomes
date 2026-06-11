@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cell_super.c
@@ -59,7 +59,7 @@ extern GtkWidget * cell_tab (int i, project * this_proj);
 gboolean ** duplicate_geom_info (project * this_proj)
 {
   int i, j;
-  gboolean ** show = g_malloc (2*sizeof*show);
+  gboolean ** show = g_malloc0(2*sizeof*show);
   for (i=0; i<2; i++)
   {
     show[i] = allocbool(this_proj -> coord -> totcoord[i]);
@@ -81,7 +81,7 @@ gboolean ** duplicate_geom_info (project * this_proj)
 gboolean ** duplicate_poly_info (project * this_proj)
 {
   int i, j;
-  gboolean ** show = g_malloc (2*sizeof*show);
+  gboolean ** show = g_malloc0(2*sizeof*show);
   for (i=0; i<2; i++)
   {
     show[i] = allocbool(this_proj -> coord -> totcoord[i]);
@@ -203,19 +203,19 @@ void sens_superbut (project * this_proj)
 */
 void super_celling (glwin * view)
 {
-  gchar * txta = "You are about to change the periodicity of the 3D model,";
-  gchar * txtb = "this will affect the entire molecular dynamics trajectory,";
-  gchar * txtc = "\tand the action is irreversible, proceed anyway ?";
+  gchar * txta = i18n("You are about to change the periodicity of the 3D model,");
+  gchar * txtb = i18n("this will affect the entire molecular dynamics trajectory,");
+  gchar * txtc = i18n("\tand the action is irreversible, proceed anyway ?");
   gchar * str;
   if (get_project_by_id(view -> proj) -> steps > 1)
   {
-    str = g_strdup_printf ("%s\n%s\n%s", txta, txtb, txtc);
+    str = g_strdup_printf ("%s\n%s\n%s", _(txta), _(txtb), _(txtc));
   }
   else
   {
-    str = g_strdup_printf ("%s\n%s", txta, txtc);
+    str = g_strdup_printf ("%s\n%s", _(txta), _(txtc));
   }
-  if (ask_yes_no ("Create a super-cell ?", str, GTK_MESSAGE_WARNING, view -> win))
+  if (ask_yes_no (_("Create a super-cell ?"), str, GTK_MESSAGE_WARNING, view -> win))
   {
     int i, j, k, l;
     k = activep;
@@ -322,7 +322,7 @@ void super_celling (glwin * view)
     }
     else
     {
-      show_warning ("Something went wrong, the 3D model was not updated", view -> win);
+      show_warning (_("Something went wrong, the 3D model was not updated"), view -> win);
     }
     restore_ogl_selection (view);
     fill_tool_model ();

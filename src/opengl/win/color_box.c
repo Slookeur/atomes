@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file color_box.c
@@ -363,7 +363,7 @@ GtkWidget * color_box (glwin * view, int ideo, int spec, int geo)
 #endif
   }
 #ifdef GTK3
-  but = create_menu_item (FALSE, "More colors ...");
+  but = create_menu_item (FALSE, _("More Colors ..."));
   gtk_menu_shell_append ((GtkMenuShell *)coltable, but);
   if (ideo < -2)
   {

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file glwin.h
@@ -198,7 +198,7 @@ typedef struct Lightning Lightning;
 struct Lightning
 {
   int lights;         /*!< The number of lights */
-  Light * spot;       /*!< The lights */
+  Light ** spot;      /*!< The lights */
 };
 
 /*! \typedef Material
@@ -213,14 +213,14 @@ struct Material
   // 0 = lightning model
   // 2 = metallic
   // 3 = roughness
-  // 4 = back lightning
+  // 4 = ambient occlusion
   // 5 = gamma
   // 6 = opacity
   GLfloat param[6];    /*!< Material parameters \n
                          0 = lightning model, \n
                          1 = metallic, \n
                          2 = roughness, \n
-                         3 = back lightning, \n
+                         3 = ambient occlusion, \n
                          4 = gamma, \n
                          5 = opacity*/
 };
@@ -308,7 +308,6 @@ struct background
                          1 = top to bottom \n
                          2 = bottom right to top left \n
                          3 = top right to bottom left \n
-                         4 = center \n
                        If circular: \n
                          0 = right to left \n
                          1 = left to right \n
@@ -442,22 +441,22 @@ struct image
   gboolean show_vol[FILLED_STYLES];             /*!< Show (1) or hide (0) overall molecular volumes, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   ColRGBA vol_col[FILLED_STYLES];               /*!< Overall molecular volume colors, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   gboolean * fm_show_vol[2][FILLED_STYLES];     /*!< Show (1) or hide (0) isolated fragment(s) and molecule(s) volumes, calculated using: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
   ColRGBA * fm_vol_col[2][FILLED_STYLES];       /*!< Isolated fragment(s) and molecule(s) volume colors: \n
                                                    0 = covalent radii, \n
                                                    1 = ionic radii, \n
-                                                   2 = van Der Waals radii, \n
+                                                   2 = van der Waals radii, \n
                                                    3 = in crystal radii */
 
   int rotation_mode;                            /*!< Not used anymore, should be removed */
@@ -472,7 +471,7 @@ struct image
   int filled_type;                              /*!< Spacefilled type, in: \n
                                                     0 = covalent radii, \n
                                                     1 = ionic radii, \n
-                                                    2 = van Der Waals radii, \n
+                                                    2 = van der Waals radii, \n
                                                     3 = in crystal radii */
   GLint quality;                                /*!< Quality of the rendering */
   GLint render;                                 /*!< OpenGL render type, in \n
@@ -485,6 +484,8 @@ struct image
   Lightning l_ghtning;                          /*!< Lightning description */
   Material m_terial;                            /*!< Material description, if any */
   Fog f_g;                                      /*!< Fog description, if any*/
+
+  gboolean ray_tracing;                         /*!< Use or not raytracing rendering with quad billboards, default = TRUE */
 
   int step;                                     /*!< The MD step, in case of trajectory */
   int rep;                                      /*!< Representation: 0 = orthographic, 1 = perspective */
@@ -830,6 +831,7 @@ struct opengl_edition
   GtkWidget * m_scale[5];
   GtkWidget * lights;
   GtkWidget * lights_box;
+  GtkWidget * render_fix;
 
   GtkWidget * basic[2];
   GtkWidget * base_ogl[2][5];
@@ -975,9 +977,7 @@ struct glwin
   GtkWidget * ogl_styles[OGL_STYLES];
   GtkWidget * filled_styles[FILLED_STYLES];
   GtkWidget * color_styles[ATOM_MAPS+POLY_MAPS];
-  GtkWidget * ogl_render[OGL_RENDERS];
   GtkWidget * ogl_rep[OGL_REPS];
-  GtkWidget * ogl_quality;
   GtkWidget ** ogl_box_axis[2];
   GtkWidget * ogl_box[8];
   GtkWidget * ogl_mouse[3];
@@ -1001,7 +1001,7 @@ struct glwin
   GtkWidget * rbuild[2];
   GtkWidget * cbuilder;
 
-  // Matrices
+  // Matrices et OpenGL
   vec3_t model_position;
   vec4_t view_port;
   mat4_t projection_matrix;

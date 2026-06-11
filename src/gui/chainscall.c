@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file chainscall.c
@@ -30,7 +30,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void initchn ();
+  void init_chain (project * this_proj);
   void update_chains_menus (glwin * view);
   void update_chains_view (project * this_proj);
   void clean_chains_data (glwin * view);
@@ -57,23 +57,26 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 #include "submenus.h"
 
 extern gboolean run_distance_matrix (GtkWidget * widg, int calc, int up_ngb);
+extern int update_voisj_and_contj ();
 extern void clean_coord_window (project * this_proj);
 
 /*!
-  \fn void initchn ()
+  \fn void init_chain (project * this_proj)
 
   \brief initialize the curve widgets for the chains statistics calculation
+
+  \param this_proj the target project
 */
-void initchn ()
+void init_chain (project * this_proj)
 {
   int i;
-  active_project -> curves[CH][0] -> name = g_strdup_printf ("Chains - Cc(n)[All]");
-  for (i=0 ; i<active_project -> nspec ; i++)
+  this_proj -> analysis[CHA] -> curves[0] -> name = g_strdup_printf (_("Chains - C<sub>c</sub>(n)[All]"));
+  for (i=0 ; i<this_proj -> nspec ; i++)
   {
-    active_project -> curves[CH][i+1] -> name = g_strdup_printf ("Chains - Cc(n)[%s]", active_chem -> label[i]);
+    this_proj -> analysis[CHA] -> curves[i+1] -> name = g_strdup_printf (_("Chains - C<sub>c</sub>(n)[%s]"), active_chem -> label[i]);
   }
-  addcurwidgets (activep, CH, 0);
-  active_project -> initok[CH] = TRUE;
+  add_curve_widgets (this_proj, CHA);
+  this_proj -> analysis[CHA] -> init_ok = TRUE;
 }
 
 #ifdef GTK3
@@ -88,7 +91,7 @@ void update_chains_menus (glwin * view)
 {
   GtkWidget * menu;
   view -> ogl_chains[0] = destroy_this_widget (view -> ogl_chains[0]);
-  view -> ogl_chains[0] = menu_item_new_with_submenu ("Chain(s)", view -> chains, add_menu_coord (view, 0, 9));
+  view -> ogl_chains[0] = menu_item_new_with_submenu (_("Chain(s)"), view -> chains, add_menu_coord (view, 0, 9));
   menu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (view -> ogl_coord[0]));
   if (GTK_IS_WIDGET(menu))
   {
@@ -113,81 +116,83 @@ void update_chains_view (project * this_proj)
   gchar * tab;
   gchar * cid;
   gchar * str;
-
-  if (this_proj -> text_buffer[CH+OT] == NULL) this_proj -> text_buffer[CH+OT] = add_buffer (NULL, NULL, NULL);
-  view_buffer (this_proj -> text_buffer[CH+OT]);
+  if (this_proj -> analysis[CHA] -> calc_buffer == NULL) this_proj -> analysis[CHA] -> calc_buffer = add_buffer (NULL, NULL, NULL);
+  view_buffer (this_proj -> analysis[CHA] -> calc_buffer);
   j = this_proj -> csparam[0];
   if (! j)
   {
-    nelt = g_strdup_printf ("All");
+    nelt = g_strdup_printf (_("All"));
     col = NULL;
   }
   else
   {
     nelt = g_strdup_printf ("%s", this_proj -> chemistry -> label[j-1]);
-    col = textcolor(j-1);
+    col = g_strdup_printf("%s", textcolor(j-1));
   }
-  print_info ("\n\nChain statistics\n\n", "heading", this_proj -> text_buffer[CH+OT]);
-
+  print_info (_("\n\nChain statistics\n\n"), "heading", this_proj -> analysis[CHA] -> calc_buffer);
 
   if (this_proj -> csparam[1])
   {
-    print_info (" * only AAAA chains have been considered\n", "italic", this_proj -> text_buffer[CH+OT]);
+    print_info (_(" * only AAAA chains have been considered\n"), "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[2])
   {
-    print_info (" * only ABAB chains have been considered\n", "italic", this_proj -> text_buffer[CH+OT]);
+    print_info (_(" * only ABAB chains have been considered\n"), "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[3])
   {
-    print_info (" * homopolar bonds can not shorten the chains\n", "italic", this_proj -> text_buffer[CH+OT]);
+    print_info (_(" * homopolar bonds can not shorten the chains\n"), "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
   if (this_proj -> csparam[4])
   {
-    print_info (" * only 1-(2)", "italic", this_proj -> text_buffer[CH+OT]);
-    print_info ("n", "sub_italic", this_proj -> text_buffer[CH+OT]);
-    print_info ("-1 chains have been considered, ie. isolated chains\n", "italic", this_proj -> text_buffer[CH+OT]);
+    print_info (_(" * only 1-(2)"), "italic", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("n", "sub_italic", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info (_("-1 chains have been considered, ie. isolated chains\n"), "italic", this_proj -> analysis[CHA] -> calc_buffer);
   }
-  print_info ("\n Atom(s) used to start the search: ", NULL, this_proj -> text_buffer[CH+OT]);
-  print_info (nelt, col, this_proj -> text_buffer[CH+OT]);
-  if (j != 0) print_info (" atom(s) only", NULL, this_proj -> text_buffer[CH+OT]);
+  print_info (_("\n Atom(s) used to start the search: "), NULL, this_proj -> analysis[CHA] -> calc_buffer);
+  print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
+  if (j != 0) print_info (_(" atom(s) only"), NULL, this_proj -> analysis[CHA] -> calc_buffer);
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n Average number of chains per configuration: ", NULL, this_proj -> text_buffer[CH+OT]);
+    print_info (_("\n Average number of chains per configuration: "), NULL, this_proj -> analysis[CHA] -> calc_buffer);
     str = g_strdup_printf ("%f", this_proj -> csdata[0]);
-    print_info (str, "bold", this_proj -> text_buffer[CH+OT]);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
     str = g_strdup_printf (" +/- %f\n", this_proj -> csdata[1]);
-    print_info (str, "bold", this_proj -> text_buffer[CH+OT]);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
   }
   else
   {
-    print_info ("\n Total number of chains: ", NULL, this_proj -> text_buffer[CH+OT]);
+    print_info (_("\n Total number of chains: "), NULL, this_proj -> analysis[CHA] -> calc_buffer);
     str = g_strdup_printf ("%f\n", this_proj -> csdata[0]);
-    print_info (str, "bold", this_proj -> text_buffer[CH+OT]);
+    print_info (str, "bold", this_proj -> analysis[CHA] -> calc_buffer);
     g_free (str);
   }
 
   if (this_proj -> steps > 1)
   {
-    print_info ("\n\t n     Av. by step \tCc(n)[", "bold", this_proj -> text_buffer[CH+OT]);
-    print_info (nelt, col, this_proj -> text_buffer[CH+OT]);
+    print_info (_("\n\t n     Av. by step \tC"), "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("c", "sub_bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[CHA] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
     if (j == this_proj -> nspec)
     {
-      print_info ("]\t  +/-\n", "bold", this_proj -> text_buffer[CH+OT]);
+      print_info ("]\t  +/-\n", "bold", this_proj -> analysis[CHA] -> calc_buffer);
     }
     else
     {
-      print_info ("]\t   +/-\n", "bold", this_proj -> text_buffer[CH+OT]);
+      print_info ("]\t   +/-\n", "bold", this_proj -> analysis[CHA] -> calc_buffer);
     }
   }
   else
   {
-    print_info ("\n\t n\tNumber\t\tCc(n)[", "bold", this_proj -> text_buffer[CH+OT]);
-    print_info (nelt, col, this_proj -> text_buffer[CH+OT]);
-    print_info ("]\n", NULL, this_proj -> text_buffer[CH+OT]);
+    print_info (_("\n\t n\tNumber\t\tC"), "bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("c", "sub_bold", this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("(n)[", "bold",  this_proj -> analysis[CHA] -> calc_buffer);
+    print_info (nelt, col, this_proj -> analysis[CHA] -> calc_buffer);
+    print_info ("]\n", NULL, this_proj -> analysis[CHA] -> calc_buffer);
   }
   tab = NULL;
   cid = NULL;
@@ -196,7 +201,7 @@ void update_chains_view (project * this_proj)
   j = 1;
   for ( i=1 ; i < this_proj -> csparam[5] ; i++ )
   {
-    if (this_proj -> curves[CH][k] -> data[1][i] != 0.0)
+    if (this_proj -> analysis[CHA] -> curves[k] -> data[1][i] != 0.0)
     {
       j ++;
       if (j - 2*(j/2) == 0)
@@ -209,27 +214,27 @@ void update_chains_view (project * this_proj)
         tab = NULL;
         cid = g_strdup_printf ("bold");
       }
-      print_info ("\t", NULL, this_proj -> text_buffer[CH+OT]);
+      print_info ("\t", NULL, this_proj -> analysis[CHA] -> calc_buffer);
       if (i < 9)
       {
-        print_info (" ",cid, this_proj -> text_buffer[CH+OT]);
+        print_info (" ",cid, this_proj -> analysis[CHA] -> calc_buffer);
       }
       str = g_strdup_printf("%d", i+1);
-      print_info (str, cid, this_proj -> text_buffer[CH+OT]);
+      print_info (str, cid, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
-      str = g_strdup_printf("\t%f\t", l*this_proj -> curves[CH][k] -> data[1][i]);
-      print_info (str, tab, this_proj -> text_buffer[CH+OT]);
+      str = g_strdup_printf("\t%f\t", l*this_proj -> analysis[CHA] -> curves[k] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
-      str = g_strdup_printf("%f\t", this_proj -> curves[CH][k] -> data[1][i]);
-      print_info (str, tab, this_proj -> text_buffer[CH+OT]);
+      str = g_strdup_printf("%f\t", this_proj -> analysis[CHA] -> curves[k] -> data[1][i]);
+      print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
       g_free (str);
       if (this_proj -> steps > 1)
       {
-        str = g_strdup_printf("%f\t", this_proj -> curves[CH][k] -> err[i]);
-        print_info (str, tab, this_proj -> text_buffer[CH+OT]);
+        str = g_strdup_printf("%f\t", this_proj -> analysis[CHA] -> curves[k] -> err[i]);
+        print_info (str, tab, this_proj -> analysis[CHA] -> calc_buffer);
         g_free (str);
       }
-       print_info ("\n", NULL, this_proj -> text_buffer[CH+OT]);
+       print_info ("\n", NULL, this_proj -> analysis[CHA] -> calc_buffer);
       if (tab != NULL)
       {
         g_free (tab);
@@ -240,7 +245,7 @@ void update_chains_view (project * this_proj)
       }
     }
   }
-  print_info (calculation_time(TRUE, this_proj -> calc_time[CH]), NULL, this_proj -> text_buffer[CH+OT]);
+  print_info (calculation_time(TRUE, this_proj -> analysis[CHA] -> calc_time), NULL, this_proj -> analysis[CHA] -> calc_buffer);
   g_free (nelt);
   if (col != NULL)
   {
@@ -302,30 +307,32 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
 
   cutoffsend ();
   //if (active_project -> steps > 1) statusb = 1;
-  if (! active_project -> initok[CH]) initchn ();
-  active_project -> csparam[6] = 0;
-  if (! active_project -> dmtx) active_project -> dmtx = run_distance_matrix (widg, 6, 0);
 
-  if (active_project -> dmtx)
+  if (! active_project -> analysis[CHA] -> init_ok) init_chain (active_project);
+  active_project -> csparam[6] = 0;
+  if (! run_distance_matrix (widg, 6, 0))
   {
-    clean_curves_data (CH, 0, active_project -> numc[CH]);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, widg);
+  }
+  else
+  {
+    clean_curves_data (CHA, active_project -> csparam[0], active_project -> csparam[0]+1);
     clean_chains_data (active_glwin);
-    active_glwin -> all_chains = g_malloc0 (active_project -> steps*sizeof*active_glwin -> all_chains);
-    active_glwin -> num_chains = g_malloc0 (active_project -> steps*sizeof*active_glwin -> num_chains);
+    active_glwin -> all_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> all_chains);
+    active_glwin -> num_chains = g_malloc0(active_project -> steps*sizeof*active_glwin -> num_chains);
     for (j=0; j<active_project -> steps; j++)
     {
-      active_glwin -> all_chains[j] = g_malloc0 (active_project -> csparam[5]*sizeof*active_glwin -> all_chains[j]);
+      active_glwin -> all_chains[j] = g_malloc0(active_project -> csparam[5]*sizeof*active_glwin -> all_chains[j]);
       active_glwin -> num_chains[j] = allocint (active_project -> csparam[5]);
       for (k=0; k < active_project -> natomes; k++)
       {
         if (active_project -> atoms[j][k].chain) g_free (active_project -> atoms[j][k].chain);
         active_project -> atoms[j][k].chain = NULL;
-        active_project -> atoms[j][k].chain = g_malloc0 (active_project -> csparam[5]*sizeof*active_project -> atoms[j][k].chain);
+        active_project -> atoms[j][k].chain = g_malloc0(active_project -> csparam[5]*sizeof*active_project -> atoms[j][k].chain);
       }
     }
     k = 1;
-    prepostcalc (widg, FALSE, CH, 0, opac);
-    clock_gettime (CLOCK_MONOTONIC, & start_time);
+    prepostcalc (widg, FALSE, CHA, 0, opac);
     j = initchains_ (& active_project -> csparam[0],
                      & active_project -> csparam[1],
                      & active_project -> csparam[2],
@@ -333,31 +340,26 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
                      & active_project -> csparam[4],
                      & active_project -> csparam[5],
                      & active_project -> csearch);
-    clock_gettime (CLOCK_MONOTONIC, & stop_time);
-    active_project -> calc_time[CH] = get_calc_time (start_time, stop_time);
+    prepostcalc (widg, TRUE, CHA, (j == 1) ? 1 : 0, 1.0);
     if (j == 0)
     {
-      show_error ("The chain statistics calculation has failed", 0, widg);
+      show_error (_("The chain statistics calculation has failed"), 0, widg);
     }
     else if (j == 2)
     {
-      gchar * str = g_strdup_printf ("\t<b>The chain statistics have failed !</b>\n\n"
+      gchar * str = g_strdup_printf (_("\t<b>The chain statistics have failed !</b>\n\n"
                                      "The number of chain per MD step appears\n"
                                      "to be bigger than the initial value of <b>%d</b>\n"
                                      "used to allocate memory to store the results.\n\n"
-                                     "Increase the value and start again !",
+                                     "Increase the value and start again !"),
                                      active_project -> csearch);
       show_error (str, 0, widg);
       g_free (str);
       j = 0;
     }
-    prepostcalc (widg, TRUE, CH, j, 1.0);
   }
-  else
-  {
-    show_error ("The nearest neighbors table calculation has failed", 0, widg);
-  }
-  if (active_coord -> totcoord[9])
+
+  if (j == 1)
   {
     active_project -> csparam[6] = 1;
     active_glwin -> chains = TRUE;
@@ -367,6 +369,7 @@ G_MODULE_EXPORT void on_calc_chains_released (GtkWidget * widg, gpointer data)
   show_the_widgets (curvetoolbox);
   clean_coord_window (active_project);
   fill_tool_model ();
+  free_contj_voisj_ ();
 #ifdef GTK3
   update_chains_menus (active_glwin);
 #endif
@@ -388,5 +391,5 @@ void save_chains_data_ (int * taille, double ectrc[* taille], double * rpstep, d
   active_project -> csdata[0] = * rpstep;
   active_project -> csdata[1] = * ectrpst;
   i = active_project -> csparam[0];
-  active_project -> curves[CH][i] -> err = duplicate_double (* taille, ectrc);
+  active_project -> analysis[CHA] -> curves[i] -> err = duplicate_double (* taille, ectrc);
 }

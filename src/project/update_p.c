@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file update_p.c
@@ -37,6 +37,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void prep_calc_actions ();
   void active_project_changed (int id);
   void opengl_project_changed (int id);
+  void update_analysis_availability (project * this_proj);
 
 */
 
@@ -58,30 +59,97 @@ extern GtkTreeStore * tool_model;
 void prep_calc_actions ()
 {
   int i;
+  gchar * str;
   // Depends on the number of calculations available
-  for (i=0; i<G_N_ELEMENTS(analyze_actions); i++)
+  for (i=0; i<NCALCS-1; i++)
   {
-    if (i < AN)
+    str = g_strdup_printf ("analyze.%d", i);
+    if (! active_project || ! active_project -> analysis)
     {
-      if (active_project -> runok[i])
-      {
-        add_action (analyze_actions[i]);
-      }
-      else
-      {
-        remove_action (analyze_acts[i].action_name);
-      }
+      remove_action (str);
     }
     else
     {
-      if (active_project -> runok[i+1])
+      if (i < ANG)
       {
-        add_action (analyze_actions[i]);
+        if (active_project -> analysis[i])
+        {
+          if (active_project -> analysis[i] -> avail_ok)
+          {
+            add_analysis_action (i);
+          }
+          else
+          {
+            remove_action (str);
+          }
+        }
+        else
+        {
+          remove_action (str);
+        }
       }
       else
       {
-        remove_action (analyze_acts[i].action_name);
+        if (active_project -> analysis[i+1])
+        {
+          if (active_project -> analysis[i+1] -> avail_ok)
+          {
+            add_analysis_action (i);
+          }
+          else
+          {
+            remove_action (str);
+          }
+        }
+        else
+        {
+          remove_action (str);
+        }
       }
+    }
+    g_free (str);
+  }
+}
+
+/*!
+  \fn void update_analysis_availability (project * this_proj)
+
+  \brief update analysis availability for a target projet
+
+  \param this_proj the target project
+*/
+void update_analysis_availability (project * this_proj)
+{
+  if (this_proj -> natomes && this_proj -> analysis)
+  {
+    if (this_proj -> cell.has_a_box)
+    {
+      if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = TRUE;
+      if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = TRUE;
+      if (this_proj -> analysis[SQD] && this_proj -> analysis[GDR]) this_proj -> analysis[SQD] -> avail_ok = this_proj -> analysis[GDR] -> calc_ok;
+      if (this_proj -> analysis[GDK] && this_proj -> analysis[SKD]) this_proj -> analysis[GDK] -> avail_ok = this_proj -> analysis[SKD] -> calc_ok;
+      if (this_proj -> steps > 1 && this_proj -> analysis[SKT]) this_proj -> analysis[SKT] -> avail_ok = TRUE;
+    }
+    else
+    {
+      if (this_proj -> analysis[GDR]) this_proj -> analysis[GDR] -> avail_ok = FALSE;
+      if (this_proj -> analysis[SQD]) this_proj -> analysis[SQD] -> avail_ok = FALSE;
+      if (this_proj -> analysis[SKD]) this_proj -> analysis[SKD] -> avail_ok = FALSE;
+      if (this_proj -> analysis[GDK]) this_proj -> analysis[GDK] -> avail_ok = FALSE;
+    }
+    if (this_proj -> analysis[BND]) this_proj -> analysis[BND] -> avail_ok = TRUE;
+    if (this_proj -> analysis[ANG]) this_proj -> analysis[ANG] -> avail_ok = TRUE;
+    if (this_proj -> analysis[RIN]) this_proj -> analysis[RIN] -> avail_ok = TRUE;
+    if (this_proj -> analysis[CHA]) this_proj -> analysis[CHA] -> avail_ok = TRUE;
+    if (this_proj -> analysis[SPH]) this_proj -> analysis[SPH] -> avail_ok = TRUE;
+    if (this_proj -> steps > 1 && this_proj -> analysis[MSD]) this_proj -> analysis[MSD] -> avail_ok = TRUE;
+  }
+  else if (this_proj -> analysis)
+  {
+    int i;
+    for (i=0; i<NCALCS; i++)
+    {
+      if (this_proj -> analysis[i]) this_proj -> analysis[i] -> avail_ok = FALSE;
     }
   }
 }
@@ -120,7 +188,6 @@ int update_project ()
     }
     if (active_project -> run)
     {
-      active_project -> dmtx = FALSE;
       j = (active_cell -> npt) ? active_project -> steps : 1;
       for (i=0; i<j; i++)
       {
@@ -136,29 +203,7 @@ int update_project ()
       cutoffsend ();
     }
   }
-  if (active_project -> numwid > 0)
-  {
-    if (active_cell -> has_a_box)
-    {
-      active_project -> runok[GR] = TRUE;
-      active_project -> runok[SK] = TRUE;
-    }
-    else
-    {
-      active_project -> runok[GR] = FALSE;
-      active_project -> runok[SQ] = FALSE;
-      active_project -> runok[SK] = FALSE;
-      active_project -> runok[GK] = FALSE;
-    }
-    if (active_project -> natomes)
-    {
-      active_project -> runok[BD] = TRUE;
-      active_project -> runok[RI] = TRUE;
-      active_project -> runok[CH] = TRUE;
-      active_project -> runok[SP] = TRUE;
-      if (active_project -> steps > 1) active_project -> runok[MS] = TRUE;
-    }
-  }
+  if (! atomes_render_image) update_analysis_availability (active_project);
 #ifdef DEBUG
   g_debug ("UPDATE_PROJECT: updated");
 #endif
@@ -175,8 +220,11 @@ int update_project ()
 void active_project_changed (int id)
 {
   char * errp = NULL;
-  if (id != inactep && inactep < nprojects && ! atomes_logo) clean_view ();
-  gtk_tree_store_clear (tool_model);
+  if (! atomes_render_image)
+  {
+    if (id != inactep && inactep < nprojects && ! atomes_logo) clean_view ();
+    gtk_tree_store_clear (tool_model);
+  }
   activep = id;
   active_project = get_project_by_id (id);
   active_chem = active_project -> chemistry;
@@ -207,28 +255,31 @@ void active_project_changed (int id)
   }
   if (update_project() == 0)
   {
-    errp = g_strdup_printf ("Impossible to update project: %s\n", active_project -> name);
+    errp = g_strdup_printf (_("Impossible to update project: %s\n"), active_project -> name);
     show_error (errp, 0, MainWindow);
     g_free (errp);
   }
   else
   {
-    if (active_project -> numwid > 0)
+    if (! atomes_render_image)
     {
-      prep_calc_actions ();
-      add_action (edition_actions[0]);
-      if (active_cell -> npt)
+      if (active_project -> analysis)
       {
-        remove_action (edition_acts[1].action_name);
+        prep_calc_actions ();
+        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[0]));
+        if (active_cell -> npt)
+        {
+          remove_action (edition_acts[1].action_name);
+        }
+        else
+        {
+          g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[1]));
+        }
+        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
+        fill_tool_model ();
+        correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
+        correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
       }
-      else
-      {
-        add_action (edition_actions[1]);
-      }
-      add_action (edition_actions[2]);
-      fill_tool_model ();
-      correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
-      correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
     }
     inactep = activep;
   }

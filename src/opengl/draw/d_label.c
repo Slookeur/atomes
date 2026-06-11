@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file d_label.c
@@ -105,6 +105,9 @@ void prepare_label (atom at, int id, double al)
       break;
     case SYMBOL_AND_NUM:
       str = g_strdup_printf ("%s%d", exact_name(proj_gl -> chemistry -> label[k]), at.id+1);
+      break;
+    case SYMBOL_AND_IND:
+      str = g_strdup_printf ("%s<sub>%d</sub>", exact_name(proj_gl -> chemistry -> label[k]), at.id+1);
       break;
     case NUM:
       str = g_strdup_printf ("%d", at.id+1);
@@ -257,7 +260,7 @@ int create_label_lists ()
     {
       nshaders += (plot -> labels[1].render + 1) * (plot -> labels[1].list -> last -> id + 1);
     }
-    wingl -> ogl_glsl[LABEL][0] = g_malloc0 (nshaders*sizeof*wingl -> ogl_glsl[LABEL][0]);
+    wingl -> ogl_glsl[LABEL][0] = g_malloc0(nshaders*sizeof*wingl -> ogl_glsl[LABEL][0]);
     for (i=0; i<2; i++) render_all_strings (LABEL, i);
   }
   return nshaders;

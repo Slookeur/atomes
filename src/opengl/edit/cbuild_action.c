@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cbuild_action.c
@@ -103,7 +103,7 @@ double get_val_from_setting (gchar * pos, gchar * sval)
       ksym = g_strdup_printf ("%s%s", sym[i], pos);
       if (strstr(sval, ksym))
       {
-        tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, ksym, NULL));
+        tmp_pos = replace_markup (tmp_pos, ksym, NULL);
         g_free (ksym);
         ksym = NULL;
         if (! strlen(tmp_pos))
@@ -116,7 +116,7 @@ double get_val_from_setting (gchar * pos, gchar * sval)
       g_free (ksym);
       ksym = NULL;
     }
-    tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, pos, NULL));
+    tmp_pos = replace_markup (tmp_pos, pos, NULL);
     if (! strlen(tmp_pos))
     {
       g_free (tmp_pos);
@@ -353,7 +353,7 @@ int test_lattice (builder_edition * cbuilder, cell_info * cif_cell)
     }
     if (! test_vol(box -> param, box -> vect))
     {
-      show_warning ("Please describe properly the lattice parameters", cbuilder -> win);
+      show_warning (_("Please describe properly the lattice parameters"), cbuilder -> win);
       return 0;
     }
     compute_lattice_properties (cell, 0);
@@ -482,7 +482,7 @@ double get_val_from_wyckoff (gchar * pos, gchar * wval)
       ksym = g_strdup_printf ("%s%s", sym[i], pos);
       if (strstr(wval, ksym))
       {
-        tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, ksym, NULL));
+        tmp_pos = replace_markup (tmp_pos, ksym, NULL);
         g_free (ksym);
         ksym = NULL;
         if (! strlen(tmp_pos))
@@ -495,7 +495,7 @@ double get_val_from_wyckoff (gchar * pos, gchar * wval)
       g_free (ksym);
       ksym = NULL;
     }
-    tmp_pos = g_strdup_printf ("%s", replace_markup (tmp_pos, pos, NULL));
+    tmp_pos = replace_markup (tmp_pos, pos, NULL);
     if (! strlen(tmp_pos))
     {
       g_free (tmp_pos);
@@ -623,9 +623,9 @@ crystal_data * allocate_crystal_data (int objects, int species)
   crystal_data * cryst = g_malloc0(sizeof*cryst);
   cryst -> objects = objects;
   cryst -> spec = species;
-  cryst -> at_by_object = allocint(cryst -> objects);
-  cryst -> pos_by_object = allocint(cryst -> objects);
-  cryst -> occupancy = allocdouble(cryst -> objects);
+  cryst -> at_by_object = allocint (cryst -> objects);
+  cryst -> pos_by_object = allocint (cryst -> objects);
+  cryst -> occupancy = allocdouble (cryst -> objects);
   cryst -> sites = g_malloc0(cryst -> objects*sizeof*cryst -> sites);
   cryst -> insert = g_malloc0(cryst -> objects*sizeof*cryst -> insert);
   cryst -> position = g_malloc0(cryst -> objects*sizeof*cryst -> position);
@@ -976,11 +976,11 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   space_group * sp_group = cell -> sp_group;
   box_info * box = & cell -> box[c_step];
   gchar * str;
-  mat4_t ** wyckpos = g_malloc0 (sp_group -> numw*sizeof*wyckpos);
+  mat4_t ** wyckpos = g_malloc0(sp_group -> numw*sizeof*wyckpos);
   double spgpos[3][4];
   for (i=0; i<1; i++)//sp_group -> numw; i++)
   {
-    wyckpos[i] = g_malloc0 (sp_group -> wyckoff[i].multi*sizeof*wyckpos[i]);
+    wyckpos[i] = g_malloc0(sp_group -> wyckoff[i].multi*sizeof*wyckpos[i]);
     for (j=0; j<sp_group -> wyckoff[i].multi; j++)
     {
       for (k=0; k<3; k++)
@@ -1143,7 +1143,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
             }
           }
           n = sp_group -> wyckoff[0].multi*npoints;
-          cdata -> at_type[i] = allocint(n);
+          cdata -> at_type[i] = allocint (n);
           cdata -> coord[i] = g_malloc0(n*sizeof*cdata -> coord[i]);
           cdata -> insert[i] = m4_mul_coord (sp_group -> coord_origin, vec3(object -> baryc[0], object -> baryc[1], object -> baryc[2]));
 #ifdef DEBUG
@@ -1176,7 +1176,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
           }
           cdata -> pos_by_object[i] = n;
           cdata -> occupancy[i] = object -> occ;
-          if (! cdata -> holes[i]) cdata -> lot[i] = allocint(object -> atoms);
+          if (! cdata -> holes[i]) cdata -> lot[i] = allocint (object -> atoms);
           cdata -> position[i] = g_malloc0(object -> atoms*sizeof*cdata -> position[i]);
           for (l=0; l<object -> atoms; l++)
           {
@@ -1205,11 +1205,11 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
           {
             if (! crystal_crowded)
             {
-              str = g_strdup_printf ("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
-                                     "If you build the crystal the final structure is likely to be crowded !\n"
-                                     "Continue anyway ?", object -> name, object -> dim);
+              str = g_strdup_printf (_("%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
+                                       "If you build the crystal the final structure is likely to be crowded !\n"
+                                       "Continue anyway ?"), object -> name, object -> dim);
               build_res = 2;
-              crystal_crowded = ask_yes_no("This object might be too big !" , str, GTK_MESSAGE_WARNING, widg);
+              crystal_crowded = ask_yes_no(_("This object might be too big !") , str, GTK_MESSAGE_WARNING, widg);
               if (! crystal_crowded)
               {
                 g_free (str);
@@ -1284,7 +1284,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       if (u+v > 1.0 || u+v < 0.0)
       {
         if (cdata) cdata = free_crystal_data (cdata);
-        show_warning ("Impossible to build crystal: check occupancy !", widg);
+        show_warning (_("Impossible to build crystal: check occupancy !"), widg);
         return 0;
       }
       else if (cdata -> overlapping && ! cdata -> with_holes)
@@ -1322,7 +1322,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                 }
                 if (u+v > 1.00001)
                 {
-                  show_warning ("Impossible to build crystal: site total occupancy > 1.0", widg);
+                  show_warning (_("Impossible to build crystal: site total occupancy > 1.0"), widg);
                   if (cdata) cdata = free_crystal_data (cdata);
                   return 0;
                 }
@@ -1354,7 +1354,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   if (m == cdata -> objects)
   {
     if (cdata) cdata = free_crystal_data (cdata);
-    show_warning ("Impossible to build crystal: empty site(s) only !", widg);
+    show_warning (_("Impossible to build crystal: empty site(s) only !"), widg);
     return 0;
   }
   gboolean new_proj = (this_proj -> natomes && visible) ? TRUE : FALSE;
@@ -1409,7 +1409,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
       if (! cdata -> holes[k]) cryst -> lot[k] = duplicate_int (cdata -> at_by_object[k], cdata -> lot[k]);
       cryst -> occupancy[k] = cdata -> occupancy[k];
       cryst -> sites[k] = duplicate_int (cdata -> sites[k][0]+1, cdata -> sites[k]);
-      cryst -> position[k] = g_malloc0 (cdata -> at_by_object[k]*sizeof*cryst -> position[k]);
+      cryst -> position[k] = g_malloc0(cdata -> at_by_object[k]*sizeof*cryst -> position[k]);
       for (l=0; l<cdata -> at_by_object[k]; l++) cryst -> position[k][l] = cdata -> position[k][l];
       cryst -> coord[k] = g_malloc0(cryst -> pos_by_object[k]*sizeof*cryst -> coord[k]);
     }
@@ -1438,7 +1438,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
             cryst -> occupancy[n+h] = cdata -> occupancy[n];
             cryst -> sites[n+h] = duplicate_int (cdata -> sites[n][0]+1, cdata -> sites[n]);
             for (o=0; o<cryst -> sites[n+h][0]; o++) cryst -> sites[n+h][o+1] += h;
-            cryst -> position[n+h] = g_malloc0 (cdata -> at_by_object[n]*sizeof*cryst -> position[n+h]);
+            cryst -> position[n+h] = g_malloc0(cdata -> at_by_object[n]*sizeof*cryst -> position[n+h]);
             for (o=0; o<cdata -> at_by_object[n]; o++) cryst -> position[n+h][o] = cdata -> position[n][o];
           }
           o = cdata -> pos_by_object[n];
@@ -1486,8 +1486,8 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
                     if (crystal_dist_chk)
                     {
                       build_res = 3;
-                      if (ask_yes_no ("Inter-object distance(s) < 0.5 Ang. !",
-                                      "Inter-object distance(s) &lt; 0.5 Ang. !\n\n\t\tContinue and leave a single object at each position ?", GTK_MESSAGE_WARNING, widg))
+                      if (ask_yes_no (_("Inter-object distance(s) < 0.5 Ang. !"),
+                                      _("Inter-object distance(s) &lt; 0.5 &#xC5; !\n\n\t\tContinue and leave a single object at each position ?"), GTK_MESSAGE_WARNING, widg))
                       {
                         crystal_dist_chk = FALSE;
                       }
@@ -1529,7 +1529,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   {
     if (! cryst -> holes[i]) tot_new_at += cryst -> pos_by_object[i]*cryst -> at_by_object[i];
   }
-  int * tot_new_lot = allocint(tot_new_at);
+  int * tot_new_lot = allocint (tot_new_at);
   vec3_t * ncc = g_malloc0(tot_new_at*sizeof*ncc);
   i = 0;
   for (j=0; j<cryst -> objects; j++)
@@ -1677,11 +1677,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
 
   if (visible)
   {
-    for (i=0; i<3; i=i+2) active_project -> runok[i] = TRUE;
-    active_project -> runok[BD] = TRUE;
-    active_project -> runok[RI] = TRUE;
-    active_project -> runok[CH] = TRUE;
-    active_project -> runok[SP] = TRUE;
+    update_analysis_availability (active_project);
     active_project_changed (activep);
     if (new_proj)
     {
@@ -1691,12 +1687,12 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
     else
     {
       active_project -> run = TRUE;
-      active_image -> style = (active_project -> natomes <= 1000) ? BALL_AND_STICK : DEFAULT_STYLE;
+      active_image -> style = (active_project -> natomes <= 10000) ? BALL_AND_STICK : DEFAULT_STYLE;
       initcutoffs (active_chem, active_project -> nspec);
       init_curves_and_calc (active_project);
-      initcwidgets ();
+      init_atomes_analysis (active_project, TRUE);
       active_project_changed (activep);
-      init_camera (active_project, TRUE);
+      init_camera (active_project);
       setup_default_lights (active_project, active_image);
       setup_image_spec_data (active_project, active_image);
       glwin_init_spec_data (active_project, active_project -> nspec);
@@ -1725,7 +1721,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
 #endif
       }
       show_the_widgets (active_glwin -> win);
-      gtk_button_set_label (GTK_BUTTON(active_glwin -> builder_win -> pbut), "Build (new project)");
+      gtk_button_set_label (GTK_BUTTON(active_glwin -> builder_win -> pbut), _("Build (new project)"));
       if (active_glwin -> atom_win)
       {
         if (active_glwin -> atom_win -> win)
@@ -1734,7 +1730,7 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
         }
       }
     }
-    init_camera (active_project, TRUE);
+    init_camera (active_project);
     active_image -> abc -> box = 1;
     if (to_wrap)
     {
@@ -1770,12 +1766,12 @@ int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean t
   active_cell -> sp_group = duplicate_space_group (sp_group);
   if (low_occ && crystal_low_warning)
   {
-    gchar * low_warning = "The crystal will be created however some objects might be missing,\n"
-                           "Occupancy is too low compared to the number of site(s) per cell.\n\n"
-                          "<b>To build a crystal matching the defined occupancy</b>:\n"
-                          "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
-                          "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
-                          "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.";
+    gchar * low_warning = _("The crystal will be created however some objects might be missing,\n"
+                            "Occupancy is too low compared to the number of site(s) per cell.\n\n"
+                            "<b>To build a crystal matching the defined occupancy</b>:\n"
+                            "\t <b>1)</b> If you are trying to read a CIF file, use the crystal builder instead.\n"
+                            "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
+                            "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.");
     show_warning (low_warning, widg);
     crystal_low_warning = FALSE;
   }

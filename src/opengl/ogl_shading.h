@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file ogl_shading.h
@@ -72,30 +72,18 @@ extern const GLchar * degree_vertex;
 // Triangles: Multiple lights + Materials + Transparency shaders
 extern const GLchar * full_vertex;
 extern const GLchar * full_color;
+extern const GLchar * full_color_ray;
 
 // Sphere
 extern const GLchar * sphere_vertex;
-
+extern const GLchar * sphere_vertex_ray;
 // Cylinder and caps
 extern const GLchar * cylinder_vertex;
+extern const GLchar * cylinder_vertex_ray;
 extern const GLchar * cone_vertex;
+extern const GLchar * cone_vertex_ray;
 extern const GLchar * cap_vertex;
-
-extern const GLchar * axis_sphere_vertex;
-extern const GLchar * axis_cylinder_geom;
-extern const GLchar * axis_line_vertex;
-
-// Cylinder in geometry shader
-extern const GLchar * gs_cylinder_vertex;
-extern const GLchar * gs_cylinder_geom;
-
-extern const GLchar * polyedron_vertex;
-extern const GLchar * polyedron_geom;
-extern const GLchar * polyedron_color;
-
-extern const GLchar * axis_cylinder_geom;
-
-extern const GLchar * pick_color;
+extern const GLchar * cap_vertex_ray;
 
 extern const GLchar * string_vertex;
 extern const GLchar * string_color;
@@ -147,4 +135,5 @@ struct glsl_program
   ColRGBA * col;           /*!< String color */
 };
 
+extern void allocate_instances (object_3d * object);
 #endif

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd_atoms.c
@@ -149,25 +149,26 @@ void create_dummy_param_box (int dummy_id)
   {
     GtkWidget * hbox;
     GtkWidget * widg;
-    str = g_strdup_printf ("Configuration for dummy atom N°<b>%d</b>: ", dummy_id+1);
+    str = g_strdup_printf (_("Configuration for dummy atom N°<b>%d</b>: "), dummy_id+1);
     dummy_box[1] = create_vbox (BSEP);
     cpmd_box (dummy_box[1], str, 0, 5, 280);
     g_free (str);
     int i;
-    hbox = cpmd_box (dummy_box[1], "Type of dummy atom:", 0, 25, -1);
+    hbox = cpmd_box (dummy_box[1], _("Type of dummy atom:"), 0, 25, -1);
     GtkWidget * box = create_combo ();
-    gchar * dtypes[3] = {"Type 1", "Type 2", "Type 3"};
-    gchar * dtext[3] = {"fixed in space:",
-                        "calculated by\nthe arithmetic mean of the coordinates of the selected atom(s)",
-                        "calculated by\nthe center of mass of the coordinates of the selected atom(s)"};
+    gchar * dtext[3] = {i18n("fixed in space:"),
+                        i18n("calculated by\nthe arithmetic mean of the coordinates of the selected atom(s)"),
+                        i18n("calculated by\nthe center of mass of the coordinates of the selected atom(s)")};
     for (i=0; i<3; i++)
     {
-      combo_text_append (box, dtypes[i]);
+      str = g_strdup_printf ("%s %d", _("Type"), i+1);
+      combo_text_append (box, str);
+      g_free (str);
     }
     g_signal_connect (G_OBJECT (box), "changed", G_CALLBACK(dummy_type_changed), NULL);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, box, FALSE, FALSE, 10);
     dummy = get_active_dummy (dummy_id);
-    str = g_strdup_printf ("The coordinates of the dummy atom are %s", dtext[dummy -> type]);
+    str = g_strdup_printf (_("The coordinates of the dummy atom are %s"), _(dtext[dummy -> type]));
 
     hbox = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, dummy_box[1], hbox, FALSE, FALSE, 0);
@@ -183,7 +184,7 @@ void create_dummy_param_box (int dummy_id)
 
       for (i=0; i<3; i++)
       {
-        str = g_strdup_printf ("Dummy %s coordinate: ", lcoo[i]);
+        str = g_strdup_printf (_("Dummy %s coordinate: "), lcoo[i]);
         hbox = cpmd_box (dummy_box[1], str, 0, 25, -1);
         widg = create_entry (G_CALLBACK(update_dummy_coord), 100, 15, FALSE, GINT_TO_POINTER(i));
         add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 10);
@@ -221,7 +222,7 @@ G_MODULE_EXPORT void changed_dummy_id_box (GtkComboBox * box, gpointer data)
 */
 dummy_atom * init_dummy (int type, int id)
 {
-  dummy_atom * dumm = g_malloc0 (sizeof*dumm);
+  dummy_atom * dumm = g_malloc0(sizeof*dumm);
   dumm -> id = id;
   dumm -> type = type;
   dumm -> show = FALSE;
@@ -415,7 +416,7 @@ G_MODULE_EXPORT void run_remove_dummy (GtkDialog * dialog, gint response_id, gpo
       }
       else
       {
-        str = g_strdup_printf ("You must select %d dummy atom(s) to be deleted !", num_to_remove);
+        str = g_strdup_printf (_("You must select %d dummy atom(s) to be deleted !"), num_to_remove);
         show_warning (str, qm_assistant);
         g_free (str);
       }
@@ -439,18 +440,18 @@ void remove_dummy (int num_to_remove)
 {
   int i, j, k;
   gchar * str;
-  str = g_strdup_printf ("Select the %d dummy atom(s) to be removed", num_to_remove);
+  str = g_strdup_printf (_("Select the %d dummy atom(s) to be removed"), num_to_remove);
   GtkWidget * rdummy = dialogmodal (str, GTK_WINDOW(qm_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(rdummy), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(rdummy), _("Apply"), GTK_RESPONSE_APPLY);
 
-  gchar * mol_title[5] = {"Id", "Type", "Atom(s)", "      ", "Select"};
+  gchar * mol_title[5] = {i18n("Id."), i18n("Type"), i18n("Atom(s)"), "      ", i18n("Select")};
   gchar * ctype[5] = {"text", "text", "text", "text", "active"};
   GType col_type[5] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_BOOLEAN};
 
   GtkTreeIter dummy_level, atom_level;
   n_dummy = 0;
-  old_dummy = allocint(tmp_cpmd -> dummies);
+  old_dummy = allocint (tmp_cpmd -> dummies);
   GtkTreeStore * remove_model = gtk_tree_store_newv (5, col_type);
   GtkWidget * remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   for (i=0; i<5; i++)
@@ -465,7 +466,7 @@ void remove_dummy (int num_to_remove)
       gtk_cell_renderer_toggle_set_radio (GTK_CELL_RENDERER_TOGGLE(dummy_renderer[i]), TRUE);
       g_signal_connect (G_OBJECT(dummy_renderer[i]), "toggled", G_CALLBACK(select_dummy), & remove_model);
     }
-    dummy_col[i] = gtk_tree_view_column_new_with_attributes (mol_title[i], dummy_renderer[i], ctype[i], i, NULL);
+    dummy_col[i] = gtk_tree_view_column_new_with_attributes ((i != 3) ? _(mol_title[i]) : mol_title[i], dummy_renderer[i], ctype[i], i, NULL);
     gtk_tree_view_column_set_alignment (dummy_col[i], 0.5);
     gtk_tree_view_append_column (GTK_TREE_VIEW(remove_tree), dummy_col[i]);
     gtk_tree_view_column_set_cell_data_func (dummy_col[i], dummy_renderer[i], dummy_set_visible, GINT_TO_POINTER(i), NULL);
@@ -476,7 +477,7 @@ void remove_dummy (int num_to_remove)
   {
     gtk_tree_store_append (remove_model, & dummy_level, NULL);
     gtk_tree_store_set (remove_model, & dummy_level, 0, i+1,
-                                                     1, g_strdup_printf ("Type %d", dumm -> type + 1),
+                                                     1, g_strdup_printf ("%s %d", _("Type"), dumm -> type + 1),
                                                      2, dumm -> natoms,
                                                      3, NULL,
                                                      4, 0, -1);
@@ -552,8 +553,8 @@ G_MODULE_EXPORT void add_or_remove_dummy (GtkSpinButton * res, gpointer data)
       k = id - tmp_cpmd -> dummies;
       if (k > 1)
       {
-        str = g_strdup_printf ("Do you really want to add %d dummy atom(s) ?", k);
-        to_add_dummy = ask_yes_no ("Adding dummy atom(s) ?", str, GTK_MESSAGE_QUESTION, qm_assistant);
+        str = g_strdup_printf (_("Do you really want to add %d dummy atom(s) ?"), k);
+        to_add_dummy = ask_yes_no (_("Adding dummy atom(s) ?"), str, GTK_MESSAGE_QUESTION, qm_assistant);
         g_free (str);
       }
       if (to_add_dummy)
@@ -580,11 +581,11 @@ GtkWidget * create_dummy_box ()
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox;
   GtkWidget * widg;
-  hbox = cpmd_box (vbox, "Number of dummy atom(s):", 5, 20, 200);
+  hbox = cpmd_box (vbox, _("Number of dummy atom(s):"), 5, 20, 200);
   widg = spin_button (G_CALLBACK(add_or_remove_dummy),
                       tmp_cpmd -> dummies, 0.0, (double)qm_proj -> natomes, 1.0, 0, 100, NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
-  combo_id[1] = cpmd_box (vbox, "Dummy atom to configure: ", 5, 5, 200);
+  combo_id[1] = cpmd_box (vbox, _("Dummy atom to configure: "), 5, 5, 200);
   dummy_box[0] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, dummy_box[0], FALSE, FALSE, 10);
   create_selection_combo (1, tmp_cpmd -> dummies, 0, G_CALLBACK(changed_dummy_id_box));
@@ -603,19 +604,18 @@ G_MODULE_EXPORT void atom_button (GtkWidget * but, gpointer data)
 {
   int i, j;
   i = GPOINTER_TO_INT(data);
-  gchar * atom_cons[2] = {"Add and configure constraint(s)", "Add and configure dummy atoms"};
-  GtkWidget * amol = dialogmodal (atom_cons[(i == DEFCO) ? 0 : 1], GTK_WINDOW(qm_assistant));
+  GtkWidget * amol = dialogmodal ((i == DEFCO) ? _("Add and configure constraint(s)") : _("Add and configure dummy atoms"), GTK_WINDOW(qm_assistant));
   GtkWidget * vbox = dialog_get_content_area (amol);
   GtkWidget * hbox;
   GtkWidget * widg;
   gchar * str;
   if (i == DEFCO)
   {
-    hbox = cpmd_box (vbox, default_opts[5][1], 5, 20, 120);
+    hbox = cpmd_box (vbox, _(default_opts[5][1]), 5, 20, 120);
     widg = create_combo ();
     for (j=0; j<defaut_num[5]; j++)
     {
-      str = g_strdup_printf ("%s", default_text[5][j]);
+      str = g_strdup_printf ("%s", _(default_text[5][j]));
       combo_text_append (widg, str);
       g_free (str);
     }

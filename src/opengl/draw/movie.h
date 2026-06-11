@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file movie.h
@@ -71,4 +71,24 @@ struct video_options
 
 extern void render_image (glwin * view, video_options * iopts);
 extern void save_movie (glwin * view, video_options * vopts);
+
+// Image rendering options from the command line
+extern int render_image_format;
+extern int render_image_style;
+extern int render_image_axis;
+extern int render_image_box;
+extern int render_image_rep;
+extern int render_image_acolor;
+extern int render_image_pcolor;
+extern gboolean trigger_fragment_analysis;
+extern gboolean trigger_molecule_analysis;
+extern ColRGBA * render_image_back_color;
+extern int render_image_back_grad;
+extern int render_image_back_dir;
+extern float render_image_back_pos;
+extern ColRGBA * render_image_grad_color[2];
+extern ColRGBA * render_image_box_color;
+extern int * render_image_pixels;
+extern gchar * render_image_output;
+
 #endif

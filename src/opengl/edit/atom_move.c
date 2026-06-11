@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_move.c
@@ -334,7 +334,7 @@ void random_move_this_atom (project * this_proj, int aid)
   i = (int)begin;
   for (j=0; j<3; j++)
   {
-    k = (j+1)*i*aid*(3*this_proj -> numwid);
+    k = (j+1)*i*aid*(3*(this_proj -> id+27));
     prob= random3_(& k);
     k *= k;
     l = (prob <= 0.5) ? 1 : -1;
@@ -381,7 +381,7 @@ void random_rotate_this_object (project * this_proj, atomic_object * object, dou
   i = (int)begin;
   for (j=0; j<3; j++)
   {
-    k = (j+1)*i*(3*this_proj -> numwid);
+    k = (j+1)*i*(3*(this_proj -> id+27));
     prob=random3_(& k);
     k *= k;
     l = (prob <= 0.5) ? 1 : -1;
@@ -426,7 +426,7 @@ void random_translate_this_object (project * this_proj, atomic_object * object, 
   i = (int)begin;
   for (j=0; j<3; j++)
   {
-    k = (j+1)*i*(3*this_proj -> numwid);
+    k = (j+1)*i*(3*(this_proj -> id+27));
     prob=random3_(& k);
     k *= k;
     l = (prob <= 0.5) ? 1 : -1;
@@ -485,7 +485,7 @@ void random_move_this_object (project * this_proj, atomic_object * object, int m
       random_rotate_this_object (this_proj, object, 1.0, msd);
       break;
     case 3:
-      j = object -> species*i*object -> atoms*(3*this_proj -> numwid);
+      j = object -> species*i*object -> atoms*(3*(this_proj -> id+27));
       prob = random3_(& j);
       random_translate_this_object (this_proj, object, prob, msd);
       random_rotate_this_object (this_proj, object, 1.0-prob, msd);
@@ -1198,7 +1198,7 @@ GtkWidget * create_axis_entries (atom_search * asearch, project * this_proj, int
                                                                      G_CALLBACK(range_move), G_CALLBACK(scroll_range_move), & asearch -> pointer[j]);
   widget_set_sensitive (this_proj -> modelgl -> atom_win -> edit_entry[j], 0);
   widget_set_sensitive (this_proj -> modelgl -> atom_win -> edit_scale[j], 0);
-  str = g_strdup_printf ("On <b>%s</b> axis:", axis[axd]);
+  str = g_strdup_printf (_("On <b>%s</b> axis:"), axis[axd]);
   lab = markup_label(unit[mot], 20, -1, 0.0, 0.5);
   update_entry_double (GTK_ENTRY(this_proj -> modelgl -> atom_win -> edit_entry[j]), this_proj -> modelgl -> atom_win -> new_param[asearch -> status][1][j]);
   hbox = create_hbox (0);
@@ -1227,14 +1227,14 @@ GtkWidget * add_motion_interaction (atom_search * asearch, int axd, project * th
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<u>Select the axis to be used:</u> ", 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<u>Select the axis to be used:</u> "), 200, -1, 0.0, 0.5), FALSE, FALSE, 20);
   this_proj -> modelgl -> atom_win -> axis_combo[axd] = create_combo ();
-  combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Model axis");
-  combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], "Eye (viewer) axis");
+  combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], _("Model axis"));
+  combo_text_append (this_proj -> modelgl -> atom_win -> axis_combo[axd], _("Eye (viewer) axis"));
   combo_set_active (this_proj -> modelgl -> atom_win -> axis_combo[axd], this_proj -> modelgl -> atom_win -> axis[axd]);
   g_signal_connect (G_OBJECT (this_proj -> modelgl -> atom_win -> axis_combo[axd]), "changed", G_CALLBACK(set_axis_for_motion), & asearch -> pointer[axd]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, this_proj -> modelgl -> atom_win -> axis_combo[axd], FALSE, FALSE, 20);
-  this_proj -> modelgl -> atom_win -> axis_but[axd] = check_button ("Show", 100, 35, FALSE, G_CALLBACK(set_show_motion_axis), & asearch -> pointer[axd]);
+  this_proj -> modelgl -> atom_win -> axis_but[axd] = check_button (_("Show"), 100, 35, FALSE, G_CALLBACK(set_show_motion_axis), & asearch -> pointer[axd]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, this_proj -> modelgl -> atom_win -> axis_but[axd], FALSE, FALSE, 20);
   int i;
   for (i=0; i<3; i++)
@@ -1244,7 +1244,7 @@ GtkWidget * add_motion_interaction (atom_search * asearch, int axd, project * th
   hbox = create_hbox (5);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 20);
   //add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-  //                    check_button ("Reset transformation(s)", -1, 35, FALSE, G_CALLBACK(set_reset_transformation), & asearch -> pointer[0]),
+  //                    check_button (_("Reset transformation(s)"), -1, 35, FALSE, G_CALLBACK(set_reset_transformation), & asearch -> pointer[0]),
   //                    FALSE, FALSE, 10);
   return vbox;
 }

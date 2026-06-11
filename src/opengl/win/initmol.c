@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file initmol.c
@@ -122,8 +122,14 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
   new_mol -> nspec = old_mol -> nspec;
   new_mol -> species = duplicate_int (active_project -> nspec, old_mol -> species);
   int j, k;
-  new_mol -> pbonds = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
-  new_mol -> pangles = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
+  if (old_mol -> natoms > 1)
+  {
+    new_mol -> pbonds = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pbonds);
+    if (old_mol -> natoms > 2)
+    {
+      new_mol -> pangles = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles);
+    }
+  }
   if (old_mol -> atoms)
   {
     new_mol -> atoms = duplicate_int (old_mol -> natoms*old_mol -> multiplicity, old_mol -> atoms);
@@ -140,7 +146,7 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
     {
       for (j=0; j<active_project -> coord -> totcoord[1]; j++)
       {
-        new_mol -> pangles[j] = g_malloc0 (active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles[j]);
+        new_mol -> pangles[j] = g_malloc0(active_project -> coord -> totcoord[1]*sizeof*new_mol -> pangles[j]);
         for (k=0; k<active_project -> coord -> totcoord[1]; k++)
         {
           new_mol -> pangles[j][k] = duplicate_int (active_project -> coord -> totcoord[1], old_mol -> pangles[j][k]);
@@ -148,7 +154,7 @@ search_molecule * duplicate_search_molecule (search_molecule * old_mol)
       }
     }
   }
-  new_mol -> lgeo = g_malloc0 (active_project -> nspec*sizeof*new_mol -> lgeo);
+  new_mol -> lgeo = g_malloc0(active_project -> nspec*sizeof*new_mol -> lgeo);
   for (j=0; j<active_project -> nspec; j++)
   {
     new_mol -> lgeo[j] = duplicate_int (active_project -> coord -> totcoord[1], old_mol -> lgeo[j]);
@@ -188,7 +194,7 @@ void allocate_mol_data_ ()
     active_project -> modelfc = NULL;
   }
   in_calc_mol = g_malloc0(active_project -> steps*sizeof*in_calc_mol);
-  active_project -> modelfc = g_malloc0 (sizeof*active_project -> modelfc);
+  active_project -> modelfc = g_malloc0(sizeof*active_project -> modelfc);
   active_project -> modelfc -> mols = g_malloc0(active_project -> steps*sizeof*active_project -> modelfc -> mols);
   active_project -> modelfc -> mol_by_step = allocint (active_project -> steps);
   for (i=0; i<2; i++)
@@ -196,7 +202,7 @@ void allocate_mol_data_ ()
     if (active_project -> force_field[i]) g_free (active_project -> force_field[i]);
     active_project -> force_field[i] = NULL;
   }
-  pgeo = g_malloc0 ((active_project -> nspec+1)*sizeof*pgeo);
+  pgeo = g_malloc0((active_project -> nspec+1)*sizeof*pgeo);
   for (i=1; i<active_project -> nspec+1; i++)
   {
     pgeo[i] = pgeo[i-1] + active_coord -> ntg[1][i-1];
@@ -266,7 +272,7 @@ void update_mol_details (search_molecule * mol, int sp, int cp)
   {
     j = active_coord -> partial_geo[sp][cp][i];
     mol -> nbonds += j;
-    if (j)
+    if (j && mol -> natoms > 2)
     {
       for (k=0; k<active_project -> nspec; k++)
       {
@@ -300,12 +306,18 @@ void send_mol_details_ (int * stp, int * mol, int * ats, int * sps, int spec_in_
   tmp_mol -> id = * mol - 1;
   tmp_mol -> md = * stp - 1;
   tmp_mol -> multiplicity = 1;
-  tmp_mol -> fragments = allocint(1);
+  tmp_mol -> fragments = allocint (1);
   tmp_mol -> fragments[0] = * mol - 1;
   tmp_mol -> natoms = * ats;
   tmp_mol -> lgeo = allocdint (active_project -> nspec, active_coord -> totcoord[1]);
-  tmp_mol -> pbonds = allocdint (active_coord -> totcoord[1], active_coord -> totcoord[1]);
-  tmp_mol -> pangles = alloctint (active_coord -> totcoord[1], active_coord -> totcoord[1], active_coord -> totcoord[1]);
+  if (tmp_mol -> natoms > 1)
+  {
+    tmp_mol -> pbonds = allocdint (active_coord -> totcoord[1], active_coord -> totcoord[1]);
+    if (tmp_mol -> natoms > 2)
+    {
+      tmp_mol -> pangles = alloctint (active_coord -> totcoord[1], active_coord -> totcoord[1], active_coord -> totcoord[1]);
+    }
+  }
   tmp_mol -> atoms = duplicate_int (* ats, atom_in_mol);
   for (i=0; i< * ats; i++)
   {
@@ -394,10 +406,10 @@ gboolean are_identical_molecules (search_molecule * mol_a, search_molecule * mol
 
   \brief merge molecule a and molecule b data
 
-  \param val_a multiplicity for molecule a
-  \param val_b multiplicity for molecule b
-  \param table_a the list of molecular fragment(s) for molecule a
-  \param table_b the list of molecular fragment(s) for molecule b
+  \param val_a multiplicity, or multiplicity x atoms, for molecule a
+  \param val_b multiplicity, or multiplicity x atoms, for molecule b
+  \param table_a the list of molecular fragment(s) or atoms for molecule a
+  \param table_b the list of molecular fragment(s) or atoms for molecule b
 */
 int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_b])
 {
@@ -412,7 +424,6 @@ int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_
   {
     p_data[val_a+i] = table_b[i];
   }
-  g_free (table_a);
   return p_data;
 }
 
@@ -426,25 +437,62 @@ int * merge_mol_data (int val_a, int val_b, int table_a[val_a], int table_b[val_
 void free_search_molecule_data (search_molecule * smol)
 {
   int i, j;
-  g_free (smol -> atoms);
-  if (smol -> nbonds)
+  if (smol -> atoms)
   {
-    for (i=0; i<active_coord -> totcoord[1]; i++) g_free (smol -> pbonds[i]);
-    g_free (smol -> pbonds);
+    g_free (smol -> atoms);
+    smol -> atoms = NULL;
   }
-  if (smol -> nangles)
+  if (smol -> pbonds)
   {
     for (i=0; i<active_coord -> totcoord[1]; i++)
     {
-      for (j=0; j<active_coord -> totcoord[1]; j++) g_free (smol -> pangles[i][j]);
-      g_free (smol -> pangles[i]);
+      if (smol -> pbonds[i])
+      {
+        g_free (smol -> pbonds[i]);
+        smol -> pbonds[i] = NULL;
+      }
+    }
+    g_free (smol -> pbonds);
+    smol -> pbonds = NULL;
+  }
+  if (smol -> pangles)
+  {
+    for (i=0; i<active_coord -> totcoord[1]; i++)
+    {
+      if (smol -> pangles[i])
+      {
+        for (j=0; j<active_coord -> totcoord[1]; j++)
+        {
+          if (smol -> pangles[i][j])
+          {
+            g_free (smol -> pangles[i][j]);
+            smol -> pangles[i][j] = NULL;
+          }
+        }
+        g_free (smol -> pangles[i]);
+        smol -> pangles[i] = NULL;
+      }
     }
     g_free (smol -> pangles);
+    smol -> pangles = NULL;
   }
-  for (i=0; i<active_project -> nspec; i++) g_free (smol -> lgeo[i]);
-  g_free (smol -> lgeo);
+  if (smol -> lgeo)
+  {
+    for (i=0; i<active_project -> nspec; i++)
+    {
+      if (smol -> lgeo[i])
+      {
+        g_free (smol -> lgeo[i]);
+        smol -> lgeo[i] = NULL;
+      }
+    }
+    g_free (smol -> lgeo);
+    smol -> lgeo = NULL;
+  }
   g_free (smol -> species);
+  smol -> species = NULL;
   g_free (smol -> fragments);
+  smol -> fragments = NULL;
 }
 
 /*!
@@ -461,21 +509,28 @@ void setup_molecules_ (int * stepid)
   search_molecule * first_mol = NULL;
   search_molecule * tmp_mol;
   gboolean add_it;
+  int * tmp_data;
   i = * stepid -1;
   j = 0;
   for (k=0; k<active_project -> modelfc -> mol_by_step[i]; k++)
   {
     mtmp_bt = & in_calc_mol[i][k];
     add_it = TRUE;
-    mtmp_at = first_mol;
+    mtmp_at = (first_mol) ? first_mol : NULL;
     while (mtmp_at)
     {
       if (are_identical_molecules (mtmp_at, mtmp_bt))
       {
-        mtmp_at -> fragments = merge_mol_data (mtmp_at -> multiplicity, mtmp_bt -> multiplicity,
-                                               mtmp_at -> fragments, mtmp_bt -> fragments);
-        mtmp_at -> atoms = merge_mol_data (mtmp_at -> natoms*mtmp_at -> multiplicity, mtmp_bt -> natoms*mtmp_bt -> multiplicity,
-                                           mtmp_at -> atoms, mtmp_bt -> atoms);
+        tmp_data = merge_mol_data (mtmp_at -> multiplicity, mtmp_bt -> multiplicity, mtmp_at -> fragments, mtmp_bt -> fragments);
+        g_free (mtmp_at -> fragments);
+        mtmp_at -> fragments = NULL;
+        mtmp_at -> fragments = duplicate_int (mtmp_at -> multiplicity+mtmp_bt -> multiplicity, tmp_data);
+        g_free (tmp_data);
+        tmp_data = merge_mol_data (mtmp_at -> natoms*mtmp_at -> multiplicity, mtmp_bt -> natoms*mtmp_bt -> multiplicity, mtmp_at -> atoms, mtmp_bt -> atoms);
+        g_free (mtmp_at -> atoms);
+        mtmp_at -> atoms = NULL;
+        mtmp_at -> atoms = duplicate_int (mtmp_at -> natoms*mtmp_at -> multiplicity+mtmp_bt -> natoms*mtmp_bt -> multiplicity, tmp_data);
+        g_free (tmp_data);
         mtmp_at -> multiplicity ++;
         add_it = FALSE;
         break;
@@ -494,10 +549,14 @@ void setup_molecules_ (int * stepid)
       else
       {
         first_mol = duplicate_search_molecule (mtmp_bt);
+        mtmp_at = first_mol;
       }
       j ++;
     }
-    free_search_molecule_data (mtmp_bt);
+  }
+  for (k=0; k<active_project -> modelfc -> mol_by_step[i]; k++)
+  {
+    free_search_molecule_data (& in_calc_mol[i][k]);
   }
   g_free (in_calc_mol[i]);
   in_calc_mol[i] = NULL;
@@ -514,15 +573,23 @@ void setup_molecules_ (int * stepid)
     }
     duplicate_molecule (& active_project -> modelfc -> mols[i][k], tmp_mol);
     active_project -> modelfc -> mols[i][k].id = k;
-    free_search_molecule_data (tmp_mol);
     if (k < j-1) tmp_mol = tmp_mol -> next;
   }
-  while (tmp_mol -> prev)
+  tmp_mol = first_mol;
+  while (tmp_mol)
   {
-    tmp_mol = tmp_mol -> prev;
-    g_free (tmp_mol -> next);
+    free_search_molecule_data (tmp_mol);
+    if (tmp_mol -> next)
+    {
+      tmp_mol = tmp_mol -> next;
+      g_free (tmp_mol -> prev);
+    }
+    else
+    {
+      g_free (tmp_mol);
+      tmp_mol = NULL;
+    }
   }
-  g_free (first_mol);
 }
 
 /*!

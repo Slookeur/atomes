@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cwidget.c
@@ -30,9 +30,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 *
 * List of functions:
 
-  void curve_default_scale (int rid, int cid);
+  void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve);
   void initcurve (project * pid, int rid, int cid);
-  void addcurwidgets (int pid, int rid, int str);
+  void init_curve_title (project * this_proj, int rid, int cid);
+  void add_curve_widgets (project * this_proj, int rid);
 
   DataLayout * curve_default_layout (project * pid, int rid, int cid);
 
@@ -56,24 +57,24 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 DataLayout * curve_default_layout (project * pid, int rid, int cid)
 {
-  DataLayout * layout = g_malloc0 (sizeof*layout);
+  DataLayout * layout = g_malloc0(sizeof*layout);
   layout -> datacolor.red = RED;
   layout -> datacolor.green = GREEN;
   layout -> datacolor.blue = BLUE;
   layout -> datacolor.alpha = 1.0;
   layout -> thickness = DTHICK;
-  layout -> hwidth = (rid == SP) ? 1.0 : pid -> delta[rid];
+  layout -> hwidth = (rid == SPH) ? 1.0 : pid -> analysis[rid] -> delta;
   layout -> hopac = 0.25;
   layout -> hpos = 1;
   layout -> dash = 1;
   layout -> gfreq = 1;
-  if (rid < RI)
+  if (rid < RIN)
   {
     layout -> aspect = 0;
     layout -> glyph = 0;
     layout -> gsize = 10;
   }
-  else if (rid == RI)
+  else if (rid == RIN)
   {
     if ( cid%4 == 0 || cid%4 == 1 )
     {
@@ -88,7 +89,7 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
       layout -> gsize = 5.0;
     }
   }
-  else if (rid < MS)
+  else if (rid < MSD)
   {
     layout -> aspect = 1;
     layout -> glyph = 0;
@@ -104,42 +105,44 @@ DataLayout * curve_default_layout (project * pid, int rid, int cid)
 }
 
 /*!
-  \fn void curve_default_scale (int rid, int cid)
+  \fn void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
 
   \brief pick appropriate scale based on the type of analysis
 
+  \param this_proj the target project
   \param rid analysis id
   \param cid curve id
+  \param this_curve the target curve
 */
-void curve_default_scale (int rid, int cid)
+void curve_default_scale (project * this_proj, int rid, int cid, Curve * this_curve)
 {
-  if (rid < RI || rid == MS)
+  if (rid < RIN || rid == MSD || rid == SKT)
   {
-    active_project -> curves[rid][cid] -> cmin[0] = active_project -> min[rid];
-    active_project -> curves[rid][cid] -> cmax[0] = active_project -> max[rid];
+    this_curve -> cmin[0] = this_proj -> analysis[rid] -> min;
+    this_curve -> cmax[0] = this_proj ->  analysis[rid] -> max;
   }
   else
   {
-    active_project -> curves[rid][cid] -> cmin[0] = 1.0;
-    active_project -> curves[rid][cid] -> cmax[0] = active_project -> curves[rid][cid] -> ndata;
+    this_curve -> cmin[0] = 1.0;
+    this_curve -> cmax[0] = this_curve -> ndata;
   }
 
-  if (rid < MS)
+  if (rid != MSD)
   {
-    active_project -> curves[rid][cid] -> scale[0] = 0;
-    active_project -> curves[rid][cid] -> scale[1] = 0;
+    this_curve -> scale[0] = 0;
+    this_curve -> scale[1] = 0;
   }
   else
   {
-    if (cid < active_project -> numc[MS] - 6)
+    if (cid < active_project -> analysis[MSD] -> numc - 6 )
     {
-      active_project -> curves[rid][cid] -> scale[0] = 1;
-      active_project -> curves[rid][cid] -> scale[1] = 1;
+      this_curve -> scale[0] = 1;
+      this_curve -> scale[1] = 1;
     }
     else
     {
-      active_project -> curves[rid][cid] -> scale[0] = 0;
-      active_project -> curves[rid][cid] -> scale[1] = 0;
+      this_curve -> scale[0] = 0;
+      this_curve -> scale[1] = 0;
     }
   }
 }
@@ -149,143 +152,147 @@ void curve_default_scale (int rid, int cid)
 
   \brief initialize curve widget
 
-  \param pid the project id
+  \param pid the target project
   \param rid the analysis id
   \param cid the curve id
 */
 void initcurve (project * pid, int rid, int cid)
 {
   int k;
-
-  pid -> curves[rid][cid] -> window = NULL;
-  pid -> curves[rid][cid] -> plot = NULL;
-  pid -> curves[rid][cid] -> wsize[0] = 800;
-  pid -> curves[rid][cid] -> wsize[1] = 600;
-  pid -> curves[rid][cid] -> show_title = FALSE;
-  pid -> curves[rid][cid] -> default_title = TRUE;
-  pid -> curves[rid][cid] -> title_font = g_strdup_printf ("Sans Bold 12");
-  pid -> curves[rid][cid] -> title_pos[0] = 0.4;
-  pid -> curves[rid][cid] -> title_pos[1] = 0.05;
-  pid -> curves[rid][cid] -> title_color.red = 0.0;
-  pid -> curves[rid][cid] -> title_color.blue = 0.0;
-  pid -> curves[rid][cid] -> title_color.green = 0.0;
-  pid -> curves[rid][cid] -> title_color.alpha = 1.0;
-  pid -> curves[rid][cid] -> format = 0;
+  Curve * this_curve = pid -> analysis[rid] -> curves[cid];
+  this_curve -> window = NULL;
+  this_curve -> plot = NULL;
+  this_curve -> wsize[0] = 800;
+  this_curve -> wsize[1] = 600;
+  this_curve -> show_title = FALSE;
+  this_curve -> default_title = TRUE;
+  this_curve -> title_font = g_strdup_printf ("Sans Bold 12");
+  this_curve -> title_pos[0] = 0.4;
+  this_curve -> title_pos[1] = 0.05;
+  this_curve -> title_color.red = 0.0;
+  this_curve -> title_color.blue = 0.0;
+  this_curve -> title_color.green = 0.0;
+  this_curve -> title_color.alpha = 1.0;
+  this_curve -> format = 0;
   for (k=0 ; k<2; k++)
   {
-    if (pid -> curves[rid][cid] -> data[k] != NULL)
+    if (this_curve -> data[k] != NULL)
     {
-      g_free (pid -> curves[rid][cid] -> data[k]);
-      pid -> curves[rid][cid] -> data[k] = NULL;
+      g_free (this_curve -> data[k]);
+      this_curve -> data[k] = NULL;
     }
-    pid -> curves[rid][cid] -> autoscale[k] = TRUE;
-    pid -> curves[rid][cid] -> show_grid[k] = FALSE;
-    pid -> curves[rid][cid] -> show_axis[k] = TRUE;
-    pid -> curves[rid][cid] -> labels_digit[k] = 1;
-    pid -> curves[rid][cid] -> ticks_io[k] = 0;
-    pid -> curves[rid][cid] -> labels_angle[k] = 0.0;
-    pid -> curves[rid][cid] -> labels_font[k] = g_strdup_printf ("Sans 12");
-    pid -> curves[rid][cid] -> mint_size[k] = 5;
-    pid -> curves[rid][cid] -> majt_size[k] = 10;
-    pid -> curves[rid][cid] -> axis_defaut_title[k] = TRUE;
-    pid -> curves[rid][cid] -> axis_title_font[k] = g_strdup_printf ("Sans 12");
+    this_curve -> autoscale[k] = TRUE;
+    this_curve -> show_grid[k] = FALSE;
+    this_curve -> show_axis[k] = TRUE;
+    this_curve -> labels_digit[k] = 1;
+    this_curve -> ticks_io[k] = 0;
+    this_curve -> labels_angle[k] = 0.0;
+    this_curve -> labels_font[k] = g_strdup_printf ("Sans 12");
+    this_curve -> mint_size[k] = 5;
+    this_curve -> majt_size[k] = 10;
+    this_curve -> axis_defaut_title[k] = TRUE;
+    this_curve -> axis_title_font[k] = g_strdup_printf ("Sans 12");
   }
-  if (pid -> curves[rid][cid] -> err != NULL)
+  if (this_curve -> err != NULL)
   {
-    g_free (pid -> curves[rid][cid] -> err);
-    pid -> curves[rid][cid] -> err = NULL;
+    g_free (this_curve -> err);
+    this_curve -> err = NULL;
   }
-  pid -> curves[rid][cid] -> labels_shift_x[0] = 10;
-  pid -> curves[rid][cid] -> labels_shift_y[0] = 20;
-  pid -> curves[rid][cid] -> labels_shift_x[1] = 50;
-  pid -> curves[rid][cid] -> labels_shift_y[1] = 10;
-  pid -> curves[rid][cid] -> axis_title_x[0] = -20;
-  pid -> curves[rid][cid] -> axis_title_y[0] = 45;
-  pid -> curves[rid][cid] -> axis_title_x[1] = MARGX - 10;
-  pid -> curves[rid][cid] -> axis_title_y[1] = -50;
-  pid -> curves[rid][cid] -> frame_type = 2;
-  pid -> curves[rid][cid] -> frame_dash = 1;
-  pid -> curves[rid][cid] -> frame_thickness = 1.0;
-  pid -> curves[rid][cid] -> frame_color.red = 0.0;
-  pid -> curves[rid][cid] -> frame_color.green = 0.0;
-  pid -> curves[rid][cid] -> frame_color.blue = 0.0;
-  pid -> curves[rid][cid] -> frame_color.alpha = 1.0;
-  pid -> curves[rid][cid] -> frame_pos[0][0] = 100.0/840.0;
-  pid -> curves[rid][cid] -> frame_pos[0][1] = 1.0;
-  pid -> curves[rid][cid] -> frame_pos[1][0] = 530.0/600.0;
-  pid -> curves[rid][cid] -> frame_pos[1][1] = 0.0;
-  pid -> curves[rid][cid] -> legend_font = g_strdup_printf ("Sans 10");
-  pid -> curves[rid][cid] -> show_legend = FALSE;
-  pid -> curves[rid][cid] -> show_frame = TRUE;
-  pid -> curves[rid][cid] -> legend_color.red = 0.0;
-  pid -> curves[rid][cid] -> legend_color.blue = 0.0;
-  pid -> curves[rid][cid] -> legend_color.green = 0.0;
-  pid -> curves[rid][cid] -> legend_color.alpha = 1.0;
-  pid -> curves[rid][cid] -> legend_pos[0] = LEGX;
-  pid -> curves[rid][cid] -> legend_pos[1] = LEGY;
-  pid -> curves[rid][cid] -> show_legend_box = FALSE;
-  pid -> curves[rid][cid] -> legend_box_dash = 1;
-  pid -> curves[rid][cid] -> legend_box_color.red = 0.0;
-  pid -> curves[rid][cid] -> legend_box_color.green = 0.0;
-  pid -> curves[rid][cid] -> legend_box_color.blue = 0.0;
-  pid -> curves[rid][cid] -> legend_box_color.alpha = 1.0;
-  pid -> curves[rid][cid] -> legend_box_thickness = 1.0;
-  pid -> curves[rid][cid] -> backcolor.red =  1.0;
-  pid -> curves[rid][cid] -> backcolor.green = 1.0;
-  pid -> curves[rid][cid] -> backcolor.blue = 1.0;
-  pid -> curves[rid][cid] -> backcolor.alpha = 1.0;
-  pid -> curves[rid][cid] -> layout = curve_default_layout (pid, rid, cid);
-  pid -> curves[rid][cid] -> extrac = NULL;
-  pid -> curves[rid][cid] -> extrac = g_malloc0 (sizeof*pid -> curves[rid][cid] -> extrac);
-  pid -> curves[rid][cid] -> extrac -> extras = 0;
-  if (pid -> curves[rid][cid] -> cfile != NULL)
+  this_curve -> labels_shift_x[0] = 10;
+  this_curve -> labels_shift_y[0] = 20;
+  this_curve -> labels_shift_x[1] = 50;
+  this_curve -> labels_shift_y[1] = 10;
+  this_curve -> axis_title_x[0] = -20;
+  this_curve -> axis_title_y[0] = 45;
+  this_curve -> axis_title_x[1] = MARGX - 10;
+  this_curve -> axis_title_y[1] = -50;
+  this_curve -> frame_type = 2;
+  this_curve -> frame_dash = 1;
+  this_curve -> frame_thickness = 1.0;
+  this_curve -> frame_color.red = 0.0;
+  this_curve -> frame_color.green = 0.0;
+  this_curve -> frame_color.blue = 0.0;
+  this_curve -> frame_color.alpha = 1.0;
+  this_curve -> frame_pos[0][0] = 100.0/840.0;
+  this_curve -> frame_pos[0][1] = 1.0;
+  this_curve -> frame_pos[1][0] = 530.0/600.0;
+  this_curve -> frame_pos[1][1] = 0.0;
+  this_curve -> legend_font = g_strdup_printf ("Sans 10");
+  this_curve -> show_legend = FALSE;
+  this_curve -> show_frame = TRUE;
+  this_curve -> legend_color.red = 0.0;
+  this_curve -> legend_color.blue = 0.0;
+  this_curve -> legend_color.green = 0.0;
+  this_curve -> legend_color.alpha = 1.0;
+  this_curve -> legend_pos[0] = LEGX;
+  this_curve -> legend_pos[1] = LEGY;
+  this_curve -> show_legend_box = FALSE;
+  this_curve -> legend_box_dash = 1;
+  this_curve -> legend_box_color.red = 0.0;
+  this_curve -> legend_box_color.green = 0.0;
+  this_curve -> legend_box_color.blue = 0.0;
+  this_curve -> legend_box_color.alpha = 1.0;
+  this_curve -> legend_box_thickness = 1.0;
+  this_curve -> backcolor.red =  1.0;
+  this_curve -> backcolor.green = 1.0;
+  this_curve -> backcolor.blue = 1.0;
+  this_curve -> backcolor.alpha = 1.0;
+  this_curve -> layout = curve_default_layout (pid, rid, cid);
+  this_curve -> extrac = NULL;
+  this_curve -> extrac = g_malloc0(sizeof*this_curve -> extrac);
+  this_curve -> extrac -> extras = 0;
+  if (this_curve -> cfile != NULL)
   {
-    g_free (pid -> curves[rid][cid] -> cfile);
+    g_free (this_curve -> cfile);
   }
-  activer = -1;
-  curve_default_scale (rid, cid);
-  activer = rid;
+  curve_default_scale (pid, rid, cid, this_curve);
 }
 
 /*!
-  \fn void addcurwidgets (int pid, int rid, int str)
+  \fn void init_curve_title (project * this_proj, int rid, int cid)
+
+  \brief init curve title and axis titles
+
+  \param this_proj the target project
+  \param rid the analysis id
+  \param cid the curve id
+*/
+void init_curve_title (project * this_proj, int rid, int cid)
+{
+  if (this_proj -> analysis[rid] -> curves[cid] -> default_title)
+  {
+    this_proj -> analysis[rid] -> curves[cid] -> title = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[rid] -> curves[cid] -> name);
+  }
+  int i;
+  for (i=0; i<2; i++)
+  {
+    if (this_proj -> analysis[rid] -> curves[cid] -> axis_defaut_title[i])
+    {
+      this_proj -> analysis[rid] -> curves[cid] -> axis_title[i] = g_strdup_printf ("%s", default_title(i, & this_proj -> analysis[rid] -> idcc[cid]));
+    }
+  }
+}
+/*!
+  \fn void add_curve_widgets (project * this_proj, int rid)
 
   \brief add curve widgets to the project
 
-  \param pid the project id
+  \param this_proj the target project
   \param rid the analysis id
-  \param str at the project creation stage (1) or latter on (0)
 */
-void addcurwidgets (int pid, int rid, int str)
+void add_curve_widgets (project * this_proj, int rid)
 {
-  int j, k, l;
-  l = 0;
-  activer = rid;
-  project * tmp_proj = get_project_by_id(pid);
-  for (j=0; j<rid; j++)
+  int i;
+  for (i=0; i<this_proj -> analysis[rid] -> numc; i++)
   {
-    l += tmp_proj -> numc[j];
-  }
-  for (j=0; j<tmp_proj -> numc[rid]; j++)
-  {
-    tmp_proj -> curves[rid][j] -> cid = l + j;
-    tmp_proj -> idcc[rid][j].a = pid;
-    tmp_proj -> idcc[rid][j].b = rid;
-    tmp_proj -> idcc[rid][j].c = j;
-    if (str == 0 || tmp_proj -> curves[rid][j] -> ndata == 0)
+    this_proj -> analysis[rid] -> curves[i] -> cid = i;
+    if (this_proj -> analysis[rid] -> curves[i] -> ndata == 0)
     {
-      initcurve (tmp_proj, rid, j);
+      initcurve (this_proj, rid, i);
     }
-    if (tmp_proj -> curves[rid][j] -> default_title)
+    if (this_proj -> analysis[rid] -> curves[i] -> name)
     {
-      tmp_proj -> curves[rid][j] -> title = g_strdup_printf ("%s - %s", prepare_for_title(tmp_proj -> name), tmp_proj -> curves[rid][j] -> name);
-    }
-    for (k=0; k<2; k++)
-    {
-      if (tmp_proj -> curves[rid][j] -> axis_defaut_title[k])
-      {
-        tmp_proj -> curves[rid][j] -> axis_title[k] = g_strdup_printf ("%s", default_title(k, j));
-      }
+      init_curve_title (this_proj, rid, i);
     }
   }
 }

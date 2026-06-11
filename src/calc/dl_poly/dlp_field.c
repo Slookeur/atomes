@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_field.c
@@ -39,6 +39,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
   G_MODULE_EXPORT gint on_assistant_go_forward (gint current_page, gpointer data);
 
+  gboolean dlp_to_translate (int fid, int obj, int key);
   gboolean set_nbd_but_sensitive (int nbid);
   gboolean field_file_has_energy_parameters (gboolean scale, int sca, int scb);
 
@@ -137,50 +138,139 @@ extern GtkWidget * extra_vbox[2];
 extern ColRGBA init_color (int id, int numid);
 extern void restore_ogl_selection (glwin * view);
 
-gchar * felemts[MAXDATA+1] = {"Energy unit",
-                              "Molecule",
-                              "Atom",
-                              "Core-shell unit",
-                              "Constraint bond",
-                              "Mean force potential",
-                              "Rigid unit",
-                              "Tethering potential",
-                              "Flexible chemical bond",
-                              "Bond restraint",
-                              "Bond angle",
-                              "Angular restraint",
-                              "Dihedral angle",
-                              "Torsional restraint",
-                              "Improper angle",
-                              "Inversion angle",
-                              "van der Waals potential",
-                              "Metal potential",
-                              "Tersoff Potential",
-                              "Three-body potential",
-                              "Four-body potential",
-                              "External field"};
+gchar * felemts[MAXDATA+1] = {i18n("Energy unit"),
+                              i18n("Molecule(s)"),
+                              i18n("Atom(s)"),
+                              i18n("Core-shell unit(s)"),
+                              i18n("Constraint bond(s)"),
+                              i18n("Mean force potential(s)"),
+                              i18n("Rigid unit(s)"),
+                              i18n("Tethering potential(s)"),
+                              i18n("Flexible chemical bond(s)"),
+                              i18n("Bond restraint(s)"),
+                              i18n("Bond angle(s)"),
+                              i18n("Angular restraint(s)"),
+                              i18n("Dihedral angle(s)"),
+                              i18n("Torsional restraint(s)"),
+                              i18n("Improper angle(s)"),
+                              i18n("Inversion angle(s)"),
+                              i18n("van der Waals potential(s)"),
+                              i18n("Metal potential(s)"),
+                              i18n("Tersoff Potential(s)"),
+                              i18n("Three-body potential(s)"),
+                              i18n("Four-body potential(s)"),
+                              i18n("External field(s)")};
 
-gchar * elemts[MAXDATA] = {"molecule",
-                           "atom",
-                           "core-shell unit",
-                           "constraint bond",
-                           "mean force potential",
-                           "rigid unit",
-                           "tethering potential",
-                           "flexible chemical bond",
-                           "bond restraint",
-                           "bond angle",
-                           "angular restraint",
-                           "dihedral angle",
-                           "torsional restraint",
-                           "improper angle",
-                           "inversion angle",
-                           "van der Waals potential",
-                           "metal potential",
-                           "Tersoff Potential",
-                           "three-body potential",
-                           "four-body potential",
-                           "external field"};
+gchar * felemt[MAXDATA+1] = {i18n("Energy unit"),
+                             i18n("Molecule"),
+                             i18n("Atom"),
+                             i18n("Core-shell unit"),
+                             i18n("Constraint bond"),
+                             i18n("Mean force potential"),
+                             i18n("Rigid unit"),
+                             i18n("Tethering potential"),
+                             i18n("Flexible chemical bond"),
+                             i18n("Bond restraint"),
+                             i18n("Bond angle"),
+                             i18n("Angular restraint"),
+                             i18n("Dihedral angle"),
+                             i18n("Torsional restraint"),
+                             i18n("Improper angle"),
+                             i18n("Inversion angle"),
+                             i18n("van der Waals potential"),
+                             i18n("Metal potential"),
+                             i18n("Tersoff Potential"),
+                             i18n("Three-body potential"),
+                             i18n("Four-body potential"),
+                             i18n("External field")};
+
+gchar * elemts[MAXDATA] = {i18n("molecule(s)"),
+                           i18n("atom(s)"),
+                           i18n("core-shell unit(s)"),
+                           i18n("constraint bond(s)"),
+                           i18n("mean force potential(s)"),
+                           i18n("rigid unit(s)"),
+                           i18n("tethering potential(s)"),
+                           i18n("flexible chemical bond(s)"),
+                           i18n("bond restraint(s)"),
+                           i18n("bond angle(s)"),
+                           i18n("angular restraint(s)"),
+                           i18n("dihedral angle(s)"),
+                           i18n("torsional restraint(s)"),
+                           i18n("improper angle(s)"),
+                           i18n("inversion angle(s)"),
+                           i18n("van der Waals potential(s)"),
+                           i18n("metal potential(s)"),
+                           i18n("Tersoff Potential(s)"),
+                           i18n("three-body potential(s)"),
+                           i18n("four-body potential(s)"),
+                           i18n("external field(s)")};
+
+gchar * elemt[MAXDATA] = {i18n("molecule"),
+                          i18n("atom"),
+                          i18n("core-shell unit"),
+                          i18n("constraint bond"),
+                          i18n("mean force potential"),
+                          i18n("rigid unit"),
+                          i18n("tethering potential"),
+                          i18n("flexible chemical bond"),
+                          i18n("bond restraint"),
+                          i18n("bond angle"),
+                          i18n("angular restraint"),
+                          i18n("dihedral angle"),
+                          i18n("torsional restraint"),
+                          i18n("improper angle"),
+                          i18n("inversion angle"),
+                          i18n("van der Waals potential"),
+                          i18n("metal potential"),
+                          i18n("Tersoff Potential"),
+                          i18n("three-body potential"),
+                          i18n("four-body potential"),
+                          i18n("external field")};
+
+gchar * intelemts[MAXDATA] = {i18n("of molecule(s)"),
+                              i18n("of atom(s)"),
+                              i18n("of core-shell unit(s)"),
+                              i18n("of constraint bond(s)"),
+                              i18n("of mean force potential(s)"),
+                              i18n("of rigid unit(s)"),
+                              i18n("of tethering potential(s)"),
+                              i18n("of flexible chemical bond(s)"),
+                              i18n("of bond restraint(s)"),
+                              i18n("of bond angle(s)"),
+                              i18n("of angular restraint(s)"),
+                              i18n("of dihedral angle(s)"),
+                              i18n("of torsional restraint(s)"),
+                              i18n("of improper angle(s)"),
+                              i18n("of inversion angle(s)"),
+                              i18n("of van der Waals potential(s)"),
+                              i18n("of metal potential(s)"),
+                              i18n("of Tersoff Potential(s)"),
+                              i18n("of three-body potential(s)"),
+                              i18n("of four-body potential(s)"),
+                              i18n("of external field(s)")};
+
+gchar * intelemt[MAXDATA] = {i18n("of the molecule"),
+                             i18n("of the atom"),
+                             i18n("of the core-shell unit"),
+                             i18n("of the constraint bond"),
+                             i18n("of the mean force potential"),
+                             i18n("of the rigid unit)"),
+                             i18n("of the tethering potential"),
+                             i18n("of the flexible chemical bond"),
+                             i18n("of the bond restraint"),
+                             i18n("of the bond angle"),
+                             i18n("of the angular restraint"),
+                             i18n("of the dihedral angle"),
+                             i18n("of the torsional restraint"),
+                             i18n("of the improper angle"),
+                             i18n("of the inversion angle"),
+                             i18n("of the van der Waals potential"),
+                             i18n("of the metal potential"),
+                             i18n("of the Tersoff Potential"),
+                             i18n("of the three-body potential"),
+                             i18n("of the four-body potential"),
+                             i18n("of the external field")};
 
 gchar * fkeysw[2][16][21] = {{{"eV", "kcal", "kJ", "K", "internal", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},                                                       //  0 - Energy unit(s)
                               {"harm", "rhrm", "quar", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},                                                          //  1 - Tethering pot.
@@ -215,36 +305,36 @@ gchar * fkeysw[2][16][21] = {{{"eV", "kcal", "kJ", "K", "internal", " ", " ", " 
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "}}};
 
-gchar * fnames[2][16][21] = {{{"Electron-Volts", "k-calories per mol", "k-Joules per mol", "Kelvin per Boltzmann", "DL_POLY internal units", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Restraint", "Quartic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Morse", "12-6", "Lennard-Jones", "Restraint", "Quartic", "Buckingham", "Coulomb", "Shifted FENE", "MM3 bond stretch", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Morse", "12-6", "Lennard-Jones", "Restraint", "Quartic", "Buckingham", "Coulomb", "Shifted FENE", "MM3 bond stretch", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Quartic", "Truncated harmonic", "Screened harmonic", "Screened Vessal", "Truncated Vessal", "Harmonic cosine", "Cosine", "MM3 stretch-bend", "Compass stretch-stretch", "Compass stretch-bend", "Compass all terms", "MM3 angle bend", "KKY", "Tabulated", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Quartic", "Truncated harmonic", "Screened harmonic", "Screened Vessal", "Truncated Vessal", "Harmonic cosine", "Cosine", "MM3 stretch-bend", "Compass stretch-stretch", "Compass stretch-bend", "Compass all terms", "MM3 angle bend", "KKY", "Tabulated", " ", " ", " ", " ", " ", " "},
-                              {"Cosine", "Harmonic", "Harmonic cosine", "Triple cosine", "Ryckaert-Bellemans", "Fluorinated Ryckaert-Bellemans", "OPLS torsion", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Cosine", "Harmonic", "Harmonic cosine", "Triple cosine", "Ryckaert-Bellemans", "Fluorinated Ryckaert-Bellemans", "OPLS torsion", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Cosine", "Harmonic", "Harmonic cosine", "Triple cosine", "Ryckaert-Bellemans", "Fluorinated Ryckaert-Bellemans", "OPLS torsion", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Harmonic cosine", "Planar", "Extended Planar", "Calcite", "Tabulated", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"12-6", "Lennard-Jones", "LJ cohesive", "n-m", "Buckingham", "Born-Huggins-Meyer", "12-10 H-bond", "Shifted force n-m", "Morse", "Shifted Weeks-Chandler-Anderson", "Standard DPD", "14-7 buffered AMOEBA FF",
-                               "Morse modified", "Rydberg", "ZBL", "ZBL mixed with Morse", "ZBL mixed with Buckingham", "Lennard-Jones tapered with MDF", "Buckingham tapered with MDF", "12-6 Lennard-Jones tapered with MDF", "Tabulated"},
-                              {"EAM", "EEAM", "2BEAM", "2BEEAM", "Finis-Sinclair", "Extended Finis-Sinclair", "Sutton-Chen", "Gupta", "MBPC", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+gchar * fnames[2][16][21] = {{{i18n("Electron-Volts"), i18n("k-calories per mol"), i18n("k-Joules per mol"), i18n("Kelvin per Boltzmann"), i18n("DL_POLY internal units"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Restraint"), i18n("Quartic"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), "Morse", "12-6", "Lennard-Jones", i18n("Restraint"), i18n("Quartic"), "Buckingham", "Coulomb", i18n("Shifted FENE"), i18n("MM3 bond stretch"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), "Morse", "12-6", "Lennard-Jones", i18n("Restraint"), i18n("Quartic"), "Buckingham", "Coulomb", i18n("Shifted FENE"), i18n("MM3 bond stretch"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Quartic"), i18n("Truncated harmonic"), i18n("Screened harmonic"), i18n("Screened Vessal"), i18n("Truncated Vessal"), i18n("Harmonic cosine"), i18n("Cosine"), i18n("MM3 stretch-bend"), i18n("Compass stretch-stretch"), i18n("Compass stretch-bend"), i18n("Compass all terms"), i18n("MM3 angle bend"), "KKY", i18n("Tabulated"), " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Quartic"), i18n("Truncated harmonic"), i18n("Screened harmonic"), i18n("Screened Vessal"), i18n("Truncated Vessal"), i18n("Harmonic cosine"), i18n("Cosine"), i18n("MM3 stretch-bend"), i18n("Compass stretch-stretch"), i18n("Compass stretch-bend"), i18n("Compass all terms"), i18n("MM3 angle bend"), "KKY", i18n("Tabulated"), " ", " ", " ", " ", " ", " "},
+                              {i18n("Cosine"), i18n("Harmonic"), i18n("Harmonic cosine"), i18n("Triple cosine"), "Ryckaert-Bellemans", i18n("Fluorinated Ryckaert-Bellemans"), i18n("OPLS torsion"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Cosine"), i18n("Harmonic"), i18n("Harmonic cosine"), i18n("Triple cosine"), "Ryckaert-Bellemans", i18n("Fluorinated Ryckaert-Bellemans"), i18n("OPLS torsion"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Cosine"), i18n("Harmonic"), i18n("Harmonic cosine"), i18n("Triple cosine"), "Ryckaert-Bellemans", i18n("Fluorinated Ryckaert-Bellemans"), i18n("OPLS torsion"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Harmonic cosine"), i18n("Planar"), i18n("Extended Planar"), i18n("Calcite"), i18n("Tabulated"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {"12-6", "Lennard-Jones", i18n("LJ cohesive"), "n-m", "Buckingham", "Born-Huggins-Meyer", i18n("12-10 H-bond"), i18n("Shifted force n-m"), "Morse", i18n("Shifted Weeks-Chandler-Anderson"), i18n("Standard DPD"), i18n("14-7 buffered AMOEBA FF"),
+                               i18n("Morse modified"), "Rydberg", "ZBL", i18n("ZBL mixed with Morse"), i18n("ZBL mixed with Buckingham"), i18n("Lennard-Jones tapered with MDF"), i18n("Buckingham tapered with MDF"), i18n("12-6 Lennard-Jones tapered with MDF"), i18n("Tabulated")},
+                              {"EAM", "EEAM", "2BEAM", "2BEEAM", "Finis-Sinclair", i18n("Extended Finis-Sinclair"), "Sutton-Chen", "Gupta", "MBPC", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {"Tersoff", "KIHS", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Truncated harmonic", "Screened harmonic", "Screened Vessal", "Truncated Vessal", "H-bond", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "Harmonic cosine", "Planar", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Electric field", "Oscillating Shear", "Continuous Shear", "Gravitational field", "Magnetic field", "Containing Sphere", "Repulsive Wall", "X-Piston", "Molecule in HR Zone", "HR Zone (pull out)", "HR Zone (pull in)", "Osc. Electric Field", "Umbrella sampling, harm. constant", " ", " ", " ", " ", " ", " ", " ", " "}},
-                             {{"lj", "k-calories per mol", "Electron-Volts", "k-Joules per mol", "cgs", "electron", "micro", "nano", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Truncated harmonic"), i18n("Screened harmonic"), i18n("Screened Vessal"), i18n("Truncated Vessal"), i18n("H-bond"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("Harmonic cosine"), i18n("Planar"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Electric field"), i18n("Oscillating Shear"), i18n("Continuous Shear"), i18n("Gravitational field"), i18n("Magnetic field"), i18n("Containing Sphere"), i18n("Repulsive Wall"), i18n("X-Piston"), i18n("Molecule in HR Zone"), i18n("HR Zone (pull out)"), i18n("HR Zone (pull in)"), i18n("Osc. Electric Field"), i18n("Umbrella sampling, harm. constant"), " ", " ", " ", " ", " ", " ", " ", " "}},
+                             {{"lj", i18n("k-calories per mol"), i18n("Electron-Volts"), i18n("k-Joules per mol"), "cgs", i18n("electron"), "micro", "nano", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic","COMPASS class2 force field", "Finite extensible nonlinear elastic (FENE)", "FENE with variable size particles", "GROMOS force field", "Shifted harmonic", "Shifted truncated harmonic", "MM3 anharmonic", "Morse", "Nonlinear", "Finite extensible nonlinear elastic DNA",
-                               "Finite extensible nonlinear elastic DNA (2)", "Finite extensible nonlinear elastic RNA", "Breakable quartic", "Special bond exclusions for 1-5 pairs and beyond", "Tabulated", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"),i18n("COMPASS class2 force field"), i18n("Finite extensible nonlinear elastic (FENE)"), i18n("FENE with variable size particles"), i18n("GROMOS force field"), i18n("Shifted harmonic"), i18n("Shifted truncated harmonic"), i18n("MM3 anharmonic"), "Morse", i18n("Nonlinear"), i18n("Finite extensible nonlinear elastic DNA"),
+                               i18n("Finite extensible nonlinear elastic DNA (2)"), i18n("Finite extensible nonlinear elastic RNA"), i18n("Breakable quartic"), i18n("Special bond exclusions for 1-5 pairs and beyond"), i18n("Tabulated"), " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "CHARMM force field", "COMPASS class2 force field", "COMPASS class2 force field - 6th order", "Cosine", "Cosine with Buckingham term between 1-3", "Difference of cosines", "DREIDING force field", "Cosine with a shift", "Cosine with a shift and exponential term in spring",
-                               "Cosine with squared term", "Cross term coupling angle and bond length", "Dipole orientation", "Fourier (multiple cosines)", "Fourier (single cosine)", "MM3", "Quartic", "Combination of the harmonic (SDK)", "Tabulated", " ", " "},
+                              {i18n("Harmonic"), i18n("CHARMM force field"), i18n("COMPASS class2 force field"), i18n("COMPASS class2 force field - 6th order"), i18n("Cosine"), i18n("Cosine with Buckingham term between 1-3"), i18n("Difference of cosines"), i18n("DREIDING force field"), i18n("Cosine with a shift"), i18n("Cosine with a shift and exponential term in spring"),
+                               i18n("Cosine with squared term"), i18n("Cross term coupling angle and bond length"), i18n("Dipole orientation"), i18n("Fourier (multiple cosines)"), i18n("Fourier (single cosine)"), "MM3", i18n("Quartic"), i18n("Combination of the harmonic (SDK)"), i18n("Tabulated"), " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Cosine with a shift and exponential term in spring", "CHARMM force field", "CHARMM force field with force switching", "COMPASS class2 force field", "Fourier (multiple cosines)", "Harmonic", "Helix", "Harmonic with 5 terms",
-                               "Harmonic with N terms", "OPLS force field", "Quadratic", "Spherical", "Tabulated", "Tabulated with analytic cutoff", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Cosine with a shift and exponential term in spring"), i18n("CHARMM force field"), i18n("CHARMM force field with force switching"), i18n("COMPASS class2 force field"), i18n("Fourier (multiple cosines)"), i18n("Harmonic"), i18n("Helix"), i18n("Harmonic with 5 terms"),
+                               i18n("Harmonic with N terms"), i18n("OPLS force field"), i18n("Quadratic"), i18n("Spherical"), i18n("Tabulated"), i18n("Tabulated with analytic cutoff"), " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic", "COMPASS class2 force field", "Cosine squared", "CVFF force field", "Distance between atom planes", "Out-of-the plane distance", "Fourier (multiple cosines)", "Planar conformation", "Squared distance harmonic", "DREIDING force field", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                              {"Harmonic with Wilson Decius out-of-plane", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic"), i18n("COMPASS class2 force field"), i18n("Cosine squared"), i18n("CVFF force field"), i18n("Distance between atom planes"), i18n("Out-of-the plane distance"), i18n("Fourier (multiple cosines)"), i18n("Planar conformation"), i18n("Squared distance harmonic"), i18n("DREIDING force field"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                              {i18n("Harmonic with Wilson Decius out-of-plane"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                               {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
@@ -334,7 +424,7 @@ char * fvars_bond[2][FBONDS][FBONDS_P] = {{{"k", "r<sub>0</sub>", " ", " ", " "}
                                            {"ϵ", "Δ", "r<sub>0</sub>", " ", " "},
                                            {"K", "B<sub>1</sub>", "B<sub>2</sub>", "R<sub>c</sub>", "U<sub>0</sub>"},
                                            {"w<sub>LJ</sub>", "w<sub>Coul</sub>", " ", " ", " "},
-                                           {"Interpolation style", "Distances", " ", " ", " "}}};
+                                           {i18n("Interpolation style"), i18n("Distances"), " ", " ", " "}}};
 
 int feunit_bond[2][FBONDS][FBONDS_P] = {{{1, 0, 0, 0, 0},
                                          {1, 0, 1, 0, 0},
@@ -406,7 +496,7 @@ char * fvars_angle[2][FANGLES][FANGLES_P] = {{{"k", "θ<sub>0</sub>", " ", " ", 
                                               {"K", "θ<sub>0</sub>", " ", " ", " ", " "},
                                               {"θ<sub>0</sub>", "K<sub>2</sub>", "K<sub>3</sub>", "K<sub>4</sub>", " ", " "},
                                               {"K", "θ<sub>0</sub>", " ", " ", " ", " "},
-                                              {"Interpolation style", "Angles", " ", " ", " ", " "}}};
+                                              {i18n("Interpolation style"), i18n("Angles"), " ", " ", " ", " "}}};
 
 int feunit_angle[2][FANGLES][FANGLES_P] = {{{1, 0, 0, 0, 0, 0},
                                             {1, 0, 1, 1, 0, 0},
@@ -462,8 +552,8 @@ char * fvars_dihedral[2][FDIHEDRAL][FDIHEDRAL_P] = {{{"A", "δ", "m", " ", " ", 
                                                      {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                                      {" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "}},
                                                     {{"U<sub>min</sub>", "θ<sub>0</sub>", "a", " ", " ", " ", " ", " ", " ", " ", " "},
-                                                     {"K", "n", "d", "weighting factor", " ", " ", " ", " ", " ", " ", " "},
-                                                     {"K", "n", "d", "weighting factor", " ", " ", " ", " ", " ", " ", " "},
+                                                     {"K", "n", "d", i18n("weighting factor"), " ", " ", " ", " ", " ", " ", " "},
+                                                     {"K", "n", "d", i18n("weighting factor"), " ", " ", " ", " ", " ", " ", " "},
                                                      {"E<sub>d</sub>", "E<sub>mbt</sub>", "E<sub>ebt</sub>", "E<sub>at</sub>", "E<sub>aat</sub>", "E<sub>bb13</sub>", " ", " ", " ", " ", " "},
                                                      {"m", "K", "n", "d", " ", " ", " ", " ", " ", " ", " "},
                                                      {"K", "d", "n", " ", " ", " ", " ", " ", " ", " ", " "},
@@ -473,8 +563,8 @@ char * fvars_dihedral[2][FDIHEDRAL][FDIHEDRAL_P] = {{{"A", "δ", "m", " ", " ", 
                                                      {"K<sub>1</sub>", "K<sub>2</sub>", "K<sub>3</sub>", "K<sub>4</sub>", " ", " ", " ", " ", " ", " ", " "},
                                                      {"K", "ϕ<sub>0</sub>", " ", " ", " ", " ", " ", " ", " ", " ", " "},
                                                      {"n", "C", "K", "a", "u", "L", "b", "v", "M", "c", "w"},
-                                                     {"Interpolation style", "Dihedrals", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-                                                     {"Interpolation style", "Dihedrals", " ", " ", " ", " ", " ", " ", " ", " ", " "}}};
+                                                     {i18n("Interpolation style"), i18n("Dihedrals"), " ", " ", " ", " ", " ", " ", " ", " ", " "},
+                                                     {i18n("Interpolation style"), i18n("Dihedrals"), " ", " ", " ", " ", " ", " ", " ", " ", " "}}};
 
 int feunit_dihedral[2][FDIHEDRAL][FDIHEDRAL_P] = {{{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                                    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -558,17 +648,17 @@ gchar * la_improper_style_keyw[11] = {"class2",
                                       "sqdistharm",
                                       "umbrella"};
 
-/*gchar * la_improper_style_info[11] = {"COMPASS class2 force field",
-                                      "Cosine squared",
-                                      "CVFF force field",
-                                      "Distance between atom planes",
-                                      "Out-of-the plane distance",
-                                      "Fourier (multiple cosines)",
-                                      "Harmonic",
-                                      "Harmonic with Wilson Decius out-of-plane",
-                                      "Planar conformation",
-                                      "Squared distance harmonic",
-                                      "DREIDING force field"};
+/*gchar * la_improper_style_info[11] = {i18n("COMPASS class2 force field"),
+                                      i18n("Cosine squared"),
+                                      i18n("CVFF force field"),
+                                      i18n("Distance between atom planes"),
+                                      i18n("Out-of-the plane distance"),
+                                      i18n("Fourier (multiple cosines)"),
+                                      i18n("Harmonic"),
+                                      i18n("Harmonic with Wilson Decius out-of-plane"),
+                                      i18n("Planar conformation"),
+                                      i18n("Squared distance harmonic"),
+                                      i18n("DREIDING force field")};
 
 gchar la_improper_var[11][LIMPROPERS] = {{"E<sub>i</sub>", "E<sub>aa</sub>", " ", " ", " "},
                                          {"K", "χ<sub>0</sub>", " ", " ", " "},
@@ -784,7 +874,7 @@ char * fvars_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{"E<sub>x</sub>", "E<sub>y</sub
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
-                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "ω<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
+                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "&omega;<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
                                                  {"i<sub>gid</sub><sup>A</sup>", "j<sub>gid</sub><sup>A</sup>", "k", "i<sub>gid</sub><sup>B</sup>", "j<sub>gid</sub><sup>B</sup>", "R<sub>0</sub>"}},
                                                 {{"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", " ", " ", " "},
                                                  {"A", "n", " ", " ", " ", " "},
@@ -797,7 +887,7 @@ char * fvars_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{"E<sub>x</sub>", "E<sub>y</sub
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
                                                  {"i<sub>ind</sub><sup>glob</sup>", "j<sub>ind</sub><sup>glob</sup>", "k", "z<sub>mn</sub>", "z<sub>mx</sub>", " "},
-                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "ω<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
+                                                 {"E<sub>x</sub>", "E<sub>y</sub>", "E<sub>z</sub>", "&omega;<sup>in</sup><sub>ps<sup>-1</sup></sub>", " ", " "},
                                                  {"i<sub>gid</sub><sup>A</sup>", "j<sub>gid</sub><sup>A</sup>", "k", "i<sub>gid</sub><sup>B</sup>", "j<sub>gid</sub><sup>B</sup>", "R<sub>0</sub>"}}};
 
 int feunit_fext[2][FEXTERNAL][FEXTERNAL_P] = {{{1, 1, 1, 0, 0, 0},
@@ -831,27 +921,27 @@ int field_v[MAXDATA] = {  8,   8,   9,   7,   8,   5,   5,   8,   8,   9,   9,  
 int field_s[MAXDATA] = {650, 520, 520, 500, 600, 450, 600, 720, 720, 720, 720, 720, 720, 720, 720, 720, 720, 720, 720, 720, 720};
 int field_a[MAXDATA] = {  0,   0,   0,   0,   0,   0,   0,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,   0};
 
-gchar * ctitle[MAXDATA][12] ={{"Id", "Name", "Multiplicity", "Chemistry", "Atom(s)", "Species", "Viz. 3D", "Viz. Atom num."},                           // Molecule(s)
-                              {"Id", "Name", "Element", "Mass", "Charge", "Frozen", "Atom(s)", "Viz. 3D"},                                              // Atom(s)
-                              {"Id", "Core Id", "Shell", "Masse", "Charge", "k2 (1)", "k4 (2)", "Viz. 3D", "Use (3)"},                                  // Core-shell unit(s)
-                              {"Id", "At.1 Id", "At.2 Id", "Length [Å]", "av. d [Å] (1)", "Viz. 3D", "Use (2)"},                                        // Constraint(s)
-                              {"Id", "Length [Å]", "av. d12 [Å] (1)", "Unit Id", "At. Id", "Weight (2)", "Viz. 3D", "Use (3)"},                         // Mean force potential(s)
-                              {"Id", "Atom(s) in unit", "List of atom(s)", "Viz. 3D", "Use(1)"},                                                        // Rigid unit(s)
-                              {"Id", "Atom Id", "Viz. 3D", "Use (1)", "Potential"},                                                                     // Tethering potential(s)
-                              {"Id", "At.1", "At.2", "Bond(s)", "av. d [Å] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},                                // Bond(s)
-                              {"Id", "At.1", "At.2", "Bond restraint(s)", "av. d [Å] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},                      // Bond restraint(s)
-                              {"Id", "At.1", "At.2", "At.3", "Angle(s)", "av. θ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},                       // Angle(s)
-                              {"Id", "At.1", "At.2", "At.3", "Angle restraint(s)", "av. θ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},             // Angle restraint(s)
-                              {"Id", "At.1", "At.2", "At.3", "At.4", "Dihedral(s)", "av. ϕ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},            // Dihedrals
-                              {"Id", "At.1", "At.2", "At.3", "At.4", "Torsional restraint(s)", "av. ϕ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"}, // Torsions
-                              {"Id", "At.1", "At.2", "At.3", "At.4", "Improper(s)", "av. ϕ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},            // Impropers
-                              {"Id", "At.1", "At.2", "At.3", "At.4", "Inversion(s)", "av. ϕ [°] (1)", "Viz. 3D", "Use (2)", "Potential (3)"},           // Inversion(s)
-                              {"Id", "Spec.1", "Spec.2", "Viz. 3D", "Use (1)", "VdW potential"},                                                        // VdW(s)
-                              {"Id", "At.1", "At.2", "Viz. 3D", "Use (1)", "Metal potential"},                                                          // Metal(s)
-                              {"Id", "At.", "Viz. 3D", "Use (1)", "Tersoff Pot."},                                                                      // Tersoff potential(s)
-                              {"Id", "At.1", "At.2*", "At.3", "Viz. 3D", "Use (1)", "Three-body Pot."},                                                 // Three-body potential(s)
-                              {"Id", "At.1*", "At.2", "At.3", "At.4", "Viz. 3D", "Use (1)", "Four-body Pot."},                                          // Four-body potential(s)
-                              {"Id", "Use (1)", "Field type"}};                                                                                         // External field(s)
+gchar * ctitle[MAXDATA][12] ={{i18n("Id."), i18n("Name"), i18n("Multiplicity"), i18n("Chemistry"), i18n("Atom(s)"), i18n("Species"), i18n("Viz. 3D"), i18n("Viz. Atom num.")},                                       // Molecule(s)
+                              {i18n("Id."), i18n("Name"), i18n("Element"), i18n("Mass"), i18n("Charge"), i18n("Frozen"), i18n("Atom(s)"), i18n("Viz. 3D")},                                                          // Atom(s)
+                              {i18n("Id."), i18n("Core Id"), i18n("Shell"), i18n("Mass"), i18n("Charge"), "k2 (1)", "k4 (2)", i18n("Viz. 3D"), i18n("Use (3)")},                                                     // Core-shell unit(s)
+                              {i18n("Id."), i18n("At.1 Id"), i18n("At.2 Id"), i18n("Length [Å]"), i18n("av. d [Å] (1)"), i18n("Viz. 3D"), i18n("Use (2)")},                                                          // Constraint(s)
+                              {i18n("Id."), i18n("Length [Å]"), i18n("av. d12 [Å] (1)"), i18n("Unit Id"), i18n("At. Id"), i18n("Weight (2)"), i18n("Viz. 3D"), i18n("Use (3)")},                                     // Mean force potential(s)
+                              {i18n("Id."), i18n("Atom(s) in unit"), i18n("List of atom(s)"), i18n("Viz. 3D"), i18n("Use (1)")},                                                                                     // Rigid unit(s)
+                              {i18n("Id."), i18n("Atom Id."), i18n("Viz. 3D"), i18n("Use (1)"), i18n("Potential")},                                                                                                   // Tethering potential(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("Bond(s)"), i18n("av. d [Å] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},                                            // Bond(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("Bond restraint(s)"), i18n("av. d [Å] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},                                  // Bond restraint(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("Angle(s)"), i18n("av. θ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},                             // Angle(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("Angular restraint(s)"), i18n("av. θ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},                   // Angle restraint(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("At.4"), i18n("Dihedral(s)"), i18n("av. ϕ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},            // Dihedrals
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("At.4"), i18n("Torsional restraint(s)"), i18n("av. ϕ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")}, // Torsions
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("At.4"), i18n("Improper(s)"), i18n("av. ϕ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},            // Impropers
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("At.3"), i18n("At.4"), i18n("Inversion(s)"), i18n("av. ϕ [°] (1)"), i18n("Viz. 3D"), i18n("Use (2)"), i18n("Potential (3)")},           // Inversion(s)
+                              {i18n("Id."), i18n("Spec.1"), i18n("Spec.2"), i18n("Viz. 3D"), i18n("Use (1)"), i18n("VdW potential")},                                                                                // VdW(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2"), i18n("Viz. 3D"), i18n("Use (1)"), i18n("Metal potential")},                                                                                  // Metal(s)
+                              {i18n("Id."), i18n("At."), i18n("Viz. 3D"), i18n("Use (1)"), i18n("Tersoff Pot.")},                                                                                                    // Tersoff potential(s)
+                              {i18n("Id."), i18n("At.1"), i18n("At.2*"), i18n("At.3"), i18n("Viz. 3D"), i18n("Use (1)"), i18n("Three-body Pot.")},                                                                   // Three-body potential(s)
+                              {i18n("Id."), i18n("At.1*"), i18n("At.2"), i18n("At.3"), i18n("At.4"), i18n("Viz. 3D"), i18n("Use (1)"), i18n("Four-body Pot.")},                                                        // Four-body potential(s)
+                              {i18n("Id."), i18n("Use (1)"), i18n("Field type")}};                                                                                                                                   // External field(s)
 
 GType col_type[MAXDATA][12] = {{G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT},                //  0 - Molecule(s)
                                {G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT},              //  1 - Atom(s)
@@ -932,7 +1022,7 @@ gboolean afp_init[MAXDATC+MAXDATA] = {TRUE,  //  0 - System
                                       FALSE, // 27 - Four-body potential(s)
                                       FALSE};// 28 - External field(s)
 
-gchar * mo_title[8]={"Bond", "Bond restraint", "Angle", "Angle restraint", "Dihedral", "Torsional restraint", "Improper", "Inversion"};
+gchar * mo_title[8]={i18n("Bond"), i18n("Bond restraint"), i18n("Angle"), i18n("Angle restraint"), i18n("Dihedral"), i18n("Torsional restraint"), i18n("Improper"), i18n("Inversion")};
 
 // Energy converter, values taken from DL_POLY 'read_file.f90' and 'setup_module.f90'
 float internal_to_other[5] = {9648.530821, 418.4, 100.0, 0.831451115, 1.0};
@@ -1067,13 +1157,13 @@ void set_mol_num_label ()
 void setup_cs_labels (int i)
 {
   gchar * str;
-  str = g_strdup_printf ("\t <b>(1)</b> Force constant of the core-shell spring in [<b>%s &#xC5;<sup>-2</sup></b>]", exact_name(fkeysw[activef][0][i]));
+  str = g_strdup_printf (_("\t <b>(1)</b> Force constant of the core-shell spring in [<b>%s &#xC5;<sup>-2</sup></b>]"), exact_name(fkeysw[activef][0][i]));
   gtk_label_set_text (GTK_LABEL(cs_label[0]), str);
   gtk_label_set_use_markup (GTK_LABEL(cs_label[0]), TRUE);
   g_free (str);
 
-  str = g_strdup_printf ("\t <b>(2)</b> Quartic (anharmonic) force constant of the core-shell spring in [<b>%s &#xC5;<sup>-4</sup></b>]"
-                         " usually <i>k<sub>2</sub></i> >> <i>k<sub>4</sub></i>", exact_name(fkeysw[activef][0][i]));
+  str = g_strdup_printf (_("\t <b>(2)</b> Quartic (anharmonic) force constant of the core-shell spring in [<b>%s &#xC5;<sup>-4</sup></b>]"
+                           " usually <i>k<sub>2</sub></i> >> <i>k<sub>4</sub></i>"), exact_name(fkeysw[activef][0][i]));
   gtk_label_set_text (GTK_LABEL(cs_label[1]), str);
   gtk_label_set_use_markup (GTK_LABEL(cs_label[1]), TRUE);
   g_free (str);
@@ -1106,12 +1196,43 @@ gchar * parameters_info (int obj, int key,  gchar ** words, float * data)
   }
   else
   {
-    str = g_strdup_printf ("<i>Tabulated</i>");
+    str = g_strdup_printf (_("<i>Tabulated</i>"));
   }
   return str;
 }
 
 extern void print_all_field_struct (field_molecule * mol, int str);
+
+/*!
+  \fn gboolean dlp_to_translate (int fid, int obj, int key)
+
+  \brief test if fnames text is to be translated or not
+
+  \param fid the target force field
+  \param obj the target object in the force field
+  \param key the target key for the object
+ */
+gboolean dlp_to_translate (int fid, int obj, int key)
+{
+  switch (fid)
+  {
+    case 0:
+      if (obj == 0 || obj == 1 || obj == 9 || obj == 13 || obj == 14 || obj == 15) return TRUE;
+      if ((obj == 2 || obj == 3) && (key == 0 || key == 3 || key == 4 || key == 7 || key == 8 || key == 9)) return TRUE;
+      if ((obj == 4 || obj == 5) && key != 13) return TRUE;
+      if ((obj == 6 || obj == 7 || obj == 8) && key != 4) return TRUE;
+      if (obj == 10 && (key == 2 || key == 6 || key == 7 || key == 8 || key == 9 || key == 10)) return TRUE;
+      if (obj == 11 && key == 5) return TRUE;
+      break;
+    case 1:
+      if (obj == 0 && (key == 1 || key == 2 || key == 3 || key == 5)) return TRUE;
+      if (obj == 2 && key != 7) return TRUE;
+      if (obj == 4 && key != 16) return TRUE;
+      if (obj == 6 || obj == 8 || obj == 10) return TRUE;
+      break;
+  }
+  return FALSE;
+}
 
 /*!
   \fn void fill_field_struct (GtkTreeStore * store, int id, int mo)
@@ -1143,7 +1264,9 @@ void fill_field_struct (GtkTreeStore * store, int id, int mo)
     gtk_tree_store_append (store, & field_level, NULL);
     tmp_fprop = tmp_fstr -> def;
     stra = g_strdup_printf ("%.3f", tmp_fstr -> av);
-    strb = g_strdup_printf ("<b>Default</b>: %s (%s)", fnames[activef][l][tmp_fprop -> key], exact_name(fkeysw[activef][l][tmp_fprop -> key]));
+    strb = g_strdup_printf (_("<b>Default</b>: %s (%s)"), 
+                            dlp_to_translate(activef,l,tmp_fprop -> key) ? _(fnames[activef][l][tmp_fprop -> key]) : fnames[activef][l][tmp_fprop -> key], 
+                            exact_name(fkeysw[activef][l][tmp_fprop -> key]));
     if (id < 2)
     {
       vars = (char **)fvars_bond[activef][tmp_fprop -> key];
@@ -1235,7 +1358,9 @@ void fill_field_body (GtkTreeStore * store, int id)
         }
       }
     }
-    stra = g_strdup_printf ("%s (%s)", fnames[activef][10+id][tmp_fbody -> key], exact_name(fkeysw[activef][10+id][tmp_fbody -> key]));
+    stra = g_strdup_printf ("%s (%s)", 
+                            dlp_to_translate(activef,10+id,tmp_fbody -> key) ? _(fnames[activef][10+id][tmp_fbody -> key]) : fnames[activef][10+id][tmp_fbody -> key],
+                            exact_name(fkeysw[activef][10+id][tmp_fbody -> key]));
     if (id == 0) strb = parameters_info (9+id, tmp_fbody -> key, fvars_vdw[activef][tmp_fbody -> key], tmp_fbody -> val);
     if (id == 1) strb = parameters_info (9+id, tmp_fbody -> key, fvars_met[activef][tmp_fbody -> key], tmp_fbody -> val);
     if (id == 2) strb = parameters_info (9+id, tmp_fbody -> key, fvars_ters[activef][tmp_fbody -> key], tmp_fbody -> val);
@@ -1269,7 +1394,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
 
   tmp_fmol = tmp_field -> first_molecule;
 
-  //if (get_active_field_elements(f) > 10000 &&  ! tmp_field -> show_all[f])
+  //if (get_active_field_elements(f) >= GTK_LIMIT &&  ! tmp_field -> show_all[f])
   {
 
   }
@@ -1365,7 +1490,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
         }
         else
         {
-          stra = g_strdup_printf ("<i>None</i>");
+          stra = g_strdup_printf ("<i>%s</i>", _("None"));
         }
         if (tmp_fshell -> ia[1])
         {
@@ -1375,7 +1500,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
         }
         else
         {
-          strb = g_strdup_printf ("<i>None</i>");
+          strb = g_strdup_printf ("<i>%s</i>", _("None"));
         }
         strc = g_strdup_printf ("%.3f", tmp_fshell -> m);
         strd = g_strdup_printf ("%.2f", tmp_fshell -> z);
@@ -1412,7 +1537,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
         }
         else
         {
-          stra = g_strdup_printf ("<i>None</i>");
+          stra = g_strdup_printf ("<i>%s</i>", _("None"));
         }
         if (tmp_fcons -> ia[1])
         {
@@ -1422,7 +1547,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
         }
         else
         {
-          strb = g_strdup_printf ("<i>None</i>");
+          strb = g_strdup_printf ("<i>%s</i>", _("None"));
         }
         gtk_tree_store_set (store, & field_level, 0, i+1,
                                                   1, stra,
@@ -1509,7 +1634,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
         j = tmp_fmol -> atoms_id[tmp_ftet -> num-1][0].a;
         k = get_active_atom (m, j) -> sp;
         stra = g_strdup_printf ("%d (%s)",  tmp_ftet -> num, exact_name(tmp_proj -> chemistry -> label[k]));
-        strb = g_strdup_printf ("%s (%s)", fnames[activef][1][tmp_ftet -> key], exact_name(fkeysw[activef][1][tmp_ftet -> key]));
+        strb = g_strdup_printf ("%s (%s)", (activef) ? fnames[activef][1][tmp_ftet -> key] : _(fnames[activef][1][tmp_ftet -> key]), exact_name(fkeysw[activef][1][tmp_ftet -> key]));
         strc = parameters_info (0, tmp_ftet -> key, fvars_teth[activef][tmp_ftet -> key], tmp_ftet -> val);
         gtk_tree_store_append (store, & field_level, NULL);
         gtk_tree_store_set (store, & field_level, 0, i+1,
@@ -1530,7 +1655,7 @@ void fill_field_model (GtkTreeStore * store, int f, int m)
       for (i=0; i < tmp_field -> extern_fields; i++)
       {
         gtk_tree_store_append (store, & field_level, NULL);
-        stra = g_strdup_printf ("%s (%s)", fnames[activef][15][tmp_fext -> key], exact_name(fkeysw[activef][15][tmp_fext -> key]));
+        stra = g_strdup_printf ("%s (%s)", (activef) ? fnames[activef][15][tmp_fext -> key] : _(fnames[activef][15][tmp_fext -> key]), exact_name(fkeysw[activef][15][tmp_fext -> key]));
         gtk_tree_store_set (store, & field_level, 0, tmp_fext -> id+1,
                                                   1, tmp_fext -> use,
                                                   2, stra,
@@ -1638,77 +1763,77 @@ gchar * set_field_label (int f, int m)
     if (tmp_field -> afp[MAXDATC])
     {
       tmp_fmol = get_active_field_molecule (m);
-      lab = g_strdup_printf ("the <b>%d</b> different fragment(s) in molecule <b>%s</b>\n",
+      lab = g_strdup_printf (_("the <b>%d</b> different fragment(s) in molecule <b>%s</b>\n"),
                              tmp_fmol -> multi, tmp_fmol -> name);
     }
     else
     {
-      lab = g_strdup_printf ("the system\n");
+      lab = g_strdup_printf (_("the system\n"));
     }
   }
   switch (f)
   {
     case 1:
-      lab = g_strdup_printf ("%seach contains the following <b>%d</b> type(s) of atom", lab, tmp_fmol -> atoms);
+      lab = g_strdup_printf (_("%seach contains the following <b>%d</b> type(s) of atom"), lab, tmp_fmol -> atoms);
       break;
     case 2:
       if (tmp_fmol ->  shells == 0)
       {
-        lab = g_strdup_printf ("%sdo not contains any core-shell unit", lab);
+        lab = g_strdup_printf (_("%sdo not contains any core-shell unit"), lab);
       }
       else
       {
-        lab = g_strdup_printf ("%seach contains the following <b>%d</b> core-shell unit", lab, tmp_fmol -> shells);
+        lab = g_strdup_printf (_("%seach contains the following <b>%d</b> core-shell unit"), lab, tmp_fmol -> shells);
       }
       break;
     case 3:
       if (tmp_fmol ->  constraints == 0)
       {
-        lab = g_strdup_printf ("%sdo not contains any constraint", lab);
+        lab = g_strdup_printf (_("%sdo not contains any constraint"), lab);
       }
       else
       {
-        lab = g_strdup_printf ("%seach contains the following <b>%d</b> constraint(s)", lab, tmp_fmol -> constraints);
+        lab = g_strdup_printf (_("%seach contains the following <b>%d</b> constraint(s)"), lab, tmp_fmol -> constraints);
       }
       break;
     case 4:
       if (tmp_fmol ->  pmfs == 0)
       {
-        lab = g_strdup_printf ("%sdo not contains any mean force potential", lab);
+        lab = g_strdup_printf (_("%sdo not contains any mean force potential"), lab);
       }
       else
       {
-        lab = g_strdup_printf ("%seach contains the following <b>%d</b> type(s) of mean force potential(s)", lab, tmp_fmol -> pmfs);
+        lab = g_strdup_printf (_("%seach contains the following <b>%d</b> type(s) of mean force potential(s)"), lab, tmp_fmol -> pmfs);
       }
       break;
     case 5:
       if (tmp_fmol ->  rigids == 0)
       {
-        lab = g_strdup_printf ("%sdo not contains any rigid unit", lab);
+        lab = g_strdup_printf (_("%sdo not contains any rigid unit"), lab);
       }
       else
       {
-        lab = g_strdup_printf ("%seach contains the following <b>%d</b> rigid unit(s)", lab, tmp_fmol -> rigids);
+        lab = g_strdup_printf (_("%seach contains the following <b>%d</b> rigid unit(s)"), lab, tmp_fmol -> rigids);
       }
       break;
     case 6:
       if (tmp_fmol ->  tethered == 0)
       {
-        lab = g_strdup_printf ("%sdo not contains any tethering potential(s)", lab);
+        lab = g_strdup_printf (_("%sdo not contains any tethering potential(s)"), lab);
       }
       else
       {
-        lab = g_strdup_printf ("%seach contains the following <b>%d</b> tethering potential(s)", lab, tmp_fmol -> tethered);
+        lab = g_strdup_printf (_("%seach contains the following <b>%d</b> tethering potential(s)"), lab, tmp_fmol -> tethered);
       }
       break;
     case SEXTERN:
       if (tmp_field -> extern_fields == 0)
       {
-        lab = g_strdup_printf ("the force field do not contains any external field(s)");
+        lab = g_strdup_printf (_("the force field do not contains any external field(s)"));
       }
       else
       {
-        lab = g_strdup_printf ("the force field contains the following <b>%d</b> external field(s)", tmp_field -> extern_fields);
+        lab = g_strdup_printf (_("the force field contains the following <b>%d</b> external field(s)"), tmp_field -> extern_fields);
       }
       break;
     default:
@@ -1718,22 +1843,22 @@ gchar * set_field_label (int f, int m)
         {
           if (tmp_fmol -> nstruct[f-7] == 0)
           {
-            lab = g_strdup_printf ("%sdo not contains any %s <sup>*</sup>", lab, mo_title[f-7]);
+            lab = g_strdup_printf (_("%sdo not contains any %s <sup>*</sup>"), lab, _(mo_title[f-7]));
           }
           else
           {
-            lab = g_strdup_printf ("%s contains the following <b>%d</b> type(s) of %s <sup>*</sup>", lab, tmp_fmol -> nstruct[f-7], elemts[f]);
+            lab = g_strdup_printf (_("%s contains the following <b>%d</b> type(s) %s <sup>*</sup>"), lab, tmp_fmol -> nstruct[f-7], _(intelemts[f]));
           }
         }
         else
         {
           if (tmp_fmol -> nstruct[f-7] == 0)
           {
-            lab = g_strdup_printf ("%sdo not contains any %s", lab, mo_title[f-7]);
+            lab = g_strdup_printf (_("%sdo not contains any %s"), lab, _(mo_title[f-7]));
           }
           else
           {
-            lab = g_strdup_printf ("%s contains the following <b>%d</b> type(s) of %s", lab, tmp_fmol -> nstruct[f-7], elemts[f]);
+            lab = g_strdup_printf (_("%s contains the following <b>%d</b> type(s) %s"), lab, tmp_fmol -> nstruct[f-7], _(intelemts[f]));
           }
         }
         break;
@@ -1743,11 +1868,11 @@ gchar * set_field_label (int f, int m)
         k = f - MOLIMIT;
         if (tmp_field -> nbody[k] == 0)
         {
-          lab = g_strdup_printf ("the force field do not contains any %s(s)", elemts[f]);
+          lab = g_strdup_printf (_("the force field do not contains any %s"), _(elemt[f]));
         }
         else
         {
-          lab = g_strdup_printf ("the force field contains the following <b>%d</b> %s(s)", tmp_field -> nbody[k], elemts[f]);
+          lab = g_strdup_printf (_("the force field contains the following <b>%d</b> %s"), tmp_field -> nbody[k], _(elemts[f]));
         }
         break;
       }
@@ -1813,10 +1938,10 @@ void get_is_energy (int i, int l)
 {
   int j, k;
   j = (i > 1 && i < 8) ? (i-1)/2 + 1 - i/7 : i;
-  is_energy = g_malloc (fetypes[activef][i+1]*sizeof*is_energy);
+  is_energy = g_malloc0(fetypes[activef][i+1]*sizeof*is_energy);
   if (l)
   {
-    is_var = g_malloc (fetypes[activef][i+1]*sizeof*is_var);
+    is_var = g_malloc0(fetypes[activef][i+1]*sizeof*is_var);
   }
   switch (j)
   {
@@ -1916,7 +2041,7 @@ void get_is_energy (int i, int l)
 gboolean field_file_has_energy_parameters (gboolean scale, int sca, int scb)
 {
   int i, j, k, l;
-  is_param = allocdint(15, 21);
+  is_param = allocdint (15, 21);
   has_energy = allocint (15);
   i = 0;
   tmp_fmol = tmp_field -> first_molecule;
@@ -2074,12 +2199,12 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
   {
     if (field_file_has_energy_parameters(FALSE, 0, 0))
     {
-      GtkWidget * dialog =  gtk_dialog_new_with_buttons ("Change energy unit ?", GTK_WINDOW(field_assistant),
-                                                         GTK_DIALOG_MODAL, "Yes", GTK_RESPONSE_YES, "No", GTK_RESPONSE_NO, NULL);
+      GtkWidget * dialog =  gtk_dialog_new_with_buttons (_("Change energy unit ?"), GTK_WINDOW(field_assistant),
+                                                         GTK_DIALOG_MODAL, _("Yes"), GTK_RESPONSE_YES, "No", GTK_RESPONSE_NO, NULL);
       gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
       GtkWidget * vbox = dialog_get_content_area (dialog);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("Change the energy unit ?\nThe value of all field parameters that are energy related (listed below) will be scaled accordingly.", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
-      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label("List of energy related parameters in your FIELD file:\n", -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("Change the energy unit ?\nThe value of all field parameters that are energy related (listed below) will be scaled accordingly."), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
+      add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("List of energy related parameters in your FIELD file:\n"), -1, -1, 0.5, 0.5), FALSE, FALSE, 0);
       GtkWidget * hbox;
       GtkWidget * vbax, * vbbx;
       GtkWidget * hax, * hbx;
@@ -2098,13 +2223,13 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbax, FALSE, FALSE, 0);
           hax = create_hbox (0);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vbax, hax, FALSE, FALSE, 0);
-          str = g_strdup_printf ("\t<b>%s(s):</b>", felemts[3]);
+          str = g_strdup_printf ("\t<b>%s:</b>", _(felemts[3]));
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hax, markup_label(str, 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
           g_free (str);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbbx, FALSE, FALSE, 0);
           hbx = create_hbox (0);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vbbx, hbx, FALSE, FALSE, 0);
-          str = g_strdup_printf ("k<sub>2</sub> and k<sub>4</sub>");
+          str = g_strdup_printf ("k<sub>2</sub> %s k<sub>4</sub>", _("and"));
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, markup_label(str, 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
           g_free (str);
           break;
@@ -2122,7 +2247,7 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbax, FALSE, FALSE, 0);
           hax = create_hbox (0);
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vbax, hax, FALSE, FALSE, 0);
-          str = g_strdup_printf ("\t<b>%s:</b>", felemts[j+7]);
+          str = g_strdup_printf ("\t<b>%s:</b>", _(felemt[j+7]));
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hax, markup_label(str, 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
           g_free (str);
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbbx, FALSE, FALSE, 0);
@@ -2133,7 +2258,7 @@ G_MODULE_EXPORT void changed_energy_unit (GtkComboBox * box, gpointer data)
             {
               hbx = create_hbox (0);
               add_box_child_start (GTK_ORIENTATION_VERTICAL, vbbx, hbx, FALSE, FALSE, 0);
-              str = g_strdup_printf ("%s %s:", fnames[activef][j+1][k], elemts[j+6]);
+              str = g_strdup_printf ("%s %s:", dlp_to_translate(activef,j+1,k) ? _(fnames[activef][j+1][k]) : fnames[activef][j+1][k], _(elemts[j+6]));
               add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, markup_label(str, 250, -1, 0.0, 0.5), FALSE, FALSE, 0);
               g_free (str);
               str = NULL;
@@ -2194,13 +2319,13 @@ GtkWidget * vbox_init (int p)
 
   vbox = create_vbox (BSEP);
   hbox = create_hbox (0);
-  str = g_strdup_printf ("<b>Please select the %s:</b>", felemts[0]);
+  str = g_strdup_printf (_("<b>Please select the %s:</b>"), _(felemt[0]));
   ebox = fbox (hbox, str);
   g_free (str);
   enbox = create_combo ();
   for (j=0; j<fetypes[activef][0]; j++)
   {
-    str = g_strdup_printf ("%s (%s)", fnames[activef][0][j], fkeysw[activef][0][j]);
+    str = g_strdup_printf ("%s (%s)", dlp_to_translate(activef,0,j) ? _(fnames[activef][0][j]) : fnames[activef][0][j], fkeysw[activef][0][j]);
     combo_text_append (enbox, str);
     g_free (str);
   }
@@ -2212,12 +2337,12 @@ GtkWidget * vbox_init (int p)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
 
   hbox = create_hbox (0);
-  ebox = fbox (hbox, "<b>Please select the component(s) of the force field:</b>");
+  ebox = fbox (hbox, _("<b>Please select the component(s) of the force field:</b>"));
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<u> Intra-molecular interaction(s):</u>", 200, 20, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<u> Intra-molecular interaction(s):</u>"), 200, 20, 0.0, 0.5), FALSE, FALSE, 10);
 
-  //str = g_strdup_printf ("Use multiple molecule(s)");
+  //str = g_strdup_printf (_("Use multiple molecule(s)"));
   //but = check_button (str, 225, 40, tmp_field -> afp[MAXDATC], G_CALLBACK(toggle_field_params), GINT_TO_POINTER(MAXDATC));
   //g_free (str);
   //add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 30);
@@ -2232,7 +2357,7 @@ GtkWidget * vbox_init (int p)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ebox, FALSE, FALSE, 20);
     for (j=0; j<col[i]; j++)
     {
-      str = g_strdup_printf ("Use %s(s)", elemts[k-MAXDATC]);
+      str = g_strdup_printf (_("Use %s"), _(elemts[k-MAXDATC]));
       ff_but[l] = check_button (str, 225, 40, tmp_field -> afp[k], G_CALLBACK(toggle_field_params), GINT_TO_POINTER(k));
       g_free (str);
       widget_set_sensitive (ff_but[l], ! activef);
@@ -2243,7 +2368,7 @@ GtkWidget * vbox_init (int p)
   }
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("<u>Non-bonded interaction(s)</u>", 200, 20, 0.0, 0.5), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<u>Non-bonded interaction(s)</u>"), 200, 20, 0.0, 0.5), FALSE, FALSE, 10);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 10);
   hbox = create_hbox (0);
   for (i=0; i<3; i++)
@@ -2252,7 +2377,7 @@ GtkWidget * vbox_init (int p)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, ebox, FALSE, FALSE, 20);
     for (j=0; j<2; j++)
     {
-      str = g_strdup_printf ("Use %s(s)", elemts[k-MAXDATC]);
+      str = g_strdup_printf (_("Use %s"), _(elemts[k-MAXDATC]));
       if (activef) tmp_field -> afp[k] = FALSE;
       ff_but[l] = check_button (str, 225, 40, tmp_field -> afp[k], G_CALLBACK(toggle_field_params), GINT_TO_POINTER(k));
       k ++;
@@ -2310,7 +2435,7 @@ int get_field_data_id (int k, gchar * data)
   i = -1;
   for (j=0; j<fetypes[activef][k]; j++)
   {
-    str = g_strdup_printf ("%s (%s)", fnames[activef][k][j], exact_name(fkeysw[activef][k][j]));
+    str = g_strdup_printf ("%s (%s)", dlp_to_translate(activef,k,j) ? _(fnames[activef][k][j]) : fnames[activef][k][j], exact_name(fkeysw[activef][k][j]));
     if (g_strcmp0 (data, str) == 0)
     {
       i = j;
@@ -2383,7 +2508,7 @@ G_MODULE_EXPORT void changed_field_key_renderer (GtkCellRendererCombo * combo, g
           {
             adjust_field_prop (i-7, o, NULL, ids, l);
             // print status of field prop
-            str = g_strdup_printf ("<b>Default</b>: %s", str);
+            str = g_strdup_printf (_("<b>Default</b>: %s"), str);
             gtk_tree_store_set (field_model[i], iter, field_v[i]-1, str, -1);
             gtk_tree_store_set (field_model[i], iter, field_v[i], parameters_info (i-6, l, vars, tmp_fstr -> def  -> val), -1);
             update_field_trees ();
@@ -2512,7 +2637,7 @@ gchar * pop_info (int i, int id)
   {
     case 0:
       tmp_fmol = get_active_field_molecule (row_id);
-      str = g_strdup_printf ("Molecule N°%d", id+1);
+      str = g_strdup_printf (_("Molecule N°%d"), id+1);
       actel = 1;
       break;
     default:
@@ -2525,7 +2650,7 @@ gchar * pop_info (int i, int id)
       {
         case 1:
           tmp_fat = get_active_atom (j, id);
-          str = g_strdup_printf ("Atom N°%d: \"%s\"", tmp_fat -> id+1, tmp_fat -> name);
+          str = g_strdup_printf (_("Atom N°%d: \"%s\""), tmp_fat -> id+1, tmp_fat -> name);
           actel = tmp_fat -> num;
           break;
         case 2:
@@ -2536,12 +2661,12 @@ gchar * pop_info (int i, int id)
             if (tmp_fshell -> ia[0])
             {
               k = tmp_fmol -> atoms_id[tmp_fshell -> ia[0]-1][0].a;
-              str = g_strdup_printf ("Core-Shell N°%d: Atom %d (%s) - ", tmp_fshell -> id+1, tmp_fshell -> ia[0],
+              str = g_strdup_printf (_("Core-Shell N°%d: Atom %d (%s) - "), tmp_fshell -> id+1, tmp_fshell -> ia[0],
                                      exact_name(tmp_proj -> chemistry -> label[get_active_atom (j, k) -> sp]));
             }
             else
             {
-              str = g_strdup_printf ("Core-Shell N°%d: <i>None</i> - ", tmp_fshell -> id+1);
+              str = g_strdup_printf (_("Core-Shell N°%d: <i>%s</i> - "), tmp_fshell -> id+1, _("None"));
             }
             if (tmp_fshell -> ia[1])
             {
@@ -2550,7 +2675,7 @@ gchar * pop_info (int i, int id)
             }
             else
             {
-              str = g_strdup_printf ("%s<i>None</i>", str);
+              str = g_strdup_printf ("%s<i>%s</i>", str, _("None"));
             }
           }
           break;
@@ -2562,12 +2687,12 @@ gchar * pop_info (int i, int id)
             if (tmp_fcons -> ia[0])
             {
               k = tmp_fmol -> atoms_id[tmp_fcons -> ia[0]-1][0].a;
-              str = g_strdup_printf ("Constrained Bond N°%d: Atom %d (%s) - ", tmp_fcons -> id+1, tmp_fcons -> ia[0],
+              str = g_strdup_printf (_("Constrained Bond N°%d: Atom %d (%s) - "), tmp_fcons -> id+1, tmp_fcons -> ia[0],
                                      exact_name(tmp_proj -> chemistry -> label[get_active_atom (j, k) -> sp]));
             }
             else
             {
-              str = g_strdup_printf ("Constrained Bond N°%d: <i>None</i> - ", tmp_fcons -> id+1);
+              str = g_strdup_printf (_("Constrained Bond N°%d: <i>%s</i> - "), tmp_fcons -> id+1, _("None"));
             }
             if (tmp_fcons -> ia[1])
             {
@@ -2576,7 +2701,7 @@ gchar * pop_info (int i, int id)
             }
             else
             {
-              str = g_strdup_printf ("%s<i>None</i>", str);
+              str = g_strdup_printf ("%s<i>%s</i>", str, _("None"));
             }
           }
           break;
@@ -2585,7 +2710,7 @@ gchar * pop_info (int i, int id)
           {
             tmp_fpmf = get_active_pmf (j, id);
             actel = 1;
-            str = g_strdup_printf ("Mean Force Potential N°%d", tmp_fpmf -> id+1);
+            str = g_strdup_printf (_("Mean Force Potential N°%d"), tmp_fpmf -> id+1);
           }
           break;
         case 5:
@@ -2593,7 +2718,7 @@ gchar * pop_info (int i, int id)
           {
             tmp_frig = get_active_rigid (j, id);
             actel = 1;
-            str = g_strdup_printf ("Rigid Unit N°%d: %d Atom(s)", tmp_frig -> id+1, tmp_frig -> num);
+            str = g_strdup_printf (_("Rigid Unit N°%d: %d Atom(s)"), tmp_frig -> id+1, tmp_frig -> num);
           }
           break;
         case 6:
@@ -2601,14 +2726,14 @@ gchar * pop_info (int i, int id)
           {
             tmp_ftet = get_active_tethered (j, id);
             actel = 1;
-            str = g_strdup_printf ("Tethering Potential N°%d", tmp_ftet -> id+1);
+            str = g_strdup_printf (_("Tethering Potential N°%d"), tmp_ftet -> id+1);
           }
           break;
         case SEXTERN:
           if (tmp_field -> extern_fields > 0)
           {
             tmp_fext = get_active_external (row_id);
-            str = g_strdup_printf ("%s N°: %d", felemts[i+1], tmp_fext -> id+1);
+            str = g_strdup_printf ("%s N°: %d", _(felemt[i+1]), tmp_fext -> id+1);
             actel = 1;
           }
           break;
@@ -2619,7 +2744,7 @@ gchar * pop_info (int i, int id)
             {
               actel = 1;
               tmp_fstr = get_active_struct (i-7, j, row_id);
-              str = g_strdup_printf ("%s N°%d: \"", mo_title[i-7], tmp_fstr -> id+1);
+              str = g_strdup_printf ("%s N°%d: \"", _(mo_title[i-7]), tmp_fstr -> id+1);
               for (k=0; k<struct_id(i); k++)
               {
                 str = g_strdup_printf ("%s%s", str, get_active_atom (j, tmp_fstr -> aid[k]) -> name);
@@ -2634,12 +2759,12 @@ gchar * pop_info (int i, int id)
             if (tmp_field -> nbody[k] > 0)
             {
               tmp_fbody = get_active_body (row_id, k);
-              str = g_strdup_printf ("%s N°: %d \"%s", felemts[i+1], tmp_fbody -> id+1, get_active_atom (tmp_fbody -> ma[0][0], tmp_fbody -> a[0][0]) -> name);
+              str = g_strdup_printf ("%s N°: %d \"%s", _(felemt[i+1]), tmp_fbody -> id+1, get_active_atom (tmp_fbody -> ma[0][0], tmp_fbody -> a[0][0]) -> name);
               for (l=1; l<body_at(k); l++)
               {
                 if (tmp_fbody -> na[l] < 0)
                 {
-                  str = g_strdup_printf ("%s - NONE", str);
+                  str = g_strdup_printf (_("%s - NONE"), str);
                 }
                 else
                 {
@@ -2670,10 +2795,10 @@ gchar * pop_edit (int i)
   switch (i)
   {
     case 0:
-      str = g_strdup_printf ("Edit Name: \"%s\"", tmp_fmol -> name);
+      str = g_strdup_printf (_("Edit Name: \"%s\""), tmp_fmol -> name);
       break;
     default:
-      str = g_strdup_printf ("Edit %s Properties", elemts[i]);
+      str = g_strdup_printf (_("Edit properties %s"), _(intelemt[i]));
       break;
   }
   return str;
@@ -2689,7 +2814,7 @@ gchar * pop_edit (int i)
 gchar * pop_add (int i)
 {
   gchar * str = NULL;
-  if ((i>1 &&  i<7) || (i>MOLIMIT && i<MAXDATA)) str = g_strdup_printf ("Add a New %s", elemts[i]);
+  if ((i>1 &&  i<7) || (i>MOLIMIT && i<MAXDATA)) str = g_strdup_printf (_("Add a new %s"), _(elemt[i]));
   return str;
 }
 
@@ -2703,7 +2828,7 @@ gchar * pop_add (int i)
 gchar * pop_remove (int i)
 {
   gchar * str = NULL;
-  if ((i>1 &&  i<7) || (i>MOLIMIT && i<MAXDATA)) str = g_strdup_printf ("Remove %s", elemts[i]);
+  if ((i>1 &&  i<7) || (i>MOLIMIT && i<MAXDATA)) str = g_strdup_printf (_("Remove %s"), _(elemt[i]));
   return str;
 }
 
@@ -2830,7 +2955,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
         if (tmp_field -> molecules < tmp_coord -> totcoord[2] && tmp_fmol -> multi > 1)
         {
           fmenus = g_menu_new ();
-          append_field_item (fmenus, "Add New Molecule", "add-mol", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(add_molecule_to_field), data, FALSE, FALSE, FALSE, TRUE);
+          append_field_item (fmenus, _("Add new molecule"), "add-mol", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(add_molecule_to_field), data, FALSE, FALSE, FALSE, TRUE);
           g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
           g_object_unref (fmenus);
         }
@@ -2839,7 +2964,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
             && tmp_fmol -> multi < tmp_fmol -> mol -> multiplicity)
         {
           fmenus = g_menu_new ();
-          str = g_strdup_printf ("Remove Molecule %s From Field", tmp_fmol -> name);
+          str = g_strdup_printf (_("Remove molecule %s from force field"), tmp_fmol -> name);
           append_field_item (fmenus, str, "rem-mol", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(remove_molecule_from_field), data, FALSE, FALSE, FALSE, TRUE);
           g_free (str);
           g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
@@ -2855,7 +2980,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           {
 
             fmenus = g_menu_new ();
-            str = g_strdup_printf ("Created New Field Atom From %s Atom(s)", tmp_fat -> name);
+            str = g_strdup_printf (_("Created new force field atom from %s atom(s)"), tmp_fat -> name);
             append_field_item (fmenus, str, "add-fat", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_select_atom_id_from_fied_molecule), GINT_TO_POINTER(0), FALSE, FALSE, FALSE, TRUE);
             g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
             g_object_unref (fmenus);
@@ -2870,7 +2995,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           if (l > 1)
           {
             fmenus = g_menu_new ();
-            str = g_strdup_printf ("Remove Atom %s From Field Molecule", tmp_fat -> name);
+            str = g_strdup_printf (_("Remove atom %s from force field molecule"), tmp_fat -> name);
             append_field_item (fmenus, str, "rem-fat", i, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(remove_atom_from_field_molecule), (gpointer *)tmp_fat, FALSE, FALSE, FALSE, TRUE);
             g_free (str);
             g_menu_append_section (fmenu, NULL, (GMenuModel *)fmenus);
@@ -2932,7 +3057,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
         if (tmp_field -> molecules < tmp_coord -> totcoord[2] && tmp_fmol -> multi > 1)
         {
           add_menu_separator (menu);
-          prop = create_menu_item (FALSE, "Add New Molecule");
+          prop = create_menu_item (FALSE, _("Add new molecule"));
           gtk_menu_shell_append ((GtkMenuShell *)menu, prop);
           g_signal_connect (G_OBJECT(prop), "activate", G_CALLBACK(add_molecule_to_field), data);
         }
@@ -2941,7 +3066,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
             && tmp_fmol -> multi < tmp_fmol -> mol -> multiplicity)
         {
           add_menu_separator (menu);
-          str = g_strdup_printf ("Remove Molecule %s From Field", tmp_fmol -> name);
+          str = g_strdup_printf (_("Remove molecule %s from force field"), tmp_fmol -> name);
           prop = create_menu_item (FALSE, str);
           g_free (str);
           gtk_menu_shell_append ((GtkMenuShell *)menu, prop);
@@ -2956,7 +3081,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           if (actel > 1)
           {
             add_menu_separator (menu);
-            str = g_strdup_printf ("Created New Field Atom From %s Atom(s)", tmp_fat -> name);
+            str = g_strdup_printf (_("Created new force field atom from %s atom(s)"), tmp_fat -> name);
             prop = create_menu_item (FALSE, str);
             g_free (str);
             gtk_menu_shell_append ((GtkMenuShell *)menu, prop);
@@ -2972,7 +3097,7 @@ void pop_up_field_context_menu (int row_id, GtkWidget * widget, GdkEvent * event
           if (l > 1)
           {
             add_menu_separator (menu);
-            str = g_strdup_printf ("Remove Atom %s From Field Molecule", tmp_fat -> name);
+            str = g_strdup_printf (_("Remove atom %s from force field molecule"), tmp_fat -> name);
             prop = create_menu_item (FALSE, str);
             g_free (str);
             gtk_menu_shell_append ((GtkMenuShell *)menu, prop);
@@ -3184,10 +3309,7 @@ void field_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTr
 void field_set_markup_box (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTreeModel * mod, GtkTreeIter * iter, gpointer data)
 {
   int tree = GPOINTER_TO_INT(data);
-  gchar * str = NULL;
-  gtk_tree_model_get (mod, iter, field_v[tree]-1, & str, -1);
-  g_object_set (renderer, "markup", str, NULL, NULL);
-  g_free (str);
+  set_renderer_markup (mod, iter, renderer, field_v[tree]-1);
 }
 
 /*!
@@ -3208,10 +3330,7 @@ void field_set_markup (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkT
   i = (tree > 5) ? 1 : 0;
   if (i)
   {
-    gchar * str = NULL;
-    gtk_tree_model_get (mod, iter, field_v[tree], & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, field_v[tree]);
   }
   else
   {
@@ -3558,7 +3677,7 @@ GtkWidget * create_field_tree (int f)
       list_store_combo = gtk_list_store_new (1, G_TYPE_STRING);
       for (j=0; j<fetypes[activef][k]; j++)
       {
-        str = g_strdup_printf ("%s (%s)", fnames[activef][k][j], exact_name(fkeysw[activef][k][j]));
+        str = g_strdup_printf ("%s (%s)", dlp_to_translate(activef,k,j) ? _(fnames[activef][k][j]) : fnames[activef][k][j], exact_name(fkeysw[activef][k][j]));
         gtk_list_store_append (list_store_combo, & iter);
         gtk_list_store_set (list_store_combo, & iter, 0, str, -1);
         g_free (str);
@@ -3568,21 +3687,25 @@ GtkWidget * create_field_tree (int f)
                                           "has-entry", FALSE,
                                           "editable", TRUE, NULL);
       g_signal_connect (G_OBJECT(field_renderer[f][i]), "changed", G_CALLBACK(changed_field_key_renderer), GINT_TO_POINTER(f));
-      field_col[f][i] = gtk_tree_view_column_new_with_attributes (ctitle[f][i], field_renderer[f][i], "text", i, NULL);
+      str = g_strdup_printf ("%s", (f == 2 && (i == 5|| i == 6)) ?  ctitle[f][i] : _(ctitle[f][i]));
+      field_col[f][i] = gtk_tree_view_column_new_with_attributes (str, field_renderer[f][i], "text", i, NULL);
+      g_free (str);
       g_object_unref (list_store_combo);
       combox = TRUE;
     }
     else if (combox)
     {
       field_renderer[f][i] = gtk_cell_renderer_text_new ();
-      field_col[f][i] = gtk_tree_view_column_new_with_attributes ("Parameter(s)", field_renderer[f][i], "text", i, NULL);
+      field_col[f][i] = gtk_tree_view_column_new_with_attributes (_("Parameter(s)"), field_renderer[f][i], "text", i, NULL);
       m = 1;
       combox = FALSE;
     }
     else if (is_special[f][i] > 1 && is_special[f][i] < 4)
     {
       field_renderer[f][i] = gtk_cell_renderer_toggle_new ();
-      field_col[f][i] = gtk_tree_view_column_new_with_attributes (ctitle[f][i-m], field_renderer[f][i], "active", i, NULL);
+      str = g_strdup_printf ("%s", (f == 2 && (i-m == 5|| i-m == 6)) ?  ctitle[f][i-m] : _(ctitle[f][i-m]));
+      field_col[f][i] = gtk_tree_view_column_new_with_attributes (str, field_renderer[f][i], "active", i, NULL);
+      g_free (str);
       g_signal_connect (G_OBJECT(field_renderer[f][i]), "toggled",
                         G_CALLBACK(on_toggle_visualize_or_select_object),
                         & tmp_view -> colorp[f][is_special[f][i]-2]);
@@ -3596,7 +3719,9 @@ GtkWidget * create_field_tree (int f)
     else
     {
       field_renderer[f][i] = gtk_cell_renderer_text_new();
-      field_col[f][i] = gtk_tree_view_column_new_with_attributes (ctitle[f][i-m], field_renderer[f][i], "text", i, NULL);
+      str = g_strdup_printf ("%s", (f == 2 && (i-m == 5|| i-m == 6)) ?  ctitle[f][i-m] : _(ctitle[f][i-m]));
+      field_col[f][i] = gtk_tree_view_column_new_with_attributes (str, field_renderer[f][i], "text", i, NULL);
+      g_free (str);
     }
 
     if (is_special[f][i] == 4)
@@ -3739,7 +3864,7 @@ GtkWidget * create_mol_box (int f)
 {
   GtkWidget * hbox;
   hbox = create_hbox (0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label("Please select molecule: ", -1, -1, 0.0, 0.5), FALSE, FALSE, 100);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("Please select molecule: "), -1, -1, 0.0, 0.5), FALSE, FALSE, 100);
   combo_mol[f] =  create_combo_mol (f);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, combo_mol[f], FALSE, FALSE, 10);
   return hbox;
@@ -3770,18 +3895,18 @@ GtkWidget * vbox_field (int f)
   }
   if (f == 0)
   {
-    hbox = fbox (vbox, "Number of isolated molecular fragments: ");
+    hbox = fbox (vbox, _("Number of isolated molecular fragments: "));
     str = g_strdup_printf ("<b>%d</b>", tmp_coord -> totcoord[2]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 75);
     g_free (str);
-    str = g_strdup_printf ("\tEach of these fragments can be described separately in the force field.");
+    str = g_strdup_printf (_("\tEach of these fragments can be described separately in the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 5);
     g_free (str);
-    hbox = fbox (vbox, "Number of distinct molecules: ");
+    hbox = fbox (vbox, _("Number of distinct molecules: "));
     str = g_strdup_printf ("<b>%d</b>", tmp_coord -> totcoord[3]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 75);
     g_free (str);
-    hbox = fbox (vbox, "Number of molecules in the force field: ");
+    hbox = fbox (vbox, _("Number of molecules in the force field: "));
     set_mol_num_label ();
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, mol_num_label, FALSE, FALSE, 75);
   }
@@ -3807,11 +3932,11 @@ GtkWidget * vbox_field (int f)
 
   if (f > 6 && f < MOLIMIT)
   {
-    hbox = fbox (vbx, g_strdup_printf ("%s(s) properties: ", felemts[f+1]));
+    hbox = fbox (vbx, g_strdup_printf (_("Properties %s: "), _(intelemt[f])));
   }
   else
   {
-    hbox = fbox (vbox, g_strdup_printf ("%s(s) properties: ", felemts[f+1]));
+    hbox = fbox (vbox, g_strdup_printf (_("Properties %s: "), _(intelemt[f])));
   }
   if (f > 0)
   {
@@ -3833,25 +3958,25 @@ GtkWidget * vbox_field (int f)
     if (f == 8 || f == 10 || f == 12 || f == 13)
     {
       int g = (f < 12) ? f - 1 : 11;
-      str = g_strdup_printf ("\t <b>*</b> in the FIELD file %s(s) appear in the %s section.\n"
-                             "\t They are presented separately in this assistant for clarity purposes only.",
-                             elemts[f], elemts[g]);
+      str = g_strdup_printf (_("\t <b>*</b> in the FIELD file %s(s) appear in the %s section.\n"
+                               "\t They are presented separately in this assistant for clarity purposes only."),
+                             _(elemts[f]), _(elemts[g]));
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
       g_free (str);
     }
     else if (f == 14)
     {
-      str = g_strdup_printf ("\t <b>*</b> the potential will be calculated by the sum of the 3 possible inversion terms between atoms 1 (center), 2, 3 and 4.");
+      str = g_strdup_printf (_("\t <b>*</b> the potential will be calculated by the sum of the 3 possible inversion terms between atoms 1 (center), 2, 3 and 4."));
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
       g_free (str);
     }
-    str = g_strdup_printf ("\t <b>(1)</b> average value for the force field element as measured in the model.");
+    str = g_strdup_printf (_("\t <b>(1)</b> average value for the force field element as measured in the model."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    str = g_strdup_printf ("\t <b>(2)</b> only the selected element(s) will be used to create the force field.");
+    str = g_strdup_printf (_("\t <b>(2)</b> only the selected element(s) will be used to create the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    str = g_strdup_printf ("\t <b>(3)</b> each force field element can be tuned separately, if not the <b>Default</b> parameters will be used.");
+    str = g_strdup_printf (_("\t <b>(3)</b> each force field element can be tuned separately, if not the <b>Default</b> parameters will be used."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
 
@@ -3863,34 +3988,34 @@ GtkWidget * vbox_field (int f)
     setup_cs_labels (tmp_field -> energy_unit);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cs_label[0], FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, cs_label[1], FALSE, FALSE, 0);
-    str = g_strdup_printf ("\t <b>(3)</b> only the selected element(s) will be used to create the force field.");
+    str = g_strdup_printf (_("\t <b>(3)</b> only the selected element(s) will be used to create the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
   else if (f == 3)
   {
-    str = g_strdup_printf ("\t <b>(1)</b> average value for the force field element as measured in the model.");
+    str = g_strdup_printf (_("\t <b>(1)</b> average value for the force field element as measured in the model."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    str = g_strdup_printf ("\t <b>(2)</b> only the selected element(s) will be used to create the force field.");
+    str = g_strdup_printf (_("\t <b>(2)</b> only the selected element(s) will be used to create the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
   else if (f == 4)
   {
-    str = g_strdup_printf ("\t <b>(1)</b> average distance between the barycenters of units 1 and 2 as measured in the model.");
+    str = g_strdup_printf (_("\t <b>(1)</b> average distance between the barycenters of units 1 and 2 as measured in the model."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    str = g_strdup_printf ("\t <b>(2)</b> if all 0.0 then atomic weight(s) will be used by DL-POLY.");
+    str = g_strdup_printf (_("\t <b>(2)</b> if all 0.0 then atomic weight(s) will be used by DL-POLY."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
-    str = g_strdup_printf ("\t <b>(3)</b> only the selected element(s) will be used to create the force field.");
+    str = g_strdup_printf (_("\t <b>(3)</b> only the selected element(s) will be used to create the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
   else if ((f > 2 && f < 7) || f > 11)
   {
-    str = g_strdup_printf ("\t <b>(1)</b> only the selected element(s) will be used to create the force field.");
+    str = g_strdup_printf (_("\t <b>(1)</b> only the selected element(s) will be used to create the force field."));
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
@@ -4080,10 +4205,10 @@ G_MODULE_EXPORT void on_assistant_prepare (GtkAssistant * assistant, GtkWidget *
   switch (i)
   {
     case 0:
-      // if (is_the_widget_visible(preview_but)) hide_the_widgets (preview_but);
+      // hide_the_widgets (preview_but);
       break;
     case 1:
-      // if (! is_the_widget_visible(preview_but)) show_the_widgets (preview_but);
+      // show_the_widgets (preview_but);
       break;
     case MAXDATC+MAXDATA+2:
       break;
@@ -4167,7 +4292,7 @@ G_MODULE_EXPORT void run_clean_field (GtkDialog * dial, gint response_id, gpoint
   {
     gtk_assistant_set_page_complete (GTK_ASSISTANT (field_assistant),
                                      gtk_assistant_get_nth_page(GTK_ASSISTANT (field_assistant), 0), FALSE);
-    gtk_label_set_text (GTK_LABEL(field_i_lab[1]), "Initialize force field using: ");
+    gtk_label_set_text (GTK_LABEL(field_i_lab[1]), _("Initialize force field using: "));
     int i;
     for (i=0; i<2; i++)
     {
@@ -4227,11 +4352,11 @@ G_MODULE_EXPORT void clean_field (GtkToggleButton * but, gpointer data)
 {
   if (button_get_status ((GtkWidget *)but))
   {
-    GtkWidget * dial = dialog_cancel_apply ("Clean all force field parameter(s) ?", field_assistant, FALSE);
+    GtkWidget * dial = dialog_cancel_apply (_("Clean all force field parameter(s) ?"), field_assistant, FALSE);
     GtkWidget * box = dialog_get_content_area (dial);
     gtk_box_set_homogeneous (GTK_BOX(box), FALSE);
-    add_box_child_start (GTK_ORIENTATION_VERTICAL, box, gtk_label_new ("Providing that the force field information was already saved once\n"
-                                                                       "the previous data could still be retrieved by canceling the assistant."), FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, box, gtk_label_new (_("Providing that the force field information was already saved once\n"
+                                                                         "the previous data could still be retrieved by canceling the assistant.")), FALSE, FALSE, 0);
     run_this_gtk_dialog (dial, G_CALLBACK(run_clean_field), but);
   }
 }
@@ -4293,7 +4418,7 @@ void add_classical_assistant_pages (int p)
   {
     fibox[i] = vbox_control (i);
     gtk_assistant_append_page (assist, fibox[i]);
-    gtk_assistant_set_page_title (assist, fibox[i], g_strdup_printf ("%s", celemts[i]));
+    gtk_assistant_set_page_title (assist, fibox[i], g_strdup_printf ("%s", _(celemts[i])));
     gtk_assistant_set_page_type (assist, fibox[i], GTK_ASSISTANT_PAGE_CONTENT);
     gtk_assistant_set_page_complete (assist, fibox[i], TRUE);
   }
@@ -4302,36 +4427,36 @@ void add_classical_assistant_pages (int p)
   i = MAXDATC;
   fibox[i] = vbox_init (p);
   gtk_assistant_append_page (assist, fibox[i]);
-  gtk_assistant_set_page_title (assist, fibox[i], "Select the component(s) of the force field");
+  gtk_assistant_set_page_title (assist, fibox[i], _("Select the component(s) of the force field"));
   gtk_assistant_set_page_type (assist, fibox[i], GTK_ASSISTANT_PAGE_CONTENT);
   gtk_assistant_set_page_complete (assist, fibox[i], TRUE);
   for (i=MAXDATC+1; i<MAXDATC+MAXDATA+1; i++)
   {
     fibox[i] = vbox_field (i-MAXDATC-1);
     gtk_assistant_append_page (assist, fibox[i]);
-    gtk_assistant_set_page_title (assist, fibox[i], g_strdup_printf ("%s(s)", felemts[i-MAXDATC]));
+    gtk_assistant_set_page_title (assist, fibox[i], g_strdup_printf ("%s", _(felemts[i-MAXDATC])));
     gtk_assistant_set_page_type (assist, fibox[i], GTK_ASSISTANT_PAGE_CONTENT);
     gtk_assistant_set_page_complete (assist, fibox[i], TRUE);
   }
   i = MAXDATC+MAXDATA+1;
   fibox[i] = create_vbox (BSEP);
 
-  info = g_strdup_printf ("<b>   Finalize the creation of the %s input file(s) now !</b>", (activef) ? "LAMMPS" : "DL-POLY");
+  info = g_strdup_printf (_("<b>   Finalize the creation of the %s input file(s) now !</b>"), (activef) ? "LAMMPS" : "DL-POLY");
   add_box_child_start (GTK_ORIENTATION_VERTICAL, fibox[i], markup_label(info, -1, -1, 0.5, 0.5), TRUE, TRUE, 100);
   g_free (info);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, fibox[i], markup_label("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n", -1, -1, 0.0, 0.5),
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, fibox[i], markup_label(_("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"), -1, -1, 0.0, 0.5),
                        FALSE, FALSE, 0);
   gtk_assistant_append_page (assist, fibox[i]);
-  gtk_assistant_set_page_title (assist, fibox[i], (activef) ? "Create the LAMMPS input file(s) now !" : "Create the DL-POLY input file(s) now !");
+  gtk_assistant_set_page_title (assist, fibox[i], (activef) ? _("Create the LAMMPS input file(s) now !") : _("Create the DL-POLY input file(s) now !"));
   gtk_assistant_set_page_type (assist, fibox[i], GTK_ASSISTANT_PAGE_CONFIRM);
   gtk_assistant_set_page_complete (assist, fibox[i], TRUE);
   gtk_assistant_update_buttons_state (assist);
   append_pages = TRUE;
 }
 
-gchar * field_init[3]={"Atomic species as field atom(s)",
-                       "Atomic species and total coordination(s) as field atom(s)",
-                       "Atomic species and partial coordination(s) as field atom(s)"};
+gchar * field_init[3]={i18n("Atomic Species as Field Atoms"),
+                       i18n("Atomic Species and Total Coordinations as Field Atoms"),
+                       i18n("Atomic Species and Partial Coordinations as Field Atoms")};
 
 // gboolean create_ff_structure (gpointer data)
 /*!
@@ -4371,7 +4496,7 @@ void create_ff_structure (int ai, int type)
   field_i_obj[1] = destroy_this_widget (field_i_obj[1]);
   field_i_obj[1] = stock_image (APPLY);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, field_i_box[1], field_i_obj[1], TRUE, TRUE, 25);
-  gtk_label_set_text (GTK_LABEL(field_i_lab[1]), "Force field was initialized using: ");
+  gtk_label_set_text (GTK_LABEL(field_i_lab[1]), _("Force field was initialized using: "));
   gtk_assistant_set_page_complete (GTK_ASSISTANT (field_assistant),
                                    gtk_assistant_get_nth_page(GTK_ASSISTANT (field_assistant), 0), TRUE);
   show_the_widgets (field_assistant);
@@ -4430,7 +4555,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
         }
         else
         {
-          show_warning ("Please select the force field first !", field_assistant);
+          show_warning (_("Please select the force field first !"), field_assistant);
         }
         break;
     }
@@ -4447,7 +4572,7 @@ G_MODULE_EXPORT void changed_init_box (GtkComboBox * box, gpointer data)
 */
 G_MODULE_EXPORT void show_force_field_preview (GtkButton * but, gpointer data)
 {
-  GtkWidget * preview = (activef) ? dialogmodal ("LAMMPS files preview", GTK_WINDOW(field_assistant)) : dialogmodal ("DL-POLY files preview", GTK_WINDOW(field_assistant));
+  GtkWidget * preview = (activef) ? dialogmodal (_("LAMMPS files preview"), GTK_WINDOW(field_assistant)) : dialogmodal (_("DL-POLY files preview"), GTK_WINDOW(field_assistant));
   GtkWidget * notebook = gtk_notebook_new ();
   GtkWidget * scrollsets;
   GtkWidget * aview;
@@ -4546,8 +4671,8 @@ G_MODULE_EXPORT void run_on_assistant_apply (GtkDialog * info, gint response_id,
           filename = g_strdup_printf ("%s/%s", direname, ff_files[activef][i]);
           if (g_file_test(filename, G_FILE_TEST_EXISTS))
           {
-            str = g_strdup_printf ("%s file found in '%s'\nreplace existing %s file ?", ff_files[activef][i], direname, ff_files[activef][i]);
-            doit[i] = ask_yes_no ("Replace file ?", str, GTK_MESSAGE_QUESTION, field_assistant);
+            str = g_strdup_printf (_("%s file found in '%s'\nreplace existing %s file ?"), ff_files[activef][i], direname, ff_files[activef][i]);
+            doit[i] = ask_yes_no (_("Replace file ?"), str, GTK_MESSAGE_QUESTION, field_assistant);
             g_free (str);
           }
           else
@@ -4587,7 +4712,7 @@ G_MODULE_EXPORT void run_on_assistant_apply (GtkDialog * info, gint response_id,
           g_object_unref (buffer);
           if (! result && err)
           {
-            show_error (g_strdup_printf ("Error while saving input file: %s\n Error: %s", filename, err -> message), 0, field_assistant);
+            show_error (g_strdup_printf (_("Error while saving input file: %s\n Error: %s"), filename, err -> message), 0, field_assistant);
             g_error_free (err);
           }
           g_free (filename);
@@ -4621,11 +4746,11 @@ void on_assistant_apply (GtkAssistant * assistant, gpointer data)
 #endif
   gchar * ff_type[2] = {"DL-POLY", "LAMMPS"};
 
-  text = g_strdup_printf ("Saving %s input file(s)", ff_type[activef]);
+  text = g_strdup_printf (_("Saving %s input file(s)"), ff_type[activef]);
   info = create_file_chooser (text,
                               GTK_WINDOW(assistant),
                               GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                              "Save");
+                              _("Save"));
   g_free (text);
 #ifdef GTK4
   run_this_gtk_native_dialog ((GtkNativeDialog *)info, G_CALLBACK(run_on_assistant_apply), NULL);
@@ -4660,7 +4785,7 @@ void create_classical_force_field (int p, int f)
   tmp_coord = tmp_proj -> coord;
   tmp_view = tmp_proj -> modelgl;
   tmp_fmol = NULL;
-  tmp_fmol = g_malloc0 (sizeof*tmp_fmol);
+  tmp_fmol = g_malloc0(sizeof*tmp_fmol);
   gchar * field_type[2] = {"DL-POLY 4", "LAMMPS"};
 
   // Preparing data structure and pointers
@@ -4668,7 +4793,7 @@ void create_classical_force_field (int p, int f)
   if (tmp_proj -> force_field[activef] == NULL)
   {
     assist_init = FALSE;
-    tmp_proj -> force_field[activef] = g_malloc0 (sizeof*tmp_proj -> force_field[activef]);
+    tmp_proj -> force_field[activef] = g_malloc0(sizeof*tmp_proj -> force_field[activef]);
     tmp_proj -> force_field[activef] -> type = -1;
     tmp_proj -> force_field[activef] -> atom_init = -1;
     for (i=0; i<2; i++) tmp_proj -> force_field[activef] -> prepare_file[i] = TRUE;
@@ -4684,24 +4809,24 @@ void create_classical_force_field (int p, int f)
 
   gtk_window_set_resizable (GTK_WINDOW (field_assistant), FALSE);
   gtk_window_set_modal (GTK_WINDOW (field_assistant), TRUE);
-  gchar * info = g_strdup_printf ("%s calculation assistant", field_type[f]);
+  gchar * info = g_strdup_printf (_("%s calculation assistant"), field_type[f]);
   gtk_window_set_title (GTK_WINDOW(field_assistant), info);
   g_free (info);
 
   GtkWidget * intro = create_vbox (BSEP);
-  info = g_strdup_printf ("<b>   This assistant will help you to setup a %s \n"
-                          "calculation using <i>%s</i> 3D model as starting point</b>", field_type[f], tmp_proj -> name);
+  info = g_strdup_printf (_("<b>   This assistant will help you to setup a %s \n"
+                            "calculation using <i>%s</i> 3D model as starting point</b>"), field_type[f], tmp_proj -> name);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, intro, markup_label(info, -1, -1, 0.5, 0.5), FALSE, FALSE, 50);
   g_free (info);
 
-  gchar * i_titles[2][2] = {{"Force field: ", "Force field: "}, {"Initialize force field using: ","Force field was initialized using: "}};
+  gchar * i_titles[2][2] = {{i18n("Force field: "), i18n("Force field: ")}, {i18n("Initialize force field using: "), i18n("Force field was initialized using: ")}};
   for (i=0; i<2; i++)
   {
     field_i_box[i] = create_hbox (0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, intro, field_i_box[i], FALSE, FALSE, 0);
     j = (i == 0) ? tmp_field -> type + 1 : tmp_field -> atom_init + 1;
     k = (j) ? 1 : 0;
-    field_i_lab[i] = markup_label(i_titles[i][k], 210, -1, 0.0, 0.5);
+    field_i_lab[i] = markup_label(_(i_titles[i][k]), 210, -1, 0.0, 0.5);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, field_i_box[i], field_i_lab[i], FALSE, FALSE, 20);
     field_i_combo[i] = create_combo ();
     combo_set_active (field_i_combo[i], -1);
@@ -4712,7 +4837,7 @@ void create_classical_force_field (int p, int f)
         combo_set_active (field_i_combo[i], tmp_field -> type);
         break;
       case 1:
-        for (j=0; j<3; j++) combo_text_append (field_i_combo[i], field_init[j]);
+        for (j=0; j<3; j++) combo_text_append (field_i_combo[i], _(field_init[j]));
         combo_set_active (field_i_combo[i], tmp_field -> atom_init);
         break;
     }
@@ -4728,22 +4853,22 @@ void create_classical_force_field (int p, int f)
 
   GtkWidget * hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, intro, hbox, FALSE, FALSE, 10);
-  GtkWidget * but = check_button ("\tDelete the existing force field data and reset the parameters to the default values",
+  GtkWidget * but = check_button (_("\tDelete the existing force field data and reset the parameters to the default values"),
                                   -1, 40, FALSE, G_CALLBACK(clean_field), GINT_TO_POINTER(p));
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 85);
 
   if (! f)
   {
-    field_i_prep[0] = check_button ("\tPrepare the CONTROL file to describe the calculation",
+    field_i_prep[0] = check_button (_("\tPrepare the CONTROL file to describe the calculation"),
                                     -1, 40, tmp_field -> prepare_file[0], G_CALLBACK(select_field_action), GINT_TO_POINTER(0));
-    field_i_prep[1] = check_button ("\tPrepare the FIELD and CONFIG files to describe the force field and the atomistic model",
+    field_i_prep[1] = check_button (_("\tPrepare the FIELD and CONFIG files to describe the force field and the atomic scale model"),
                                     -1, 40, tmp_field -> prepare_file[1], G_CALLBACK(select_field_action), GINT_TO_POINTER(1));
   }
   else
   {
-    field_i_prep[0] = check_button ("\tPrepare the LAMMPS Input to describe the calculation",
+    field_i_prep[0] = check_button (_("\tPrepare the LAMMPS Input to describe the calculation"),
                                     -1, 40, tmp_field -> prepare_file[0], G_CALLBACK(select_field_action), GINT_TO_POINTER(0));
-    field_i_prep[1] = check_button ("\tPrepare the LAMMPS Atom file to describe the force field and the atomistic model",
+    field_i_prep[1] = check_button (_("\tPrepare the LAMMPS Atom file to describe the force field and the atomic scale model"),
                                     -1, 40, tmp_field -> prepare_file[1], G_CALLBACK(select_field_action), GINT_TO_POINTER(1));
   }
   for (i=0; i<2; i++)
@@ -4755,7 +4880,7 @@ void create_classical_force_field (int p, int f)
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, field_i_prep[i], FALSE, FALSE, 50);
   }
   add_box_child_start (GTK_ORIENTATION_VERTICAL, intro,
-                       markup_label("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n",
+                       markup_label(_("\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"),
                        -1, -1, 0.0, 0.5), FALSE, FALSE, 50);
 
   gtk_assistant_append_page (GTK_ASSISTANT (field_assistant), intro);
@@ -4764,7 +4889,7 @@ void create_classical_force_field (int p, int f)
   g_free (info);
   gtk_assistant_set_page_type (GTK_ASSISTANT (field_assistant), intro, GTK_ASSISTANT_PAGE_INTRO);
   gtk_assistant_set_page_complete (GTK_ASSISTANT (field_assistant), intro, assist_init);
-  preview_but = create_button ("Preview", IMG_STOCK, EDITF, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_force_field_preview), NULL);
+  preview_but = create_button (_("Preview"), IMG_STOCK, EDITF, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(show_force_field_preview), NULL);
   gtk_assistant_add_action_widget (GTK_ASSISTANT (field_assistant), preview_but);
 
   if (assist_init)

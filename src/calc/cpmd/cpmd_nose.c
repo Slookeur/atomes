@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd_nose.c
@@ -95,32 +95,32 @@ extern GtkWidget * cpmd_box (GtkWidget * box, gchar * lab, int v_space, int h_sp
 extern dummy_atom * get_active_dummy (int id);
 extern void create_dummy_param_box (int dummy_id);
 
-char * c_thermo[2][CP2NTHERM][4] = {{{"Initial temperature: ", " ", " ", " "},
-                                     {"Target temperature: ","Tolerance: ", " ", " "},
-                                     {"Target temperature: ", "Target frequency: ", " ", " "},
-                                     {" ", " ", " ", " "},
-                                     {" ", " ", " ", " "}},
-                                    {{" ", " ", " ", " "},
-                                     {"Time constant (Langevin): ", "Time constant (Nosë-Hoover): ", "Mass: ", "Chi: "},
-                                     {"Time constant: ", " ", " ", " "},
-                                     {" ", " ", " ", " "},
-                                     {"Length: ", "Multiple time steps: ", "Time constant: ", "Yoshida integrator: "}}};
+gchar * c_thermo[2][CP2NTHERM][4] = {{{i18n("Initial temperature: "), " ", " ", " "},
+                                      {i18n("Target temperature: "),i18n("Tolerance: "), " ", " "},
+                                      {i18n("Target temperature: "), i18n("Target frequency: "), " ", " "},
+                                      {" ", " ", " ", " "},
+                                      {" ", " ", " ", " "}},
+                                     {{" ", " ", " ", " "},
+                                      {i18n("Time constant (Langevin): "), i18n("Time constant (Nosë-Hoover): "), i18n("Mass: "), "Chi: "},
+                                      {i18n("Time constant: "), " ", " ", " "},
+                                      {" ", " ", " ", " "},
+                                      {i18n("Length: "), i18n("Multiple time steps: "), i18n("Time constant: "), i18n("Yoshida integrator: ")}}};
 
-char * u_thermo[2][CP2NTHERM][4] = {{{" K", " ", " ", " "},
-                                     {" K", " K", " ", " "},
-                                     {" K", " cm<sup>-1</sup>", " ", " "},
-                                     {" ", " ", " ", " "},
-                                     {" ", " ", " ", " "}},
-                                    {{" ", " ", " ", " "},
-                                     {" fs", " fs", " fs<sup>-1</sup>", " fs<sup>-1</sup>"},
-                                     {" fs", " ", " ", " "},
-                                     {" ", " ", " ", " "},
-                                     {" ", " ", " fs", " "}}};
+gchar * u_thermo[2][CP2NTHERM][4] = {{{" K", " ", " ", " "},
+                                      {" K", " K", " ", " "},
+                                      {" K", " cm<sup>-1</sup>", " ", " "},
+                                      {" ", " ", " ", " "},
+                                      {" ", " ", " ", " "}},
+                                     {{" ", " ", " ", " "},
+                                      {" fs", " fs", " fs<sup>-1</sup>", " fs<sup>-1</sup>"},
+                                      {" fs", " ", " ", " "},
+                                      {" ", " ", " ", " "},
+                                      {" ", " ", " fs", " "}}};
 
-char * ue_thermo[CP2NTHERM][4] = {{" a.u.", " ", " ", " "},
-                                  {" a.u.", " ", " ", " "},
-                                  {" a.u.", " a.u.", " ", " "},
-                                  {" a.u.", " cm<sup>-1</sup>", " ", " "}};
+gchar * ue_thermo[CP2NTHERM][4] = {{" a.u.", " ", " ", " "},
+                                   {" a.u.", " ", " ", " "},
+                                   {" a.u.", " a.u.", " ", " "},
+                                   {" a.u.", " cm<sup>-1</sup>", " ", " "}};
 
 int v_thermo[2][CP2NTHERM] = {{1, 2, 2, 0, 0}, {0, 4, 1, 0, 4}};
 
@@ -436,7 +436,7 @@ G_MODULE_EXPORT void run_remove_nose_thermostat (GtkDialog * dialog, gint respon
       }
       else
       {
-        str = g_strdup_printf ("You must select %d thermostat(s) to be deleted !", num_to_remove);
+        str = g_strdup_printf (_("You must select %d thermostat(s) to be deleted !"), num_to_remove);
         show_warning (str, qm_assistant);
         g_free (str);
       }
@@ -460,18 +460,18 @@ void remove_nose_thermostat (int num_to_remove)
   int i, j, k;
   gchar * str;
   // int cpmd_object = 0;
-  str = g_strdup_printf ("Select the %d thermostat(s) to be removed", num_to_remove);
+  str = g_strdup_printf (_("Select the %d thermostat(s) to be removed"), num_to_remove);
   GtkWidget * rthermo = dialogmodal (str, GTK_WINDOW(qm_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(rthermo), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(rthermo), _("Apply"), GTK_RESPONSE_APPLY);
 
-  gchar * mol_title[6] = {"Id", "Target T°", "Frequency", "Atom(s)", "      ", "Select"};
+  gchar * mol_title[6] = {i18n("Id."), i18n("Target T°"), i18n("Frequency"), i18n("Atom(s)"), "      ", i18n("Select")};
   gchar * ctype[6] = {"text", "text", "text", "text", "text", "active"};
   GType col_type[6] = {G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_INT, G_TYPE_STRING, G_TYPE_BOOLEAN};
 
   GtkTreeIter thermo_level, atom_level;
   n_therm = 0;
-  old_thermo = allocint(get_num_thermo());
+  old_thermo = allocint (get_num_thermo());
   GtkTreeStore * remove_model = gtk_tree_store_newv (6, col_type);
   GtkWidget * remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   for (i=0; i<6; i++)
@@ -486,7 +486,7 @@ void remove_nose_thermostat (int num_to_remove)
       gtk_cell_renderer_toggle_set_radio (GTK_CELL_RENDERER_TOGGLE(thermo_renderer[i]), TRUE);
       g_signal_connect (G_OBJECT(thermo_renderer[i]), "toggled", G_CALLBACK(select_thermo), & remove_model);
     }
-    thermo_col[i] = gtk_tree_view_column_new_with_attributes (mol_title[i], thermo_renderer[i], ctype[i], i, NULL);
+    thermo_col[i] = gtk_tree_view_column_new_with_attributes ((i != 4) ? _(mol_title[i]) : mol_title[i], thermo_renderer[i], ctype[i], i, NULL);
     gtk_tree_view_column_set_alignment (thermo_col[i], 0.5);
     gtk_tree_view_append_column (GTK_TREE_VIEW(remove_tree), thermo_col[i]);
     gtk_tree_view_column_set_cell_data_func (thermo_col[i], thermo_renderer[i], thermo_set_visible, GINT_TO_POINTER(i), NULL);
@@ -531,7 +531,7 @@ void remove_nose_thermostat (int num_to_remove)
 */
 thermostat * init_thermo (int id, int type, int sys)
 {
-  thermostat * thermo = g_malloc0 (sizeof*thermo);
+  thermostat * thermo = g_malloc0(sizeof*thermo);
   thermo -> id = id;
   thermo -> type = type;
   thermo -> sys = sys;
@@ -622,14 +622,24 @@ G_MODULE_EXPORT void update_thermo_parameter (GtkEntry * res, gpointer data);
 void nose_parameters (GtkWidget * vbox, int id, int jd, gchar ** la, gchar ** lb)
 {
   thermostat * thermo = get_active_thermostat (id);
-  //gchar * itemp[2]={"Initial temperature:", "Target temperature:"};
+  //gchar * itemp[2]={_("Initial temperature:"), _("Target temperature:")};
+  gchar * str;
   GtkWidget * hbox;
   GtkWidget * widg;
   int i, j;
   i = (id < 0) ? id : 0;
   for (j=0; j<jd; j++)
   {
-    hbox = cpmd_box (vbox, la[j], 5, (is_cpmd) ? 20 : 50, 220);
+    if (! is_cpmd)
+    {
+      str = g_strdup_printf ("%s", (j < 3 || thermo -> type == 4) ? _(la[j]) : la[j]);
+    }
+    else
+    {
+      str = g_strdup_printf ("%s", _(la[j]));
+    }
+    hbox = cpmd_box (vbox, str, 5, (is_cpmd) ? 20 : 50, 220);
+    g_free (str);
     widg = create_entry (G_CALLBACK(update_thermo_parameter), 100, 15, FALSE, GINT_TO_POINTER(i+j));
     update_entry_double (GTK_ENTRY(widg), thermo -> params[j]);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
@@ -725,10 +735,7 @@ void atom_set_color (GtkTreeViewColumn * col, GtkCellRenderer * renderer, GtkTre
   k = GPOINTER_TO_INT(data);
   if (k == 2)
   {
-    gchar * str;
-    gtk_tree_model_get (mod, iter, 2, & str, -1);
-    g_object_set (renderer, "markup", str, NULL, NULL);
-    g_free (str);
+    set_renderer_markup (mod, iter, renderer, 2);
   }
 }
 
@@ -1035,17 +1042,17 @@ G_MODULE_EXPORT void run_select_atom_from_model (GtkDialog * dialog, gint respon
     case GTK_RESPONSE_APPLY:
       if (n_therm > 1)
       {
-        str = g_strdup_printf ("%d atoms have been selected !", n_therm);
+        str = g_strdup_printf (_("%d atoms have been selected !"), n_therm);
       }
       else if (n_therm)
       {
-        str = g_strdup_printf ("A single atom has been selected !");
+        str = g_strdup_printf (_("A single atom has been selected !"));
       }
       else
       {
-        str = g_strdup_printf ("Not at single atom has been selected !");
+        str = g_strdup_printf (_("Not at single atom has been selected !"));
       }
-      str = g_strdup_printf ("%s\nis this correct ?", str);
+      str = g_strdup_printf (_("%s\nis this correct ?"), str);
       selection_confirmed = FALSE;
       field_question (str, G_CALLBACK(confirm_selection), NULL);
       g_free (str);
@@ -1058,8 +1065,8 @@ G_MODULE_EXPORT void run_select_atom_from_model (GtkDialog * dialog, gint respon
           {
             if (old_thermo[i] && ! old_fixed[i][0] && ! old_fixed[i][1] && ! old_fixed[i][2])
             {
-              str = g_strdup_printf ("Atom %d has been selected but not coordinates are frozen !\n"
-                                     "Unselect atom %d or select coordinate(s) to freeze !", i+1, i+1);
+              str = g_strdup_printf (_("Atom %d has been selected but not coordinates are frozen !\n"
+                                       "Unselect atom %d or select coordinate(s) to freeze !"), i+1, i+1);
               show_warning (str, qm_assistant);
               done = FALSE;
             }
@@ -1206,8 +1213,8 @@ void select_atom_from_model (int therm)
   the_therm = therm;
   GtkTreeViewColumn * ato_col[8];
   GtkCellRenderer * ato_cell[8];
-  gchar * ato_title[2][8] = {{"Species", "Id (*)", "Atom", "Viz.3D & Select", " "},
-                             {"Species", "Id (*)", "Atom", "Viz.3D & Select", "x", "y", "z", " "}};
+  gchar * ato_title[2][8] = {{i18n("Species"), i18n("Id. (*)"), i18n("Atom"), i18n("Viz.3D & Select"), " "},
+                             {i18n("Species"), i18n("Id. (*)"), i18n("Atom"), i18n("Viz.3D & Select"), "x", "y", "z", " "}};
   gchar * ctype[2][8] = {{"text", "text", "text", "active", "text", "active", "active", "active"},
                          {"text", "text", "text", "active", "active", "active", "active", "text"}};
   GType col_type[2][8] = {{G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT},
@@ -1227,25 +1234,25 @@ void select_atom_from_model (int therm)
   }
   if (the_therm < -1)
   {
-    str = g_strdup_printf ("Select atom(s) to construct dummy N°%d", -(the_therm+1));
+    str = g_strdup_printf (_("Select atom(s) to construct dummy N°%d"), -(the_therm+1));
   }
   else if (the_therm == -1)
   {
-    str = g_strdup_printf ("Select atom(s) to fix");
+    str = g_strdup_printf (_("Select atom(s) to fix"));
     if (fixco)
     {
       g_free (str);
       at_col = 7;
-      str = g_strdup_printf ("Select atom(s) and coordinate(s) to fix");
+      str = g_strdup_printf (_("Select atom(s) and coordinate(s) to fix"));
     }
   }
   else
   {
-    str = g_strdup_printf ("Add atom(s) to thermostat N°%d", the_therm+1);
+    str = g_strdup_printf (_("Add atom(s) to thermostat N°%d"), the_therm+1);
   }
   GtkWidget * amol = dialogmodal (str, GTK_WINDOW(qm_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(amol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(amol), _("Apply"), GTK_RESPONSE_APPLY);
   n_therm = 0;
   i = (fixco) ? 1 : 0;
   j = (fixco) ? 8 : 5;
@@ -1269,7 +1276,7 @@ void select_atom_from_model (int therm)
         g_signal_connect (G_OBJECT(ato_cell[k]), "toggled", G_CALLBACK(cp2k_select_coord_id), GINT_TO_POINTER(k));
       }
     }
-    ato_col[k] = gtk_tree_view_column_new_with_attributes (ato_title[i][k], ato_cell[k], ctype[i][k], k, NULL);
+    ato_col[k] = gtk_tree_view_column_new_with_attributes ((k < 4) ? _(ato_title[i][k]) : ato_title[i][k], ato_cell[k], ctype[i][k], k, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(add_tree), ato_col[k]);
     gtk_tree_view_column_set_alignment (ato_col[k], 0.5);
     gtk_tree_view_column_set_cell_data_func (ato_col[k], ato_cell[k], atom_set_visible, GINT_TO_POINTER(k), NULL);
@@ -1322,7 +1329,7 @@ void select_atom_from_model (int therm)
   //GtkWidget * scrollsets = create_scroll (NULL, -1, -1, GTK_SHADOW_ETCHED_IN, 0);
   GtkWidget * scrollsets = create_scroll (dialog_get_content_area (amol), 320, i, GTK_SHADOW_ETCHED_IN);
   add_container_child (CONTAINER_SCR, scrollsets, add_tree);
-  str = g_strdup_printf (" <b>(*)</b> Order of appearance in the input file");
+  str = g_strdup_printf (_(" <b>(*)</b> Order of appearance in the input file"));
   GtkWidget * vbox = dialog_get_content_area (amol);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, -1, -1, 0.0, 0.5), FALSE, FALSE, 0);
   g_free (str);
@@ -1332,9 +1339,9 @@ void select_atom_from_model (int therm)
     {
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
       GtkWidget * hbox = create_hbox (0);
-      gchar * lab[2] = {"All non-thermostated atom(s)", "All atom(s)"};
+      gchar * lab[2] = {i18n("All non-thermostated atom(s)"), i18n("All atom(s)")};
       add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                          check_button (lab[(the_therm > -1) ? 0 : 1], -1, -1,
+                          check_button (_(lab[(the_therm > -1) ? 0 : 1]), -1, -1,
                           FALSE, G_CALLBACK(select_atoms_not_thermostated), GINT_TO_POINTER(the_therm)),
                           FALSE, FALSE, 50);
       add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 0);
@@ -1379,12 +1386,12 @@ G_MODULE_EXPORT void atom_selection_button (GtkButton * but, gpointer data)
   gchar * stra, * strb;
   if (num  == 0)
   {
-    stra = g_strdup_printf ("Not picked yet !");
+    stra = g_strdup_printf (_("Not picked yet !"));
     strb = g_strdup_printf (DELETEB);
   }
   else
   {
-    stra = g_strdup_printf ("%d atom(s)", num);
+    stra = g_strdup_printf (_("%d atom(s)"), num);
     strb = g_strdup_printf (APPLY);
   }
   set_image_from_icon_name (sel_img[id], strb);
@@ -1426,16 +1433,16 @@ G_MODULE_EXPORT void atom_selection_button (GtkButton * but, gpointer data)
 void create_selection_button (GtkWidget * box, int num, int id, gpointer data)
 {
   int i = GPOINTER_TO_INT(data);
-  GtkWidget * hbox = cpmd_box (box, "Atom(s) selection: ", 5, 20, (i < -1) ? 120 : 220);
+  GtkWidget * hbox = cpmd_box (box, _("Atom(s) selection: "), 5, 20, (i < -1) ? 120 : 220);
   gchar * str;
   if (num == 0)
   {
-    str = g_strdup_printf ("Not picked yet !");
+    str = g_strdup_printf (_("Not picked yet !"));
     sel_img[id] = stock_image (DELETEB);
   }
   else
   {
-    str = g_strdup_printf ("%d atom(s)", (int)num);
+    str = g_strdup_printf (_("%d atom(s)"), (int)num);
     sel_img[id] = stock_image (APPLY);
   }
   sel_but[id] = gtk_button_new_with_label (str);
@@ -1457,13 +1464,13 @@ void create_nose_thermo_param_box (int therm_id)
 {
   gchar * str;
   nose_id_box[1] = destroy_this_widget (nose_id_box[1]);
-  str = g_strdup_printf ("Configuration for thermostat N°<b>%d</b>: ", therm_id+1);
+  str = g_strdup_printf (_("Configuration for thermostat N°<b>%d</b>: "), therm_id+1);
   nose_id_box[1] = create_vbox (BSEP);
   cpmd_box (nose_id_box[1], str, 5, 5, 220);
   g_free (str);
   thermostat * thermo = get_active_thermostat (therm_id);
   create_selection_button (nose_id_box[1], thermo -> natoms, 0, GINT_TO_POINTER(therm_id));
-  nose_parameters (nose_id_box[1], therm_id,
+  nose_parameters (nose_id_box[1], therm_id, 
                    v_thermo[!is_cpmd][thermo->type],
                    c_thermo[!is_cpmd][thermo->type],
                    u_thermo[!is_cpmd][thermo->type]);
@@ -1500,12 +1507,12 @@ void create_selection_combo (int id, int num, int type, GCallback handler)
 {
   int i, j;
   gchar * str;
-  gchar * lab[2]={"Thermostat", "Dummy atom"};
+  gchar * lab[2]={i18n("Thermostat"), i18n("Dummy atom")};
   combo_id_box[id] = destroy_this_widget (combo_id_box[id]);
   combo_id_box[id] = create_combo ();
   for (i=0; i<num; i++)
   {
-    str = g_strdup_printf ("%s N°%d", lab[id], i+1);
+    str = g_strdup_printf ("%s N°%d", _(lab[id]), i+1);
     combo_text_append (combo_id_box[id], str);
     g_free (str);
   }
@@ -1600,8 +1607,8 @@ G_MODULE_EXPORT void add_or_remove_thermostat (GtkSpinButton * res, gpointer dat
         {
           if (k > 1)
           {
-            str = g_strdup_printf ("Do you really want to add %d thermostat(s) ?", k);
-            add_thermo = ask_yes_no ("Adding thermostat(s) ?", str, GTK_MESSAGE_QUESTION, qm_assistant);
+            str = g_strdup_printf (_("Do you really want to add %d thermostat(s) ?"), k);
+            add_thermo = ask_yes_no (_("Adding thermostat(s) ?"), str, GTK_MESSAGE_QUESTION, qm_assistant);
             g_free (str);
           }
           if (add_thermo)
@@ -1616,13 +1623,13 @@ G_MODULE_EXPORT void add_or_remove_thermostat (GtkSpinButton * res, gpointer dat
         }
         else
         {
-          show_warning ("It is not possible to create so many thermostats", qm_assistant);
+          show_warning (_("It is not possible to create so many thermostats"), qm_assistant);
           gtk_spin_button_set_value (GTK_SPIN_BUTTON(res), (double)get_num_thermo ());
         }
       }
       else
       {
-        show_warning ("All atoms arleady have a thermostat assigned", qm_assistant);
+        show_warning (_("All atoms arleady have a thermostat assigned"), qm_assistant);
         gtk_spin_button_set_value (GTK_SPIN_BUTTON(res), (double)get_num_thermo ());
       }
     }
@@ -1703,11 +1710,11 @@ GtkWidget * create_nose_box (int n)
   GtkWidget * widg;
   if (n > GLOBAL)
   {
-    hbox = cpmd_box (vbox, "Number of thermostat(s): ", 5, 5, 220);
+    hbox = cpmd_box (vbox, _("Number of thermostat(s): "), 5, 5, 220);
     widg = spin_button (G_CALLBACK(add_or_remove_thermostat),
                         (double)(get_num_thermo ()), 1.0, (double)qm_proj -> natomes, 1.0, 0, 100, NULL);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
-    combo_id[0] = cpmd_box (vbox, "Thermostat to configure: ", 5, 5, 220);
+    combo_id[0] = cpmd_box (vbox, _("Thermostat to configure: "), 5, 5, 220);
     nose_id_box[0] = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, nose_id_box[0], FALSE, FALSE, 10);
     create_selection_combo (0, get_num_thermo (), get_thermo () -> type, G_CALLBACK(changed_nose_thermo_id_box));
@@ -1717,7 +1724,7 @@ GtkWidget * create_nose_box (int n)
   {
     nose_parameters (vbox, 0,
                      v_thermo[!is_cpmd][get_thermo()->type],
-                     c_thermo[!is_cpmd][get_thermo()->type],
+                     c_thermo[!is_cpmd][get_thermo() -> type],
                      u_thermo[!is_cpmd][get_thermo()->type]);
   }
   return vbox;
@@ -1769,12 +1776,12 @@ void prepare_therm_ions ()
   {
     if (get_thermo () -> type > i)
     {
-      hbox = cpmd_box (therm_param_ions, "Thermostat type: ", 5, 5, 220);
+      hbox = cpmd_box (therm_param_ions, _("Thermostat type: "), 5, 5, 220);
       tbox = create_combo ();
       j = 2; // For QM-MM: qm_view -> bonding + 2;
       for (k=0; k<j; k++)
       {
-        str = g_strdup_printf ("%s", nosetype[k]);
+        str = g_strdup_printf ("%s", _(nosetype[k]));
         combo_text_append (tbox, str);
         g_free (str);
       }
@@ -1859,7 +1866,7 @@ void thermo_type_box (GtkWidget * vbox, gchar * str, int id)
   GtkWidget * tbox = create_combo ();
   for (i=0; i<num_thermo[!is_cpmd]; i++)
   {
-    str = g_strdup_printf ("%s", thermo_name[!is_cpmd][i]);
+    str = g_strdup_printf ("%s", (!is_cpmd || i != 3) ? _(thermo_name[!is_cpmd][i]) : thermo_name[!is_cpmd][i]);
     combo_text_append (tbox, str);
     g_free (str);
   }
@@ -1883,7 +1890,7 @@ void thermo_type_box (GtkWidget * vbox, gchar * str, int id)
 */
 GtkWidget * thermo_box ()
 {
-  gchar * thermo_info[2] = {"<u>Ionic subsystem thermostat:</u> ", "Thermostat: "};
+  gchar * thermo_info[2] = {i18n("<u>Ionic subsystem thermostat:</u> "), i18n("Thermostat: ")};
   GtkWidget * vbox = create_vbox (BSEP);
   GtkWidget * vvbox;
   nose_id_box[0] = nose_id_box[1] = NULL;
@@ -1897,7 +1904,7 @@ GtkWidget * thermo_box ()
   vvbox = create_vbox (BSEP);
   gtk_widget_set_size_request (vvbox, (is_cpmd) ? 525 : -1, (is_cpmd) ? 350 : 260);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, vvbox, FALSE, FALSE, 0);
-  thermo_type_box (vvbox, thermo_info[!is_cpmd], 0);
+  thermo_type_box (vvbox, _(thermo_info[!is_cpmd]), 0);
   therm_ions = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, therm_ions, FALSE, FALSE, (is_cpmd) ? 0 : 20);
   prepare_therm_ions ();
@@ -1906,7 +1913,7 @@ GtkWidget * thermo_box ()
   {
     electron_box = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, electron_box, FALSE, FALSE, 5);
-    thermo_type_box (electron_box, "<u>Fictitious electronic subsystem:</u> ", -1);
+    thermo_type_box (electron_box, _("<u>Fictitious electronic subsystem:</u> "), -1);
     therm_elec = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, electron_box, therm_elec, FALSE, FALSE, 0);
     prepare_therm_elec ();

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file glwindow.h
@@ -28,6 +28,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 */
 
+extern void set_this_style (glwin * view, int style);
+extern void update_menus (glwin * view);
 extern void prep_model (int p);
 
 extern void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, gchar * key, int mpop, int item_id,
@@ -37,6 +39,7 @@ extern void append_opengl_item (glwin * view, GMenu * menu, const gchar * name, 
 
 #ifdef GTK4
 extern G_MODULE_EXPORT void to_reset_view (GSimpleAction * action, GVariant * parameter, gpointer data);
+extern void activate_glwin_action (gchar * action_string, gchar * action_name, glwin * view);
 #else
 extern G_MODULE_EXPORT void to_reset_view (GtkWidget * widg, gpointer data);
 #endif

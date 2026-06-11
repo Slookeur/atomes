@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_copy.c
@@ -67,7 +67,7 @@ extern void print_all_field_struct (field_molecule * mol, int str);
 field_atom* duplicate_field_atom (field_atom* old_fat)
 {
   field_atom* new_fat;
-  new_fat = g_malloc0 (sizeof*new_fat);
+  new_fat = g_malloc0(sizeof*new_fat);
   new_fat -> id = old_fat -> id;
   new_fat -> fid = old_fat -> fid;
   new_fat -> afid = old_fat -> afid;
@@ -101,7 +101,7 @@ field_atom* duplicate_field_atom (field_atom* old_fat)
 field_shell * duplicate_field_shell (field_shell * old_shell)
 {
   field_shell * new_shell;
-  new_shell = g_malloc0 (sizeof*new_shell);
+  new_shell = g_malloc0(sizeof*new_shell);
   new_shell -> id = old_shell -> id;
   new_shell -> ia[0] = old_shell -> ia[0];
   new_shell -> ia[1] = old_shell -> ia[1];
@@ -127,7 +127,7 @@ field_shell * duplicate_field_shell (field_shell * old_shell)
 field_constraint * duplicate_field_constraint (field_constraint * old_cons)
 {
   field_constraint * new_cons;
-  new_cons = g_malloc0 (sizeof*new_cons);
+  new_cons = g_malloc0(sizeof*new_cons);
   new_cons -> id = old_cons -> id;
   new_cons -> ia[0] = old_cons -> ia[0];
   new_cons -> ia[1] = old_cons -> ia[1];
@@ -149,7 +149,7 @@ field_constraint * duplicate_field_constraint (field_constraint * old_cons)
 field_pmf * duplicate_field_pmf (field_pmf * old_pmf)
 {
   field_pmf * new_pmf;
-  new_pmf = g_malloc0 (sizeof*new_pmf);
+  new_pmf = g_malloc0(sizeof*new_pmf);
   new_pmf -> id = old_pmf -> id;
   new_pmf -> length = old_pmf -> length;
   int i;
@@ -176,7 +176,7 @@ field_pmf * duplicate_field_pmf (field_pmf * old_pmf)
 field_rigid * duplicate_field_rigid (field_rigid * old_rig)
 {
   field_rigid * new_rig;
-  new_rig = g_malloc0 (sizeof*new_rig);
+  new_rig = g_malloc0(sizeof*new_rig);
   new_rig -> id = old_rig -> id;
   new_rig -> num =  old_rig -> num;
   new_rig -> list = duplicate_int (old_rig -> num, old_rig -> list);
@@ -197,7 +197,7 @@ field_rigid * duplicate_field_rigid (field_rigid * old_rig)
 field_tethered * duplicate_field_tethered (field_tethered * old_tet)
 {
   field_tethered * new_tet;
-  new_tet = g_malloc0 (sizeof*new_tet);
+  new_tet = g_malloc0(sizeof*new_tet);
   new_tet -> id = old_tet -> id;
   new_tet -> num =  old_tet -> num;
   new_tet -> show = old_tet -> show;
@@ -218,7 +218,7 @@ field_tethered * duplicate_field_tethered (field_tethered * old_tet)
 field_prop * duplicate_field_prop (field_prop * old_prop, int ti)
 {
   field_prop * new_prop;
-  new_prop = g_malloc0 (sizeof*new_prop);
+  new_prop = g_malloc0(sizeof*new_prop);
   new_prop -> aid = duplicate_int (struct_id(ti+7), old_prop -> aid);
   new_prop -> key = old_prop -> key;
   new_prop -> pid = old_prop -> pid;
@@ -300,7 +300,7 @@ void duplicate_other_prop (int oid, field_struct * old_fstr, field_struct * new_
 field_struct * duplicate_field_struct (field_struct * old_fstr)
 {
   field_struct * new_fstr;
-  new_fstr = g_malloc0 (sizeof*new_fstr);
+  new_fstr = g_malloc0(sizeof*new_fstr);
   new_fstr -> st = old_fstr -> st;
   new_fstr -> id = old_fstr -> id;
   new_fstr -> num = old_fstr -> num;
@@ -366,16 +366,16 @@ field_nth_body * duplicate_field_nth_body (field_nth_body * old_fbody)
 {
   field_nth_body * new_fbody;
   int i, j;
-  new_fbody = g_malloc0 (sizeof*new_fbody);
+  new_fbody = g_malloc0(sizeof*new_fbody);
   new_fbody -> id = old_fbody -> id;
   new_fbody -> bd = old_fbody -> bd;
   if (old_fbody -> fpid) new_fbody -> fpid = duplicate_int (2, old_fbody -> fpid);
   j = body_at (old_fbody -> bd);
   new_fbody -> na = duplicate_int (j, old_fbody -> na);
   new_fbody -> ma = NULL;
-  new_fbody -> ma = g_malloc (j*sizeof*new_fbody -> ma);
+  new_fbody -> ma = g_malloc0(j*sizeof*new_fbody -> ma);
   new_fbody -> a = NULL;
-  new_fbody -> a = g_malloc (j*sizeof*new_fbody -> a);
+  new_fbody -> a = g_malloc0(j*sizeof*new_fbody -> a);
 
   for (i=0; i<j; i++)
   {
@@ -412,7 +412,7 @@ field_nth_body * duplicate_field_nth_body (field_nth_body * old_fbody)
 field_external * duplicate_field_external (field_external * old_fext)
 {
   field_external * new_fext;
-  new_fext = g_malloc0 (sizeof*new_fext);
+  new_fext = g_malloc0(sizeof*new_fext);
   new_fext -> id = old_fext -> id;
   new_fext -> key = old_fext -> key;
   new_fext -> val = NULL;
@@ -437,7 +437,7 @@ field_molecule * duplicate_field_molecule (field_molecule * old_fmol)
 {
   int i, j;
   field_molecule * new_fmol;
-  new_fmol = g_malloc0 (sizeof*new_fmol);
+  new_fmol = g_malloc0(sizeof*new_fmol);
   new_fmol -> id = old_fmol -> id;
   new_fmol -> multi = old_fmol -> multi;
   new_fmol -> name = g_strdup_printf ("%s", old_fmol -> name);
@@ -455,11 +455,11 @@ field_molecule * duplicate_field_molecule (field_molecule * old_fmol)
   new_fmol -> constraints = old_fmol -> constraints;
   new_fmol -> first_shell = NULL;
   new_fmol -> shells = old_fmol -> shells;
-  new_fmol -> mol = g_malloc0 (sizeof*new_fmol -> mol);
+  new_fmol -> mol = g_malloc0(sizeof*new_fmol -> mol);
   new_fmol -> mol = & tmp_proj -> modelfc -> mols[0][old_fmol -> mol -> id];
   // Duplicating atoms
   new_fmol -> fragments = NULL;
-  new_fmol -> fragments = allocint(new_fmol -> multi);
+  new_fmol -> fragments = allocint (new_fmol -> multi);
   for (i=0; i<new_fmol -> multi; i++) new_fmol -> fragments[i] = old_fmol -> fragments[i];
 
   new_fmol -> first_atom = duplicate_field_atom (old_fmol -> first_atom);
@@ -474,10 +474,10 @@ field_molecule * duplicate_field_molecule (field_molecule * old_fmol)
     tmp_fa = tmp_fa -> next;
   }
 
-  new_fmol -> atoms_id = g_malloc (new_fmol -> mol -> natoms*sizeof*new_fmol -> atoms_id);
+  new_fmol -> atoms_id = g_malloc0(new_fmol -> mol -> natoms*sizeof*new_fmol -> atoms_id);
   for (i=0; i<new_fmol -> mol -> natoms; i++)
   {
-    new_fmol -> atoms_id[i] = g_malloc0 (new_fmol -> multi*sizeof*new_fmol -> atoms_id[i]);
+    new_fmol -> atoms_id[i] = g_malloc0(new_fmol -> multi*sizeof*new_fmol -> atoms_id[i]);
     for (j=0; j<new_fmol -> multi; j++)
     {
       new_fmol -> atoms_id[i][j].a = old_fmol -> atoms_id[i][j].a;
@@ -519,7 +519,7 @@ field_molecule * duplicate_field_molecule (field_molecule * old_fmol)
 classical_field * duplicate_classical_field (classical_field * init_field)
 {
   classical_field * new_field = NULL;
-  new_field = g_malloc (sizeof*new_field);
+  new_field = g_malloc0(sizeof*new_field);
 
   int i, j;
 
@@ -583,10 +583,10 @@ classical_field * duplicate_classical_field (classical_field * init_field)
     new_field -> cross = NULL;
     if (init_field -> cross != NULL)
     {
-      new_field -> cross = g_malloc (tmp_field -> nbody[2]*sizeof*new_field -> cross);
+      new_field -> cross = g_malloc0(tmp_field -> nbody[2]*sizeof*new_field -> cross);
       for (i=0; i<tmp_field -> nbody[2]; i++)
       {
-        new_field -> cross[i] = g_malloc (tmp_field -> nbody[2]*sizeof*new_field -> cross[i]);
+        new_field -> cross[i] = g_malloc0(tmp_field -> nbody[2]*sizeof*new_field -> cross[i]);
         for (j=0; j<tmp_field -> nbody[2]; j++) new_field -> cross[i][j] = duplicate_double (3, init_field -> cross[i][j]);
       }
     }

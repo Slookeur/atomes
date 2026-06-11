@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd.h
@@ -103,9 +103,6 @@ extern int calc_box_num[NCACOMBO];
 extern gchar * calc_box_name[NCACOMBO][3];
 extern gchar * calc_box_keys[NCACOMBO][3];
 
-extern gchar * rest_kw[2];
-extern gchar * rest_opts[3];
-
 extern GtkWidget * sel_but[3];
 extern GtkWidget * sel_img[3];
 
@@ -124,7 +121,7 @@ extern gchar * nosekey[2];
 extern gchar * thermo_name[2][5];
 extern int num_thermo[2];
 extern int type_thermo[2];
-extern gchar * termoke[2];
+
 extern gchar * param[2];
 extern gchar * iunit[2];
 extern gchar * eunit[2];

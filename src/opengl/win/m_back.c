@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file m_back.c
@@ -69,10 +69,10 @@ G_MODULE_EXPORT void to_gradient_advanced (GSimpleAction * action, GVariant * pa
 GtkWidget * menu_back (glwin * view)
 {
   GtkWidget * menub = gtk_menu_new ();
-  GtkWidget * bc = create_menu_item (FALSE, "Color");
+  GtkWidget * bc = create_menu_item (FALSE, _("Color"));
   gtk_menu_shell_append ((GtkMenuShell *)menub, bc);
   gtk_menu_item_set_submenu ((GtkMenuItem *)bc, color_box(view, -2, 0, 0));
-  GtkWidget * gc = create_menu_item (FALSE, "Gradient color");
+  GtkWidget * gc = create_menu_item (FALSE, _("Gradient color"));
   g_signal_connect (G_OBJECT (gc), "activate", G_CALLBACK(gradient_advanced), view);
   gtk_menu_shell_append ((GtkMenuShell *)menub, gc);
   return menub;
@@ -89,9 +89,8 @@ GtkWidget * menu_back (glwin * view)
 GMenu * menu_back (glwin * view, int popm)
 {
   GMenu * menu = g_menu_new ();
-  append_opengl_item (view, menu, "back-color", "back-color", popm, popm, NULL, IMG_NONE, NULL, TRUE, NULL, NULL, FALSE, FALSE, FALSE, FALSE);
-  append_opengl_item (view, menu, "More colors ...", "back-color", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_run_back_color_window), view, FALSE, FALSE, FALSE, TRUE);
-  append_opengl_item (view, menu, "Gradient colors", "back-gradient", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_gradient_advanced), view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("More Colors ..."), "back-color", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_run_back_color_window), view, FALSE, FALSE, FALSE, TRUE);
+  append_opengl_item (view, menu, _("Gradient colors"), "back-gradient", popm, popm, NULL, IMG_NONE, NULL, FALSE, G_CALLBACK(to_gradient_advanced), view, FALSE, FALSE, FALSE, TRUE);
   return menu;
 }
 #endif

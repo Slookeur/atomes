@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file calc.c
@@ -103,9 +103,9 @@ G_MODULE_EXPORT void confirm_selection (GtkDialog * dialog, gint response_id, gp
 void field_question (gchar * question, GCallback handler, gpointer data)
 {
   GtkWidget * dialog;
-  dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Are you sure ?");
+  dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Are you sure ?"));
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", question);
-  gtk_window_set_title(GTK_WINDOW(dialog), "Please confirm");
+  gtk_window_set_title(GTK_WINDOW(dialog), _("Please confirm"));
   run_this_gtk_dialog (dialog, handler, data);
 }
 
@@ -120,7 +120,7 @@ atom_selection * duplicate_ogl_selection (atom_selection * old_sel)
 {
   int i, j;
   atom_in_selection * at, * bt;
-  atom_selection * new_sel = g_malloc0 (sizeof*new_sel);
+  atom_selection * new_sel = g_malloc0(sizeof*new_sel);
   if (! old_sel -> selected) return new_sel;
   new_sel -> selected = old_sel -> selected;
   at = old_sel -> first;
@@ -274,7 +274,7 @@ void preserve_ogl_selection (glwin * view)
     {
       if (j && k)
       {
-        view -> stored_labels[i] = allocint(k+1);
+        view -> stored_labels[i] = allocint (k+1);
         view -> stored_labels[i][0] = k+1;
       }
       k = j;
@@ -317,9 +317,9 @@ G_MODULE_EXPORT void create_field (GtkWidget * widg, gpointer data)
 
   if (opengl_project -> steps > 1)
   {
-    gchar * info = g_strdup_printf (" %s contains %d different sets of atomic coordinates. \n"
-                                    " Please select the one to use to create the input file(s) \n"
-                                    " Note that a new project will be generated for that purpose. \n",
+    gchar * info = g_strdup_printf (_(" %s contains %d different sets of atomic coordinates. \n"
+                                      " Please select the one to use to create the input file(s) \n"
+                                      " Note that a new project will be generated for that purpose. \n"),
                                     opengl_project -> name,
                                     opengl_project -> steps);
     // preserve parameters
@@ -328,7 +328,7 @@ G_MODULE_EXPORT void create_field (GtkWidget * widg, gpointer data)
     int tmp_v = activev;
     tint t_data;
     t_data.a = p;
-    t_data.b = iask (info, "Enter the selected MD step: ", 5+opengl_project -> steps, opengl_project -> modelgl -> win);
+    t_data.b = iask (info, _("Enter the selected MD step: "), 5+opengl_project -> steps, opengl_project -> modelgl -> win);
     t_data.c = 1;
     g_free (info);
 

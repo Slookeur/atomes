@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file glview.h
@@ -47,7 +47,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 /*! \def DEFAULT_LIGHTNING
   \brief Default OpenGL material ligthning
 */
-#define DEFAULT_LIGHTNING          1.00
+#define DEFAULT_LIGHTNING          5.00
 
 /*! \def DEFAULT_METALLIC
   \brief Default OpenGL material metallic
@@ -62,7 +62,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 /*! \def DEFAULT_AMBIANT_OCCLUSION
   \brief Default OpenGL material ambiant occlusion
 */
-#define DEFAULT_AMBIANT_OCCLUSION  1.00
+#define DEFAULT_AMBIANT_OCCLUSION  0.99
 
 /*! \def DEFAULT_GAMMA_CORRECTION
   \brief Default OpenGL material gamma correction
@@ -91,7 +91,7 @@ extern GLfloat template_parameters[TEMPLATES][5];
 /*! \def DEFAULT_INTENSITY
   \brief Default light intensity
 */
-#define DEFAULT_INTENSITY 10.0
+#define DEFAULT_INTENSITY 30.0
 
 /*! \def NEAR_PLANE
   \brief Default value for the OpenGL near plane
@@ -174,7 +174,7 @@ enum modes {
   CP2K_MM   = 8  /*!< 8 */
 };
 
-#define NUM_STYLES 7
+#define NUM_STYLES OGL_STYLES+FILLED_STYLES+1
 
 /*! \enum styles */
 enum styles {
@@ -221,11 +221,12 @@ enum axisposition {
 
 /*! \enum labels */
 enum labels {
-  ELEMENT_NAME   = 0, /*!< 0 */
-  SYMBOL         = 1, /*!< 1 */
-  SYMBOL_AND_NUM = 2, /*!< 2 */
-  NUM            = 3, /*!< 3 */
-  ID_IN_MOLECULE = 4  /*!< 4 */
+  ELEMENT_NAME   = 0, /*!< 0 Element name */
+  SYMBOL         = 1, /*!< 1 Element symbol */
+  SYMBOL_AND_NUM = 2, /*!< 2 Element symbol and ID number */
+  SYMBOL_AND_IND = 3, /*!< 3 Element symbol and ID number in subscript font */
+  NUM            = 4, /*!< 4 ID number */
+  ID_IN_MOLECULE = 5  /*!< 5 ID number in molecule */
 };
 
 /*! \enum actions */
@@ -270,6 +271,7 @@ extern int gColorID[3];
 extern int field_object;
 extern GLenum ogl_texture;
 
+extern int get_filled_id (int sid);
 extern gboolean create_bond (int ac, int bid, int ba, int bb, int sel, double length);
 extern void draw_cylinder_bond (atom a, atom b, int bid, int ci, int bi);
 extern void draw_cylinder_bond_to_pick (atom a, atom b, int bid);
@@ -313,7 +315,7 @@ void reshape (glwin * view, int width, int height, gboolean use_ratio);
 void zoom (glwin * view, int delta);
 
 void init_opengl ();
-void init_camera (project * this_proj, gboolean get_depth);
+void init_camera (project * this_proj);
 
 #ifdef GTKGLAREA
   G_MODULE_EXPORT void on_realize (GtkGLArea * area, gpointer data);
@@ -332,6 +334,7 @@ extern angle angle_3d (cell_info * cell, int mdstep, atom * at, atom * bt, atom 
 extern angle dihedral_3d (cell_info * cell, int mdstep, atom * at, atom * bt, atom * ct, atom * dt);
 
 extern atom * duplicate_atom (atom * at);
+extern atom * free_atom (atom * at);
 extern void at_shift (atom * at, float * shift);
 extern void at_unshift (atom * at, float * shift);
 extern int check_label_numbers (project * this_proj, int types);
@@ -346,6 +349,7 @@ extern void cleaning_shaders (glwin * view, int shader);
 extern void init_default_shaders (glwin * view);
 extern void init_shaders(glwin * view);
 
+extern object_3d * free_object_3d (object_3d * obj);
 extern glsl_program * init_shader_program (int object, int object_id,
                                            const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                            GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj);

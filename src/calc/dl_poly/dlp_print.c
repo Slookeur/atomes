@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_print.c
@@ -303,7 +303,7 @@ void print_dlp_improper_inversion (int di, GtkTextBuffer * buf, field_struct * d
   gchar * stra, * strb, * strc, * strd, * stre, * strf, * strg;
   float w;
   GtkTreeIter di_level;
-  int * ids = allocint(4);
+  int * ids = allocint (4);
   imp_inv * first_imp_inv = NULL;
   imp_inv * this_ii = NULL;
 
@@ -341,12 +341,12 @@ void print_dlp_improper_inversion (int di, GtkTextBuffer * buf, field_struct * d
                         {
                           if (! first_imp_inv)
                           {
-                            first_imp_inv = g_malloc0 (sizeof*first_imp_inv);
+                            first_imp_inv = g_malloc0(sizeof*first_imp_inv);
                             this_ii = first_imp_inv;
                           }
                           else
                           {
-                            this_ii -> next = g_malloc0 (sizeof*this_ii);
+                            this_ii -> next = g_malloc0(sizeof*this_ii);
                             this_ii -> next -> prev = this_ii;
                             this_ii = this_ii -> next;
                           }
@@ -436,7 +436,9 @@ void print_dlp_improper_inversion (int di, GtkTextBuffer * buf, field_struct * d
 
                             w /= tmp_fmol -> multi;
                             stre = g_strdup_printf ("%.3f", w);
-                            strf = g_strdup_printf ("%s (%s)", fnames[activef][di+2][tmp_fprop -> key], fkeysw[activef][di+2][tmp_fprop -> key]);
+                            strf = g_strdup_printf ("%s (%s)", 
+                                                    dlp_to_translate(activef,di+2,tmp_fprop -> key) ? _(fnames[activef][di+2][tmp_fprop -> key]) : fnames[activef][di+2][tmp_fprop -> key], 
+                                                    fkeysw[activef][di+2][tmp_fprop -> key]);
                             strg = parameters_info (di+1, tmp_fprop -> key, fvars_dihedral[activef][tmp_fprop -> key], tmp_fprop -> val);
                             gtk_tree_store_append (store, & di_level, iter);
                             gtk_tree_store_set (store, & di_level, 0, 0,
@@ -510,7 +512,7 @@ void print_dlp_dihedral (int dih, GtkTextBuffer * buf, field_struct * dh, int fi
     same_atom = TRUE;
     already_done = allocbool (tmp_fmol -> mol -> natoms);
   }
-  int * ids = allocint(4);
+  int * ids = allocint (4);
   for (i=0; i<tmp_fat -> num; i++)
   {
     j = tmp_fat -> list[i];
@@ -599,7 +601,9 @@ void print_dlp_dihedral (int dih, GtkTextBuffer * buf, field_struct * dh, int fi
                     }
                     v /= tmp_fmol -> multi;
                     stre = g_strdup_printf ("%.3f", v);
-                    strf = g_strdup_printf ("%s (%s)", fnames[activef][dih+2][tmp_fprop -> key], fkeysw[activef][dih+2][tmp_fprop -> key]);
+                    strf = g_strdup_printf ("%s (%s)",
+                                            dlp_to_translate(activef,dih+2,tmp_fprop -> key) ? _(fnames[activef][dih+2][tmp_fprop -> key]) : fnames[activef][dih+2][tmp_fprop -> key], 
+                                            fkeysw[activef][dih+2][tmp_fprop -> key]);
                     strg = parameters_info (dih+1, tmp_fprop -> key, fvars_dihedral[activef][tmp_fprop -> key], tmp_fprop -> val);
                     gtk_tree_store_append (store, & di_level, iter);
                     gtk_tree_store_set (store, & di_level, 0, 0,
@@ -653,7 +657,7 @@ void print_dlp_angle (int ai, GtkTextBuffer * buf, field_struct * an, int fi, Gt
   gchar * stra, * strb, * strc, * strd, * stre, * strf;
   float v;
   GtkTreeIter an_level;
-  int * ids = allocint(3);
+  int * ids = allocint (3);
   gboolean same_atom = FALSE;
   gboolean * already_done;
   if (tmp_fat -> id == tmp_fct -> id)
@@ -728,7 +732,9 @@ void print_dlp_angle (int ai, GtkTextBuffer * buf, field_struct * an, int fi, Gt
                 }
                 v /= tmp_fmol -> multi;
                 strd = g_strdup_printf ("%.3f", v);
-                stre = g_strdup_printf ("%s (%s)", fnames[activef][ai+2][tmp_fprop -> key], fkeysw[activef][ai+2][tmp_fprop -> key]);
+                stre = g_strdup_printf ("%s (%s)", 
+                                        dlp_to_translate(activef,ai+2,tmp_fprop -> key) ? _(fnames[activef][ai+2][tmp_fprop -> key]) : fnames[activef][ai+2][tmp_fprop -> key], 
+                                        fkeysw[activef][ai+2][tmp_fprop -> key]);
                 strf = parameters_info (ai+1, tmp_fprop -> key, fvars_angle[activef][tmp_fprop -> key], tmp_fprop -> val);
                 gtk_tree_store_append (store, & an_level, iter);
                 gtk_tree_store_set (store, & an_level, 0, 0,
@@ -777,7 +783,7 @@ void print_dlp_bond (int bi, GtkTextBuffer * buf,  field_struct * bd, int fi, Gt
   gboolean show;
   gchar * stra, * strb, * strc, * strd, * stre;
   float v;
-  int * ids = allocint(2);
+  int * ids = allocint (2);
   GtkTreeIter bd_level;
   gboolean same_atom = FALSE;
   gboolean * already_done;
@@ -839,7 +845,9 @@ void print_dlp_bond (int bi, GtkTextBuffer * buf,  field_struct * bd, int fi, Gt
             }
             v /= tmp_fmol -> multi;
             strc = g_strdup_printf ("%.3f", v);
-            strd = g_strdup_printf ("%s (%s)", fnames[activef][bi+2][tmp_fprop -> key], fkeysw[activef][bi+2][tmp_fprop -> key]);
+            strd = g_strdup_printf ("%s (%s)",
+                                    dlp_to_translate(activef,bi+2,tmp_fprop -> key) ? _(fnames[activef][bi+2][tmp_fprop -> key]) : fnames[activef][bi+2][tmp_fprop -> key], 
+                                    fkeysw[activef][bi+2][tmp_fprop -> key]);
             stre = parameters_info (bi+1, tmp_fprop -> key, fvars_bond[activef][tmp_fprop -> key], tmp_fprop -> val);
             gtk_tree_store_append (store, & bd_level, iter);
             gtk_tree_store_set (store, & bd_level, 0, 0,
@@ -1410,10 +1418,10 @@ void print_dlp_field (GtkTextBuffer * buf)
   gtk_text_buffer_get_end_iter (buf, & bEnd);
   gtk_text_buffer_delete (buf, & bStart, & bEnd);
 
-  str = g_strdup_printf ("# This file was created using %s\n", PACKAGE);
+  str = g_strdup_printf (_("# This file was created using %s\n"), PACKAGE);
   print_info (str, NULL, buf);
   g_free (str);
-  str = g_strdup_printf ("# %s contains:\n", prepare_for_title(tmp_proj -> name));
+  str = g_strdup_printf (_("# %s contains:\n"), prepare_for_title(tmp_proj -> name));
   print_info (str, NULL, buf);
   g_free (str);
   i = 0;
@@ -1421,19 +1429,19 @@ void print_dlp_field (GtkTextBuffer * buf)
   {
     i += tmp_proj -> modelfc -> mols[0][j].multiplicity;
   }
-  str = g_strdup_printf ("#  - %d atoms\n"
-                         "#  - %d isolated molecular fragments\n"
-                         "#  - %d distinct molecules\n",
+  str = g_strdup_printf (_("#  - %d atoms\n"
+                           "#  - %d isolated molecular fragments\n"
+                           "#  - %d distinct molecules\n"),
                          tmp_proj -> natomes, i, tmp_proj -> modelfc -> mol_by_step[0]);
   print_info (str, NULL, buf);
   g_free (str);
 
-  print_info ("# Energy unit:\n", NULL, buf);
+  print_info (_("# Energy unit:\n"), NULL, buf);
   print_info ("UNITS ", "bold", buf);
   str = g_strdup_printf ("%s\n", fkeysw[activef][0][tmp_field -> energy_unit]);
   print_info (str, "bold_green", buf);
   g_free (str);
-  print_info ("# Number of field molecules:\n", NULL, buf);
+  print_info (_("# Number of field molecules:\n"), NULL, buf);
   print_info ("MOLECULES ", "bold", buf);
   str = g_strdup_printf ("%d\n", tmp_field -> molecules);
   print_info (str, "bold_red", buf);
@@ -1441,11 +1449,11 @@ void print_dlp_field (GtkTextBuffer * buf)
   tmp_fmol = tmp_field -> first_molecule;
   for (i=0; i<tmp_field -> molecules; i++)
   {
-    str = g_strdup_printf ("# Begin molecule %d\n", i+1);
+    str = g_strdup_printf (_("# Begin molecule %d\n"), i+1);
     print_info (str, NULL, buf);
     g_free (str);
     print_dlp_molecule (buf, tmp_fmol);
-    str = g_strdup_printf ("# End molecule %d\n", i+1);
+    str = g_strdup_printf (_("# End molecule %d\n"), i+1);
     print_info (str, NULL, buf);
     g_free (str);
     if (tmp_fmol -> next != NULL) tmp_fmol = tmp_fmol -> next;
@@ -1453,7 +1461,7 @@ void print_dlp_field (GtkTextBuffer * buf)
 
   // Non bonded
   gchar * nd_title[5] = {"VDW", "METAL", "TERSOFF", "TBP", "FBP"};
-  gchar * com_ndb[5] = {"Van der Walls pair", "metal", "Tersoff", "three-body", "four-body"};
+  gchar * com_ndb[5] = {i18n("van der Walls pair"), i18n("metal"), "Tersoff", i18n("three-body"), i18n("four-body")};
   for (i=0; i<5; i++)
   {
     if (tmp_field -> afp[i+23])
@@ -1467,7 +1475,7 @@ void print_dlp_field (GtkTextBuffer * buf)
       }
       if (j > 0)
       {
-        str = g_strdup_printf ("# Non-bonded: %s potential(s)\n", com_ndb[i]);
+        str = g_strdup_printf (_("# Non-bonded: %s potential(s)\n"), (i != 2) ? _(com_ndb[i]) : com_ndb[i]);
         print_info (str, NULL, buf);
         g_free (str);
         print_info (nd_title[i], "bold", buf);
@@ -1585,7 +1593,7 @@ void print_dlp_config (GtkTextBuffer * buf)
   gtk_text_buffer_get_end_iter (buf, & bEnd);
   gtk_text_buffer_delete (buf, & bStart, & bEnd);
 
-  str = g_strdup_printf ("# DL-POLY CONFIG file created by %s, %s - %d atoms\n",
+  str = g_strdup_printf (_("# DL-POLY CONFIG file created by %s, %s - %d atoms\n"),
                          PACKAGE,
                          prepare_for_title(tmp_proj -> name),
                          tmp_proj -> natomes);
@@ -1662,9 +1670,9 @@ gchar * thermo_keyw[10] = {"evans", "lang", "ander", "ber", "hoover", "gst", "dp
 gchar * pseudo_thermo[3] = {"langevin", "gauss", "direct"};
 gchar * area_keyw[5]={"area", "tens", "tens", "orth", "orth"};
 gchar * md_keyw[4]={"temp               ", "steps              ", "integrat           ", "pres               "};
-gchar * md_text[4]={"# Target temperature in K\n", "# Number of MD steps\n", "# Integration time step in ps\n", "# Target presssure in k atms\n"};
+gchar * md_text[4]={i18n("# Target temperature in K\n"), i18n("# Number of MD steps\n"), i18n("# Integration time step in ps\n"), i18n("# Target presssure in k atms\n")};
 gchar * min_key[3]={"force", "energy", "distance"};
-//gchar * md_legend[3]={"# Target temperature", "# Number of MD steps", "# MD time step d(t)"};
+//gchar * md_legend[3]={i18n("# Target temperature"), i18n("# Number of MD steps"), i18n("# MD time step d(t)")};
 
 /*!
   \fn gboolean print_ana ()
@@ -1700,24 +1708,24 @@ gchar * elec_key[10]={"coul               ",
                       "shift precision    "};
 gchar * vdw_key[6]={"lor ", "fend", "hoge",
                     "halg", "tang", "func"};
-gchar * sys_info[8]={"\n# Ignore particle indices from CONFIG file and set indices by order of reading",
-                     "\n# Ignore strict checks when reading CONFIG file, warning messages and assume safe simulation parameters",
-                     "\n# Skip detailed topology reporting when reading FIELD file",
-                     "\n# Ignore center of mass momentum removal during the simulation",
-                     "\n# Tolerance for the relaxed shell model\n",
-                     "\n# Subcelling threshold density of particle per link cell\n",
-                     "\n# Create an expanded version of the current model\n",
-                     "\n# Restart job from previous run: "};
+gchar * sys_info[8]={i18n("\n# Ignore particle indices from CONFIG file and set indices by order of reading"),
+                     i18n("\n# Ignore strict checks when reading CONFIG file, warning messages and assume safe simulation parameters"),
+                     i18n("\n# Skip detailed topology reporting when reading FIELD file"),
+                     i18n("\n# Ignore center of mass momentum removal during the simulation"),
+                     i18n("\n# Tolerance for the relaxed shell model\n"),
+                     i18n("\n# Subcelling threshold density of particle per link cell\n"),
+                     i18n("\n# Create an expanded version of the current model\n"),
+                     i18n("\n# Restart job from previous run: ")};
 gchar * sys_key[8]={NULL, NULL, NULL, NULL, "rlxtol             ", "subcell            ", "nfold              ", "restart            "};
 gchar * sys_string[8]={"ind", "str", "top", "vom", NULL, NULL, NULL, NULL};
-gchar * rest_inf[3]={"\n# Continue current simulation - require REVOLD file",
-                     "\n# Start new simulation from older run without temperature reset",
-                     "\n# Start new simulation from older run with temperature reset"};
+gchar * rest_inf[3]={i18n("\n# Continue current simulation - require REVOLD file"),
+                     i18n("\n# Start new simulation from older run without temperature reset"),
+                     i18n("\n# Start new simulation from older run with temperature reset")};
 gchar * rest_key[3]={NULL, "noscale", "scale"};
 
-gchar * time_inf[2]={"\n\n# Set job time to ", "\n\n# Set job closure time to "};
+gchar * time_inf[2]={i18n("\n\n# Set job time to "), i18n("\n\n# Set job closure time to ")};
 gchar * time_key[2]={"job time           ", "close time         "};
-gchar * io_inf[2]={"\n# I/O read interface, with:\n", "\n# I/O write interface, with:\n"};
+gchar * io_inf[2]={i18n("\n# I/O read interface, with:\n"), i18n("\n# I/O write interface, with:\n")};
 gchar * io_key[2]={"\nio read             ", "\nio writ             "};
 gchar * io_meth[4]={"mpiio", "direct", "master", "netcdf"};
 gchar * io_pec[2]={"off", "on"};
@@ -1907,7 +1915,7 @@ void print_dlp_control (GtkTextBuffer * buf)
   gtk_text_buffer_get_end_iter (buf, & bEnd);
   gtk_text_buffer_delete (buf, & bStart, & bEnd);
 
-  str = g_strdup_printf ("# DL-POLY CONTROL file created by %s, %s - %d atoms\n\n",
+  str = g_strdup_printf (_("# DL-POLY CONTROL file created by %s, %s - %d atoms\n\n"),
                          PACKAGE,
                          prepare_for_title(tmp_proj -> name),
                          tmp_proj -> natomes);
@@ -1917,11 +1925,11 @@ void print_dlp_control (GtkTextBuffer * buf)
 
   if (tmp_field -> sys_opts[0] != 1.0)
   {
-    print_control_float (buf, tmp_field -> sys_opts[0], "# Relative dielectric constant = ", NULL, "eps                 ");
+    print_control_float (buf, tmp_field -> sys_opts[0], _("# Relative dielectric constant = "), NULL, "eps                 ");
   }
   if (tmp_field -> sys_opts[1] != 0.0)
   {
-    print_control_float (buf, tmp_field -> sys_opts[1], "\n# Allowing local variation of system density of : ", " \%", "densvar            ");
+    print_control_float (buf, tmp_field -> sys_opts[1], _("\n# Allowing local variation of system density of: "), " \%", "densvar            ");
   }
   for (i=2; i<10; i++)
   {
@@ -1931,15 +1939,15 @@ void print_dlp_control (GtkTextBuffer * buf)
       if (i == 9)
       {
         k = (int)tmp_field -> sys_opts[15];
-        print_control_string (buf, rest_key[k], sys_info[i-2], rest_inf[k], sys_key[i-2]);
+        print_control_string (buf, rest_key[k], _(sys_info[i-2]), _(rest_inf[k]), sys_key[i-2]);
       }
       else if (i < 6)
       {
-        print_control_string (buf, sys_string[i-2], sys_info[i-2], NULL, "no                 ");
+        print_control_string (buf, sys_string[i-2], _(sys_info[i-2]), NULL, "no                 ");
       }
       else
       {
-        print_control_key (buf, sys_info[i-2], sys_key[i-2]);
+        print_control_key (buf, _(sys_info[i-2]), sys_key[i-2]);
       }
       if (i == 6 || i == 7)
       {
@@ -1955,41 +1963,41 @@ void print_dlp_control (GtkTextBuffer * buf)
 
   if (tmp_field -> vdw_opts[0] == 1.0)
   {
-    print_info ("\n# Non bonded short range interactions - type vdW", NULL, buf);
-    print_control_float (buf, tmp_field -> vdw_opts[1], "\n# van Der Waals short range cutoff = ", " Ang.", "rvdw               ");
+    print_info (_("\n# Non-bonded short range interactions - type vdW"), NULL, buf);
+    print_control_float (buf, tmp_field -> vdw_opts[1], _("\n# van der Waals short range cutoff = "), " Ang.", "rvdw               ");
     if (tmp_field -> vdw_opts[2] == 1.0)
     {
-      print_control_string (buf, "direct", "\n# Enforce direct calculation of vdW interactions",
-                          "\n# Do not work with system using tabulated potentials", "vdw                ");
+      print_control_string (buf, "direct", _("\n# Enforce direct calculation of vdW interactions"),
+                                 _("\n# Do not work with system using tabulated potentials"), "vdw                ");
     }
     if (tmp_field -> vdw_opts[3] == 1.0)
     {
-      print_control_string (buf,  "shift", "\n# Apply force-shifting for vdW interactions", NULL, "vdw                ");
+      print_control_string (buf,  "shift", _("\n# Apply force-shifting for vdW interactions"), NULL, "vdw                ");
     }
     if (tmp_field -> vdw_opts[4] == 1.0)
     {
-      print_control_string (buf, vdw_key[(int)tmp_field -> vdw_opts[5]], "\n# Apply mixing rule of type: ", eval_vdw[(int)tmp_field -> vdw_opts[5]], "vdw mix            ");
+      print_control_string (buf, vdw_key[(int)tmp_field -> vdw_opts[5]], _("\n# Apply mixing rule of type: "), eval_vdw[(int)tmp_field -> vdw_opts[5]], "vdw mix            ");
     }
   }
   else
   {
-    print_control_string (buf, "vdw", "\n# No van der Waals interactions (short range)", NULL, "no                 ");
+    print_control_string (buf, "vdw", _("\n# No van der Waals interactions (short range)"), NULL, "no                 ");
   }
   print_info ("\n\n", NULL, buf);
 
   if (tmp_field -> elec_opts[0] == 1.0)
   {
-    print_info ("\n# Non bonded long range interactions", NULL, buf);
-    print_control_float (buf, tmp_field -> elec_opts[1], "\n# Electrostatics long range cutoff = ", " Ang.", "cut                ");
+    print_info (_("\n# Non-bonded long range interactions"), NULL, buf);
+    print_control_float (buf, tmp_field -> elec_opts[1], _("\n# Electrostatics long range cutoff = "), " Ang.", "cut                ");
     if (tmp_field -> elec_opts[2] == 1.0)
     {
-      print_control_float (buf, tmp_field -> elec_opts[3], "\n# Use optional padding to the cutoff = ", " Ang.", "pad                ");
+      print_control_float (buf, tmp_field -> elec_opts[3], _("\n# Use optional padding to the cutoff = "), " Ang.", "pad                ");
     }
     if (tmp_field -> elec_opts[4] == 1.0)
     {
-      print_control_key (buf, "\n# Use extended coulombic exclusion\n", "exclu");
+      print_control_key (buf, _("\n# Use extended coulombic exclusion\n"), "exclu");
     }
-    print_info ("\n# Electrostatics calculated using ", NULL, buf);
+    print_info (_("\n# Electrostatics calculated using "), NULL, buf);
     print_info (eval_m[(int)tmp_field -> elec_opts[5]], NULL, buf);
     print_info ("\n", NULL, buf);
     print_info (elec_key[(int)tmp_field -> elec_opts[5]], "bold", buf);
@@ -2009,30 +2017,30 @@ void print_dlp_control (GtkTextBuffer * buf)
 
     if (tmp_field -> elec_opts[5] == 2.0 || tmp_field -> elec_opts[5] == 3.0)
     {
-      print_control_int (buf, (int)tmp_field -> elec_opts[10], "\n# Evaluate k space contribution to the Ewald sum every: ", " MD step(s)", "ewald evalu        ");
+      print_control_int (buf, (int)tmp_field -> elec_opts[10], _("\n# Evaluate k space contribution to the Ewald sum every: "), _(" MD step(s)"), "ewald evalu        ");
     }
   }
   else
   {
-    print_control_string (buf, "elec", "# No electrostatics interactions (long range)", NULL, "no                 ");
+    print_control_string (buf, "elec", _("# No electrostatics interactions (long range)"), NULL, "no                 ");
   }
   print_info ("\n", NULL, buf);
 
   if (tmp_field -> met_opts[0] == 1.0 || tmp_field -> met_opts[1] == 1.0)
   {
-    print_info ("\n# Metallic interactions", NULL, buf);
+    print_info (_("\n# Metallic interactions"), NULL, buf);
   }
   if (tmp_field -> met_opts[0] == 1.0)
   {
-    print_control_string (buf, "direct", "\n# Enforce direct calculation of metal interactions", "\n# This does not work with metal alloy systems using the *EAM* potentials", "metal              ");
+    print_control_string (buf, "direct", _("\n# Enforce direct calculation of metal interactions"), _("\n# This does not work with metal alloy systems using the *EAM* potentials"), "metal              ");
   }
   if (tmp_field -> met_opts[1] == 1.0)
   {
-    print_control_string (buf, "sqrtrho", "\n# Switch the TABEAM default embedding functions, F, from F(ρ) to F(√ρ)", NULL, "metal              ");
+    print_control_string (buf, "sqrtrho", _("\n# Switch the TABEAM default embedding functions, F, from F(ρ) to F(√ρ)"), NULL, "metal              ");
   }
   if (tmp_field -> met_opts[0] == 1.0 || tmp_field -> met_opts[1] == 1.0) print_info ("\n", NULL, buf);
 
-  print_control_string (buf, ens_keyw[tmp_field -> ensemble], "\n# Thermostat information", NULL, "ensemble           ");
+  print_control_string (buf, ens_keyw[tmp_field -> ensemble], _("\n# Thermostat information"), NULL, "ensemble           ");
   if (tmp_field -> ensemble)
   {
     switch (tmp_field -> ensemble)
@@ -2077,29 +2085,29 @@ void print_dlp_control (GtkTextBuffer * buf)
   print_info ("\n\n", NULL, buf);
   if (tmp_field -> thermo_opts[6] == 1.0)
   {
-    print_info ("# Attach a pseudo thermal bath with:\n", NULL, buf);
+    print_info (_("# Attach a pseudo thermal bath with:\n"), NULL, buf);
     if (tmp_field -> thermo_opts[7] > 0.0)
     {
-      str = g_strdup_printf ("# - thermostat of type: %s\n", pseudo_thermo[(int)tmp_field -> thermo_opts[7] - 1]);
+      str = g_strdup_printf (_("# - thermostat of type: %s\n"), pseudo_thermo[(int)tmp_field -> thermo_opts[7] - 1]);
     }
     else
     {
-      str = g_strdup_printf ("# - thermostats of type Langevin and Direct applied successively\n");
+      str = g_strdup_printf (_("# - thermostats of type Langevin and Direct applied successively\n"));
     }
     print_info (str, NULL, buf);
     g_free (str);
-    str = g_strdup_printf ("# - thickness of thermostat layer to MD cell boundaries: %f Ang.\n", tmp_field -> thermo_opts[8]);
+    str = g_strdup_printf (_("# - thickness of thermostat layer to MD cell boundaries: %f Ang.\n"), tmp_field -> thermo_opts[8]);
     print_info (str, NULL, buf);
     g_free (str);
     if (tmp_field -> thermo_opts[9] > 0.0)
     {
-      str = g_strdup_printf ("# - Target temperature: %f K\n", tmp_field -> thermo_opts[9]);
+      str = g_strdup_printf (_("# - Target temperature: %f K\n"), tmp_field -> thermo_opts[9]);
       print_info (str, NULL, buf);
       g_free (str);
     }
     else
     {
-      print_info ("# - Target temperature: system target temperature\n", NULL, buf);
+      print_info (_("# - Target temperature: system target temperature\n"), NULL, buf);
     }
     print_info ("pseudo              ", "bold", buf);
     if (tmp_field -> thermo_opts[7] > 0.0)
@@ -2112,10 +2120,10 @@ void print_dlp_control (GtkTextBuffer * buf)
   }
 
   // MD information
-  print_info ("# Molecular dynamics information\n", NULL, buf);
+  print_info (_("# Molecular dynamics information\n"), NULL, buf);
   for (i=0; i<2+(int)tmp_field -> md_opts[1]; i++)
   {
-    print_control_key (buf, md_text[i],  md_keyw[i]);
+    print_control_key (buf, _(md_text[i]),  md_keyw[i]);
     switch (i)
     {
       case 0:
@@ -2139,39 +2147,39 @@ void print_dlp_control (GtkTextBuffer * buf)
 
   if (tmp_field -> md_opts[3] == 1.0)
   {
-    print_control_float (buf, tmp_field -> md_opts[4], "# Variable time step, initial time step = ", " ps", "variable timestep  ");
-    print_control_float (buf, tmp_field -> md_opts[6], "\n# Maximum time step allowed = ", " ps", "mxstep             ");
-    print_control_float (buf, tmp_field -> md_opts[7], "\n# Maximum move allowed = ", " Ang.", "maxdis             ");
-    print_control_float (buf, tmp_field -> md_opts[8], "\n# Minimum move allowed = ", " Ang.", "mindis             ");
+    print_control_float (buf, tmp_field -> md_opts[4], _("# Variable time step, initial time step = "), " ps", "variable timestep  ");
+    print_control_float (buf, tmp_field -> md_opts[6], _("\n# Maximum time step allowed = "), " ps", "mxstep             ");
+    print_control_float (buf, tmp_field -> md_opts[7], _("\n# Maximum move allowed = "), " Ang.", "maxdis             ");
+    print_control_float (buf, tmp_field -> md_opts[8], _("\n# Minimum move allowed = "), " Ang.", "mindis             ");
   }
   else
   {
-    print_control_float (buf, tmp_field -> md_opts[4], "# MD time step = ", " fs", "timestep           ");
+    print_control_float (buf, tmp_field -> md_opts[4], _("# MD time step = "), " fs", "timestep           ");
   }
 
-  print_control_int (buf, (int)tmp_field -> md_opts[9], "\n# Shake / Rattle iterations limit: ", " cycle(s)", "mxshak             ");
-  print_control_sci (buf, tmp_field -> md_opts[10], "\n# Shake / Rattle tolerance: ", NULL, "shake               ");
+  print_control_int (buf, (int)tmp_field -> md_opts[9], _("\n# Shake / Rattle iterations limit: "), _(" cycle(s)"), "mxshak             ");
+  print_control_sci (buf, tmp_field -> md_opts[10], _("\n# Shake / Rattle tolerance: "), NULL, "shake               ");
 
   if (tmp_field -> md_opts[1] == 1.0)
   {
-    print_control_int (buf, (int)tmp_field -> md_opts[11], "\n# FIQA iterations limit: ", " cycle(s)", "mxquat             ");
-    print_control_sci (buf, tmp_field -> md_opts[12], "\n# Quaternion tolerance: ", NULL, "quater              ");
+    print_control_int (buf, (int)tmp_field -> md_opts[11], _("\n# FIQA iterations limit: "), _(" cycle(s)"), "mxquat             ");
+    print_control_sci (buf, tmp_field -> md_opts[12], _("\n# Quaternion tolerance: "), NULL, "quater              ");
   }
 
   if (tmp_field -> md_opts[13] == 1.0)
   {
-      print_info ("\n\n# Initiate impact on particle\n#  - with particle index: ", NULL, buf);
+      print_info (_("\n\n# Initiate impact on particle\n#  - with particle index: "), NULL, buf);
       str = g_strdup_printf ("%d", (int)tmp_field -> md_opts[14]);
       print_info (str, NULL, buf);
-      print_info ("\n#  - at MD step: ", NULL, buf);
+      print_info (_("\n#  - at MD step: "), NULL, buf);
       str = g_strdup_printf ("%d", (int)tmp_field -> md_opts[15]);
       print_info (str, NULL, buf);
       g_free (str);
-      print_info ("\n#  - with energy (k eV): ", NULL, buf);
+      print_info (_("\n#  - with energy (k eV): "), NULL, buf);
       str = g_strdup_printf ("%f", tmp_field -> md_opts[16]);
       print_info (str, NULL, buf);
       g_free (str);
-      print_info ("\n#  - direction (x, y, z): ", NULL, buf);
+      print_info (_("\n#  - direction (x, y, z): "), NULL, buf);
       str = g_strdup_printf ("%f %f %f", tmp_field -> md_opts[17], tmp_field -> md_opts[18], tmp_field -> md_opts[19]);
       print_info (str, NULL, buf);
       g_free (str);
@@ -2185,23 +2193,23 @@ void print_dlp_control (GtkTextBuffer * buf)
   if (tmp_field -> equi_opts[0] == 1.0)
   {
     // Equilibration information
-    print_info ("\n\n# Equilibration information", NULL, buf);
-    print_control_int (buf, (int)tmp_field -> equi_opts[1], "\n# Equilibrate during: ", " MD step(s)", "equil              ");
+    print_info (_("\n\n# Equilibration information"), NULL, buf);
+    print_control_int (buf, (int)tmp_field -> equi_opts[1], _("\n# Equilibrate during: "), _(" MD step(s)"), "equil              ");
     if (tmp_field -> equi_opts[2] == 1.0)
     {
-      print_control_int (buf, (int)tmp_field -> equi_opts[3], "\n# During equilibration: rescale system temperature every: ", " MD step(s)", "scale              ");
+      print_control_int (buf, (int)tmp_field -> equi_opts[3], _("\n# During equilibration: rescale system temperature every: "), _(" MD step(s)"), "scale              ");
     }
     if (tmp_field -> equi_opts[4] == 1.0)
     {
-      print_control_float (buf, tmp_field -> equi_opts[5], "\n# During equilibration: cap forces, with fmax= ", " Kb T Ang-1", "cap                ");
+      print_control_float (buf, tmp_field -> equi_opts[5], _("\n# During equilibration: cap forces, with fmax= "), " Kb T Ang-1", "cap                ");
     }
     if (tmp_field -> equi_opts[6] == 1.0)
     {
-      print_control_int (buf, (int)tmp_field -> equi_opts[7], "\n# During equilibration: resample the instantaneous momenta distribution every: ", " MD step(s)", "regaus             ");
+      print_control_int (buf, (int)tmp_field -> equi_opts[7], _("\n# During equilibration: resample the instantaneous momenta distribution every: "), _(" MD step(s)"), "regaus             ");
     }
     if (tmp_field -> equi_opts[8] == 1.0)
     {
-      str = g_strdup_printf ("\n# Every %d step(s) during equilibration: minimize %s with target %s= %f\n",
+      str = g_strdup_printf (_("\n# Every %d step(s) during equilibration: minimize %s with target %s= %f\n"),
                              (int)tmp_field -> equi_opts[11], min_key[(int)tmp_field -> equi_opts[9]], min_key[(int)tmp_field -> equi_opts[9]], tmp_field -> equi_opts[10]);
       print_control_key (buf, str, "minim              ");
       g_free (str);
@@ -2212,7 +2220,7 @@ void print_dlp_control (GtkTextBuffer * buf)
     }
     if (tmp_field -> equi_opts[12] == 1.0)
     {
-      str = g_strdup_printf ("# At the start of the equilibration: minimize %s with target %s= %f\n",
+      str = g_strdup_printf (_("# At the start of the equilibration: minimize %s with target %s= %f\n"),
                              min_key[(int)tmp_field -> equi_opts[13]], min_key[(int)tmp_field -> equi_opts[13]], tmp_field -> equi_opts[14]);
       print_control_key (buf, str, "optim              ");
       g_free (str);
@@ -2222,127 +2230,127 @@ void print_dlp_control (GtkTextBuffer * buf)
     }
     if (tmp_field -> equi_opts[15] == 1.0)
     {
-      print_control_key (buf, "# During equilibration: perform a zero temperature MD minimization\n", "zero");
+      print_control_key (buf, _("# During equilibration: perform a zero temperature MD minimization\n"), "zero");
       print_info ("\n", NULL, buf);
     }
     if (tmp_field -> equi_opts[16] == 1.0)
     {
-      print_control_key (buf, "# Include equilibration data in overall statistics\n", "collect");
+      print_control_key (buf, _("# Include equilibration data in overall statistics\n"), "collect");
       print_info ("\n", NULL, buf);
     }
   }
 
   if (print_ana())
   {
-    print_info ("\n# Analysis information", NULL, buf);
+    print_info (_("\n# Analysis information"), NULL, buf);
     if (tmp_field -> ana_opts[0] == 1.0)
     {
-      print_control_string (buf, "all", "\n# Calculate and collect all intra-molecular PDFs", NULL, "ana                ");
+      print_control_string (buf, "all", _("\n# Calculate and collect all intra-molecular PDFs"), NULL, "ana                ");
       for (k=1; k<3; k++) print_int (buf, (int)tmp_field -> ana_opts[k]);
       print_float (buf, tmp_field -> ana_opts[3]);
     }
     if (tmp_field -> ana_opts[4] == 1.0)
     {
-      print_control_string (buf, "bon", "\n# Calculate and collect bonds PDFs", NULL, "ana                ");
+      print_control_string (buf, "bon", _("\n# Calculate and collect bonds PDFs"), NULL, "ana                ");
       for (k=5; k<6; k++) print_int (buf, (int)tmp_field -> ana_opts[k]);
       print_float (buf, tmp_field -> ana_opts[7]);
     }
     if (tmp_field -> ana_opts[8] == 1.0)
     {
-      print_control_string (buf, "ang", "\n# Calculate and collect angles PDFs", NULL, "ana                ");
+      print_control_string (buf, "ang", _("\n# Calculate and collect angles PDFs"), NULL, "ana                ");
       for (k=9; k<11; k++) print_int (buf, (int)tmp_field -> ana_opts[k]);
     }
     if (tmp_field -> ana_opts[11] == 1.0)
     {
-      print_control_string (buf, "dih", "\n# Calculate and collect dihedrals PDFs", NULL, "ana                ");
+      print_control_string (buf, "dih", _("\n# Calculate and collect dihedrals PDFs"), NULL, "ana                ");
       for (k=12; k<14; k++) print_int (buf, (int)tmp_field -> ana_opts[k]);
     }
     if (tmp_field -> ana_opts[14] == 1.0)
     {
-      print_control_string (buf, "inv", "\n# Calculate and collect inversions PDFs", NULL, "ana                ");
+      print_control_string (buf, "inv", _("\n# Calculate and collect inversions PDFs"), NULL, "ana                ");
       for (k=15; k<17; k++) print_int (buf, (int)tmp_field -> ana_opts[k]);
     }
-    print_control_string (buf, "ana", "\n# Print any opted for analysis inter and intra-molecular PDFs", NULL, "print              ");
+    print_control_string (buf, "ana", _("\n# Print any opted for analysis inter and intra-molecular PDFs"), NULL, "print              ");
   }
 
   print_info ("\n", NULL, buf);
 
   if (tmp_field -> out_opts[21] == 1.0 || tmp_field -> out_opts[27] == 1.0)
   {
-    print_control_float (buf, tmp_field -> out_opts[23], "\n# Bin size for RDfs and Z-density distribution: ", " Ang.", "binsize            ");
+    print_control_float (buf, tmp_field -> out_opts[23], _("\n# Bin size for RDfs and Z-density distribution: "), " Ang.", "binsize            ");
   }
   if (tmp_field -> out_opts[21] == 1.0)
   {
-    print_control_int (buf, (int)tmp_field -> out_opts[22], "\n# Calculate and collect radial distribution functions every: ", " MD step(s)", "rdf                ");
+    print_control_int (buf, (int)tmp_field -> out_opts[22], _("\n# Calculate and collect radial distribution functions every: "), _(" MD step(s)"), "rdf                ");
     print_info ("\n", NULL, buf);
     print_control_string (buf, "rdf", NULL, NULL, "print              ");
   }
   if (tmp_field -> out_opts[27] == 1.0)
   {
-    print_control_int (buf, (int)tmp_field -> out_opts[28], "\n# Calculate and collect Z-density profile every: ", " MD step(s)", "zden               ");
+    print_control_int (buf, (int)tmp_field -> out_opts[28], _("\n# Calculate and collect Z-density profile every: "), _(" MD step(s)"), "zden               ");
     print_info ("\n", NULL, buf);
     print_control_string (buf, "zden", NULL, NULL, "print              ");
   }
   if (tmp_field -> out_opts[24] == 1.0)
   {
-    print_control_key (buf, "\n# Velocity autocorrelation functions, VAFs\n", "vaf                ");
+    print_control_key (buf, _("\n# Velocity autocorrelation functions, VAFs\n"), "vaf                ");
     for (k=25; k<27; k++) print_int (buf, (int)tmp_field -> out_opts[k]);
     print_info ("\n", NULL, buf);
     print_control_string (buf, "vaf", NULL, NULL, "print              ");
     if (tmp_field -> out_opts[29] == 1.0)
     {
-      print_control_string (buf, "vafav", "\n# Ignore time averaging for the VAFs", NULL, "no                 ");
+      print_control_string (buf, "vafav", _("\n# Ignore time averaging for the VAFs"), NULL, "no                 ");
     }
   }
 
   if ((int)tmp_field -> out_opts[0] || (int)tmp_field -> out_opts[4] || (int)tmp_field -> out_opts[8]
    || (int)tmp_field -> out_opts[12] || (int)tmp_field -> out_opts[15] || (int)tmp_field -> out_opts[17] || (int)tmp_field -> out_opts[19])
   {
-    print_info ("\n\n# Output information", NULL, buf);
+    print_info (_("\n\n# Output information"), NULL, buf);
     if ((int)tmp_field -> out_opts[0])
     {
-      print_control_key (buf, "\n# Write defects trajectory file, DEFECTS\n", "defe               ");
+      print_control_key (buf, _("\n# Write defects trajectory file, DEFECTS\n"), "defe               ");
       for (k=1; k<3; k++) print_int (buf, (int)tmp_field -> out_opts[k]);
       print_float (buf, tmp_field -> out_opts[3]);
     }
     if ((int)tmp_field -> out_opts[4])
     {
-      print_control_key (buf, "\n# Write displacement trajectory file, RSDDAT\n", "disp               ");
+      print_control_key (buf, _("\n# Write displacement trajectory file, RSDDAT\n"), "disp               ");
       for (k=5; k<7; k++) print_int (buf, (int)tmp_field -> out_opts[k]);
       print_float (buf, tmp_field -> out_opts[7]);
     }
     if ((int)tmp_field -> out_opts[8])
     {
-      print_control_key (buf, "\n# Write HISTORY file\n", "traj               ");
+      print_control_key (buf, _("\n# Write HISTORY file\n"), "traj               ");
       for (k=9; k<11; k++) print_int (buf, (int)tmp_field -> out_opts[k]);
       print_float (buf, tmp_field -> out_opts[11]);
     }
     if ((int)tmp_field -> out_opts[12])
     {
-      print_control_key (buf, "\n# Write MSDTMP file\n", "msdtmp             ");
+      print_control_key (buf, _("\n# Write MSDTMP file\n"), "msdtmp             ");
       for (k=13; k<15; k++) print_int (buf, (int)tmp_field -> out_opts[k]);
     }
     if ((int)tmp_field -> out_opts[15])
     {
-      print_control_int (buf, (int)tmp_field -> out_opts[16], "\n# Print system data every: ", " MD step(s)", "print              ");
+      print_control_int (buf, (int)tmp_field -> out_opts[16], _("\n# Print system data every: "), _(" MD step(s)"), "print              ");
     }
     if ((int)tmp_field -> out_opts[17])
     {
-      print_control_int (buf, (int)tmp_field -> out_opts[18], "\n# Accumulate statics data every: ", " MD step(s)", "stats              ");
+      print_control_int (buf, (int)tmp_field -> out_opts[18], _("\n# Accumulate statics data every: "), _(" MD step(s)"), "stats              ");
     }
     if ((int)tmp_field -> out_opts[19])
     {
-      print_control_int (buf, (int)tmp_field -> out_opts[20], "\n# Set rolling average stack to: ", " MD step(s)", "stack              ");
+      print_control_int (buf, (int)tmp_field -> out_opts[20], _("\n# Set rolling average stack to: "), _(" MD step(s)"), "stack              ");
     }
   }
 
-  print_control_int (buf, (int)tmp_field -> out_opts[30], "\n# Dump restart information every: ", " MD step(s)", "dump               ");
+  print_control_int (buf, (int)tmp_field -> out_opts[30], _("\n# Dump restart information every: "), _(" MD step(s)"), "dump               ");
 
   for (i=0; i<2; i++)
   {
     if (tmp_field -> io_opts[2*i] == 1.0)
     {
-      print_control_float (buf, tmp_field -> io_opts[2*i+1], time_inf[i], " s", time_key[i]);
+      print_control_float (buf, tmp_field -> io_opts[2*i+1], _(time_inf[i]), " s", time_key[i]);
     }
   }
   print_info ("\n", NULL, buf);
@@ -2352,43 +2360,43 @@ void print_dlp_control (GtkTextBuffer * buf)
     if (tmp_field -> io_opts[j] == 1.0)
     {
       j ++;
-      print_info (io_inf[i], NULL, buf);
-      print_info ("#  - method = ", NULL, buf);
+      print_info (_(io_inf[i]), NULL, buf);
+      print_info (_("#  - method = "), NULL, buf);
       print_info (io_rw_m[(int)tmp_field -> io_opts[j]], NULL, buf);
       j++;
       if (i)
       {
         if (tmp_field -> io_opts[j-1] == 3.0)
         {
-          print_info ("\n#  - precision = ", NULL, buf);
+          print_info (_("\n#  - precision = "), NULL, buf);
           print_info (io_pres[(int)tmp_field -> io_opts[j]], NULL, buf);
         }
         j ++;
-        print_info ("\n#  - type = ", NULL, buf);
+        print_info (_("\n#  - type = "), NULL, buf);
         print_info (io_typ[(int)tmp_field -> io_opts[j]], NULL, buf);
         j++;
       }
       if (tmp_field -> io_opts[4+7*i] != 2.0)
       {
-        print_info ("\n#  - j, reader count = ", NULL, buf);
+        print_info (_("\n#  - j, reader count = "), NULL, buf);
         str_a = g_strdup_printf ("%d", (int)tmp_field -> io_opts[j]);
         print_info (str_a, NULL, buf);
       }
       j++;
       if (tmp_field -> io_opts[4+7*i] != 2.0)
       {
-        print_info ("\n#  - k, batch size = ", NULL, buf);
+        print_info (_("\n#  - k, batch size = "), NULL, buf);
         str_b = g_strdup_printf ("%d", (int)tmp_field -> io_opts[j]);
         print_info (str_b, NULL, buf);
       }
       j++;
-      print_info ("\n#  - l, buffer size = ", NULL, buf);
+      print_info (_("\n#  - l, buffer size = "), NULL, buf);
       str_c = g_strdup_printf ("%d", (int)tmp_field -> io_opts[j]);
       print_info (str_c, NULL, buf);
       j++;
       if (tmp_field -> io_opts[4+7*i] != 2.0)
       {
-        print_info ("\n#  - e, parallel error check is ", NULL, buf);
+        print_info (_("\n#  - e, parallel error check is "), NULL, buf);
         print_info (io_pec[(int)tmp_field -> io_opts[j]], NULL, buf);
       }
       print_info (io_key[i], "bold", buf);
@@ -2424,13 +2432,13 @@ void print_dlp_control (GtkTextBuffer * buf)
   }
   if (tmp_field -> io_opts[18] == 1.0)
   {
-    print_control_key (buf, "\n# Seeds for the random number generators\n", "seed               ");
+    print_control_key (buf, _("\n# Seeds for the random number generators\n"), "seed               ");
     for (i=19; i<22; i++) print_int (buf, (int)tmp_field -> io_opts[i]);
     print_info ("\n", NULL, buf);
   }
   if (tmp_field -> io_opts[22] == 1.0)
   {
-    print_control_key (buf, "\n# Limits to 2 the number of processors in z direction for slab simulations\n", "slab");
+    print_control_key (buf, _("\n# Limits to 2 the number of processors in z direction for slab simulations\n"), "slab");
   }
 
   print_info ("\n\n", NULL, buf);

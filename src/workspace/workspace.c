@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file workspace.c
@@ -86,22 +86,12 @@ GdkPixbuf * wpix = NULL;
 gchar * wchar = NULL;
 int projects_in_workspace = 0;
 
-char * work_menu_items[NITEMS-2] = {"Workspace                ",
-                                    "Settings                 ",
-                                   //"OpenGL - 3D              ",
-                                    "Visualization            ",
-                                   //"Calc. visualization      ",
-                                    "Analysis                 ",
-                                    "g(r)/G(r)                ",
-                                    "S(q) from g(r)           ",
-                                    "S(q) from Debye equation ",
-                                    "g(r) from FFT[S(q) Debye]",
-                                    "Bonding information      ",
-                                    "Angle distribution       ",
-                                    "Ring statistics          ",
-                                    "Chain statistics         ",
-                                    "Spherical harmonics      ",
-                                    "Mean Square Displacement "};
+char * work_menu_items[NITEMS] = {i18n("Workspace                "),
+                                  i18n("Settings                 "),
+                                  //i18n("OpenGL - 3D            "),
+                                  i18n("Visualization            "),
+                                  //i18n("Calc. visualization    "),
+                                  i18n("Analysis                 ")};
 
 /*!
   \fn void add_project (GtkTreeStore * store, int i)
@@ -118,35 +108,33 @@ void add_project (GtkTreeStore * store, int i)
   GtkTreeIter steplevel;
   GtkTreeIter optslevel;
   gtk_tree_store_append (store, & piter[i], & worklevel);
+  project * this_proj = get_project_by_id(i);
   if (i == activep)
   {
-    tmp = g_strdup_printf ("<b>%s</b>", active_project -> name);
+    tmp = g_strdup_printf ("<b>%s</b>", this_proj -> name);
   }
   else
   {
-    tmp = g_strdup_printf ("%s", get_project_by_id(i) -> name);
+    tmp = g_strdup_printf ("%s", this_proj -> name);
   }
   gtk_tree_store_set (store, & piter[i], 0, THETD, 1, tmp, 2, -1, -1);
   prpath[i] = gtk_tree_model_get_path (GTK_TREE_MODEL(store), & piter[i]);
   g_free (tmp);
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, SETTING, 1, work_menu_items[1], 2, -3, -1);
+  gtk_tree_store_set (store, & steplevel, 0, SETTING, 1, _(work_menu_items[1]), 2, -3, -1);
   // OpenGL
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, OGLM, 1, work_menu_items[2], 2, -2, -1);
-  //gtk_tree_store_append (store, & optslevel, & steplevel);
-  //gtk_tree_store_set (store, & optslevel, 0, OGLM, 1, work_menu_items[3], 2, -1, -1);
-  //gtk_tree_store_append (store, & optslevel, & steplevel);
-  //gtk_tree_store_set (store, & optslevel, 0, OGLC, 1, work_menu_items[4], 2, -1, -1);
+  gtk_tree_store_set (store, & steplevel, 0, OGLM, 1, _(work_menu_items[2]), 2, -2, -1);
   // Calculations
   gtk_tree_store_append (store, & steplevel, & piter[i]);
-  gtk_tree_store_set (store, & steplevel, 0, RUN, 1, work_menu_items[3], 2, -1, -1);
-  for (j=0; j<NCALCS-2; j++)
+  gtk_tree_store_set (store, & steplevel, 0, RUN, 1, _(work_menu_items[3]), 2, -1, -1);
+
+  for (j=0; j<NCALCS; j++)
   {
-    if (j < NCALCS-3 || get_project_by_id(i) -> steps > 1)
+    if (j < NCALCS-2 || get_project_by_id(i) -> steps > 1)
     {
       gtk_tree_store_append (store, & optslevel, & steplevel);
-      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, work_menu_items[4+j], 2, j, -1);
+      gtk_tree_store_set (store, & optslevel, 0, gdk_pixbuf_new_from_file(graph_img[j], NULL), 1, _(graph_name[j]), 2, j, -1);
     }
   }
   gtk_tree_view_expand_to_path (GTK_TREE_VIEW(worktree), gtk_tree_model_get_path(GTK_TREE_MODEL(store), & worklevel));
@@ -165,14 +153,14 @@ static void fill_workspace (GtkTreeStore * store)
   int i;
 
   gtk_tree_store_append (store, & worklevel, NULL);
-  gtk_tree_store_set (store, & worklevel, 0, THETD, 1, work_menu_items[0], 2, -4, -1);
+  gtk_tree_store_set (store, & worklevel, 0, THETD, 1, _(work_menu_items[0]), 2, -4, -1);
 
   if (piter != NULL) g_free (piter);
   if (prpath != NULL) g_free (prpath);
   if (nprojects > 0)
   {
-    piter = g_malloc (nprojects*sizeof*piter);
-    prpath = g_malloc (nprojects*sizeof*prpath);
+    piter = g_malloc0(nprojects*sizeof*piter);
+    prpath = g_malloc0(nprojects*sizeof*prpath);
   }
   for (i=0; i<nprojects; i++)
   {
@@ -311,7 +299,6 @@ G_MODULE_EXPORT void workspace_ondc (GtkTreeView * treeview,
       g_debug ("WORKSPACE_ONDC: wchar = %s", wchar);
 #endif
       gtk_tree_model_get (model, & iter, 2, & i, -1);
-      i += 4;
 #ifdef DEBUG
       g_debug ("WORKSPACE_ONDC: creating view id= %d", i);
 #endif
@@ -320,7 +307,7 @@ G_MODULE_EXPORT void workspace_ondc (GtkTreeView * treeview,
       g_debug ("WORKSPACE_ONDC: for project= %d", j);
 #endif
       if (j < 0) j = activep;
-      if (i == 2) prep_model (j);
+      if (i == -2) prep_model (j);
       workinfo (get_project_by_id(j), i);
     }
   }
@@ -359,9 +346,9 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
   int i, j, k;
   gchar * tmp;
   i = GPOINTER_TO_INT (edata);
-  tmp = g_strdup_printf ("Please enter a new name for project N°%d", i);
+  tmp = g_strdup_printf (_("Please enter a new name for project N°%d"), i);
   project * this_proj = get_project_by_id(i);
-  tmp = cask(tmp, "Project name", i, this_proj -> name, MainWindow);
+  tmp = cask(tmp, _("Project name"), i, this_proj -> name, MainWindow);
   if (tmp != NULL)
   {
     this_proj -> name = g_strdup_printf ("%s", tmp);
@@ -378,56 +365,56 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     {
       if (this_proj -> modelgl -> win  != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> win, g_strdup_printf ("%s - 3D view - [%s mode]", tmp_title, mode_name[this_proj -> modelgl -> mode]));
+        correct_this_window_title (this_proj -> modelgl -> win, g_strdup_printf (_("%s - 3D view - [%s mode]"), tmp_title, _(mode_name[this_proj -> modelgl -> mode])));
       }
-      gchar * win_title[2]={"Atom(s) configuration", "Clone(s) configuration"};
+      gchar * win_title[2]={i18n("Atom(s) configuration"), i18n("Clone(s) configuration")};
       for (j=0; j<2; j++)
       {
         if (this_proj -> modelgl -> model_win[j] != NULL)
         {
-          correct_this_window_title (this_proj -> modelgl -> model_win[j] -> win, g_strdup_printf ("%s - %s", win_title[j], tmp_title));
+          correct_this_window_title (this_proj -> modelgl -> model_win[j] -> win, g_strdup_printf ("%s - %s", _(win_title[j]), tmp_title));
         }
       }
       if (this_proj -> modelgl -> coord_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> coord_win -> win, g_strdup_printf ("Environments configuration - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> coord_win -> win, g_strdup_printf (_("Environments configuration - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> atom_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> atom_win -> win, g_strdup_printf ("Model edition - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> atom_win -> win, g_strdup_printf (_("Model edition - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> cell_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> cell_win -> win, g_strdup_printf ("Cell edition - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> cell_win -> win, g_strdup_printf (_("Cell edition - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> opengl_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> opengl_win -> win, g_strdup_printf ("OpenGL material aspect and light settings - %s", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> opengl_win -> win, g_strdup_printf (_("OpenGL material aspect and light settings - %s"), tmp_title));
       }
       if (this_proj -> modelgl -> spiner != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> spiner -> win, g_strdup_printf ("%s - spin", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> spiner -> win, g_strdup_printf (_("%s - spin"), tmp_title));
       }
       if (this_proj -> modelgl -> player != NULL)
       {
         j = this_proj -> modelgl -> anim -> last -> img -> step;
-        correct_this_window_title (this_proj -> modelgl -> player -> win, g_strdup_printf ("%s - player - step %d", tmp_title, j));
+        correct_this_window_title (this_proj -> modelgl -> player -> win, g_strdup_printf (_("%s - player - step %d"), tmp_title, j));
       }
       if (this_proj -> modelgl -> measure_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> measure_win -> win, g_strdup_printf ("%s - measures", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> measure_win -> win, g_strdup_printf (_("%s - measures"), tmp_title));
       }
       if (this_proj -> modelgl -> gradient_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> gradient_win -> win, g_strdup_printf ("%s - background settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> gradient_win -> win, g_strdup_printf (_("%s - background settings"), tmp_title));
       }
       if (this_proj -> modelgl -> box_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> box_win -> win, g_strdup_printf ("%s - box settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> box_win -> win, g_strdup_printf (_("%s - box settings"), tmp_title));
       }
       if (this_proj -> modelgl -> axis_win != NULL)
       {
-        correct_this_window_title (this_proj -> modelgl -> axis_win -> win, g_strdup_printf ("%s - axis settings", tmp_title));
+        correct_this_window_title (this_proj -> modelgl -> axis_win -> win, g_strdup_printf (_("%s - axis settings"), tmp_title));
       }
       if (this_proj -> modelgl -> rep_win != NULL)
       {
@@ -435,15 +422,15 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
       }
     }
     g_free (tmp_title);
-    for (j=0; j<NGRAPHS; j++)
+    for (j=0; j<NCALCS; j++)
     {
-      if (this_proj -> initok[j])
+      if (this_proj -> analysis[j] -> init_ok)
       {
-        for (k=0; k<this_proj -> numc[j]; k++)
+        for (k=0; k<this_proj -> analysis[j] -> numc; k++)
         {
-          if (this_proj -> curves[j][k] -> window != NULL)
+          if (this_proj -> analysis[j] -> curves[k] -> window != NULL)
           {
-            correct_this_window_title (this_proj -> curves[j][k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[j][k] -> name));
+            correct_this_window_title (this_proj -> analysis[j] -> curves[k] -> window, g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> analysis[j] -> curves[k] -> name));
           }
         }
       }
@@ -451,7 +438,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     if (activep == i)
     {
       correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title(active_project -> name)));
-      correct_this_window_title (curvetoolbox, g_strdup_printf ("Toolboxes - %s", prepare_for_title(active_project -> name)));
+      correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
     }
   }
 }
@@ -485,7 +472,7 @@ void workspace_menu (GtkWidget * tree, gpointer event, double x, double y)
 #ifdef GTK3
   pop_menu_at_pointer (menu, (GdkEvent *)event);
 #else
-  gtk_widget_set_parent (menu, MainWindow);
+  gtk_widget_set_parent (menu, tree);
   pop_menu_at_pointer (menu, x, y);
 #endif
 }
@@ -551,8 +538,8 @@ GtkWidget * create_workspace_tree ()
 
   worktree = destroy_this_widget (worktree);
   workstore = gtk_tree_store_new (3, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
-  fill_workspace (workstore);
   worktree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(workstore));
+  fill_workspace (workstore);
   g_object_unref (workstore);
 
 
@@ -615,15 +602,15 @@ void add_project_to_workspace ()
     if (projects_in_workspace > 0)
     {
       GtkTreeIter ** tmpiter;
-      tmpiter = g_malloc (projects_in_workspace*sizeof*tmpiter);
+      tmpiter = g_malloc0(projects_in_workspace*sizeof*tmpiter);
       for (i=0; i<projects_in_workspace; i++)
       {
         tmpiter[i] = gtk_tree_iter_copy (& piter[i]);
       }
       if (piter != NULL) g_free (piter);
       if (prpath != NULL) g_free (prpath);
-      piter = g_malloc ((projects_in_workspace+1)*sizeof*piter);
-      prpath = g_malloc ((projects_in_workspace+1)*sizeof*prpath);
+      piter = g_malloc0((projects_in_workspace+1)*sizeof*piter);
+      prpath = g_malloc0((projects_in_workspace+1)*sizeof*prpath);
       for (i=0; i<projects_in_workspace; i++)
       {
         piter[i] = * gtk_tree_iter_copy (tmpiter[i]);
@@ -636,8 +623,8 @@ void add_project_to_workspace ()
     {
       if (prpath != NULL) g_free (prpath);
       if (piter != NULL) g_free (piter);
-      piter = g_malloc ((projects_in_workspace+1)*sizeof*piter);
-      prpath = g_malloc ((projects_in_workspace+1)*sizeof*prpath);
+      piter = g_malloc0((projects_in_workspace+1)*sizeof*piter);
+      prpath = g_malloc0((projects_in_workspace+1)*sizeof*prpath);
     }
     add_project (workstore, activep);
     newspace = FALSE;
@@ -681,7 +668,7 @@ void remove_project_from_workspace (int id)
     }
     if (projects_in_workspace > 1)
     {
-      tmpiter = g_malloc ((projects_in_workspace-1)*sizeof*tmpiter);
+      tmpiter = g_malloc0((projects_in_workspace-1)*sizeof*tmpiter);
       j = -1;
       for (i=0; i<projects_in_workspace; i++)
       {
@@ -695,8 +682,8 @@ void remove_project_from_workspace (int id)
       g_free (piter);
       g_free (prpath);
       projects_in_workspace --;
-      piter = g_malloc (projects_in_workspace*sizeof*piter);
-      prpath = g_malloc (projects_in_workspace*sizeof*prpath);
+      piter = g_malloc0(projects_in_workspace*sizeof*piter);
+      prpath = g_malloc0(projects_in_workspace*sizeof*prpath);
       j = -1;
       for (i=0; i<projects_in_workspace+1; i++)
       {

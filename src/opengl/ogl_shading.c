@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file ogl_shading.c
@@ -40,6 +40,7 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   gboolean in_md_shaders (project * this_proj, int id);
   gboolean glsl_disable_cull_face (glsl_program * glsl);
 
+  void allocate_instances (object_3d * object);
   void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string);
   void glsl_bind_points (glsl_program * glsl, object_3d * obj);
   void glsl_bind_spheres (glsl_program * glsl, object_3d * obj);
@@ -58,14 +59,20 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   void init_shaders (glwin * view);
   void set_lights_data (glsl_program * glsl);
   void shading_glsl_text (glsl_program * glsl);
+  void update_ray_instances (glsl_program * glsl);
   void render_this_shader (glsl_program * glsl, int ids);
   void draw_vertices (int id);
 
+  glsl_program * free_this_glsl_program (glsl_program * glsl);
   glsl_program * init_shader_program (int object, int object_id,
                                       const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                       GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj);
 
   object_3d * duplicate_object_3d (object_3d * old_obj);
+
+*
+* Notes:
+*
 
 */
 
@@ -98,9 +105,9 @@ GLuint create_shader (int type, const GLchar * src)
     int log_len;
     char *buffer;
     glGetShaderiv (shader, GL_INFO_LOG_LENGTH, & log_len);
-    buffer = g_malloc (log_len + 1);
+    buffer = g_malloc0(log_len + 1);
     glGetShaderInfoLog (shader, log_len, NULL, buffer);
-    g_warning ("Compile failure in %s shader:\n%s",
+    g_warning (_("Compilation failure in %s shader:\n%s"),
                type == GL_VERTEX_SHADER ? "vertex" : "fragment",
                buffer);
 
@@ -130,10 +137,21 @@ GLuint * alloc_shader_pointer (GLuint * pointer, int shaders)
 }
 
 #define LIGHT_INFO     3
-#define MATERIAL_DATA  6
+#define MATERIAL_DATA  8
 #define FOG_DATA       5
 #define LIGHT_DATA    10
 
+/*!
+  \fn void allocate_instances (object_3d * object)
+
+  \brief allocate the instances buffer of a 3D object
+
+  \param object the target object_3d
+*/
+void allocate_instances (object_3d * object)
+{
+  object -> instances = allocfloat (object -> num_instances * object -> inst_buffer_size);
+}
 
 /*!
   \fn void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string)
@@ -148,7 +166,9 @@ GLuint * alloc_shader_pointer (GLuint * pointer, int shaders)
 */
 void set_light_uniform_location (GLuint * lightning, int id, int j, int k, char * string)
 {
-  lightning[LIGHT_INFO+MATERIAL_DATA+FOG_DATA+LIGHT_DATA*j+k] = glGetUniformLocation (id, g_strdup_printf ("AllLights[%d].%s", j, string));
+  gchar * light_string = g_strdup_printf ("AllLights[%d].%s", j, string);
+  lightning[LIGHT_INFO+MATERIAL_DATA+FOG_DATA+LIGHT_DATA*j+k] = glGetUniformLocation (id, light_string);
+  g_free (light_string);
 }
 
 /*!
@@ -163,19 +183,21 @@ GLuint * glsl_add_lights (glsl_program * glsl)
   int tot = MATERIAL_DATA + plot -> l_ghtning.lights * LIGHT_DATA + LIGHT_INFO + FOG_DATA;
   GLuint * lightning = allocgluint(tot);
   lightning[0]  = glGetUniformLocation (glsl -> id, "m_view");
-  lightning[1]  = glGetUniformLocation (glsl -> id, "lights_on");
-  lightning[2]  = glGetUniformLocation (glsl -> id, "mat.albedo");
-  lightning[3]  = glGetUniformLocation (glsl -> id, "mat.metallic");
-  lightning[4]  = glGetUniformLocation (glsl -> id, "mat.roughness");
-  lightning[5]  = glGetUniformLocation (glsl -> id, "mat.back_light");
-  lightning[6]  = glGetUniformLocation (glsl -> id, "mat.gamma");
-  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.alpha");
-  lightning[8]  = glGetUniformLocation (glsl -> id, "fog.mode");
-  lightning[9]  = glGetUniformLocation (glsl -> id, "fog.based");
-  lightning[10] = glGetUniformLocation (glsl -> id, "fog.density");
-  lightning[11] = glGetUniformLocation (glsl -> id, "fog.depth");
-  lightning[12] = glGetUniformLocation (glsl -> id, "fog.color");
-  lightning[13] = glGetUniformLocation (glsl -> id, "numLights");
+  lightning[1]  = glGetUniformLocation (glsl -> id, "m_proj");
+  lightning[2]  = glGetUniformLocation (glsl -> id, "view_is_ortho");
+  lightning[3]  = glGetUniformLocation (glsl -> id, "lights_on");
+  lightning[4]  = glGetUniformLocation (glsl -> id, "mat.albedo");
+  lightning[5]  = glGetUniformLocation (glsl -> id, "mat.metallic");
+  lightning[6]  = glGetUniformLocation (glsl -> id, "mat.roughness");
+  lightning[7]  = glGetUniformLocation (glsl -> id, "mat.ambient_occlusion");
+  lightning[8]  = glGetUniformLocation (glsl -> id, "mat.gamma");
+  lightning[9]  = glGetUniformLocation (glsl -> id, "mat.alpha");
+  lightning[10] = glGetUniformLocation (glsl -> id, "fog.mode");
+  lightning[11] = glGetUniformLocation (glsl -> id, "fog.based");
+  lightning[12] = glGetUniformLocation (glsl -> id, "fog.density");
+  lightning[13] = glGetUniformLocation (glsl -> id, "fog.depth");
+  lightning[14] = glGetUniformLocation (glsl -> id, "fog.color");
+  lightning[15] = glGetUniformLocation (glsl -> id, "numLights");
   int j;
   for (j=0; j<plot -> l_ghtning.lights; j++)
   {
@@ -190,6 +212,7 @@ GLuint * glsl_add_lights (glsl_program * glsl)
     set_light_uniform_location (lightning, glsl -> id, j, 8, "spot_inner");
     set_light_uniform_location (lightning, glsl -> id, j, 9, "spot_outer");
   }
+
   return lightning;
 }
 
@@ -336,6 +359,19 @@ void glsl_bind_cylinders (glsl_program * glsl, object_3d * obj)
   glEnableVertexAttribArray (glsl -> array_pointer[5]);
   glVertexAttribPointer (glsl -> array_pointer[5], 4, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (9*sizeof(GLfloat)));
   glVertexAttribDivisor (glsl -> array_pointer[5], 1);
+
+  if (obj -> inst_buffer_size == CYLI_BUFF_SIZE + 2)
+  {
+    glsl -> array_pointer[6] = glGetAttribLocation (glsl -> id, "r_sphere_a");
+    glsl -> array_pointer[7] = glGetAttribLocation (glsl -> id, "r_sphere_b");
+    glEnableVertexAttribArray (glsl -> array_pointer[6]);
+    glVertexAttribPointer (glsl -> array_pointer[6], 1, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (13*sizeof(GLfloat)));
+    glVertexAttribDivisor (glsl -> array_pointer[6], 1);
+
+    glEnableVertexAttribArray (glsl -> array_pointer[7]);
+    glVertexAttribPointer (glsl -> array_pointer[7], 1, GL_FLOAT, GL_FALSE, obj -> inst_buffer_size*sizeof(GLfloat), (GLvoid*) (14*sizeof(GLfloat)));
+    glVertexAttribDivisor (glsl -> array_pointer[7], 1);
+  }
 }
 
 /*!
@@ -509,7 +545,7 @@ void glsl_bind_string (glsl_program * glsl, object_3d * obj)
 */
 object_3d * duplicate_object_3d (object_3d * old_obj)
 {
-  object_3d * new_obj = g_malloc0 (sizeof*new_obj);
+  object_3d * new_obj = g_malloc0(sizeof*new_obj);
   new_obj -> quality = old_obj -> quality;
   // Vertices
   new_obj -> num_vertices = old_obj -> num_vertices;
@@ -536,6 +572,40 @@ object_3d * duplicate_object_3d (object_3d * old_obj)
 }
 
 /*!
+  \fn object_3d * free_object_3d (object_3d * obj)
+
+  \brief free the memory allocated to create an object_3d data structure
+
+  \param obj the target object_3d data structure to free
+*/
+object_3d * free_object_3d (object_3d * obj)
+{
+  if (obj -> vertices) g_free (obj -> vertices);
+  if (obj -> indices) g_free (obj -> indices);
+  if (obj -> instances) g_free (obj -> instances);
+  g_free (obj);
+  return NULL;
+}
+
+/*!
+  \fn glsl_program * free_this_glsl_program (glsl_program * glsl)
+
+  \brief free memory allocated to create a glsl program
+
+  \param glsl the target glsl program
+*/
+glsl_program * free_this_glsl_program (glsl_program * glsl)
+{
+  if (glsl -> array_pointer) g_free (glsl -> array_pointer);
+  if (glsl -> uniform_loc) g_free (glsl -> uniform_loc);
+  if (glsl -> light_uniform) g_free (glsl -> light_uniform);
+  if (glsl -> vbo) g_free (glsl -> vbo);
+  glsl -> obj = free_object_3d (glsl -> obj);
+  g_free (glsl);
+  return NULL;
+}
+
+/*!
   \fn glsl_program * init_shader_program (int object, int object_id,
                                           const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                           GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
@@ -557,7 +627,7 @@ glsl_program * init_shader_program (int object, int object_id,
                                     const GLchar * vertex, const GLchar * geometry, const GLchar * fragment,
                                     GLenum type_of_vertices, int narray, int nunif, gboolean lightning, object_3d * obj)
 {
-  glsl_program * glsl = g_malloc0 (sizeof * glsl);
+  glsl_program * glsl = g_malloc0(sizeof * glsl);
 
   glsl -> id = glCreateProgram ();
   glsl -> object = object;
@@ -594,6 +664,7 @@ glsl_program * init_shader_program (int object, int object_id,
   if (lightning) glsl -> light_uniform = glsl_add_lights (glsl);
 
   glsl -> obj = duplicate_object_3d (obj);
+  if (glsl -> draw_type != GLSL_STRING) obj = free_object_3d (obj);
 
   glsl -> draw_instanced = FALSE;
 
@@ -720,11 +791,12 @@ void re_create_md_shaders (int nshaders, int shaders[nshaders], project * this_p
 */
 void cleaning_shaders (glwin * view, int shader)
 {
-  int i = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? step : 0;
+  int i, j, k;
+  i = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? step : 0;
   if (view -> ogl_glsl[shader][i] != NULL)
   {
-    g_free (view -> ogl_glsl[shader][i]);
-    view -> ogl_glsl[shader][i] = NULL;
+    j = view -> n_shaders[shader][i];
+    for (k=0; k<j; k++) view -> ogl_glsl[shader][i][k] = free_this_glsl_program (view -> ogl_glsl[shader][i][k]);
   }
   view -> n_shaders[shader][i] = (in_md_shaders(get_project_by_id(view -> proj), shader)) ? -1 : 0;
 }
@@ -789,7 +861,7 @@ void init_shaders (glwin * view)
     view -> ogl_glsl[i] = NULL;
     if (in_md_shaders (this_proj, i))
     {
-      view -> ogl_glsl[i] = g_malloc0 (this_proj -> steps*sizeof*view -> ogl_glsl[i]);
+      view -> ogl_glsl[i] = g_malloc0(this_proj -> steps*sizeof*view -> ogl_glsl[i]);
       view -> n_shaders[i] = allocint (this_proj -> steps);
       for (j=0; j<this_proj -> steps; j++)
       {
@@ -799,7 +871,7 @@ void init_shaders (glwin * view)
     else
     {
       j = (i == MEASU) ? 2 : 1;
-      view -> ogl_glsl[i] = g_malloc0 (j*sizeof*view -> ogl_glsl[i]);
+      view -> ogl_glsl[i] = g_malloc0(j*sizeof*view -> ogl_glsl[i]);
       view -> ogl_glsl[i][0] = NULL;
       view -> n_shaders[i] = allocint (j);
     }
@@ -845,46 +917,48 @@ void set_lights_data (glsl_program * glsl)
 {
   int j, k;
   vec3_t l_pos, l_dir;
-  k = (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0];
+
   glUniformMatrix4fv (glsl -> light_uniform[0], 1, GL_FALSE, & wingl -> model_view_matrix.m00);
-  glUniform1i (glsl -> light_uniform[1], k);
-  glUniform3f (glsl -> light_uniform[2], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);
-  for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[3+j], plot -> m_terial.param[j+1]);
-  glUniform1i (glsl -> light_uniform[8], plot -> f_g.mode);
-  glUniform1i (glsl -> light_uniform[9], plot -> f_g.based);
-  glUniform1f (glsl -> light_uniform[10], plot -> f_g.density/plot -> p_depth);
-  glUniform2f (glsl -> light_uniform[11], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
-  glUniform3f (glsl -> light_uniform[12], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
-  glUniform1i (glsl -> light_uniform[13], plot -> l_ghtning.lights);
+  glUniformMatrix4fv (glsl -> light_uniform[1], 1, GL_FALSE, & wingl -> projection_matrix.m00);
+  glUniform1i (glsl -> light_uniform[2], plot -> rep);
+  glUniform1i (glsl -> light_uniform[3], (glsl -> draw_type == GLSL_LIGHT) ? 0 : plot -> m_terial.param[0]);
+  glUniform3f (glsl -> light_uniform[4], plot -> m_terial.albedo.x, plot -> m_terial.albedo.y, plot -> m_terial.albedo.z);
+  for (j=0; j<5; j++) glUniform1f (glsl -> light_uniform[5+j], plot -> m_terial.param[j+1]);
+  glUniform1i (glsl -> light_uniform[10], plot -> f_g.mode);
+  glUniform1i (glsl -> light_uniform[11], plot -> f_g.based);
+  glUniform1f (glsl -> light_uniform[12], plot -> f_g.density/plot -> p_depth);
+  glUniform2f (glsl -> light_uniform[13], plot -> f_g.depth[0]*plot -> p_depth/100.0 + plot -> p_depth, plot -> f_g.depth[1]*plot -> p_depth/100.0+ plot -> p_depth);
+  glUniform3f (glsl -> light_uniform[14], plot -> f_g.color.x, plot -> f_g.color.y, plot -> f_g.color.z);
+  glUniform1i (glsl -> light_uniform[15], plot -> l_ghtning.lights);
   for (j=0; j<plot -> l_ghtning.lights; j++)
   {
     k = j*LIGHT_DATA + LIGHT_INFO + MATERIAL_DATA + FOG_DATA;
-    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j].type);
-    if (plot -> l_ghtning.spot[j].fix == 0)
+    glUniform1i (glsl -> light_uniform[k], plot -> l_ghtning.spot[j] -> type);
+    if (plot -> l_ghtning.spot[j] -> fix == 0)
     {
-      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].position);
+      l_pos = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j] -> position);
     }
     else
     {
-      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].position);
+      l_pos = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j] -> position);
     }
     glUniform3f (glsl -> light_uniform[k+1], l_pos.x, l_pos.y, l_pos.z);
-    if (plot -> l_ghtning.spot[j].fix == 0)
+    if (plot -> l_ghtning.spot[j] -> fix == 0)
     {
-      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_matrix, plot -> l_ghtning.spot[j] -> direction);
     }
     else
     {
-      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j].direction);
+      l_dir = m4_mul_pos (wingl -> model_view_matrix, plot -> l_ghtning.spot[j] -> direction);
     }
     glUniform3f (glsl -> light_uniform[k+2], l_dir.x, l_dir.y, l_dir.z);
-    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j].intensity.x, plot -> l_ghtning.spot[j].intensity.y, plot -> l_ghtning.spot[j].intensity.z);
-    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j].attenuation.x);
-    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j].attenuation.y);
-    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j].attenuation.z);
-    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j].spot_data.x*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j].spot_data.y*pi/180.0));
-    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j].spot_data.z*pi/180.0));
+    glUniform3f (glsl -> light_uniform[k+3], plot -> l_ghtning.spot[j] -> intensity.x, plot -> l_ghtning.spot[j] -> intensity.y, plot -> l_ghtning.spot[j] -> intensity.z);
+    glUniform1f (glsl -> light_uniform[k+4], plot -> l_ghtning.spot[j] -> attenuation.x);
+    glUniform1f (glsl -> light_uniform[k+5], plot -> l_ghtning.spot[j] -> attenuation.y);
+    glUniform1f (glsl -> light_uniform[k+6], plot -> l_ghtning.spot[j] -> attenuation.z);
+    glUniform1f (glsl -> light_uniform[k+7], cos(plot -> l_ghtning.spot[j] -> spot_data.x*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+8], cos(plot -> l_ghtning.spot[j] -> spot_data.y*pi/180.0));
+    glUniform1f (glsl -> light_uniform[k+9], cos(plot -> l_ghtning.spot[j] -> spot_data.z*pi/180.0));
   }
 }
 
@@ -1024,6 +1098,12 @@ void render_this_shader (glsl_program * glsl, int ids)
 
   if (glsl -> draw_type == GLSL_SPHERES || glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS)
   {
+    gboolean poly_offset = (! plot -> ray_tracing && (glsl -> draw_type == GLSL_CYLINDERS || glsl -> draw_type == GLSL_CAPS));
+    if (poly_offset)
+    {
+      glEnable (GL_POLYGON_OFFSET_FILL);
+      glPolygonOffset (1.0, 1.0);
+    }
     if (glsl -> draw_instanced)
     {
       glDrawElementsInstanced (glsl -> vert_type, glsl -> obj -> num_indices, GL_UNSIGNED_INT, 0, glsl -> obj -> num_instances);
@@ -1031,6 +1111,10 @@ void render_this_shader (glsl_program * glsl, int ids)
     else
     {
       glDrawElements (glsl -> vert_type, glsl -> obj -> num_indices, GL_UNSIGNED_INT, 0);
+    }
+    if (poly_offset)
+    {
+      glDisable (GL_POLYGON_OFFSET_FILL);
     }
   }
   else if (glsl -> draw_type == GLSL_POINTS || glsl -> draw_type == GLSL_LINES || glsl -> draw_type == GLSL_STRING)
@@ -1041,6 +1125,12 @@ void render_this_shader (glsl_program * glsl, int ids)
       glActiveTexture (GL_TEXTURE0);
       glBindTexture (ogl_texture, glsl -> obj -> texture);
     }
+#ifdef GTK4
+    else
+    {
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+#endif
     if (glsl -> draw_instanced)
     {
       j = (glsl -> draw_type == GLSL_STRING) ? 4 : 3*(glsl -> draw_type+1);
@@ -1050,6 +1140,12 @@ void render_this_shader (glsl_program * glsl, int ids)
     {
       glDrawArrays (glsl -> vert_type, 0, glsl -> obj -> num_vertices);
     }
+#ifdef GTK4
+    if (glsl -> draw_type == GLSL_POINTS || glsl -> draw_type == GLSL_LINES)
+    {
+      glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
+#endif
   }
   else
   {

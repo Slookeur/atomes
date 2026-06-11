@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file tools.c
@@ -43,8 +43,8 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
   G_MODULE_EXPORT void toggle_show_hide_curve (GtkCellRendererToggle * cell_renderer,
                                                 gchar * string_path, gpointer data);
 
-  GtkWidget * tooltree ();
-  GtkWidget * curvetbox ();
+  GtkWidget * create_tool_tree ();
+  GtkWidget * create_curve_tool_box ();
 
 */
 
@@ -59,7 +59,7 @@ extern gchar * substitute_string (gchar * init, gchar * o_motif, gchar * n_motif
 
 GtkTreeStore * tool_model = NULL;
 GtkWidget * tool_tree = NULL;
-GtkWidget * toolscroll = NULL;
+GtkWidget * tool_scroll = NULL;
 
 /*!
   \fn gchar * prepare_for_title (gchar * init)
@@ -70,12 +70,16 @@ GtkWidget * toolscroll = NULL;
 */
 gchar * prepare_for_title (gchar * init)
 {
-  gchar * str = g_strdup_printf ("%s", substitute_string (init, "<sub>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</sub>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "<sup>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</sup>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "<i>", NULL));
-  str = g_strdup_printf ("%s", substitute_string (str, "</i>", NULL));
+  gchar * str = substitute_string (init, "<sub>", NULL);
+  str = substitute_string (str, "</sub>", NULL);
+  str = substitute_string (str, "<sup>", NULL);
+  str = substitute_string (str, "</sup>", NULL);
+  str = substitute_string (str, "<i>", NULL);
+  str = substitute_string (str, "</i>", NULL);
+  str = substitute_string (str, "<b>", NULL);
+  str = substitute_string (str, "</b>", NULL);
+  str = substitute_string (str, "<u>", NULL);
+  str = substitute_string (str, "</u>", NULL);
   return str;
 }
 
@@ -94,19 +98,19 @@ void fill_tool_model ()
 
   if (active_project)
   {
-    i = (active_project -> steps > 1) ? 25 : 0;
+    i = (active_project -> steps > 1) ? 45 : 0;
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), TRUE);
 #ifdef GTK4
-    gtk_widget_set_size_request (curvetoolbox, 300, 210+i);
+    gtk_window_set_default_size (GTK_WINDOW (curvetoolbox), 300, 250+i);
 #else
-    gtk_widget_set_size_request (curvetoolbox, 300, 240+i);
+    gtk_widget_set_size_request (curvetoolbox, 300, 320+i);
 #endif
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), FALSE);
   }
   gtk_tree_store_clear (tool_model);
-  for (i=0; i<NGRAPHS; i++)
+  for (i=0; i<NCALCS; i++)
   {
-    if (i != MS)
+    if (i != MSD && i != SKT)
     {
       append = TRUE;
     }
@@ -126,33 +130,39 @@ void fill_tool_model ()
       gtk_tree_store_append (tool_model, & calc_level, NULL);
       img = GTK_IMAGE(gtk_image_new_from_file(graph_img[i]));
 #ifdef GTK4
-      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, img, 3, graph_name[i], -1);
+      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, img, 3, _(graph_name[i]), -1);
 #else
       GdkPixbuf * pix =  gtk_image_get_pixbuf(img);
-      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, pix, 3, graph_name[i], -1);
+      gtk_tree_store_set (tool_model, & calc_level, 0, -1, 1, -1, 2, pix, 3, _(graph_name[i]), -1);
 #endif
 
       gtk_image_clear (img);
       if (active_project)
       {
-        if (active_project -> numc[i] > 0 && active_project -> visok[i])
+        if (active_project -> analysis)
         {
-          for (j=0; j<active_project -> numc[i]; j++)
+          if (active_project -> analysis[i])
           {
-            if (active_project -> curves[i][j] -> name && active_project -> curves[i][j] -> ndata)
+            if (active_project -> analysis[i] -> numc > 0 && active_project -> analysis[i] -> calc_ok)
             {
-              gtk_tree_store_append (tool_model, & curve_level, & calc_level);
-              status = FALSE;
-              str = g_strdup_printf ("%s", active_project -> curves[i][j] -> name);
-              if (active_project -> curves[i][j] -> window != NULL)
+              for (j=0; j<active_project -> analysis[i] -> numc; j++)
               {
-                if (GTK_IS_WIDGET(active_project -> curves[i][j] -> window))
+                if (active_project -> analysis[i] -> curves[j] -> name && active_project -> analysis[i] -> curves[j] -> ndata)
                 {
-                  if (gtk_widget_get_visible(active_project -> curves[i][j] -> window)) status = TRUE;
+                  gtk_tree_store_append (tool_model, & curve_level, & calc_level);
+                  status = FALSE;
+                  str = g_strdup_printf ("%s", active_project -> analysis[i] -> curves[j] -> name);
+                  if (active_project -> analysis[i] -> curves[j] -> window != NULL)
+                  {
+                    if (GTK_IS_WIDGET(active_project -> analysis[i] -> curves[j] -> window))
+                    {
+                      if (gtk_widget_get_visible(active_project -> analysis[i] -> curves[j] -> window)) status = TRUE;
+                    }
+                  }
+                  gtk_tree_store_set (tool_model, & curve_level, 0, i, 1, j, 3, str, 4, status, -1);
+                  g_free (str);
                 }
               }
-              gtk_tree_store_set (tool_model, & curve_level, 0, i, 1, j, 3, str, 4, status, -1);
-              g_free (str);
             }
           }
         }
@@ -190,12 +200,19 @@ void tool_set_visible (GtkTreeViewColumn * col,
   {
     gtk_cell_renderer_set_sensitive (renderer, FALSE);
   }
-  else if (j > -1 && active_project -> numwid > 0)
+  else if (j > -1 && active_project -> analysis)
   {
-    if (active_project -> numc[j])
+    if (active_project -> analysis[j])
     {
-      gtk_tree_model_get (mod, iter, 1, & k, -1);
-      if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> curves[j][k] -> ndata);
+      if (active_project -> analysis[j] -> numc)
+      {
+        gtk_tree_model_get (mod, iter, 1, & k, -1);
+        if (active_project) gtk_cell_renderer_set_sensitive (renderer, active_project -> analysis[j] -> curves[k] -> ndata);
+        if (i == 1)
+        {
+          set_renderer_markup (mod, iter, renderer, 3);
+        }
+      }
     }
   }
   else
@@ -218,7 +235,7 @@ void adjust_tool_model (int calc, int curve, gchar * string_path)
   GtkTreeIter iter;
   GtkTreePath * path = gtk_tree_path_new_from_string (string_path);
   gtk_tree_model_get_iter (GTK_TREE_MODEL(tool_model), & iter, path);
-  if (calc == SP || calc == MS)
+  if (calc == SPH || calc == MSD)
   {
     int i, j;
     gtk_tree_model_get (GTK_TREE_MODEL(tool_model), & iter, 0, & i, -1);
@@ -256,33 +273,33 @@ G_MODULE_EXPORT void toggle_show_hide_curve (GtkCellRendererToggle * cell_render
 #endif // DEBUG
   if (! k)
   {
-    if (active_project -> curves[i][j] -> window == NULL)
+    if (active_project -> analysis[i] -> curves[j] -> window == NULL)
     {
-      active_project -> curves[i][j] -> window = create_curve (& active_project -> idcc[i][j]);
-      active_project -> curves[i][j] -> path = g_strdup_printf ("%s", string_path);
+      active_project -> analysis[i] -> curves[j] -> window = create_curve (& active_project -> analysis[i] -> idcc[j]);
+      active_project -> analysis[i] -> curves[j] -> path = g_strdup_printf ("%s", string_path);
     }
-    show_the_widgets (active_project -> curves[i][j] -> window);
+    show_the_widgets (active_project -> analysis[i] -> curves[j] -> window);
   }
   else
   {
-    if (active_project -> curves[i][j] -> window != NULL)
+    if (active_project -> analysis[i] -> curves[j] -> window != NULL)
     {
-      hide_the_widgets (active_project -> curves[i][j] -> window);
+      hide_the_widgets (active_project -> analysis[i] -> curves[j] -> window);
     }
   }
   gtk_tree_store_set (tool_model, & iter, 4, ! k, -1);
 }
 
 /*!
-  \fn GtkWidget * tooltree ()
+  \fn GtkWidget * create_tool_tree ()
 
   \brief create the toolbox tree view
 */
-GtkWidget * tooltree ()
+GtkWidget * create_tool_tree ()
 {
   GtkTreeViewColumn * tool_col[3];
   GtkCellRenderer * tool_cell[3];
-  gchar * ctitle[3]={"Logo", "Name", "Button"};
+  gchar * ctitle[3]={i18n("Logo"), i18n("Name"), i18n("Button")};
   gchar * ctype[3]={"pixbuf", "text", "active"};
   GType coltype[5]= {G_TYPE_INT, G_TYPE_INT, G_TYPE_OBJECT, G_TYPE_STRING, G_TYPE_BOOLEAN};
   tool_model = gtk_tree_store_newv (5, coltype);
@@ -304,9 +321,10 @@ GtkWidget * tooltree ()
         g_signal_connect (G_OBJECT(tool_cell[i]), "toggled", G_CALLBACK(toggle_show_hide_curve), NULL);
         break;
     }
-    tool_col[i] = gtk_tree_view_column_new_with_attributes (ctitle[i], tool_cell[i], ctype[i], i+2, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tool_tree), tool_col[i]);
+    tool_col[i] = gtk_tree_view_column_new_with_attributes (_(ctitle[i]), tool_cell[i], ctype[i], i+2, NULL);
+    gtk_tree_view_append_column (GTK_TREE_VIEW(tool_tree), tool_col[i]);
     gtk_tree_view_column_set_alignment (tool_col[i], 0.5);
+    // if (i == 1) gtk_tree_view_column_set_attributes (tool_col[i], tool_cell[i], "markup", 3, NULL);
     gtk_tree_view_column_set_cell_data_func (tool_col[i], tool_cell[i], tool_set_visible, GINT_TO_POINTER(i), NULL);
   }
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW(tool_tree), FALSE);
@@ -314,34 +332,25 @@ GtkWidget * tooltree ()
 }
 
 /*!
-  \fn GtkWidget * curvetbox ()
+  \fn GtkWidget * create_curve_tool_box ()
 
   \brief create the curve tool box window
 */
-GtkWidget * curvetbox ()
+GtkWidget * create_curve_tool_box ()
 {
   GtkWidget * ctbox;
-  ctbox = create_win ("Toolboxes", MainWindow, FALSE, FALSE);
+  ctbox = create_win (_("Toolboxes"), MainWindow, FALSE, FALSE);
 #ifdef GTK4
-  gtk_widget_set_size_request (ctbox, 300, 210);
+  gtk_widget_set_size_request (ctbox, 300, 250);
 #else
-  gtk_widget_set_size_request (ctbox, 300, 240);
+  gtk_widget_set_size_request (ctbox, 300, 320);
 #endif
-  graph_img[0] = g_strdup_printf ("%s", PACKAGE_GR);
-  graph_img[1] = g_strdup_printf ("%s", PACKAGE_SQ);
-  graph_img[2] = g_strdup_printf ("%s", PACKAGE_SQ);
-  graph_img[3] = g_strdup_printf ("%s", PACKAGE_GR);
-  graph_img[4] = g_strdup_printf ("%s", PACKAGE_BD);
-  graph_img[5] = g_strdup_printf ("%s", PACKAGE_AN);
-  graph_img[6] = g_strdup_printf ("%s", PACKAGE_RI);
-  graph_img[7] = g_strdup_printf ("%s", PACKAGE_CH);
-  graph_img[8] = g_strdup_printf ("%s", PACKAGE_SP);
-  graph_img[9] = g_strdup_printf ("%s", PACKAGE_MS);
+  // New calculation icon to be added here
 
-  toolscroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);
-  add_container_child (CONTAINER_SCR, toolscroll, tooltree ());
-  add_container_child (CONTAINER_WIN, ctbox, toolscroll);
-  show_the_widgets (toolscroll);
+  tool_scroll = create_scroll (NULL, -1, -1, GTK_SHADOW_NONE);
+  add_container_child (CONTAINER_SCR, tool_scroll, create_tool_tree ());
+  add_container_child (CONTAINER_WIN, ctbox, tool_scroll);
+  show_the_widgets (tool_scroll);
   add_gtk_close_event (ctbox, G_CALLBACK(hide_this_window), NULL);
   return (ctbox);
 }

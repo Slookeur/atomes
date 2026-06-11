@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file w_periodic.c
@@ -87,14 +87,14 @@ gchar * get_electronic_structure (int r, int c)
 {
   gchar * str = NULL;
   gchar * prev[10]={" ", "He", "Ne", "Ar", "Kr", "Xe", "Rn", " ", "Xe", "Rn"};
-  if (r == -1 && c == -1) return g_strdup_printf ("Electronic structure: [None]");
+  if (r == -1 && c == -1) return g_strdup_printf (_("Electronic structure: [%s]"), _("None"));
   if (r > 0)
   {
-    str = g_strdup_printf ("Electronic structure:\t [%s]", prev[r]);
+    str = g_strdup_printf (_("Electronic structure:\t [%s]"), prev[r]);
   }
   else
   {
-    str = g_strdup_printf ("Electronic structure:\t ");
+    str = g_strdup_printf (_("Electronic structure:\t "));
   }
 
   if (c < 2)
@@ -265,7 +265,7 @@ GtkWidget * create_el_preview (int p, int a, int r, int c)
         lab[i] = gtk_label_new (periodic_table_info[id].lab);
         break;
       case 1:
-        lab[i] = gtk_label_new (periodic_table_info[id].name);
+        lab[i] = gtk_label_new (_(periodic_table_info[id].name));
         break;
       case 2:
         str = g_strdup_printf ("Z= %d", periodic_table_info[id].Z);
@@ -648,15 +648,15 @@ GtkWidget * periodic_table (int p, int a)
     }
   }
 
-  gchar * groups[11] = {" <b>Alkali metal</b>", " <b>Alkaline earth metal</b>", " <b>Lanthanide</b>", " <b>Actinide</b>",
-                        " <b>Transition metal</b>", " <b>Post-transition metal</b>", " <b>Metalloid</b>", " <b>Polyatomic non-metal</b>",
-                        " <b>Diatomic non-metal</b>", " <b>Noble gas</b>", " <b>Unknown</b>"};
+  gchar * groups[11] = {i18n(" <b>Alkali metal</b>"), i18n(" <b>Alkaline earth metal</b>"), i18n(" <b>Lanthanide</b>"), i18n(" <b>Actinide</b>"),
+                        i18n(" <b>Transition metal</b>"), i18n(" <b>Post-transition metal</b>"), i18n(" <b>Metalloid</b>"), i18n(" <b>Polyatomic non-metal</b>"),
+                        i18n(" <b>Diatomic non-metal</b>"), i18n(" <b>Noble gas</b>"), i18n(" <b>Unknown</b>")};
   gtk_grid_attach (GTK_GRID (ptable), gtk_label_new (" "), 18, 0, 1, 1);
   int colid[11] = {1, 2, 9, 10, 3, 4, 7, 5, 0, 8, 6};
   for (i=0; i<11; i++)
   {
     gtk_grid_attach (GTK_GRID (ptable), create_css_group (p, colid[i]), 19, 1+i, 1, 1);
-    gtk_grid_attach (GTK_GRID (ptable), markup_label(groups[i], 120, -1, 0.0, 0.5), 20, 1+i, 3, 1);
+    gtk_grid_attach (GTK_GRID (ptable), markup_label(_(groups[i]), 120, -1, 0.0, 0.5), 20, 1+i, 3, 1);
   }
 
   return ptable;
@@ -675,7 +675,7 @@ int get_atom_id_from_periodic_table (atom_search * asearch)
   gchar * str;
   if (asearch != NULL)
   {
-    str = g_strdup_printf ("Element selection from the periodic table");
+    str = g_strdup_printf (_("Element selection from the periodic table"));
     periodic_search = asearch;
 #ifdef GTK3
     if (get_project_by_id (asearch -> proj) ->  modelgl)
@@ -691,8 +691,8 @@ int get_atom_id_from_periodic_table (atom_search * asearch)
   }
   else
   {
-    str = g_strdup_printf ("Periodic table of the elements");
-    periodic_search = g_malloc0 (sizeof*periodic_search);
+    str = g_strdup_printf (_("Periodic table of the elements"));
+    periodic_search = g_malloc0(sizeof*periodic_search);
     periodic_search -> proj = -1;
     periodic_search -> action = -1;
 #ifdef GTK3

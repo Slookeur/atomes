@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file project.h
@@ -32,6 +32,10 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 
 #ifndef PROJECT_H_
 #define PROJECT_H_
+
+extern float project_file_version;
+extern gboolean reading_project;
+extern atomes_error * project_error;
 
 #define IODEBUG FALSE
 
@@ -57,7 +61,7 @@ extern int open_project (FILE * fp, int wid);
 // Save
 extern int save_atom_a (FILE * fp, project * this_proj, int s, int a);
 extern int save_opengl_image (FILE * fp, project * this_proj, image * img, int sid);
-extern int save_project_curve (FILE * fp, int wid, project * this_proj, int rid, int cid);
+extern int save_project_curve (FILE * fp, project * this_proj, int wid, int rid, int cid);
 extern int save_dlp_field_data (FILE * fp, project * this_proj);
 extern int save_lmp_field_data (FILE * fp, project * this_proj);
 extern int save_cpmd_data (FILE * fp, int cid, project * this_proj);
@@ -79,6 +83,7 @@ extern G_MODULE_EXPORT gboolean edit_tab (GtkWidget * widget, GdkEventButton * e
 #endif
 extern void init_curves_and_calc (project * this_proj);
 extern void init_project (gboolean alloc_box);
+extern void update_analysis_availability (project * this_proj);
 extern int update_project ();
 extern void clean_view ();
 extern void view_buffer (GtkTextBuffer * buffer);

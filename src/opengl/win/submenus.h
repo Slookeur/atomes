@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file submenus.h
@@ -35,8 +35,6 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 extern void menu_items_opengl (GtkWidget * menu, glwin * view, int popm);
 extern GtkWidget * menu_style (glwin * view, int id);
 extern GtkWidget * menu_map (glwin * view, int id);
-extern GtkWidget * menu_render (glwin * view, int id);
-extern GtkWidget * menu_quality (glwin * view, int id);
 extern GtkWidget * menu_atoms ( glwin * view, int id, int at);
 extern GtkWidget * menu_bonds (glwin * view, int id, int at);
 extern GtkWidget * menu_clones (glwin * view, int id);
@@ -57,8 +55,6 @@ extern void menu_items_view (GtkWidget * menu, glwin * view, int popm);
 #else
 extern GMenu * menu_style (glwin * view, int popm);
 extern GMenu * menu_map (glwin * view, int popm);
-extern GMenu * menu_render (glwin * view, int popm);
-extern GMenu * menu_quality (glwin * view, int popm);
 extern GMenu * menu_atoms ( glwin * view, int popm, int at);
 extern GMenu * menu_bonds (glwin * view, int popm, int at);
 extern GMenu * menu_clones (glwin * view, int popm);

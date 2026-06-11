@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file force_fields.c
@@ -322,20 +322,20 @@ void allocate_field_data (int * objects, int * dim,
   int h, i;
   field_objects = objects;
   field_dim = dim;
-  field_atoms = g_malloc (field_objects[0]*sizeof*field_atoms);
+  field_atoms = g_malloc0(field_objects[0]*sizeof*field_atoms);
   for (i=0; i<field_objects[0]; i++)
   {
-    field_atoms[i] = g_malloc (field_dim[0]*sizeof*field_atoms[i]);
+    field_atoms[i] = g_malloc0(field_dim[0]*sizeof*field_atoms[i]);
     field_atoms[i] = atoms[i];
   }
   for (h=0; h<2; h++)
   {
     if (field_objects[1+h])
     {
-      field_equi[h] = g_malloc (field_objects[1+h]*sizeof*field_equi[h]);
+      field_equi[h] = g_malloc0(field_objects[1+h]*sizeof*field_equi[h]);
       for (i=0; i<field_objects[1+h]; i++)
       {
-        field_equi[h][i] = g_malloc (field_dim[h+1]*sizeof*field_equi[h][i]);
+        field_equi[h][i] = g_malloc0(field_dim[h+1]*sizeof*field_equi[h][i]);
         switch (h)
         {
           case 0:
@@ -352,10 +352,10 @@ void allocate_field_data (int * objects, int * dim,
   {
     if (field_objects[3+h])
     {
-      field_bonds[h] = g_malloc (field_objects[3+h]*sizeof*field_bonds[h]);
+      field_bonds[h] = g_malloc0(field_objects[3+h]*sizeof*field_bonds[h]);
       for (i=0; i<field_objects[3+h]; i++)
       {
-        field_bonds[h][i] = g_malloc (field_dim[3+h]*sizeof*field_bonds[h][i]);
+        field_bonds[h][i] = g_malloc0(field_dim[3+h]*sizeof*field_bonds[h][i]);
         switch (h)
         {
           case 0:
@@ -379,10 +379,10 @@ void allocate_field_data (int * objects, int * dim,
   {
     if (field_objects[6+h])
     {
-      field_angles[h] = g_malloc (field_objects[6+h]*sizeof*field_angles[h]);
+      field_angles[h] = g_malloc0(field_objects[6+h]*sizeof*field_angles[h]);
       for (i=0; i<field_objects[6+h]; i++)
       {
-        field_angles[h][i] = g_malloc (field_dim[6+h]*sizeof*field_angles[h][i]);
+        field_angles[h][i] = g_malloc0(field_dim[6+h]*sizeof*field_angles[h][i]);
         switch (h)
         {
           case 0:
@@ -403,10 +403,10 @@ void allocate_field_data (int * objects, int * dim,
   {
     if (field_objects[8+h])
     {
-      field_dihedrals[h] = g_malloc (field_objects[8+h]*sizeof*field_dihedrals[h]);
+      field_dihedrals[h] = g_malloc0(field_objects[8+h]*sizeof*field_dihedrals[h]);
       for (i=0; i<field_objects[8+h]; i++)
       {
-        field_dihedrals[h][i] = g_malloc (field_dim[8+h]*sizeof*field_dihedrals[h][i]);
+        field_dihedrals[h][i] = g_malloc0(field_dim[8+h]*sizeof*field_dihedrals[h][i]);
         switch (h)
         {
           case 0:
@@ -426,10 +426,10 @@ void allocate_field_data (int * objects, int * dim,
 
   if (field_objects[10])
   {
-    field_inversions = g_malloc (field_objects[10]*sizeof*field_inversions);
+    field_inversions = g_malloc0(field_objects[10]*sizeof*field_inversions);
     for (i=0; i<field_objects[10]; i++)
     {
-      field_inversions[i] = g_malloc (field_dim[10]*sizeof*field_inversions[i]);
+      field_inversions[i] = g_malloc0(field_dim[10]*sizeof*field_inversions[i]);
       field_inversions[i] = inversions[i];
     }
   }
@@ -441,10 +441,10 @@ void allocate_field_data (int * objects, int * dim,
 
   if (field_objects[11])
   {
-    field_impropers = g_malloc (field_objects[11]*sizeof*field_impropers);
+    field_impropers = g_malloc0(field_objects[11]*sizeof*field_impropers);
     for (i=0; i<field_objects[11]; i++)
     {
-      field_impropers[i] = g_malloc (field_dim[11]*sizeof*field_impropers[i]);
+      field_impropers[i] = g_malloc0(field_dim[11]*sizeof*field_impropers[i]);
       field_impropers[i] = impropers[i];
     }
   }
@@ -456,10 +456,10 @@ void allocate_field_data (int * objects, int * dim,
 
   if (field_objects[12])
   {
-    field_vdw = g_malloc (field_objects[12]*sizeof*field_vdw);
+    field_vdw = g_malloc0(field_objects[12]*sizeof*field_vdw);
     for (i=0; i<field_objects[12]; i++)
     {
-      field_vdw[i] = g_malloc (field_dim[12]*sizeof*field_vdw[i]);
+      field_vdw[i] = g_malloc0(field_dim[12]*sizeof*field_vdw[i]);
       field_vdw[i] = vdw[i];
     }
   }
@@ -767,12 +767,12 @@ void set_data (int pid, int obj, int oid, int faid)
 {
   if (all_data[pid][faid] == NULL)
   {
-    all_data[pid][faid] = g_malloc0 (sizeof*all_data[pid][faid]);
+    all_data[pid][faid] = g_malloc0(sizeof*all_data[pid][faid]);
     om_tmp = all_data[pid][faid];
   }
   else
   {
-    om_tmp -> next = g_malloc0 (sizeof*om_tmp -> next);
+    om_tmp -> next = g_malloc0(sizeof*om_tmp -> next);
     om_tmp -> next -> id = om_tmp -> id + 1;
     om_tmp -> next -> prev = om_tmp;
   }
@@ -1965,7 +1965,7 @@ int field_find_atoms ()
   int i, j, k, l;
   atoms_id = allocint (tmp_proj -> nspec);
   extraz_id = allocdint (5, tmp_proj -> nspec);
-  atoms_id_list = g_malloc (tmp_proj -> nspec*sizeof*atoms_id_list);
+  atoms_id_list = g_malloc0(tmp_proj -> nspec*sizeof*atoms_id_list);
   k = 0;
   for (i=0; i<tmp_proj -> nspec; i++)
   {
@@ -1989,7 +1989,7 @@ int field_find_atoms ()
 #endif
     if (atoms_id[i])
     {
-      atoms_id_list[i] = g_malloc0 (atoms_id[i]*sizeof*atoms_id_list[i]);
+      atoms_id_list[i] = g_malloc0(atoms_id[i]*sizeof*atoms_id_list[i]);
       l = 0;
       for (j=0; j<ff_objects[0]; j++)
       {
@@ -2101,14 +2101,14 @@ void find_object_ijkl (int hid, int foid, int oid, int sa, int za, int sb, int z
             }
             if (save_this_id)
             {
-              tmp_obj_id -> next = g_malloc0 (sizeof*tmp_obj_id -> next);
+              tmp_obj_id -> next = g_malloc0(sizeof*tmp_obj_id -> next);
               tmp_obj_id -> next -> id = tmp_obj_id -> id + 1;
               tmp_obj_id = tmp_obj_id -> next;
             }
           }
           else
           {
-            field_objects_id[oid] = g_malloc0 (sizeof*field_objects_id[oid]);
+            field_objects_id[oid] = g_malloc0(sizeof*field_objects_id[oid]);
             tmp_obj_id = field_objects_id[oid];
           }
           if (save_this_id)
@@ -2379,6 +2379,7 @@ gchar * open_field_file (int field)
   xmlNodePtr n_node, m_node, o_node;
   field_data * ff_data;
   xmlAttrPtr prop;
+  xmlChar * content;
   const xmlChar fml[7]="ff-xml";
   gchar * data_nodes[11]={"atoms", "bonds-h", "bonds-q", "bonds-m", "angles-h", "angles-q",
                           "dihedrals-c", "dihedrals-ccc", "impropers", "inversions", "non-bonded"};
@@ -2440,7 +2441,9 @@ gchar * open_field_file (int field)
       clean_this_field_data (doc, reader);
       return NULL;
     }
-    force_field_name = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(f_node));
+    content = xmlNodeGetContent(f_node);
+    force_field_name = g_strdup_printf ("%s", content);
+    xmlFree (content);
     f_node = findnode (racine -> children, "units");
     if (f_node == NULL)
     {
@@ -2448,7 +2451,9 @@ gchar * open_field_file (int field)
       clean_this_field_data (doc, reader);
       return NULL;
     }
-    str = g_strdup_printf ("%s", (gchar *)xmlNodeGetContent(f_node));
+    content = xmlNodeGetContent(f_node);
+    str = g_strdup_printf ("%s", content);
+    xmlFree (content);
     for (i=0; i<4;i++)
     {
       if (g_strcmp0 (str, fnames[activef][0][i]) == 0)
@@ -2470,10 +2475,10 @@ gchar * open_field_file (int field)
       clean_this_field_data (doc, reader);
       return NULL;
     }
-    ff_objects = g_malloc0 (11*sizeof*ff_objects);
-    ff_dim = g_malloc0 (11*sizeof*ff_dim);
-    //ff_info = g_malloc0 (11*sizeof*ff_key);
-    ff_key = g_malloc0 (10*sizeof*ff_key);
+    ff_objects = g_malloc0(11*sizeof*ff_objects);
+    ff_dim = g_malloc0(11*sizeof*ff_dim);
+    //ff_info = g_malloc0(11*sizeof*ff_key);
+    ff_key = g_malloc0(10*sizeof*ff_key);
     for (i=0; i<11; i++)
     {
       m_node = findnode (f_node -> children, data_nodes[i]);
@@ -2483,7 +2488,9 @@ gchar * open_field_file (int field)
         clean_this_field_data (doc, reader);
         return NULL;
       }
-      ff_objects[i] = (int)string_to_double ((gpointer)xmlNodeGetContent(m_node));
+      content = xmlNodeGetContent(m_node);
+      ff_objects[i] = (int)string_to_double ((gpointer)content);
+      xmlFree (content);
       if (ff_objects[i] < 0)
       {
         g_warning ("Error reading FF file %s, ff-data, ff_objects[%d] = %d < 0 ?!", filetoread, i, ff_objects[i]);
@@ -2508,18 +2515,20 @@ gchar * open_field_file (int field)
             clean_this_field_data (doc, reader);
             return NULL;
           }
+          content = xmlNodeGetContent(o_node);
           if (g_strcmp0 ("dim",(char *)prop -> name) == 0)
           {
-            ff_dim[i] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_dim[i] = (int) string_to_double ((gpointer)content);
           }
           /*else if (g_strcmp0 ("info",(char *)prop -> name) == 0)
           {
-            ff_info[i] = (int)string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_info[i] = (int)string_to_double ((gpointer)content);
           }*/
           else if (g_strcmp0 ("pot",(char *)prop -> name) == 0)
           {
-            ff_key[i-1] = (int)string_to_double ((gpointer)xmlNodeGetContent(o_node));
+            ff_key[i-1] = (int)string_to_double ((gpointer)content);
           }
+          xmlFree (content);
           prop = prop -> next;
         }
       }
@@ -2544,56 +2553,56 @@ gchar * open_field_file (int field)
         }
         if (i == 0)
         {
-          ff_atoms = g_malloc (ff_objects[0]*sizeof*ff_atoms);
+          ff_atoms = g_malloc0(ff_objects[0]*sizeof*ff_atoms);
           for (j=0; j<ff_objects[0]; j++)
           {
-            ff_atoms[j] = g_malloc (ff_dim[0]*sizeof*ff_atoms[j]);
+            ff_atoms[j] = g_malloc0(ff_dim[0]*sizeof*ff_atoms[j]);
           }
         }
         else if (i < 4)
         {
-          ff_bonds[i-1] = g_malloc0 (sizeof*ff_bonds[i-1]);
+          ff_bonds[i-1] = g_malloc0(sizeof*ff_bonds[i-1]);
           ff_data = ff_bonds[i-1];
         }
         else if (i < 6)
         {
-          ff_angles[i-4] = g_malloc0 (sizeof*ff_angles[i-4]);
+          ff_angles[i-4] = g_malloc0(sizeof*ff_angles[i-4]);
           ff_data = ff_angles[i-4];
         }
         else if (i < 8)
         {
-          ff_dih[i-6] = g_malloc0 (sizeof*ff_dih[i-6]);
+          ff_dih[i-6] = g_malloc0(sizeof*ff_dih[i-6]);
           ff_data = ff_dih[i-6];
         }
         else if (i == 8)
         {
-          ff_imp = g_malloc0 (sizeof*ff_imp);
+          ff_imp = g_malloc0(sizeof*ff_imp);
           ff_data = ff_imp;
         }
         else if (i == 9)
         {
-          ff_inv = g_malloc0 (sizeof*ff_inv);
+          ff_inv = g_malloc0(sizeof*ff_inv);
           ff_data = ff_inv;
         }
         else if (i == 10)
         {
-          ff_vdw = g_malloc0 (sizeof*ff_vdw);
+          ff_vdw = g_malloc0(sizeof*ff_vdw);
           ff_data = ff_vdw;
         }
         if (i > 0)
         {
-          ff_data -> atoms_z = g_malloc0 (ff_objects[i]*sizeof*ff_data -> atoms_z);
-          ff_data -> atoms_id = g_malloc0 (ff_objects[i]*sizeof*ff_data -> atoms_id);
+          ff_data -> atoms_z = g_malloc0(ff_objects[i]*sizeof*ff_data -> atoms_z);
+          ff_data -> atoms_id = g_malloc0(ff_objects[i]*sizeof*ff_data -> atoms_id);
           ff_data -> npar = ff_dim[i];
           ff_data -> key = ff_key[i-1];
-          ff_data -> param = g_malloc0 (ff_objects[i]*sizeof*ff_data -> param);
+          ff_data -> param = g_malloc0(ff_objects[i]*sizeof*ff_data -> param);
           for (j=0; j<ff_objects[i]; j++)
           {
-            ff_data -> atoms_z[j] = g_malloc0 (odim[i-1]*sizeof*ff_data -> atoms_z[j]);
-            ff_data -> atoms_id[j] = g_malloc0 (odim[i-1]*sizeof*ff_data -> atoms_id[j]);
-            ff_data -> param[j] = g_malloc0 (ff_dim[i]*sizeof*ff_data -> param[j]);
+            ff_data -> atoms_z[j] = g_malloc0(odim[i-1]*sizeof*ff_data -> atoms_z[j]);
+            ff_data -> atoms_id[j] = g_malloc0(odim[i-1]*sizeof*ff_data -> atoms_id[j]);
+            ff_data -> param[j] = g_malloc0(ff_dim[i]*sizeof*ff_data -> param[j]);
           }
-          ff_data -> info = g_malloc0 (ff_objects[i]*sizeof*ff_data -> info);
+          ff_data -> info = g_malloc0(ff_objects[i]*sizeof*ff_data -> info);
         }
         setinfo = FALSE;
         for (j=0; j<ff_objects[i]; j++)
@@ -2621,24 +2630,25 @@ gchar * open_field_file (int field)
               clean_this_field_data (doc, reader);
               return NULL;
             }
+            content = xmlNodeGetContent(o_node);
             switch (i)
             {
               case 0:
                 if (g_strcmp0 ("label",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][0] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][0] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("mass",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][1] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][1] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("key",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][2] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][2] = g_strdup_printf ("%s", content);
                 }
                 else if (g_strcmp0 ("info",(char *)prop -> name) == 0)
                 {
-                  ff_atoms[j][3] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_atoms[j][3] = g_strdup_printf ("%s", content);
                 }
                 else
                 {
@@ -2650,39 +2660,39 @@ gchar * open_field_file (int field)
               default:
                 if (g_strcmp0 ("a",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][0] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][0] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("b",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][1] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][1] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("c",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][2] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][2] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("d",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_id[j][3] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_id[j][3] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_a",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][0] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][0] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_b",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][1] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][1] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_c",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][2] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][2] = (int) string_to_double ((gpointer)content);
                 }
                 else if (g_strcmp0 ("z_d",(char *)prop -> name) == 0)
                 {
-                  ff_data -> atoms_z[j][3] = (int) string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                  ff_data -> atoms_z[j][3] = (int) string_to_double ((gpointer)content);
                 }
                 else if (i > 0 && g_strcmp0 ("info",(char *)prop -> name) == 0)
                 {
-                  ff_data -> info[j] = g_strdup_printf ("%s", (char *)xmlNodeGetContent(o_node));
+                  ff_data -> info[j] = g_strdup_printf ("%s", content);
                   setinfo = TRUE;
                 }
                 else
@@ -2692,32 +2702,33 @@ gchar * open_field_file (int field)
                     // Non-bonded: 12-6: E_i, R_i, E_14, R_14
                     if (g_strcmp0 ("Ei",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Ri",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Eii",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Rii",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("A",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("B",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else
                     {
                       g_warning ("Error reading FF file %s, i= %d, j= %d, unexpected node ?! node name= %s", filetoread, i, j, (char *)prop -> name);
                       clean_this_field_data (doc, reader);
+                      xmlFree (content);
                       return NULL;
                     }
                   }
@@ -2733,51 +2744,52 @@ gchar * open_field_file (int field)
                     // Inversion: Harm: K, Phi_0
                     if (g_strcmp0 ("K",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("R_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Theta_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Phi_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][1] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][1] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("KK",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("KKK",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Kub",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("S_zero",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][3] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][3] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("n",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("D",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][0] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][0] = string_to_double ((gpointer)content);
                     }
                     else if (g_strcmp0 ("Alpha",(char *)prop -> name) == 0)
                     {
-                      ff_data -> param[j][2] = string_to_double ((gpointer)xmlNodeGetContent(o_node));
+                      ff_data -> param[j][2] = string_to_double ((gpointer)content);
                     }
                     else
                     {
                       g_warning ("Error reading FF file %s, i= %d, j= %d, unexpected node ?! node name= %s", filetoread, i, j, (char *)prop -> name);
+                      xmlFree (content);
                       clean_this_field_data (doc, reader);
                       return NULL;
                     }
@@ -2785,6 +2797,7 @@ gchar * open_field_file (int field)
                 }
                 break;
             }
+            xmlFree (content);
             prop = prop -> next;
           }
           n_node = n_node -> next;

@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cpmd_restart.c
@@ -137,47 +137,46 @@ GtkWidget * restart_box ()
   gtk_widget_set_size_request (vbox, 525, 350);
 
   // Initialization: Random / Atom / Restart
-  hbox = cpmd_box (vbox, "<u>Initialization for the Wavefunction:</u>", 20, 5, 230);
+  hbox = cpmd_box (vbox, _("<u>Initialization for the Wavefunction:</u>"), 20, 5, 230);
 
   GtkWidget * box = create_combo ();
-  for (i=0; i<3; i++)
-  {
-    combo_text_append (box, rest_opts[i]);
-  }
+  combo_text_append (box, _("Random"));
+  combo_text_append (box, _("Atomic Pseudo Wavefunctions"));
+  combo_text_append (box, _("Use a RESTART.* File"));
   combo_set_active (box, tmp_cpmd -> restart[0]);
   g_signal_connect (G_OBJECT (box), "changed", G_CALLBACK(changed_restart_box), NULL);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, box, FALSE, FALSE, 5);
 
   // Save restart every
-  hbox = cpmd_box (vbox, "Save the information required for a restart every:", 5, 5, 340);
+  hbox = cpmd_box (vbox, _("Save the information required for a restart every:"), 5, 5, 340);
   GtkWidget * widg = create_entry (G_CALLBACK(update_restart_parameter), 100, 15, FALSE, GINT_TO_POINTER(1));
   update_entry_int (GTK_ENTRY(widg), tmp_cpmd -> restart[1]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new("steps"), FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_("steps")), FALSE, FALSE, 10);
 
   // Num of restart:
-  hbox = cpmd_box (vbox, "Number of restart file(s): ", 0, 5, 340);
+  hbox = cpmd_box (vbox, _("Number of restart file(s): "), 0, 5, 340);
   widg = create_entry (G_CALLBACK(update_restart_parameter), 100, 15, FALSE, GINT_TO_POINTER(2));
   update_entry_int (GTK_ENTRY(widg), tmp_cpmd -> restart[2]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, widg, FALSE, FALSE, 0);
 
   // Trajectory:
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                      check_button("Create a trajectory", -1, -1, tmp_cpmd -> restart[3], G_CALLBACK(update_restart_check), GINT_TO_POINTER(3)),
+                      check_button(_("Create a trajectory"), -1, -1, tmp_cpmd -> restart[3], G_CALLBACK(update_restart_check), GINT_TO_POINTER(3)),
                       FALSE, FALSE, 20);
   trap_box[0] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,trap_box[0], FALSE, FALSE, 0);
 
-  hbox = cpmd_box (trap_box[0], "Save the atomic coordinates every: ", 0, 25, 300);
+  hbox = cpmd_box (trap_box[0], _("Save the atomic coordinates every: "), 0, 25, 300);
   sace[0] = create_entry (G_CALLBACK(update_restart_parameter), 100, 15, FALSE, GINT_TO_POINTER(3));
   update_entry_int (GTK_ENTRY(sace[0]), tmp_cpmd -> restart[3]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, sace[0], FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new("steps"), FALSE, FALSE, 10);
-  hbox = cpmd_box (trap_box[0], "Write XYZ format", 0, 25, 300);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_("steps")), FALSE, FALSE, 10);
+  hbox = cpmd_box (trap_box[0], _("Write XYZ format"), 0, 25, 300);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
                       check_button(NULL, -1, -1, tmp_cpmd -> restart[4], G_CALLBACK(update_restart_check), GINT_TO_POINTER(4)),
                       FALSE, FALSE, 0);
-  hbox = cpmd_box (trap_box[0], "Write atomic forces", 0, 25, 300);
+  hbox = cpmd_box (trap_box[0], _("Write atomic forces"), 0, 25, 300);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
                       check_button(NULL, -1, -1, tmp_cpmd -> restart[5], G_CALLBACK(update_restart_check), GINT_TO_POINTER(5)),
                       FALSE, FALSE, 0);
@@ -185,24 +184,24 @@ GtkWidget * restart_box ()
 
   // Print information
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox,
-                      check_button("Print extra data in the global output file", -1, -1, tmp_cpmd -> restart[6], G_CALLBACK(update_restart_check), GINT_TO_POINTER(6)),
+                      check_button(_("Print extra data in the global output file"), -1, -1, tmp_cpmd -> restart[6], G_CALLBACK(update_restart_check), GINT_TO_POINTER(6)),
                       FALSE, FALSE, 20);
   trap_box[1] = create_vbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, trap_box[1], FALSE, FALSE, 0);
-  hbox = cpmd_box (trap_box[1], "Save the extra information every: ", 0, 25, 300);
+  hbox = cpmd_box (trap_box[1], _("Save the extra information every: "), 0, 25, 300);
   sace[1] = create_entry (G_CALLBACK(update_restart_parameter), 100, 15, FALSE, GINT_TO_POINTER(6));
   update_entry_int (GTK_ENTRY(sace[1]), tmp_cpmd -> restart[6]);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, sace[1], FALSE, FALSE, 0);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new("steps"), FALSE, FALSE, 10);
-  hbox = cpmd_box (trap_box[1], "Select the information to print:", 5, 25, 300);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, gtk_label_new(_("steps")), FALSE, FALSE, 10);
+  hbox = cpmd_box (trap_box[1], _("Select the information to print:"), 5, 25, 300);
   widget_set_sensitive (trap_box[1], tmp_cpmd -> restart[6]);
   hbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, trap_box[1], hbox, FALSE, FALSE, 0);
-  gchar * print_str[3]={"Information", "Coordinates", "Forces"};
+  gchar * print_str[3]={i18n("Information"), i18n("Coordinates"), i18n("Forces")};
   for (i=0; i<3; i++)
   {
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
-                        check_button(print_str[i], -1, -1, tmp_cpmd -> restart[i+7], G_CALLBACK(update_restart_check), GINT_TO_POINTER(i+7)),
+                        check_button(_(print_str[i]), -1, -1, tmp_cpmd -> restart[i+7], G_CALLBACK(update_restart_check), GINT_TO_POINTER(i+7)),
                         FALSE, FALSE, 5);
   }
   return vbox;

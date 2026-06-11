@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file bind.h
@@ -143,6 +143,20 @@ extern int rundmtx_ (int *,
                      int *,
                      int *);
 
+extern void free_contj_voisj_ ();
+
+extern void read_contj_ (int *,
+                         int *,
+                         int *);
+
+extern void read_voisj_ (int *,
+                         int *,
+                         int *,
+                         int *);
+
+extern int alloc_contj_voisj_ (int *,
+                               int *);
+
 extern int bonding_ (int *,
                      int *,
                      int *,
@@ -189,6 +203,16 @@ extern int cqvf_ (double *,
 
 extern int s_of_k_ (int *,
                     int *);
+
+extern int s_of_k_t_ (int *,
+                      int *,
+                      int *,
+                      int *,
+                      int *,
+                      double *,
+                      int *,
+                      double *,
+                      int *);
 
 extern int send_gr_ (int *,
                      int *,

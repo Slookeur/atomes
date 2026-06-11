@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_comp.c
@@ -129,9 +129,9 @@ void compare_body (gchar * fatom, field_nth_body * new_body, int n_body, field_n
               p = 0;
               old_one -> na[l] --;
               old_one -> a[l] = NULL;
-              old_one -> a[l] = g_malloc (old_one -> na[l]*sizeof*old_one -> a[l]);
+              old_one -> a[l] = g_malloc0(old_one -> na[l]*sizeof*old_one -> a[l]);
               old_one -> ma[l] = NULL;
-              old_one -> ma[l] = g_malloc (old_one -> na[l]*sizeof*old_one -> ma[l]);
+              old_one -> ma[l] = g_malloc0(old_one -> na[l]*sizeof*old_one -> ma[l]);
               for (n=0; n<tmp_fbody -> na[l]; n++)
               {
                 if (n != o)

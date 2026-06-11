@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_species.c
@@ -49,9 +49,9 @@ Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
 */
 chemical_data * duplicate_chemical_data (int spec, chemical_data * chem)
 {
-  chemical_data * newchem = g_malloc0 (sizeof*chem);
-  newchem -> label = g_malloc (spec*sizeof*newchem -> label);
-  newchem -> element = g_malloc (spec*sizeof*newchem -> element);
+  chemical_data * newchem = g_malloc0(sizeof*chem);
+  newchem -> label = g_malloc0(spec*sizeof*newchem -> label);
+  newchem -> element = g_malloc0(spec*sizeof*newchem -> element);
   int i, j;
   for (i=0; i<spec; i++)
   {
@@ -134,11 +134,11 @@ int search_for_new_spec (atom_edition * edit, atomic_object * object)
         g_free (coord -> geolist[j]);
       }
       coord -> ntg[j] = allocint (coord -> species + i);
-      coord -> geolist[j] = g_malloc0 ((coord -> species + i)*sizeof* coord -> geolist[j]);
+      coord -> geolist[j] = g_malloc0((coord -> species + i)*sizeof* coord -> geolist[j]);
       if (j)
       {
         if (coord -> species) g_free (coord -> partial_geo);
-        coord -> partial_geo = g_malloc0 ((coord -> species + i)*sizeof*coord -> partial_geo);
+        coord -> partial_geo = g_malloc0((coord -> species + i)*sizeof*coord -> partial_geo);
       }
       for (k=0; k<coord -> species; k++)
       {

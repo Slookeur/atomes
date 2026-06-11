@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file dlp_atom.c
@@ -305,13 +305,13 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
       {
         if (a_ato > 1)
         {
-          str = g_strdup_printf ("%d atoms have been selected !", a_ato);
-          str = g_strdup_printf ("%s\nConfirm this choice and create a new field atom to describe them ?", str);
+          str = g_strdup_printf (_("%d atoms have been selected !"), a_ato);
+          str = g_strdup_printf (_("%s\nConfirm this choice and create a new field atom to describe them ?"), str);
         }
         else
         {
-          str = g_strdup_printf ("A single atom has been selected !");
-          str = g_strdup_printf ("%s\nIs this correct, create a new field atom to describe it ?", str);
+          str = g_strdup_printf (_("A single atom has been selected !"));
+          str = g_strdup_printf (_("%s\nIs this correct, create a new field atom to describe it ?"), str);
         }
         field_question (str, G_CALLBACK(confirm_selection), NULL);
         if (selection_confirmed)
@@ -319,7 +319,7 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
           done = TRUE;
           i = combo_get_active (combo_mol[0]);
           tmp_fbt = get_active_atom (i, tmp_fmol -> atoms-1);
-          new_at = allocint(a_ato);
+          new_at = allocint (a_ato);
           j = 0;
           for (k=0; k<tmp_fat -> num/tmp_fmol -> multi; k++)
           {
@@ -335,7 +335,7 @@ G_MODULE_EXPORT void run_add_atom_dialog (GtkDialog * add_dialog, gint response_
                                              a_ato*tmp_fmol -> multi,
                                              -1,
                                              new_at);
-          tmp_fbt -> next -> prev = g_malloc (sizeof*tmp_fbt -> next -> prev);
+          tmp_fbt -> next -> prev = g_malloc0(sizeof*tmp_fbt -> next -> prev);
           tmp_fbt -> next -> prev = tmp_fbt;
           tmp_fmol -> atoms ++;
           clean_old_atom (tmp_fat, a_ato, new_at);
@@ -430,11 +430,11 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
       {
         if (sid < 2 || sid > 4)
         {
-          str = g_strdup_printf ("%d atoms selected !\nIs this correct ?", k);
+          str = g_strdup_printf (_("%d atoms selected !\nIs this correct ?"), k);
         }
         else
         {
-          str = g_strdup_printf ("%d atoms selected !\nOnly a single atom is required !", k);
+          str = g_strdup_printf (_("%d atoms selected !\nOnly a single atom is required !"), k);
           redone = TRUE;
         }
       }
@@ -443,7 +443,7 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
         switch (sid)
         {
           case 1:
-            str = g_strdup_printf ("A single atom selected !\nIs this correct ?");
+            str = g_strdup_printf (_("A single atom selected !\nIs this correct ?"));
             break;
           default:
             done = TRUE;
@@ -453,7 +453,7 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
       }
       else
       {
-        str = g_strdup_printf ("No atom selected !\nIs this correct ?");
+        str = g_strdup_printf (_("No atom selected !\nIs this correct ?"));
       }
       if (! done)
       {
@@ -521,8 +521,8 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
         tmp_fpmf -> weight[i] = NULL;
         if (k > 0)
         {
-          tmp_fpmf -> list[i] = allocint(tmp_fpmf -> num[i]);
-          tmp_fpmf -> weight[i] = allocfloat(tmp_fpmf -> num[i]);
+          tmp_fpmf -> list[i] = allocint (tmp_fpmf -> num[i]);
+          tmp_fpmf -> weight[i] = allocfloat (tmp_fpmf -> num[i]);
           k = -1;
           for (j=0; j<tmp_fmol -> mol -> natoms; j++)
           {
@@ -541,7 +541,7 @@ G_MODULE_EXPORT void run_select_atom_dialog (GtkDialog * select_dialog, gint res
         tmp_frig -> list = NULL;
         if (k > 0)
         {
-          tmp_frig -> list = allocint(tmp_frig -> num);
+          tmp_frig -> list = allocint (tmp_frig -> num);
           k = -1;
           for (j=0; j<tmp_fmol -> mol -> natoms; j++)
           {
@@ -661,7 +661,7 @@ G_MODULE_EXPORT void run_remove_atom_from_field_molecule (GtkDialog * rmol, gint
       {
         i = combo_get_active (combo_mol[0]);
         field_atom* to_merge = get_active_atom(i, new_at[0]);
-        str = g_strdup_printf ("Merging with atom N°%d - %s !\nIs this correct ?",
+        str = g_strdup_printf (_("Merging with atom N°%d - %s !\nIs this correct ?"),
                                new_at[0]+1, to_merge -> name);
         selection_confirmed = FALSE;
         field_question (str, G_CALLBACK(confirm_selection), NULL);
@@ -733,20 +733,20 @@ G_MODULE_EXPORT void remove_atom_from_field_molecule (GSimpleAction * action, GV
   at_to_remove = (field_atom*) data;
   int i, j;
   field_object = 1;
-  gchar * str = g_strdup_printf ("Select the field atom to merge atom \"%s\" with", at_to_remove -> name);
+  gchar * str = g_strdup_printf (_("Select the field atom to merge atom \"%s\" with"), at_to_remove -> name);
   GtkWidget * rmol = dialogmodal (str, GTK_WINDOW(field_assistant));
   g_free (str);
-  gtk_dialog_add_button (GTK_DIALOG(rmol), "Apply", GTK_RESPONSE_APPLY);
+  gtk_dialog_add_button (GTK_DIALOG(rmol), _("Apply"), GTK_RESPONSE_APPLY);
 
   GtkWidget * remove_tree =  NULL;
   GtkTreeIter iter;
 
-  gchar * mol_title[4] = {"Id", "Name", "Number", "Viz.3D & Merge with"};
+  gchar * mol_title[4] = {i18n("Id."), i18n("Name"), i18n("Number"), i18n("Viz.3D & Merge with")};
   gchar * ctype[4] = {"text", "text", "text", "active"};
   GType col_type[4] = {G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN};
 
   a_ato = 0;
-  new_at = allocint(1);
+  new_at = allocint (1);
   GtkTreeStore * remove_model = gtk_tree_store_newv (4, col_type);
   remove_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(remove_model));
   num_field_objects = tmp_fmol -> atoms;
@@ -762,7 +762,7 @@ G_MODULE_EXPORT void remove_atom_from_field_molecule (GSimpleAction * action, GV
       gtk_cell_renderer_toggle_set_radio (GTK_CELL_RENDERER_TOGGLE(remove_renderer[i]), TRUE);
       g_signal_connect (G_OBJECT(remove_renderer[i]), "toggled", G_CALLBACK(select_field_atom), & remove_model);
     }
-    remove_col[i] = gtk_tree_view_column_new_with_attributes (mol_title[i], remove_renderer[i], ctype[i], i, NULL);
+    remove_col[i] = gtk_tree_view_column_new_with_attributes (_(mol_title[i]), remove_renderer[i], ctype[i], i, NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW(remove_tree), remove_col[i]);
     if (i < 3)
     {

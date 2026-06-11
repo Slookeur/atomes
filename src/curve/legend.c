@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file legend.c
@@ -62,45 +62,46 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
   int j, k, l, m;
   gchar * str;
   curve_dash * dasht;
+  Curve * this_curve =  this_proj -> analysis[rid] -> curves[cid];
 
-  x = this_proj -> curves[rid][cid] -> legend_pos[0] * resol[0];
-  y = this_proj -> curves[rid][cid] -> legend_pos[1] * resol[1];
+  x = this_curve -> legend_pos[0] * resol[0];
+  y = this_curve -> legend_pos[1] * resol[1];
 
-  pango_layout_set_font_description (layout, pango_font_description_from_string (this_proj -> curves[rid][cid] -> legend_font));
+  pango_layout_set_font_description (layout, pango_font_description_from_string (this_curve -> legend_font));
   CurveExtra * ctmp;
-  ctmp = this_proj -> curves[rid][cid] -> extrac -> first;
-  for ( j=this_proj -> curves[rid][cid] -> extrac -> extras ; j >= 0 ; j-- )
+  ctmp = this_curve -> extrac -> first;
+  for ( j=this_curve -> extrac -> extras ; j >= 0 ; j-- )
   {
     y = y + 4.0*z/3.0;
-    if (this_proj -> curves[rid][cid] -> draw_id == j)
+    if (this_curve -> draw_id == j)
     {
-      if (this_proj -> curves[rid][cid] -> layout -> dash > 0)
+      if (this_curve -> layout -> dash > 0)
       {
-        dasht = selectdash (this_proj -> curves[rid][cid] -> layout -> dash);
+        dasht = selectdash (this_curve -> layout -> dash);
         cairo_set_dash(cr, dasht -> a, dasht -> b, 0.0);
-        cairo_set_source_rgba (cr, this_proj -> curves[rid][cid] -> layout -> datacolor.red,
-                                   this_proj -> curves[rid][cid] -> layout -> datacolor.green,
-                                   this_proj -> curves[rid][cid] -> layout -> datacolor.blue,
-                                   this_proj -> curves[rid][cid] -> layout -> datacolor.alpha);
-        cairo_set_line_width (cr, this_proj -> curves[rid][cid] -> layout -> thickness);
+        cairo_set_source_rgba (cr, this_curve -> layout -> datacolor.red,
+                                   this_curve -> layout -> datacolor.green,
+                                   this_curve -> layout -> datacolor.blue,
+                                   this_curve -> layout -> datacolor.alpha);
+        cairo_set_line_width (cr, this_curve -> layout -> thickness);
         cairo_move_to (cr, x-5, y);
         cairo_line_to (cr, x+20, y);
         cairo_stroke(cr);
         g_free (dasht);
       }
       z = x-5;
-      draw_glyph (cr, this_proj -> curves[rid][cid] -> layout -> glyph, z, y,
-                      this_proj -> curves[rid][cid] -> layout -> datacolor,
-                      this_proj -> curves[rid][cid] -> layout -> gsize);
+      draw_glyph (cr, this_curve -> layout -> glyph, z, y,
+                      this_curve -> layout -> datacolor,
+                      this_curve -> layout -> gsize);
       z = x+20;
-      draw_glyph (cr, this_proj -> curves[rid][cid] -> layout -> glyph, z, y,
-                      this_proj -> curves[rid][cid] -> layout -> datacolor,
-                      this_proj -> curves[rid][cid] -> layout -> gsize);
-      cairo_set_source_rgba (cr, this_proj -> curves[rid][cid] -> legend_color.red,
-                                 this_proj -> curves[rid][cid] -> legend_color.green,
-                                 this_proj -> curves[rid][cid] -> legend_color.blue,
-                                 this_proj -> curves[rid][cid] -> legend_color.alpha);
-      str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_proj -> curves[rid][cid] -> name);
+      draw_glyph (cr, this_curve -> layout -> glyph, z, y,
+                      this_curve -> layout -> datacolor,
+                      this_curve -> layout -> gsize);
+      cairo_set_source_rgba (cr, this_curve -> legend_color.red,
+                                 this_curve -> legend_color.green,
+                                 this_curve -> legend_color.blue,
+                                 this_curve -> legend_color.alpha);
+      str = g_strdup_printf ("%s - %s", prepare_for_title(this_proj -> name), this_curve -> name);
     }
     else
     {
@@ -127,11 +128,10 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
       k = ctmp -> id.a;
       l = ctmp -> id.b;
       m = ctmp -> id.c;
-      str = g_strdup_printf ("%s - %s", prepare_for_title(get_project_by_id(k) -> name),
-                                        get_project_by_id(k) -> curves[l][m] -> name);
+      str = g_strdup_printf ("%s - %s", get_project_by_id(k) -> name, get_project_by_id(k) -> analysis[l] -> curves[m] -> name);
       if (ctmp -> next !=  NULL) ctmp = ctmp -> next;
     }
-    pango_layout_set_text (layout, str, -1);
+    pango_layout_set_markup (layout, str, -1);
     pango_layout_get_size (layout, & w, & h);
     z = (double) h / PANGO_SCALE;
     if (j == 0) ih = z;
@@ -143,18 +143,18 @@ void show_legend (cairo_t * cr, project * this_proj, int rid, int cid)
     cairo_stroke (cr);
     g_free (str);
   }
-  if (this_proj -> curves[rid][cid] -> show_legend_box)
+  if (this_curve -> show_legend_box)
   {
-    dasht = selectdash (this_proj -> curves[rid][cid] -> legend_box_dash);
+    dasht = selectdash (this_curve -> legend_box_dash);
     cairo_set_dash(cr, dasht -> a, dasht -> b, 0.0);
-    cairo_set_source_rgba (cr, this_proj -> curves[rid][cid] -> legend_box_color.red,
-                               this_proj -> curves[rid][cid] -> legend_box_color.green,
-                               this_proj -> curves[rid][cid] -> legend_box_color.blue,
-                               this_proj -> curves[rid][cid] -> legend_box_color.alpha);
-    cairo_set_line_width (cr, this_proj -> curves[rid][cid] -> legend_box_thickness);
-    x = this_proj -> curves[rid][cid] -> legend_pos[0] * resol[0] - 25;
-    th = ih + fh + (y - this_proj -> curves[rid][cid] -> legend_pos[1] * resol[1]);
-    y = this_proj -> curves[rid][cid] -> legend_pos[1] * resol[1] - ih;
+    cairo_set_source_rgba (cr, this_curve -> legend_box_color.red,
+                               this_curve -> legend_box_color.green,
+                               this_curve -> legend_box_color.blue,
+                               this_curve -> legend_box_color.alpha);
+    cairo_set_line_width (cr, this_curve -> legend_box_thickness);
+    x = this_curve -> legend_pos[0] * resol[0] - 25;
+    th = ih + fh + (y - this_curve -> legend_pos[1] * resol[1]);
+    y = this_curve -> legend_pos[1] * resol[1] - ih;
     tw = tw + 80;
     cairo_rectangle (cr, x, y, tw, th);
     cairo_stroke(cr);

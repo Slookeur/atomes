@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file save_bond.c
@@ -57,19 +57,19 @@ int save_bonding (FILE * fp, project * this_proj)
     {
       for (j=0; j<this_proj -> natomes; j++)
       {
-        if (fwrite (this_proj -> atoms[i][j].coord, sizeof(int), 5, fp) != 5) return ERROR_COORD;
-        if (fwrite (& this_proj -> atoms[i][j].numv, sizeof(int), 1, fp) != 1) return ERROR_COORD;
+        if (fwrite (this_proj -> atoms[i][j].coord, sizeof(int), 5, fp) != 5) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+        if (fwrite (& this_proj -> atoms[i][j].numv, sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         if (this_proj -> atoms[i][j].numv)
         {
-          if (fwrite (this_proj -> atoms[i][j].vois, sizeof(int), this_proj -> atoms[i][j].numv, fp) != this_proj -> atoms[i][j].numv) return ERROR_COORD;
+          if (fwrite (this_proj -> atoms[i][j].vois, sizeof(int), this_proj -> atoms[i][j].numv, fp) != this_proj -> atoms[i][j].numv) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         }
       }
-      if (fwrite (this_proj -> modelgl -> bonds[i], sizeof(int), 2, fp) != 2) return ERROR_COORD;
+      if (fwrite (this_proj -> modelgl -> bonds[i], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       for (j=0; j<2; j++)
       {
         for (k=0; k<this_proj -> modelgl -> bonds[i][j]; k++)
         {
-          if (fwrite (this_proj -> modelgl -> bondid[i][j][k], sizeof(int), 2, fp) != 2) return ERROR_COORD;
+          if (fwrite (this_proj -> modelgl -> bondid[i][j][k], sizeof(int), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         }
       }
     }
@@ -77,15 +77,15 @@ int save_bonding (FILE * fp, project * this_proj)
     coord_info * coord = this_proj -> coord;
     for (i=0; i<2; i++)
     {
-      if (fwrite (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
+      if (fwrite (coord -> ntg[i], sizeof(int), coord -> species, fp) != coord -> species) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       for (j=0; j<coord -> species; j++)
       {
-        if (fwrite (coord -> geolist[i][j], sizeof(int), coord -> ntg[i][j], fp) != coord -> ntg[i][j]) return ERROR_COORD;
+        if (fwrite (coord -> geolist[i][j], sizeof(int), coord -> ntg[i][j], fp) != coord -> ntg[i][j]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
         if (i == 1)
         {
           for (k=0; k<coord -> ntg[i][j]; k++)
           {
-            if (fwrite (coord -> partial_geo[j][k], sizeof(int), coord -> species, fp) != coord -> species) return ERROR_COORD;
+            if (fwrite (coord -> partial_geo[j][k], sizeof(int), coord -> species, fp) != coord -> species) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
           }
         }
       }
@@ -94,18 +94,18 @@ int save_bonding (FILE * fp, project * this_proj)
 
   for (i=0; i<10; i++)
   {
-    if (fwrite (& this_proj -> coord -> totcoord[i], sizeof(int), 1, fp) != 1) return ERROR_COORD;
+    if (fwrite (& this_proj -> coord -> totcoord[i], sizeof(int), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
     if (i < 2)
     {
-      if (fwrite (img -> show_atom[i], sizeof(gboolean), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_COORD;
-      if (fwrite (img -> show_label[i], sizeof(gboolean), this_proj -> nspec, fp) != this_proj -> nspec) return ERROR_COORD;
+      if (fwrite (img -> show_atom[i], sizeof(gboolean), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
+      if (fwrite (img -> show_label[i], sizeof(gboolean), this_proj -> nspec, fp) != this_proj -> nspec) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
     }
     if (this_proj -> coord -> totcoord[i])
     {
-      if (fwrite (img -> show_coord[i], sizeof(gboolean), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return ERROR_COORD;
+      if (fwrite (img -> show_coord[i], sizeof(gboolean), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       if (i < 2 || (i > 3 && i < 9))
       {
-        if (fwrite (img -> show_poly[i], sizeof(gboolean), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return ERROR_COORD;
+        if (fwrite (img -> show_poly[i], sizeof(gboolean), this_proj -> coord -> totcoord[i], fp) != this_proj -> coord -> totcoord[i]) return signal_error (__FILE__, __func__, __LINE__, ERROR_COORD);
       }
     }
   }

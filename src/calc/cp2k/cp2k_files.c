@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file cp2k_files.c
@@ -290,7 +290,7 @@ GtkWidget * prepare_basis_combo (int sp, int obj)
 {
   int i, j;
   GtkWidget * widg = create_combo ();
-  int * sp_id = g_malloc0 (100*sizeof*sp_id);
+  int * sp_id = g_malloc0(100*sizeof*sp_id);
   if (obj)
   {
     i = prepare_cp2k_basis_pseudo_list (sp, sp_id, N_POTS, pot_elem);

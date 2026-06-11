@@ -11,7 +11,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 If not, see <https://www.gnu.org/licenses/>
 
-Copyright (C) 2022-2025 by CNRS and University of Strasbourg */
+Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
 /*!
 * @file atom_remove.c
@@ -107,8 +107,8 @@ int test_this_fragment (int natomes, int fcoord, int fid, atom ** atom_list, int
 {
   int i, j, k, l, m, n;
   gboolean modif;
-  tigl = allocint(natomes);
-  migl = allocint(natomes);
+  tigl = allocint (natomes);
+  migl = allocint (natomes);
   i = 0;
   for (j=0; j<natomes; j++)
   {
@@ -137,7 +137,7 @@ int test_this_fragment (int natomes, int fcoord, int fid, atom ** atom_list, int
 
   if (i)
   {
-    togl = allocint(i);
+    togl = allocint (i);
     atoms_in_frag = i;
 
     // Check each atoms (recursive testing)
@@ -365,7 +365,7 @@ gboolean * remove_bonds_from_project (project * this_proj, atomic_object * this_
   }
   g_free (in_frag);
   g_free (per_frag);
-  atom ** atom_list = g_malloc0 (nat*sizeof*atom_list);
+  atom ** atom_list = g_malloc0(nat*sizeof*atom_list);
   tmp_list = new_list;
   while (tmp_list)
   {
@@ -497,7 +497,7 @@ gboolean * remove_bonds_from_project (project * this_proj, atomic_object * this_
         }
         if (tmpbond[i])
         {
-          if (i) this_proj -> modelgl -> clones[0] = g_malloc0 (tmpbond[i]*sizeof*this_proj -> modelgl -> clones[0]);
+          if (i) this_proj -> modelgl -> clones[0] = g_malloc0(tmpbond[i]*sizeof*this_proj -> modelgl -> clones[0]);
           this_proj -> modelgl -> bondid[0][i] = allocdint (tmpbond[i], 2);
           for (k=0; k<tmpbond[i]; k++)
           {

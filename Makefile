@@ -1,14 +1,14 @@
-# This file is part of atomes.
+# This file is part of 'atomes'.
 
-# atomes is free software: you can redistribute it and/or modify it under the terms
+# 'atomes' is free software: you can redistribute it and/or modify it under the terms
 # of the GNU Affero General Public License as published by the Free Software Foundation,
 # either version 3 of the License, or (at your option) any later version.
 
-# atomes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# 'atomes' is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 
-# You should have received a copy of the GNU Affero General Public License along with atomes.
+# You should have received a copy of the GNU Affero General Public License along with 'atomes'.
 # If not, see <https://www.gnu.org/licenses/>
 
 # The targets to build are 'atomes' or 'debug'
@@ -17,17 +17,16 @@ LINUX = 1
 WINDOWS = 0
 
 # The next line defines the GTK version !
-GTKV = 4
+GTKV = 3
 ifeq ($(GTKV),4)
-  DGTK = -DGTK4 -DGTKGLAREA
-  # -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+  DGTK = -DGTK4 -DGTKGLAREA -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
   # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
-  IGTK = `pkg-config --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
-  LGTK = `pkg-config --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  IGTK = `pkgconf --cflags gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  LGTK = `pkgconf --libs gtk4 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 else
   DGTK = -DGTK3 -DGTKGLAREA -DMENU_ICONS
-  IGTK = `pkg-config --cflags gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
-  LGTK = `pkg-config --libs gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  IGTK = `pkgconf --cflags gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
+  LGTK = `pkgconf --libs gtk+-3.0 epoxy glu libxml-2.0 pangoft2 libavutil libavcodec libavformat libswscale`
 endif
 
 # OpenMP
@@ -53,7 +52,7 @@ ifeq ($(LINUX),1)
   LIBS = $(LGTK) -lm -lgfortran
 
   DOS = -DLINUX
-  CPPFLAGS = -DCODEBLOCKS -DPACKAGE_PREFIX=\"./\" -DPACKAGE_LIBEXEC=\"./\"
+  CPPFLAGS = -DCODEBLOCKS -DPACKAGE_PREFIX=\"./\" -DPACKAGE_LIBEXEC=\"./\" -DPACKAGE_LOCALE=\"./locale\"
   LDFLGS = $(DOMP)
 
   RM = rm
@@ -62,6 +61,7 @@ ifeq ($(LINUX),1)
   CP = cp
   CPFLAGS = -f
   ECHO = echo
+  MSGFMT = msgfmt
 
   EXT =
 
@@ -85,6 +85,7 @@ ifeq ($(WINDOWS),1)
   LD = $(COMP)$(CPU)-w64-mingw32-gfortran $(DOMP)
 
   CPPFLAGS =
+  LDFLG = -lz -liphlpapi
 
   ifeq ($(GTKV), 4)
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-4.0 -IC:/msys64/mingw64/include/cairo \
@@ -99,8 +100,7 @@ ifeq ($(WINDOWS),1)
 
     LGTK = -LC:/msys64/mingw64/lib -lgtk-4 -lpangowin32-1.0 -lharfbuzz -lpangocairo-1.0 -lpango-1.0 -lgdk_pixbuf-2.0 \
 		-lcairo-gobject -lcairo -lgraphene-1.0 -lgio-2.0 -lglib-2.0 -lintl -lgobject-2.0 -lxml2  -lpangoft2-1.0 \
-		-lepoxy -lavutil -lavcodec -lavformat -lswscale
-    LDTK = -lole32 -luuid
+		-lepoxy -lavutil -lavcodec -lavformat -lswscale -lole32 -luuid
   else
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-3.0 -IC:/msys64/mingw64/include/cairo \
 		-IC:/msys64/mingw64/include/pango-1.0 -IC:/msys64/mingw64/include/atk-1.0 \
@@ -115,9 +115,7 @@ ifeq ($(WINDOWS),1)
 		-Wl,-luuid -lwinmm -ldwmapi -lsetupapi -lcfgmgr32 -lpangowin32-1.0 -lpangocairo-1.0 \
 		-latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lepoxy -lxml2 -lpangoft2-1.0 \
 		-lpango-1.0 -lgobject-2.0 -lglib-2.0 -lintl -lfontconfig -lfreetype -lavutil -lavcodec -lavformat -lswscale
-    LDTK =
   endif
-  LDFLG = -lz -liphlpapi $(LDTK)
   LIB = $(LGTK)
 
   ifeq ($(MAKECMDGOALS), atomes)
@@ -138,14 +136,15 @@ ifeq ($(WINDOWS),1)
   CAT = $(DEV)bin/cat
   CPFLAGS = -f
   ECHO = $(DEV)bin/echo
+  MSGFMT = $(COMP)msgfmt
 
   WINDRES = $(COMP)windres
   WIN_ATOMES = $(OBJ)win_atomes.o
   WIN_STARTUP = $(OBJ)win_startup.o
 
   EXT=".exe"
-  FCVER = 14.2.0
-  CCVER = 14.2.0
+  FCVER = 16.1.0
+  CCVER = 16.1.0
 
 endif
 
@@ -167,22 +166,22 @@ GLEDIT = src/opengl/edit/
 FOR = src/fortran/
 OBJ = obj/
 BIN = bin/
+LOCALE = bin/locale
 
 INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
-INCLUDES = $(INC) $(IGTK)
-# -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
+INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
 # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ifeq ($(MAKECMDGOALS),atomes)
   FCFLAGS = -O2 -cpp
-  CFLAGS = -O2
+  CFLAGS = -O2 -std=gnu99
   LDFLAGS = $(LIBS) $(LDFLGS)
   DEFS = -DHAVE_CONFIG_H $(DGTK) $(DOS)
 endif
 
 ifeq ($(MAKECMDGOALS),debug)
   FCFLAGS = -fno-second-underscore -O0 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all
-  CFLAGS = -O0 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all -Wduplicated-cond
+  CFLAGS = -O0 -std=gnu99 -Wall -g3 -pg -ggdb3 -cpp -dA -dD -dH -dp -dP -fvar-tracking -fbounds-check -fstack-protector-all -Wduplicated-cond
   LDFLAGS = $(LIBS) $(LDFLGS) -pg
   DEFS = -DHAVE_CONFIG_H -DDEBUG $(DGTK) $(DOS)
 endif
@@ -212,6 +211,7 @@ OBJ_GUI = \
 	$(OBJ)bdcall.o \
 	$(OBJ)grcall.o \
 	$(OBJ)sqcall.o \
+	$(OBJ)sktcall.o \
 	$(OBJ)ringscall.o \
 	$(OBJ)chainscall.o \
 	$(OBJ)msdcall.o \
@@ -321,7 +321,6 @@ OBJ_FIELD = \
 #	$(OBJ)oplsaap.o \
 #	$(OBJ)oplsaar.o \
 #	$(OBJ)pcff.o
-
 
 OBJ_CPMD = \
 	$(OBJ)cpmd_print.o \
@@ -484,9 +483,13 @@ endif
 
 # The rule to build the executable
 
-atomes: version ogl exe
+atomes: all_langs version ogl exe
 
-debug: version ogl exe
+debug: all_langs version ogl exe
+
+all_langs:
+	$(MSGFMT) $(LOCALE)/en/atomes-messages.po -o $(LOCALE)/en/LC_MESSAGES/atomes.mo
+	$(MSGFMT) $(LOCALE)/fr/atomes-messages.po -o $(LOCALE)/fr/LC_MESSAGES/atomes.mo
 
 version:
 	$(ECHO) "#define FC \""$(FC) $(FCVER)"\"" > src/version.h
@@ -562,7 +565,7 @@ cleanf:
 	$(RM) $(RMFLAGS) $(OBJ)*.mod
 
 clean_all:
-	$(RM) $(RMFLAGS) $(OBJECTS) *.mod $(OBJ)*.mod $(BIN)$(PROGRAM) $(OBJ)startup_testing.o $(BIN)$(OGL_TEST_PROG)
+	$(RM) $(RMFLAGS) $(OBJECTS) *.mod $(OBJ)*.mod $(BIN)$(PROGRAM) $(OBJ)startup_testing.o $(BIN)$(OGL_TEST_PROG) $(BIN)/locale/*/LC_MESSAGES/*.mo
 
 clean_win:
 	$(RM) $(RMFLAGS) $(OBJ)win_atomes.o
@@ -628,6 +631,8 @@ $(OBJ)grcall.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)grcall.o $(GUI)grcall.c $(INCLUDES)
 $(OBJ)sqcall.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)sqcall.o $(GUI)sqcall.c $(INCLUDES)
+$(OBJ)sktcall.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)sktcall.o $(GUI)sktcall.c $(INCLUDES)
 $(OBJ)ringscall.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)ringscall.o $(GUI)ringscall.c $(INCLUDES)
 $(OBJ)chainscall.o:
