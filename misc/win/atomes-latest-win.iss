@@ -36,7 +36,6 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Code]
-[Code]
 var
     maj : Integer;
     min : Integer;

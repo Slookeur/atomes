@@ -100,7 +100,7 @@ ifeq ($(WINDOWS),1)
 
     LGTK = -LC:/msys64/mingw64/lib -lgtk-4 -lpangowin32-1.0 -lharfbuzz -lpangocairo-1.0 -lpango-1.0 -lgdk_pixbuf-2.0 \
 		-lcairo-gobject -lcairo -lgraphene-1.0 -lgio-2.0 -lglib-2.0 -lintl -lgobject-2.0 -lxml2  -lpangoft2-1.0 \
-		-lepoxy -lavutil -lavcodec -lavformat -lswscale
+		-lepoxy -lavutil -lavcodec -lavformat -lswscale -lole32 -luuid
   else
     IGTK = -pthread -mms-bitfields -IC:/msys64/mingw64/include/gtk-3.0 -IC:/msys64/mingw64/include/cairo \
 		-IC:/msys64/mingw64/include/pango-1.0 -IC:/msys64/mingw64/include/atk-1.0 \
