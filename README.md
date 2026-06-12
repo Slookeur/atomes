@@ -89,7 +89,8 @@ to
 
 The documentation is hosted on [GitHub][github] here: [atomes documentation][atomes-doc]
 
-Developer contribution guidelines are hosted on [GitHub][github]: [atomes developer guidelines][devel-guide]
+Developer contribution guidelines are hosted on [GitHub][github] here: [atomes developer guidelines][devel-guide]
+
 Developer documentation is hosted on [GitHub][github] here: [atomes developer documentation][devel-doc]
 
 ## Tutorials
