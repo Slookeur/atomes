@@ -229,7 +229,7 @@ G_MODULE_EXPORT void run_vectors (GtkDialog * win, gint response_id, gpointer da
 G_MODULE_EXPORT void on_vectors_clicked (GtkButton * but, gpointer data)
 {
   int i, j, k;
-  GtkWidget * win = dialog_cancel_apply (_(edit_prop[3]), MainWindow, FALSE);
+  GtkWidget * win = dialog_cancel_apply (_(edit_prop[3]), atomes_app -> main_window, FALSE);
   GtkWidget * table = gtk_grid_new ();
   add_box_child_start (GTK_ORIENTATION_VERTICAL, dialog_get_content_area (win), table, FALSE, FALSE, 5);
   k = 0;
@@ -868,7 +868,7 @@ G_MODULE_EXPORT void on_edit_activate (GtkWidget * widg, gpointer data)
   gboolean skip = FALSE;
   int id = GPOINTER_TO_INT(data);
   i = (id < 2) ? id : (id > 2 && id < 5) ? 1 : 2;
-  GtkWidget * win = dialog_cancel_apply (_(edit_prop[i]), MainWindow, FALSE);
+  GtkWidget * win = dialog_cancel_apply (_(edit_prop[i]), atomes_app -> main_window, FALSE);
   GtkWidget * box = dialog_get_content_area (win);
   gtk_box_set_homogeneous (GTK_BOX(box), FALSE);
   if (i == 0)

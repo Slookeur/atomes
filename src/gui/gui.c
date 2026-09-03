@@ -540,7 +540,7 @@ void add_analysis_action (int act)
   gchar * str = g_strdup_printf ("analyze.%d", act);
   GSimpleAction * this_action = g_simple_action_new (str, NULL);
   g_free (str);
-  g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(this_action));
+  g_action_map_add_action (G_ACTION_MAP(atomes_app -> gtk_app), G_ACTION(this_action));
   g_signal_connect (this_action, "activate", G_CALLBACK(atomes_menu_bar_action), GINT_TO_POINTER(act));
 }
 
@@ -553,7 +553,7 @@ void add_analysis_action (int act)
 */
 void remove_action (gchar * action_name)
 {
-  g_action_map_remove_action (G_ACTION_MAP(AtomesApp), (const gchar *)action_name);
+  g_action_map_remove_action (G_ACTION_MAP(atomes_app -> gtk_app), (const gchar *)action_name);
 }
 
 /*!
@@ -1054,7 +1054,7 @@ G_MODULE_EXPORT void atomes_popup_menu (GtkGesture * gesture, int n_press, doubl
   if (gtk_gesture_single_get_current_button ((GtkGestureSingle * )gesture) == GDK_BUTTON_SECONDARY)
   {
     GtkWidget * popover = work_menu (-1, -1);
-    gtk_widget_set_parent (popover, MainWindow);
+    gtk_widget_set_parent (popover, atomes_app -> main_window);
     pop_menu_at_pointer (popover, x, y);
   }
 }
@@ -1133,7 +1133,7 @@ GtkWidget * create_main_window (GApplication * atomes)
   for (i=0; i<G_N_ELEMENTS(main_actions); i++)
   {
     main_act[i] = g_simple_action_new (main_actions[i].action_name, NULL);
-    g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(main_act[i]));
+    g_action_map_add_action (G_ACTION_MAP(atomes_app -> gtk_app), G_ACTION(main_act[i]));
     g_signal_connect (main_act[i], "activate", G_CALLBACK(atomes_menu_bar_action), main_actions[i].action_data);
   }
   for (i=0; i<G_N_ELEMENTS(edition_acts); i++)

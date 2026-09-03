@@ -203,7 +203,6 @@ double pi = 3.141592653589793238462643383279502884197;
 
 GSimpleAction * edition_actions[3];
 
-GtkApplication * AtomesApp = NULL;
 GtkWidget * MainWindow = NULL;
 GtkWidget * MainView = NULL;
 GtkWidget * MainFrame[2];

@@ -339,7 +339,7 @@ GtkWidget * create_tool_tree ()
 GtkWidget * create_curve_tool_box ()
 {
   GtkWidget * ctbox;
-  ctbox = create_win (_("Toolboxes"), MainWindow, FALSE, FALSE);
+  ctbox = create_win (_("Toolboxes"), atomes_app -> main_window, FALSE, FALSE);
 #ifdef GTK4
   gtk_widget_set_size_request (ctbox, 300, 250);
 #else

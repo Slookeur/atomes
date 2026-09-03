@@ -181,6 +181,8 @@ GtkWidget * sel_combo;
 GtkWidget * sel_box[2];
 GtkWidget * preference_notebook = NULL;
 
+int default_instance;
+int tmp_instance;
 double default_totcut;
 double tmp_totcut;
 bond_cutoff * default_bond_cutoff;
@@ -533,6 +535,12 @@ int save_preferences_to_xml_file ()
   if (rc < 0) return 0;
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"atomes_preferences-xml");
+  if (rc < 0) return 0;
+  rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"general");
+  if (rc < 0) return 0;
+  rc = xml_save_parameter_to_file (writer, _("File opening"), "default_instance", TRUE, 0, (default_instance) ? "single" : "multiple(s)");
+  if (! rc) return 0;
+  rc = xmlTextWriterEndElement (writer);
   if (rc < 0) return 0;
 
   rc = xmlTextWriterStartElement (writer, BAD_CAST (const xmlChar *)"analysis");
@@ -1288,6 +1296,10 @@ void set_parameter (xmlChar * content, gchar * key, int vid, dint * bond, vec3_t
     cut -> use = TRUE;
     cut -> cutoff = xml_string_to_double(content);
   }
+  else if (g_strcmp0(key, "default_instance") == 0)
+  {
+    default_instance = (g_strcmp0((gchar *)content, "single") == 0) ? TRUE : FALSE;
+  }
   else if (g_strcmp0(key, "default_totcut") == 0)
   {
     default_totcut = xml_string_to_double(content);
@@ -1965,6 +1977,11 @@ void read_preferences_from_xml_file ()
       {
         if (g_strcmp0 ((char *)(racine -> name), "atomes_preferences-xml") == 0)
         {
+          node = findnode(racine -> children, "general");
+          if (node)
+          {
+           read_preferences (node);
+          }
           node = findnode(racine -> children, "analysis");
           if (node)
           {
@@ -2140,6 +2157,10 @@ void read_preferences_from_xml_file ()
 void set_atomes_defaults ()
 {
   int i, j;
+
+  // Software behavior
+  default_instance = TRUE;
+
   // Analysis preferences
 
   default_totcut = 2.0;
@@ -3223,7 +3244,7 @@ void color_button_event (GtkWidget * widget, double event_x, double event_y, gui
           gtk_tree_model_get (model, & row, 3, & z, -1);
           gchar * str = g_strdup_printf (_("%s %s color"), periodic_table_info[z].lab, obj[i]);
           GdkRGBA col = colrgba_togtkrgba (get_spec_color (z, color_list));
-          GtkWidget * win = gtk_color_chooser_dialog_new (str, GTK_WINDOW(MainWindow));
+          GtkWidget * win = gtk_color_chooser_dialog_new (str, GTK_WINDOW(atomes_app -> main_window));
           gtk_window_set_modal (GTK_WINDOW(win), TRUE);
           gtk_color_chooser_set_use_alpha (GTK_COLOR_CHOOSER(win), TRUE);
           gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER(win), & col);
@@ -3346,7 +3367,7 @@ G_MODULE_EXPORT void edit_species_parameters (GtkButton * but, gpointer data)
   edit_list = NULL;
   color_list = NULL;
   tmp_color = NULL;
-  GtkWidget * win = dialog_cancel_apply (str, MainWindow, TRUE);
+  GtkWidget * win = dialog_cancel_apply (str, atomes_app -> main_window, TRUE);
   g_free (str);
   gtk_window_set_default_size (GTK_WINDOW(win), (num_col == 8) ? 600 : 300, 600);
   GtkWidget * vbox = dialog_get_content_area (win);
@@ -4184,7 +4205,7 @@ G_MODULE_EXPORT void edit_cutoffs (GtkDialog * edit_cuts, gint response_id, gpoi
 */
 G_MODULE_EXPORT void set_cutoffs_default (GtkButton * but, gpointer data)
 {
-  GtkWidget * win = dialog_cancel_apply (_("Select partial cutoffs(s)"), MainWindow, TRUE);
+  GtkWidget * win = dialog_cancel_apply (_("Select partial cutoffs(s)"), atomes_app -> main_window, TRUE);
   GtkWidget * vbox = dialog_get_content_area (win);
   GtkWidget * hbox = create_hbox (BSEP);
   add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, hbox, FALSE, FALSE, 5);
@@ -4570,6 +4591,7 @@ void duplicate_axis_data (axis * new_axis, axis * old_axis)
 void prepare_tmp_default ()
 {
   clean_all_tmp ();
+  tmp_instance = default_instance;
   tmp_totcut = default_totcut;
   tmp_bond_cutoff = duplicate_cutoffs (default_bond_cutoff);
   tmp_num_delta = duplicate_int (NUM_DELTA, default_num_delta);
@@ -4768,6 +4790,8 @@ G_MODULE_EXPORT void toggled_select_project (GtkToggleButton * but, gpointer dat
 */
 void save_preferences ()
 {
+  default_instance = tmp_instance;
+  g_debug ("default_instance = %d", default_instance);
   default_totcut = tmp_totcut;
   if (default_bond_cutoff)
   {
@@ -4879,7 +4903,7 @@ void save_preferences ()
     if (ask_yes_no(_("Apply to project(s) in workspace ?"), _("Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?"), GTK_MESSAGE_QUESTION, pref_ogl_edit -> win))
     {
      // Select project here
-     GtkWidget * proj_sel = message_dialogmodal (_("Project selection"), _("Select to apply preferences"), GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, MainWindow);
+     GtkWidget * proj_sel = message_dialogmodal (_("Project selection"), _("Select to apply preferences"), GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, atomes_app -> main_window);
      GtkWidget * vbox = dialog_get_content_area (proj_sel);
      GtkWidget * hbox;
      up_project = allocbool (nprojects*2);
@@ -4942,7 +4966,7 @@ void adjust_preferences_window ()
 G_MODULE_EXPORT void restore_defaults_parameters (GtkButton * but, gpointer data)
 {
 
-  if (ask_yes_no(_("Restore default parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, MainWindow))
+  if (ask_yes_no(_("Restore default parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, atomes_app -> main_window))
   {
     set_atomes_defaults ();
     prepare_tmp_default ();
@@ -4975,7 +4999,7 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   switch (response_id)
   {
     case GTK_RESPONSE_APPLY:
-      if (ask_yes_no(_("Save parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, MainWindow))
+      if (ask_yes_no(_("Save parameters"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, atomes_app -> main_window))
       {
         save_preferences ();
         gchar * str = g_strdup_printf (_("Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"), ATOMES_CONFIG);
@@ -4983,7 +5007,7 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
         {
           if (! save_preferences_to_xml_file ())
           {
-            show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, MainWindow);
+            show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, atomes_app -> main_window);
             g_free (pref_error);
             pref_error = NULL;
           }
@@ -5014,6 +5038,33 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
   }
 }
 
+
+#ifdef GTK4
+/*!
+  \fn G_MODULE_EXPORT void set_instance_mode (GtkCheckButton * but, gpointer data)
+
+  \brief set default instance mode
+
+  \param but the GtkCheckButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_instance_mode (GtkCheckButton * but, gpointer data)
+#else
+/*!
+  \fn G_MODULE_EXPORT void set_instance_mode (GtkToggleButton * but, gpointer data)
+
+  \brief set default instance mode
+
+  \param but the GtkToggleButton sending the signal
+  \param data the associated data pointer
+*/
+G_MODULE_EXPORT void set_instance_mode (GtkToggleButton * but, gpointer data)
+#endif
+{
+  int i = GPOINTER_TO_INT(data);
+  tmp_instance = (i) ? FALSE : TRUE;
+}
+
 /*!
   \fn void create_configuration_dialog ()
 
@@ -5021,7 +5072,7 @@ G_MODULE_EXPORT void edit_preferences (GtkDialog * edit_prefs, gint response_id,
 */
 void create_user_preferences_dialog ()
 {
-  GtkWidget * win = dialog_cancel_apply (_("User preferences"), MainWindow, TRUE);
+  GtkWidget * win = dialog_cancel_apply (_("User preferences"), atomes_app -> main_window, TRUE);
   preferences = TRUE;
   prepare_tmp_default ();
   GtkWidget * vbox = dialog_get_content_area (win);
@@ -5054,11 +5105,54 @@ void create_user_preferences_dialog ()
   add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, pref_list(mess, 4, mlist, end), FALSE, FALSE, 20);
 
   GtkWidget * hbox = create_hbox (BSEP);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 10);
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, markup_label(_("<b>atomes</b> default behavior:"), 200, -1, 0.5, 0.5),  FALSE, FALSE, 100);
+  gchar * but_text[2]  = {i18n("Single instance (1)"), i18n("Multiple instance(s) (2)")};
+  GtkWidget * beh_but[2];
+  gboolean val;
+  for (i=0; i<2; i++)
+  {
+    val = (! i) ? tmp_instance : ! tmp_instance;
+#ifdef GTK4
+    beh_but[i] = check_button (_(but_text[i]), 150, -1, val, G_CALLBACK(set_instance_mode), GINT_TO_POINTER(i));
+    if (i)
+    {
+      gtk_check_button_set_group ((GtkCheckButton *) beh_but[i], (GtkCheckButton *)beh_but[0]);
+    }
+#else
+    if (! i)
+    {
+      beh_but[i] = radio_button (_(but_text[i]), 150, -1, val, G_CALLBACK(set_instance_mode), GINT_TO_POINTER(i));
+    }
+    else
+    {
+      beh_but[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(beh_but[0]), _(but_text[i]));
+      g_signal_connect (G_OBJECT (beh_but[i]), "toggled", G_CALLBACK(set_instance_mode), GINT_TO_POINTER(i));
+    }
+#endif
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, beh_but[i], FALSE, FALSE, 150);
+  }
+#ifdef GTK3
+   gtk_toggle_button_set_active ((GtkToggleButton *)beh_but[1], ! tmp_instance);
+#endif // GTK3
+  gchar * instance_about[2] = {i18n("(1) Each and every file is opened in a single <b>atomes</b> instance"),
+                               i18n("(2) When required files are opened in separate, new, <b>atomes</b> instance(s)")};
+  for (i=0; i<2; i++)
+  {
+    hbox = create_hbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 5);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,markup_label(_(instance_about[i]), 200, -1, 0.0, 0.5), FALSE, FALSE, 50);
+  }
+
+  hbox = create_hbox (BSEP);
   GtkWidget * but = create_button (NULL, IMG_NONE, NULL, -1, -1, GTK_RELIEF_NORMAL, G_CALLBACK(restore_defaults_parameters), NULL);
   GtkWidget * but_lab = markup_label (_("Restore <b>atomes</b> default parameters"), -1, -1, 0.5, 0.5);
   add_container_child (CONTAINER_BUT, but, but_lab);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, but, FALSE, FALSE, 150);
-  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 0);
+  add_box_child_start (GTK_ORIENTATION_VERTICAL, gbox, hbox, FALSE, FALSE, 40);
+
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), gbox, gtk_label_new (_("General")));
 
   gtk_notebook_append_page (GTK_NOTEBOOK(preference_notebook), calc_preferences(), gtk_label_new (_("Analysis ")));
@@ -5129,7 +5223,7 @@ G_MODULE_EXPORT void set_default_options (GtkButton * but, gpointer data)
     {
       if (! save_preferences_to_xml_file ())
       {
-        show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, MainWindow);
+        show_error ((pref_error) ? pref_error : _("Error while trying to save preferences to file"), 0, atomes_app -> main_window);
         g_free (pref_error);
         pref_error = NULL;
       }

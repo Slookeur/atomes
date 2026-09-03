@@ -113,7 +113,7 @@ int search_type;
 */
 GtkWidget * calc_window (int i)
 {
-  calc_dialog = dialog_cancel_apply (calc_name[i], MainWindow, FALSE);
+  calc_dialog = dialog_cancel_apply (calc_name[i], atomes_app -> main_window, FALSE);
   return calc_dialog;
 }
 
@@ -773,14 +773,14 @@ G_MODULE_EXPORT void toggle_bond (GtkToggleButton * Button, gpointer data)
     {
       // To add = do not annoy me with that again !
       show_info (_("The result of the nearest neighbors analysis\n"
-                   "will be saved in a file that you may use afterwards.\n"), 0, MainWindow);
+                   "will be saved in a file that you may use afterwards.\n"), 0, atomes_app -> main_window);
 #ifdef GTK4
      GtkFileChooserNative * info;
 #else
       GtkWidget * info;
 #endif
       info = create_file_chooser (_("Save neighbors analysis in file"),
-                                  GTK_WINDOW(MainWindow),
+                                  GTK_WINDOW(atomes_app -> main_window),
                                   GTK_FILE_CHOOSER_ACTION_SAVE,
                                   _("Save"));
       GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);

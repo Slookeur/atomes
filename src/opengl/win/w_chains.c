@@ -957,7 +957,7 @@ G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data)
   GtkWidget * info;
 #endif
   info = create_file_chooser (_("Save atoms in chains to file"),
-                              GTK_WINDOW(MainWindow),
+                              GTK_WINDOW(atomes_app -> main_window),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
                               _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
@@ -1010,7 +1010,7 @@ GtkWidget * chains_tab (glwin * view)
   add_box_child_start (GTK_ORIENTATION_VERTICAL, chains, hbox, FALSE, FALSE, 2);
   GtkWidget * hhbox = create_hbox (0);
   add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, hhbox, TRUE, TRUE, 100);
-  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button(_("Save to file"), IMG_NONE, NULL, 50, -1, 
+  add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hhbox, create_button(_("Save to file"), IMG_NONE, NULL, 50, -1,
                        GTK_RELIEF_NORMAL, G_CALLBACK(save_chains_to_file), & view -> colorp[0][0]), TRUE, TRUE, 40);
   return chains;
 }

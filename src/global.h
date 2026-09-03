@@ -51,6 +51,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #endif
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <gio/gio.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -99,6 +100,22 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #    include <epoxy/glx.h>
 #  endif
 #endif
+
+/*! \typedef AppData
+
+  \brief application information data structure
+*/
+typedef struct AppData AppData;
+struct AppData
+{
+  GtkApplication * gtk_app;                // GTK application
+  GtkWidget * main_window;                 // main Gtk Window
+#ifndef G_OS_WIN32
+  GDBusConnection * dbus_connection;       // D-Bus connection
+  GDBusInterfaceSkeleton * dbus_skeleton;  // D-Bus skeleton
+#endif
+};
+extern AppData * atomes_app;
 
 #define MY_ENCODING "UTF-8"
 
@@ -1135,7 +1152,7 @@ extern void remove_action (gchar * action_name);
 extern void remove_edition_actions ();
 extern void remove_edition_and_analyze_actions ();
 
-extern GtkApplication * AtomesApp;
+extern AppData * AtomesApp;
 extern workspace workzone;
 extern project * proj;
 extern chemical_data * active_chem;

@@ -920,7 +920,7 @@ G_MODULE_EXPORT void open_save_data_map (GtkWidget * but, gpointer data)
 #endif
     str = g_strdup_printf ("%s%s", _(title[osmap.b]), prepare_for_title(this_proj -> name));
     info = create_file_chooser (str,
-                                GTK_WINDOW(MainWindow),
+                                GTK_WINDOW(atomes_app -> main_window),
                                 act[osmap.b],
                                 _(res[osmap.b]));
     GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);

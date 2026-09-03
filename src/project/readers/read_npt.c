@@ -293,7 +293,7 @@ int open_cell_file (int format, gchar * filename)
   {
     if (this_cell -> info)
     {
-      show_error (this_cell -> info, 0, MainWindow);
+      show_error (this_cell -> info, 0, atomes_app -> main_window);
     }
     if (this_cell)
     {

@@ -1048,7 +1048,7 @@ void edit_data (gpointer data)
   else
   {
     gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (this_proj -> name), this_curve -> name);
-    win = create_win (str, MainWindow, FALSE, TRUE);
+    win = create_win (str, atomes_app -> main_window, FALSE, TRUE);
     g_free (str);
     gtk_window_set_default_size (GTK_WINDOW(win), 300, 600);
     GtkWidget * vbox = create_vbox (BSEP);

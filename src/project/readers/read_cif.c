@@ -359,7 +359,7 @@ gboolean get_missing_object_from_user ()
 {
   cif_search = allocate_atom_search (activep, REPLACE, 0, this_reader -> object_to_insert);
   cif_object = NULL;
-  GtkWidget * info = dialogmodal (_("Error while reading CIF file"), GTK_WINDOW(MainWindow));
+  GtkWidget * info = dialogmodal (_("Error while reading CIF file"), GTK_WINDOW(atomes_app -> main_window));
   GtkWidget * vbox, * hbox;
   gchar * str;
   vbox = dialog_get_content_area (info);
@@ -1181,7 +1181,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
         cid[i+5] -= loop_line;
         if (i == 1 && this_reader -> rounding < 0)
         {
-          this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
+          this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, atomes_app -> main_window);
           if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
           if (! cif_use_symmetry_positions)
           {
@@ -2570,7 +2570,7 @@ int open_cif_file (int linec)
     cif_occup = cif_get_value ("_atom_site", _("occupancy"), 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occup)
     {
-      this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
+      this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, atomes_app -> main_window);
       if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
       if (! cif_use_symmetry_positions)
       {
@@ -2607,15 +2607,15 @@ int open_cif_file (int linec)
       // Read only a selected configuration and:
       //   - read as normal CIF file, forget about using occupancy to sort coordinates
       // Because what follow will depend on this choice
-      /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
+      /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, atomes_app -> main_window);
       this_reader -> chemical = ! cif_action;
       cif_action = (cif_action == 1) ? 0 : 1; */
-      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, atomes_app -> main_window);
     }
     else
     {
       add_reader_info (_("This CIF file could be describing a trajectory.\n"), 1);
-      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, atomes_app -> main_window);
     }
   }
   else
@@ -2630,7 +2630,7 @@ int open_cif_file (int linec)
     cif_step = 0;
     while (! cif_step)
     {
-      cif_step = iask (_("Please select the configuration to work on"), str, 0, MainWindow);
+      cif_step = iask (_("Please select the configuration to work on"), str, 0, atomes_app -> main_window);
       if (cif_step < 1 || cif_step > this_reader -> steps) cif_step = 0;
     }
     g_free (str);

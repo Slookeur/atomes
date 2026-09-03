@@ -68,6 +68,13 @@ ifeq ($(LINUX),1)
   FCVER = `$(FC) -dumpfullversion`
   CCVER = `$(CC) -dumpfullversion`
 
+  dbus = src/d-bus/
+  DBUS_XML = $(dbus)fr.ipcms.atomes.Instance.xml
+  atomes_dbus = $(dbus)fr_ipcms_atomes-Instance.c
+  DBUS_H = $(dbus)fr_ipcms_atomes-Instance.h
+  OBJECTS_dbus = $(OBJ)fr_ipcms_atomes-Instance.o
+  # Règle pour générer les fichiers dbus C/H
+
 endif
 
 ifeq ($(WINDOWS),1)
@@ -116,6 +123,7 @@ ifeq ($(WINDOWS),1)
 		-latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lepoxy -lxml2 -lpangoft2-1.0 \
 		-lpango-1.0 -lgobject-2.0 -lglib-2.0 -lintl -lfontconfig -lfreetype -lavutil -lavcodec -lavformat -lswscale
   endif
+
   LIB = $(LGTK)
 
   ifeq ($(MAKECMDGOALS), atomes)
@@ -146,6 +154,12 @@ ifeq ($(WINDOWS),1)
   FCVER = 16.1.0
   CCVER = 16.1.0
 
+  dbus =
+  DBUS_XML =
+  atomes_dbus =
+  DBUS_H =
+  OBJECTS_dbus =
+
 endif
 
 SRC = src/
@@ -168,7 +182,7 @@ OBJ = obj/
 BIN = bin/
 LOCALE = bin/locale
 
-INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
+INC = -I$(SRC) -I$(dbus) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
 # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
@@ -445,7 +459,7 @@ ifeq ($(WINDOWS),1)
 
 else
 
-  OBJECTS = $(OBJECTS_F90) $(OBJECTS_c)
+  OBJECTS = $(OBJECTS_F90) $(OBJECTS_dbus) $(OBJECTS_c)
 
 endif
 
@@ -455,6 +469,7 @@ SOURCES_h = \
 	$(SRC)affero.h \
 	$(SRC)bind.h \
 	$(SRC)global.h \
+	$(DBUS_H) \
 	$(GUI)interface.h \
 	$(GUI)callbacks.h \
 	$(PROJ)project.h \
@@ -591,6 +606,11 @@ $(OBJ)startup_testing.o:
 # C files:
 $(OBJ)global.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)global.o $(SRC)global.c $(INCLUDES)
+
+# d-bus for Linux and OSX
+$(OBJ)fr_ipcms_atomes-Instance.o: $(DBUS_XML)
+	gdbus-codegen --interface-prefix fr.ipcms.atomes. --generate-c-code $(dbus)fr_ipcms_atomes-Instance $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)fr_ipcms_atomes-Instance.o $(atomes_dbus) $(INCLUDES)
 
 # GUI
 $(OBJ)gtk-misc.o:

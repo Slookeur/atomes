@@ -256,7 +256,7 @@ void active_project_changed (int id)
   if (update_project() == 0)
   {
     errp = g_strdup_printf (_("Impossible to update project: %s\n"), active_project -> name);
-    show_error (errp, 0, MainWindow);
+    show_error (errp, 0, atomes_app -> main_window);
     g_free (errp);
   }
   else
@@ -266,19 +266,19 @@ void active_project_changed (int id)
       if (active_project -> analysis)
       {
         prep_calc_actions ();
-        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[0]));
+        g_action_map_add_action (G_ACTION_MAP(atomes_app -> gtk_app), G_ACTION(edition_actions[0]));
         if (active_cell -> npt)
         {
           remove_action (edition_acts[1].action_name);
         }
         else
         {
-          g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[1]));
+          g_action_map_add_action (G_ACTION_MAP(atomes_app -> gtk_app), G_ACTION(edition_actions[1]));
         }
-        g_action_map_add_action (G_ACTION_MAP(AtomesApp), G_ACTION(edition_actions[2]));
+        g_action_map_add_action (G_ACTION_MAP(atomes_app -> gtk_app), G_ACTION(edition_actions[2]));
         fill_tool_model ();
         correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
-        correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
+        correct_this_window_title (atomes_app -> main_window, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title (active_project -> name)));
       }
     }
     inactep = activep;

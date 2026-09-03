@@ -121,15 +121,15 @@ gchar * celemts[MAXDATC] = {i18n("System information"),
 #define DLP_ENS 4
 #define DLP_ENS_TYPE 10
 gchar * md_ensemble[DLP_ENS] = {"NVE", "NVT", "NPT", "NST"};
-gchar * md_thermo[DLP_ENS_TYPE] = {"Evans", 
-                                   "Langevin", 
-                                   "Andersen", 
-                                   "Berendsen", 
-                                   "Nosë-Hoover", 
-                                   i18n("Gentle Stochastic"), 
-                                   "DPD", 
-                                   "Martyna-Tuckerman-Klein", 
-                                   i18n("Two temperature model"), 
+gchar * md_thermo[DLP_ENS_TYPE] = {"Evans",
+                                   "Langevin",
+                                   "Andersen",
+                                   "Berendsen",
+                                   "Nosë-Hoover",
+                                   i18n("Gentle Stochastic"),
+                                   "DPD",
+                                   "Martyna-Tuckerman-Klein",
+                                   i18n("Two temperature model"),
                                    i18n("Inhomogeneous Langevin")};
 
 // In the following, 0 = no thermo, > 0 = thermo and num of opts + 1
@@ -161,7 +161,7 @@ gchar * unit_nvt[9][3]={{NULL, NULL, NULL},
 gchar * opts_npt_nvs[2][3] = {{i18n("Thermostat relaxation speed constant (friction):"), i18n("Barostat relaxation speed constant (friction):"), NULL},
                               {i18n("Thermostat relaxation time:"), i18n("Barostat relaxation time:"), i18n("Target surface tension:")}};
 
-gchar * unit_npt_nvs[2][3] = {{"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", NULL}, 
+gchar * unit_npt_nvs[2][3] = {{"<b>ps<sup>-1</sup></b>", "<b>ps<sup>-1</sup></b>", NULL},
                               {"<b>ps</b>", "<b>ps</b>", "<b>dyn cm<sup>-1</sup></b>"}};
 
 gchar * extra_nvs[4] = {i18n("Standard"), i18n("Area"), i18n("Tension"), i18n("Orthorhombic")};
@@ -389,6 +389,7 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
           else
           {
             check_nvs_butt[i] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(check_nvs_butt[0]), _(extra_nvs[i]));
+            g_signal_connect (G_OBJECT(check_nvs_butt[i]), "toggled", G_CALLBACK(check_nvs), GINT_TO_POINTER(i));
           }
 #endif
           add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, check_nvs_butt[i], FALSE, FALSE, 20);
@@ -415,6 +416,9 @@ GtkWidget * create_thermo_options (int ensemble, int thermo)
           }
           add_box_child_start (GTK_ORIENTATION_VERTICAL, vvbox, hbox, FALSE, FALSE, 0);
         }
+#ifdef GTK3
+        gtk_toggle_button_set_active ((GtkToggleButton *)check_nvs_butt[(int)tmp_field -> thermo_opts[3]], TRUE);
+#endif // GTK3
       }
       break;
   }
@@ -671,9 +675,9 @@ G_MODULE_EXPORT void set_md_combo (GtkComboBox * box, gpointer data)
     gtk_widget_set_visible (extra_vbox[1], (int)tmp_field -> md_opts[1]);
     for (j=0 ;j<2; j++)
     {
-      gtk_label_set_text (GTK_LABEL(extra_lab[2*j]), 
+      gtk_label_set_text (GTK_LABEL(extra_lab[2*j]),
                           ((int)tmp_field -> md_opts[i] || 2*j < 2) ? _(md_extra[(int)tmp_field -> md_opts[i]][2*j]) : md_extra[(int)tmp_field -> md_opts[i]][2*j]);
-      gtk_label_set_text (GTK_LABEL(extra_lab[2*j+1]), 
+      gtk_label_set_text (GTK_LABEL(extra_lab[2*j+1]),
                           ((int)tmp_field -> md_opts[i] || 2*j+1 < 2) ? _(md_extra[(int)tmp_field -> md_opts[i]][2*j+1]) : md_extra[(int)tmp_field -> md_opts[i]][2*j+1]);
     }
   }
@@ -800,8 +804,8 @@ GtkWidget * create_md_box ()
     for (j=0; j<2; j++, l++)
     {
       k = (j) ? 110 : 150;
-      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, 
-                           markup_label((2*i+j) < 5 ? _(md_data[2*i+j]) :md_data[2*i+j], k, -1, 1.0, 0.5), 
+      add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox,
+                           markup_label((2*i+j) < 5 ? _(md_data[2*i+j]) :md_data[2*i+j], k, -1, 1.0, 0.5),
                            FALSE, FALSE, 5);
       if (j)
       {

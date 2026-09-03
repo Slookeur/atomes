@@ -348,7 +348,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
   i = GPOINTER_TO_INT (edata);
   tmp = g_strdup_printf (_("Please enter a new name for project N°%d"), i);
   project * this_proj = get_project_by_id(i);
-  tmp = cask(tmp, _("Project name"), i, this_proj -> name, MainWindow);
+  tmp = cask(tmp, _("Project name"), i, this_proj -> name, atomes_app -> main_window);
   if (tmp != NULL)
   {
     this_proj -> name = g_strdup_printf ("%s", tmp);
@@ -437,7 +437,7 @@ G_MODULE_EXPORT void change_project_name (GtkWidget * wid, gpointer edata)
     }
     if (activep == i)
     {
-      correct_this_window_title (MainWindow, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title(active_project -> name)));
+      correct_this_window_title (atomes_app -> main_window, g_strdup_printf ("%s - %s", PACKAGE, prepare_for_title(active_project -> name)));
       correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes - %s"), prepare_for_title(active_project -> name)));
     }
   }
