@@ -101,22 +101,6 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #  endif
 #endif
 
-/*! \typedef AppData
-
-  \brief application information data structure
-*/
-typedef struct AppData AppData;
-struct AppData
-{
-  GtkApplication * gtk_app;                // GTK application
-  GtkWidget * main_window;                 // main Gtk Window
-#ifndef G_OS_WIN32
-  GDBusConnection * dbus_connection;       // D-Bus connection
-  GDBusInterfaceSkeleton * dbus_skeleton;  // D-Bus skeleton
-#endif
-};
-extern AppData * atomes_app;
-
 #define MY_ENCODING "UTF-8"
 
 #include "math_3d.h"
@@ -483,7 +467,8 @@ extern struct timespec stop_time;
 extern double opac;
 extern double pi;
 
-extern GtkWidget * MainWindow;
+extern GtkApplication * atomes_app;
+extern GtkWidget * atomes_main_window;
 extern GtkWidget * MainView;
 extern GtkWidget * MainFrame[2];
 extern GtkWidget * pop;
@@ -1152,7 +1137,6 @@ extern void remove_action (gchar * action_name);
 extern void remove_edition_actions ();
 extern void remove_edition_and_analyze_actions ();
 
-extern AppData * AtomesApp;
 extern workspace workzone;
 extern project * proj;
 extern chemical_data * active_chem;

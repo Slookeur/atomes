@@ -124,7 +124,7 @@ GtkWidget * this_work_menu (int p, int c)
   GtkWidget * dmenu;
   menu = gtk_menu_new ();
   GtkAccelGroup * accel_group = gtk_accel_group_new ();
-  gtk_window_add_accel_group (GTK_WINDOW (atomes_app -> main_window), accel_group);
+  gtk_window_add_accel_group (GTK_WINDOW (atomes_main_window), accel_group);
   if (! atomes_from_libreoffice)
   {
     widget_set_sensitive (gtk3_menu_item (menu, _("Workspace"), IMG_FILE, (gpointer)PACKAGE_TD, NULL, NULL, FALSE, 0, 0, FALSE, FALSE, FALSE), 0);

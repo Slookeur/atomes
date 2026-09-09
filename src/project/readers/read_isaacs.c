@@ -751,14 +751,14 @@ int testopening (char * tdata, char * tfichier)
     {
       j=4;
       err=g_strdup_printf(_("The %s\n %s\n from the XML file does not exist\n"), tdata, tfichier);
-      show_error (err, 0, atomes_app -> main_window);
+      show_error (err, 0, atomes_main_window);
       g_free (err);
       return j;
     }
   }
   else
   {
-    show_error (_("Unknown data format in XML file\n"), 0, atomes_app -> main_window);
+    show_error (_("Unknown data format in XML file\n"), 0, atomes_main_window);
     j=4;
     return j;
   }
@@ -795,7 +795,7 @@ int setchemistry (xmlNodePtr xsnode)
                     "is not the same that the number of atoms\n"
                     "in the file containing the coordinates.\n"
                     "Other information from the XML file\n"
-                    "will be ignored\n"), atomes_app -> main_window);
+                    "will be ignored\n"), atomes_main_window);
     res=5;
     goto xend;
   }
@@ -816,7 +816,7 @@ int setchemistry (xmlNodePtr xsnode)
     {
       show_warning (_("The number of chemical species in the XML file\n"
                       "is not the same that the number of chemical species\n"
-                      "in the file that contains the atomic coordinates.\n"), atomes_app -> main_window);
+                      "in the file that contains the atomic coordinates.\n"), atomes_main_window);
       res = 5;
       goto xend;
     }

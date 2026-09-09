@@ -1825,7 +1825,7 @@ G_MODULE_EXPORT void on_realize (GtkWidget * widg, gpointer data)
   {
     gchar * errm = g_strdup_printf (_("Impossible to initialize the OpenGL 3D rendering ! \n %s\n"), err -> message);
     g_error_free (err);
-    show_error (errm, 0, atomes_app -> main_window);
+    show_error (errm, 0, atomes_main_window);
     g_free (errm);
   }
 }

@@ -204,7 +204,7 @@ G_MODULE_EXPORT void on_calc_sph_released (GtkWidget * widg, gpointer data)
   }
   if (! err_update)
   {
-    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : atomes_app -> main_window);
+    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : atomes_main_window);
   }
   else if (! active_project -> dmtx)
   {

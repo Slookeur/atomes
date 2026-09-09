@@ -74,7 +74,7 @@ msgid "Fragment"
 msgstr "Fragment"
 
 # File: calc/cpmd/cpmd_init.c, Line: 214
-# File: calc/dl_poly/dlp_field.c, Line: 142
+# File: calc/dl_poly/dlp_field.c, Line: 165
 # File: gui/bdcall.c, Line: 503
 # File: opengl/win/glwindow.c, Line: 158
 # File: opengl/win/m_coord.c, Line: 582
@@ -218,7 +218,7 @@ msgstr "\nNumber and proportion of tetrahedra units for "
 msgid "\t\t Total number of tetrahedra:"
 msgstr "\t\t Total number of tetrahedra:"
 
-# File: gui/calc_menu.c, Line: 600
+# File: gui/calc_menu.c, Line: 597
 msgid "<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
 "<sub>[2] L. Guttman. <i>J. Non-Cryst. Solids.</i>, <b>116</b>:145-147 (1990).</sub>\n"
 "<sub>[3] D. S. Franzblau. <i>Phys. Rev. B</i>, <b>44</b>(10):4925-4930 (1991).</sub>\n"
@@ -232,39 +232,39 @@ msgstr "<sub>[1] S. V. King. <i>Nature</i>, <b>213</b>:1112 (1967).</sub>\n"
 "<sub>[5] X. Yuan and A. N. Cormack. <i>Comp. Mat. Sci.</i>, <b>24</b>:343-360 (2002).</sub>\n"
 "<sub>[6] F. Wooten. <i>Acta Cryst. A</i>, <b>58</b>(4):346-351 (2002).</sub>"
 
-# File: gui/calc_menu.c, Line: 776
+# File: gui/calc_menu.c, Line: 775
 msgid "The result of the nearest neighbors analysis\n"
 "will be saved in a file that you may use afterwards.\n"
 msgstr "The result of the nearest neighbors analysis\n"
 "will be saved in a file that you may use afterwards.\n"
 
-# File: gui/calc_menu.c, Line: 817
-msgid "You must specify a number of &#x3b4;r >= 2\n"
+# File: gui/calc_menu.c, Line: 816
+msgid "You must specify a number of &#x3b4;r intervals >= 2\n"
 "to discretize the real space between 0.0 and D<sub>max</sub>\n"
-msgstr "You must specify a number of &#x3b4;r >= 2\n"
+msgstr "You must specify a number of &#x3b4;r intervals >= 2\n"
 "to discretize the real space between 0.0 and D<sub>max</sub>\n"
 
-# File: gui/calc_menu.c, Line: 823
+# File: gui/calc_menu.c, Line: 822
 msgid "You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
 "for the FFT, with Q<sub>min</sub> < Q<sub>max</sub>[FFT] <= Q<sub>max</sub>"
 msgstr "You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
 "for the FFT, with Q<sub>min</sub> < Q<sub>max</sub>[FFT] <= Q<sub>max</sub>"
 
-# File: gui/calc_menu.c, Line: 870
-msgid "You must specify a number of &#x3b4;r >= 2\n"
+# File: gui/calc_menu.c, Line: 868
+msgid "You must specify a number of &#x3b4;r intervals >= 2\n"
 "to discretize the real space between\n"
 "the shortest and the highest inter-atomic distances"
-msgstr "You must specify a number of &#x3b4;r >= 2\n"
+msgstr "You must specify a number of &#x3b4;r interals >= 2\n"
 "to discretize the real space between\n"
 "the shortest and the highest inter-atomic distances"
 
-# File: gui/calc_menu.c, Line: 876
-msgid "You must specify a number of &#x3b4;&#x3b8; >= 2\n"
+# File: gui/calc_menu.c, Line: 875
+msgid "You must specify a number of &#x3b4;&#x3b8; intervals >= 2\n"
 "to discretize the angular space between 0 and 180°"
-msgstr "You must specify a number of &#x3b4;&#x3b8; >= 2\n"
+msgstr "You must specify a number of &#x3b4;&#x3b8; intervals >= 2\n"
 "to discretize the angular space between 0 and 180°"
 
-# File: gui/calc_menu.c, Line: 904
+# File: gui/calc_menu.c, Line: 903
 msgid "You must specify a number of %ss per size 'n' and per node\n"
 "this value is used when allocating the memory to store the results\n"
 "and depends on both the maximum %s size used in the search\n"
@@ -284,7 +284,7 @@ msgstr "You must specify a number of %ss per size 'n' and per node\n"
 "then the search will failed but the program will propose\n"
 "you to initiate a new search using a higher value"
 
-# File: gui/calc_menu.c, Line: 950
+# File: gui/calc_menu.c, Line: 956
 msgid "You must specify the time unit\n"
 "used to integrate the Newton's equations\n"
 "of motion during the molecular dynamics\n"
@@ -292,7 +292,7 @@ msgstr "You must specify the time unit\n"
 "used to integrate the Newton's equations\n"
 "of motion during the molecular dynamics\n"
 
-# File: gui/calc_menu.c, Line: 971
+# File: gui/calc_menu.c, Line: 970
 msgid "You must specify the number of steps\n"
 "between each of the %d configurations\n"
 "found for the molecular dynamics\n"
@@ -325,12 +325,12 @@ msgid "\tNumber of step(s) between each configuration:"
 msgstr "\tNumber of step(s) between each configuration:"
 
 # File: gui/calc_menu.c, Line: 318
-# File: gui/preferences.c, Line: 4240
+# File: gui/preferences.c, Line: 4261
 msgid "Time step &#x3b4;t"
 msgstr "Time step &#x3b4;t"
 
 # File: gui/calc_menu.c, Line: 319
-# File: gui/preferences.c, Line: 4229
+# File: gui/preferences.c, Line: 4250
 msgid "Step(s) between conf."
 msgstr "Step(s) between conf."
 
@@ -379,7 +379,7 @@ msgid "Maximum number of chains of size <i><b>n</b></i> per MD step <sup>**</sup
 msgstr "Maximum number of chains of size <i><b>n</b></i> per MD step <sup>**</sup>"
 
 # File: gui/calc_menu.c, Line: 590
-# File: gui/preferences.c, Line: 470
+# File: gui/preferences.c, Line: 472
 msgid "Only search for ABAB rings"
 msgstr "Only search for ABAB rings"
 
@@ -388,17 +388,17 @@ msgid "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>"
 msgstr "No homopolar bonds in the rings (A-A, B-B ...) <sup>***</sup>"
 
 # File: gui/calc_menu.c, Line: 590
-# File: gui/preferences.c, Line: 472
+# File: gui/preferences.c, Line: 474
 msgid "No homopolar bonds in the connectivity matrix"
 msgstr "No homopolar bonds in the connectivity matrix"
 
 # File: gui/calc_menu.c, Line: 591
-# File: gui/preferences.c, Line: 476
+# File: gui/preferences.c, Line: 478
 msgid "Only search for AAAA chains"
 msgstr "Only search for AAAA chains"
 
 # File: gui/calc_menu.c, Line: 591
-# File: gui/preferences.c, Line: 477
+# File: gui/preferences.c, Line: 479
 msgid "Only search for ABAB chains"
 msgstr "Only search for ABAB chains"
 
@@ -427,7 +427,6 @@ msgstr "but homopolar bonds can shorten the rings"
 # File: gui/ringscall.c, Line: 163
 # File: opengl/edit/cbuild_edit.c, Line: 949
 # File: opengl/win/initcoord.c, Line: 645
-# File: opengl/win/m_coord.c, Line: 597
 # File: opengl/win/w_search.c, Line: 4154
 msgid "All"
 msgstr "All"
@@ -445,25 +444,17 @@ msgstr "Save neighbors analysis in file"
 # File: calc/dl_poly/dlp_field.c, Line: 4753
 # File: curve/w_data.c, Line: 181
 # File: curve/w_img.c, Line: 250
-# File: gui/calc_menu.c, Line: 782
-# File: gui/callbacks.c, Line: 560,918,1775
+# File: gui/calc_menu.c, Line: 785
+# File: gui/callbacks.c, Line: 561,918,1775
 # File: gui/gui.c, Line: 772,853
-# File: gui/work_menu.c, Line: 134,148,177
+# File: gui/work_menu.c, Line: 133,147,176
 # File: opengl/draw/image.c, Line: 212
 # File: opengl/draw/movie.c, Line: 1310
 # File: opengl/win/m_map.c, Line: 885
-# File: opengl/win/w_chains.c, Line: 959
-# File: opengl/win/w_rings.c, Line: 1094
+# File: opengl/win/w_chains.c, Line: 962
+# File: opengl/win/w_rings.c, Line: 1098
 msgid "Save"
 msgstr "Save"
-
-# File: gui/calc_menu.c, Line: 868
-msgid "You must specify a number of &#x3b4;r intervals >= 2\n"
-msgstr "You must specify a number of &#x3b4;r intervals >= 2\n"
-
-# File: gui/calc_menu.c, Line: 822
-msgid "You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
-msgstr "You must specify a maximum wave vector Q<sub>max</sub>[FFT]\n"
 
 # File: gui/calc_menu.c, Line: 843
 msgid "You must specify a maximum wave vector Q<sub>max</sub>\n"
@@ -471,13 +462,14 @@ msgid "You must specify a maximum wave vector Q<sub>max</sub>\n"
 msgstr "You must specify a maximum wave vector Q<sub>max</sub>\n"
 "note that Q<sub>max</sub> must be > Q<sub>min</sub>"
 
-# File: gui/calc_menu.c, Line: 850
-msgid "You must specify a number of &#x3b4;q >= 2\n"
+# File: gui/calc_menu.c, Line: 849
+msgid "You must specify a number of &#x3b4;q intervals >= 2\n"
 "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n"
-msgstr "You must specify a number of &#x3b4;q >= 2\n"
+msgstr "You must specify a number of &#x3b4;q intervals >= 2\n"
 "to discretize the reciprocal space between 0.0 and Q<sub>max</sub>\n"
 
-# File: gui/calc_menu.c, Line: 883
+# File: calc/dl_poly/dlp_field.c, Line: 299,647
+# File: gui/calc_menu.c, Line: 892
 msgid "ring"
 msgstr "ring"
 
@@ -495,7 +487,11 @@ msgstr "You must specify a number <i>l<sub>max</sub></i> &#x2208; [2-40]"
 
 # File: gui/calc_menu.c, Line: 949
 msgid "You must specify the time step &#x3b4;t\n"
+"used to integrate the Newton's equations\n"
+"of motion during the molecular dynamics\n"
 msgstr "You must specify the time step &#x3b4;t\n"
+"used to integrate the Newton's equations\n"
+"of motion during the molecular dynamics\n"
 
 # File: gui/calc_menu.c, Line: 997
 msgid "You must specify the number of frequency points\n"
@@ -565,15 +561,15 @@ msgstr "Factor [0.0-1.0]"
 msgid "Smooth"
 msgstr "Smooth"
 
-# File: gui/calc_menu.c, Line: 1430
+# File: gui/calc_menu.c, Line: 1430,1433
 msgid "Number of &#x3b4;r steps"
 msgstr "Number of &#x3b4;r steps"
 
-# File: gui/calc_menu.c, Line: 1431
+# File: gui/calc_menu.c, Line: 1431,1432,1842
 msgid "Number of &#x3b4;q steps"
 msgstr "Number of &#x3b4;q steps"
 
-# File: gui/calc_menu.c, Line: 1434
+# File: gui/calc_menu.c, Line: 1434,1435,1853
 msgid "Q<sub>max</sub> [&#xC5;<sup>-1</sup>]"
 msgstr "Q<sub>max</sub> [&#xC5;<sup>-1</sup>]"
 
@@ -653,7 +649,7 @@ msgstr "<b>Intermediate scattering</b>: F(q,&#x3b4;t)"
 msgid "<b>Dynamic calculations</b>: S(q,&#969;)"
 msgstr "<b>Dynamic calculations</b>: S(q,&#969;)"
 
-# File: gui/callbacks.c, Line: 295
+# File: gui/callbacks.c, Line: 292
 msgid "Impossible to %s project file: \n\n"
 "\t\t%s\n\n"
 "\tError %s %s\n"
@@ -663,7 +659,7 @@ msgstr "Impossible to %s project file: \n\n"
 "\tError %s %s\n"
 "\tProject file version: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 309
+# File: gui/callbacks.c, Line: 305
 msgid "Impossible to %s workspace file.\n"
 "Error with project: \n\n"
 "\t\t%s\n\n"
@@ -682,6 +678,7 @@ msgstr "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 
 # File: gui/callbacks.c, Line: 88,1776
+# File: project/readers/read_isaacs.c, Line: 70
 msgid "XYZ file"
 msgstr "XYZ file"
 
@@ -690,10 +687,12 @@ msgid "XYZ file - NPT"
 msgstr "XYZ file - NPT"
 
 # File: gui/callbacks.c, Line: 90,1776
+# File: project/readers/read_isaacs.c, Line: 71
 msgid "Chem3D file"
 msgstr "Chem3D file"
 
 # File: gui/callbacks.c, Line: 91
+# File: project/readers/read_isaacs.c, Line: 72
 msgid "CPMD trajectory"
 msgstr "CPMD trajectory"
 
@@ -702,6 +701,7 @@ msgid "CPMD trajectory - NPT"
 msgstr "CPMD trajectory - NPT"
 
 # File: gui/callbacks.c, Line: 93
+# File: project/readers/read_isaacs.c, Line: 73
 msgid "VASP trajectory"
 msgstr "VASP trajectory"
 
@@ -710,6 +710,7 @@ msgid "VASP trajectory - NPT"
 msgstr "VASP trajectory - NPT"
 
 # File: gui/callbacks.c, Line: 95,96
+# File: project/readers/read_isaacs.c, Line: 76
 msgid "PDB file"
 msgstr "PDB file"
 
@@ -739,7 +740,7 @@ msgstr "Close workspace ?"
 
 # File: calc/calc.c, Line: 106
 # File: gui/callbacks.c, Line: 133
-# File: gui/preferences.c, Line: 4945,4978
+# File: gui/preferences.c, Line: 4969,5002
 msgid "Are you sure ?"
 msgstr "Are you sure ?"
 
@@ -815,21 +816,21 @@ msgstr "Function: %s()\n"
 msgid "Line    : %d</span>"
 msgstr "Line    : %d</span>"
 
-# File: gui/callbacks.c, Line: 296
+# File: gui/callbacks.c, Line: 296,310
 msgid "open"
 msgstr "open"
 
-# File: gui/callbacks.c, Line: 296
+# File: gui/callbacks.c, Line: 296,310
 msgid "save"
 msgstr "save"
 
-# File: gui/callbacks.c, Line: 298,473
-# File: gui/interface.c, Line: 340
+# File: gui/callbacks.c, Line: 298,312,473
+# File: gui/interface.c, Line: 340,354
 msgid "reading"
 msgstr "reading"
 
-# File: gui/callbacks.c, Line: 298,473
-# File: gui/interface.c, Line: 340
+# File: gui/callbacks.c, Line: 298,312,473
+# File: gui/interface.c, Line: 340,354
 msgid "saving"
 msgstr "saving"
 
@@ -853,7 +854,7 @@ msgstr "Open Workspace"
 msgid "Save Workspace"
 msgstr "Save Workspace"
 
-# File: gui/callbacks.c, Line: 560,918,1381,1775
+# File: gui/callbacks.c, Line: 561,918,1381,1775
 # File: gui/gui.c, Line: 767,847
 # File: gui/work_menu.c, Line: 132,145
 # File: opengl/win/m_map.c, Line: 885
@@ -976,7 +977,7 @@ msgstr "Apply"
 msgid "Please select the file format of the NPT cell data"
 msgstr "Please select the file format of the NPT cell data"
 
-# File: gui/callbacks.c, Line: 1352,1686
+# File: gui/callbacks.c, Line: 1352,1686,1694
 msgid "Select format:"
 msgstr "Select format:"
 
@@ -1032,7 +1033,7 @@ msgstr "No project loaded ... nothing to be saved\n"
 msgid "Project <b>%s</b> is empty ... nothing to be saved\n"
 msgstr "Project <b>%s</b> is empty ... nothing to be saved\n"
 
-# File: gui/chainscall.c, Line: 352
+# File: gui/chainscall.c, Line: 350
 msgid "\t<b>The chain statistics have failed !</b>\n\n"
 "The number of chain per MD step appears\n"
 "to be bigger than the initial value of <b>%d</b>\n"
@@ -1114,7 +1115,7 @@ msgstr "\n\t n\tNumber\t\tC"
 msgid "The chain statistics calculation has failed"
 msgstr "The chain statistics calculation has failed"
 
-# File: gui/edit_menu.c, Line: 779
+# File: gui/edit_menu.c, Line: 778
 msgid "To apply PBC or use fractional coordinates\n"
 "describe properly the simulation box parameters"
 msgstr "To apply PBC or use fractional coordinates\n"
@@ -1149,7 +1150,7 @@ msgstr "Atomic mass:"
 msgid "Radius:"
 msgstr "Radius:"
 
-# File: gui/preferences.c, Line: 3426,3587
+# File: gui/preferences.c, Line: 3447,3608
 # File: opengl/win/m_bonds.c, Line: 245
 msgid "Radius"
 msgstr "Radius"
@@ -1362,7 +1363,7 @@ msgid "Ring Statistics"
 msgstr "Ring Statistics"
 
 # File: gui/gui.c, Line: 118,130
-# File: gui/initc.c, Line: 265
+# File: gui/initc.c, Line: 265,356
 msgid "Chain Statistics"
 msgstr "Chain Statistics"
 
@@ -1377,7 +1378,6 @@ msgid "Mean Squared Displacement"
 msgstr "Mean Squared Displacement"
 
 # File: gui/gui.c, Line: 121,133
-# File: gui/initc.c, Line: 280,374
 msgid "Dynamic Structure Factor"
 msgstr "Dynamic Structure Factor"
 
@@ -1457,7 +1457,7 @@ msgid "open atomes project"
 msgstr "open atomes project"
 
 # File: gui/gui.c, Line: 168
-# File: gui/preferences.c, Line: 2474,3678,3855,4319,5062
+# File: gui/preferences.c, Line: 2495,3699,3876,4340,5156
 # File: opengl/win/glwindow.c, Line: 126
 msgid "General"
 msgstr "General"
@@ -1519,7 +1519,7 @@ msgstr "New"
 
 # File: curve/m_curve.c, Line: 78
 # File: gui/gui.c, Line: 864
-# File: gui/work_menu.c, Line: 153
+# File: gui/work_menu.c, Line: 153,182
 msgid "Export"
 msgstr "Export"
 
@@ -1568,7 +1568,7 @@ msgid "Shortcuts"
 msgstr "Shortcuts"
 
 # File: gui/gui.c, Line: 1034
-# File: opengl/win/m_tools.c, Line: 320,517
+# File: opengl/win/m_tools.c, Line: 320,525
 msgid "Edit"
 msgstr "Edit"
 
@@ -1578,7 +1578,7 @@ msgstr "Analyze"
 
 # File: curve/m_curve.c, Line: 614
 # File: gui/gui.c, Line: 1036
-# File: opengl/win/glwindow.c, Line: 639,1523
+# File: opengl/win/glwindow.c, Line: 1523
 # File: opengl/win/menu_bar.c, Line: 281
 msgid "Help"
 msgstr "Help"
@@ -1599,7 +1599,7 @@ msgstr "Size <i>n</i> of the ring [total number of nodes]"
 msgid "Size <i>n</i> of the chain [total number of nodes]"
 msgstr "Size <i>n</i> of the chain [total number of nodes]"
 
-# File: gui/interface.c, Line: 339
+# File: gui/interface.c, Line: 335
 msgid "\n\tError %s %s, at:\n"
 "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
 "\t\tFunction: <b>%s()</b>\n"
@@ -1611,7 +1611,7 @@ msgstr "\n\tError %s %s, at:\n"
 "\t\tLine    : <b>%d</b></span>\n\n"
 "\tBacktrace:\n%s\t\t →\t\t <i>call to</i>\t<span font_desc=\"monospace 10\"><b>%s()</b></span>\n"
 
-# File: gui/interface.c, Line: 353
+# File: gui/interface.c, Line: 350
 msgid "\n\tError %s %s, at:\n"
 "<span font_desc=\"monospace 10\">\t\tFile    : <b>%s</b>\n"
 "\t\tFunction: <b>%s()</b>\n"
@@ -1621,7 +1621,7 @@ msgstr "\n\tError %s %s, at:\n"
 "\t\tFunction: <b>%s()</b>\n"
 "\t\tLine    : <b>%d</b></span>\n"
 
-# File: gui/interface.c, Line: 529
+# File: gui/interface.c, Line: 527
 msgid "\t<b>Single step chemical reaction</b>\n"
 "\t\tConsider each configuration as a step in a chemical reaction:\n"
 "\t\t\t- Atomic coordinates are sorted based on occupancy or disorder site\n"
@@ -1643,7 +1643,7 @@ msgstr "\t<b>Single step chemical reaction</b>\n"
 "\t<b>Single configuration </b>\n"
 "\t\tSelect a single configuration in the CIF file"
 
-# File: gui/interface.c, Line: 534
+# File: gui/interface.c, Line: 537
 msgid "\t<b>MD trajectory</b>\n"
 "\t\tConsider the CIF file a MD trajectory\n\n"
 "\t\tNumber of atom(s) must not change between configuration(s)\n\n"
@@ -1655,7 +1655,7 @@ msgstr "\t<b>MD trajectory</b>\n"
 "\t<b>Single configuration </b>\n"
 "\t\tSelect a single configuration in the CIF file"
 
-# File: gui/interface.c, Line: 677
+# File: gui/interface.c, Line: 698
 msgid "\t<b>Lowest integer: </b>\n"
 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.76⌋ = 8\n\n"
 "\t<b>Highest integer: </b>\n"
@@ -1808,11 +1808,11 @@ msgstr "Parameter Required"
 msgid "%s - isolated"
 msgstr "%s - isolated"
 
-# File: gui/interface.c, Line: 1088
+# File: gui/interface.c, Line: 1092
 msgid " - isolated"
 msgstr " - isolated"
 
-# File: gui/main.c, Line: 179
+# File: gui/main.c, Line: 137
 msgid "\nUsage: atomes [OPTION]\n"
 "       atomes [FILE]\n"
 "       atomes [OPTION] [FILE]\n"
@@ -1926,35 +1926,36 @@ msgstr "\nUsage: atomes [OPTION]\n"
 " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
 " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
 
-# File: gui/main.c, Line: 181
+# File: gui/main.c, Line: 193,274
+# File: startup-testing/startup_testing.c, Line: 68,85
 msgid "\nReport a bug to <"
 msgstr "\nReport a bug to <"
 
-# File: gui/main.c, Line: 192
+# File: gui/main.c, Line: 204
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 
-# File: gui/main.c, Line: 839
+# File: gui/main.c, Line: 851
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Error while reading workspace file\n%s\n"
 
-# File: gui/main.c, Line: 1053
+# File: gui/main.c, Line: 1370
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible to load the splash screen\n"
 
-# File: gui/main.c, Line: 1155
+# File: gui/main.c, Line: 1472
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Fatal error on OpenGL initialization: trying to adjust environment !"
 
-# File: gui/main.c, Line: 1158
+# File: gui/main.c, Line: 1475
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible to initialize the OpenGL 3D rendering !"
 
-# File: gui/main.c, Line: 1161
+# File: gui/main.c, Line: 1478
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "GDK visual must be modified to initialize the OpenGL context !"
 
-# File: gui/main.c, Line: 1289
+# File: gui/main.c, Line: 1609
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -1994,7 +1995,7 @@ msgstr "\n\nMean Square Displacement\n\n"
 msgid "The MSD calculation has failed"
 msgstr "The MSD calculation has failed"
 
-# File: gui/preferences.c, Line: 3484
+# File: gui/preferences.c, Line: 3502
 msgid "\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008).</sub>\n"
 "<sub>[2] Slater. <i>J. Chem. Phys.</i>, <b>41</b>:3199 (1964).</sub>\n"
 "<sub>[3] Bondi A. <i>J. Phys. Chem.</i>, <b>68</b>:441 (1964).</sub>\n"
@@ -2006,170 +2007,170 @@ msgstr "\n<sub>[1] B. Cordero and al. <i>Dalton Trans</i>, <b>213</b>:1112 (2008
 "<sub>[4] R.D. Shannon and C.T. Prewitt <i>Acta Cryst. B</i>, <b>25</b>:925-946 (1969).</sub>\n"
 "<sub>[5] R.D. Shannon <i>Acta Cryst. A</i>, <b>23</b>:751-767 (1976).</sub>"
 
-# File: gui/preferences.c, Line: 448
+# File: gui/preferences.c, Line: 450
 msgid "Error: impossible to create %s (code: %lu)\n"
 msgstr "Error: impossible to create %s (code: %lu)\n"
 
-# File: gui/preferences.c, Line: 454
+# File: gui/preferences.c, Line: 456
 msgid "Error: impossible to create %s (code: %s)\n"
 msgstr "Error: impossible to create %s (code: %s)\n"
 
-# File: gui/preferences.c, Line: 461
+# File: gui/preferences.c, Line: 463
 msgid "g(r): number of δr"
 msgstr "g(r): number of δr"
 
-# File: gui/preferences.c, Line: 461
+# File: gui/preferences.c, Line: 463
 msgid "s(q): number of δq"
 msgstr "s(q): number of δq"
 
-# File: gui/preferences.c, Line: 461
+# File: gui/preferences.c, Line: 463
 msgid "s(k): number of δk"
 msgstr "s(k): number of δk"
 
-# File: gui/preferences.c, Line: 461
+# File: gui/preferences.c, Line: 463
 msgid "g(r) FFT: number of δr"
 msgstr "g(r) FFT: number of δr"
 
-# File: gui/preferences.c, Line: 462
+# File: gui/preferences.c, Line: 464
 msgid "Dij: number of δr [min(Dij)-max(Dij)]"
 msgstr "Dij: number of δr [min(Dij)-max(Dij)]"
 
-# File: gui/preferences.c, Line: 462
+# File: gui/preferences.c, Line: 464
 msgid "Angles distribution: number of δθ [0-180°]"
 msgstr "Angles distribution: number of δθ [0-180°]"
 
-# File: gui/preferences.c, Line: 463
+# File: gui/preferences.c, Line: 465
 msgid "Spherical harmonics: l(max) in [2-40]"
 msgstr "Spherical harmonics: l(max) in [2-40]"
 
-# File: gui/preferences.c, Line: 463
+# File: gui/preferences.c, Line: 465
 msgid "MSD: steps between configurations"
 msgstr "MSD: steps between configurations"
 
-# File: gui/preferences.c, Line: 464
+# File: gui/preferences.c, Line: 466
 msgid "F(k,t): number of δk"
 msgstr "F(k,t): number of δk"
 
-# File: gui/preferences.c, Line: 465
+# File: gui/preferences.c, Line: 467
 msgid "MSD: time steps δt"
 msgstr "MSD: time steps δt"
 
-# File: gui/preferences.c, Line: 465
+# File: gui/preferences.c, Line: 467
 msgid "MSD: time unit"
 msgstr "MSD: time unit"
 
-# File: gui/preferences.c, Line: 466
+# File: gui/preferences.c, Line: 468
 msgid "Default search"
 msgstr "Default search"
 
-# File: gui/preferences.c, Line: 467,473
+# File: gui/preferences.c, Line: 469,475
 msgid "Atom(s) to initiate the search from"
 msgstr "Atom(s) to initiate the search from"
 
-# File: gui/preferences.c, Line: 468,474
+# File: gui/preferences.c, Line: 470,476
 msgid "Maximum size for a ring"
 msgstr "Maximum size for a ring"
 
-# File: gui/preferences.c, Line: 469,475
+# File: gui/preferences.c, Line: 471,477
 msgid "Maximum number of rings of size n per MD step"
 msgstr "Maximum number of rings of size n per MD step"
 
-# File: gui/preferences.c, Line: 471
+# File: gui/preferences.c, Line: 473
 msgid "No homopolar bonds in the rings (A-A, B-B ...)"
 msgstr "No homopolar bonds in the rings (A-A, B-B ...)"
 
-# File: gui/preferences.c, Line: 478
+# File: gui/preferences.c, Line: 480
 msgid "No homopolar bonds in the chains (A-A, B-B ...)"
 msgstr "No homopolar bonds in the chains (A-A, B-B ...)"
 
-# File: gui/preferences.c, Line: 479
+# File: gui/preferences.c, Line: 481
 msgid "Only search for 1-(2)n-1 chains"
 msgstr "Only search for 1-(2)n-1 chains"
 
-# File: gui/preferences.c, Line: 480
+# File: gui/preferences.c, Line: 482
 msgid "Analyze all correlated δt steps"
 msgstr "Analyze all correlated δt steps"
 
-# File: gui/preferences.c, Line: 481
+# File: gui/preferences.c, Line: 483
 msgid "Number of analyzed δt steps"
 msgstr "Number of analyzed δt steps"
 
-# File: gui/preferences.c, Line: 482
+# File: gui/preferences.c, Line: 484
 msgid "Number of analyzed q points"
 msgstr "Number of analyzed q points"
 
-# File: gui/preferences.c, Line: 483
+# File: gui/preferences.c, Line: 485
 msgid "Number of frequency points"
 msgstr "Number of frequency points"
 
-# File: gui/preferences.c, Line: 484
+# File: gui/preferences.c, Line: 486
 msgid "Default style"
 msgstr "Default style"
 
-# File: gui/preferences.c, Line: 485
+# File: gui/preferences.c, Line: 487
 # File: opengl/win/glwindow.c, Line: 139
 msgid "Atom(s) color map"
 msgstr "Atom(s) color map"
 
-# File: gui/preferences.c, Line: 486
+# File: gui/preferences.c, Line: 488
 # File: opengl/win/glwindow.c, Line: 140
 msgid "Polyhedra color map"
 msgstr "Polyhedra color map"
 
-# File: gui/preferences.c, Line: 487
+# File: gui/preferences.c, Line: 489
 # File: opengl/win/w_advance.c, Line: 1372
 msgid "Quality"
 msgstr "Quality"
 
-# File: gui/preferences.c, Line: 488
+# File: gui/preferences.c, Line: 490
 # File: opengl/win/w_advance.c, Line: 1304
 msgid "Ray Tracing"
 msgstr "Ray Tracing"
 
-# File: gui/preferences.c, Line: 489
+# File: gui/preferences.c, Line: 491
 msgid "Predefine material"
 msgstr "Predefine material"
 
-# File: gui/preferences.c, Line: 490
+# File: gui/preferences.c, Line: 492
 # File: opengl/win/w_advance.c, Line: 1377
 msgid "Lightning model"
 msgstr "Lightning model"
 
-# File: gui/preferences.c, Line: 491
+# File: gui/preferences.c, Line: 493
 # File: opengl/win/w_advance.c, Line: 115
 msgid "Metallic"
 msgstr "Metallic"
 
-# File: gui/preferences.c, Line: 492
+# File: gui/preferences.c, Line: 494
 # File: opengl/win/w_advance.c, Line: 116
 msgid "Roughness"
 msgstr "Roughness"
 
-# File: gui/preferences.c, Line: 493
+# File: gui/preferences.c, Line: 495
 msgid "Back lightning"
 msgstr "Back lightning"
 
-# File: gui/preferences.c, Line: 495
+# File: gui/preferences.c, Line: 497
 # File: opengl/win/w_advance.c, Line: 119
 msgid "Opacity"
 msgstr "Opacity"
 
-# File: gui/preferences.c, Line: 496
+# File: gui/preferences.c, Line: 498
 # File: opengl/win/w_advance.c, Line: 114
 msgid "Albedo"
 msgstr "Albedo"
 
-# File: calc/cpmd/cpmd_atoms.c, Line: 157,448,480
-# File: gui/preferences.c, Line: 497,505
+# File: calc/cpmd/cpmd_atoms.c, Line: 164,448,480
+# File: gui/preferences.c, Line: 499,507
 # File: opengl/win/w_advance.c, Line: 129
 msgid "Type"
 msgstr "Type"
 
-# File: gui/preferences.c, Line: 498
+# File: gui/preferences.c, Line: 500
 msgid "Fix"
 msgstr "Fix"
 
-# File: gui/preferences.c, Line: 499,511
+# File: gui/preferences.c, Line: 501,513
 # File: opengl/edit/cell_cut.c, Line: 307
 # File: opengl/win/m_axis.c, Line: 210,336
 # File: opengl/win/w_advance.c, Line: 120
@@ -2178,413 +2179,414 @@ msgstr "Fix"
 msgid "Position"
 msgstr "Position"
 
-# File: gui/preferences.c, Line: 500,1036
+# File: gui/preferences.c, Line: 502,1044
 # File: opengl/win/w_advance.c, Line: 121
 msgid "Direction"
 msgstr "Direction"
 
-# File: gui/preferences.c, Line: 501
+# File: gui/preferences.c, Line: 503
 # File: opengl/win/w_advance.c, Line: 122
 msgid "Intensity"
 msgstr "Intensity"
 
-# File: gui/preferences.c, Line: 502
+# File: gui/preferences.c, Line: 504
 msgid "Attenuation"
 msgstr "Attenuation"
 
-# File: gui/preferences.c, Line: 503
+# File: gui/preferences.c, Line: 505
 msgid "Spot specifics"
 msgstr "Spot specifics"
 
-# File: gui/preferences.c, Line: 504
+# File: gui/preferences.c, Line: 506
 # File: opengl/win/m_rep.c, Line: 504
 msgid "Mode"
 msgstr "Mode"
 
-# File: gui/preferences.c, Line: 506
+# File: gui/preferences.c, Line: 508
 msgid "Density"
 msgstr "Density"
 
-# File: gui/preferences.c, Line: 507
+# File: gui/preferences.c, Line: 509
 msgid "Depth"
 msgstr "Depth"
 
-# File: gui/preferences.c, Line: 508,1012,1045,1051,1147,2520,3215,3444
+# File: gui/preferences.c, Line: 510,1020,1053,1059,1155,2541,3236,3465
 # File: opengl/win/m_back.c, Line: 72
 # File: opengl/win/m_box.c, Line: 380,629
 # File: opengl/win/m_coord.c, Line: 656
-# File: opengl/win/popup.c, Line: 3667
+# File: opengl/win/popup.c, Line: 3700
 # File: opengl/win/w_atoms.c, Line: 360
 # File: opengl/win/w_coord.c, Line: 537,873,892,997
 msgid "Color"
 msgstr "Color"
 
-# File: gui/preferences.c, Line: 509
+# File: gui/preferences.c, Line: 511
 msgid "Show clones"
 msgstr "Show clones"
 
-# File: gui/preferences.c, Line: 510
+# File: gui/preferences.c, Line: 512
 msgid "Show box"
 msgstr "Show box"
 
-# File: gui/preferences.c, Line: 512
+# File: gui/preferences.c, Line: 514
 msgid "Rendering"
 msgstr "Rendering"
 
-# File: gui/preferences.c, Line: 513
+# File: gui/preferences.c, Line: 515
 msgid "Scaling"
 msgstr "Scaling"
 
-# File: gui/preferences.c, Line: 514
+# File: gui/preferences.c, Line: 516
 # File: opengl/win/w_axis.c, Line: 969
 # File: opengl/win/w_labels.c, Line: 707
 msgid "Font"
 msgstr "Font"
 
-# File: gui/preferences.c, Line: 515
+# File: gui/preferences.c, Line: 517
 msgid "Shift"
 msgstr "Shift"
 
-# File: gui/preferences.c, Line: 516,3696
+# File: gui/preferences.c, Line: 518,3717
 # File: opengl/win/w_axis.c, Line: 1000
 msgid "Colors"
 msgstr "Colors"
 
-# File: gui/preferences.c, Line: 517
+# File: gui/preferences.c, Line: 519
 msgid "Legend on x"
 msgstr "Legend on x"
 
-# File: gui/preferences.c, Line: 518
+# File: gui/preferences.c, Line: 520
 msgid "Legend on y"
 msgstr "Legend on y"
 
-# File: gui/preferences.c, Line: 519
+# File: gui/preferences.c, Line: 521
 msgid "Legend on z"
 msgstr "Legend on z"
 
-# File: gui/preferences.c, Line: 532
+# File: gui/preferences.c, Line: 534
 msgid "atomes preferences XML file"
 msgstr "atomes preferences XML file"
 
-# File: gui/preferences.c, Line 541
+# File: gui/preferences.c, Line: 541
 msgid "File opening"
 msgstr "File opening"
 
-# File: gui/preferences.c, Line: 550
+# File: gui/preferences.c, Line: 558
 msgid "Total cutoff"
 msgstr "Total cutoff"
 
-# File: gui/preferences.c, Line: 563
+# File: gui/preferences.c, Line: 571
 msgid "cutoff %s-%s"
 msgstr "cutoff %s-%s"
 
-# File: gui/preferences.c, Line: 682
+# File: gui/preferences.c, Line: 690
 msgid "Number of lights"
 msgstr "Number of lights"
 
-# File: gui/preferences.c, Line: 946
+# File: gui/preferences.c, Line: 954
 msgid "Format"
 msgstr "Format"
 
-# File: gui/preferences.c, Line: 955
+# File: gui/preferences.c, Line: 963
 msgid "Only label color"
 msgstr "Only label color"
 
-# File: gui/preferences.c, Line: 1009,1114
+# File: gui/preferences.c, Line: 1017,1122
 msgid "Wireframe width"
 msgstr "Wireframe width"
 
-# File: gui/preferences.c, Line: 1009,1114
+# File: gui/preferences.c, Line: 1017,1122
 msgid "Cylinder radius"
 msgstr "Cylinder radius"
 
-# File: gui/preferences.c, Line: 1030
+# File: gui/preferences.c, Line: 1038
 msgid "Gradient"
 msgstr "Gradient"
 
-# File: gui/preferences.c, Line: 1040
+# File: gui/preferences.c, Line: 1048
 # File: opengl/win/w_colors.c, Line: 549
 msgid "Mixed position"
 msgstr "Mixed position"
 
-# File: gui/preferences.c, Line: 1063
+# File: gui/preferences.c, Line: 1071
 msgid "Representation type"
 msgstr "Representation type"
 
-# File: gui/preferences.c, Line: 1069
+# File: gui/preferences.c, Line: 1077
 msgid "Camera depth"
 msgstr "Camera depth"
 
-# File: gui/preferences.c, Line: 1075
+# File: gui/preferences.c, Line: 1083
 # File: opengl/win/m_rep.c, Line: 427
 msgid "Zoom"
 msgstr "Zoom"
 
-# File: gui/preferences.c, Line: 1081
+# File: gui/preferences.c, Line: 1089
 # File: opengl/win/m_rep.c, Line: 428
 msgid "Camera pitch"
 msgstr "Camera pitch"
 
-# File: gui/preferences.c, Line: 1081
+# File: gui/preferences.c, Line: 1089
 # File: opengl/win/m_rep.c, Line: 428
 msgid "Camera heading"
 msgstr "Camera heading"
 
-# File: gui/preferences.c, Line: 1088
+# File: gui/preferences.c, Line: 1096
 msgid "Camera x"
 msgstr "Camera x"
 
-# File: gui/preferences.c, Line: 1088
+# File: gui/preferences.c, Line: 1096
 msgid "Camera y"
 msgstr "Camera y"
 
-# File: gui/preferences.c, Line: 1104
+# File: gui/preferences.c, Line: 1112
 msgid "Template position"
 msgstr "Template position"
 
-# File: gui/preferences.c, Line: 1110
+# File: gui/preferences.c, Line: 1118
 msgid "Custom position"
 msgstr "Custom position"
 
-# File: gui/preferences.c, Line: 1118
+# File: gui/preferences.c, Line: 1126
 # File: opengl/win/m_axis.c, Line: 187,332
 msgid "Length"
 msgstr "Length"
 
-# File: gui/preferences.c, Line: 1179
+# File: gui/preferences.c, Line: 1187
 # File: opengl/win/w_labels.c, Line: 711
 msgid "Font color"
 msgstr "Font color"
 
-# File: gui/preferences.c, Line: 1186
+# File: gui/preferences.c, Line: 1194
 msgid "Tilt along"
 msgstr "Tilt along"
 
-# File: gui/preferences.c, Line: 1191
+# File: gui/preferences.c, Line: 1199
 # File: opengl/win/w_labels.c, Line: 813
 msgid "Pattern"
 msgstr "Pattern"
 
-# File: gui/preferences.c, Line: 1196
+# File: gui/preferences.c, Line: 1204
 # File: opengl/win/w_labels.c, Line: 832
 msgid "Factor"
 msgstr "Factor"
 
-# File: gui/preferences.c, Line: 1201,3426,3587
+# File: gui/preferences.c, Line: 1209,3447,3608
 # File: opengl/win/w_labels.c, Line: 837
 msgid "Width"
 msgstr "Width"
 
-# File: gui/preferences.c, Line: 1216
+# File: gui/preferences.c, Line: 1224
 msgid "Selection color"
 msgstr "Selection color"
 
-# File: gui/preferences.c, Line: 2462
+# File: gui/preferences.c, Line: 2483
 msgid "The <b>View</b> tab regroups representation options"
 msgstr "The <b>View</b> tab regroups representation options"
 
-# File: gui/preferences.c, Line: 2463
+# File: gui/preferences.c, Line: 2484
 msgid "which effect apply to the general aspect of the model:"
 msgstr "which effect apply to the general aspect of the model:"
 
-# File: curve/cedit.c, Line: 384,385
-# File: gui/preferences.c, Line: 2465,2484
+# File: curve/cedit.c, Line: 384
+# File: gui/preferences.c, Line: 2486,2505
 # File: opengl/win/m_box.c, Line: 301,600
 # File: opengl/win/w_bonds.c, Line: 411
 msgid "Axis"
 msgstr "Axis"
 
-# File: gui/preferences.c, Line: 2464
+# File: gui/preferences.c, Line: 2485
 msgid "scene set-up and orientation"
 msgstr "scene set-up and orientation"
 
-# File: gui/preferences.c, Line: 2465
+# File: gui/preferences.c, Line: 2486
 msgid "axis options"
 msgstr "axis options"
 
-# File: gui/preferences.c, Line: 2466,2526
+# File: gui/preferences.c, Line: 2487,2547
 # File: opengl/win/glwindow.c, Line: 630
 # File: opengl/win/menu_bar.c, Line: 278
-# File: opengl/win/popup.c, Line: 4031,4243
+# File: opengl/win/popup.c, Line: 4038,4243,4251
 msgid "Tools"
 msgstr "Tools"
 
-# File: gui/preferences.c, Line: 2466
+# File: gui/preferences.c, Line: 2487
 msgid "measures and selections option"
 msgstr "measures and selections option"
 
-# File: gui/preferences.c, Line: 2479
+# File: gui/preferences.c, Line: 2485,2500
 # File: opengl/win/glwindow.c, Line: 558
 # File: opengl/win/m_rep.c, Line: 812
 msgid "Representation"
 msgstr "Representation"
 
-# File: gui/preferences.c, Line: 2489
+# File: gui/preferences.c, Line: 2510
 msgid "<b>Select measure type</b>"
 msgstr "<b>Select measure type</b>"
 
 # File: calc/dl_poly/dlp_control.c, Line: 167
-# File: gui/preferences.c, Line: 2491,2508
+# File: gui/preferences.c, Line: 2512,2529
 msgid "Standard"
 msgstr "Standard"
 
-# File: gui/preferences.c, Line: 2492,2509
+# File: gui/preferences.c, Line: 2513,2530
 # File: opengl/win/glwindow.c, Line: 126,169,172
 msgid "Edition mode"
 msgstr "Edition mode"
 
-# File: gui/preferences.c, Line: 2506
+# File: gui/preferences.c, Line: 2527
 msgid "<b>Select selection type</b>"
 msgstr "<b>Select selection type</b>"
 
-# File: calc/dl_poly/dlp_field.c, Line: 188
-# File: gui/preferences.c, Line: 3221,3336,3341
+# File: calc/dl_poly/dlp_field.c, Line: 210
+# File: calc/force_fields/charmm_silicates.c, Line: 195
+# File: calc/force_fields/force_fields.c, Line: 2271
+# File: gui/preferences.c, Line: 3242,3357,3362
+# File: opengl/win/w_library.c, Line: 519
 msgid "atom"
 msgstr "atom"
 
-# File: gui/preferences.c, Line: 3221,3336,3341
+# File: gui/preferences.c, Line: 3242,3357,3362
 msgid "clone"
 msgstr "clone"
 
-# File: gui/preferences.c, Line: 3224
+# File: gui/preferences.c, Line: 3245
 msgid "%s %s color"
 msgstr "%s %s color"
 
-# File: gui/preferences.c, Line: 3299
+# File: calc/dl_poly/dlp_field.c, Line: 188
+# File: gui/preferences.c, Line: 3320
 # File: opengl/win/w_search.c, Line: 2903,3129
 msgid "atom(s)"
 msgstr "atom(s)"
 
-# File: gui/preferences.c, Line: 3299
+# File: gui/preferences.c, Line: 3320
 msgid "dot(s)"
 msgstr "dot(s)"
 
-# File: gui/preferences.c, Line: 3299
+# File: gui/preferences.c, Line: 3320
 msgid "sphere(s)"
 msgstr "sphere(s)"
 
-# File: gui/preferences.c, Line: 3300
+# File: gui/preferences.c, Line: 3321
+# File: opengl/ogl_shading.c, Line: 263,330,388
+# File: project/readers/read_isaacs.c, Line: 237,655
 msgid "radius"
 msgstr "radius"
 
-# File: gui/preferences.c, Line: 3300
+# File: gui/gtk-misc.c, Line: 1028,1034,1040,1046,1052,1058,1064,1070,1078,1084,1090,1096,1108,1118,1124,1130,1136,1142,1148,1154,1160,1166,1172,1178,1186,1194,1202,1210,1218,1226,1234,1242
+# File: gui/preferences.c, Line: 3321
+# File: opengl/ogl_shading.c, Line: 230
 msgid "size"
 msgstr "size"
 
-# File: gui/preferences.c, Line: 3300
+# File: gui/main.c, Line: 558
+# File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "width"
 
-# File: gui/preferences.c, Line: 3301
+# File: gui/preferences.c, Line: 3322
 msgid "bond(s)"
 msgstr "bond(s)"
 
-# File: gui/preferences.c, Line: 3301
+# File: gui/preferences.c, Line: 3322
 msgid "wireframe(s)"
 msgstr "wireframe(s)"
 
-# File: gui/preferences.c, Line: 3301
+# File: gui/preferences.c, Line: 3322
 msgid "cylinder(s)"
 msgstr "cylinder(s)"
 
-# File: gui/preferences.c, Line: 3317,3326
+# File: gui/preferences.c, Line: 3338,3347
 msgid "Edit cloned %s %s"
 msgstr "Edit cloned %s %s"
 
-# File: gui/preferences.c, Line: 3317,3326
+# File: gui/preferences.c, Line: 3338,3347
 msgid "Edit %s %s"
 msgstr "Edit %s %s"
 
-# File: gui/preferences.c, Line: 3336
+# File: gui/preferences.c, Line: 3357
 msgid "Select %s color"
 msgstr "Select %s color"
 
-# File: gui/preferences.c, Line: 3341
+# File: gui/preferences.c, Line: 3362
 msgid "Select %s label color"
 msgstr "Select %s label color"
 
 # File: calc/dl_poly/dlp_field.c, Line: 925
-# File: gui/preferences.c, Line: 3425
+# File: gui/preferences.c, Line: 3446
 # File: opengl/win/m_map.c, Line: 679
 msgid "Element"
 msgstr "Element"
 
-# File: gui/preferences.c, Line: 3425
+# File: gui/preferences.c, Line: 3446
 msgid "Symbol"
 msgstr "Symbol"
 
-# File: gui/preferences.c, Line: 3426,3587
+# File: gui/preferences.c, Line: 3447,3608
 # File: opengl/edit/cell_cut.c, Line: 307
 # File: opengl/win/w_axis.c, Line: 974
 # File: opengl/win/w_labels.c, Line: 726
 msgid "Size"
 msgstr "Size"
 
-# File: gui/preferences.c, Line: 3427
+# File: gui/preferences.c, Line: 3448
 msgid "Covalent [1]"
 msgstr "Covalent [1]"
 
-# File: gui/preferences.c, Line: 3427
+# File: gui/preferences.c, Line: 3448
 msgid "Ionic [2]"
 msgstr "Ionic [2]"
 
-# File: gui/preferences.c, Line: 3427
+# File: gui/preferences.c, Line: 3448
 msgid "Crystal [4,5]"
 msgstr "Crystal [4,5]"
 
-# File: gui/preferences.c, Line: 3478
+# File: gui/preferences.c, Line: 3499
 msgid "<i>User defined values appear in colored bold font.</i>"
 msgstr "<i>User defined values appear in colored bold font.</i>"
 
-# File: gui/preferences.c, Line: 3494
+# File: gui/preferences.c, Line: 3515
 msgid "By default label and species colors are similar,"
 msgstr "By default label and species colors are similar,"
 
-# File: gui/preferences.c, Line: 3494
+# File: gui/preferences.c, Line: 3515
 msgid "you can modify that using this dialog window."
 msgstr "you can modify that using this dialog window."
 
-# File: gui/preferences.c, Line: 3494
+# File: gui/preferences.c, Line: 3515
 msgid "You can also use a single color for all labels:"
 msgstr "You can also use a single color for all labels:"
 
-# File: gui/preferences.c, Line: 3506
+# File: gui/preferences.c, Line: 3527
 msgid "Use single color"
 msgstr "Use single color"
 
-# File: gui/preferences.c, Line: 3543
+# File: gui/preferences.c, Line: 3564
 msgid "Edit species related parameters"
 msgstr "Edit species related parameters"
 
-# File: gui/preferences.c, Line: 3547
+# File: gui/preferences.c, Line: 3568
 msgid "Override species based parameters"
 msgstr "Override species based parameters"
 
-# File: gui/preferences.c, Line: 3552
+# File: gui/preferences.c, Line: 3573
 msgid "Set default value"
 msgstr "Set default value"
 
-# File: gui/preferences.c, Line: 3586
+# File: gui/preferences.c, Line: 3607
 msgid "<b>Atom(s)</b>"
 msgstr "<b>Atom(s)</b>"
 
-# File: gui/preferences.c, Line: 3586
+# File: gui/preferences.c, Line: 3607
 msgid "<b>Bond(s)</b>"
 msgstr "<b>Bond(s)</b>"
 
-# File: gui/preferences.c, Line: 3586
+# File: gui/preferences.c, Line: 3607
 msgid "\t<u>Clone(s)</u>"
 msgstr "\t<u>Clone(s)</u>"
 
-# File: gui/preferences.c, Line: 3586
-msgid "Atom(s) "
-msgstr "Atom(s) "
-
-# File: gui/preferences.c, Line: 3299
-msgid "atom(s) "
-msgstr "atom(s) "
-
-# File: calc/dl_poly/dlp_field.c, Line: 346
+# File: calc/dl_poly/dlp_field.c, Line: 931
 # File: opengl/win/glwindow.c, Line: 526
 # File: opengl/win/m_clones.c, Line: 125
 # File: opengl/win/menu_bar.c, Line: 187
@@ -2592,25 +2594,25 @@ msgstr "atom(s) "
 msgid "Bond(s)"
 msgstr "Bond(s)"
 
-# File: gui/preferences.c, Line: 3644
+# File: gui/preferences.c, Line: 3665
 msgid "The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options"
 msgstr "The <b>Model</b> tab regroups atom(s), bond(s) and clone(s) options"
 
-# File: gui/preferences.c, Line: 3645
+# File: gui/preferences.c, Line: 3666
 msgid "which effect apply when the corresponding <b>OpenGL</b> style is used:"
 msgstr "which effect apply when the corresponding <b>OpenGL</b> style is used:"
 
-# File: gui/preferences.c, Line: 3646
+# File: gui/preferences.c, Line: 3667
 # File: opengl/win/glwindow.c, Line: 141
 # File: opengl/win/m_style.c, Line: 59
 msgid "Balls and Sticks"
 msgstr "Balls and Sticks"
 
-# File: gui/preferences.c, Line: 3646
+# File: gui/preferences.c, Line: 3667
 msgid "atoms<sup>*</sup> and bonds radii"
 msgstr "atoms<sup>*</sup> and bonds radii"
 
-# File: gui/preferences.c, Line: 3647
+# File: gui/preferences.c, Line: 3668
 # File: opengl/win/glwindow.c, Line: 148
 # File: opengl/win/m_style.c, Line: 60
 # File: opengl/win/w_axis.c, Line: 935
@@ -2618,21 +2620,21 @@ msgstr "atoms<sup>*</sup> and bonds radii"
 msgid "Wireframes"
 msgstr "Wireframes"
 
-# File: gui/preferences.c, Line: 3647
+# File: gui/preferences.c, Line: 3668
 msgid "dots<sup>**</sup> size and wireframes width"
 msgstr "dots<sup>**</sup> size and wireframes width"
 
-# File: gui/preferences.c, Line: 3648
+# File: gui/preferences.c, Line: 3669
 # File: opengl/win/m_style.c, Line: 61,371,406,505
 # File: opengl/win/popup.c, Line: 3104
 msgid "Spacefilled"
 msgstr "Spacefilled"
 
-# File: gui/preferences.c, Line: 3648
+# File: gui/preferences.c, Line: 3669
 msgid "tabulated parameters"
 msgstr "tabulated parameters"
 
-# File: gui/preferences.c, Line: 3649
+# File: gui/preferences.c, Line: 3670
 # File: opengl/win/glwindow.c, Line: 142
 # File: opengl/win/m_box.c, Line: 362,370,617
 # File: opengl/win/m_style.c, Line: 63
@@ -2641,306 +2643,306 @@ msgstr "tabulated parameters"
 msgid "Cylinders"
 msgstr "Cylinders"
 
-# File: gui/preferences.c, Line: 3649
+# File: gui/preferences.c, Line: 3670
 msgid "bonds radii"
 msgstr "bonds radii"
 
-# File: gui/preferences.c, Line: 3652
+# File: gui/preferences.c, Line: 3673
 msgid "It also provides options to customize atomic label(s),"
 msgstr "It also provides options to customize atomic label(s),"
 
-# File: gui/preferences.c, Line: 3652
+# File: gui/preferences.c, Line: 3673
 msgid "and, the model box, if any:"
 msgstr "and, the model box, if any:"
 
-# File: gui/preferences.c, Line: 3653,3701
+# File: gui/preferences.c, Line: 3674,3722
 msgid "Labels"
 msgstr "Labels"
 
-# File: gui/preferences.c, Line: 3653
+# File: gui/preferences.c, Line: 3674
 msgid "atom labels"
 msgstr "atom labels"
 
-# File: gui/preferences.c, Line: 3654,3718
+# File: gui/preferences.c, Line: 3675,3726
 # File: opengl/win/m_box.c, Line: 301,600
 # File: opengl/win/w_bonds.c, Line: 411
 msgid "Box"
 msgstr "Box"
 
-# File: gui/preferences.c, Line: 3654
+# File: gui/preferences.c, Line: 3675
 msgid "model box details"
 msgstr "model box details"
 
-# File: gui/preferences.c, Line: 3659
+# File: gui/preferences.c, Line: 3680
 msgid "<b>Atoms</b>"
 msgstr "<b>Atoms</b>"
 
-# File: gui/preferences.c, Line: 3659
+# File: gui/preferences.c, Line: 3680
 msgid "<b>Clones</b>"
 msgstr "<b>Clones</b>"
 
-# File: gui/preferences.c, Line: 3664
+# File: gui/preferences.c, Line: 3685
 msgid "Edit species colors"
 msgstr "Edit species colors"
 
-# File: gui/preferences.c, Line: 3668
+# File: gui/preferences.c, Line: 3689
 msgid "Always show clone(s), if any."
 msgstr "Always show clone(s), if any."
 
-# File: gui/preferences.c, Line: 3671
+# File: gui/preferences.c, Line: 3692
 msgid "Always show box, if any."
 msgstr "Always show box, if any."
 
-# File: gui/preferences.c, Line: 3675
+# File: gui/preferences.c, Line: 3696
 msgid "the same parameters are also used for the <b>spheres</b> style"
 msgstr "the same parameters are also used for the <b>spheres</b> style"
 
-# File: gui/preferences.c, Line: 3676
+# File: gui/preferences.c, Line: 3697
 msgid "the same parameters are also used for the <b>dots</b> style"
 msgstr "the same parameters are also used for the <b>dots</b> style"
 
-# File: gui/preferences.c, Line: 3697
+# File: gui/preferences.c, Line: 3718
 msgid "Adjust color(s)"
 msgstr "Adjust color(s)"
 
-# File: gui/preferences.c, Line: 3742
+# File: gui/preferences.c, Line: 3763
 msgid "f(atoms) <sup>*</sup>"
 msgstr "f(atoms) <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 3785
+# File: gui/preferences.c, Line: 3806
 # File: opengl/win/m_map.c, Line: 1132,1239
 # File: opengl/win/w_coord.c, Line: 90
 msgid "Atomic Species"
 msgstr "Atomic Species"
 
-# File: gui/preferences.c, Line: 3786
+# File: gui/preferences.c, Line: 3807
 # File: opengl/win/m_poly.c, Line: 333,493
 msgid "Total Coordination(s)"
 msgstr "Total Coordination(s)"
 
-# File: gui/preferences.c, Line: 3787
+# File: gui/preferences.c, Line: 3808
 # File: opengl/win/m_poly.c, Line: 334,494
 msgid "Partial Coordination(s)"
 msgstr "Partial Coordination(s)"
 
-# File: gui/preferences.c, Line: 3816
+# File: gui/preferences.c, Line: 3837
 msgid "The <b>OpenGL</b> tab regroups rendering options"
 msgstr "The <b>OpenGL</b> tab regroups rendering options"
 
-# File: gui/preferences.c, Line: 3817
+# File: gui/preferences.c, Line: 3838
 msgid "use it to configure the OpenGL 3D scene:"
 msgstr "use it to configure the OpenGL 3D scene:"
 
-# File: gui/preferences.c, Line: 3818,3857
+# File: gui/preferences.c, Line: 3839,3878
 msgid "Material"
 msgstr "Material"
 
-# File: gui/preferences.c, Line: 3818
+# File: gui/preferences.c, Line: 3839
 msgid "aspect for atom(s) and bond(s)"
 msgstr "aspect for atom(s) and bond(s)"
 
-# File: gui/preferences.c, Line: 3819,3858
+# File: gui/preferences.c, Line: 3840,3879
 msgid "Lights"
 msgstr "Lights"
 
-# File: gui/preferences.c, Line: 3819
+# File: gui/preferences.c, Line: 3840
 msgid "lightning of the scene"
 msgstr "lightning of the scene"
 
-# File: gui/preferences.c, Line: 3820,3859
+# File: gui/preferences.c, Line: 3841,3880
 msgid "Fog"
 msgstr "Fog"
 
-# File: gui/preferences.c, Line: 3820
+# File: gui/preferences.c, Line: 3841
 msgid "atmosphere effects"
 msgstr "atmosphere effects"
 
-# File: gui/preferences.c, Line: 3821
+# File: gui/preferences.c, Line: 3842
 msgid "It also offers to adjust the main visualization style and the color maps"
 msgstr "It also offers to adjust the main visualization style and the color maps"
 
-# File: gui/preferences.c, Line: 3826
+# File: gui/preferences.c, Line: 3847
 msgid "<b>Style</b>"
 msgstr "<b>Style</b>"
 
-# File: gui/preferences.c, Line: 3838
+# File: gui/preferences.c, Line: 3859
 msgid "if 10 000 atoms or more: <b>Wireframes</b>, otherwise: <b>Balls and sticks</b>"
 msgstr "if 10 000 atoms or more: <b>Wireframes</b>, otherwise: <b>Balls and sticks</b>"
 
-# File: gui/preferences.c, Line: 3841
+# File: gui/preferences.c, Line: 3862
 msgid "<b>Color maps</b>"
 msgstr "<b>Color maps</b>"
 
-# File: gui/preferences.c, Line: 3844
+# File: gui/preferences.c, Line: 3865
 msgid "\tatom(s) and bond(s)"
 msgstr "\tatom(s) and bond(s)"
 
-# File: gui/preferences.c, Line: 3849
+# File: gui/preferences.c, Line: 3870
 msgid "\tpolyhedra"
 msgstr "\tpolyhedra"
 
-# File: gui/preferences.c, Line: 4016,4196
+# File: gui/preferences.c, Line: 4037,4217
 msgid "Spec. &#x3B1;"
 msgstr "Spec. &#x3B1;"
 
-# File: gui/preferences.c, Line: 4017,4211
+# File: gui/preferences.c, Line: 4038,4232
 msgid "Spec. &#x3B2;"
 msgstr "Spec. &#x3B2;"
 
-# File: gui/preferences.c, Line: 4018
+# File: gui/preferences.c, Line: 4039
 msgid "R<sub>cut</sub> (&#x3B1;, &#x3B2;)"
 msgstr "R<sub>cut</sub> (&#x3B1;, &#x3B2;)"
 
-# File: gui/preferences.c, Line: 4019
+# File: gui/preferences.c, Line: 4040
 msgid "Use <sup>*</sup>"
 msgstr "Use <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 4040
+# File: gui/preferences.c, Line: 4061
 msgid "Unused values will not be saved !"
 msgstr "Unused values will not be saved !"
 
-# File: gui/preferences.c, Line: 4187
+# File: gui/preferences.c, Line: 4208
 msgid "Select partial cutoffs(s)"
 msgstr "Select partial cutoffs(s)"
 
-# File: gui/preferences.c, Line: 4229,4269
+# File: gui/preferences.c, Line: 4250,4290
 msgid "Step(s) between configurations"
 msgstr "Step(s) between configurations"
 
-# File: gui/preferences.c, Line: 4267
+# File: gui/preferences.c, Line: 4288
 msgid "<b>g(r)</b>: number of &#x3b4;r"
 msgstr "<b>g(r)</b>: number of &#x3b4;r"
 
-# File: gui/preferences.c, Line: 4267
+# File: gui/preferences.c, Line: 4288
 msgid "<b>s(q)</b>: number of &#x3b4;q"
 msgstr "<b>s(q)</b>: number of &#x3b4;q"
 
-# File: gui/preferences.c, Line: 4267
+# File: gui/preferences.c, Line: 4288
 msgid "<b>s(k)</b>: number of &#x3b4;k"
 msgstr "<b>s(k)</b>: number of &#x3b4;k"
 
-# File: gui/preferences.c, Line: 4267
+# File: gui/preferences.c, Line: 4288
 msgid "<b>g(r) FFT</b>: number of &#x3b4;r"
 msgstr "<b>g(r) FFT</b>: number of &#x3b4;r"
 
-# File: gui/preferences.c, Line: 4268
+# File: gui/preferences.c, Line: 4289
 msgid "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"
 msgstr "<b>D<sub>ij</sub></b>: number of &#x3b4;r [D<sub>ij</sub>min-D<sub>ij</sub>max]"
 
-# File: gui/preferences.c, Line: 4268
+# File: gui/preferences.c, Line: 4289
 msgid "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]"
 msgstr "<b>Angles distribution</b>: number of &#x3b4;&#x3b8; [0-180°]"
 
-# File: gui/preferences.c, Line: 4269
+# File: gui/preferences.c, Line: 4290
 msgid "<b>Spherical harmonics</b>: l<sub>max</sub> &#x2208; [2-40]"
 msgstr "<b>Spherical harmonics</b>: l<sub>max</sub> &#x2208; [2-40]"
 
-# File: gui/preferences.c, Line: 4269
+# File: gui/preferences.c, Line: 4290
 msgid "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"
 msgstr "<b>F(k,&#x3b4;t)</b>: number of &#x3b4;k"
 
-# File: gui/preferences.c, Line: 4270
+# File: gui/preferences.c, Line: 4291
 msgid "The <b>Analysis</b> tab regroups calculation options"
 msgstr "The <b>Analysis</b> tab regroups calculation options"
 
-# File: gui/preferences.c, Line: 4271
+# File: gui/preferences.c, Line: 4292
 msgid "use it to setup your own default parameters:"
 msgstr "use it to setup your own default parameters:"
 
-# File: gui/preferences.c, Line: 4272,4343
+# File: gui/preferences.c, Line: 4293,4364
 msgid "Calculations"
 msgstr "Calculations"
 
-# File: gui/preferences.c, Line: 4272
+# File: gui/preferences.c, Line: 4293
 msgid "most analysis options"
 msgstr "most analysis options"
 
-# File: gui/preferences.c, Line: 4273,4350
+# File: gui/preferences.c, Line: 4294,4371
 # File: opengl/win/popup.c, Line: 4235
 msgid "Rings"
 msgstr "Rings"
 
-# File: gui/preferences.c, Line: 4273
+# File: gui/preferences.c, Line: 4294
 msgid "ring statistics options"
 msgstr "ring statistics options"
 
-# File: gui/preferences.c, Line: 4274,4350
+# File: gui/preferences.c, Line: 4295,4371
 msgid "Chains"
 msgstr "Chains"
 
-# File: gui/preferences.c, Line: 4274
+# File: gui/preferences.c, Line: 4295
 msgid "chain statistics options"
 msgstr "chain statistics options"
 
-# File: gui/preferences.c, Line: 4275
+# File: gui/preferences.c, Line: 4296
 msgid "dynamic structure factor options"
 msgstr "dynamic structure factor options"
 
-# File: gui/preferences.c, Line: 4280
+# File: gui/preferences.c, Line: 4301
 msgid "To determine the existence, or the absence, of a chemical bond"
 msgstr "To determine the existence, or the absence, of a chemical bond"
 
-# File: gui/preferences.c, Line: 4281
+# File: gui/preferences.c, Line: 4302
 msgid "between 2 atoms is a key feature in the <b>atomes</b> software"
 msgstr "between 2 atoms is a key feature in the <b>atomes</b> software"
 
-# File: gui/preferences.c, Line: 4284
+# File: gui/preferences.c, Line: 4305
 msgid "It is used for analysis purposes, and, to draw bonds in the OpenGL window."
 msgstr "It is used for analysis purposes, and, to draw bonds in the OpenGL window."
 
-# File: gui/preferences.c, Line: 4286
+# File: gui/preferences.c, Line: 4307
 msgid "You can adapt below the distance cutoffs:"
 msgstr "You can adapt below the distance cutoffs:"
 
-# File: gui/preferences.c, Line: 4292
+# File: gui/preferences.c, Line: 4313
 msgid "<b>Total cutoff</b>"
 msgstr "<b>Total cutoff</b>"
 
-# File: gui/preferences.c, Line: 4294
+# File: gui/preferences.c, Line: 4315
 msgid "Evaluated by <b>atomes</b>"
 msgstr "Evaluated by <b>atomes</b>"
 
-# File: gui/preferences.c, Line: 4295
+# File: gui/preferences.c, Line: 4316
 msgid "User Defined <sup>*</sup>"
 msgstr "User Defined <sup>*</sup>"
 
-# File: gui/preferences.c, Line: 4313
+# File: gui/preferences.c, Line: 4334
 msgid "<b>Partial cutoff(s)</b>"
 msgstr "<b>Partial cutoff(s)</b>"
 
-# File: gui/preferences.c, Line: 4314
+# File: gui/preferences.c, Line: 4335
 msgid "Set default cutoff(s)"
 msgstr "Set default cutoff(s)"
 
-# File: gui/preferences.c, Line: 4317
+# File: gui/preferences.c, Line: 4338
 msgid "The highest this value is, the highest the number of neighbors around an atom."
 msgstr "The highest this value is, the highest the number of neighbors around an atom."
 
-# File: gui/preferences.c, Line: 4339
+# File: gui/preferences.c, Line: 4360
 msgid "<b>Dynamical analysis: MSD, S(q,&#969;)</b>"
 msgstr "<b>Mean Squared Displacement :</b>"
 
-# File: gui/preferences.c, Line: 4879
+# File: gui/preferences.c, Line: 4903
 msgid "Apply to project(s) in workspace ?"
 msgstr "Apply to project(s) in workspace ?"
 
-# File: gui/preferences.c, Line: 4879
+# File: gui/preferences.c, Line: 4903
 msgid "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?"
 msgstr "Preferences were saved for the active session !\n Do you want to apply preferences to the project(s) opened in the workspace ?"
 
-# File: gui/preferences.c, Line: 4882
+# File: gui/preferences.c, Line: 4906
 msgid "Project selection"
 msgstr "Project selection"
 
-# File: gui/preferences.c, Line: 4882
+# File: gui/preferences.c, Line: 4906
 msgid "Select to apply preferences"
 msgstr "Select to apply preferences"
 
-# File: gui/preferences.c, Line: 4891
+# File: gui/preferences.c, Line: 4915
 msgid "Including analysis parameters and cutoffs ..."
 msgstr "Including analysis parameters and cutoffs ..."
 
-# File: gui/preferences.c, Line: 4945
+# File: gui/preferences.c, Line: 4969
 msgid "Restore default parameters"
 msgstr "Restore default parameters"
 
@@ -2948,69 +2950,69 @@ msgstr "Restore default parameters"
 msgid "Analysis"
 msgstr "Analysis"
 
-# File: gui/preferences.c, Line: 4954,5064
+# File: gui/preferences.c, Line: 4978,5090,5158
 # File: opengl/win/m_tools.c, Line: 78
 msgid "Analysis "
 msgstr "Analysis"
 
-# File: gui/preferences.c, Line: 4956,5066
+# File: gui/preferences.c, Line: 4980,5092,5160
 # File: opengl/win/glwindow.c, Line: 622
 # File: opengl/win/menu_bar.c, Line: 270,275
 # File: opengl/win/w_volumes.c, Line: 1138
 msgid "Model"
 msgstr "Model"
 
-# File: gui/preferences.c, Line: 4957,5067
+# File: gui/preferences.c, Line: 4981,5093,5161
 # File: opengl/win/glwindow.c, Line: 631
 # File: opengl/win/menu_bar.c, Line: 279
 msgid "View"
 msgstr "View"
 
-# File: gui/preferences.c, Line: 4978
+# File: gui/preferences.c, Line: 5002
 msgid "Save parameters"
 msgstr "Save parameters"
 
-# File: gui/preferences.c, Line: 4981,5127
+# File: gui/preferences.c, Line: 5005,5221
 msgid "Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"
 msgstr "Do you want to save <b>atomes</b> preferences in:\n\n\t%s\n\nIf found this file is processed at every <b>atomes</b> startup.\n\n\t\t\t\t\t\tSave file ?"
 
-# File: gui/preferences.c, Line: 4982,5128
+# File: gui/preferences.c, Line: 5006,5222
 msgid "Save atomes preferences to file ?"
 msgstr "Save atomes preferences to file ?"
 
-# File: gui/preferences.c, Line: 4986,5132
+# File: gui/preferences.c, Line: 5010,5226
 msgid "Error while trying to save preferences to file"
 msgstr "Error while trying to save preferences to file"
 
-# File: gui/preferences.c, Line: 5024
+# File: gui/preferences.c, Line: 5075
 msgid "User preferences"
 msgstr "User preferences"
 
-# File: gui/preferences.c, Line: 5037
+# File: gui/preferences.c, Line: 5088
 msgid "Browse the following to modify the default configuration of <b>atomes</b>"
 msgstr "Browse the following to modify the default configuration of <b>atomes</b>"
 
-# File: gui/preferences.c, Line: 5038
+# File: gui/preferences.c, Line: 5089
 msgid "by replacing internal parameters by user defined preferences."
 msgstr "by replacing internal parameters by user defined preferences."
 
-# File: gui/preferences.c, Line: 5039
+# File: gui/preferences.c, Line: 5090
 msgid "calculation preferences"
 msgstr "calculation preferences"
 
-# File: gui/preferences.c, Line: 5040
+# File: gui/preferences.c, Line: 5091
 msgid "rendering preferences"
 msgstr "rendering preferences"
 
-# File: gui/preferences.c, Line: 5041
+# File: gui/preferences.c, Line: 5092
 msgid "atom(s), bond(s) and box preferences"
 msgstr "atom(s), bond(s) and box preferences"
 
-# File: gui/preferences.c, Line: 5042
+# File: gui/preferences.c, Line: 5093
 msgid "representation and projection preferences"
 msgstr "representation and projection preferences"
 
-# File: gui/preferences.c, Line: 5043
+# File: gui/preferences.c, Line: 5094
 msgid "Default parameters are used for any new project added to the workspace\n"
 msgstr "Default parameters are used for any new project added to the workspace\n"
 
@@ -3018,61 +3020,67 @@ msgstr "Default parameters are used for any new project added to the workspace\n
 msgid "<b>atomes</b> default behavior:"
 msgstr "<b>atomes</b> default behavior:"
 
-# File: gui/preferences.c, Line 5110
+# File: gui/preferences.c, Line: 5110
 msgid "Single instance (1)"
 msgstr "Single instance (1)"
 
-# File: gui/preferences.c, Line 5110
+# File: gui/preferences.c, Line: 5110
 msgid "Multiple instance(s) (2)"
 msgstr "Multiple instance(s) (2)"
 
-# File: gui/preferences.c, Line 5140
+# File: gui/preferences.c, Line: 5140
 msgid "(1) Each and every file is opened in a single <b>atomes</b> instance"
 msgstr "(1) Each and every file is opened in a single <b>atomes</b> instance"
 
-# File: gui/preferences.c, Line 5140
+# File: gui/preferences.c, Line: 5141
 msgid "(2) When required files are opened in a separate, new, <b>atomes</b> instance"
 msgstr "(2) When required files are opened in a separate, new, <b>atomes</b> instance"
 
-# File: gui/preferences.c, Line: 5058
+# File: gui/preferences.c, Line: 5151
 msgid "Restore <b>atomes</b> default parameters"
 msgstr "Restore <b>atomes</b> default parameters"
 
-# File: gui/preferences.c, Line: 5094
+# File: gui/preferences.c, Line: 5178
 msgid "rendering"
 msgstr "rendering"
 
-# File: gui/preferences.c, Line: 5104
+# File: gui/main.c, Line: 565
+# File: gui/preferences.c, Line: 1014,2074,5178
+# File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
+# File: project/readers/read_isaacs.c, Line: 272,1333
 msgid "box"
 msgstr "box"
 
-# File: gui/preferences.c, Line: 5108
+# File: gui/main.c, Line: 564
+# File: gui/preferences.c, Line: 1107,2094,5178
+# File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
 msgid "axis"
 msgstr "axis"
 
-# File: gui/preferences.c, Line: 5112
+# File: gui/gtk-misc.c, Line: 1172,1179
+# File: gui/preferences.c, Line: 1036,2084,5178
 msgid "background"
 msgstr "background"
 
-# File: gui/preferences.c, Line: 5084
+# File: gui/preferences.c, Line: 1068,2089,5178
 msgid "representation"
 msgstr "representation"
 
-# File: gui/preferences.c, Line: 5085
+# File: gui/preferences.c, Line: 5179
 msgid "Set %s preferences as default preferences ?"
 msgstr "Set %s preferences as default preferences ?"
 
-# File: gui/preferences.c, Line: 5087
+# File: gui/preferences.c, Line: 5181
 msgid "Set model preferences as default ?"
 msgstr "Set model preferences as default ?"
 
-# File: gui/preferences.c, Line: 5157
+# File: gui/preferences.c, Line: 5251
 msgid "Set default"
 msgstr "Set default"
 
-# File: gui/ringscall.c, Line: 488
+# File: gui/ringscall.c, Line: 486
 msgid "\t<b>The ring statistics have failed !</b>\n\n"
 "The number of ring per MD step appears\n"
 "to be bigger than the initial value of <b>%d</b>\n"
@@ -3221,8 +3229,8 @@ msgstr "\t - Number of δq steps: "
 msgid "\n\n\t between "
 msgstr "\n\n\t between "
 
+# File: calc/dl_poly/dlp_field.c, Line: 2232
 # File: gui/sqcall.c, Line: 155,175
-# File: calc/dl_poly/dlp_field.c, Line: 3
 msgid "and"
 msgstr "and"
 
@@ -3243,10 +3251,10 @@ msgid "Logo"
 msgstr "Logo"
 
 # File: calc/dl_poly/dlp_atom.c, Line: 744
-# File: calc/dl_poly/dlp_field.c, Line: 924
+# File: calc/dl_poly/dlp_field.c, Line: 924,925
 # File: calc/dl_poly/dlp_mol.c, Line: 761
 # File: gui/tools.c, Line: 302
-# File: opengl/win/w_search.c, Line: 3577
+# File: opengl/win/w_search.c, Line: 3577,3578,3579,3580,3581,3582
 msgid "Name"
 msgstr "Name"
 
@@ -3288,6 +3296,7 @@ msgid "Guttman's"
 msgstr "de Guttman"
 
 # File: global.c, Line: 150
+# File: opengl/edit/cbuild_edit.c, Line: 946
 msgid "Primitive"
 msgstr "Primitive"
 
@@ -3295,11 +3304,11 @@ msgstr "Primitive"
 msgid "Strong"
 msgstr "Strong"
 
-# File: global.c, Line: 617
+# File: global.c, Line: 616
 msgid "Error in string format: string = \"%s\" - value == %lf\n"
 msgstr "Error in string format: string = \"%s\" - value == %lf\n"
 
-# File: global.c, Line: 646
+# File: global.c, Line: 645
 msgid "\n \tAnalysis was performed in: "
 msgstr "\n \tAnalysis was performed in: "
 
@@ -3321,6 +3330,7 @@ msgstr "Project N°"
 msgid "Fragment(s)"
 msgstr "Fragment(s)"
 
+# File: calc/dl_poly/dlp_field.c, Line: 142
 # File: opengl/win/glwindow.c, Line: 316
 # File: opengl/win/m_map.c, Line: 1140,1253
 # File: opengl/win/menu_bar.c, Line: 232,236
@@ -3328,7 +3338,6 @@ msgstr "Fragment(s)"
 # File: opengl/win/w_coord.c, Line: 94,1355
 # File: opengl/win/w_volumes.c, Line: 1140
 # File: project/read_mol.c, Line: 150
-# File: calc/dl_poly/dlp_field.c, Line: 142
 msgid "Molecule(s)"
 msgstr "Molecule(s)"
 
@@ -3367,7 +3376,7 @@ msgstr "Number of atoms"
 msgid "Number of steps"
 msgstr "Number of steps"
 
-# File: project/readers/read_cif.c, Line: 367
+# File: project/readers/read_cif.c, Line: 388
 msgid "<b>To continue and build the crystal according to the information of the CIF file\n"
 "it is required to provide a suitable value for each and every missing parameter(s).</b>\n\n"
 "Please select an atom type for the following object(s):"
@@ -3375,7 +3384,7 @@ msgstr "<b>To continue and build the crystal according to the information of the
 "it is required to provide a suitable value for each and every missing parameter(s).</b>\n\n"
 "Please select an atom type for the following object(s):"
 
-# File: project/readers/read_cif.c, Line: 769
+# File: project/readers/read_cif.c, Line: 791
 msgid "<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
@@ -3383,7 +3392,7 @@ msgstr "<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
 
-# File: project/readers/read_cif.c, Line: 819
+# File: project/readers/read_cif.c, Line: 841
 msgid "<b>CIF retrieved value</b>: keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
@@ -3391,13 +3400,13 @@ msgstr "<b>CIF retrieved value</b>: keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
 
-# File: project/readers/read_cif.c, Line: 857
+# File: project/readers/read_cif.c, Line: 878
 msgid "<b>Key positions</b>: keyword: %s_%s\n"
 "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n"
 msgstr "<b>Key positions</b>: keyword: %s_%s\n"
 "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1203
+# File: project/readers/read_cif.c, Line: 1256
 msgid "<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
 "  - configuration N°%d\t :: atoms= %d\n"
 "  - initialization      \t\t :: atoms= %d\n"
@@ -3405,7 +3414,7 @@ msgstr "<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
 "  - configuration N°%d\t :: atoms= %d\n"
 "  - initialization      \t\t :: atoms= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1265
+# File: project/readers/read_cif.c, Line: 1318
 msgid "<b>Atomic coordinates</b>: the number of chemical species changes !\n"
 "  - configuration N°%d\t :: species= %d\n"
 "  - initialization      \t\t :: species= %d\n"
@@ -3413,7 +3422,7 @@ msgstr "<b>Atomic coordinates</b>: the number of chemical species changes !\n"
 "  - configuration N°%d\t :: species= %d\n"
 "  - initialization      \t\t :: species= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1277
+# File: project/readers/read_cif.c, Line: 1330
 msgid "<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
 "  - configuration N°%d\t :: atom(s)= %d\n"
 "  - initialization      \t\t :: atom(s)= %d\n"
@@ -3421,19 +3430,19 @@ msgstr "<b>Atomic coordinates</b>: the number of atom(s) for species %d changes 
 "  - configuration N°%d\t :: atom(s)= %d\n"
 "  - initialization      \t\t :: atom(s)= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1658,1739
+# File: project/readers/read_cif.c, Line: 1710,1723,1791,1815
 msgid "<b>Space group</b>: CIF file information could be inaccurate !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 msgstr "<b>Space group</b>: CIF file information could be inaccurate !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 
-# File: project/readers/read_cif.c, Line: 1899
+# File: project/readers/read_cif.c, Line: 1951
 msgid "<b>Space group</b>: space group and H-M symbol do not match !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 msgstr "<b>Space group</b>: space group and H-M symbol do not match !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 
-# File: project/readers/read_cif.c, Line: 2048
+# File: project/readers/read_cif.c, Line: 2101
 msgid "<b>Space group</b>: found trigonal space group N°%d-%s, <b>%s</b> setting\n"
 "but the lattice parameters were found in <b>%s</b> format ...\n"
 "\t ... the space group setting was modified accordingly !\n"
@@ -3441,13 +3450,13 @@ msgstr "<b>Space group</b>: found trigonal space group N°%d-%s, <b>%s</b> setti
 "but the lattice parameters were found in <b>%s</b> format ...\n"
 "\t ... the space group setting was modified accordingly !\n"
 
-# File: project/readers/read_cif.c, Line: 2063
+# File: project/readers/read_cif.c, Line: 2115
 msgid "<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
 "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n"
 msgstr "<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
 "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n"
 
-# File: project/readers/read_cif.c, Line: 2170
+# File: project/readers/read_cif.c, Line: 2239
 msgid "<b>Building crystal using symmetry positions: </b> \n"
 "  1) evaluate candidate atomic positions using data in CIF file: \n"
 "     - symmetry positions\n"
@@ -3463,7 +3472,7 @@ msgstr "<b>Building crystal using symmetry positions: </b> \n"
 "     - occupancy %s\n"
 "     - %s\n"
 
-# File: project/readers/read_cif.c, Line: 2517
+# File: project/readers/read_cif.c, Line: 2587
 msgid "The crystal will be created however some objects might be missing,\n"
 "Occupancy is too low compared to the number of site(s) per cell.\n\n"
 "<b>To build a crystal matching the defined occupancy</b>:\n"
@@ -3477,7 +3486,7 @@ msgstr "The crystal will be created however some objects might be missing,\n"
 "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
 "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.\n\n"
 
-# File: project/readers/read_cif.c, Line: 2525
+# File: project/readers/read_cif.c, Line: 2596
 msgid "Object(s) at equivalent positions have been removed\n"
 "to ensure the consistency of the model\n"
 "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n "
@@ -3485,135 +3494,134 @@ msgstr "Object(s) at equivalent positions have been removed\n"
 "to ensure the consistency of the model\n"
 "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n "
 
-# File: project/readers/read_cif.c, Line: 362
+# File: project/readers/read_cif.c, Line: 384
 msgid "Error while reading CIF file"
 msgstr "Error while reading CIF file"
 
-# File: project/readers/read_cif.c, Line: 379
+# File: project/readers/read_cif.c, Line: 401
 msgid "Type N°%d:\t<b>%s</b>"
 msgstr "Type N°%d:\t<b>%s</b>"
 
-# File: project/readers/read_cif.c, Line: 396
+# File: project/readers/read_cif.c, Line: 418
 msgid "In case of a molecule: insert an extra type of atom and run a substitution afterwards."
 msgstr "In case of a molecule: insert an extra type of atom and run a substitution afterwards."
 
-# File: project/readers/read_cif.c, Line: 478,561
+# File: project/readers/read_cif.c, Line: 500,583
 msgid "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 msgstr "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 
-# File: project/readers/read_cif.c, Line: 1107
+# File: calc/force_fields/force_fields.c, Line: 1048,2637
+# File: opengl/win/w_library.c, Line: 486
+# File: project/readers/read_cif.c, Line: 1129
+# File: project/readers/read_isaacs.c, Line: 210,829
 msgid "label"
 msgstr "label"
 
-# File: project/readers/read_cif.c, Line: 1110,2518
+# File: project/readers/read_cif.c, Line: 1130,2666
 msgid "occupancy"
 msgstr "occupancy"
 
-# File: project/readers/read_cif.c, Line: 1156
+# File: project/readers/read_cif.c, Line: 1209
 msgid "<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."
 msgstr "<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."
 
-# File: project/readers/read_cif.c, Line: 1168
+# File: project/readers/read_cif.c, Line: 1221
 msgid "<b>Atomic coordinates</b>: impossible to find '%s' ..."
 msgstr "<b>Atomic coordinates</b>: impossible to find '%s' ..."
 
-# File: project/readers/read_cif.c, Line: 1184
+# File: project/readers/read_cif.c, Line: 1237,2669
 msgid "Please select how to handle occupancy"
 msgstr "Please select how to handle occupancy"
 
-# File: project/readers/read_cif.c, Line: 1184
+# File: project/readers/read_cif.c, Line: 1237,2669
 msgid "Select how to handle occupancy"
 msgstr "Select how to handle occupancy"
 
-# File: project/readers/read_cif.c, Line: 1188
+# File: project/readers/read_cif.c, Line: 1241,2673
 msgid "Occupancy %s\n\t%s\n"
 msgstr "Occupancy %s\n\t%s\n"
 
-# File: project/readers/read_cif.c, Line: 1304
+# File: project/readers/read_cif.c, Line: 1357
 msgid "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 msgstr "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 
-# File: project/readers/read_cif.c, Line: 1368
-msgid "reaction or trajectory"
-msgstr "reaction or trajectory"
-
-# File: project/readers/read_cif.c, Line: 1379
+# File: project/readers/read_cif.c, Line: 1432
 msgid "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n"
 msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n"
 
-# File: project/readers/read_cif.c, Line: 1379
+# File: project/readers/read_cif.c, Line: 1443
 msgid "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 
-# File: project/readers/read_cif.c, Line: 1796
+# File: project/readers/read_cif.c, Line: 1849,1866
 msgid "<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"
 msgstr "<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"
 
-# File: project/readers/read_cif.c, Line: 1875
+# File: project/readers/read_cif.c, Line: 1928
 msgid "<b>Space group</b>: no space group and no H-M symbol found !\n"
 msgstr "<b>Space group</b>: no space group and no H-M symbol found !\n"
 
-# File: project/readers/read_cif.c, Line: 1891
+# File: project/readers/read_cif.c, Line: 1944
 msgid "<b>Space group</b>: no space group found, unknown H-M symbol !\n"
 msgstr "<b>Space group</b>: no space group found, unknown H-M symbol !\n"
 
-# File: project/readers/read_cif.c, Line: 1953,1983,1990
+# File: project/readers/read_cif.c, Line: 2006,2036,2043,2053,2064
 msgid "<b>Space group</b>: ambiguous space group setting !\n"
 msgstr "<b>Space group</b>: ambiguous space group setting !\n"
 
-# File: project/readers/read_cif.c, Line: 2047
+# File: project/readers/read_cif.c, Line: 2100
 msgid "hexagonal"
 msgstr "hexagonal"
 
-# File: project/readers/read_cif.c, Line: 2047
+# File: project/readers/read_cif.c, Line: 2100
 msgid "rhombohedral"
 msgstr "rhombohedral"
 
-# File: project/readers/read_cif.c, Line: 2095
+# File: project/readers/read_cif.c, Line: 2168
 msgid "Space group changes between configurations !\n"
 msgstr "Space group changes between configurations !\n"
 
-# File: project/readers/read_cif.c, Line: 2130
+# File: project/readers/read_cif.c, Line: 2203
 msgid "Symmetry position(s) in CIF file\n"
 msgstr "Symmetry position(s) in CIF file\n"
 
-# File: project/readers/read_cif.c, Line: 2135
+# File: project/readers/read_cif.c, Line: 2208
 msgid "No symmetry position(s) in CIF file\n"
 msgstr "No symmetry position(s) in CIF file\n"
 
-# File: project/readers/read_cif.c, Line: 2586
+# File: project/readers/read_cif.c, Line: 2682
 msgid "It seems the CIF file contains <b>%d</b> distinct configurations\n"
 msgstr "It seems the CIF file contains <b>%d</b> distinct configurations\n"
 
-# File: project/readers/read_cif.c, Line: 2591
+# File: project/readers/read_cif.c, Line: 2687
 msgid "Impossible to use symmetry positions with multiple configurations\n"
 msgstr "Impossible to use symmetry positions with multiple configurations\n"
 
-# File: project/readers/read_cif.c, Line: 2602
+# File: project/readers/read_cif.c, Line: 2698
 msgid "This CIF file could be describing a trajectory or a chemical reaction.\n"
 msgstr "This CIF file could be describing a trajectory or a chemical reaction.\n"
 
-# File: project/readers/read_cif.c, Line: 2610
+# File: project/readers/read_cif.c, Line: 2709,2714
 msgid "Please select how to process the data in the CIF file"
 msgstr "Please select how to process the data in the CIF file"
 
-# File: project/readers/read_cif.c, Line: 2610
+# File: project/readers/read_cif.c, Line: 2709,2714
 msgid "Select how to process data"
 msgstr "Select how to process data"
 
-# File: project/readers/read_cif.c, Line: 2617
+# File: project/readers/read_cif.c, Line: 2713
 msgid "This CIF file could be describing a trajectory.\n"
 msgstr "This CIF file could be describing a trajectory.\n"
 
-# File: project/readers/read_cif.c, Line: 2629
+# File: project/readers/read_cif.c, Line: 2725
 msgid "Select the configuration <i>c</i>, <i>c</i> &#x2208; [1-%d]"
 msgstr "Select the configuration <i>c</i>, <i>c</i> &#x2208; [1-%d]"
 
-# File: project/readers/read_cif.c, Line: 2633
+# File: project/readers/read_cif.c, Line: 2729
 msgid "Please select the configuration to work on"
 msgstr "Please select the configuration to work on"
 
-# File: project/readers/read_cif.c, Line: 2643
+# File: project/readers/read_cif.c, Line: 2739
 msgid "Working on configuration N°%d\n"
 msgstr "Working on configuration N°%d\n"
 
@@ -3651,13 +3659,13 @@ msgstr "Potential issue(s) when building crystal !\n"
 "\t - missing space group setting\n"
 "\t - incorrect space group setting\n"
 
-# File: project/readers/read_coord.c, Line: 146
+# File: project/readers/read_coord.c, Line: 145
 msgid "Wrong file format: error at step %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 msgstr "Wrong file format: error at step %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 
-# File: project/readers/read_coord.c, Line: 152
+# File: project/readers/read_coord.c, Line: 151
 msgid "Wrong file format: error at step %d, atom %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 msgstr "Wrong file format: error at step %d, atom %d !\n"
@@ -3711,7 +3719,7 @@ msgstr "Wrong file format - record <b>ii</b> line is corrupted !"
 msgid "Cannot find species with a mass of %f !"
 msgstr "Cannot find species with a mass of %f !"
 
-# File: project/readers/read_isaacs.c, Line: 795
+# File: project/readers/read_isaacs.c, Line: 794
 msgid "The number of atoms in the XML file\n"
 "is not the same that the number of atoms\n"
 "in the file containing the coordinates.\n"
@@ -3723,7 +3731,7 @@ msgstr "The number of atoms in the XML file\n"
 "Other information from the XML file\n"
 "will be ignored\n"
 
-# File: project/readers/read_isaacs.c, Line: 818
+# File: project/readers/read_isaacs.c, Line: 817
 msgid "The number of chemical species in the XML file\n"
 "is not the same that the number of chemical species\n"
 "in the file that contains the atomic coordinates.\n"
@@ -3840,6 +3848,10 @@ msgstr "Impossible to initialize the OpenGL 3D rendering ! \n %s\n"
 msgid "Compilation failure in %s shader:\n%s"
 msgstr "Compilation failure in %s shader:\n%s"
 
+# File: gui/main.c, Line: 413
+# File: opengl/ogl_shading.c, Line: 111
+# File: opengl/win/menu_bar.c, Line: 372
+# File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
 # File: opengl/win/w_search.c, Line: 999
 # File: opengl/win/w_volumes.c, Line: 706,870
@@ -3902,18 +3914,18 @@ msgstr "Move"
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 3703
 # File: opengl/win/w_library.c, Line: 1139
-# File: opengl/win/w_search.c, Line: 2904,3579
+# File: opengl/win/w_search.c, Line: 2904,2910,3579
 msgid "Replace"
 msgstr "Replace"
 
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 3702
-# File: opengl/win/w_search.c, Line: 2904,3580,4104
+# File: opengl/win/w_search.c, Line: 2904,2913,3580,4104
 msgid "Remove"
 msgstr "Remove"
 
 # File: opengl/edit/atom_edit.c, Line: 60
-# File: opengl/win/popup.c, Line: 4201
+# File: opengl/win/popup.c, Line: 4201,4256
 # File: opengl/win/w_library.c, Line: 1139
 # File: opengl/win/w_search.c, Line: 3581
 msgid "Insert"
@@ -3981,7 +3993,6 @@ msgstr "Eye (viewer) axis"
 msgid "Show"
 msgstr "Show"
 
-# File: opengl/edit/atom_move.c, Line: 1247
 # File: opengl/edit/atom_search.c, Line: 332
 msgid "Reset transformation(s)"
 msgstr "Reset transformation(s)"
@@ -4111,7 +4122,7 @@ msgstr "Replace: "
 msgid "Remove: "
 msgstr "Remove: "
 
-# File: opengl/edit/cbuild_action.c, Line: 1209
+# File: opengl/edit/cbuild_action.c, Line: 1208
 msgid "%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
 "If you build the crystal the final structure is likely to be crowded !\n"
 "Continue anyway ?"
@@ -4119,7 +4130,7 @@ msgstr "%s size (%f &#xC5;) is bigger than the min(<b><i>a,b,c</i></b>)\n"
 "If you build the crystal the final structure is likely to be crowded !\n"
 "Continue anyway ?"
 
-# File: opengl/edit/cbuild_action.c, Line: 1772
+# File: opengl/edit/cbuild_action.c, Line: 1769
 msgid "The crystal will be created however some objects might be missing,\n"
 "Occupancy is too low compared to the number of site(s) per cell.\n\n"
 "<b>To build a crystal matching the defined occupancy</b>:\n"
@@ -4178,7 +4189,7 @@ msgid "<i>Sites are filled randomly for the entire network,\n"
 msgstr "<i>Sites are filled randomly for the entire network,\n"
 "the final crystal is considered as a whole.</i>"
 
-# File: opengl/edit/cbuild_edit.c, Line: 1252
+# File: opengl/edit/cbuild_edit.c, Line: 1250
 msgid "<i>Instead of ensuring that sites are filled by a single object,\n"
 "this allows object(s) to share the same crystalline position. \n"
 "The option above describes how filled and empty positions alternate.</i>\n"
@@ -4186,7 +4197,7 @@ msgstr "<i>Instead of ensuring that sites are filled by a single object,\n"
 "this allows object(s) to share the same crystalline position. \n"
 "The option above describes how filled and empty positions alternate.</i>\n"
 
-# File: opengl/edit/cbuild_edit.c, Line: 1271
+# File: opengl/edit/cbuild_edit.c, Line: 1265
 msgid "\t<b>Lowest integer: </b>\n"
 "\t\t Occupancy %s\n\t\t\t ex:\t ⌊8.75⌋ = 8\n"
 "\t<b>Highest integer: </b>\n"
@@ -4203,13 +4214,13 @@ msgstr "\t<b>Lowest integer: </b>\n"
 "\n\t\t%s\n"
 
 # File: calc/cpmd/cpmd_init.c, Line: 155
-# File: opengl/edit/cbuild_edit.c, Line: 102
+# File: opengl/edit/cbuild_edit.c, Line: 1290
 # File: opengl/win/w_crystal.c, Line: 75
 msgid "Triclinic"
 msgstr "Triclinic"
 
 # File: calc/cpmd/cpmd_init.c, Line: 155
-# File: opengl/edit/cbuild_edit.c, Line: 103
+# File: opengl/edit/cbuild_edit.c, Line: 1290
 # File: opengl/win/w_crystal.c, Line: 75
 msgid "Monoclinic"
 msgstr "Monoclinic"
@@ -4219,44 +4230,44 @@ msgid "Othorhombic"
 msgstr "Othorhombic"
 
 # File: calc/cpmd/cpmd_init.c, Line: 155
-# File: opengl/edit/cbuild_edit.c, Line: 105
+# File: opengl/edit/cbuild_edit.c, Line: 1290
 # File: opengl/win/w_crystal.c, Line: 75
 msgid "Tetragonal"
 msgstr "Tetragonal"
 
 # File: calc/cpmd/cpmd_init.c, Line: 154
-# File: opengl/edit/cbuild_edit.c, Line: 106
+# File: opengl/edit/cbuild_edit.c, Line: 1290
 # File: opengl/win/w_crystal.c, Line: 75
 msgid "Trigonal"
 msgstr "Trigonal"
 
 # File: calc/cpmd/cpmd_init.c, Line: 154
-# File: opengl/edit/cbuild_edit.c, Line: 107
+# File: opengl/edit/cbuild_edit.c, Line: 945,1290
 # File: opengl/win/w_crystal.c, Line: 75
 msgid "Hexagonal"
 msgstr "Hexagonal"
 
 # File: calc/cpmd/cpmd_init.c, Line: 154
-# File: opengl/edit/cbuild_edit.c, Line: 108
+# File: opengl/edit/cbuild_edit.c, Line: 1290
 msgid "Cubic"
 msgstr "Cubic"
 
-# File: opengl/edit/cbuild_edit.c, Line: 940
+# File: opengl/edit/cbuild_edit.c, Line: 940,941,942,943
 # File: opengl/edit/cbuild_info.c, Line: 99
 msgid "Primitive "
 msgstr "Primitive "
 
-# File: opengl/edit/cbuild_edit.c, Line: 941
+# File: opengl/edit/cbuild_edit.c, Line: 941,942
 # File: opengl/edit/cbuild_info.c, Line: 87
 msgid "Base-centered"
 msgstr "Base-centered"
 
-# File: opengl/edit/cbuild_edit.c, Line: 942
+# File: opengl/edit/cbuild_edit.c, Line: 942,943,946
 # File: opengl/edit/cbuild_info.c, Line: 95
 msgid "Body-centered"
 msgstr "Body-centered"
 
-# File: opengl/edit/cbuild_edit.c, Line: 942
+# File: opengl/edit/cbuild_edit.c, Line: 942,946
 # File: opengl/edit/cbuild_info.c, Line: 91
 msgid "Face-centered"
 msgstr "Face-centered"
@@ -4269,7 +4280,7 @@ msgstr "Hexagonal Axes"
 msgid "Rhombohedral Axes"
 msgstr "Rhombohedral Axes"
 
-# File: opengl/edit/cbuild_edit.c, Line: 104
+# File: opengl/edit/cbuild_edit.c, Line: 103
 msgid "<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° &#x2260; &#x263;\n\tor\n&#x3B1; = &#x263; = 90° &#x2260; &#x3B2;"
 msgstr "<i>a</i> &#x2260; <i>b</i> &#x2260; <i>c</i>\n&#x3B1; = &#x3B2; = 90° &#x2260; &#x263;\n\tor\n&#x3B1; = &#x263; = 90° &#x2260; &#x3B2;"
 
@@ -4394,6 +4405,11 @@ msgstr "Build"
 msgid "Rhombohedral"
 msgstr "Rhombohedral"
 
+# File: calc/cpmd/cpmd_atoms.c, Line: 448
+# File: calc/cpmd/cpmd_nose.c, Line: 468
+# File: calc/dl_poly/dlp_atom.c, Line: 744
+# File: calc/dl_poly/dlp_field.c, Line: 924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944
+# File: calc/dl_poly/dlp_mol.c, Line: 761
 # File: opengl/edit/cbuild_info.c, Line: 366
 # File: opengl/win/m_map.c, Line: 679
 # File: opengl/win/w_chains.c, Line: 298
@@ -4478,7 +4494,7 @@ msgstr "\t - %s atom(s) in slab: "
 msgid "- Position the center of the slab: "
 msgstr "- Position the center of the slab: "
 
-# File: opengl/edit/cell_cut.c, Line: 226,227
+# File: opengl/edit/cell_cut.c, Line: 226,227,228
 msgid "- Size of the slab: "
 msgstr "- Size of the slab: "
 
@@ -4490,7 +4506,7 @@ msgstr "- Parallelepiped angles: "
 msgid "- Slab rotation: "
 msgstr "- Slab rotation: "
 
-# File: calc/dl_poly/dlp_field.c, Line: 279
+# File: calc/dl_poly/dlp_field.c, Line: 499
 # File: opengl/edit/cell_cut.c, Line: 307
 # File: opengl/win/w_measures.c, Line: 752
 msgid "Angles"
@@ -4508,7 +4524,7 @@ msgstr "Cut and modify model ?\n This is irreversible !"
 msgid "Cut and create new project ?"
 msgstr "Cut and create new project ?"
 
-# File: opengl/edit/cell_cut.c, Line: 498
+# File: opengl/edit/cell_cut.c, Line: 499
 msgid "Cut"
 msgstr "Cut"
 
@@ -4613,7 +4629,7 @@ msgstr "Modify the density of the simulation box <sup>*</sup>: "
 msgid "Homogeneous rescaling <sup>**</sup>"
 msgstr "Homogeneous rescaling <sup>**</sup>"
 
-# File: opengl/edit/cell_density.c, Line: 130
+# File: opengl/edit/cell_density.c, Line: 129
 msgid " * Visual information will be preserved, real bonding is likely to be modified.\n"
 "  Bond properties should be re-calculated, if required bond cutoffs should be updated."
 msgstr " * Visual information will be preserved, real bonding is likely to be modified.\n"
@@ -4751,7 +4767,7 @@ msgid "Styles"
 msgstr "Styles"
 
 # File: opengl/win/glwindow.c, Line: 128,161
-# File: opengl/win/m_tools.c, Line: 316,473
+# File: opengl/win/m_tools.c, Line: 316,481
 msgid "Measures"
 msgstr "Measures"
 
@@ -4870,9 +4886,9 @@ msgstr "All measures for the selection, pressed:\n\n"
 msgid "Show measures"
 msgstr "Show measures"
 
-# File: calc/cpmd/cpmd_nose.c, Line: 1216
+# File: calc/cpmd/cpmd_nose.c, Line: 1216,1217
 # File: calc/dl_poly/dlp_edit.c, Line: 1184
-# File: calc/dl_poly/dlp_field.c, Line: 143
+# File: calc/dl_poly/dlp_field.c, Line: 166
 # File: opengl/win/glwindow.c, Line: 155
 # File: opengl/win/w_library.c, Line: 194
 msgid "Atom"
@@ -4941,6 +4957,7 @@ msgstr "Rotate right"
 msgid "rotate right"
 msgstr "rotate right"
 
+# File: opengl/win/glwindow.c, Line: 177,202
 # File: opengl/win/w_spiner.c, Line: 186
 msgid "Right"
 msgstr "Right"
@@ -4953,6 +4970,7 @@ msgstr "Rotate left"
 msgid "rotate left"
 msgstr "rotate left"
 
+# File: opengl/win/glwindow.c, Line: 178,203
 # File: opengl/win/w_spiner.c, Line: 187
 msgid "Left"
 msgstr "Left"
@@ -4965,6 +4983,7 @@ msgstr "Rotate up"
 msgid "rotate up"
 msgstr "rotate up"
 
+# File: opengl/win/glwindow.c, Line: 179,204
 # File: opengl/win/w_spiner.c, Line: 189
 msgid "Up"
 msgstr "Up"
@@ -4977,6 +4996,7 @@ msgstr "Rotate down"
 msgid "rotate down"
 msgstr "rotate down"
 
+# File: opengl/win/glwindow.c, Line: 180,205
 # File: opengl/win/w_spiner.c, Line: 190
 msgid "Down"
 msgstr "Down"
@@ -5142,14 +5162,13 @@ msgstr "Render Image"
 
 # File: calc/cpmd/cpmd_atoms.c, Line: 448
 # File: calc/cpmd/cpmd_nose.c, Line: 468
-# File: calc/dl_poly/dlp_field.c, Line: 143
+# File: calc/dl_poly/dlp_field.c, Line: 143,924,925
 # File: opengl/win/glwindow.c, Line: 525
 # File: opengl/win/m_clones.c, Line: 122,185
 # File: opengl/win/m_edit.c, Line: 360
 # File: opengl/win/menu_bar.c, Line: 186
 # File: opengl/win/popup.c, Line: 4228
-# File: opengl/win/w_search.c, Line: 4000,4141
-# File: calc/dl_poly/dlp_field.c, Line: 143
+# File: opengl/win/w_search.c, Line: 4008,4141
 msgid "Atom(s)"
 msgstr "Atom(s)"
 
@@ -5204,7 +5223,7 @@ msgid "%s - 3D view - [%s mode]"
 msgstr "%s - 3D view - [%s mode]"
 
 # File: opengl/win/initcoord.c, Line: 267
-# File: opengl/win/m_box.c, Line: 321,325
+# File: opengl/win/m_box.c, Line: 321,325,603
 # File: opengl/win/m_clones.c, Line: 116,120,183
 # File: opengl/win/m_coord.c, Line: 294,656
 # File: opengl/win/m_poly.c, Line: 234,449,453
@@ -5217,6 +5236,7 @@ msgstr "Show/Hide"
 msgid "fragment(s)"
 msgstr "fragment(s)"
 
+# File: calc/dl_poly/dlp_field.c, Line: 187
 # File: opengl/win/initcoord.c, Line: 483
 msgid "molecule(s)"
 msgstr "molecule(s)"
@@ -5227,7 +5247,7 @@ msgstr "Maximum number of %s per MD step: %d"
 
 # File: opengl/win/m_anim.c, Line: 61
 # File: opengl/win/menu_bar.c, Line: 280
-# File: opengl/win/popup.c, Line: 4045
+# File: opengl/win/popup.c, Line: 4052
 msgid "Animate"
 msgstr "Animate"
 
@@ -5239,8 +5259,7 @@ msgstr "Spin"
 msgid "Sequencer"
 msgstr "Sequencer"
 
-# File: opengl/win/m_atoms.c, Line: 361
-# File: opengl/win/m_atoms.c, Line: 689
+# File: opengl/win/m_atoms.c, Line: 361,689
 msgid "Show/Hide All"
 msgstr "Show/Hide All"
 
@@ -5689,7 +5708,6 @@ msgid "Measures (Edition Mode Only)"
 msgstr "Measures (Edition Mode Only)"
 
 # File: opengl/win/m_tools.c, Line: 88
-# File: opengl/win/w_search.c, Line: 4206
 msgid "Selection"
 msgstr "Selection"
 
@@ -5697,7 +5715,7 @@ msgstr "Selection"
 msgid "Visible/Hidden"
 msgstr "Visible/Hidden"
 
-# File: opengl/win/m_tools.c, Line: 317,502
+# File: opengl/win/m_tools.c, Line: 317,510
 msgid "Volumes"
 msgstr "Volumes"
 
@@ -5709,8 +5727,8 @@ msgstr "Mouse Mode"
 msgid "Selection Mode"
 msgstr "Selection Mode"
 
-# File: opengl/win/m_tools.c, Line: 412,785
 # File: calc/cp2k/cp2k_init.c, Line: 119
+# File: opengl/win/m_tools.c, Line: 412,785
 msgid "Molecular Dynamics"
 msgstr "Molecular Dynamics"
 
@@ -5735,7 +5753,7 @@ msgstr "No atoms to be removed !"
 msgid "%d atom(s) removed !"
 msgstr "%d atom(s) removed !"
 
-# File: opengl/win/popup.c, Line: 681
+# File: opengl/win/popup.c, Line: 685
 msgid "%d atom(s) inserted !"
 msgstr "%d atom(s) inserted !"
 
@@ -5768,11 +5786,11 @@ msgstr "This Atom: %s<sub>%d</sub>"
 msgid "This Bond: %s<sub>%d</sub> - %s<sub>%d</sub>"
 msgstr "This Bond: %s<sub>%d</sub> - %s<sub>%d</sub>"
 
-# File: opengl/win/popup.c, Line: 3500,3789,3852
+# File: opengl/win/popup.c, Line: 3501,3790,3853
 msgid "Fragment N°:\t<b>%d</b>"
 msgstr "Fragment N°:\t<b>%d</b>"
 
-# File: opengl/win/popup.c, Line: 3500,3789,3852
+# File: opengl/win/popup.c, Line: 3501,3790,3853
 msgid "Molecule N°:\t<b>%d</b>"
 msgstr "Molecule N°:\t<b>%d</b>"
 
@@ -5821,7 +5839,7 @@ msgstr "Unselect"
 # File: opengl/win/w_chains.c, Line: 298
 # File: opengl/win/w_coord.c, Line: 537,892,997
 # File: opengl/win/w_rings.c, Line: 413
-# File: opengl/win/w_search.c, Line: 3577
+# File: opengl/win/w_search.c, Line: 3577,3578,3579,3580,3582
 msgid "Label"
 msgstr "Label"
 
@@ -5857,25 +5875,32 @@ msgstr "Center crystal atom(s)"
 msgid "Are you sure, this can affect the visual representation of the unit cell ?"
 msgstr "Are you sure, this can affect the visual representation of the unit cell ?"
 
+# File: opengl/win/menu_bar.c, Line: 323
 # File: opengl/win/popup.c, Line: 4094
 msgid "Color palette error: %s - %d - custom= %s"
 msgstr "Color palette error: %s - %d - custom= %s"
 
+# File: opengl/win/menu_bar.c, Line: 355
 # File: opengl/win/popup.c, Line: 4126
 msgid "Color palette error: %s - spec= %d - coord= %d, custom= %s"
 msgstr "Color palette error: %s - spec= %d - coord= %d, custom= %s"
 
+# File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
 msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Color palette error: %s - %d, custom= %s"
 
-# File: calc/dl_poly/dlp_field.c, Line: 187
+# File: calc/dl_poly/dlp_field.c, Line: 209
+# File: gui/main.c, Line: 414
+# File: opengl/win/menu_bar.c, Line: 372
+# File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
 # File: opengl/win/w_search.c, Line: 999
 # File: opengl/win/w_volumes.c, Line: 706,870
 msgid "molecule"
 msgstr "molecule"
 
+# File: opengl/win/menu_bar.c, Line: 385
 # File: opengl/win/popup.c, Line: 4156
 msgid "Color palette error: rings - %d - %d, custom= %s"
 msgstr "Color palette error: rings - %d - %d, custom= %s"
@@ -5969,7 +5994,7 @@ msgstr "Please select the light source to be removed: "
 msgid "Remove light source(s)"
 msgstr "Remove light source(s)"
 
-# File: opengl/win/w_advance.c, Line: 280,520
+# File: opengl/win/w_advance.c, Line: 280,301,520
 msgid "Light N°%d"
 msgstr "Light N°%d"
 
@@ -6051,7 +6076,7 @@ msgstr "<b>Fog mode</b> "
 msgid "Linear"
 msgstr "Linear"
 
-# File: opengl/win/w_advance.c, Line: 1638
+# File: opengl/win/w_advance.c, Line: 1637
 msgid "Exponential"
 msgstr "Exponential"
 
@@ -6164,10 +6189,16 @@ msgstr "Atom(s) configuration - "
 msgid "Clone(s) configuration - "
 msgstr "Clone(s) configuration - "
 
+# File: calc/force_fields/force_fields.c, Line: 711,2384
+# File: gui/main.c, Line: 562
+# File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
+# File: opengl/win/w_library.c, Line: 466
+# File: project/readers/read_isaacs.c, Line: 200,783
 msgid "atoms"
 msgstr "atoms"
 
+# File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
 msgid "clones"
 msgstr "clones"
@@ -6312,6 +6343,7 @@ msgstr "Adjust atomic line width(s)"
 msgid "Adjust clone line width(s)"
 msgstr "Adjust clone line width(s)"
 
+# File: calc/force_fields/force_fields.c, Line: 2271
 # File: opengl/win/w_bonds.c, Line: 410
 msgid "bond"
 msgstr "bond"
@@ -6320,7 +6352,8 @@ msgstr "bond"
 msgid "clone bond"
 msgstr "clone bond"
 
-# File: calc/dl_poly/dlp_field.c, Line: 932
+# File: calc/dl_poly/dlp_field.c, Line: 1025
+# File: calc/lammps/la_print.c, Line: 733
 # File: opengl/win/w_bonds.c, Line: 411
 msgid "Bond"
 msgstr "Bond"
@@ -6374,7 +6407,7 @@ msgstr "Show/Hide box"
 msgid "Color "
 msgstr "Color "
 
-# File: opengl/win/w_chains.c, Line: 825
+# File: opengl/win/w_chains.c, Line: 823
 msgid "Too many chains in your model !\n"
 "  It is impossible to display the entire list ...\n"
 "... instead you can look for chain(s) individually:\n"
@@ -6485,19 +6518,19 @@ msgstr "No Gradient"
 msgid "Circular"
 msgstr "Circular"
 
-# File: opengl/win/w_colors.c, Line: 483
+# File: opengl/win/w_colors.c, Line: 482,483
 msgid "Top to Bottom"
 msgstr "Top to Bottom"
 
-# File: opengl/win/w_colors.c, Line: 483
+# File: opengl/win/w_colors.c, Line: 482,483
 msgid "Right to Left"
 msgstr "Right to Left"
 
-# File: opengl/win/w_colors.c, Line: 484
+# File: opengl/win/w_colors.c, Line: 482,484
 msgid "Bottom Right to Top Left"
 msgstr "Bottom Right to Top Left"
 
-# File: opengl/win/w_colors.c, Line: 484
+# File: opengl/win/w_colors.c, Line: 482,484
 msgid "Top Right to Bottom Left"
 msgstr "Top Right to Bottom Left"
 
@@ -6553,8 +6586,8 @@ msgstr "%d atom chain(s) color"
 msgid "%s - %d atom ring(s) color"
 msgstr "%s - %d atom ring(s) color"
 
-# File: opengl/win/w_coord.c, Line: 962
-# File: opengl/win/w_volumes.c, Line: 873
+# File: opengl/win/w_coord.c, Line: 960
+# File: opengl/win/w_volumes.c, Line: 871
 msgid "Too many <b>%ss</b> in your model !\n"
 "  It is impossible to display the entire list ...\n"
 "... instead you can look for %s(s) individually:\n"
@@ -6562,6 +6595,8 @@ msgstr "Too many <b>%ss</b> in your model !\n"
 "  It is impossible to display the entire list ...\n"
 "... instead you can look for %s(s) individually:\n"
 
+# File: calc/force_fields/force_fields.c, Line: 2785
+# File: calc/force_fields/oplsaar.c, Line: 1060
 # File: opengl/win/w_coord.c, Line: 537
 msgid "Alpha"
 msgstr "Alpha"
@@ -6649,7 +6684,7 @@ msgstr "<b>Polyhedra color map:</b>"
 msgid "Use atom(s) custom map"
 msgstr "Use atom(s) custom map"
 
-# File: opengl/win/w_coord.c, Line: 1235
+# File: opengl/win/w_coord.c, Line: 1234
 msgid "\n<b>Display polyhedra at the edges of the model box\n"
 "using the PBC even if the clones are not shown:</b>"
 msgstr "\n<b>Display polyhedra at the edges of the model box\n"
@@ -6659,7 +6694,7 @@ msgstr "\n<b>Display polyhedra at the edges of the model box\n"
 msgid "Cloned polyhedra"
 msgstr "Cloned polyhedra"
 
-# File: opengl/win/w_coord.c, Line: 1243
+# File: opengl/win/w_coord.c, Line: 1242
 msgid "This is automatic if the clones are shown.\n"
 "The clones are the replica of the atoms linked by PBC."
 msgstr "This is automatic if the clones are shown.\n"
@@ -6716,6 +6751,7 @@ msgstr "Error impossible to display the environments window !"
 
 # File: calc/dl_poly/dlp_control.c, Line: 167
 # File: opengl/win/w_crystal.c, Line: 75
+# File: project/readers/read_cif.c, Line: 125,126,127,128,129,130
 msgid "Orthorhombic"
 msgstr "Orthorhombic"
 
@@ -7373,35 +7409,35 @@ msgstr "Ni-Phthalocyanine"
 msgid "More ..."
 msgstr "More ..."
 
-# File: opengl/win/w_library.c, Line: 215
+# File: opengl/win/w_library.c, Line: 215,242
 msgid "Misc"
 msgstr "Misc"
 
-# File: opengl/win/w_library.c, Line: 216
+# File: opengl/win/w_library.c, Line: 216,243
 msgid "Alcohols"
 msgstr "Alcohols"
 
-# File: opengl/win/w_library.c, Line: 217
+# File: opengl/win/w_library.c, Line: 217,244
 msgid "Aldehydes"
 msgstr "Aldehydes"
 
-# File: opengl/win/w_library.c, Line: 218
+# File: opengl/win/w_library.c, Line: 218,245
 msgid "Alkanes"
 msgstr "Alkanes"
 
-# File: opengl/win/w_library.c, Line: 219
+# File: opengl/win/w_library.c, Line: 219,246
 msgid "Alkenes"
 msgstr "Alkenes"
 
-# File: opengl/win/w_library.c, Line: 220
+# File: opengl/win/w_library.c, Line: 220,247
 msgid "Alkynes"
 msgstr "Alkynes"
 
-# File: opengl/win/w_library.c, Line: 221
+# File: opengl/win/w_library.c, Line: 221,248
 msgid "Amides"
 msgstr "Amides"
 
-# File: opengl/win/w_library.c, Line: 222
+# File: opengl/win/w_library.c, Line: 222,249
 msgid "Amines"
 msgstr "Amines"
 
@@ -7409,7 +7445,7 @@ msgstr "Amines"
 msgid "Amino acids"
 msgstr "Amino acids"
 
-# File: opengl/win/w_library.c, Line: 224
+# File: opengl/win/w_library.c, Line: 224,251
 msgid "Aromatics"
 msgstr "Aromatics"
 
@@ -7425,7 +7461,7 @@ msgstr "Cyclic alkanes"
 msgid "Cyclic alkenes"
 msgstr "Cyclic alkenes"
 
-# File: opengl/win/w_library.c, Line: 228
+# File: opengl/win/w_library.c, Line: 228,255
 msgid "Ethers"
 msgstr "Ethers"
 
@@ -7433,31 +7469,31 @@ msgstr "Ethers"
 msgid "Fatty acids"
 msgstr "Fatty acids"
 
-# File: opengl/win/w_library.c, Line: 230
+# File: opengl/win/w_library.c, Line: 230,257
 msgid "Fullerenes"
 msgstr "Fullerenes"
 
-# File: opengl/win/w_library.c, Line: 231
+# File: opengl/win/w_library.c, Line: 231,258
 msgid "Heterocyclics"
 msgstr "Heterocyclics"
 
-# File: opengl/win/w_library.c, Line: 232
+# File: opengl/win/w_library.c, Line: 232,259
 msgid "Macrocycles"
 msgstr "Macrocycles"
 
-# File: opengl/win/w_library.c, Line: 233
+# File: opengl/win/w_library.c, Line: 233,260
 msgid "Ketones"
 msgstr "Ketones"
 
-# File: opengl/win/w_library.c, Line: 234
+# File: opengl/win/w_library.c, Line: 234,261
 msgid "Nitriles"
 msgstr "Nitriles"
 
-# File: opengl/win/w_library.c, Line: 235
+# File: opengl/win/w_library.c, Line: 235,262
 msgid "Nucleobases"
 msgstr "Nucleobases"
 
-# File: opengl/win/w_library.c, Line: 236
+# File: opengl/win/w_library.c, Line: 236,263
 msgid "Steroids"
 msgstr "Steroids"
 
@@ -7469,11 +7505,11 @@ msgstr "Sugars (Linears)"
 msgid "Sugars (Cyclics)"
 msgstr "Sugars (Cyclics)"
 
-# File: opengl/win/w_library.c, Line: 239
+# File: opengl/win/w_library.c, Line: 239,266
 msgid "Sulfoxides"
 msgstr "Sulfoxides"
 
-# File: opengl/win/w_library.c, Line: 240
+# File: opengl/win/w_library.c, Line: 240,267
 msgid "Thiols"
 msgstr "Thiols"
 
@@ -7539,7 +7575,8 @@ msgstr "%s - measures"
 msgid "Distances"
 msgstr "Distances"
 
-# File: calc/dl_poly/dlp_field.c, Line: 566
+# File: calc/dl_poly/dlp_field.c, Line: 566,567
+# File: calc/force_fields/force_fields.c, Line: 251
 # File: opengl/win/w_measures.c, Line: 753
 msgid "Dihedrals"
 msgstr "Dihedrals"
@@ -7628,7 +7665,7 @@ msgstr "%s - record"
 msgid "Record"
 msgstr "Record"
 
-# File: opengl/win/w_rings.c, Line: 951
+# File: opengl/win/w_rings.c, Line: 949
 msgid "Too many <b>%s</b> rings in your model !\n"
 "  It is impossible to display the entire list ...\n"
 "... instead you can look for ring(s) individually:\n"
@@ -7636,6 +7673,7 @@ msgstr "Too many <b>%s</b> rings in your model !\n"
 "  It is impossible to display the entire list ...\n"
 "... instead you can look for ring(s) individually:\n"
 
+# File: calc/dl_poly/dlp_print.c, Line: 2248
 # File: opengl/win/w_rings.c, Line: 61
 msgid "all"
 msgstr "all"
@@ -7688,7 +7726,7 @@ msgstr "\nRing(s) of size %d atoms\n"
 msgid "Save atoms in %s rings to file"
 msgstr "Save atoms in %s rings to file"
 
-# File: opengl/win/w_search.c, Line: 4192
+# File: opengl/win/w_search.c, Line: 4190
 msgid "\t<b>The number of atoms in the model is too large</b>\n"
 "\t\t<b>to display and browse the entire list !</b>\n"
 "\t<b>You need to search for object(s) individually:</b>"
@@ -7702,13 +7740,13 @@ msgid "<b>The number of atoms in the model is too large to display and browse th
 msgstr "<b>The number of atoms in the model is too large to display and browse the entire list !</b>\n"
 "\t\t\t\t<b>You need to search for object(s) individually:</b>"
 
-# File: opengl/win/w_search.c, Line: 4216
+# File: opengl/win/w_search.c, Line: 4215
 msgid "The search must be performed using species and/or Id.\n"
 "Use the filters above to define the object(s) of the search"
 msgstr "The search must be performed using species and/or Id..\n"
 "Use the filters above to define the object(s) of the search"
 
-# File: opengl/win/w_search.c, Line: 268,386,417,677,1180,3184
+# File: opengl/win/w_search.c, Line: 268,386,417,677,1180,3184,3199
 msgid "MSD<sub>max</sub>= %f"
 msgstr "MSD<sub>max</sub>= %f"
 
@@ -7729,7 +7767,7 @@ msgid "%s + neighbor(s)"
 msgstr "%s + neighbor(s)"
 
 # File: calc/dl_poly/dlp_ff_match.c, Line: 556,613
-# File: opengl/win/w_search.c, Line: 706,1166,2548,2589,2624
+# File: opengl/win/w_search.c, Line: 706,1166,2548,2589,2596,2624
 msgid "Select ..."
 msgstr "Select ..."
 
@@ -7773,7 +7811,7 @@ msgstr "in fragment"
 msgid "in molecule"
 msgstr "in molecule"
 
-# File: opengl/win/w_search.c, Line: 2910
+# File: opengl/win/w_search.c, Line: 2910,2913
 msgid "%s %s randomly"
 msgstr "%s %s randomly"
 
@@ -7873,7 +7911,7 @@ msgstr " with <i>n</i><sub>max</sub> = <b>%d</b>"
 msgid "MSD<sub>max</sub> for all objects = "
 msgstr "MSD<sub>max</sub> for all objects = "
 
-# File: opengl/win/w_search.c, Line: 3577
+# File: opengl/win/w_search.c, Line: 3577,3578,3579,3580,3581,3582
 msgid "Object"
 msgstr "Object"
 
@@ -7906,7 +7944,7 @@ msgstr "Atom(s): All"
 msgid "Group of Atoms: All"
 msgstr "Group of Atoms: All"
 
-# File: opengl/win/w_search.c, Line: 4001,4143
+# File: opengl/win/w_search.c, Line: 4009,4143
 msgid "Group of Atoms"
 msgstr "Group of Atoms"
 
@@ -7934,21 +7972,21 @@ msgstr "Total Coordination"
 msgid "Partial Coordination"
 msgstr "Partial Coordination"
 
-# File: opengl/win/w_search.c, Line: 4164
+# File: opengl/win/w_search.c, Line: 4164,4175
 msgid "For "
 msgstr "For "
 
-# File: opengl/win/w_search.c, Line: 4165
+# File: opengl/win/w_search.c, Line: 4165,4177
 msgid "Filter by "
 msgstr "Filter by "
 
-# File: opengl/win/w_search.c, Line: 4166
+# File: opengl/win/w_search.c, Line: 4166,4179
 msgid "Species "
 msgstr "Species "
 
-# File: opengl/win/w_search.c, Line: 4169
-# File: calc/dl_poly/dlp_edit.c, Line: 1184
+# File: calc/dl_poly/dlp_edit.c, Line: 1184,1185
 # File: calc/dl_poly/dlp_field.c, Line: 930
+# File: opengl/win/w_search.c, Line: 4169
 msgid "Atom Id."
 msgstr "Atom Id."
 
@@ -7956,7 +7994,7 @@ msgstr "Atom Id."
 msgid "All objects"
 msgstr "All objects"
 
-# File: opengl/win/w_search.c, Line: 4206
+# File: opengl/win/w_search.c, Line: 4219
 msgid "Selection "
 msgstr "Selection "
 
@@ -8062,6 +8100,7 @@ msgstr "Angular precision: "
 msgid "%s - volumes"
 msgstr "%s - volumes"
 
+# File: calc/cp2k/cp2k_print.c, Line: 318
 # File: opengl/draw/d_measures.c, Line: 96,453
 # File: opengl/win/popup.c, Line: 3772
 msgid "PBC"
@@ -8296,7 +8335,7 @@ msgstr "Atom(s) configuration"
 msgid "Clone(s) configuration"
 msgstr "Clone(s) configuration"
 
-# File: calc/calc.c, Line: 322
+# File: calc/calc.c, Line: 320
 msgid " %s contains %d different sets of atomic coordinates. \n"
 " Please select the one to use to create the input file(s) \n"
 " Note that a new project will be generated for that purpose. \n"
@@ -8312,7 +8351,7 @@ msgstr "Please confirm"
 msgid "Enter the selected MD step: "
 msgstr "Enter the selected MD step: "
 
-# File: calc/cp2k/cp2k_init.c, Line: 948
+# File: calc/cp2k/cp2k_init.c, Line: 945
 msgid "<sup><tt>\t   - BASIS_MOLOPT\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
 "<sup><tt>\t   - GTH_BASIS_SETS\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
 "<sup><tt>\t   - BASIS_SET\t\t(CP2K v9.1, released: <b>2021-12-31</b>)</tt></sup>\n"
@@ -8703,7 +8742,7 @@ msgid "Symmetry:"
 msgstr "Symmetry:"
 
 # File: calc/cp2k/cp2k_init.c, Line: 184
-# File: calc/dl_poly/dlp_control.c, Line: 531
+# File: calc/dl_poly/dlp_control.c, Line: 535
 msgid "Ensemble:"
 msgstr "Ensemble:"
 
@@ -8716,7 +8755,6 @@ msgid "MD time step:"
 msgstr "MD time step:"
 
 # File: calc/cp2k/cp2k_init.c, Line: 187
-# File: calc/cpmd/cpmd_nose.c, Line: 625
 msgid "Initial temperature:"
 msgstr "Initial temperature:"
 
@@ -8740,7 +8778,7 @@ msgstr "Save information every:"
 msgid "Add constraint(s)"
 msgstr "Add constraint(s)"
 
-# File: calc/cp2k/cp2k_init.c, Line: 194,1156
+# File: calc/cp2k/cp2k_init.c, Line: 194,1159
 msgid "The CP2K input structure"
 msgstr "The CP2K input structure"
 
@@ -8858,7 +8896,7 @@ msgid "\t\t\t\tChemical species"
 msgstr "\t\t\t\tChemical species"
 
 # File: calc/cp2k/cp2k_init.c, Line: 979
-# File: calc/cpmd/cpmd_init.c, Line: 936
+# File: calc/cpmd/cpmd_init.c, Line: 936,940,944
 msgid "Details of the <b>%s</b> section that %s"
 msgstr "Details of the <b>%s</b> section that %s"
 
@@ -8870,7 +8908,7 @@ msgstr "CP2K main input file '*.inp'"
 msgid "CP2K input file '*.inp'"
 msgstr "CP2K input file '*.inp'"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1055
+# File: calc/cp2k/cp2k_init.c, Line: 1055,1082
 msgid "! Information"
 msgstr "! Information"
 
@@ -8882,30 +8920,30 @@ msgstr "Single input file"
 msgid "Multiple files"
 msgstr "Multiple files"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1160
-# File: calc/cpmd/cpmd_init.c, Line: 984
+# File: calc/cp2k/cp2k_init.c, Line: 1163
+# File: calc/cpmd/cpmd_init.c, Line: 997,1001
 msgid "The %s section"
 msgstr "The %s section"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1164
+# File: calc/cp2k/cp2k_init.c, Line: 1167
 msgid "The MOTION section - thermostat(s)"
 msgstr "The MOTION section - thermostat(s)"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1168
+# File: calc/cp2k/cp2k_init.c, Line: 1171
 msgid "The MOTION section - restart(s)"
 msgstr "The MOTION section - restart(s)"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1228
+# File: calc/cp2k/cp2k_init.c, Line: 1231
 msgid "<b>   Finalize the creation of the CP2K input files now !</b>"
 msgstr "<b>   Finalize the creation of the CP2K input files now !</b>"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1231
+# File: calc/cp2k/cp2k_init.c, Line: 1234
 # File: calc/cpmd/cpmd_init.c, Line: 1697
-# File: calc/dl_poly/dlp_field.c, Line: 4447
+# File: calc/dl_poly/dlp_field.c, Line: 4447,4883
 msgid "\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"
 msgstr "\n \t<b>Note: </b>You can re-open this assistant later if required to adjust your choices\n"
 
-# File: calc/cp2k/cp2k_init.c, Line: 1233
+# File: calc/cp2k/cp2k_init.c, Line: 1236
 msgid "Create the input files now !"
 msgstr "Create the input files now !"
 
@@ -8943,13 +8981,13 @@ msgid "Please select the fragment(s) to fix"
 msgstr "Please select the fragment(s) to fix"
 
 # File: calc/cp2k/cp2k_mol.c, Line: 256
-# File: calc/cpmd/cpmd_nose.c, Line: 1216
-# File: calc/dl_poly/dlp_edit.c, Line: 1184
+# File: calc/cpmd/cpmd_nose.c, Line: 1216,1217
+# File: calc/dl_poly/dlp_edit.c, Line: 1184,1185
 # File: calc/dl_poly/dlp_mol.c, Line: 478
 msgid "Viz.3D & Select"
 msgstr "Viz.3D & Select"
 
-# File: calc/cp2k/cp2k_print.c, Line: 130
+# File: calc/cp2k/cp2k_print.c, Line: 123
 msgid "!\n"
 "! Always a FORCE_EVAL section that describes\n"
 "! the method to compute energy and forces\n"
@@ -8997,7 +9035,7 @@ msgstr "                       ! => Number of multigrids to use, default = 4\n"
 "    &QS\n"
 "      METHOD "
 
-# File: calc/cp2k/cp2k_print.c, Line: 152
+# File: calc/cp2k/cp2k_print.c, Line: 151
 msgid "\n"
 "      EPS_DEFAULT 1.0E-12                   ! => Default value is 1.0E-10\n"
 "      MAP_CONSISTENT TRUE                   ! => This is the default value\n"
@@ -9033,7 +9071,7 @@ msgid "                ! => Maximum number of SCF cycles\n"
 msgstr "                ! => Maximum number of SCF cycles\n"
 "      EPS_SCF "
 
-# File: calc/cp2k/cp2k_print.c, Line: 165
+# File: calc/cp2k/cp2k_print.c, Line: 164
 msgid "                  ! => Threshold for the SCF convergence\n"
 "! If after the ${SCF_NCYCLES} first SCF steps no convergence has been reached\n"
 "! more SCF cycles can be done updating the preconditioner. \n"
@@ -9069,7 +9107,7 @@ msgstr "                ! => Convergence threshold for the extra cycles\n"
 "      &OT ON\n"
 "        MINIMIZER "
 
-# File: calc/cp2k/cp2k_print.c, Line: 184
+# File: calc/cp2k/cp2k_print.c, Line: 181
 msgid "\n"
 "        PRECONDITIONER FULL_ALL             ! => Preconditioner for the minimization scheme,\n"
 "                                            !    FULL_ALL is the most effective state selective\n"
@@ -9099,16 +9137,13 @@ msgstr "\n"
 "          &EACH\n"
 "            QS_SCF 0                        ! => Never write restart file(s) during the SCF cycle\n"
 
-# File: calc/cp2k/cp2k_print.c, Line: 198
-msgid "      &END PRINT\n"
-"\n"
+msgid "      &END PRINT\n\n"
 "    &END SCF\n"
 "! Going to the exchange-correlation section\n"
 "    &XC\n"
 "      &XC_FUNCTIONAL FUNCTIONAL\n"
 "      &END XC_FUNCTIONAL\n"
-msgstr "      &END PRINT\n"
-"\n"
+msgstr "      &END PRINT\n\n"
 "    &END SCF\n"
 "! Going to the exchange-correlation section\n"
 "    &XC\n"
@@ -9121,7 +9156,7 @@ msgid "! Spin polarized calculation\n"
 msgstr "! Spin polarized calculation\n"
 "    UKS "
 
-# File: calc/cp2k/cp2k_print.c, Line: 313
+# File: calc/cp2k/cp2k_print.c, Line: 311
 msgid "!\n"
 "! Always a SUBSYS section that describes\n"
 "! the chemistry and the periodicity of the system\n"
@@ -9137,7 +9172,7 @@ msgstr "!\n"
 "  &CELL\n"
 "    PERIODIC "
 
-# File: calc/cp2k/cp2k_print.c, Line: 324
+# File: calc/cp2k/cp2k_print.c, Line: 322
 msgid "\n"
 "  &END CELL\n"
 "  &TOPOLOGY\n"
@@ -9159,7 +9194,7 @@ msgstr "                            ! => Restricted Open Kohn-Sham calculation\n
 "    &LOW_SPIN_ROKS\n"
 "      ENERGY_SCALING "
 
-# File: calc/cp2k/cp2k_print.c, Line: 561
+# File: calc/cp2k/cp2k_print.c, Line: 560
 msgid "!\n"
 "! Always a MOTION section that describes\n"
 "! how to move the atoms\n"
@@ -9169,7 +9204,7 @@ msgstr "!\n"
 "! how to move the atoms\n"
 "!\n"
 
-# File: calc/cp2k/cp2k_print.c, Line: 710
+# File: calc/cp2k/cp2k_print.c, Line: 707
 msgid "! What follow is tricky and tests are recommended\n"
 "! Atomic basis set and pseudo-potential must be provided for all chemical species\n"
 "! the exact sequences '${BASIS_FOR_*}' '${POTENTIAL_FOR_*}' appear\n"
@@ -9233,7 +9268,7 @@ msgstr "! This file contains the atomic coordinates in XYZ format:"
 msgid "\t\t! A file is required !"
 msgstr "\t\t! A file is required !"
 
-# File: calc/cp2k/cp2k_print.c, Line: 986
+# File: calc/cp2k/cp2k_print.c, Line: 986,1000
 msgid "\t\t! A keyword is required !"
 msgstr "\t\t! A keyword is required !"
 
@@ -9245,7 +9280,7 @@ msgstr "! The mandatory FORCE_EVAL section include file\n"
 msgid "! The mandatory MOTION section include file\n"
 msgstr "! The mandatory MOTION section include file\n"
 
-# File: calc/cp2k/cp2k_print.c, Line: 190
+# File: calc/cp2k/cp2k_print.c, Line: 1066
 msgid "  LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n"
 msgstr "  LOG_PRINT_KEY T                   ! => Printing on screen when restart file is written\n"
 
@@ -9313,7 +9348,7 @@ msgstr "Add and configure constraint(s)"
 msgid "Add and configure dummy atoms"
 msgstr "Add and configure dummy atoms"
 
-# File: calc/cpmd/cpmd_init.c, Line: 749
+# File: calc/cpmd/cpmd_init.c, Line: 748
 msgid "\t * electronic density(ies) or/and wavefunction(s)\n"
 "\t ** as many index(es) to be supplied on the next line:\n"
 "\t\t &gt; 0 for electronic density\n"
@@ -9343,7 +9378,7 @@ msgstr "The input files 'forces.inc', 'system.inc', and 'coord.inc'\n"
 "for the atomic basis set and peudo-potentials\n"
 "were saved in the same directory as the main input file."
 
-# File: calc/cpmd/cpmd_init.c, Line: 1494
+# File: calc/cpmd/cpmd_init.c, Line: 1508
 msgid "The files 'basis.inc' and 'pseudo.inc'\n"
 "for the atomic basis set and peudo-potentials\n"
 "were saved in the same directory as the main input file."
@@ -9351,7 +9386,7 @@ msgstr "The files 'basis.inc' and 'pseudo.inc'\n"
 "for the atomic basis set and peudo-potentials\n"
 "were saved in the same directory as the main input file."
 
-# File: calc/cpmd/cpmd_init.c, Line: 1618
+# File: calc/cpmd/cpmd_init.c, Line: 1617,1669
 msgid "  Project name: %s\n"
 "  Total number of atoms:      %d\n"
 "  Number of chemical species: %d"
@@ -9359,7 +9394,7 @@ msgstr "  Project name: %s\n"
 "  Total number of atoms:      %d\n"
 "  Number of chemical species: %d"
 
-# File: calc/cpmd/cpmd_init.c, Line: 1690
+# File: calc/cpmd/cpmd_init.c, Line: 1686
 msgid "\t<b>This assistant will help you to setup a %s %s\n"
 "\tcalculation using <i>%s</i> 3D model as starting point</b>\n"
 "\n"
@@ -9430,7 +9465,7 @@ msgid "Parameters:"
 msgstr "Parameters:"
 
 # File: calc/cpmd/cpmd_init.c, Line: 127
-# File: calc/dl_poly/dlp_control.c, Line: 1399
+# File: calc/dl_poly/dlp_control.c, Line: 1403
 msgid "Angles:"
 msgstr "Angles:"
 
@@ -9642,7 +9677,7 @@ msgstr "Local"
 msgid "Controlled"
 msgstr "Controlled"
 
-# File: calc/cpmd/cpmd_init.c, Line: 216
+# File: calc/cpmd/cpmd_init.c, Line: 215,216
 msgid "Nosé-Hoover chains"
 msgstr "Nosé-Hoover chains"
 
@@ -9710,7 +9745,7 @@ msgstr "Create the input file now !"
 msgid "CP2K input file"
 msgstr "CP2K input file"
 
-# File: calc/cpmd/cpmd_init.c, Line: 1242
+# File: calc/cpmd/cpmd_init.c, Line: 1253
 msgid " input file preview"
 msgstr " input file preview"
 
@@ -9718,7 +9753,7 @@ msgstr " input file preview"
 msgid " input files preview"
 msgstr " input files preview"
 
-# File: calc/cpmd/cpmd_init.c, Line: 1417
+# File: calc/cpmd/cpmd_init.c, Line: 1417,1442
 # File: calc/dl_poly/dlp_field.c, Line: 4715
 msgid "Error while saving input file: %s\n Error: %s"
 msgstr "Error while saving input file: %s\n Error: %s"
@@ -9821,8 +9856,7 @@ msgstr "Target T°"
 msgid "Frequency"
 msgstr "Frequency"
 
-# File: calc/cpmd/cpmd_nose.c, Line: 625
-# File: calc/dl_poly/dlp_control.c, Line: 581
+# File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Target temperature:"
 msgstr "Target temperature:"
 
@@ -9844,7 +9878,7 @@ msgstr "Not at single atom has been selected !"
 msgid "%s\nis this correct ?"
 msgstr "%s\nis this correct ?"
 
-# File: calc/cpmd/cpmd_nose.c, Line: 1216
+# File: calc/cpmd/cpmd_nose.c, Line: 1216,1217
 # File: calc/dl_poly/dlp_ff_match.c, Line: 927
 # File: calc/dl_poly/dlp_field.c, Line: 924
 msgid "Species"
@@ -9883,12 +9917,12 @@ msgid "All atom(s)"
 msgstr "All atom(s)"
 
 # File: calc/cpmd/cpmd_nose.c, Line: 1389,1440
-# File: calc/dl_poly/dlp_edit.c, Line: 1682,1698,1714,1728,2414,2436,2531,2586,2644,2777
+# File: calc/dl_poly/dlp_edit.c, Line: 1682,1698,1714,1728,1742,1757,2414,2531,2586,2644,2675,2777
 msgid "Not picked yet !"
 msgstr "Not picked yet !"
 
 # File: calc/cpmd/cpmd_nose.c, Line: 1394,1445
-# File: calc/dl_poly/dlp_edit.c, Line: 1605,1719,2396,2591,2649
+# File: calc/dl_poly/dlp_edit.c, Line: 1605,1719,1733,2396,2591,2649
 msgid "%d atom(s)"
 msgstr "%d atom(s)"
 
@@ -10051,7 +10085,7 @@ msgid "Target temperature for the pseudo bath must be &#8805; 1.0 K,\n"
 msgstr "Target temperature for the pseudo bath must be &#8805; 1.0 K,\n"
 "Alternatively set value to 0.0 K to system temperature."
 
-# File: calc/dl_poly/dlp_control.c, Line: 1590
+# File: calc/dl_poly/dlp_control.c, Line: 1594
 msgid "The batch size or max. number of particles by batch\n"
 "must &#x2208; [1 - 10 000 000]"
 msgstr "The batch size or max. number of particles by batch\n"
@@ -10161,660 +10195,660 @@ msgstr "Area"
 msgid "Tension"
 msgstr "Tension"
 
-# File: calc/dl_poly/dlp_control.c, Line: 412
+# File: calc/dl_poly/dlp_control.c, Line: 413
 msgid "Semi-anisotropic constraint"
 msgstr "Semi-anisotropic constraint"
 
-# File: calc/dl_poly/dlp_control.c, Line: 467
+# File: calc/dl_poly/dlp_control.c, Line: 471
 msgid "Thermostat:"
 msgstr "Thermostat:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 554
+# File: calc/dl_poly/dlp_control.c, Line: 558
 msgid "Use pseudo thermal bath"
 msgstr "Use pseudo thermal bath"
 
-# File: calc/dl_poly/dlp_control.c, Line: 556
+# File: calc/dl_poly/dlp_control.c, Line: 560
 msgid "Thermostat type:"
 msgstr "Thermostat type:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 559
+# File: calc/dl_poly/dlp_control.c, Line: 563
 msgid "Langevin + Direct"
 msgstr "Langevin + Direct"
 
-# File: calc/dl_poly/dlp_control.c, Line: 559
+# File: calc/dl_poly/dlp_control.c, Line: 566
 msgid "Direct"
 msgstr "Direct"
 
-# File: calc/dl_poly/dlp_control.c, Line: 565
+# File: calc/dl_poly/dlp_control.c, Line: 569
 msgid "Thickness:"
 msgstr "Thickness:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 570
+# File: calc/dl_poly/dlp_control.c, Line: 574
 msgid "Target T°:"
 msgstr "Target T°:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 581
+# File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Verlet integrator:"
 msgstr "Verlet integrator:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 581
+# File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Number of steps:"
 msgstr "Number of steps:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 581
+# File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Time step δt:"
 msgstr "Time step δt:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 581
+# File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Target pressure:"
 msgstr "Target pressure:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 582
+# File: calc/dl_poly/dlp_control.c, Line: 586
 msgid "Shake iterations limit:"
 msgstr "Shake iterations limit:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 582
+# File: calc/dl_poly/dlp_control.c, Line: 586
 msgid "Shake tolerance:"
 msgstr "Shake tolerance:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 583
+# File: calc/dl_poly/dlp_control.c, Line: 587
 msgid "Rattle iterations limit:"
 msgstr "Rattle iterations limit:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 583
+# File: calc/dl_poly/dlp_control.c, Line: 587
 msgid "Rattle tolerance:"
 msgstr "Rattle tolerance:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 583
+# File: calc/dl_poly/dlp_control.c, Line: 587
 msgid "FIQA iterations limit:"
 msgstr "FIQA iterations limit:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 583
+# File: calc/dl_poly/dlp_control.c, Line: 587
 msgid "FIQA quaternions tolerance:"
 msgstr "FIQA quaternions tolerance:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 585
+# File: calc/dl_poly/dlp_control.c, Line: 589
 msgid "<b>cycle(s)</b>"
 msgstr "<b>cycle(s)</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 586
+# File: calc/dl_poly/dlp_control.c, Line: 590
 msgid "Maximum time step:"
 msgstr "Maximum time step:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 586
+# File: calc/dl_poly/dlp_control.c, Line: 590
 msgid "Maximum distance allowed:"
 msgstr "Maximum distance allowed:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 586
+# File: calc/dl_poly/dlp_control.c, Line: 590
 msgid "Minimum distance allowed:"
 msgstr "Minimum distance allowed:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 588
+# File: calc/dl_poly/dlp_control.c, Line: 592
 msgid "Velocity"
 msgstr "Velocity"
 
-# File: calc/dl_poly/dlp_control.c, Line: 588
+# File: calc/dl_poly/dlp_control.c, Line: 592
 msgid "Leapfrog"
 msgstr "Leapfrog"
 
-# File: calc/dl_poly/dlp_control.c, Line: 588
+# File: calc/dl_poly/dlp_control.c, Line: 592
 msgid "Fixed"
 msgstr "Fixed"
 
-# File: calc/dl_poly/dlp_control.c, Line: 588
+# File: calc/dl_poly/dlp_control.c, Line: 592
 msgid "Variable"
 msgstr "Variable"
 
-# File: calc/dl_poly/dlp_control.c, Line: 635
+# File: calc/dl_poly/dlp_control.c, Line: 639
 msgid "Variable time step information"
 msgstr "Variable time step information"
 
-# File: calc/dl_poly/dlp_control.c, Line: 722
+# File: calc/dl_poly/dlp_control.c, Line: 726
 msgid "Initiate impact on particle"
 msgstr "Initiate impact on particle"
 
-# File: calc/dl_poly/dlp_control.c, Line: 729
+# File: calc/dl_poly/dlp_control.c, Line: 733
 msgid "Index of the particle to impact: "
 msgstr "Index of the particle to impact: "
 
-# File: calc/dl_poly/dlp_control.c, Line: 729
+# File: calc/dl_poly/dlp_control.c, Line: 733
 msgid "Time step of impact:"
 msgstr "Time step of impact:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 729
+# File: calc/dl_poly/dlp_control.c, Line: 733
 msgid "Energy of impact:"
 msgstr "Energy of impact:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 729
+# File: calc/dl_poly/dlp_control.c, Line: 733
 msgid "Direction (from center of mass):"
 msgstr "Direction (from center of mass):"
 
-# File: calc/dl_poly/dlp_control.c, Line: 730
+# File: calc/dl_poly/dlp_control.c, Line: 734
 msgid "<b>n<sup>th</sup> step</b>"
 msgstr "<b>n<sup>th</sup> step</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 769
+# File: calc/dl_poly/dlp_control.c, Line: 773
 msgid "on %s:"
 msgstr "on %s:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 830
+# File: calc/dl_poly/dlp_control.c, Line: 834
 msgid "Time step details"
 msgstr "Time step details"
 
-# File: calc/dl_poly/dlp_control.c, Line: 854
+# File: calc/dl_poly/dlp_control.c, Line: 858
 msgid "<b>Bond constraint(s) dynamics:</b>"
 msgstr "<b>Bond constraint(s) dynamics:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 854
+# File: calc/dl_poly/dlp_control.c, Line: 858
 msgid "<b>Rotational motion of rigid body(ies):</b>"
 msgstr "<b>Rotational motion of rigid body(ies):</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 890
+# File: calc/dl_poly/dlp_control.c, Line: 894
 msgid "<b>Initiate impact on particle</b>"
 msgstr "<b>Initiate impact on particle</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 891
+# File: calc/dl_poly/dlp_control.c, Line: 895
 msgid "Impact details"
 msgstr "Impact details"
 
-# File: calc/dl_poly/dlp_control.c, Line: 901
+# File: calc/dl_poly/dlp_control.c, Line: 905
 msgid "Equilibrate for the first:"
 msgstr "Equilibrate for the first:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 901
+# File: calc/dl_poly/dlp_control.c, Line: 905
 msgid "Scale temperature:"
 msgstr "Scale temperature:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 901
+# File: calc/dl_poly/dlp_control.c, Line: 905
 msgid "Cap forces:"
 msgstr "Cap forces:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 902
+# File: calc/dl_poly/dlp_control.c, Line: 906
 msgid "Resample the momenta distribution:"
 msgstr "Resample the momenta distribution:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 902
+# File: calc/dl_poly/dlp_control.c, Line: 906
 msgid "Minimize system configuration:"
 msgstr "Minimize system configuration:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 903
+# File: calc/dl_poly/dlp_control.c, Line: 907
 msgid "Optimize system configuration from start:"
 msgstr "Optimize system configuration from start:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 903
+# File: calc/dl_poly/dlp_control.c, Line: 907
 msgid "Perform zero temperature (10 K) optimization"
 msgstr "Perform zero temperature (10 K) optimization"
 
-# File: calc/dl_poly/dlp_control.c, Line: 903
+# File: calc/dl_poly/dlp_control.c, Line: 907
 msgid "Include equilibration data in statistics"
 msgstr "Include equilibration data in statistics"
 
-# File: calc/dl_poly/dlp_control.c, Line: 904,1112,1302,1359,1400
+# File: calc/dl_poly/dlp_control.c, Line: 908,1116,1117,1118,1119,1306,1363,1404
 msgid "Every:"
 msgstr "Every:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 904
+# File: calc/dl_poly/dlp_control.c, Line: 908
 msgid "During:"
 msgstr "During:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 904
+# File: calc/dl_poly/dlp_control.c, Line: 908
 msgid "Minimize:"
 msgstr "Minimize:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 903
+# File: calc/dl_poly/dlp_control.c, Line: 908
 msgid "Optimize"
 msgstr "Optimize"
 
-# File: calc/dl_poly/dlp_control.c, Line: 905,1260,1293,1330,1363,1502,2051
+# File: calc/dl_poly/dlp_control.c, Line: 909,1264,1297,1334,1367,1506,2055
 msgid "<b>step(s)</b>"
 msgstr "<b>step(s)</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 906
+# File: calc/dl_poly/dlp_control.c, Line: 910
 msgid "Force"
 msgstr "Force"
 
-# File: calc/dl_poly/dlp_control.c, Line: 906
+# File: calc/dl_poly/dlp_control.c, Line: 910
 msgid "Energy"
 msgstr "Energy"
 
-# File: calc/dl_poly/dlp_control.c, Line: 906
+# File: calc/dl_poly/dlp_control.c, Line: 910
 msgid "Distance"
 msgstr "Distance"
 
-# File: calc/dl_poly/dlp_control.c, Line: 957
+# File: calc/dl_poly/dlp_control.c, Line: 961
 msgid "Minimization parameter must ∈ [ %f - %f ]"
 msgstr "Minimization parameter must ∈ [ %f - %f ]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1023
+# File: calc/dl_poly/dlp_control.c, Line: 1027
 msgid "Equilibrate"
 msgstr "Equilibrate"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1107
+# File: calc/dl_poly/dlp_control.c, Line: 1111
 msgid "Defects:"
 msgstr "Defects:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1108
+# File: calc/dl_poly/dlp_control.c, Line: 1112
 msgid "Displacements:"
 msgstr "Displacements:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1109
+# File: calc/dl_poly/dlp_control.c, Line: 1113
 msgid "History:"
 msgstr "History:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1110
+# File: calc/dl_poly/dlp_control.c, Line: 1114
 msgid "Atom's MSD:"
 msgstr "Atom's MSD:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1112
+# File: calc/dl_poly/dlp_control.c, Line: 1116,1117,1118,1119
 msgid "From step:"
 msgstr "From step:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1112
+# File: calc/dl_poly/dlp_control.c, Line: 1116
 msgid "Site interstitial cutoff:"
 msgstr "Site interstitial cutoff:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1113
+# File: calc/dl_poly/dlp_control.c, Line: 1117
 msgid "Qualifying cutoff:"
 msgstr "Qualifying cutoff:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1114
+# File: calc/dl_poly/dlp_control.c, Line: 1118
 msgid "Data level:"
 msgstr "Data level:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1119
+# File: calc/dl_poly/dlp_control.c, Line: 1123
 msgid "Radial distribution functions (RDFs):"
 msgstr "Radial distribution functions (RDFs):"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1120
+# File: calc/dl_poly/dlp_control.c, Line: 1124
 msgid "Velocity autocorrelation functions (VAFs):"
 msgstr "Velocity autocorrelation functions (VAFs):"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1121
+# File: calc/dl_poly/dlp_control.c, Line: 1125
 msgid "Z density profile:"
 msgstr "Z density profile:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1289
+# File: calc/dl_poly/dlp_control.c, Line: 1293
 msgid "Dump restart information every:"
 msgstr "Dump restart information every:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1298
+# File: calc/dl_poly/dlp_control.c, Line: 1302
 msgid "Print system data:"
 msgstr "Print system data:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1299
+# File: calc/dl_poly/dlp_control.c, Line: 1303
 msgid "Accumulate statistics data:"
 msgstr "Accumulate statistics data:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1300
+# File: calc/dl_poly/dlp_control.c, Line: 1304
 msgid "Rolling average stack:"
 msgstr "Rolling average stack:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1364
+# File: calc/dl_poly/dlp_control.c, Line: 1368
 msgid "Bin size:"
 msgstr "Bin size:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1391
+# File: calc/dl_poly/dlp_control.c, Line: 1395
 msgid "Ignore time-averaging for the VAFs"
 msgstr "Ignore time-averaging for the VAFs"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1399
+# File: calc/dl_poly/dlp_control.c, Line: 1403
 msgid "All:"
 msgstr "All:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1399
+# File: calc/dl_poly/dlp_control.c, Line: 1403
 msgid "Bonds:"
 msgstr "Bonds:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1399
+# File: calc/dl_poly/dlp_control.c, Line: 1403
 msgid "Dihedrals:"
 msgstr "Dihedrals:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1399
+# File: calc/dl_poly/dlp_control.c, Line: 1403
 msgid "Inversions:"
 msgstr "Inversions:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1400
+# File: calc/dl_poly/dlp_control.c, Line: 1404
 msgid "Num. δ"
 msgstr "Num. δ"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1400
+# File: calc/dl_poly/dlp_control.c, Line: 1404
 msgid "Cutoff = "
 msgstr "Cutoff = "
 
-# File: calc/dl_poly/dlp_control.c, Line: 1505
+# File: calc/dl_poly/dlp_control.c, Line: 1509
 msgid "%sr in [0 : r]"
 msgstr "%sr in [0 : r]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1509
+# File: calc/dl_poly/dlp_control.c, Line: 1513
 msgid "%s° in [-180 : 180]"
 msgstr "%s° in [-180 : 180]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1513
+# File: calc/dl_poly/dlp_control.c, Line: 1517
 msgid "%s° in [0 : 180]"
 msgstr "%s° in [0 : 180]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1547
+# File: calc/dl_poly/dlp_control.c, Line: 1551
 msgid "Set job time:"
 msgstr "Set job time:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1547
+# File: calc/dl_poly/dlp_control.c, Line: 1551
 msgid "Set job closure time:"
 msgstr "Set job closure time:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1548
+# File: calc/dl_poly/dlp_control.c, Line: 1552
 msgid "Traditional master I/O"
 msgstr "Traditional master I/O"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1549
+# File: calc/dl_poly/dlp_control.c, Line: 1553
 msgid "<b>General Input/Output (I/O) read interface:</b>"
 msgstr "<b>General Input/Output (I/O) read interface:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1549
+# File: calc/dl_poly/dlp_control.c, Line: 1553
 msgid "<b>General Input/Output (I/O) write interface:</b>"
 msgstr "<b>General Input/Output (I/O) write interface:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1550
+# File: calc/dl_poly/dlp_control.c, Line: 1554
 msgid "Reader count:"
 msgstr "Reader count:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1550
+# File: calc/dl_poly/dlp_control.c, Line: 1554
 msgid "Batch size:"
 msgstr "Batch size:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1550
+# File: calc/dl_poly/dlp_control.c, Line: 1554
 msgid "Buffer size:"
 msgstr "Buffer size:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1550
+# File: calc/dl_poly/dlp_control.c, Line: 1554
 msgid "// error check"
 msgstr "// error check"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1780
+# File: calc/dl_poly/dlp_control.c, Line: 1784
 msgid "Sorted"
 msgstr "Sorted"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1781
+# File: calc/dl_poly/dlp_control.c, Line: 1785
 msgid "Unsorted"
 msgstr "Unsorted"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1606
+# File: calc/dl_poly/dlp_control.c, Line: 1610
 msgid "The buffer size or max. number of ASCII line records by batch\nmust &#x2208; [100 - 100 000]"
 msgstr "The buffer size or max. number of ASCII line records by batch\nmust &#x2208; [100 - 100 000]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1754
+# File: calc/dl_poly/dlp_control.c, Line: 1758
 msgid "Method:"
 msgstr "Method:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1770
+# File: calc/dl_poly/dlp_control.c, Line: 1774
 msgid "Real precision:"
 msgstr "Real precision:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1778
+# File: calc/dl_poly/dlp_control.c, Line: 1782
 # File: curve/tab-1.c, Line: 648
 msgid "Type:"
 msgstr "Type:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1825
+# File: calc/dl_poly/dlp_control.c, Line: 1829
 msgid "Random number generator seeds:"
 msgstr "Random number generator seeds:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1841
+# File: calc/dl_poly/dlp_control.c, Line: 1845
 msgid "Limits to 2 the number of processors in <i>z</i> direction for slab simulations"
 msgstr "Limits to 2 the number of processors in <i>z</i> direction for slab simulations"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1848
+# File: calc/dl_poly/dlp_control.c, Line: 1852
 msgid "Direct Coulomb sum"
 msgstr "Direct Coulomb sum"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1848
+# File: calc/dl_poly/dlp_control.c, Line: 1852
 msgid "Distance dependent dielectric Coulomb sum"
 msgstr "Distance dependent dielectric Coulomb sum"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1849
+# File: calc/dl_poly/dlp_control.c, Line: 1853
 msgid "Ewald sum (auto)"
 msgstr "Ewald sum (auto)"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1849
+# File: calc/dl_poly/dlp_control.c, Line: 1853
 msgid "Ewald sum"
 msgstr "Ewald sum"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1850
+# File: calc/dl_poly/dlp_control.c, Line: 1854
 msgid "Reaction field electrostatics"
 msgstr "Reaction field electrostatics"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1850
+# File: calc/dl_poly/dlp_control.c, Line: 1854
 msgid "Reaction field with Fennel damping"
 msgstr "Reaction field with Fennel damping"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1851
+# File: calc/dl_poly/dlp_control.c, Line: 1855
 msgid "Reaction field with Fennel damping (auto)"
 msgstr "Reaction field with Fennel damping (auto)"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1852
+# File: calc/dl_poly/dlp_control.c, Line: 1856
 msgid "Force-shifted Coulomb sum"
 msgstr "Force-shifted Coulomb sum"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1852
+# File: calc/dl_poly/dlp_control.c, Line: 1856
 msgid "Force-shifted Coulomb sum with Fennel damping"
 msgstr "Force-shifted Coulomb sum with Fennel damping"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1853
+# File: calc/dl_poly/dlp_control.c, Line: 1857
 msgid "Force-shifted Coulomb sum with Fennel damping (auto)"
 msgstr "Force-shifted Coulomb sum with Fennel damping (auto)"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1877,2181
+# File: calc/dl_poly/dlp_control.c, Line: 1881,2185
 msgid "Cutoff must be > 0.0 &#xC5;"
 msgstr "Cutoff must be > 0.0 &#xC5;"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1890
+# File: calc/dl_poly/dlp_control.c, Line: 1894
 msgid "Padding must be &#8805; min(0.05, 0.5%r<sub>cut</sub>) &#xC5;"
 msgstr "Padding must be &#8805; min(0.05, 0.5%r<sub>cut</sub>) &#xC5;"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1895
+# File: calc/dl_poly/dlp_control.c, Line: 1899
 msgid "Padding must be > 0.0 &#xC5;"
 msgstr "Padding must be > 0.0 &#xC5;"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1917
+# File: calc/dl_poly/dlp_control.c, Line: 1921
 msgid "Precision must &#x2208; [10<sup>-20</sup> - 0.5]"
 msgstr "Precision must &#x2208; [10<sup>-20</sup> - 0.5]"
 
-# File: calc/dl_poly/dlp_control.c, Line: 1989
+# File: calc/dl_poly/dlp_control.c, Line: 1993
 msgid "Precision:"
 msgstr "Precision:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2010
+# File: calc/dl_poly/dlp_control.c, Line: 2014
 msgid "Ewald convergence parameter:"
 msgstr "Ewald convergence parameter:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2018
+# File: calc/dl_poly/dlp_control.c, Line: 2022
 msgid "Maximum k vector index in directions:"
 msgstr "Maximum k vector index in directions:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2037
+# File: calc/dl_poly/dlp_control.c, Line: 2041
 msgid "Fennell damping parameter (&#x3B1;):"
 msgstr "Fennell damping parameter (&#x3B1;):"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2047
+# File: calc/dl_poly/dlp_control.c, Line: 2051
 msgid "Evaluate <i>k</i>-space contribution to the Ewald sum every:"
 msgstr "Evaluate <i>k</i>-space contribution to the Ewald sum every:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2112
+# File: calc/dl_poly/dlp_control.c, Line: 2116
 msgid "Evaluate electrostatics interactions"
 msgstr "Evaluate electrostatics interactions"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2120
+# File: calc/dl_poly/dlp_control.c, Line: 2124
 msgid "Long range interaction cutoff [r<sub>cut</sub>]:"
 msgstr "Long range interaction cutoff [r<sub>cut</sub>]:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2126
+# File: calc/dl_poly/dlp_control.c, Line: 2130
 msgid "Add padding to r<sub>cut</sub>:"
 msgstr "Add padding to r<sub>cut</sub>:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2135
+# File: calc/dl_poly/dlp_control.c, Line: 2139
 msgid "Use extended coulombic exclusion"
 msgstr "Use extended coulombic exclusion"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2138
+# File: calc/dl_poly/dlp_control.c, Line: 2142
 msgid "Evaluation method:"
 msgstr "Evaluation method:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2157
+# File: calc/dl_poly/dlp_control.c, Line: 2161
 msgid "Functional"
 msgstr "Functional"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2240
+# File: calc/dl_poly/dlp_control.c, Line: 2244
 msgid "Evaluate van der Waals interactions"
 msgstr "Evaluate van der Waals interactions"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2249
+# File: calc/dl_poly/dlp_control.c, Line: 2253
 msgid "Short range interaction cutoff:"
 msgstr "Short range interaction cutoff:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2257
+# File: calc/dl_poly/dlp_control.c, Line: 2261
 msgid "Enforce direct calculation of van der Waals interactions"
 msgstr "Enforce direct calculation of van der Waals interactions"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2261
+# File: calc/dl_poly/dlp_control.c, Line: 2265
 msgid "Apply force-shifting (contributions smoothly fall to zero near r<sub>cut</sub>)"
 msgstr "Apply force-shifting (contributions smoothly fall to zero near r<sub>cut</sub>)"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2265
+# File: calc/dl_poly/dlp_control.c, Line: 2269
 msgid "Apply mixing rule (when needed and if possible generate cross species interactions)"
 msgstr "Apply mixing rule (when needed and if possible generate cross species interactions)"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2272
+# File: calc/dl_poly/dlp_control.c, Line: 2276
 msgid "Mixing rule:"
 msgstr "Mixing rule:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2327
+# File: calc/dl_poly/dlp_control.c, Line: 2331
 msgid "Enforce direct calculation of metal interactions by explicit potentials, does not work with *EAM* potentials"
 msgstr "Enforce direct calculation of metal interactions by explicit potentials, does not work with *EAM* potentials"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2332
+# File: calc/dl_poly/dlp_control.c, Line: 2336
 msgid "Switch the default embedding functions, <i>F</i>, from <i>F(&#x3c1;)</i> to <i>F(√&#x3c1;)</i>"
 msgstr "Switch the default embedding functions, <i>F</i>, from <i>F(&#x3c1;)</i> to <i>F(√&#x3c1;)</i>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2359
+# File: calc/dl_poly/dlp_control.c, Line: 2363
 msgid "Subcelling threshold density must be &#8805; 1.0"
 msgstr "Subcelling threshold density must be &#8805; 1.0"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2377
+# File: calc/dl_poly/dlp_control.c, Line: 2381
 msgid "Relative dielectric constant &#949;<sub>r</sub>"
 msgstr "Relative dielectric constant &#949;<sub>r</sub>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2378
+# File: calc/dl_poly/dlp_control.c, Line: 2382
 msgid "Allowed local variation of system density:"
 msgstr "Allowed local variation of system density:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2379
+# File: calc/dl_poly/dlp_control.c, Line: 2383
 msgid "Ignore the particle indices in CONFIG file"
 msgstr "Ignore the particle indices in CONFIG file"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2380
+# File: calc/dl_poly/dlp_control.c, Line: 2384
 msgid "Ignore strict checks, hide warnings and assume safe simulation parameters"
 msgstr "Ignore strict checks, hide warnings and assume safe simulation parameters"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2381
+# File: calc/dl_poly/dlp_control.c, Line: 2385
 msgid "Skip detailed topology reporting during read of FIELD file in output"
 msgstr "Skip detailed topology reporting during read of FIELD file in output"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2382
+# File: calc/dl_poly/dlp_control.c, Line: 2386
 msgid "Ignore center of mass removal during the calculation"
 msgstr "Ignore center of mass removal during the calculation"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2383
+# File: calc/dl_poly/dlp_control.c, Line: 2387
 msgid "Set tolerance for relaxed shell model:"
 msgstr "Set tolerance for relaxed shell model:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2384
+# File: calc/dl_poly/dlp_control.c, Line: 2388
 msgid "Set the subcelling threshold density of particles per link cell:"
 msgstr "Set the subcelling threshold density of particles per link cell:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2385
+# File: calc/dl_poly/dlp_control.c, Line: 2389
 msgid "Create an expanded version of the current model:"
 msgstr "Create an expanded version of the current model:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2386
+# File: calc/dl_poly/dlp_control.c, Line: 2390
 msgid "Restart calculation:"
 msgstr "Restart calculation:"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2512
+# File: calc/dl_poly/dlp_control.c, Line: 2516
 msgid "Continue current simulation"
 msgstr "Continue current simulation"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2513
+# File: calc/dl_poly/dlp_control.c, Line: 2517
 msgid "Start new simulation from older run without temperature reset"
 msgstr "Start new simulation from older run without temperature reset"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2514
+# File: calc/dl_poly/dlp_control.c, Line: 2518
 msgid "Start new simulation from older run with temperature reset"
 msgstr "Start new simulation from older run with temperature reset"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2539
+# File: calc/dl_poly/dlp_control.c, Line: 2543
 msgid "<b>Global options:</b>"
 msgstr "<b>Global options:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2541
+# File: calc/dl_poly/dlp_control.c, Line: 2545
 msgid "<b>Restart options:</b>"
 msgstr "<b>Restart options:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2545
+# File: calc/dl_poly/dlp_control.c, Line: 2549
 msgid "<b>Intra-molecular probability denisty function (PDF) analysis:</b>"
 msgstr "<b>Intra-molecular probability denisty function (PDF) analysis:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2547
+# File: calc/dl_poly/dlp_control.c, Line: 2551
 msgid "<b>Overall analysis:</b>"
 msgstr "<b>Overall analysis:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2551
+# File: calc/dl_poly/dlp_control.c, Line: 2555
 msgid "<b>van der Waals (Non-bonded short range):</b>"
 msgstr "<b>van der Waals (Non-bonded short range):</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2553
+# File: calc/dl_poly/dlp_control.c, Line: 2557
 msgid "<b>Electrostatics (Non-bonded long range):</b>"
 msgstr "<b>Electrostatics (Non-bonded long range):</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2555
+# File: calc/dl_poly/dlp_control.c, Line: 2559
 msgid "<b>Metallic interactions:</b>"
 msgstr "<b>Metallic interactions:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2559
+# File: calc/dl_poly/dlp_control.c, Line: 2563
 msgid "<b>Equilibration:</b>"
 msgstr "<b>Equilibration:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2563
+# File: calc/dl_poly/dlp_control.c, Line: 2567
 msgid "<b>Thermodynamics:</b>"
 msgstr "<b>Thermodynamics:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2567
+# File: calc/dl_poly/dlp_control.c, Line: 2571
 msgid "<b>Molecular dynamics:</b>"
 msgstr "<b>Molecular dynamics:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2571
+# File: calc/dl_poly/dlp_control.c, Line: 2575
 msgid "<b>Output information:</b>"
 msgstr "<b>Output information:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2573
+# File: calc/dl_poly/dlp_control.c, Line: 2577
 msgid "<b>Trajectory file(s):</b>"
 msgstr "<b>Trajectory file(s):</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2575
+# File: calc/dl_poly/dlp_control.c, Line: 2579
 msgid "<b>Restart file:</b>"
 msgstr "<b>Restart file:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2579
+# File: calc/dl_poly/dlp_control.c, Line: 2583
 msgid "<b>Job options:</b>"
 msgstr "<b>Job options:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2581
+# File: calc/dl_poly/dlp_control.c, Line: 2585
 msgid "<b>I/O options:</b>"
 msgstr "<b>I/O options:</b>"
 
-# File: calc/dl_poly/dlp_control.c, Line: 2583
+# File: calc/dl_poly/dlp_control.c, Line: 2587
 msgid "<b>Other options:</b>"
 msgstr "<b>Other options:</b>"
 
-# File: calc/dl_poly/dlp_edit.c, Line: 610
+# File: calc/dl_poly/dlp_edit.c, Line: 629
 msgid "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters."
@@ -10822,7 +10856,7 @@ msgstr "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using Ɛ<sub>i/j</sub> and r0<sub>i/j</sub> provided by the force field parameters."
 
-# File: calc/dl_poly/dlp_edit.c, Line: 619
+# File: calc/dl_poly/dlp_edit.c, Line: 639
 msgid "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters."
@@ -10830,7 +10864,7 @@ msgstr "In %s, 12-6 non-bonded interactions are evaluated using: \n"
 "%s\n"
 "<i><b>A</b></i> and <i><b>B</b></i> are calculated using A<sub>i/j</sub> and B<sub>i/j</sub> provided by the force field parameters."
 
-# File: calc/dl_poly/dlp_edit.c, Line: 686
+# File: calc/dl_poly/dlp_edit.c, Line: 684
 msgid "Are you sure to change the type of Tersoff potential ?\n"
 "<i>Tersoff (ter)</i> and <i>KIHS (kihs)</i> forms cannot be mixed\n"
 "Therefore this choice will affect <b>all</b> Tersoff potential(s).\n"
@@ -10840,7 +10874,7 @@ msgstr "Are you sure to change the type of Tersoff potential ?\n"
 "Therefore this choice will affect <b>all</b> Tersoff potential(s).\n"
 "Any previous parameters will be erased !"
 
-# File: calc/dl_poly/dlp_edit.c, Line: 1589
+# File: calc/dl_poly/dlp_edit.c, Line: 1588
 msgid "The atom(s) above will be described\n"
 "in the force field using the parameters\n"
 "of the <b>%s</b> field atom.\n"
@@ -10856,7 +10890,7 @@ msgstr "<sup>*</sup> this will be used to adjust bonding, angles, etc ... accord
 "  providing that some parameters can be found in the force field data.\n"
 "  Please note that comments are directly imported from the force field file."
 
-# File: calc/dl_poly/dlp_edit.c, Line: 2836
+# File: calc/dl_poly/dlp_edit.c, Line: 2834
 msgid "<sup>*</sup> Available parameters with matching chemical species,\n"
 "  %s force field energy related parameters in: %s \n"
 "  if required conversion to FIELD file energy unit will be performed upon selection.\n"
@@ -10879,7 +10913,7 @@ msgstr "<u><i>Cross terms with atom:</i></u>"
 msgid "<i>Tabulated</i>"
 msgstr "<i>Tabulated</i>"
 
-# File: calc/dl_poly/dlp_edit.c, Line: 618
+# File: calc/dl_poly/dlp_edit.c, Line: 617
 msgid "In %s, non-bonded interactions are evaluated using: \n%s\n"
 "Therefore the parameters provided by the force field are incompatible with the DL-POLY options."
 msgstr "In %s, non-bonded interactions are evaluated using: \n%s\n"
@@ -10895,7 +10929,7 @@ msgid "Urey-Bradley terms provided by the %s force field are ignored.\n"
 msgstr "Urey-Bradley terms provided by the %s force field are ignored.\n"
 
 # File: calc/dl_poly/dlp_edit.c, Line: 669
-# File: calc/dl_poly/dlp_field.c, Line: 162
+# File: calc/dl_poly/dlp_field.c, Line: 185
 msgid "External field"
 msgstr "External field"
 
@@ -11116,7 +11150,7 @@ msgstr "Atom: "
 msgid "\t%s type N°<b>%d</b>\n\tField atoms: <b>"
 msgstr "\t%s type N°<b>%d</b>\n\tField atoms: <b>"
 
-# File: calc/dl_poly/dlp_edit.c, Line: 2707
+# File: calc/dl_poly/dlp_edit.c, Line: 2707,2721
 msgid "%s</b> and <b>"
 msgstr "%s</b> and <b>"
 
@@ -11162,7 +11196,7 @@ msgstr "  <b>(1)</b> average distance between the barycenters\n\tof units 1 and 
 msgid "Please enter name for new molecule N°%d"
 msgstr "Please enter name for new molecule N°%d"
 
-# File: calc/dl_poly/dlp_edit.c, Line: 3007
+# File: calc/dl_poly/dlp_edit.c, Line: 3007,3018
 msgid "Molecule name:"
 msgstr "Molecule name:"
 
@@ -11178,7 +11212,7 @@ msgstr "Delete %s N°%d from molecule %s, is this correct ?"
 msgid "Delete %s, is this correct ?"
 msgstr "Delete %s, is this correct ?"
 
-# File: calc/dl_poly/dlp_ff_match.c, Line: 1014
+# File: calc/dl_poly/dlp_ff_match.c, Line: 1013
 msgid "\t<b>(*)</b> Each force field element can be tuned separately, if not this <b>default</b> parameters will be used.\n"
 "\t<b>(1)</b> %s energy unit: %s, if required conversion to FIELD file energy unit will be performed upon selection.\n"
 "\t<b>(2)</b> Restraint parameters are duplicates of the non-restraint parameters.\n"
@@ -11230,25 +11264,25 @@ msgstr "Atom (1 and 2) <b>%s</b>"
 msgid "Atom (%d) <b>%s</b>"
 msgstr "Atom (%d) <b>%s</b>"
 
-# File: calc/dl_poly/dlp_field.c, Line: 1077
+# File: calc/dl_poly/dlp_field.c, Line: 1165
 msgid "\t <b>(2)</b> Quartic (anharmonic) force constant of the core-shell spring in [<b>%s &#xC5;<sup>-4</sup></b>]"
 " usually <i>k<sub>2</sub></i> >> <i>k<sub>4</sub></i>"
 msgstr "\t <b>(2)</b> Quartic (anharmonic) force constant of the core-shell spring in [<b>%s &#xC5;<sup>-4</sup></b>]"
 " usually <i>k<sub>2</sub></i> >> <i>k<sub>4</sub></i>"
 
-# File: calc/dl_poly/dlp_field.c, Line: 3962
+# File: calc/dl_poly/dlp_field.c, Line: 3961
 msgid "\t <b>*</b> in the FIELD file %s(s) appear in the %s section.\n"
 "\t They are presented separately in this assistant for clarity purposes only."
 msgstr "\t <b>*</b> in the FIELD file %s(s) appear in the %s section.\n"
 "\t They are presented separately in this assistant for clarity purposes only."
 
-# File: calc/dl_poly/dlp_field.c, Line: 4359
+# File: calc/dl_poly/dlp_field.c, Line: 4358
 msgid "Providing that the force field information was already saved once\n"
 "the previous data could still be retrieved by canceling the assistant."
 msgstr "Providing that the force field information was already saved once\n"
 "the previous data could still be retrieved by canceling the assistant."
 
-# File: calc/dl_poly/dlp_field.c, Line: 4818
+# File: calc/dl_poly/dlp_field.c, Line: 4817
 msgid "<b>   This assistant will help you to setup a %s \n"
 "calculation using <i>%s</i> 3D model as starting point</b>"
 msgstr "<b>   This assistant will help you to setup a %s \n"
@@ -11290,7 +11324,7 @@ msgstr "Bond restraint(s)"
 msgid "Bond angle(s)"
 msgstr "Bond angle(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 152
+# File: calc/dl_poly/dlp_field.c, Line: 152,934
 msgid "Angular restraint(s)"
 msgstr "Angular restraint(s)"
 
@@ -11310,7 +11344,7 @@ msgstr "Improper angle(s)"
 msgid "Inversion angle(s)"
 msgstr "Inversion angle(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 157
+# File: calc/dl_poly/dlp_field.c, Line: 157,202
 msgid "van der Waals potential(s)"
 msgstr "van der Waals potential(s)"
 
@@ -11318,7 +11352,7 @@ msgstr "van der Waals potential(s)"
 msgid "Metal potential(s)"
 msgstr "Metal potential(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 159
+# File: calc/dl_poly/dlp_field.c, Line: 159,204
 msgid "Tersoff Potential(s)"
 msgstr "Tersoff Potential(s)"
 
@@ -11354,7 +11388,7 @@ msgstr "Tethering potential"
 msgid "Flexible chemical bond"
 msgstr "Flexible chemical bond"
 
-# File: calc/dl_poly/dlp_field.c, Line: 173,932
+# File: calc/dl_poly/dlp_field.c, Line: 173,1025
 msgid "Bond restraint"
 msgstr "Bond restraint"
 
@@ -11370,7 +11404,7 @@ msgstr "Angular restraint"
 msgid "Dihedral angle"
 msgstr "Dihedral angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 177,936
+# File: calc/dl_poly/dlp_field.c, Line: 177,1025
 msgid "Torsional restraint"
 msgstr "Torsional restraint"
 
@@ -11382,15 +11416,15 @@ msgstr "Improper angle"
 msgid "Inversion angle"
 msgstr "Inversion angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 180
+# File: calc/dl_poly/dlp_field.c, Line: 180,224
 msgid "van der Waals potential"
 msgstr "van der Waals potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 158,181
+# File: calc/dl_poly/dlp_field.c, Line: 181,940
 msgid "Metal potential"
 msgstr "Metal potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 182
+# File: calc/dl_poly/dlp_field.c, Line: 182,226
 msgid "Tersoff Potential"
 msgstr "Tersoff Potential"
 
@@ -11470,71 +11504,71 @@ msgstr "four-body potential(s)"
 msgid "external field(s)"
 msgstr "external field(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 189
+# File: calc/dl_poly/dlp_field.c, Line: 211
 msgid "core-shell unit"
 msgstr "core-shell unit"
 
-# File: calc/dl_poly/dlp_field.c, Line: 190
+# File: calc/dl_poly/dlp_field.c, Line: 212
 msgid "constraint bond"
 msgstr "contrainte de liaison"
 
-# File: calc/dl_poly/dlp_field.c, Line: 191
+# File: calc/dl_poly/dlp_field.c, Line: 213
 msgid "mean force potential"
 msgstr "potentiel de force moyen"
 
-# File: calc/dl_poly/dlp_field.c, Line: 192
+# File: calc/dl_poly/dlp_field.c, Line: 214
 msgid "rigid unit"
 msgstr "rigid unit"
 
-# File: calc/dl_poly/dlp_field.c, Line: 193
+# File: calc/dl_poly/dlp_field.c, Line: 215
 msgid "tethering potential"
 msgstr "tethering potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 194
+# File: calc/dl_poly/dlp_field.c, Line: 216
 msgid "flexible chemical bond"
 msgstr "flexible chemical bond"
 
-# File: calc/dl_poly/dlp_field.c, Line: 195
+# File: calc/dl_poly/dlp_field.c, Line: 217
 msgid "bond restraint"
 msgstr "bond restraint"
 
-# File: calc/dl_poly/dlp_field.c, Line: 196
+# File: calc/dl_poly/dlp_field.c, Line: 218
 msgid "bond angle"
 msgstr "bond angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 197
+# File: calc/dl_poly/dlp_field.c, Line: 219
 msgid "angular restraint"
 msgstr "angular restraint"
 
-# File: calc/dl_poly/dlp_field.c, Line: 198
+# File: calc/dl_poly/dlp_field.c, Line: 220
 msgid "dihedral angle"
 msgstr "dihedral angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 199
+# File: calc/dl_poly/dlp_field.c, Line: 221
 msgid "torsional restraint"
 msgstr "torsional restraint"
 
-# File: calc/dl_poly/dlp_field.c, Line: 200
+# File: calc/dl_poly/dlp_field.c, Line: 222
 msgid "improper angle"
 msgstr "improper angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 201
+# File: calc/dl_poly/dlp_field.c, Line: 223
 msgid "inversion angle"
 msgstr "inversion angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 203
+# File: calc/dl_poly/dlp_field.c, Line: 225
 msgid "metal potential"
 msgstr "metal potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 205
+# File: calc/dl_poly/dlp_field.c, Line: 227
 msgid "three-body potential"
 msgstr "three-body potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 206
+# File: calc/dl_poly/dlp_field.c, Line: 228
 msgid "four-body potential"
 msgstr "four-body potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 207
+# File: calc/dl_poly/dlp_field.c, Line: 229
 msgid "external field"
 msgstr "external field"
 
@@ -11690,15 +11724,15 @@ msgstr "of the four-body potential"
 msgid "of the external field"
 msgstr "of the external field"
 
-# File: calc/dl_poly/dlp_field.c, Line: 308
+# File: calc/dl_poly/dlp_field.c, Line: 308,325
 msgid "Electron-Volts"
 msgstr "Electron-Volts"
 
-# File: calc/dl_poly/dlp_field.c, Line: 308
+# File: calc/dl_poly/dlp_field.c, Line: 308,325
 msgid "k-calories per mol"
 msgstr "k-calories per mol"
 
-# File: calc/dl_poly/dlp_field.c, Line: 308
+# File: calc/dl_poly/dlp_field.c, Line: 308,325
 msgid "k-Joules per mol"
 msgstr "k-Joules per mol"
 
@@ -11706,87 +11740,87 @@ msgstr "k-Joules per mol"
 msgid "Kelvin per Boltzmann"
 msgstr "Kelvin per Boltzmann"
 
-# File: calc/dl_poly/dlp_field.c, Line: 309
+# File: calc/dl_poly/dlp_field.c, Line: 309,310,311,312,313,314,315,316,317,322,323,327,330,333,336
 msgid "Harmonic"
 msgstr "Harmonic"
 
-# File: calc/dl_poly/dlp_field.c, Line: 309
+# File: calc/dl_poly/dlp_field.c, Line: 309,310,311
 msgid "Restraint"
 msgstr "Restraint"
 
-# File: calc/dl_poly/dlp_field.c, Line: 309
+# File: calc/dl_poly/dlp_field.c, Line: 309,310,311,312,313,331
 msgid "Quartic"
 msgstr "Quartic"
 
-# File: calc/dl_poly/dlp_field.c, Line: 310
+# File: calc/dl_poly/dlp_field.c, Line: 310,311
 msgid "Shifted FENE"
 msgstr "Shifted FENE"
 
-# File: calc/dl_poly/dlp_field.c, Line: 310
+# File: calc/dl_poly/dlp_field.c, Line: 310,311
 msgid "MM3 bond stretch"
 msgstr "MM3 bond stretch"
 
-# File: calc/dl_poly/dlp_field.c, Line: 310
+# File: calc/dl_poly/dlp_field.c, Line: 310,311,312,313,314,315,316,317,319,328,331,334
 msgid "Tabulated"
 msgstr "Tabulated"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,322
 msgid "Truncated harmonic"
 msgstr "Truncated harmonic"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,322
 msgid "Screened harmonic"
 msgstr "Screened harmonic"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,322
 msgid "Screened Vessal"
 msgstr "Screened Vessal"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,322
 msgid "Truncated Vessal"
 msgstr "Truncated Vessal"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,314,315,316,317,323
 msgid "Harmonic cosine"
 msgstr "Harmonic cosine"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313,314,315,316,330
 msgid "Cosine"
 msgstr "Cosine"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313
 msgid "MM3 stretch-bend"
 msgstr "MM3 stretch-bend"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313
 msgid "Compass stretch-stretch"
 msgstr "Compass stretch-stretch"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313
 msgid "Compass stretch-bend"
 msgstr "Compass stretch-bend"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313
 msgid "Compass all terms"
 msgstr "Compass all terms"
 
-# File: calc/dl_poly/dlp_field.c, Line: 312
+# File: calc/dl_poly/dlp_field.c, Line: 312,313
 msgid "MM3 angle bend"
 msgstr "MM3 angle bend"
 
-# File: calc/dl_poly/dlp_field.c, Line: 314
+# File: calc/dl_poly/dlp_field.c, Line: 314,315,316
 msgid "Triple cosine"
 msgstr "Triple cosine"
 
-# File: calc/dl_poly/dlp_field.c, Line: 314
+# File: calc/dl_poly/dlp_field.c, Line: 314,315,316
 msgid "Fluorinated Ryckaert-Bellemans"
 msgstr "Fluorinated Ryckaert-Bellemans"
 
-# File: calc/dl_poly/dlp_field.c, Line: 314
+# File: calc/dl_poly/dlp_field.c, Line: 314,315,316
 msgid "OPLS torsion"
 msgstr "OPLS torsion"
 
-# File: calc/dl_poly/dlp_field.c, Line: 317
+# File: calc/dl_poly/dlp_field.c, Line: 317,323
 msgid "Planar"
 msgstr "Planar"
 
@@ -11850,7 +11884,7 @@ msgstr "12-6 Lennard-Jones tapered with MDF"
 msgid "Extended Finis-Sinclair"
 msgstr "Extended Finis-Sinclair"
 
-# File: calc/dl_poly/dlp_field.c, Line: 318
+# File: calc/dl_poly/dlp_field.c, Line: 322
 msgid "H-bond"
 msgstr "H-bond"
 
@@ -11906,11 +11940,11 @@ msgstr "Osc. Electric Field"
 msgid "Umbrella sampling, harm. constant"
 msgstr "Umbrella sampling, harm. constant"
 
-# File: calc/dl_poly/dlp_field.c, Line: 291
+# File: calc/dl_poly/dlp_field.c, Line: 291,325
 msgid "electron"
 msgstr "electron"
 
-# File: calc/dl_poly/dlp_field.c, Line: 327
+# File: calc/dl_poly/dlp_field.c, Line: 327,330,333,336
 msgid "COMPASS class2 force field"
 msgstr "COMPASS class2 force field"
 
@@ -11962,7 +11996,7 @@ msgstr "Breakable quartic"
 msgid "Special bond exclusions for 1-5 pairs and beyond"
 msgstr "Special bond exclusions for 1-5 pairs and beyond"
 
-# File: calc/dl_poly/dlp_field.c, Line: 330
+# File: calc/dl_poly/dlp_field.c, Line: 330,333
 msgid "CHARMM force field"
 msgstr "CHARMM force field"
 
@@ -11978,7 +12012,7 @@ msgstr "Cosine with Buckingham term between 1-3"
 msgid "Difference of cosines"
 msgstr "Difference of cosines"
 
-# File: calc/dl_poly/dlp_field.c, Line: 330
+# File: calc/dl_poly/dlp_field.c, Line: 330,336
 msgid "DREIDING force field"
 msgstr "DREIDING force field"
 
@@ -11986,7 +12020,7 @@ msgstr "DREIDING force field"
 msgid "Cosine with a shift"
 msgstr "Cosine with a shift"
 
-# File: calc/dl_poly/dlp_field.c, Line: 330
+# File: calc/dl_poly/dlp_field.c, Line: 330,333
 msgid "Cosine with a shift and exponential term in spring"
 msgstr "Cosine with a shift and exponential term in spring"
 
@@ -12002,7 +12036,7 @@ msgstr "Cross term coupling angle and bond length"
 msgid "Dipole orientation"
 msgstr "Dipole orientation"
 
-# File: calc/dl_poly/dlp_field.c, Line: 331
+# File: calc/dl_poly/dlp_field.c, Line: 331,333,336
 msgid "Fourier (multiple cosines)"
 msgstr "Fourier (multiple cosines)"
 
@@ -12074,15 +12108,15 @@ msgstr "Squared distance harmonic"
 msgid "Harmonic with Wilson Decius out-of-plane"
 msgstr "Harmonic with Wilson Decius out-of-plane"
 
-# File: calc/dl_poly/dlp_field.c, Line: 427,499
+# File: calc/dl_poly/dlp_field.c, Line: 427,499,566,567
 msgid "Interpolation style"
 msgstr "Interpolation style"
 
-# File: calc/dl_poly/dlp_field.c, Line: 555
+# File: calc/dl_poly/dlp_field.c, Line: 555,556
 msgid "weighting factor"
 msgstr "weighting factor"
 
-# File: calc/dl_poly/dlp_field.c, Line: 924
+# File: calc/dl_poly/dlp_field.c, Line: 924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943
 msgid "Viz. 3D"
 msgstr "Viz. 3D"
 
@@ -12090,11 +12124,11 @@ msgstr "Viz. 3D"
 msgid "Viz. Atom num."
 msgstr "Viz. Atom num."
 
-# File: calc/dl_poly/dlp_field.c, Line: 925
+# File: calc/dl_poly/dlp_field.c, Line: 925,926
 msgid "Mass"
 msgstr "Mass"
 
-# File: calc/dl_poly/dlp_field.c, Line: 925
+# File: calc/dl_poly/dlp_field.c, Line: 925,926
 msgid "Charge"
 msgstr "Charge"
 
@@ -12110,7 +12144,7 @@ msgstr "Core Id"
 msgid "Shell"
 msgstr "Shell"
 
-# File: calc/dl_poly/dlp_field.c, Line: 926
+# File: calc/dl_poly/dlp_field.c, Line: 926,928
 msgid "Use (3)"
 msgstr "Use (3)"
 
@@ -12122,15 +12156,15 @@ msgstr "At.1 Id"
 msgid "At.2 Id"
 msgstr "At.2 Id"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 927,928
 msgid "Length [Å]"
 msgstr "Length [Å]"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 927,931,932
 msgid "av. d [Å] (1)"
 msgstr "av. d [Å] (1)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 927,931,932,933,934,935,936,937,938
 msgid "Use (2)"
 msgstr "Use (2)"
 
@@ -12158,27 +12192,27 @@ msgstr "Atom(s) in unit"
 msgid "List of atom(s)"
 msgstr "List of atom(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 929
+# File: calc/dl_poly/dlp_field.c, Line: 929,930,939,940,941,942,943,944
 msgid "Use (1)"
 msgstr "Use (1)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 159
+# File: calc/dl_poly/dlp_field.c, Line: 930
 msgid "Potential"
 msgstr "Potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 931,932,933,934,935,936,937,938,940,942
 msgid "At.1"
 msgstr "At.1"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 931,932,933,934,935,936,937,938,940,943
 msgid "At.2"
 msgstr "At.2"
 
-# File: calc/dl_poly/dlp_field.c, Line: 933
+# File: calc/dl_poly/dlp_field.c, Line: 933,934,935,936,937,938,942,943
 msgid "At.3"
 msgstr "At.3"
 
-# File: calc/dl_poly/dlp_field.c, Line: 935
+# File: calc/dl_poly/dlp_field.c, Line: 935,936,937,938,943
 msgid "At.4"
 msgstr "At.4"
 
@@ -12190,31 +12224,31 @@ msgstr "At.1*"
 msgid "At.2*"
 msgstr "At.2*"
 
-# File: calc/dl_poly/dlp_field.c, Line: 931
+# File: calc/dl_poly/dlp_field.c, Line: 931,932,933,934,935,936,937,938
 msgid "Potential (3)"
 msgstr "Potential (3)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 348
+# File: calc/dl_poly/dlp_field.c, Line: 933
 msgid "Angle(s)"
 msgstr "Angle(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 933
+# File: calc/dl_poly/dlp_field.c, Line: 933,934
 msgid "av. θ [°] (1)"
 msgstr "av. θ [°] (1)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 350
+# File: calc/dl_poly/dlp_field.c, Line: 935
 msgid "Dihedral(s)"
 msgstr "Dihedral(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 935
+# File: calc/dl_poly/dlp_field.c, Line: 935,936,937,938
 msgid "av. ϕ [°] (1)"
 msgstr "av. ϕ [°] (1)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 352
+# File: calc/dl_poly/dlp_field.c, Line: 937
 msgid "Improper(s)"
 msgstr "Improper(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 353
+# File: calc/dl_poly/dlp_field.c, Line: 938
 msgid "Inversion(s)"
 msgstr "Inversion(s)"
 
@@ -12230,7 +12264,7 @@ msgstr "Spec.2"
 msgid "VdW potential"
 msgstr "VdW potential"
 
-# File: calc/dl_poly/dlp_field.c, Line: 927
+# File: calc/dl_poly/dlp_field.c, Line: 941
 msgid "At."
 msgstr "At."
 
@@ -12250,23 +12284,26 @@ msgstr "Four-body Pot."
 msgid "Field type"
 msgstr "Field type"
 
-# File: calc/dl_poly/dlp_field.c, Line: 934
+# File: calc/dl_poly/dlp_field.c, Line: 1025
+# File: calc/lammps/la_print.c, Line: 733
 msgid "Angle"
 msgstr "Angle"
 
-# File: calc/dl_poly/dlp_field.c, Line: 934
+# File: calc/dl_poly/dlp_field.c, Line: 1025
 msgid "Angle restraint"
 msgstr "Angle restraint"
 
-# File: calc/dl_poly/dlp_field.c, Line: 935
+# File: calc/dl_poly/dlp_field.c, Line: 1025
+# File: calc/lammps/la_print.c, Line: 733
 msgid "Dihedral"
 msgstr "Dihedral"
 
-# File: calc/dl_poly/dlp_field.c, Line: 937
+# File: calc/dl_poly/dlp_field.c, Line: 1025
+# File: calc/lammps/la_print.c, Line: 733
 msgid "Improper"
 msgstr "Improper"
 
-# File: calc/dl_poly/dlp_field.c, Line: 938
+# File: calc/dl_poly/dlp_field.c, Line: 1025
 msgid "Inversion"
 msgstr "Inversion"
 
@@ -12346,11 +12383,11 @@ msgstr "%sdo not contains any %s <sup>*</sup>"
 msgid "%s contains the following <b>%d</b> type(s) %s <sup>*</sup>"
 msgstr "%s contains the following <b>%d</b> type(s) %s <sup>*</sup>"
 
-# File: calc/dl_poly/dlp_field.c, Line: 1846
+# File: calc/dl_poly/dlp_field.c, Line: 1857
 msgid "%sdo not contains any %s"
 msgstr "%sdo not contains any %s"
 
-# File: calc/dl_poly/dlp_field.c, Line: 1850
+# File: calc/dl_poly/dlp_field.c, Line: 1861
 msgid "%s contains the following <b>%d</b> type(s) %s"
 msgstr "%s contains the following <b>%d</b> type(s) %s"
 
@@ -12394,7 +12431,7 @@ msgstr "<u> Intra-molecular interaction(s):</u>"
 msgid "Use multiple molecule(s)"
 msgstr "Use multiple molecule(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2360
+# File: calc/dl_poly/dlp_field.c, Line: 2360,2380
 msgid "Use %s"
 msgstr "Use %s"
 
@@ -12402,11 +12439,11 @@ msgstr "Use %s"
 msgid "<u>Non-bonded interaction(s)</u>"
 msgstr "<u>Non-bonded interaction(s)</u>"
 
-# File: calc/dl_poly/dlp_field.c, Line: 1267
+# File: calc/dl_poly/dlp_field.c, Line: 2511
 msgid "<b>Default</b>: %s"
 msgstr "<b>Default</b>: %s"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2564
+# File: calc/dl_poly/dlp_field.c, Line: 2653
 msgid "Atom N°%d: \"%s\""
 msgstr "Atom N°%d: \"%s\""
 
@@ -12442,7 +12479,7 @@ msgstr "Tethering Potential N°%d"
 msgid "%s - NONE"
 msgstr "%s - NONE"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2709
+# File: calc/dl_poly/dlp_field.c, Line: 2798
 msgid "Edit Name: \"%s\""
 msgstr "Edit Name: \"%s\""
 
@@ -12506,11 +12543,11 @@ msgstr "Properties %s: "
 msgid "\t <b>*</b> the potential will be calculated by the sum of the 3 possible inversion terms between atoms 1 (center), 2, 3 and 4."
 msgstr "\t <b>*</b> the potential will be calculated by the sum of the 3 possible inversion terms between atoms 1 (center), 2, 3 and 4."
 
-# File: calc/dl_poly/dlp_field.c, Line: 3973
+# File: calc/dl_poly/dlp_field.c, Line: 3973,3997
 msgid "\t <b>(1)</b> average value for the force field element as measured in the model."
 msgstr "\t <b>(1)</b> average value for the force field element as measured in the model."
 
-# File: calc/dl_poly/dlp_field.c, Line: 3976
+# File: calc/dl_poly/dlp_field.c, Line: 3976,4000
 msgid "\t <b>(2)</b> only the selected element(s) will be used to create the force field."
 msgstr "\t <b>(2)</b> only the selected element(s) will be used to create the force field."
 
@@ -12518,7 +12555,7 @@ msgstr "\t <b>(2)</b> only the selected element(s) will be used to create the fo
 msgid "\t <b>(3)</b> each force field element can be tuned separately, if not the <b>Default</b> parameters will be used."
 msgstr "\t <b>(3)</b> each force field element can be tuned separately, if not the <b>Default</b> parameters will be used."
 
-# File: calc/dl_poly/dlp_field.c, Line: 3991
+# File: calc/dl_poly/dlp_field.c, Line: 3991,4012
 msgid "\t <b>(3)</b> only the selected element(s) will be used to create the force field."
 msgstr "\t <b>(3)</b> only the selected element(s) will be used to create the force field."
 
@@ -12534,7 +12571,7 @@ msgstr "\t <b>(2)</b> if all 0.0 then atomic weight(s) will be used by DL-POLY."
 msgid "\t <b>(1)</b> only the selected element(s) will be used to create the force field."
 msgstr "\t <b>(1)</b> only the selected element(s) will be used to create the force field."
 
-# File: calc/dl_poly/dlp_field.c, Line: 4295
+# File: calc/dl_poly/dlp_field.c, Line: 4295,4822
 msgid "Initialize force field using: "
 msgstr "Initialize force field using: "
 
@@ -12570,7 +12607,7 @@ msgstr "Atomic Species and Total Coordinations as Field Atoms"
 msgid "Atomic Species and Partial Coordinations as Field Atoms"
 msgstr "Atomic Species and Partial Coordinations as Field Atoms"
 
-# File: calc/dl_poly/dlp_field.c, Line: 4499
+# File: calc/dl_poly/dlp_field.c, Line: 4499,4822
 msgid "Force field was initialized using: "
 msgstr "Force field was initialized using: "
 
@@ -12622,7 +12659,7 @@ msgstr "\tPrepare the LAMMPS Input to describe the calculation"
 msgid "\tPrepare the LAMMPS Atom file to describe the force field and the atomic scale model"
 msgstr "\tPrepare the LAMMPS Atom file to describe the force field and the atomic scale model"
 
-# File: calc/dl_poly/dlp_mol.c, Line: 89
+# File: calc/dl_poly/dlp_mol.c, Line: 86
 msgid "The description of atom <b>%s</b> will be deleted\n"
 "and merged with the one of the selected field atom.\n"
 "Field object(s) using atom <b>%s</b> will also be deleted\n"
@@ -12632,7 +12669,7 @@ msgstr "The description of atom <b>%s</b> will be deleted\n"
 "Field object(s) using atom <b>%s</b> will also be deleted\n"
 "and the force field parameter(s) will be updated accordingly."
 
-# File: calc/dl_poly/dlp_mol.c, Line: 105
+# File: calc/dl_poly/dlp_mol.c, Line: 102
 msgid "The description of atom <b>%s</b> will be deleted\n"
 "and merged with the one of field atom <b>%s</b>\n"
 "Field object(s) using atom <b>%s</b> will also be deleted\n"
@@ -12646,7 +12683,7 @@ msgstr "The description of atom <b>%s</b> will be deleted\n"
 msgid "The description of molecule <b>%s</b> will be deleted\nand merged with the one of the selected molecule."
 msgstr "The description of molecule <b>%s</b> will be deleted\nand merged with the one of the selected molecule."
 
-# File: calc/dl_poly/dlp_mol.c, Line: 93
+# File: calc/dl_poly/dlp_mol.c, Line: 99
 msgid "The description of molecule <b>%s</b> will be deleted\nand merged with the one of molecule <b>%s</b>"
 msgstr "The description of molecule <b>%s</b> will be deleted\nand merged with the one of molecule <b>%s</b>"
 
@@ -12666,7 +12703,7 @@ msgstr "Please select the fragment(s) of the new molecule"
 msgid "Select the molecule to merge molecule \"%s\" with"
 msgstr "Select the molecule to merge molecule \"%s\" with"
 
-# File: calc/dl_poly/dlp_print.c, Line: 1433
+# File: calc/dl_poly/dlp_print.c, Line: 1432
 msgid "#  - %d atoms\n"
 "#  - %d isolated molecular fragments\n"
 "#  - %d distinct molecules\n"
@@ -12702,6 +12739,7 @@ msgstr "# End molecule %d\n"
 msgid "van der Walls pair"
 msgstr "van der Walls pair"
 
+# File: calc/dl_poly/dlp_field.c, Line: 291
 # File: calc/dl_poly/dlp_print.c, Line: 1464
 msgid "metal"
 msgstr "metal"
@@ -12746,7 +12784,7 @@ msgstr "# Target temperature"
 msgid "# Number of MD steps"
 msgstr "# Number of MD steps"
 
-# File: calc/dl_poly/dlp_print.c, Line: 1675
+# File: calc/dl_poly/dlp_print.c, Line: 1673
 msgid "# MD time step d(t)"
 msgstr "# MD time step d(t)"
 
@@ -12874,7 +12912,7 @@ msgstr "\n# Electrostatics calculated using "
 msgid "\n# Evaluate k space contribution to the Ewald sum every: "
 msgstr "\n# Evaluate k space contribution to the Ewald sum every: "
 
-# File: calc/dl_poly/dlp_print.c, Line: 2020,2197,2284,2335
+# File: calc/dl_poly/dlp_print.c, Line: 2020,2197,2200,2208,2284,2290,2335,2339,2343,2347
 msgid " MD step(s)"
 msgstr " MD step(s)"
 
@@ -12954,7 +12992,7 @@ msgstr "# MD time step = "
 msgid "\n# Shake / Rattle iterations limit: "
 msgstr "\n# Shake / Rattle iterations limit: "
 
-# File: calc/dl_poly/dlp_print.c, Line: 2160
+# File: calc/dl_poly/dlp_print.c, Line: 2160,2165
 msgid " cycle(s)"
 msgstr " cycle(s)"
 
@@ -13151,16 +13189,16 @@ msgstr "Data sets"
 msgid "Edit curve"
 msgstr "Edit curve"
 
-# File: curve/cedit.c, Line: 372,373
+# File: curve/cedit.c, Line: 372
 msgid "Graph"
 msgstr "Graph"
 
-# File: curve/cedit.c, Line: 376,377
+# File: curve/cedit.c, Line: 376
 # File: curve/m_curve.c, Line: 611
 msgid "Data"
 msgstr "Data"
 
-# File: curve/cedit.c, Line: 380,381
+# File: curve/cedit.c, Line: 380
 msgid "Legend"
 msgstr "Legend"
 
@@ -13168,7 +13206,7 @@ msgstr "Legend"
 msgid "<b>Add data set(s) to the active window</b>"
 msgstr "<b>Add data set(s) to the active window</b>"
 
-# File: curve/cedit.c, Line: 392,393
+# File: curve/cedit.c, Line: 392
 msgid "Add data set"
 msgstr "Add data set"
 
@@ -13521,7 +13559,10 @@ msgstr "<u>Tick marks:</u>"
 msgid "Location:"
 msgstr "Location:"
 
+# File: calc/cp2k/cp2k_molopt-basis.c, Line: 184,185
+# File: calc/cp2k/cp2k_pot.c, Line: 90,91,241,242,348,349
 # File: curve/tab-4.c, Line: 762
+# File: opengl/win/w_library.c, Line: 121
 msgid "In"
 msgstr "In"
 
@@ -13537,10 +13578,22 @@ msgstr "Opposite"
 msgid "Both"
 msgstr "Both"
 
-# File: curve/tab-4.c, Line: 772,803
 # File: calc/cp2k/cp2k_init.c, Line: 700
-# File: calc/dl_poly/dlp_field.c, Line: 1493
+# File: calc/cp2k/cp2k_print.c, Line: 855,985,999
+# File: calc/cpmd/cpmd_init.c, Line: 204,205,215,216
+# File: calc/dl_poly/dlp_edit.c, Line: 2348
+# File: calc/dl_poly/dlp_field.c, Line: 1493,1503,1540,1550,2669,2678,2695,2704,2882
+# File: curve/datab.c, Line: 601,626
+# File: curve/m_curve.c, Line: 672,689
+# File: curve/tab-4.c, Line: 772,803
+# File: gui/gui.c, Line: 833,907,925,930
+# File: opengl/win/m_atoms.c, Line: 812,818
+# File: opengl/win/m_axis.c, Line: 332
+# File: opengl/win/m_box.c, Line: 600
+# File: opengl/win/m_poly.c, Line: 501
+# File: opengl/win/menu_bar.c, Line: 132,167,212,220,228,236,275,276
 # File: opengl/win/w_advance.c, Line: 1344,1635
+# File: opengl/win/w_labels.c, Line: 736
 # File: opengl/win/w_periodic.c, Line: 90
 msgid "None"
 msgstr "None"

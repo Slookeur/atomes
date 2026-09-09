@@ -367,7 +367,7 @@ void close_project (project * to_close)
     // if (workzone.last) g_free (workzone.last);
     workzone.last = NULL;
     activep = -1;
-    correct_this_window_title (atomes_app -> main_window, g_strdup_printf ("%s", PACKAGE));
+    correct_this_window_title (atomes_main_window, g_strdup_printf ("%s", PACKAGE));
     correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes")));
     if (workspacefile != NULL)
     {
@@ -523,6 +523,6 @@ G_MODULE_EXPORT void on_close_activate (GtkWidget * widg, gpointer cdata)
   }
   else
   {
-    show_warning (_("No project to be closed"), atomes_app -> main_window);
+    show_warning (_("No project to be closed"), atomes_main_window);
   }
 }

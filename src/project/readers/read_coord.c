@@ -191,7 +191,7 @@ int set_v_dummy (gchar * this_word)
   this_reader -> dummy[this_reader -> ndummy-1] = g_strdup_printf ("%s", this_word);
   // Dummy added, then do we use this dummy ?
   gchar * str = g_strdup_printf (_("Use dummy atom(s) for unknown %s species ?"), this_word);
-  gboolean use_dummy = ask_yes_no (_("Use dummy atom(s) ?"), str, GTK_MESSAGE_QUESTION, atomes_app -> main_window);
+  gboolean use_dummy = ask_yes_no (_("Use dummy atom(s) ?"), str, GTK_MESSAGE_QUESTION, atomes_main_window);
   g_free (str);
   if (use_dummy)
   {
@@ -410,7 +410,7 @@ int open_coord_file (gchar * filename, int fti)
         crystal_low_warning = TRUE;
         for (j=0; j<active_project -> steps; j++)
         {
-          k = build_crystal (FALSE, active_project, j, TRUE, FALSE, & this_reader -> lattice, atomes_app -> main_window);
+          k = build_crystal (FALSE, active_project, j, TRUE, FALSE, & this_reader -> lattice, atomes_main_window);
           if (! k)
           {
             add_reader_info (_("Error(s) trying to build crystal using the CIF file parameters !\n"

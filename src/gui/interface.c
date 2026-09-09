@@ -283,7 +283,7 @@ void show_warning_ (char * warning, char * sub, char * tab)
   /* This function is called from fortran 90 */
   gchar * wtot=NULL;
   wtot = g_strdup_printf ("%s\n%s\n%s", warning, sub, tab);
-  show_warning (wtot, atomes_app -> main_window);
+  show_warning (wtot, atomes_main_window);
   g_free (wtot);
 }
 
@@ -386,7 +386,7 @@ void show_error_ (char * error, char * sub, char * tab)
   /* This function is called from fortran 90 */
   gchar * etot=NULL;
   etot = g_strdup_printf ("%s\n\t%s\n\t%s", error, sub, tab);
-  show_error (etot, 0, atomes_app -> main_window);
+  show_error (etot, 0, atomes_main_window);
   g_free (etot);
 }
 
@@ -482,13 +482,13 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWindow * widget, gpointer data)
 G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event, gpointer data)
 #endif
 {
-  if (ask_yes_no (_("Leaving ?!"), _("Are you sure you want to quit ?"), GTK_MESSAGE_QUESTION, atomes_app -> main_window))
+  if (ask_yes_no (_("Leaving ?!"), _("Are you sure you want to quit ?"), GTK_MESSAGE_QUESTION, atomes_main_window))
   {
     quit_gtk ();
   }
   else
   {
-    show_the_widgets (atomes_app -> main_window);
+    show_the_widgets (atomes_main_window);
   }
   return TRUE;
 }
@@ -502,7 +502,7 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event,
 */
 int dummy_ask_ (char * question)
 {
-  GtkWidget * dask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, atomes_app -> main_window);
+  GtkWidget * dask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, atomes_main_window);
   run_this_gtk_dialog (dask, G_CALLBACK(run_yes_no), NULL);
   return (res_yes_no) ? 0 : -1;
 }

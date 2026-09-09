@@ -588,7 +588,7 @@ GtkWidget * create_curve (tint * data)
 
   Curve * this_curve = get_curve_from_pointer ((gpointer)data);
   gchar * str = g_strdup_printf ("%s - %s", prepare_for_title (get_project_by_id(data -> a) -> name), this_curve -> name);
-  curve_win = create_win (str, atomes_app -> main_window, FALSE, TRUE);
+  curve_win = create_win (str, atomes_main_window, FALSE, TRUE);
   g_free (str);
   vbox = create_vbox (BSEP);
   add_container_child (CONTAINER_WIN, curve_win, vbox);

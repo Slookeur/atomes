@@ -1093,7 +1093,7 @@ G_MODULE_EXPORT void save_rings_to_file (GtkButton * but, gpointer data)
 #endif
   gchar * crname = g_strdup_printf (_("Save atoms in %s rings to file"), _(rtype[dat -> b]));
   info = create_file_chooser (crname,
-                              GTK_WINDOW(atomes_app -> main_window),
+                              GTK_WINDOW(atomes_main_window),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
                               _("Save"));
   g_free (crname);

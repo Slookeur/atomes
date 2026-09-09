@@ -957,7 +957,7 @@ G_MODULE_EXPORT void save_chains_to_file (GtkButton * but, gpointer data)
   GtkWidget * info;
 #endif
   info = create_file_chooser (_("Save atoms in chains to file"),
-                              GTK_WINDOW(atomes_app -> main_window),
+                              GTK_WINDOW(atomes_main_window),
                               GTK_FILE_CHOOSER_ACTION_SAVE,
                               _("Save"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);

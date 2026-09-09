@@ -1374,7 +1374,7 @@ gboolean create_3d_model (int p, gboolean load)
     if (load)
     {
       gchar * str = g_strdup_printf (_("%s - 3D view - [%s mode]"), this_proj -> name, _(mode_name[0]));
-      this_proj -> modelgl -> win = create_win (str, atomes_app -> main_window, FALSE, TRUE);
+      this_proj -> modelgl -> win = create_win (str, atomes_main_window, FALSE, TRUE);
 #ifdef GTK3
 #ifdef GTKGLAREA
 #ifdef LINUX

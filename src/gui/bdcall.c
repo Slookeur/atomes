@@ -586,14 +586,14 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
 
   if (! active_project -> dmtx)
   {
-    show_error (_("The nearest neighbors table calculation has failed"), 0, (widg) ? widg : atomes_app -> main_window);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, (widg) ? widg : atomes_main_window);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
   }
   else if (! err_update)
   {
-    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : atomes_app -> main_window);
+    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : atomes_main_window);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
@@ -620,7 +620,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       active_project -> analysis[SPH] -> avail_ok = j;
       if (! j)
       {
-        show_error (_("Unexpected error when calculating bond properties"), 0, (widg) ? widg : atomes_app -> main_window);
+        show_error (_("Unexpected error when calculating bond properties"), 0, (widg) ? widg : atomes_main_window);
       }
       else
       {
@@ -632,7 +632,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           clock_gettime (CLOCK_MONOTONIC, & start_time);
           if (! molecules_ (& mol_update, & k))
           {
-            show_error (_("Unexpected error when looking for isolated fragment(s) and molecule(s)"), 0, (widg) ? widg : atomes_app -> main_window);
+            show_error (_("Unexpected error when looking for isolated fragment(s) and molecule(s)"), 0, (widg) ? widg : atomes_main_window);
             if (active_glwin)
             {
               for (k=0; k<2; k++)
@@ -678,7 +678,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       if (! j)
       {
         prepostcalc (widg, TRUE, ANG, j, 1.0);
-        show_error (_("Unexpected error when calculating the bond angles distribution"), 0, (widg) ? widg : atomes_app -> main_window);
+        show_error (_("Unexpected error when calculating the bond angles distribution"), 0, (widg) ? widg : atomes_main_window);
       }
       else
       {
@@ -686,7 +686,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
         prepostcalc (widg, TRUE, ANG, j, 1.0);
         if (! j)
         {
-          show_error (_("Unexpected error when calculating the dihedral angles distribution"), 0, (widg) ? widg : atomes_app -> main_window);
+          show_error (_("Unexpected error when calculating the dihedral angles distribution"), 0, (widg) ? widg : atomes_main_window);
         }
         else
         {

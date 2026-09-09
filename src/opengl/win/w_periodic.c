@@ -685,7 +685,7 @@ int get_atom_id_from_periodic_table (atom_search * asearch)
     }
     else
     {
-      gtk_window_set_attached_to (GTK_WINDOW (win), atomes_app -> main_window);
+      gtk_window_set_attached_to (GTK_WINDOW (win), atomes_main_window);
     }
 #endif
   }
@@ -696,7 +696,7 @@ int get_atom_id_from_periodic_table (atom_search * asearch)
     periodic_search -> proj = -1;
     periodic_search -> action = -1;
 #ifdef GTK3
-    gtk_window_set_attached_to (GTK_WINDOW (win), atomes_app -> main_window);
+    gtk_window_set_attached_to (GTK_WINDOW (win), atomes_main_window);
 #endif
   }
   gtk_window_set_resizable (GTK_WINDOW (win), FALSE);

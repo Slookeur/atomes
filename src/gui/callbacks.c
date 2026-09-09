@@ -130,7 +130,7 @@ G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
   j = GPOINTER_TO_INT (data);
   if (j == 1)
   {
-    close = ask_yes_no (_("Close workspace ?"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, atomes_app -> main_window);
+    close = ask_yes_no (_("Close workspace ?"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, atomes_main_window);
   }
   else
   {
@@ -313,7 +313,7 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
                                _(project_error -> error_signal.message),
                                project_file_version);
     }
-    show_error_with_trace (err, project_error, act, 0, atomes_app -> main_window);
+    show_error_with_trace (err, project_error, act, 0, atomes_main_window);
     g_free (tmp_err);
     g_free (err);
   }
@@ -347,7 +347,7 @@ void quit_gtk ()
     for (i=nprojects-1; i>=0; i--) to_close_this_project (i, get_project_by_id(i));
   }
   profree_ ();
-  g_application_quit (G_APPLICATION(atomes_app -> gtk_app));
+  g_application_quit (G_APPLICATION(atomes_app));
 }
 
 /*!
@@ -526,7 +526,7 @@ G_MODULE_EXPORT void run_on_open_save_active (GtkDialog * info, gint response_id
       if (k != 0)
       {
         err = g_strdup_printf (_("Error %s workspace file\n%s\n"), _(mess[osp.b]), projfile);
-        show_error (err, 0, atomes_app -> main_window);
+        show_error (err, 0, atomes_main_window);
         g_free (err);
       }
     }
@@ -577,27 +577,27 @@ G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data)
   action = 0;
   if (i == 2 && ! newspace)
   {
-    show_info (_("A workspace is already open !"), 0, atomes_app -> main_window);
+    show_info (_("A workspace is already open !"), 0, atomes_main_window);
   }
   else if (i == 3 && newspace)
   {
-    show_warning (_("Empty workspace ... nothing to be saved\n"), atomes_app -> main_window);
+    show_warning (_("Empty workspace ... nothing to be saved\n"), atomes_main_window);
   }
   else if (i == 3)
   {
     for (k=0; k<nprojects; k++) if (get_project_by_id(k) -> natomes) action = 1;
     if (! action)
     {
-      show_warning (_("Workspace contains only empty projects ... nothing to be saved\n"), atomes_app -> main_window);
+      show_warning (_("Workspace contains only empty projects ... nothing to be saved\n"), atomes_main_window);
     }
   }
   else if (i == 1 && nprojects == 0)
   {
-    show_warning (_("No project open ... nothing to be saved\n"), atomes_app -> main_window);
+    show_warning (_("No project open ... nothing to be saved\n"), atomes_main_window);
   }
   else if (i == 1 && ! this_proj -> natomes)
   {
-    show_warning (_("Empty project ... nothing to be saved\n"), atomes_app -> main_window);
+    show_warning (_("Empty project ... nothing to be saved\n"), atomes_main_window);
   }
   else
   {
@@ -659,7 +659,7 @@ G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data)
       tmp_str = g_strdup_printf ("%s", _(str[i]));
     }
     info = create_file_chooser (tmp_str,
-                                GTK_WINDOW(atomes_app -> main_window),
+                                GTK_WINDOW(atomes_main_window),
                                 act[j],
                                 _(res[j]));
     chooser = GTK_FILE_CHOOSER (info);
@@ -824,7 +824,7 @@ void open_this_isaacs_xml_file (gchar * profile, int ptoc, gboolean visible)
     apply_project (TRUE);
     active_project_changed (activep);
     add_project_to_workspace ();
-    if (visible) show_info (_("ISAACS project file (XML) successfully opened"), 0, atomes_app -> main_window);
+    if (visible) show_info (_("ISAACS project file (XML) successfully opened"), 0, atomes_main_window);
   }
   else
   {
@@ -877,7 +877,7 @@ G_MODULE_EXPORT void run_on_isaacs_port (GtkDialog * info, gint response_id, gpo
       active_project_changed (activew);
       if (write_xml (projfile) == 0)
       {
-        show_error (_("Impossible to write the IPF file\n"), 0, atomes_app -> main_window);
+        show_error (_("Impossible to write the IPF file\n"), 0, atomes_main_window);
       }
       active_project_changed (osp.b);
     }
@@ -920,11 +920,11 @@ G_MODULE_EXPORT void on_isaacs_port (GtkWidget * widg, gpointer data)
   int pactive = activep;
   i = GPOINTER_TO_INT (data);
 
-  action = (i && ! nprojects) ? ask_yes_no (_("Save an empty project ?"), _("Do you want to save an empty project ?"), GTK_MESSAGE_QUESTION, atomes_app -> main_window) : TRUE;
+  action = (i && ! nprojects) ? ask_yes_no (_("Save an empty project ?"), _("Do you want to save an empty project ?"), GTK_MESSAGE_QUESTION, atomes_main_window) : TRUE;
   if (action)
   {
     info = create_file_chooser (_(str[i]),
-                                GTK_WINDOW(atomes_app -> main_window),
+                                GTK_WINDOW(atomes_main_window),
                                 act[i],
                                 _(res[i]));
     chooser = GTK_FILE_CHOOSER (info);
@@ -1269,7 +1269,7 @@ int to_read_trj_or_vas (int ff)
 {
   int i;
   gchar * rlabel[2]={i18n("Total number of atom(s):"), i18n("Number of chemical species:")};
-  GtkWidget * dialog = dialogmodal (_("Reading CPMD / VASP trajectory"), GTK_WINDOW(atomes_app -> main_window));
+  GtkWidget * dialog = dialogmodal (_("Reading CPMD / VASP trajectory"), GTK_WINDOW(atomes_main_window));
   read_this = gtk_dialog_add_button (GTK_DIALOG (dialog), _("Apply"), GTK_RESPONSE_APPLY);
   GtkWidget * vbox = dialog_get_content_area (dialog);
   widget_set_sensitive (read_this, 0);
@@ -1349,7 +1349,7 @@ G_MODULE_EXPORT void run_read_npt_data (GtkDialog * info, gint response_id, gpoi
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     npt_file = file_chooser_get_file_name (chooser);
-    npt_selection = iask (_("Please select the file format of the NPT cell data"), _("Select format:"), 6, atomes_app -> main_window);
+    npt_selection = iask (_("Please select the file format of the NPT cell data"), _("Select format:"), 6, atomes_main_window);
   }
   else
   {
@@ -1376,7 +1376,7 @@ int read_npt_data ()
    GtkWidget * info;
 #endif
   info = create_file_chooser (_("Read cell data for NPT molecular dynamics"),
-                              GTK_WINDOW(atomes_app -> main_window),
+                              GTK_WINDOW(atomes_main_window),
                               GTK_FILE_CHOOSER_ACTION_OPEN,
                               _("Open"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
@@ -1495,10 +1495,10 @@ int open_coordinate_file (int id)
       switch (this_reader -> mid)
       {
         case 0:
-          show_error (info, 0, atomes_app -> main_window);
+          show_error (info, 0, atomes_main_window);
           break;
         case 1:
-          show_warning (info, atomes_app -> main_window);
+          show_warning (info, atomes_main_window);
           break;
       }
       g_free (info);
@@ -1528,13 +1528,13 @@ int open_coordinate_file (int id)
   switch (result)
   {
     case 1:
-      show_error (_("Error loading atomic coordinates:\nfile does not exist"), 0, atomes_app -> main_window);
+      show_error (_("Error loading atomic coordinates:\nfile does not exist"), 0, atomes_main_window);
       break;
     case 2:
-      show_error (_("Error loading coordinates file: format not supported"), 0, atomes_app -> main_window);
+      show_error (_("Error loading coordinates file: format not supported"), 0, atomes_main_window);
       break;
     case 3:
-      show_error (_("Error at input: impossible to process input file data"), 0, atomes_app -> main_window);
+      show_error (_("Error at input: impossible to process input file data"), 0, atomes_main_window);
       break;
     default:
       if (id > 6 && id < 9)
@@ -1543,7 +1543,7 @@ int open_coordinate_file (int id)
         if (! prep_data_ ())
         {
           show_error (_("Error while parsing the chemical information\n"
-                        "please check carefully the coordinates file"), 0, atomes_app -> main_window);
+                        "please check carefully the coordinates file"), 0, atomes_main_window);
           result = 4;
         }
         clock_gettime (CLOCK_MONOTONIC, & sto_time);
@@ -1683,7 +1683,7 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
 #endif
         if (j == NCFORMATS)
         {
-          j = iask (_("Please select the file format of the atomic coordinates"), _("Select format:"), 2, atomes_app -> main_window);
+          j = iask (_("Please select the file format of the atomic coordinates"), _("Select format:"), 2, atomes_main_window);
         }
         open_this_coordinate_file (j, NULL);
       }
@@ -1691,7 +1691,7 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
       {
         if (j < 2)
         {
-          format = iask (_("Please select the format of the atomic coordinates"), _("Select format:"), 1, atomes_app -> main_window);
+          format = iask (_("Please select the format of the atomic coordinates"), _("Select format:"), 1, atomes_main_window);
         }
         else
         {
@@ -1732,7 +1732,7 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
         if (k)
         {
           tmp_str = g_strdup_printf (_("Impossible to export the atomic coordinates\nError code: %d"), k);
-          show_error (tmp_str, 0, atomes_app -> main_window);
+          show_error (tmp_str, 0, atomes_main_window);
           g_free (tmp_str);
         }
         active_project_changed (pactive);
@@ -1791,7 +1791,7 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
     }
     tmp_str = g_strdup_printf ("%s - %s", prepare_for_title(active_project -> name), _(str[i]));
     info = create_file_chooser (tmp_str,
-                                GTK_WINDOW(atomes_app -> main_window),
+                                GTK_WINDOW(atomes_main_window),
                                 act[i],
                                 _(res[i]));
     g_free (tmp_str);
@@ -1847,13 +1847,13 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
   {
     if (nprojects == 0)
     {
-      show_warning (_("No project loaded ... nothing to be saved\n"), atomes_app -> main_window);
+      show_warning (_("No project loaded ... nothing to be saved\n"), atomes_main_window);
     }
     else
     {
       tmp_str = g_strdup_printf (_("Project <b>%s</b> is empty ... nothing to be saved\n"),
                                  get_project_by_id(activew) -> name);
-      show_warning (tmp_str, atomes_app -> main_window);
+      show_warning (tmp_str, atomes_main_window);
       g_free (tmp_str);
     }
   }

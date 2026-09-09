@@ -1126,7 +1126,7 @@ int select_from_library (gboolean visible, project * this_proj, atom_search * as
   int active = activep;
   int nats = this_proj -> natomes;
   lib_visible = visible;
-  GtkWidget * lib = dialogmodal (_("Library"), GTK_WINDOW((this_proj -> modelgl) ? this_proj -> modelgl -> win : atomes_app -> main_window));
+  GtkWidget * lib = dialogmodal (_("Library"), GTK_WINDOW((this_proj -> modelgl) ? this_proj -> modelgl -> win : atomes_main_window));
 #ifdef GTK3
 #ifdef GTKGLAREA
 #ifndef OSX

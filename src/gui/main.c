@@ -46,9 +46,15 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   ColRGBA * get_color_from_hexa_string (gchar * color_string);
 
   gboolean destroy_func (gpointer user_data);
+
   static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * invocation, const gchar * arg_file, gpointer user_data);
-  static gboolean init_dbus_server (AppData * app_data);
+  static gboolean init_dbus_server ();
   static gboolean check_existing_instance (void);
+
+  static gboolean win32_open_file_idle (gpointer user_data);
+  static gpointer win32_pipe_server_thread (gpointer user_data);
+  static gboolean init_win32_server ();
+  static gboolean check_existing_win32_instance ();
 
   G_MODULE_EXPORT gboolean splashdraw (GtkWidget * widget, cairo_t * cr, gpointer data);
 
@@ -104,8 +110,6 @@ struct file_list {
 struct file_list * flist = NULL;
 struct file_list * ftmp = NULL;
 gboolean with_workspace = FALSE;
-
-AppData * atomes_app = NULL;
 
 gchar * bs_styles[] = {"ball&stick", "balls&sticks", "balls&stick", "ball&sticks",
                        "ball_&_stick", "balls_&_sticks", "balls_&_stick", "ball_&_sticks",
@@ -821,7 +825,7 @@ GtkWidget * create_splash_window ()
   image = gtk_image_new_from_file (PACKAGE_LOGO);
 #endif
   add_container_child (CONTAINER_WIN, splash_window, image);
-  gtk_window_set_transient_for ((GtkWindow *)splash_window, (GtkWindow *)atomes_app -> main_window);
+  gtk_window_set_transient_for ((GtkWindow *)splash_window, (GtkWindow *)atomes_main_window);
   show_the_widgets (splash_window);
   return splash_window;
 }
@@ -843,7 +847,7 @@ void read_this_file (int file_type, gchar * this_file)
     if (i != 0)
     {
       gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\n"), this_file);
-      show_error (err, 0, atomes_app -> main_window);
+      show_error (err, 0, atomes_main_window);
       g_free (err);
     }
   }
@@ -1012,10 +1016,10 @@ void open_this_data_file (int file_type, gchar * file_name)
 
   \brief D-Bus method for OpenFile : open a file in the active instance
 
-  \param object   D-bus skeleton
+  \param object D-bus skeleton
   \param invocation invocation method
-  \param arg_file  file to be opened
-  \param user_data associated data (AppData)
+  \param arg_file file to be opened
+  \param user_data associated data pointer, null
 */
 static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * invocation, const gchar * arg_file, gpointer user_data)
 {
@@ -1030,26 +1034,29 @@ static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * inv
   }
   instance_complete_open_file (object, invocation);
   // Bring the main window on sight
-  if (atomes_app && atomes_app -> main_window)
+  if (atomes_app && atomes_main_window)
   {
-    gtk_window_present (GTK_WINDOW (atomes_app -> main_window));
+    if (GTK_IS_WIDGET(atomes_main_window))
+    {
+      gtk_window_present (GTK_WINDOW (atomes_main_window));
+    }
   }
   return TRUE;
 }
 
 /*!
-  \fn static gboolean init_dbus_server (AppData * app_data)
+  \fn static gboolean init_dbus_server ()
 
   \brief initialize D-Bus server for the atomes instance
-
-  \param app_data application data
 */
-static gboolean init_dbus_server (AppData * app_data)
+static gboolean init_dbus_server ()
 {
   GError * error = NULL;
 
+  GDBusConnection * dbus_connection;       // D-Bus connection
+  GDBusInterfaceSkeleton * dbus_skeleton;  // D-Bus skeleton
   // Connexion au bus de session
-  app_data -> dbus_connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, & error);
+  dbus_connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, & error);
   if (error)
   {
     g_printerr ("D-Bus connection error : %s\n", error -> message);
@@ -1059,17 +1066,13 @@ static gboolean init_dbus_server (AppData * app_data)
 
   // Créer le skeleton généré par gdbus-codegen
   Instance * interface = instance_skeleton_new ();
-  // Stocker dans AppData pour éviter la fuite mémoire
-  app_data -> dbus_skeleton = G_DBUS_INTERFACE_SKELETON (interface);
+  dbus_skeleton = G_DBUS_INTERFACE_SKELETON (interface);
 
   // Connecter le gestionnaire de méthode OpenFile
-  g_signal_connect (interface, "handle-open-file", G_CALLBACK (handle_open_file), app_data);
+  g_signal_connect (interface, "handle-open-file", G_CALLBACK (handle_open_file), NULL);
 
   // Exporter le skeleton via son API propre (utilise sa vtable interne)
-  if (! g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (interface),
-                                          app_data -> dbus_connection,
-                                          "/fr/ipcms/atomes/Instance",
-                                          & error))
+  if (! g_dbus_interface_skeleton_export (dbus_skeleton, dbus_connection, "/fr/ipcms/atomes/Instance", & error))
   {
     g_printerr ("D-Bus interface export error : %s\n", error -> message);
     g_error_free (error);
@@ -1078,7 +1081,7 @@ static gboolean init_dbus_server (AppData * app_data)
 
   // Réserver le nom bien connu sur le bus (appel synchrone pour garantir
   // que le nom est disponible avant le démarrage de la boucle principale)
-  GVariant * name_result = g_dbus_connection_call_sync (app_data -> dbus_connection,
+  GVariant * name_result = g_dbus_connection_call_sync (dbus_connection,
                                                         "org.freedesktop.DBus",
                                                         "/org/freedesktop/DBus",
                                                         "org.freedesktop.DBus",
@@ -1128,6 +1131,7 @@ static gboolean check_existing_instance (void)
     return FALSE;
   }
 
+  if (! flist) return FALSE;
   gboolean sent = FALSE;
   struct file_list * tmp = flist;
   while (tmp)
@@ -1183,19 +1187,19 @@ struct OpenFileData
 
   \param user_data pointer to an OpenFileData structure (ownership transferred; freed here)
 
-  \return G_SOURCE_REMOVE (always, single-shot idle)
+  \return FALSE
 */
 static gboolean win32_open_file_idle (gpointer user_data)
 {
   OpenFileData * ofd = (OpenFileData *) user_data;
   open_this_data_file (ofd -> file_type, ofd -> file_name);
-  if (atomes_app && atomes_app -> main_window)
+  if (atomes_app && atomes_main_window)
   {
-    gtk_window_present (GTK_WINDOW (atomes_app -> main_window));
+    gtk_window_present (GTK_WINDOW (atomes_main_window));
   }
   g_free (ofd -> file_name);
   g_free (ofd);
-  return G_SOURCE_REMOVE;
+  return FALSE;
 }
 
 /*!
@@ -1245,16 +1249,14 @@ static gpointer win32_pipe_server_thread (gpointer user_data)
 }
 
 /*!
-  \fn static gboolean init_win32_server (AppData * app_data)
+  \fn static gboolean init_win32_server ()
 
   \brief Initialize the Windows single-instance server: create the Named Mutex
          that signals an active instance, then start the Named Pipe listener thread.
 
-  \param app_data application data (currently unused, reserved for future use)
-
   \return TRUE on success, FALSE on failure
 */
-static gboolean init_win32_server (AppData * app_data)
+static gboolean init_win32_server ()
 {
   win32_mutex = CreateMutex (NULL, TRUE, ATOMES_MUTEX_NAME);
   if (win32_mutex == NULL)
@@ -1272,7 +1274,7 @@ static gboolean init_win32_server (AppData * app_data)
 }
 
 /*!
-  \fn static gboolean check_existing_win32_instance (void)
+  \fn static gboolean check_existing_win32_instance ()
 
   \brief Search for an already running atomes instance on Windows.
          If found, transmit all pending files (flist) via the Named Pipe
@@ -1282,7 +1284,7 @@ static gboolean init_win32_server (AppData * app_data)
   \return TRUE if an existing instance was found and handled flist,
           FALSE otherwise (no instance found, or flist is empty)
 */
-static gboolean check_existing_win32_instance (void)
+static gboolean check_existing_win32_instance ()
 {
   if (! flist) return FALSE;
 
@@ -1356,7 +1358,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
 
   if (! atomes_render_image)
   {
-    atomes_app -> main_window = create_main_window (app);
+    atomes_main_window = create_main_window (app);
     GtkWidget * isplash = create_splash_window ();
     if (isplash == NULL)
     {
@@ -1565,40 +1567,6 @@ int main (int argc, char *argv[])
 
   if (RUNC)
   {
-    if (default_instance && (! atomes_from_libreoffice && ! atomes_render_image))
-    {
-      if (argc > 1)
-      {
-        // Check if there is already an existing atomes instance running
-        // If yes then transmit the file(s) to open
-#ifdef G_OS_WIN32
-         /* Check for an existing atomes instance via Win32 Named Mutex/Pipe */
-        if (check_existing_win32_instance ())
-        {
-          g_free (atomes_app);
-          return 0;
-        }
-      }
-      if (! init_win32_server (atomes_app))
-      {
-        g_print ("Init Win32 pipe server failed\n");
-        return 1;
-      }
-#else
-       if (check_existing_instance ())
-       {
-          g_free (atomes_app);
-          return 0;
-        }
-      }
-      if (! init_dbus_server (atomes_app))
-      {
-        g_print ("Init DBUS failed\n");
-        return 1;
-      }
-#endif // G_OS_WIN32
-    }
-
 #ifdef G_OS_WIN32
 #ifndef DEBUG
     FreeConsole ();
@@ -1658,17 +1626,53 @@ int main (int argc, char *argv[])
 
     set_atomes_preferences ();
 
-#if GLIB_MINOR_VERSION < 74
-    atomes_app -> gtk_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
+    // Now user preferences are known
+    if (! atomes_from_libreoffice && ! atomes_render_image)
+    {
+      if (default_instance)
+      {
+        if (argc > 1)
+        {
+          // Check if there is already an existing atomes instance running
+          // If yes then transmit the file(s) to open to this instance
+#ifdef G_OS_WIN32
+          /* Check for an existing atomes instance via Win32 Named Mutex/Pipe */
+          if (check_existing_win32_instance ())
+          {
+            // Another instance was found, quit.
+            return 0;
+          }
+        }
+        else if (! init_win32_server ())
+        {
+          g_print ("Init Win32 pipe server failed\n");
+          return 1;
 #else
-    atomes_app -> gtk_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS);
+          if (check_existing_instance ())
+          {
+            // Another instance was found, quit.
+            return 0;
+          }
+        }
+        else if (! init_dbus_server ())
+        {
+          g_print ("Init D-BUS failed\n");
+          return 1;
+#endif // G_OS_WIN32
+        }
+      }
+    }
+#if GLIB_MINOR_VERSION < 74
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
+#else
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS);
 #endif
     GError * error = NULL;
-    g_application_register (G_APPLICATION(atomes_app -> gtk_app), NULL, & error);
-    g_signal_connect (G_OBJECT(atomes_app -> gtk_app), "activate", G_CALLBACK(run_program), NULL);
+    g_application_register (G_APPLICATION(atomes_app), NULL, & error);
+    g_signal_connect (G_OBJECT(atomes_app), "activate", G_CALLBACK(run_program), NULL);
 
-    int status = g_application_run (G_APPLICATION (atomes_app -> gtk_app), 0, NULL);
-    g_object_unref (atomes_app -> gtk_app);
+    int status = g_application_run (G_APPLICATION (atomes_app), 0, NULL);
+    g_object_unref (atomes_app);
 #ifdef G_OS_WIN32
     if (win32_mutex)
     {
