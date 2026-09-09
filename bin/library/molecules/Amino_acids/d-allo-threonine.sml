@@ -6,7 +6,7 @@
    <library-name>Allo-threonine-(D)</library-name>
   <iupac-name>(D)-Allo-threonine</iupac-name>
   <other-names>
-   <name>(2R,3R)-2-Amino-3-hydroxybutanoicacid</name>
+   <name>(2R,3R)-2-Amino-3-hydroxybutanoic acid</name>
   </other-names>
  </names>
  <chemistry>

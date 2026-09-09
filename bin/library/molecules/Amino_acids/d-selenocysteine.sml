@@ -3,10 +3,10 @@
 <scl-xml>
  <class>Amino acids</class>
  <names>
-   <library-name>Cysteine-(D)</library-name>
-  <iupac-name>(D)-Cysteine</iupac-name>
+   <library-name>Selenocysteine-(D)</library-name>
+  <iupac-name>(D)-Selenocysteine</iupac-name>
   <other-names>
-   <name>(2S)-2-Amino-3-sulfanylpropanoic acid</name>
+   <name>(2S)-2-Amino-3-selanylpropanoic acid</name>
   </other-names>
  </names>
  <chemistry>
@@ -15,7 +15,7 @@
    <label id="0" num="3">C</label>
    <label id="1" num="7">H</label>
    <label id="2" num="2">O</label>
-   <label id="3" num="1">S</label>
+   <label id="3" num="1">Se</label>
    <label id="4" num="1">N</label>
   </species>
  </chemistry>

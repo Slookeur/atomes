@@ -6,7 +6,7 @@
    <library-name>Aspartic acid-(D)</library-name>
   <iupac-name>(D)-Aspartic acid</iupac-name>
   <other-names>
-   <name>(2R)-2-Aminobutanedioicacid</name>
+   <name>(2R)-2-Aminobutanedioic acid</name>
   </other-names>
  </names>
  <chemistry>

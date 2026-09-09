@@ -6,7 +6,7 @@
    <library-name>Arginine-(D)</library-name>
   <iupac-name>(D)-Arginine</iupac-name>
   <other-names>
-   <name>(2R)-2-Amino-5-(diaminomethylideneamino)pentanoicacid</name>
+   <name>(2R)-2-Amino-5-(diaminomethylideneamino)pentanoic acid</name>
   </other-names>
  </names>
  <chemistry>
