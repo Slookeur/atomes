@@ -870,16 +870,22 @@ void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer)
 {
   GtkTextIter bEnd;
   GtkTextTag * tag;
-  gtk_text_buffer_get_end_iter (buffer, &bEnd);
-  if (stag != NULL)
+  if (buffer)
   {
-    tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), stag);
-    gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
-  }
-  else
-  {
-    tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), "default-size");
-    gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+    if (GTK_IS_TEXT_BUFFER(buffer))
+    {
+      gtk_text_buffer_get_end_iter (buffer, &bEnd);
+      if (stag != NULL)
+      {
+        tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), stag);
+        gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+      }
+      else
+      {
+        tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), "default-size");
+        gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+      }
+    }
   }
 }
 
