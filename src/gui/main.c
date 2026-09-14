@@ -1171,8 +1171,10 @@ static gboolean check_existing_instance ()
 #else
 
 #define ATOMES_MUTEX_NAME "fr.ipcms.atomes.mutex"
-#define ATOMES_PIPE_NAME "fr.ipcms.atomes.pipe"
+#define ATOMES_PIPE_NAME "\\\\.\\pipe\\fr.ipcms.atomes.pipe"
 #define ATOMES_PIPE_BUFSIZE 4096
+
+HANDLE win32_mutex = NULL;
 
 /*! \typedef OpenFileData
 
@@ -1232,12 +1234,25 @@ static gpointer win32_pipe_server_thread (gpointer user_data)
                                    ATOMES_PIPE_BUFSIZE,
                                    ATOMES_PIPE_BUFSIZE,
                                    0, NULL);
-    if (pipe == INVALID_HANDLE_VALUE) break;
-    if (ConnectNamedPipe (pipe, NULL) || GetLastError () == ERROR_PIPE_CONNECTED)
+    if (pipe == INVALID_HANDLE_VALUE)
+    {
+      g_printerr ("CreateNamedPipe failed: %lu\n", GetLastError ());
+      break;
+    }
+
+    BOOL connected = ConnectNamedPipe(pipe, NULL);
+    if (! connected && GetLastError() != ERROR_PIPE_CONNECTED)
+    {
+      g_printerr ("ConnectNamedPipe failed: %lu", GetLastError());
+      CloseHandle(pipe);
+      break;
+    }
+    else if (connected || GetLastError () == ERROR_PIPE_CONNECTED)
     {
       char buf[ATOMES_PIPE_BUFSIZE];
-      DWORD bytes_read;
-      while (ReadFile (pipe, buf, sizeof (buf) - 1, & bytes_read, NULL) && bytes_read > 0)
+      DWORD bytes_read = 0;
+      BOOL ok = ReadFile (pipe, buf, sizeof (buf) - 1, & bytes_read, NULL);
+      if (ok && bytes_read > 0)
       {
         buf[bytes_read] = '\0';
         int len = (int) strlen (buf);
@@ -1250,7 +1265,12 @@ static gpointer win32_pipe_server_thread (gpointer user_data)
           g_idle_add (win32_open_file_idle, ofd);
         }
       }
+      else
+      {
+        g_printerr ("ReadFile failed: %lu", GetLastError());
+      }
     }
+    DisconnectNamedPipe(pipe);
     CloseHandle (pipe);
   }
   return NULL;
@@ -1269,20 +1289,30 @@ static gboolean init_win32_server ()
   win32_mutex = CreateMutex (NULL, TRUE, ATOMES_MUTEX_NAME);
   if (win32_mutex == NULL)
   {
-    g_printerr ("Win32 mutex creation error (code: %lu)\n", GetLastError ());
+    g_printerr ("CreateMutex failed: %lu\n", GetLastError ());
     return FALSE;
   }
-  win32_pipe_thread = g_thread_new ("atomes-pipe-server", win32_pipe_server_thread, NULL);
-  if (win32_pipe_thread == NULL)
+
+  if (GetLastError () == ERROR_ALREADY_EXISTS)
   {
-    g_printerr ("Win32 pipe server thread creation error\n");
+    CloseHandle (win32_mutex);
+    win32_mutex = NULL;
+    return TRUE;
+  }
+
+  HANDLE thread = g_thread_new ("atomes-pipe-server", win32_pipe_server_thread, NULL);
+  if (thread == NULL)
+  {
+    CloseHandle (win32_mutex);
+    win32_mutex = NULL;
     return FALSE;
   }
+
   return TRUE;
 }
 
 /*!
-  \fn static gboolean check_existing_win32_instance ()
+  \fn gboolean check_existing_win32_instance ()
 
   \brief Search for an already running atomes instance on Windows.
          If found, transmit all pending files (flist) via the Named Pipe
@@ -1296,26 +1326,48 @@ static gboolean check_existing_win32_instance ()
 {
   if (! flist) return FALSE;
 
-  /* Try to open the mutex without creating it: succeeds only if an instance exists */
   HANDLE mutex = OpenMutex (MUTEX_ALL_ACCESS, FALSE, ATOMES_MUTEX_NAME);
   if (mutex == NULL) return FALSE;
-
-  CloseHandle (mutex);
 
   gboolean sent = FALSE;
   struct file_list * tmp = flist;
   while (tmp)
   {
-    DWORD bytes_written;
-    BOOL ok = CallNamedPipe (ATOMES_PIPE_NAME,
-                             tmp -> file_name,
-                             (DWORD) strlen (tmp -> file_name),
-                             NULL, 0,
-                             & bytes_written,
-                             NMPWAIT_WAIT_FOREVER);
-    if (ok) sent = TRUE;
-    tmp = tmp -> next;
+    HANDLE pipe = CreateFile (ATOMES_PIPE_NAME,
+                              GENERIC_WRITE,
+                              0,
+                              NULL,
+                              OPEN_EXISTING,
+                              0,
+                              NULL);
+
+    if (pipe == INVALID_HANDLE_VALUE)
+    {
+      g_printerr ("CreateFile PIPE FAILED: %lu\n", GetLastError());
+    }
+
+    DWORD len = (DWORD) strlen (tmp -> file_name);
+    DWORD written = 0;
+
+    BOOL ok = WriteFile (pipe, tmp -> file_name, len, & written, NULL);
+
+    if (! ok)
+    {
+      g_printerr ("WriteFile FAILED: %lu\n", GetLastError());
+    }
+    else
+    {
+      g_printerr ("WriteFile OK: %lu/%lu bytes\n", written, len);
+      if (written == len) sent = TRUE;
+    }
+
+    CloseHandle (pipe);
+    tmp = tmp->next;
   }
+
+  CloseHandle (mutex);
+  mutex = NULL;
+
   return sent;
 }
 #endif /* G_OS_WIN32 */
@@ -1577,7 +1629,7 @@ int main (int argc, char *argv[])
   {
 #ifdef G_OS_WIN32
 #ifndef DEBUG
-    FreeConsole ();
+//    FreeConsole ();
 #endif
 #endif
     atomes_visual = check_opengl_rendering ();
@@ -1645,10 +1697,8 @@ int main (int argc, char *argv[])
         /* Check for an existing atomes instance via Win32 Named Mutex/Pipe */
         if (argc > 1 && check_existing_win32_instance ())
         {
-          // Another instance was found, quit.
           return 0;
         }
-
         if (! init_win32_server ())
         {
           g_print ("Init Win32 pipe server failed\n");
