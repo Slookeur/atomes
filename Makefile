@@ -37,6 +37,26 @@ else
   DOMP =
 endif
 
+SRC = src/
+GUI = src/gui/
+WORK = src/workspace/
+PROJ = src/project/
+CALC = src/calc/
+DLPOLY = src/calc/dl_poly/
+LAMMPS = src/calc/lammps/
+FIELDS = src/calc/force_fields/
+CPMD = src/calc/cpmd/
+CP2K = src/calc/cp2k/
+CURVE = src/curve/
+OGL = src/opengl/
+GLWIN = src/opengl/win/
+GLDRAW = src/opengl/draw/
+GLEDIT = src/opengl/edit/
+FOR = src/fortran/
+OBJ = obj/
+BIN = bin/
+LOCALE = bin/locale
+
 ifeq ($(LINUX),1)
 
   # Use a specific compiler version
@@ -74,6 +94,8 @@ ifeq ($(LINUX),1)
   DBUS_H = $(dbus)fr_ipcms_atomes-Instance.h
   OBJECTS_dbus = $(OBJ)fr_ipcms_atomes-Instance.o
   # Règle pour générer les fichiers dbus C/H
+
+  INC = -I$(SRC) -I$(dbus) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 
 endif
 
@@ -160,29 +182,10 @@ ifeq ($(WINDOWS),1)
   DBUS_H =
   OBJECTS_dbus =
 
+  INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
+
 endif
 
-SRC = src/
-GUI = src/gui/
-WORK = src/workspace/
-PROJ = src/project/
-CALC = src/calc/
-DLPOLY = src/calc/dl_poly/
-LAMMPS = src/calc/lammps/
-FIELDS = src/calc/force_fields/
-CPMD = src/calc/cpmd/
-CP2K = src/calc/cp2k/
-CURVE = src/curve/
-OGL = src/opengl/
-GLWIN = src/opengl/win/
-GLDRAW = src/opengl/draw/
-GLEDIT = src/opengl/edit/
-FOR = src/fortran/
-OBJ = obj/
-BIN = bin/
-LOCALE = bin/locale
-
-INC = -I$(SRC) -I$(dbus) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
 # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 

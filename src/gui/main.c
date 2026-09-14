@@ -1169,6 +1169,11 @@ static gboolean check_existing_instance ()
   return sent;
 }
 #else
+
+#define ATOMES_MUTEX_NAME "fr.ipcms.atomes.mutex"
+#define ATOMES_PIPE_NAME "fr.ipcms.atomes.pipe"
+#define ATOMES_PIPE_BUFSIZE 4096
+
 /*! \typedef OpenFileData
 
   \brief Data structure used to pass file-open parameters to the GTK main thread
