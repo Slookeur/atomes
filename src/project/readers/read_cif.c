@@ -151,9 +151,9 @@ The following lines describe keywords used to declare atomic coordinates in the 
   - NLKEYS   : the number of keyword possibly used to start the line
   - linekeys : the keyword possibly used to start the line
 
-  - CFKEYS   : he number of keyword possibly used to describe fractional coordinates
+  - CFKEYS   : he number of keyword possibly used to describe coordinates
   - frackeys : the keyword possibly used to describe fractional coordinates
-  - cartkeys : the keyword possibly used to describe cartesian coordinates
+  - cartkeys : the keyword possibly used to describe Cartesian coordinates
 
 Note that this can change, so in all cases if required add more.
 */
@@ -161,11 +161,13 @@ Note that this can change, so in all cases if required add more.
 gchar * linekeys[NLKEYS] = {"_atom_site",                                            // Most common
                             "_chem_comp_atom"};                                      // RCSB database: https://www.rcsb.org/
 
-#define CFKEYS 2
-gchar * frackeys[CFKEYS][3] = {{"fract_x", "fract_y", "fract_z"},                    // Most common
-                               {"model_fract_x", "model_fract_y", "model_fract_z"}}; // RCSB database: https://www.rcsb.org/
-gchar * cartkeys[CFKEYS][3] = {{"cartn_x", "cartn_y", "cartn_z"},                    // Most common
-                               {"model_cartn_x", "model_cartn_y", "model_cartn_z"}}; // RCSB database: https://www.rcsb.org/
+#define CFKEYS 3
+gchar * frackeys[CFKEYS-1][3] = {{"fract_x", "fract_y", "fract_z"},                                                     // Most common
+                                 {"model_fract_x", "model_fract_y", "model_fract_z"}};                                  // RCSB database: https://www.rcsb.org/
+gchar * cartkeys[CFKEYS][3] = {{"cartn_x", "cartn_y", "cartn_z"},                                                     // Most common, or is it old stuff ?
+                               // For the following next lines, it is not yet clear which one to put first, waiting reply from RCSB
+                               {"pdbx_model_cartn_x_ideal", "pdbx_model_cartn_y_ideal", "pdbx_model_cartn_z_ideal"},  // RCSB database: https://www.rcsb.org/
+                               {"model_cartn_x", "model_cartn_y", "model_cartn_z"}};                                  // RCSB database: https://www.rcsb.org/
 
 #ifdef G_OS_WIN32
   typedef intptr_t ssize_t;
@@ -1141,13 +1143,14 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     for (i=0; i<NLKEYS; i++)
     {
-      for (j=0; j<CFKEYS; j++)
+      j = (this_reader -> cartesian) ? CFKEYS : CFKEYS-1;
+      for (k=0; k<j; k++)
       {
-        loop_line = get_loop_line_for_key (linec, conf, linekeys[i], (this_reader -> cartesian) ? cartkeys[j][0] : frackeys[j][0]);
+        loop_line = get_loop_line_for_key (linec, conf, linekeys[i], (this_reader -> cartesian) ? cartkeys[k][0] : frackeys[k][0]);
         if (loop_line)
         {
           lid = i;
-          fid = j;
+          fid = k;
           break;
         }
       }
@@ -1178,7 +1181,7 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
     {
       for (i=0; i<NLKEYS; i++)
       {
-        for (j=0; j<CFKEYS; j++)
+        for (j=0; j<CFKEYS-1; j++)
         {
           loop_line = get_loop_line_for_key (linec, 0, linekeys[i], frackeys[j][0]);
           if (loop_line)
@@ -2195,6 +2198,11 @@ int open_cif_configuration (int linec, int conf)
       return 3;
     }
   }
+  else
+  {
+    // No symmetry data for Cartesian CIF file
+    cif_use_symmetry_positions = FALSE;
+  }
   // Reading positions
   if (cif_get_symmetry_positions (linec, conf))
   {
@@ -2632,7 +2640,7 @@ int open_cif_file (int linec)
   // of the instruction used to declare atomic coordinates
   for (i=0; i<NLKEYS; i++)
   {
-    for (j=0; j<CFKEYS; j++)
+    for (j=0; j<CFKEYS-1; j++)
     {
       this_reader -> steps = cif_get_value (linekeys[i], frackeys[j][0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
       if (this_reader -> steps)

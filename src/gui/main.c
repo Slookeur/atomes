@@ -73,6 +73,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   LLM tools (Le Chat) were used at few occasions to prepare some sections of this file, including:
     - To write of the function to convert hexadecimal chain to color
+    - To write parts of the d-bus, and Mutex instances management functions
 
 */
 

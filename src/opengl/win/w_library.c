@@ -211,7 +211,7 @@ insertion_menu mol[] = {
     { NULL, i18n("More ..."), -1, -1 },
     { NULL, NULL, -1, 0 }};
 
-#define FAMILY 26
+#define FAMILY 27
 gchar * family_list[FAMILY]={i18n("Misc"),
                              i18n("Alcohols"),
                              i18n("Aldehydes"),
@@ -233,6 +233,7 @@ gchar * family_list[FAMILY]={i18n("Misc"),
                              i18n("Ketones"),
                              i18n("Nitriles"),
                              i18n("Nucleobases"),
+                             i18n("Nucleotides"),
                              i18n("Steroids"),
                              i18n("Sugars (Linears)"),
                              i18n("Sugars (Cyclics)"),
@@ -260,6 +261,7 @@ gchar * family_dir[FAMILY]={"Misc",
                             "Ketones",
                             "Nitriles",
                             "Nucleobases",
+                            "Nucleotides",
                             "Steroids",
                             "Linear_sugars",
                             "Cyclic_sugars",

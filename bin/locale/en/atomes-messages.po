@@ -7494,6 +7494,10 @@ msgid "Nucleobases"
 msgstr "Nucleobases"
 
 # File: opengl/win/w_library.c, Line: 236,263
+msgid "Nucleotides"
+msgstr "Nucleotides"
+
+# File: opengl/win/w_library.c, Line: 236,263
 msgid "Steroids"
 msgstr "Steroids"
 
