@@ -3536,7 +3536,7 @@ msgstr "occupation"
 # File: project/readers/read_cif.c, Line: 1169,1250
 msgid "<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
 "<b>atomes</b> will open each set of coordinate(s) in a separate model."
-msgstr "<b>>Coordonnées atomiques</b>: différents jeux de coordonnée(s) ont été trouvés.\n"
+msgstr "<b>Coordonnées atomiques</b>: différents jeux de coordonnée(s) ont été trouvés.\n"
 "<b>atomes</b> va ouvrir chaque jeu de coordonnée(s) dans un modèle séparé."
 
 # File: project/readers/read_cif.c, Line: 1322
