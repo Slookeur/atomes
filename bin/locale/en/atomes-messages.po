@@ -80,7 +80,7 @@ msgstr "Fragment"
 # File: opengl/win/m_coord.c, Line: 582
 # File: opengl/win/m_tools.c, Line: 83
 # File: opengl/win/w_coord.c, Line: 850
-# File: opengl/win/w_library.c, Line: 1148
+# File: opengl/win/w_library.c, Line: 1150
 # File: opengl/win/w_search.c, Line: 4147
 # File: opengl/win/w_volumes.c, Line: 707
 msgid "Molecule"
@@ -445,7 +445,7 @@ msgstr "Save neighbors analysis in file"
 # File: curve/w_data.c, Line: 181
 # File: curve/w_img.c, Line: 250
 # File: gui/calc_menu.c, Line: 785
-# File: gui/callbacks.c, Line: 561,918,1775
+# File: gui/callbacks.c, Line: 561,918,1807
 # File: gui/gui.c, Line: 772,853
 # File: gui/work_menu.c, Line: 133,147,176
 # File: opengl/draw/image.c, Line: 212
@@ -677,7 +677,7 @@ msgid "Error while parsing the chemical information\n"
 msgstr "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 
-# File: gui/callbacks.c, Line: 88,1776
+# File: gui/callbacks.c, Line: 88,1808
 # File: project/readers/read_isaacs.c, Line: 70
 msgid "XYZ file"
 msgstr "XYZ file"
@@ -686,7 +686,7 @@ msgstr "XYZ file"
 msgid "XYZ file - NPT"
 msgstr "XYZ file - NPT"
 
-# File: gui/callbacks.c, Line: 90,1776
+# File: gui/callbacks.c, Line: 90,1808
 # File: project/readers/read_isaacs.c, Line: 71
 msgid "Chem3D file"
 msgstr "Chem3D file"
@@ -854,7 +854,7 @@ msgstr "Open Workspace"
 msgid "Save Workspace"
 msgstr "Save Workspace"
 
-# File: gui/callbacks.c, Line: 561,918,1381,1775
+# File: gui/callbacks.c, Line: 561,918,1381,1807
 # File: gui/gui.c, Line: 767,847
 # File: gui/work_menu.c, Line: 132,145
 # File: opengl/win/m_map.c, Line: 885
@@ -894,7 +894,7 @@ msgid "%s - New project"
 msgstr "%s - New project"
 
 # File: calc/cpmd/cpmd_init.c, Line: 1556
-# File: gui/callbacks.c, Line: 711,916,1388,1831
+# File: gui/callbacks.c, Line: 711,916,1388,1863
 # File: opengl/win/m_map.c, Line: 937
 msgid "All files (*)"
 msgstr "All files (*)"
@@ -977,7 +977,7 @@ msgstr "Apply"
 msgid "Please select the file format of the NPT cell data"
 msgstr "Please select the file format of the NPT cell data"
 
-# File: gui/callbacks.c, Line: 1352,1686,1694
+# File: gui/callbacks.c, Line: 1352,1718,1726
 msgid "Select format:"
 msgstr "Select format:"
 
@@ -1001,7 +1001,7 @@ msgstr "Error loading coordinates file: format not supported"
 msgid "Error at input: impossible to process input file data"
 msgstr "Error at input: impossible to process input file data"
 
-# File: gui/callbacks.c, Line: 1619
+# File: gui/callbacks.c, Line: 1625
 msgid "%s - symmetry position(s)"
 msgstr "%s - symmetry position(s)"
 
@@ -1017,31 +1017,31 @@ msgstr "mmCIF - x/y/z coordinates for each atom"
 msgid "mmCIF - computed idealized coordinates"
 msgstr "mmCIF - computed idealized coordinates"
 
-# File: gui/callbacks.c, Line: 1686
+# File: gui/callbacks.c, Line: 1718
 msgid "Please select the file format of the atomic coordinates"
 msgstr "Please select the file format of the atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1694
+# File: gui/callbacks.c, Line: 1726
 msgid "Please select the format of the atomic coordinates"
 msgstr "Please select the format of the atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1734
+# File: gui/callbacks.c, Line: 1766
 msgid "Impossible to export the atomic coordinates\nError code: %d"
 msgstr "Impossible to export the atomic coordinates\nError code: %d"
 
-# File: gui/callbacks.c, Line: 1774
+# File: gui/callbacks.c, Line: 1806
 msgid "Import atomic coordinates"
 msgstr "Import atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1774
+# File: gui/callbacks.c, Line: 1806
 msgid "Export atomic coordinates"
 msgstr "Export atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1850
+# File: gui/callbacks.c, Line: 1882
 msgid "No project loaded ... nothing to be saved\n"
 msgstr "No project loaded ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 1854
+# File: gui/callbacks.c, Line: 1886
 msgid "Project <b>%s</b> is empty ... nothing to be saved\n"
 msgstr "Project <b>%s</b> is empty ... nothing to be saved\n"
 
@@ -1496,7 +1496,7 @@ msgstr "Save As"
 # File: opengl/edit/cell_edit.c, Line: 203
 # File: opengl/win/w_atoms.c, Line: 547
 # File: opengl/win/w_coord.c, Line: 1378
-# File: opengl/win/w_measures.c, Line: 683
+# File: opengl/win/w_measures.c, Line: 680
 msgid "Close"
 msgstr "Close"
 
@@ -1816,15 +1816,15 @@ msgstr "with n<sub>sites</sub> = f(symmetry positions, crystalline positions)"
 msgid "Parameter Required"
 msgstr "Parameter Required"
 
-# File: gui/interface.c, Line: 1088
+# File: gui/interface.c, Line: 1094
 msgid "%s - isolated"
 msgstr "%s - isolated"
 
-# File: gui/interface.c, Line: 1092
+# File: gui/interface.c, Line: 1098
 msgid " - isolated"
 msgstr " - isolated"
 
-# File: gui/main.c, Line: 137
+# File: gui/main.c, Line: 136
 msgid "\nUsage: atomes [OPTION]\n"
 "       atomes [FILE]\n"
 "       atomes [OPTION] [FILE]\n"
@@ -1938,36 +1938,36 @@ msgstr "\nUsage: atomes [OPTION]\n"
 " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
 " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
 
-# File: gui/main.c, Line: 193,274
+# File: gui/main.c, Line: 192,273
 # File: startup-testing/startup_testing.c, Line: 68,85
 msgid "\nReport a bug to <"
 msgstr "\nReport a bug to <"
 
-# File: gui/main.c, Line: 204
+# File: gui/main.c, Line: 203
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 
-# File: gui/main.c, Line: 851
+# File: gui/main.c, Line: 850
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Error while reading workspace file\n%s\n"
 
-# File: gui/main.c, Line: 1370
+# File: gui/main.c, Line: 1426
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible to load the splash screen\n"
 
-# File: gui/main.c, Line: 1472
+# File: gui/main.c, Line: 1528
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Fatal error on OpenGL initialization: trying to adjust environment !"
 
-# File: gui/main.c, Line: 1475
+# File: gui/main.c, Line: 1531
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible to initialize the OpenGL 3D rendering !"
 
-# File: gui/main.c, Line: 1478
+# File: gui/main.c, Line: 1534
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "GDK visual must be modified to initialize the OpenGL context !"
 
-# File: gui/main.c, Line: 1609
+# File: gui/main.c, Line: 1665
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -2454,7 +2454,7 @@ msgstr "<b>Select selection type</b>"
 # File: calc/force_fields/charmm_silicates.c, Line: 195
 # File: calc/force_fields/force_fields.c, Line: 2271
 # File: gui/preferences.c, Line: 3242,3357,3362
-# File: opengl/win/w_library.c, Line: 519
+# File: opengl/win/w_library.c, Line: 521
 msgid "atom"
 msgstr "atom"
 
@@ -2492,7 +2492,7 @@ msgstr "radius"
 msgid "size"
 msgstr "size"
 
-# File: gui/main.c, Line: 558
+# File: gui/main.c, Line: 557
 # File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "width"
@@ -3056,7 +3056,7 @@ msgstr "Restore <b>atomes</b> default parameters"
 msgid "rendering"
 msgstr "rendering"
 
-# File: gui/main.c, Line: 565
+# File: gui/main.c, Line: 564
 # File: gui/preferences.c, Line: 1014,2074,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3064,7 +3064,7 @@ msgstr "rendering"
 msgid "box"
 msgstr "box"
 
-# File: gui/main.c, Line: 564
+# File: gui/main.c, Line: 563
 # File: gui/preferences.c, Line: 1107,2094,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3316,11 +3316,11 @@ msgstr "Primitive"
 msgid "Strong"
 msgstr "Strong"
 
-# File: global.c, Line: 616
+# File: global.c, Line: 617
 msgid "Error in string format: string = \"%s\" - value == %lf\n"
 msgstr "Error in string format: string = \"%s\" - value == %lf\n"
 
-# File: global.c, Line: 645
+# File: global.c, Line: 646
 msgid "\n \tAnalysis was performed in: "
 msgstr "\n \tAnalysis was performed in: "
 
@@ -3388,7 +3388,7 @@ msgstr "Number of atoms"
 msgid "Number of steps"
 msgstr "Number of steps"
 
-# File: project/readers/read_cif.c, Line: 388
+# File: project/readers/read_cif.c, Line: 395
 msgid "<b>To continue and build the crystal according to the information of the CIF file\n"
 "it is required to provide a suitable value for each and every missing parameter(s).</b>\n\n"
 "Please select an atom type for the following object(s):"
@@ -3396,7 +3396,7 @@ msgstr "<b>To continue and build the crystal according to the information of the
 "it is required to provide a suitable value for each and every missing parameter(s).</b>\n\n"
 "Please select an atom type for the following object(s):"
 
-# File: project/readers/read_cif.c, Line: 791
+# File: project/readers/read_cif.c, Line: 798
 msgid "<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
@@ -3404,7 +3404,7 @@ msgstr "<b>CIF get loop line</b>: something is wrong for keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
 
-# File: project/readers/read_cif.c, Line: 841
+# File: project/readers/read_cif.c, Line: 848
 msgid "<b>CIF retrieved value</b>: keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
@@ -3412,13 +3412,13 @@ msgstr "<b>CIF retrieved value</b>: keyword: %s_%s\n"
 "  -> keyword found= %d times\n"
 "  -> configurations in CIF file= %d !\n"
 
-# File: project/readers/read_cif.c, Line: 878
+# File: project/readers/read_cif.c, Line: 885
 msgid "<b>Key positions</b>: keyword: %s_%s\n"
 "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n"
 msgstr "<b>Key positions</b>: keyword: %s_%s\n"
 "  -> not found for conf %d between loop_pos[0]= %d and loop_pos[1]= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1256
+# File: project/readers/read_cif.c, Line: 1369
 msgid "<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
 "  - configuration N°%d\t :: atoms= %d\n"
 "  - initialization      \t\t :: atoms= %d\n"
@@ -3426,7 +3426,7 @@ msgstr "<b>Atomic coordinates</b>: the number of atom(s) changes !\n"
 "  - configuration N°%d\t :: atoms= %d\n"
 "  - initialization      \t\t :: atoms= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1318
+# File: project/readers/read_cif.c, Line: 1431
 msgid "<b>Atomic coordinates</b>: the number of chemical species changes !\n"
 "  - configuration N°%d\t :: species= %d\n"
 "  - initialization      \t\t :: species= %d\n"
@@ -3434,7 +3434,7 @@ msgstr "<b>Atomic coordinates</b>: the number of chemical species changes !\n"
 "  - configuration N°%d\t :: species= %d\n"
 "  - initialization      \t\t :: species= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1330
+# File: project/readers/read_cif.c, Line: 1443
 msgid "<b>Atomic coordinates</b>: the number of atom(s) for species %d changes !\n"
 "  - configuration N°%d\t :: atom(s)= %d\n"
 "  - initialization      \t\t :: atom(s)= %d\n"
@@ -3442,19 +3442,19 @@ msgstr "<b>Atomic coordinates</b>: the number of atom(s) for species %d changes 
 "  - configuration N°%d\t :: atom(s)= %d\n"
 "  - initialization      \t\t :: atom(s)= %d\n"
 
-# File: project/readers/read_cif.c, Line: 1710,1723,1791,1815
+# File: project/readers/read_cif.c, Line: 1823,1836,1904,1928
 msgid "<b>Space group</b>: CIF file information could be inaccurate !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 msgstr "<b>Space group</b>: CIF file information could be inaccurate !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 
-# File: project/readers/read_cif.c, Line: 1951
+# File: project/readers/read_cif.c, Line: 2064
 msgid "<b>Space group</b>: space group and H-M symbol do not match !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 msgstr "<b>Space group</b>: space group and H-M symbol do not match !\n"
 " CIF file space group: <b>%s</b>, CIF file H-M symbol: <b>%s</b>\n"
 
-# File: project/readers/read_cif.c, Line: 2101
+# File: project/readers/read_cif.c, Line: 2214
 msgid "<b>Space group</b>: found trigonal space group N°%d-%s, <b>%s</b> setting\n"
 "but the lattice parameters were found in <b>%s</b> format ...\n"
 "\t ... the space group setting was modified accordingly !\n"
@@ -3462,13 +3462,13 @@ msgstr "<b>Space group</b>: found trigonal space group N°%d-%s, <b>%s</b> setti
 "but the lattice parameters were found in <b>%s</b> format ...\n"
 "\t ... the space group setting was modified accordingly !\n"
 
-# File: project/readers/read_cif.c, Line: 2115
+# File: project/readers/read_cif.c, Line: 2228
 msgid "<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
 "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n"
 msgstr "<b>Space group</b> and <b>lattice parameters</b> are not compatible !\n"
 "\nCheck a, b, c, and &#x3B1;, &#x3B2;, &#x263;, with the type of crystal system.\n"
 
-# File: project/readers/read_cif.c, Line: 2239
+# File: project/readers/read_cif.c, Line: 2357
 msgid "<b>Building crystal using symmetry positions: </b> \n"
 "  1) evaluate candidate atomic positions using data in CIF file: \n"
 "     - symmetry positions\n"
@@ -3484,7 +3484,7 @@ msgstr "<b>Building crystal using symmetry positions: </b> \n"
 "     - occupancy %s\n"
 "     - %s\n"
 
-# File: project/readers/read_cif.c, Line: 2587
+# File: project/readers/read_cif.c, Line: 2705
 msgid "The crystal will be created however some objects might be missing,\n"
 "Occupancy is too low compared to the number of site(s) per cell.\n\n"
 "<b>To build a crystal matching the defined occupancy</b>:\n"
@@ -3498,7 +3498,7 @@ msgstr "The crystal will be created however some objects might be missing,\n"
 "\t <b>2)</b> Modify the occupancy set-up to 'Completely random'.\n"
 "\t <b>3)</b> Increase the number of unit cells up to get rid of this message.\n\n"
 
-# File: project/readers/read_cif.c, Line: 2596
+# File: project/readers/read_cif.c, Line: 2714
 msgid "Object(s) at equivalent positions have been removed\n"
 "to ensure the consistency of the model\n"
 "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n "
@@ -3506,60 +3506,60 @@ msgstr "Object(s) at equivalent positions have been removed\n"
 "to ensure the consistency of the model\n"
 "when using <b>P</b>eriodic <b>B</b>oundary <b>C</b>onditions\n "
 
-# File: project/readers/read_cif.c, Line: 384
+# File: project/readers/read_cif.c, Line: 391
 msgid "Error while reading CIF file"
 msgstr "Error while reading CIF file"
 
-# File: project/readers/read_cif.c, Line: 401
+# File: project/readers/read_cif.c, Line: 408
 msgid "Type N°%d:\t<b>%s</b>"
 msgstr "Type N°%d:\t<b>%s</b>"
 
-# File: project/readers/read_cif.c, Line: 418
+# File: project/readers/read_cif.c, Line: 425
 msgid "In case of a molecule: insert an extra type of atom and run a substitution afterwards."
 msgstr "In case of a molecule: insert an extra type of atom and run a substitution afterwards."
 
-# File: project/readers/read_cif.c, Line: 500,583
+# File: project/readers/read_cif.c, Line: 507,590
 msgid "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 msgstr "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 
 # File: calc/force_fields/force_fields.c, Line: 1048,2637
-# File: opengl/win/w_library.c, Line: 486
-# File: project/readers/read_cif.c, Line: 1129
+# File: opengl/win/w_library.c, Line: 488
+# File: project/readers/read_cif.c, Line: 1136
 # File: project/readers/read_isaacs.c, Line: 210,829
 msgid "label"
 msgstr "label"
 
-# File: project/readers/read_cif.c, Line: 1130,2666
+# File: project/readers/read_cif.c, Line: 1137,2784
 msgid "occupancy"
 msgstr "occupancy"
 
-# File: project/readers/read_cif.c, Line: 1169, 1250
+# File: project/readers/read_cif.c, Line: 1169,1250
 msgid "<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
 "<b>atomes</b> will open each set of coordinate(s) in a separate model."
 msgstr "<b>Atomic coordinates</b>: different sets of coordinate(s) were found. \n"
 "<b>atomes</b> will open each set of coordinate(s) in a separate model."
 
-# File: project/readers/read_cif.c, Line: 1209
+# File: project/readers/read_cif.c, Line: 1322
 msgid "<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."
 msgstr "<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."
 
-# File: project/readers/read_cif.c, Line: 1221
+# File: project/readers/read_cif.c, Line: 1334
 msgid "<b>Atomic coordinates</b>: impossible to find '%s' ..."
 msgstr "<b>Atomic coordinates</b>: impossible to find '%s' ..."
 
-# File: project/readers/read_cif.c, Line: 1237,2669
+# File: project/readers/read_cif.c, Line: 1350,2787
 msgid "Please select how to handle occupancy"
 msgstr "Please select how to handle occupancy"
 
-# File: project/readers/read_cif.c, Line: 1237,2669
+# File: project/readers/read_cif.c, Line: 1350,2787
 msgid "Select how to handle occupancy"
 msgstr "Select how to handle occupancy"
 
-# File: project/readers/read_cif.c, Line: 1241,2673
+# File: project/readers/read_cif.c, Line: 1354,2791
 msgid "Occupancy %s\n\t%s\n"
 msgstr "Occupancy %s\n\t%s\n"
 
-# File: project/readers/read_cif.c, Line: 1357
+# File: project/readers/read_cif.c, Line: 1470
 msgid "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 msgstr "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 
@@ -3571,75 +3571,75 @@ msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be s
 msgid "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 
-# File: project/readers/read_cif.c, Line: 1849,1866
+# File: project/readers/read_cif.c, Line: 1962,1979
 msgid "<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"
 msgstr "<b>Lattice parameters</b>: impossible to retrieve the '%s' parameter !\n"
 
-# File: project/readers/read_cif.c, Line: 1928
+# File: project/readers/read_cif.c, Line: 2041
 msgid "<b>Space group</b>: no space group and no H-M symbol found !\n"
 msgstr "<b>Space group</b>: no space group and no H-M symbol found !\n"
 
-# File: project/readers/read_cif.c, Line: 1944
+# File: project/readers/read_cif.c, Line: 2057
 msgid "<b>Space group</b>: no space group found, unknown H-M symbol !\n"
 msgstr "<b>Space group</b>: no space group found, unknown H-M symbol !\n"
 
-# File: project/readers/read_cif.c, Line: 2006,2036,2043,2053,2064
+# File: project/readers/read_cif.c, Line: 2119,2149,2156,2166,2177
 msgid "<b>Space group</b>: ambiguous space group setting !\n"
 msgstr "<b>Space group</b>: ambiguous space group setting !\n"
 
-# File: project/readers/read_cif.c, Line: 2100
+# File: project/readers/read_cif.c, Line: 2213
 msgid "hexagonal"
 msgstr "hexagonal"
 
-# File: project/readers/read_cif.c, Line: 2100
+# File: project/readers/read_cif.c, Line: 2213
 msgid "rhombohedral"
 msgstr "rhombohedral"
 
-# File: project/readers/read_cif.c, Line: 2168
+# File: project/readers/read_cif.c, Line: 2281
 msgid "Space group changes between configurations !\n"
 msgstr "Space group changes between configurations !\n"
 
-# File: project/readers/read_cif.c, Line: 2203
+# File: project/readers/read_cif.c, Line: 2321
 msgid "Symmetry position(s) in CIF file\n"
 msgstr "Symmetry position(s) in CIF file\n"
 
-# File: project/readers/read_cif.c, Line: 2208
+# File: project/readers/read_cif.c, Line: 2326
 msgid "No symmetry position(s) in CIF file\n"
 msgstr "No symmetry position(s) in CIF file\n"
 
-# File: project/readers/read_cif.c, Line: 2682
+# File: project/readers/read_cif.c, Line: 2800
 msgid "It seems the CIF file contains <b>%d</b> distinct configurations\n"
 msgstr "It seems the CIF file contains <b>%d</b> distinct configurations\n"
 
-# File: project/readers/read_cif.c, Line: 2687
+# File: project/readers/read_cif.c, Line: 2805
 msgid "Impossible to use symmetry positions with multiple configurations\n"
 msgstr "Impossible to use symmetry positions with multiple configurations\n"
 
-# File: project/readers/read_cif.c, Line: 2698
+# File: project/readers/read_cif.c, Line: 2816
 msgid "This CIF file could be describing a trajectory or a chemical reaction.\n"
 msgstr "This CIF file could be describing a trajectory or a chemical reaction.\n"
 
-# File: project/readers/read_cif.c, Line: 2709,2714
+# File: project/readers/read_cif.c, Line: 2827,2832
 msgid "Please select how to process the data in the CIF file"
 msgstr "Please select how to process the data in the CIF file"
 
-# File: project/readers/read_cif.c, Line: 2709,2714
+# File: project/readers/read_cif.c, Line: 2827,2832
 msgid "Select how to process data"
 msgstr "Select how to process data"
 
-# File: project/readers/read_cif.c, Line: 2713
+# File: project/readers/read_cif.c, Line: 2831
 msgid "This CIF file could be describing a trajectory.\n"
 msgstr "This CIF file could be describing a trajectory.\n"
 
-# File: project/readers/read_cif.c, Line: 2725
+# File: project/readers/read_cif.c, Line: 2843
 msgid "Select the configuration <i>c</i>, <i>c</i> &#x2208; [1-%d]"
 msgstr "Select the configuration <i>c</i>, <i>c</i> &#x2208; [1-%d]"
 
-# File: project/readers/read_cif.c, Line: 2729
+# File: project/readers/read_cif.c, Line: 2847
 msgid "Please select the configuration to work on"
 msgstr "Please select the configuration to work on"
 
-# File: project/readers/read_cif.c, Line: 2739
+# File: project/readers/read_cif.c, Line: 2857
 msgid "Working on configuration N°%d\n"
 msgstr "Working on configuration N°%d\n"
 
@@ -3866,7 +3866,7 @@ msgstr "Impossible to initialize the OpenGL 3D rendering ! \n %s\n"
 msgid "Compilation failure in %s shader:\n%s"
 msgstr "Compilation failure in %s shader:\n%s"
 
-# File: gui/main.c, Line: 413
+# File: gui/main.c, Line: 412
 # File: opengl/ogl_shading.c, Line: 111
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
@@ -3931,7 +3931,7 @@ msgstr "Move"
 
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 3703
-# File: opengl/win/w_library.c, Line: 1139
+# File: opengl/win/w_library.c, Line: 1141
 # File: opengl/win/w_search.c, Line: 2904,2910,3579
 msgid "Replace"
 msgstr "Replace"
@@ -3944,7 +3944,7 @@ msgstr "Remove"
 
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 4201,4256
-# File: opengl/win/w_library.c, Line: 1139
+# File: opengl/win/w_library.c, Line: 1141
 # File: opengl/win/w_search.c, Line: 3581
 msgid "Insert"
 msgstr "Insert"
@@ -3962,7 +3962,6 @@ msgid "All Selected Atoms"
 msgstr "All Selected Atoms"
 
 # File: calc/cpmd/cpmd_init.c, Line: 158
-# File: calc/dl_poly/dlp_edit.c, Line: 2466
 # File: opengl/edit/atom_edit.c, Line: 61
 msgid "All Atoms"
 msgstr "All Atoms"
@@ -4432,7 +4431,7 @@ msgstr "Rhombohedral"
 # File: opengl/win/m_map.c, Line: 679
 # File: opengl/win/w_chains.c, Line: 298
 # File: opengl/win/w_coord.c, Line: 892,997
-# File: opengl/win/w_measures.c, Line: 491,492,493
+# File: opengl/win/w_measures.c, Line: 469,470,471
 # File: opengl/win/w_rings.c, Line: 413
 msgid "Id."
 msgstr "Id."
@@ -4526,7 +4525,7 @@ msgstr "- Slab rotation: "
 
 # File: calc/dl_poly/dlp_field.c, Line: 499
 # File: opengl/edit/cell_cut.c, Line: 307
-# File: opengl/win/w_measures.c, Line: 752
+# File: opengl/win/w_measures.c, Line: 749
 msgid "Angles"
 msgstr "Angles"
 
@@ -5234,7 +5233,7 @@ msgstr "Chemistry"
 msgid "Sorry OpenGL is not supported !"
 msgstr "Sorry OpenGL is not supported !"
 
-# File: gui/callbacks.c, Line 1641
+# File: gui/callbacks.c, Line: 1641
 # File: opengl/win/glwindow.c, Line: 1376
 # File: opengl/win/m_tools.c, Line: 240
 # File: workspace/workspace.c, Line: 368
@@ -5910,7 +5909,7 @@ msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Color palette error: %s - %d, custom= %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 209
-# File: gui/main.c, Line: 414
+# File: gui/main.c, Line: 413
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
@@ -6209,10 +6208,10 @@ msgid "Clone(s) configuration - "
 msgstr "Clone(s) configuration - "
 
 # File: calc/force_fields/force_fields.c, Line: 711,2384
-# File: gui/main.c, Line: 562
+# File: gui/main.c, Line: 561
 # File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
-# File: opengl/win/w_library.c, Line: 466
+# File: opengl/win/w_library.c, Line: 468
 # File: project/readers/read_isaacs.c, Line: 200,783
 msgid "atoms"
 msgstr "atoms"
@@ -6783,7 +6782,7 @@ msgid "Other"
 msgstr "Other"
 
 # File: opengl/win/w_crystal.c, Line: 450
-# File: opengl/win/w_library.c, Line: 865
+# File: opengl/win/w_library.c, Line: 867
 msgid "<i>Formula:</i>"
 msgstr "<i>Formula:</i>"
 
@@ -7412,7 +7411,7 @@ msgstr "Deuterium"
 msgid "Other ..."
 msgstr "Other ..."
 
-# File: opengl/win/w_library.c, Line: 204,1129
+# File: opengl/win/w_library.c, Line: 204,1131
 msgid "Library"
 msgstr "Library"
 
@@ -7428,35 +7427,35 @@ msgstr "Ni-Phthalocyanine"
 msgid "More ..."
 msgstr "More ..."
 
-# File: opengl/win/w_library.c, Line: 215,242
+# File: opengl/win/w_library.c, Line: 215,243
 msgid "Misc"
 msgstr "Misc"
 
-# File: opengl/win/w_library.c, Line: 216,243
+# File: opengl/win/w_library.c, Line: 216,244
 msgid "Alcohols"
 msgstr "Alcohols"
 
-# File: opengl/win/w_library.c, Line: 217,244
+# File: opengl/win/w_library.c, Line: 217,245
 msgid "Aldehydes"
 msgstr "Aldehydes"
 
-# File: opengl/win/w_library.c, Line: 218,245
+# File: opengl/win/w_library.c, Line: 218,246
 msgid "Alkanes"
 msgstr "Alkanes"
 
-# File: opengl/win/w_library.c, Line: 219,246
+# File: opengl/win/w_library.c, Line: 219,247
 msgid "Alkenes"
 msgstr "Alkenes"
 
-# File: opengl/win/w_library.c, Line: 220,247
+# File: opengl/win/w_library.c, Line: 220,248
 msgid "Alkynes"
 msgstr "Alkynes"
 
-# File: opengl/win/w_library.c, Line: 221,248
+# File: opengl/win/w_library.c, Line: 221,249
 msgid "Amides"
 msgstr "Amides"
 
-# File: opengl/win/w_library.c, Line: 222,249
+# File: opengl/win/w_library.c, Line: 222,250
 msgid "Amines"
 msgstr "Amines"
 
@@ -7464,7 +7463,7 @@ msgstr "Amines"
 msgid "Amino acids"
 msgstr "Amino acids"
 
-# File: opengl/win/w_library.c, Line: 224,251
+# File: opengl/win/w_library.c, Line: 224,252
 msgid "Aromatics"
 msgstr "Aromatics"
 
@@ -7480,7 +7479,7 @@ msgstr "Cyclic alkanes"
 msgid "Cyclic alkenes"
 msgstr "Cyclic alkenes"
 
-# File: opengl/win/w_library.c, Line: 228,255
+# File: opengl/win/w_library.c, Line: 228,256
 msgid "Ethers"
 msgstr "Ethers"
 
@@ -7488,131 +7487,131 @@ msgstr "Ethers"
 msgid "Fatty acids"
 msgstr "Fatty acids"
 
-# File: opengl/win/w_library.c, Line: 230,257
+# File: opengl/win/w_library.c, Line: 230,258
 msgid "Fullerenes"
 msgstr "Fullerenes"
 
-# File: opengl/win/w_library.c, Line: 231,258
+# File: opengl/win/w_library.c, Line: 231,259
 msgid "Heterocyclics"
 msgstr "Heterocyclics"
 
-# File: opengl/win/w_library.c, Line: 232,259
+# File: opengl/win/w_library.c, Line: 232,260
 msgid "Macrocycles"
 msgstr "Macrocycles"
 
-# File: opengl/win/w_library.c, Line: 233,260
+# File: opengl/win/w_library.c, Line: 233,261
 msgid "Ketones"
 msgstr "Ketones"
 
-# File: opengl/win/w_library.c, Line: 234,261
+# File: opengl/win/w_library.c, Line: 234,262
 msgid "Nitriles"
 msgstr "Nitriles"
 
-# File: opengl/win/w_library.c, Line: 235,262
+# File: opengl/win/w_library.c, Line: 235,263
 msgid "Nucleobases"
 msgstr "Nucleobases"
 
-# File: opengl/win/w_library.c, Line: 236,263
+# File: opengl/win/w_library.c, Line: 236,264
 msgid "Nucleotides"
 msgstr "Nucleotides"
 
-# File: opengl/win/w_library.c, Line: 236,263
+# File: opengl/win/w_library.c, Line: 237,265
 msgid "Steroids"
 msgstr "Steroids"
 
-# File: opengl/win/w_library.c, Line: 237
+# File: opengl/win/w_library.c, Line: 238
 msgid "Sugars (Linears)"
 msgstr "Sugars (Linears)"
 
-# File: opengl/win/w_library.c, Line: 238
+# File: opengl/win/w_library.c, Line: 239
 msgid "Sugars (Cyclics)"
 msgstr "Sugars (Cyclics)"
 
-# File: opengl/win/w_library.c, Line: 239,266
+# File: opengl/win/w_library.c, Line: 240,268
 msgid "Sulfoxides"
 msgstr "Sulfoxides"
 
-# File: opengl/win/w_library.c, Line: 240,267
+# File: opengl/win/w_library.c, Line: 241,269
 msgid "Thiols"
 msgstr "Thiols"
 
-# File: opengl/win/w_library.c, Line: 884
+# File: opengl/win/w_library.c, Line: 886
 msgid "<i>Molecular mass:</i>"
 msgstr "<i>Molecular mass:</i>"
 
-# File: opengl/win/w_library.c, Line: 895
+# File: opengl/win/w_library.c, Line: 897
 msgid "<i>IUPAC name:</i>"
 msgstr "<i>IUPAC name:</i>"
 
-# File: opengl/win/w_library.c, Line: 905
+# File: opengl/win/w_library.c, Line: 907
 msgid "<i>Other name(s):</i>"
 msgstr "<i>Other name(s):</i>"
 
-# File: opengl/win/w_library.c, Line: 1146
+# File: opengl/win/w_library.c, Line: 1148
 msgid "Family"
 msgstr "Family"
 
-# File: opengl/win/w_measures.c, Line: 491,492,493
+# File: opengl/win/w_measures.c, Line: 469,470,471
 msgid "Atom 1"
 msgstr "Atom 1"
 
-# File: opengl/win/w_measures.c, Line: 491,492,493
+# File: opengl/win/w_measures.c, Line: 469,470,471
 msgid "Atom 2"
 msgstr "Atom 2"
 
-# File: opengl/win/w_measures.c, Line: 491
+# File: opengl/win/w_measures.c, Line: 469
 msgid "Distance [Å]"
 msgstr "Distance [Å]"
 
-# File: opengl/win/w_measures.c, Line: 491,492,493
+# File: opengl/win/w_measures.c, Line: 469,470,471
 msgid "Using PBC"
 msgstr "Using PBC"
 
-# File: opengl/win/w_measures.c, Line: 492,493
+# File: opengl/win/w_measures.c, Line: 470,471
 msgid "Atom 3"
 msgstr "Atom 3"
 
-# File: opengl/win/w_measures.c, Line: 493
+# File: opengl/win/w_measures.c, Line: 471
 msgid "Atom 4"
 msgstr "Atom 4"
 
-# File: opengl/win/w_measures.c, Line: 626
+# File: opengl/win/w_measures.c, Line: 623
 msgid "\tAtom(s) in selection<sup>*</sup> :\t<b>%d</b>"
 msgstr "\tAtom(s) in selection<sup>*</sup> :\t<b>%d</b>"
 
-# File: opengl/win/w_measures.c, Line: 630
+# File: opengl/win/w_measures.c, Line: 627
 msgid "\tSorry too many [%d] atoms in selection<sup>*</sup>"
 msgstr "\tSorry too many [%d] atoms in selection<sup>*</sup>"
 
-# File: opengl/win/w_measures.c, Line: 675
+# File: opengl/win/w_measures.c, Line: 672
 msgid "%s - measures - style"
 msgstr "%s - measures - style"
 
-# File: opengl/win/w_measures.c, Line: 740
+# File: opengl/win/w_measures.c, Line: 737
 # File: workspace/workspace.c, Line: 405
 msgid "%s - measures"
 msgstr "%s - measures"
 
 # File: calc/dl_poly/dlp_field.c, Line: 427
-# File: opengl/win/w_measures.c, Line: 751
+# File: opengl/win/w_measures.c, Line: 748
 msgid "Distances"
 msgstr "Distances"
 
 # File: calc/dl_poly/dlp_field.c, Line: 566,567
 # File: calc/force_fields/force_fields.c, Line: 251
-# File: opengl/win/w_measures.c, Line: 753
+# File: opengl/win/w_measures.c, Line: 750
 msgid "Dihedrals"
 msgstr "Dihedrals"
 
-# File: opengl/win/w_measures.c, Line: 755
+# File: opengl/win/w_measures.c, Line: 752
 msgid "You can select up to %d atoms for both inter-atomic distance(s) and angle(s),"
 msgstr "You can select up to %d atoms for both inter-atomic distance(s) and angle(s),"
 
-# File: opengl/win/w_measures.c, Line: 758
+# File: opengl/win/w_measures.c, Line: 755
 msgid "and up to %d atoms for dihedral angle(s) measurement(s)"
 msgstr "and up to %d atoms for dihedral angle(s) measurement(s)"
 
-# File: opengl/win/w_measures.c, Line: 762
+# File: opengl/win/w_measures.c, Line: 759
 msgid "Font and style"
 msgstr "Font and style"
 
@@ -9160,6 +9159,7 @@ msgstr "\n"
 "          &EACH\n"
 "            QS_SCF 0                        ! => Never write restart file(s) during the SCF cycle\n"
 
+# File: calc/cp2k/cp2k_print.c, Line: 196
 msgid "      &END PRINT\n\n"
 "    &END SCF\n"
 "! Going to the exchange-correlation section\n"
