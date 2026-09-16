@@ -51,7 +51,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void update_sa_info (int sid);
   void prepare_sp_box ();
   void cell_data_from_pdb_ (float * a, float * b, float * c, float * alp, float * bet, float * gam);
-  void open_this_coordinate_file (int format, gchar * proj_name);
+  void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader);
 
   G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data);
   G_MODULE_EXPORT void run_on_open_save_active (GtkNativeDialog * info, gint response_id, gpointer data);
@@ -1558,15 +1558,21 @@ GtkFileFilter * filter[NCFORMATS+1];
 int pactive;
 
 /*!
-  \fn void open_this_coordinate_file (int format, gchar * proj_name)
+  \fn void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader)
 
   \brief open coordinate file format, if successful add to workspace
 
   \param format the format of the file that contains the atomic coordinates
   \param proj_name the project name to use, if any
+  \param main_reader CIF file use only to define the initial process
 */
-void open_this_coordinate_file (int format, gchar * proj_name)
+void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader)
 {
+  // Extra for CIF files
+  int ncc;
+  gchar * cif_file_name;
+  gchar * cif_proj_name;
+  //
   active_project -> newproj = FALSE;
   clock_gettime (CLOCK_MONOTONIC, & start_time);
   if (open_coordinate_file (format) == 0)
@@ -1620,8 +1626,34 @@ void open_this_coordinate_file (int format, gchar * proj_name)
         init_project (TRUE);
         active_project -> coordfile = g_strdup_printf ("%s", file_name);
         g_free (file_name);
-        open_this_coordinate_file (11, proj_name);
+        open_this_coordinate_file (11, proj_name, FALSE);
         g_free (proj_name);
+      }
+      else if (cif_cnftodo && main_reader)
+      {
+        gchar * cif_coordinates[3]={i18n("Standard CIF Cartesian coordinates"),
+                                    i18n("mmCIF - x/y/z coordinates for each atom"),
+                                    i18n("mmCIF - computed idealized coordinates")};
+        // For Cartesian coordinates only, if multiple formats are found
+        cif_file_name = g_strdup_printf ("%s", active_project -> coordfile);
+        cif_proj_name = g_strdup_printf ("%s", active_project -> name);
+        active_project -> name = g_strdup_printf ("%s - %s", cif_proj_name, (! cif_cnfkeys[0][0]) ? _(cif_coordinates[0]) : _(cif_coordinates[cif_cnfkeys[0][1]]));
+        correct_this_window_title (active_glwin -> win, g_strdup_printf (_("%s - 3D view - [%s mode]"), active_project -> name, _(mode_name[active_glwin -> mode])));
+        for (ncc=1; ncc < cif_cnfcart; ncc ++)
+        {
+          init_project (TRUE);
+          active_project -> coordfile = g_strdup_printf ("%s", cif_file_name);
+          active_project -> name =  g_strdup_printf ("%s - %s", cif_proj_name, (! cif_cnfkeys[ncc][0]) ? _(cif_coordinates[0]) : _(cif_coordinates[cif_cnfkeys[ncc][1]]));
+          open_this_coordinate_file (format, active_project -> name, FALSE);
+        }
+        g_free (cif_file_name);
+        g_free (cif_proj_name);
+        cif_cnfcart = 0;
+        g_free (cif_cnfkeys);
+        cif_cnfkeys = NULL;
+        g_free (cif_cnftodo);
+        cif_cnftodo = NULL;
+        cif_cnfdone = 0;
       }
     }
   }
@@ -1685,7 +1717,7 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
         {
           j = iask (_("Please select the file format of the atomic coordinates"), _("Select format:"), 2, atomes_main_window);
         }
-        open_this_coordinate_file (j, NULL);
+        open_this_coordinate_file (j, NULL, TRUE);
       }
       else
       {

@@ -16,7 +16,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: atomes 1.3.2\n"
-"PO-Revision-Date: 2026-09-03 16:00+0200\n"
+"PO-Revision-Date: 2026-09-16 14:00+0200\n"
 "Last-Translator: Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>\n"
 "Language-Team: Français\n"
 "Language: fr\n"
@@ -1004,6 +1004,18 @@ msgstr "Erreur de lecture: impossible de traiter les données du fichier d'entr�
 # File: gui/callbacks.c, Line: 1619
 msgid "%s - symmetry position(s)"
 msgstr "%s - position(s) de symétrie"
+
+# File: gui/callbacks.c, Line: 1634
+msgid "Standard CIF Cartesian coordinates"
+msgstr "Coordonnées CIF standard"
+
+# File: gui/callbacks.c, Line: 1635
+msgid "mmCIF - x/y/z coordinates for each atom"
+msgstr "mmCIF - coordonnées x/y/z pour chaque atome"
+
+# File: gui/callbacks.c, Line: 1636
+msgid "mmCIF - computed idealized coordinates"
+msgstr "mmCIF - coordonnées calculées idéales"
 
 # File: gui/callbacks.c, Line: 1686
 msgid "Please select the file format of the atomic coordinates"
@@ -3521,6 +3533,12 @@ msgstr "label"
 msgid "occupancy"
 msgstr "occupation"
 
+# File: project/readers/read_cif.c, Line: 1169, 1250
+msgid "<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
+"<b>atomes</b> will open each set of coordinate(s) in a separate model."
+msgstr "<b>>Coordonnées atomiques</b>: différents jeux de coordonnée(s) ont été trouvés.\n"
+"<b>atomes</b> va ouvrir chaque jeu de coordonnée(s) dans un modèle séparé."
+
 # File: project/readers/read_cif.c, Line: 1209
 msgid "<b>Atomic coordinates</b>: impossible to find atomic label(s) ..."
 msgstr "<b>Coordonnées atomiques</b>: impossible de trouver des labels atomiques ..."
@@ -5216,6 +5234,7 @@ msgstr "Chimie"
 msgid "Sorry OpenGL is not supported !"
 msgstr "Désolé, OpenGL n'est pas supporté !"
 
+# File: gui/callbacks.c, Line 1641
 # File: opengl/win/glwindow.c, Line: 1376
 # File: opengl/win/m_tools.c, Line: 240
 # File: workspace/workspace.c, Line: 368

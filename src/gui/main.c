@@ -970,7 +970,7 @@ void open_this_data_file (int file_type, gchar * file_name)
           {
             init_project (TRUE);
             active_project -> coordfile =  g_strdup_printf ("%s\\%s", filedir, (gchar *)ffd.cFileName);
-            open_this_coordinate_file (file_type-3, NULL);
+            open_this_coordinate_file (file_type-3, NULL, TRUE);
           }
           while (FindNextFile(hFind, &ffd) != 0)
           {
@@ -978,7 +978,7 @@ void open_this_data_file (int file_type, gchar * file_name)
             {
               init_project (TRUE);
               active_project -> coordfile = g_strdup_printf ("%s\\%s", filedir, (gchar *)ffd.cFileName);
-              open_this_coordinate_file (file_type-3, NULL);
+              open_this_coordinate_file (file_type-3, NULL, TRUE);
             }
           }
         }
@@ -993,7 +993,7 @@ void open_this_data_file (int file_type, gchar * file_name)
             {
               init_project (TRUE);
               active_project -> coordfile = g_strdup_printf ("%s/%s", filedir, dir -> d_name);
-              open_this_coordinate_file (file_type-3, NULL);
+              open_this_coordinate_file (file_type-3, NULL, TRUE);
             }
           }
           closedir(d);
@@ -1005,7 +1005,7 @@ void open_this_data_file (int file_type, gchar * file_name)
       {
         init_project (TRUE);
         active_project -> coordfile = g_strdup_printf ("%s", file_name);
-        open_this_coordinate_file (file_type-3, NULL);
+        open_this_coordinate_file (file_type-3, NULL, TRUE);
       }
       break;
   }

@@ -163,11 +163,16 @@ gchar * linekeys[NLKEYS] = {"_atom_site",                                       
 
 #define CFKEYS 3
 gchar * frackeys[CFKEYS-1][3] = {{"fract_x", "fract_y", "fract_z"},                                                     // Most common
-                                 {"model_fract_x", "model_fract_y", "model_fract_z"}};                                  // RCSB database: https://www.rcsb.org/
-gchar * cartkeys[CFKEYS][3] = {{"cartn_x", "cartn_y", "cartn_z"},                                                     // Most common, or is it old stuff ?
-                               // For the following next lines, it is not yet clear which one to put first, waiting reply from RCSB
-                               {"pdbx_model_cartn_x_ideal", "pdbx_model_cartn_y_ideal", "pdbx_model_cartn_z_ideal"},  // RCSB database: https://www.rcsb.org/
-                               {"model_cartn_x", "model_cartn_y", "model_cartn_z"}};                                  // RCSB database: https://www.rcsb.org/
+                                 {"model_fract_x", "model_fract_y", "model_fract_z"}};                                  // mmCIF, RCSB database: https://www.rcsb.org/
+gchar * cartkeys[CFKEYS][3] = {{"cartn_x", "cartn_y", "cartn_z"},                                                       // Most common
+                               {"model_cartn_x", "model_cartn_y", "model_cartn_z"},                                     // mmCIF, RCSB database: https://www.rcsb.org/
+                               {"pdbx_model_cartn_x_ideal", "pdbx_model_cartn_y_ideal", "pdbx_model_cartn_z_ideal"}};   // mmCIF, RCSB database: https://www.rcsb.org/
+
+// Coordinates identification buffers if multiple sets of Cartesian coordinates are found
+int cif_cnfcart = 0;              // Number of formats of Cartesian coordinates, if multiple
+int ** cif_cnfkeys = NULL;        // Associated keywords in linekeys and cartkeys
+gboolean * cif_cnftodo = NULL;    // Was processed already or not
+int cif_cnfdone = 0;              // Number of format(s) processed
 
 #ifdef G_OS_WIN32
   typedef intptr_t ssize_t;
@@ -1141,32 +1146,72 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   double * tmp_z;
   if (cif_multiple)
   {
-    for (i=0; i<NLKEYS; i++)
+    if (this_reader -> cartesian)
     {
-      j = (this_reader -> cartesian) ? CFKEYS : CFKEYS-1;
-      for (k=0; k<j; k++)
+      if (! cif_cnftodo)
       {
-        loop_line = get_loop_line_for_key (linec, conf, linekeys[i], (this_reader -> cartesian) ? cartkeys[k][0] : frackeys[k][0]);
-        if (loop_line)
+        k = 0;
+        for (i=0; i<NLKEYS; i++)
         {
-          lid = i;
-          fid = k;
-          break;
+          for (j=0; j<CFKEYS; j++)
+          {
+            if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+            {
+              lid = i;
+              fid = j;
+              k ++;
+            }
+          }
+        }
+        if (k > 1)        {
+          // Opening k models for the different sets of atomic coordinates
+          add_reader_info (_("<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
+                             "<b>atomes</b> will open each set of coordinate(s) in a separate model."), 1);
+          cif_cnfkeys = allocdint (k, 2);
+          cif_cnftodo = allocbool (k);
+          cif_cnfcart = k;
+          k = 0;
+          for (i=0; i<NLKEYS; i++)
+          {
+            for (j=0; j<CFKEYS; j++)
+            {
+              if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+              {
+                cif_cnfkeys[k][0] = i;
+                cif_cnfkeys[k][1] = j;
+                k ++;
+              }
+            }
+          }
+          lid = cif_cnfkeys[0][0];
+          fid = cif_cnfkeys[0][1];
+          cif_cnftodo[0] = TRUE;
+          cif_cnfdone = 1;
         }
       }
-      if (loop_line) break;
+      else
+      {
+        for (i=0; i<cif_cnfcart; i++)
+        {
+          if (! cif_cnftodo[i])
+          {
+            lid = cif_cnfkeys[i][0];
+            fid = cif_cnfkeys[i][1];
+            cif_cnftodo[i] = TRUE;
+            cif_cnfdone ++;
+            break;
+          }
+        }
+      }
+      loop_line = get_loop_line_for_key (linec, conf, linekeys[lid], cartkeys[fid][0]);
     }
-    if (! loop_line) return FALSE;
-  }
-  else
-  {
-    if (this_reader -> cartesian)
+    else
     {
       for (i=0; i<NLKEYS; i++)
       {
-        for (j=0; j<CFKEYS; j++)
+        for (j=0; j<CFKEYS-1; j++)
         {
-          loop_line = get_loop_line_for_key (linec, 0, linekeys[i], cartkeys[j][0]);
+          loop_line = get_loop_line_for_key (linec, conf, linekeys[i], frackeys[j][0]);
           if (loop_line)
           {
             lid = i;
@@ -1176,6 +1221,70 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
         }
         if (loop_line) break;
       }
+      if (! loop_line) return FALSE;
+    }
+  }
+  else
+  {
+    if (this_reader -> cartesian)
+    {
+      if (! cif_cnftodo)
+      {
+        k = 0;
+        for (i=0; i<NLKEYS; i++)
+        {
+          for (j=0; j<CFKEYS; j++)
+          {
+            if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+            {
+              lid = i;
+              fid = j;
+              k ++;
+            }
+          }
+        }
+        if (k > 1)
+        {
+          // Opening k models for the different sets of atomic coordinates
+          add_reader_info (_("<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
+                             "<b>atomes</b> will open each set of coordinate(s) in a separate model."), 1);
+          cif_cnfkeys = allocdint (k, 2);
+          cif_cnftodo = allocbool (k);
+          cif_cnfcart = k;
+          k = 0;
+          for (i=0; i<NLKEYS; i++)
+          {
+            for (j=0; j<CFKEYS; j++)
+            {
+              if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+              {
+                cif_cnfkeys[k][0] = i;
+                cif_cnfkeys[k][1] = j;
+                k ++;
+              }
+            }
+          }
+          lid = cif_cnfkeys[0][0];
+          fid = cif_cnfkeys[0][1];
+          cif_cnftodo[0] = TRUE;
+          cif_cnfdone = 1;
+        }
+      }
+      else
+      {
+        for (i=1; i<cif_cnfcart; i++)
+        {
+          if (! cif_cnftodo[i])
+          {
+            lid = cif_cnfkeys[i][0];
+            fid = cif_cnfkeys[i][1];
+            cif_cnftodo[i] = TRUE;
+            cif_cnfdone ++;
+            break;
+          }
+        }
+      }
+      loop_line = get_loop_line_for_key (linec, conf, linekeys[lid], cartkeys[fid][0]);
     }
     else
     {

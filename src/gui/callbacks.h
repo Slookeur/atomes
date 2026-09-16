@@ -43,7 +43,7 @@ G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data);
 G_MODULE_EXPORT void on_save_as_activate (GtkWidget * widg, gpointer data);
 extern void open_this_isaacs_xml_file (gchar * profile, int ptoc, gboolean visible);
 G_MODULE_EXPORT void on_isaacs_port (GtkWidget * widg, gpointer data);
-extern void open_this_coordinate_file (int format, gchar * proj_name);
+extern void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader);
 G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data);
 void to_read_pos ();
 void display_distances ();
