@@ -251,6 +251,7 @@ OBJ_PROJ = \
 	$(OBJ)read_pdb.o \
 	$(OBJ)read_hist.o \
 	$(OBJ)read_npt.o \
+	$(OBJ)read_sml.o \
 	$(OBJ)update_p.o \
 	$(OBJ)init_p.o \
 	$(OBJ)debugio.o \
@@ -688,6 +689,8 @@ $(OBJ)read_hist.o:
 	$(CC) -c $(CFLAGS) $(DOMP) $(DEFS) -o $(OBJ)read_hist.o $(PROJ)readers/read_hist.c $(INCLUDES)
 $(OBJ)read_npt.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)read_npt.o $(PROJ)readers/read_npt.c $(INCLUDES)
+$(OBJ)read_sml.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)read_sml.o $(PROJ)readers/read_sml.c $(INCLUDES)
 $(OBJ)update_p.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)update_p.o $(PROJ)update_p.c $(INCLUDES)
 $(OBJ)init_p.o:
