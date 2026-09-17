@@ -7500,8 +7500,8 @@ msgid "Fullerenes"
 msgstr "Fullerènes"
 
 # File: opengl/win/w_library.c, Line: 231,259
-msgid "Heterocyclics"
-msgstr "Hétérocycliques"
+msgid "Heterocycles"
+msgstr "Hétérocycles"
 
 # File: opengl/win/w_library.c, Line: 232,260
 msgid "Macrocycles"
@@ -7554,6 +7554,10 @@ msgstr "<i>Nom IUPAC:</i>"
 # File: opengl/win/w_library.c, Line: 907
 msgid "<i>Other name(s):</i>"
 msgstr "<i>Autre(s) nom(s):</i>"
+
+# File: opengl/win/w_library.c, Line: 947
+msgid "<i>Information:</i>"
+msgstr "<i>Information(s):</i>"
 
 # File: opengl/win/w_library.c, Line: 1148
 msgid "Family"

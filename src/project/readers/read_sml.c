@@ -183,7 +183,8 @@ int sml_writer (project * this_proj)
   rc = xmlTextWriterStartElement(writer, BAD_CAST "scl-xml");
   if (rc < 0) return 1;
 
-  // class (corresponding family of molecule in the atomes software library)
+  // class : corresponding family of molecule in the atomes software library
+  // Setting-up "Misc" as default
   rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"class", "%s", "Misc");
   if (rc < 0) return 1;
 
@@ -192,24 +193,28 @@ int sml_writer (project * this_proj)
   if (rc < 0) return 1;
 
   // Library name = name displayed in atomes library, ask for it ?
-  rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"library-name", "%s", "Compound name here !");
+  rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"library-name", "%s", "Name in atomes library");
   if (rc < 0) return 1;
 
   // Ask for IUPAC name ?
-  rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"iupac-name", "%s", "IUPAC name here !");
+  rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"iupac-name", "%s", "IUPAC name");
   if (rc < 0) return 1;
 
-  rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"other-names");
-  if (rc < 0) return 1;
   // Ask for other name(s) ?
+  // rc = xmlTextWriterStartElement(writer, BAD_CAST (const xmlChar *)"other-names");
+  // if (rc < 0) return 1;
   // rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"name", "%s", "If any other name here !");
   // if (rc < 0) return 1;
-  rc = xmlTextWriterEndElement(writer);
-  if (rc < 0) return 1;
+  // rc = xmlTextWriterEndElement(writer);
+  // if (rc < 0) return 1;
 
   // End "names" section
   rc = xmlTextWriterEndElement(writer);
   if (rc < 0) return 1;
+
+  // Ask for information ?
+  // xmlTextWriterWriteFormatElement(writer, BAD_CAST (const xmlChar *)"information", "%s", "Information");
+  // if (rc < 0) return 1;
 
   if (save_sml_chemistry (writer, this_proj) < 0) return 1;
 

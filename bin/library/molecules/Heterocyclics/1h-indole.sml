@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Simple chemical library XML file -->
 <scl-xml>
- <class>Heterocyclics</class>
+ <class>Heterocycles</class>
  <names>
   <library-name>Indole</library-name>
   <iupac-name>Indole</iupac-name>

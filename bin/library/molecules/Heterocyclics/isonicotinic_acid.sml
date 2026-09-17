@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Simple chemical library XML file -->
 <scl-xml>
- <class>Heterocyclics</class>
+ <class>Heterocycles</class>
  <names>
   <library-name>Isonicotinic acid</library-name>
   <iupac-name>Pyridine-4-carboxylic acid</iupac-name>

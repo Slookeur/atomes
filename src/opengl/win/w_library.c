@@ -228,7 +228,7 @@ gchar * family_list[FAMILY]={i18n("Misc"),
                              i18n("Ethers"),
                              i18n("Fatty acids"),
                              i18n("Fullerenes"),
-                             i18n("Heterocyclics"),
+                             i18n("Heterocycles"),
                              i18n("Macrocycles"),
                              i18n("Ketones"),
                              i18n("Nitriles"),
@@ -256,7 +256,7 @@ gchar * family_dir[FAMILY]={"Misc",
                             "Ethers",
                             "Fatty_acids",
                             "Fullerenes",
-                            "Heterocyclics",
+                            "Heterocycles",
                             "Macrocycles",
                             "Ketones",
                             "Nitriles",
@@ -294,6 +294,7 @@ GtkWidget * lib_preview_box = NULL;
 GtkWidget * lib_preview_plot = NULL;
 project * lib_proj = NULL;
 gchar * other_name[5];
+gchar * lib_info = NULL;
 int o_names;
 int inserted_from_lib;
 
@@ -421,7 +422,7 @@ int sml_preview (const char * filetoread)
   int i, j, k;
   xmlDoc * doc;
   xmlTextReaderPtr reader;
-  xmlNodePtr racine, name_node, chem_node;
+  xmlNodePtr racine, name_node, info_node, chem_node;
   xmlNodePtr n_node, at_node, sp_node, coord_node;
   xmlNodePtr spec_node, lab_node, lot_node, pbc_node;
   xmlAttrPtr xspec;
@@ -451,17 +452,31 @@ int sml_preview (const char * filetoread)
   xmlFree (content);
   o_names ++;
   n_node = findnode (name_node -> children, "other-names");
-  if (n_node == NULL) return clean_xml_data (doc, reader);
-  n_node = n_node -> children;
-  for (name_node = n_node; name_node && o_names < 5; name_node = name_node->next)
+  if (n_node)
   {
-    if (name_node -> type == XML_ELEMENT_NODE)
+    n_node = n_node -> children;
+    for (name_node = n_node; name_node && o_names < 5; name_node = name_node->next)
     {
-      content = xmlNodeGetContent(name_node);
-      other_name[o_names] = g_strdup_printf ("%s", content);
-      xmlFree (content);
-      o_names ++;
+      if (name_node -> type == XML_ELEMENT_NODE)
+      {
+        content = xmlNodeGetContent(name_node);
+        other_name[o_names] = g_strdup_printf ("%s", content);
+        xmlFree (content);
+        o_names ++;
+      }
     }
+  }
+  info_node = findnode(racine -> children, "information");
+  if (info_node)
+  {
+    content = xmlNodeGetContent(info_node);
+    lib_info = g_strdup_printf ("%s", content);
+    xmlFree (content);
+  }
+  else
+  {
+    if (lib_info) g_free (lib_info);
+    lib_info = NULL;
   }
   chem_node = findnode(racine -> children, "chemistry");
   if (chem_node == NULL) return clean_xml_data (doc, reader);
@@ -883,7 +898,7 @@ void insert_preview ()
     str = g_strdup_printf ("%s</b>", str);
   }
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, -1, 0.0, 0.5), 8, 1, 3, 1);
-  gtk_grid_attach (GTK_GRID (grid),markup_label(_("<i>Molecular mass:</i>"), 100, -1, 0.0, 0.5), 5, 2, 3, 1);
+  gtk_grid_attach (GTK_GRID (grid), markup_label(_("<i>Molecular mass:</i>"), 100, -1, 0.0, 0.5), 5, 2, 3, 1);
   g_free (str);
   double mass = 0.0;
   for (i=0; i<lib_proj -> nspec; i++)
@@ -898,11 +913,12 @@ void insert_preview ()
   str = g_strdup_printf ("<b>%s</b>", check_xml_string(other_name[0]));
   gtk_grid_attach (GTK_GRID (grid), markup_label(str, 100, 30, 0.0, 0.5), 3, 5, 11, 1);
 
+  GtkWidget * hbox, * vbox;
   if (o_names > 1)
   {
-    GtkWidget * hbox = create_hbox (0);
+    hbox = create_hbox (0);
     gtk_fixed_put (GTK_FIXED(lib_preview_plot), hbox, 0, 230);
-    GtkWidget * vbox = create_vbox (BSEP);
+    vbox = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 0);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<i>Other name(s):</i>"), 100, 30, 0.0, 0.5), FALSE, FALSE, 0);
     for (i=1; i<o_names; i++)
@@ -919,6 +935,20 @@ void insert_preview ()
     vbox = create_vbox (BSEP);
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 15);
     add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, 100, 30+20*(o_names-2), 0.0, 0.5), FALSE, FALSE, 0);
+    g_free (str);
+  }
+
+  if (lib_info)
+  {
+    hbox = create_hbox (0);
+    gtk_fixed_put (GTK_FIXED(lib_preview_plot), hbox, 0, 230+15*(o_names-1));
+    vbox = create_vbox (BSEP);
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 0);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(_("<i>Information:</i>"), 100, 30, 0.0, 0.5), FALSE, FALSE, 0);
+    vbox = create_vbox (BSEP);
+    str = g_strdup_printf ("<b>%s</b>", check_xml_string(lib_info));
+    add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbox, vbox, FALSE, FALSE, 15);
+    add_box_child_start (GTK_ORIENTATION_VERTICAL, vbox, markup_label(str, 100, 30, 0.0, 0.5), FALSE, FALSE, 0);
     g_free (str);
   }
   show_the_widgets (lib_preview_box);
