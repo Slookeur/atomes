@@ -498,7 +498,7 @@ int XmlwriterFilename (const char * uri)
 int write_xml (const char * filetosave)
 {
   /* first, the file version */
-  int res=XmlwriterFilename(filetosave);
+  int res = XmlwriterFilename(filetosave);
   /*
    * Cleanup function for the XML library.
    */

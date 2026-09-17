@@ -143,16 +143,17 @@ void print_help()
             "  -v, --version             version information\n"
             "  -h, --help                display this help message\n\n"
             "files, any number, in any order, in the following formats:\n\n"
-            "  atomes workspace file             : .awf\n"
-            "  atomes project file               : .apf\n"
-            "  XYZ coordinates file              : .xyz\n"
-            "  Chem3D coordinates file           : .c3d\n"
-            "  CPMD trajectory                   : .trj\n"
-            "  VASP trajectory                   : .xdatcar\n"
-            "  PDB coordinates                   : .pdb, .ent\n"
-            "  Crystallographic Information File : .cif\n"
-            "  DL-POLY history file              : .hist\n"
-            "  ISAACS project file               : .ipf\n\n"
+            "  atomes workspace file              : .awf\n"
+            "  atomes project file                : .apf\n"
+            "  XYZ coordinates file               : .xyz\n"
+            "  Chem3D coordinates file            : .c3d\n"
+            "  CPMD trajectory                    : .trj\n"
+            "  VASP trajectory                    : .xdatcar\n"
+            "  PDB coordinates                    : .pdb, .ent\n"
+            "  Crystallographic Information File  : .cif\n"
+            "  DL-POLY history file               : .hist\n"
+            "  atomes chemical library file (XML) : .sml\n"
+            "  ISAACS project file                : .ipf\n\n"
             " alternatively specify the file format using:\n\n"
             " -awf [FILE]\n"
             " -apf [FILE]\n"
@@ -163,6 +164,7 @@ void print_help()
             " -pdb [FILE], or, -ent [FILE]\n"
             " -cif [FILE]\n"
             " -hist [FILE]\n"
+            " -sml [FILE]\n"
             " -ipf [FILE]\n\n"
             "ex:\n\n"
             " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
@@ -286,8 +288,8 @@ int test_this_ext (int len, gchar * arg)
 {
   int i;
   gchar * aext = g_strdup_printf ("%c%c%c%c", arg[len-4], arg[len-3], arg[len-2], arg[len-1]);
-  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
-  for (i=0; i<15; i++) if (g_strcmp0 (aext, eext[i]) == 0)
+  char * eext[16]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", ".car", "NULL", ".pdb", ".ent", ".cif", "NULL", ".hist", ".sml", ".ipf"};
+  for (i=0; i<16; i++) if (g_strcmp0 (aext, eext[i]) == 0)
   {
     g_free (aext);
     return -(i+1);
@@ -305,11 +307,11 @@ int test_this_ext (int len, gchar * arg)
 */
 int test_this_arg (gchar * arg)
 {
-  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
+  char * fext[16]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-sml", "-ipf"};
   int i, j;
   i = strlen(arg);
   gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<15; j++)
+  for (j=0; j<16; j++)
   {
     if (g_strcmp0 (str, fext[j]) == 0)
     {
@@ -945,7 +947,7 @@ void open_this_data_file (int file_type, gchar * file_name)
         read_this_file (2, file_name);
       }
       break;
-    case 15:
+    case 16:
       init_project (TRUE);
       open_this_isaacs_xml_file (g_strdup_printf ("%s", file_name), activep, FALSE);
       break;

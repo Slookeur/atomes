@@ -933,8 +933,8 @@ gchar * textcolor (int i)
 
 /*!
   \fn void lattice_info_ (int * bid, double * volume, double * density,
-                       double dvects[3][3], double rvects[3][3], double mod[3], double ang[3],
-                       double f_to_c[3][3], double c_to_f[3][3])
+                          double dvects[3][3], double rvects[3][3], double mod[3], double ang[3],
+                          double f_to_c[3][3], double c_to_f[3][3])
 
   \brief lattice data from Fortran90
 

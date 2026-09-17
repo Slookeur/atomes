@@ -330,7 +330,7 @@ enum ImageFormats {
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
 */
-#define NCFORMATS 13
+#define NCFORMATS 14
 
 #define NITEMS 4
 

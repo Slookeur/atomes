@@ -60,6 +60,7 @@ extern int open_vas_file (int linec);
 extern int open_cif_configuration (int linec, int conf);
 extern int open_cif_file (int linec);
 extern int open_hist_file (int linec);
+extern int open_sml_file_out_of_library ();
 extern void allocatoms (project * this_proj);
 extern chemical_data * alloc_chem_data (int spec);
 extern int build_crystal (gboolean visible, project * this_proj, int c_step, gboolean to_wrap, gboolean show_clones, cell_info * cell, GtkWidget * widg);
@@ -273,6 +274,7 @@ void check_for_species (double v, int ato)
 */
 int open_coord_file (gchar * filename, int fti)
 {
+  int i, j, k, l;
   int res = 0;
 #ifdef OPENMP
   struct stat status;
@@ -284,64 +286,72 @@ int open_coord_file (gchar * filename, int fti)
   }
   int fsize = status.st_size;
 #endif
-  coordf = fopen (filename, dfi[0]);
-  if (! coordf)
+
+  if (fti == 13)
   {
-    add_reader_info (_("Error - cannot open coordinates file !\n"), 0);
-    return 1;
+    i = 1;
   }
-  int i, j, k, l;
+  else
+  {
+    coordf = fopen (filename, dfi[0]);
+    if (! coordf)
+    {
+      add_reader_info (_("Error - cannot open coordinates file !\n"), 0);
+      return 1;
+    }
 #ifdef OPENMP
-  gchar * coord_content = g_malloc0(fsize*sizeof*coord_content);
-  fread (coord_content, fsize, 1, coordf);
-  fclose (coordf);
-  int linecount = 0;
-  for (j=0; j<fsize; j++) if (coord_content[j] == '\n') linecount ++;
-  coord_line = g_malloc0(linecount*sizeof*coord_line);
-  coord_line[0] = & coord_content[0];
-  i = 1;
-  for (j=0; j<fsize; j++)
-  {
-    if (coord_content[j] == '\n')
+    gchar * coord_content = g_malloc0(fsize*sizeof*coord_content);
+    fread (coord_content, fsize, 1, coordf);
+    fclose (coordf);
+    int linecount = 0;
+    for (j=0; j<fsize; j++) if (coord_content[j] == '\n') linecount ++;
+    coord_line = g_malloc0(linecount*sizeof*coord_line);
+    coord_line[0] = & coord_content[0];
+    i = 1;
+    for (j=0; j<fsize; j++)
     {
-      coord_content[j] = '\0';
-      if (i < linecount)
+      if (coord_content[j] == '\n')
       {
-        coord_line[i] = & coord_content[j+1];
-        i ++;
+        coord_content[j] = '\0';
+        if (i < linecount)
+        {
+          coord_line[i] = & coord_content[j+1];
+          i ++;
+        }
       }
     }
-  }
 #else
-  gchar * buf = g_malloc0(LINE_SIZE*sizeof*buf);
-  head = NULL;
-  tail = NULL;
-  i = 0;
-  while (fgets(buf, LINE_SIZE, coordf))
-  {
-    if (head == NULL)
+    gchar * buf = g_malloc0(LINE_SIZE*sizeof*buf);
+    head = NULL;
+    tail = NULL;
+    i = 0;
+    while (fgets(buf, LINE_SIZE, coordf))
     {
-      head = g_malloc0(sizeof*head);
-      tail = g_malloc0(sizeof*tail);
-      tail = head;
-    }
-    else
-    {
-      tail -> next = g_malloc0(sizeof*tail -> next);
-      if (fti == 9 || fti == 10)
+      if (head == NULL)
       {
-        tail -> next -> prev = g_malloc0(sizeof*tail -> next -> prev);
-        tail -> next -> prev = tail;
+        head = g_malloc0(sizeof*head);
+        tail = g_malloc0(sizeof*tail);
+        tail = head;
       }
-      tail = tail -> next;
+      else
+      {
+        tail -> next = g_malloc0(sizeof*tail -> next);
+        if (fti == 9 || fti == 10)
+        {
+          tail -> next -> prev = g_malloc0(sizeof*tail -> next -> prev);
+          tail -> next -> prev = tail;
+        }
+        tail = tail -> next;
+      }
+      tail -> line = g_strdup_printf ("%s", buf);
+      tail -> line = substitute_string (tail -> line, "\n", "\0");
+      i ++;
     }
-    tail -> line = g_strdup_printf ("%s", buf);
-    tail -> line = substitute_string (tail -> line, "\n", "\0");
-    i ++;
-  }
-  g_free (buf);
-  fclose (coordf);
+    g_free (buf);
+    fclose (coordf);
 #endif
+  }
+
   if (i)
   {
     this_reader -> cartesian = TRUE;
@@ -384,6 +394,10 @@ int open_coord_file (gchar * filename, int fti)
     else if (fti == 12)
     {
       res = open_hist_file (i);
+    }
+    else if (fti == 13)
+    {
+      res = ! open_sml_file_out_of_library ();
     }
   }
   else

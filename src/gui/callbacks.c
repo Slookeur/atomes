@@ -98,10 +98,11 @@ char * coord_files[NCFORMATS+1] = {i18n("XYZ file"),
                                    i18n("Cryst. information (crystal build) - multiple configurations"),
                                    i18n("Cryst. information (symmetry positions) - single configuration"),
                                    i18n("DL-POLY HISTORY file"),
+                                   i18n("atomes Simple Chemical Library"),
                                    i18n("ISAACS Project File")};
 
 char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar", "xdatcar",
-                                    "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
+                                     "pdb", "ent", "cif", "cif", "cif", "hist", "sml", "ipf"};
 
 char ** las;
 
@@ -824,7 +825,6 @@ void open_this_isaacs_xml_file (gchar * profile, int ptoc, gboolean visible)
     apply_project (TRUE);
     active_project_changed (activep);
     add_project_to_workspace ();
-    if (visible) show_info (_("ISAACS project file (XML) successfully opened"), 0, atomes_main_window);
   }
   else
   {
@@ -1409,76 +1409,27 @@ int open_coordinate_file (int id)
   struct timespec sta_time;
   struct timespec sto_time;
   int result;
-  int length = strlen(active_project -> coordfile);
   clock_gettime (CLOCK_MONOTONIC, & sta_time);
   this_reader = g_malloc0(sizeof*this_reader);
   // Set default message type to warning
   this_reader -> mid = 1;
-  switch (id)
+  if (id == 7 || id == 8)
   {
-    case 0:
-      // XYZ file
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_xyz_ (active_project -> coordfile, & length, & npt);
-      break;
-    case 1:
-      // XYZ file NPT
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_xyz_ (active_project -> coordfile, & length, & npt);
-      if (! result) result = read_npt_data ();
-      break;
-    case 2:
-      // Chem3D file
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_c3d_ (active_project -> coordfile, & length);
-      break;
-    case 3:
-      // CPMD TRJ file
-      result = to_read_trj_or_vas (id);
-      break;
-    case 4:
-      // CPMD TRJ file NPT
-      result = to_read_trj_or_vas (id);
-      if (! result) result = read_npt_data ();
-      break;
-    case 5:
-      // VASP XDATCAR file
-      result = to_read_trj_or_vas (id);
-      break;
-    case 6:
-      // VASP XDATCAR file NPT
-      result = to_read_trj_or_vas (id);
-      if (! result) result = read_npt_data ();
-      break;
-    case 7:
-      // PDB file
-      // result = open_coord_file (active_project -> coordfile, id);
-      result = read_pdb_ (active_project -> coordfile, & length);
-      break;
-    case 8:
-      // PDB file
-      // result = open_coord_file (active_project -> coordfile, id);
-      result = read_pdb_ (active_project -> coordfile, & length);
-      break;
-    case 9:
-      // CIF file building the crystal
-      result = open_coord_file (active_project -> coordfile, 9);
-      break;
-    case 10:
-      // CIF file using symmetry positions
-      result = open_coord_file (active_project -> coordfile, 10);
-      break;
-    case 11:
-      // CIF file using symmetry positions
-      result = open_coord_file (active_project -> coordfile, 11);
-      break;
-    case 12:
-      // DL-POLY file
-      result = open_coord_file (active_project -> coordfile, 12);
-      break;
-    default:
-      result = 2;
-      break;
+    int length = strlen (active_project -> coordfile);
+    result = read_pdb_ (active_project -> coordfile, & length);
+  }
+  else if (id < 3 || id > 8)
+  {
+    result = open_coord_file (active_project -> coordfile, id);
+  }
+  else
+  {
+    result = to_read_trj_or_vas (id);
+  }
+
+  if (! result && (id == 1 || id == 4 || id == 6))
+  {
+   result = read_npt_data ();
   }
   clock_gettime (CLOCK_MONOTONIC, & sto_time);
   g_print ("Time to read atomic coordinates: %s\n", calculation_time(FALSE, get_calc_time (sta_time, sto_time)));
@@ -1663,6 +1614,8 @@ void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_rea
   }
 }
 
+extern int write_sml (project * this_proj);
+
 #ifdef GTK4
 /*!
   \fn G_MODULE_EXPORT void run_on_coord_port (GtkNativeDialog * info, gint response_id, gpointer data)
@@ -1760,6 +1713,9 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
           case 1:
             k = write_c3d_ (active_project -> coordfile, & length, & active_cell -> frac, & car_to_au);
             break;
+          case 2:
+            k = write_sml (active_project);
+            break;
         }
         if (k)
         {
@@ -1802,11 +1758,12 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
 #endif
   GtkFileChooser * chooser;
   gchar * tmp_str;
-  int num_files[2]={NCFORMATS, 2};
+#define OUT_FORMATS 3
+  int num_files[2]={NCFORMATS, OUT_FORMATS};
   const gchar * str[2]= {i18n("Import atomic coordinates"), i18n("Export atomic coordinates")};
   const gchar * res[2]= {i18n("Open"), i18n("Save")};
-  char * out_files[2] = {i18n("XYZ file"), i18n("Chem3D file")};
-  char * out_ext[2]={"xyz", "c3d"};
+  char * out_files[OUT_FORMATS] = {i18n("XYZ file"), i18n("Chem3D file"), i18n("atomes Simple Chemical Library")};
+  char * out_ext[OUT_FORMATS]={"xyz", "c3d", "sml"};
   GtkFileChooserAction act[2]={GTK_FILE_CHOOSER_ACTION_OPEN, GTK_FILE_CHOOSER_ACTION_SAVE};
   pactive = activep;
   i = GPOINTER_TO_INT (data);
