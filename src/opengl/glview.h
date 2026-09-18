@@ -178,7 +178,6 @@ enum modes {
 
 /*! \enum styles */
 enum styles {
-  NONE           = -1, /*!< -1 */
   BALL_AND_STICK =  0, /*!< 0 */
   WIREFRAME      =  1, /*!< 1 */
   SPACEFILL      =  2, /*!< 2 */

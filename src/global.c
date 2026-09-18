@@ -194,6 +194,7 @@ gboolean cif_use_symmetry_positions = FALSE;
 
 gboolean atomes_from_libreoffice = FALSE;
 gboolean atomes_render_image = FALSE;
+int atomes_convert_file = -1;
 
 struct timespec start_time;
 struct timespec stop_time;

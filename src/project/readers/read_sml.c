@@ -60,8 +60,8 @@ extern double get_z_from_periodic_table (gchar * lab);
 
   \brief write content of SML file
 
-  \param writer target XML writer
-  \param this_proj target project
+  \param writer the target XML writer
+  \param this_proj the target project
 */
 int save_sml_chemistry (xmlTextWriterPtr writer, project * this_proj)
 {
@@ -92,7 +92,7 @@ int save_sml_chemistry (xmlTextWriterPtr writer, project * this_proj)
     g_free (val);
     if (rc < 0) return 1;
 
-    rc = xmlTextWriterWriteFormatString (writer, "%s", this_proj -> chemistry -> label[i]);
+    rc = xmlTextWriterWriteFormatString (writer, "%s", exact_name(this_proj -> chemistry -> label[i]));
     if (rc < 0) return 1;
     rc = xmlTextWriterEndElement(writer);
     if (rc < 0) return 1;
@@ -110,8 +110,8 @@ int save_sml_chemistry (xmlTextWriterPtr writer, project * this_proj)
 
   \brief write content of SML file
 
-  \param writer target XML writer
-  \param this_proj target project
+  \param writer the target XML writer
+  \param this_proj the target project
 */
 int save_sml_coordinates (xmlTextWriterPtr writer, project * this_proj)
 {
@@ -160,7 +160,7 @@ int save_sml_coordinates (xmlTextWriterPtr writer, project * this_proj)
 
   \brief write content of SML file
 
-  \param this_proj target project
+  \param this_proj the target project
 */
 int sml_writer (project * this_proj)
 {
@@ -236,7 +236,7 @@ int sml_writer (project * this_proj)
 
   \brief write SML file
 
-  \param this_proj target project
+  \param this_proj the target project
 */
 int write_sml (project * this_proj)
 {
@@ -296,7 +296,7 @@ int open_sml_file_out_of_library ()
     content = xmlNodeGetContent(at_node);
     this_reader -> natomes = (int)string_to_double ((gpointer)content);
     xmlFree (content);
-    this_reader -> steps = 1; // Always single configruation in SML file
+    this_reader -> steps = 1; // Always single configuration in SML file
 
     sp_node = findnode (chem_node -> children, "species");
     if (sp_node == NULL) return clean_xml_data (doc, reader);
@@ -341,6 +341,7 @@ int open_sml_file_out_of_library ()
     active_project -> steps = this_reader -> steps;
     active_project -> natomes = this_reader -> natomes;
     allocatoms (active_project);
+
     at_node = findnode (racine -> children, "coordinates");
     if (at_node == NULL) return clean_xml_data (doc, reader);
     coord_node = at_node -> children;

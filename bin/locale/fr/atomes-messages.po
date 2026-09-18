@@ -446,7 +446,7 @@ msgstr "Enregistrer l'analyse des voisins dans un fichier"
 # File: curve/w_data.c, Line: 181
 # File: curve/w_img.c, Line: 250
 # File: gui/calc_menu.c, Line: 785
-# File: gui/callbacks.c, Line: 562,918,1764
+# File: gui/callbacks.c, Line: 578,934,1806
 # File: gui/gui.c, Line: 772,853
 # File: gui/work_menu.c, Line: 133,147,176
 # File: opengl/draw/image.c, Line: 212
@@ -650,7 +650,7 @@ msgstr "<b>Diffusion intermédiaire</b>: F(q,&#x3b4;t)"
 msgid "<b>Dynamic calculations</b>: S(q,&#969;)"
 msgstr "<b>Calculs dynamiques</b>: S(q,&#969;)"
 
-# File: gui/callbacks.c, Line: 293
+# File: gui/callbacks.c, Line: 309
 msgid "Impossible to %s project file: \n\n"
 "\t\t%s\n\n"
 "\tError %s %s\n"
@@ -660,7 +660,7 @@ msgstr "Impossible d%s le fichier projet: \n\n"
 "\tErreur %s %s\n"
 "\tVersion du fichier du projet: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 306
+# File: gui/callbacks.c, Line: 322
 msgid "Impossible to %s workspace file.\n"
 "Error with project: \n\n"
 "\t\t%s\n\n"
@@ -672,13 +672,13 @@ msgstr "Impossible d%s le fichier espace de travail.\n"
 "\tErreur %s %s\n"
 "\tVersion du fichier du projet: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 1496
+# File: gui/callbacks.c, Line: 1512
 msgid "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 msgstr "Erreur lors de l'analyse des informations chimiques\n"
 "veuillez vérifier attentivement le fichier de coordonnées"
 
-# File: gui/callbacks.c, Line: 88,1765
+# File: gui/callbacks.c, Line: 88,1807
 # File: project/readers/read_isaacs.c, Line: 70
 msgid "XYZ file"
 msgstr "Fichier XYZ"
@@ -687,12 +687,12 @@ msgstr "Fichier XYZ"
 msgid "XYZ file - NPT"
 msgstr "Fichier XYZ - NPT"
 
-# File: gui/callbacks.c, Line: 90,1765
+# File: gui/callbacks.c, Line: 90,1807
 # File: project/readers/read_isaacs.c, Line: 71
 msgid "Chem3D file"
 msgstr "Fichier Chem3D"
 
-# File: gui/callbacks.c, Line: 101,1765
+# File: gui/callbacks.c, Line: 101,1807
 msgid "atomes Simple Chemical Library"
 msgstr "Bibliothèque de Chimie d'atomes"
 
@@ -739,167 +739,167 @@ msgstr "Fichier HISTORY de DL-POLY"
 msgid "ISAACS Project File"
 msgstr "Dossier de projet ISAACS"
 
-# File: gui/callbacks.c, Line: 134
+# File: gui/callbacks.c, Line: 144
 msgid "Close workspace ?"
 msgstr "Fermer l'espace de travail ?"
 
 # File: calc/calc.c, Line: 106
-# File: gui/callbacks.c, Line: 134
+# File: gui/callbacks.c, Line: 144
 # File: gui/preferences.c, Line: 4969,5002
 msgid "Are you sure ?"
 msgstr "Etes-vous sûr ?"
 
-# File: gui/callbacks.c, Line: 157
+# File: gui/callbacks.c, Line: 167
 msgid "I/O error"
 msgstr "Erreur d'E/S"
 
-# File: gui/callbacks.c, Line: 158
+# File: gui/callbacks.c, Line: 168
 msgid "project information"
 msgstr "informations sur le projet"
 
-# File: gui/callbacks.c, Line: 159
+# File: gui/callbacks.c, Line: 169
 msgid "curve(s) information"
 msgstr "informations sur les courbes"
 
-# File: gui/callbacks.c, Line: 160
+# File: gui/callbacks.c, Line: 170
 msgid "OpenGL information"
 msgstr "Informations OpenGL"
 
-# File: gui/callbacks.c, Line: 161
+# File: gui/callbacks.c, Line: 171
 msgid "atom's data - A"
 msgstr "données de l'atome - A"
 
-# File: gui/callbacks.c, Line: 162
+# File: gui/callbacks.c, Line: 172
 msgid "atom's data - B"
 msgstr "données de l'atome - B"
 
-# File: gui/callbacks.c, Line: 163
+# File: gui/callbacks.c, Line: 173
 msgid "updating project"
 msgstr "projet de mise à jour"
 
-# File: gui/callbacks.c, Line: 164
+# File: gui/callbacks.c, Line: 174
 msgid "this should not happen"
 msgstr "cela ne devrait pas arriver"
 
-# File: gui/callbacks.c, Line: 165
+# File: gui/callbacks.c, Line: 175
 msgid "coordination data"
 msgstr "données de coordination"
 
-# File: gui/callbacks.c, Line: 166
+# File: gui/callbacks.c, Line: 176
 msgid "ring(s) data"
 msgstr "données des anneaux"
 
-# File: gui/callbacks.c, Line: 167
+# File: gui/callbacks.c, Line: 177
 msgid "chain(s) data"
 msgstr "données des chaînes"
 
-# File: gui/callbacks.c, Line: 168
+# File: gui/callbacks.c, Line: 178
 msgid "molecule(s) data"
 msgstr "données des molécules"
 
-# File: gui/callbacks.c, Line: 169
+# File: gui/callbacks.c, Line: 179
 msgid "analysis data"
 msgstr "données d'analyse"
 
-# File: gui/callbacks.c, Line: 170
+# File: gui/callbacks.c, Line: 180
 msgid "ab-initio data"
 msgstr "données ab-initio"
 
-# File: gui/callbacks.c, Line: 171
+# File: gui/callbacks.c, Line: 181
 msgid "classical data"
 msgstr "données classiques"
 
-# File: gui/callbacks.c, Line: 223
+# File: gui/callbacks.c, Line: 233
 msgid "File    : %s\n"
 msgstr "Fichier : %s\n"
 
-# File: gui/callbacks.c, Line: 224
+# File: gui/callbacks.c, Line: 234
 msgid "Function: %s()\n"
 msgstr "Fonction: %s()\n"
 
-# File: gui/callbacks.c, Line: 225
+# File: gui/callbacks.c, Line: 235
 msgid "Line    : %d</span>"
 msgstr "Ligne   : %d</span>"
 
-# File: gui/callbacks.c, Line: 297,311
+# File: gui/callbacks.c, Line: 313,327
 msgid "open"
 msgstr "'ouvrir"
 
-# File: gui/callbacks.c, Line: 297,311
+# File: gui/callbacks.c, Line: 313,327
 msgid "save"
 msgstr "e sauvegarder"
 
-# File: gui/callbacks.c, Line: 299,313,474
+# File: gui/callbacks.c, Line: 315,329,490
 # File: gui/interface.c, Line: 340,354
 msgid "reading"
 msgstr "en lisant"
 
-# File: gui/callbacks.c, Line: 299,313,474
+# File: gui/callbacks.c, Line: 315,329,490
 # File: gui/interface.c, Line: 340,354
 msgid "saving"
 msgstr "en sauvegardant"
 
-# File: gui/callbacks.c, Line: 529
+# File: gui/callbacks.c, Line: 545
 msgid "Error %s workspace file\n%s\n"
 msgstr "Erreur %s le fichier d'espace de travail\n%s\n"
 
-# File: gui/callbacks.c, Line: 561
+# File: gui/callbacks.c, Line: 577
 msgid "Open Project File(s)"
 msgstr "Ouvrir un ou plusieurs fichiers de projet"
 
-# File: gui/callbacks.c, Line: 561
+# File: gui/callbacks.c, Line: 577
 msgid "Save Project File"
 msgstr "Enregistrer le fichier de projet"
 
-# File: gui/callbacks.c, Line: 561
+# File: gui/callbacks.c, Line: 577
 msgid "Open Workspace"
 msgstr "Ouvrir un espace de travail"
 
-# File: gui/callbacks.c, Line: 561
+# File: gui/callbacks.c, Line: 577
 msgid "Save Workspace"
 msgstr "Enregistrer l'espace de travail"
 
-# File: gui/callbacks.c, Line: 562,918,1381,1764
+# File: gui/callbacks.c, Line: 578,934,1397,1806
 # File: gui/gui.c, Line: 767,847
 # File: gui/work_menu.c, Line: 132,145
 # File: opengl/win/m_map.c, Line: 885
 msgid "Open"
 msgstr "Ouvrir"
 
-# File: gui/callbacks.c, Line: 563
+# File: gui/callbacks.c, Line: 579
 msgid "Project file (*.apf)"
 msgstr "Fichier de projet (*.apf)"
 
-# File: gui/callbacks.c, Line: 563
+# File: gui/callbacks.c, Line: 579
 msgid "Workspace file (*.awf)"
 msgstr "Fichier d'espace de travail (*.awf)"
 
-# File: gui/callbacks.c, Line: 581
+# File: gui/callbacks.c, Line: 597
 msgid "A workspace is already open !"
 msgstr "Un espace de travail est déjà ouvert !"
 
-# File: gui/callbacks.c, Line: 585
+# File: gui/callbacks.c, Line: 601
 msgid "Empty workspace ... nothing to be saved\n"
 msgstr "Espace de travail vide ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 592
+# File: gui/callbacks.c, Line: 608
 msgid "Workspace contains only empty projects ... nothing to be saved\n"
 msgstr "L'espace de travail ne contient que des projets vides ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 597
+# File: gui/callbacks.c, Line: 613
 msgid "No project open ... nothing to be saved\n"
 msgstr "Aucun projet ouvert ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 601
+# File: gui/callbacks.c, Line: 617
 msgid "Empty project ... nothing to be saved\n"
 msgstr "Projet vide ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 652
+# File: gui/callbacks.c, Line: 668
 msgid "%s - New project"
 msgstr "%s - Nouveau projet"
 
 # File: calc/cpmd/cpmd_init.c, Line: 1556
-# File: gui/callbacks.c, Line: 712,916,1388,1820
+# File: gui/callbacks.c, Line: 728,932,1404,1861
 # File: opengl/win/m_map.c, Line: 937
 msgid "All files (*)"
 msgstr "Tous les fichiers (*)"
@@ -908,59 +908,59 @@ msgstr "Tous les fichiers (*)"
 msgid "ISAACS project file (XML) successfully opened"
 msgstr "Le fichier de projet ISAACS (XML) a été ouvert avec succès"
 
-# File: gui/callbacks.c, Line: 880
+# File: gui/callbacks.c, Line: 896
 msgid "Impossible to write the IPF file\n"
 msgstr "Impossible d'écrire le fichier IPF\n"
 
-# File: gui/callbacks.c, Line: 916
+# File: gui/callbacks.c, Line: 932
 msgid "IPF file (*.ipf)"
 msgstr "Fichier IPF (*.ipf)"
 
-# File: gui/callbacks.c, Line: 917
+# File: gui/callbacks.c, Line: 933
 msgid "Import ISAACS Project File"
 msgstr "Importer le fichier de projet ISAACS"
 
-# File: gui/callbacks.c, Line: 917
+# File: gui/callbacks.c, Line: 933
 msgid "Export ISAACS Project File"
 msgstr "Exporter le fichier de projet ISAACS"
 
-# File: gui/callbacks.c, Line: 923
+# File: gui/callbacks.c, Line: 939
 msgid "Save an empty project ?"
 msgstr "Enregistrer un projet vide ?"
 
-# File: gui/callbacks.c, Line: 923
+# File: gui/callbacks.c, Line: 939
 msgid "Do you want to save an empty project ?"
 msgstr "Voulez-vous sauvegarder un projet vide ?"
 
-# File: gui/callbacks.c, Line: 1037
+# File: gui/callbacks.c, Line: 1053
 msgid "Label of atomic spec. N° %d:"
 msgstr "Label de l'espèce atomique. N° %d :"
 
-# File: gui/callbacks.c, Line: 1043
+# File: gui/callbacks.c, Line: 1059
 msgid "Number of %s atom(s):"
 msgstr "Nombre d'atomes %s :"
 
-# File: gui/callbacks.c, Line: 1048
+# File: gui/callbacks.c, Line: 1064
 msgid "Number of atom(s) for spec. N° %d:"
 msgstr "Nombre d'atomes pour l'espèce N° %d :"
 
-# File: gui/callbacks.c, Line: 1129
+# File: gui/callbacks.c, Line: 1145
 msgid "Chemical species info:"
 msgstr "Informations sur les espèces chimiques:"
 
-# File: gui/callbacks.c, Line: 1132
+# File: gui/callbacks.c, Line: 1148
 msgid "Species: "
 msgstr "Espèces: "
 
-# File: gui/callbacks.c, Line: 1271
+# File: gui/callbacks.c, Line: 1287
 msgid "Total number of atom(s):"
 msgstr "Nombre total d'atome(s):"
 
-# File: gui/callbacks.c, Line: 1271
+# File: gui/callbacks.c, Line: 1287
 msgid "Number of chemical species:"
 msgstr "Nombre d'espèces chimiques:"
 
-# File: gui/callbacks.c, Line: 1272
+# File: gui/callbacks.c, Line: 1288
 msgid "Reading CPMD / VASP trajectory"
 msgstr "Lecture de la trajectoire CPMD/VASP"
 
@@ -971,82 +971,82 @@ msgstr "Lecture de la trajectoire CPMD/VASP"
 # File: calc/dl_poly/dlp_edit.c, Line: 1264
 # File: calc/dl_poly/dlp_mol.c, Line: 473,756
 # File: curve/datab.c, Line: 473,526,1060
-# File: gui/callbacks.c, Line: 1273
+# File: gui/callbacks.c, Line: 1289
 # File: gui/gtk-misc.c, Line: 619
 # File: opengl/edit/atom_edit.c, Line: 445
 # File: opengl/win/m_map.c, Line: 506,739,983
 msgid "Apply"
 msgstr "Appliquer"
 
-# File: gui/callbacks.c, Line: 1352
+# File: gui/callbacks.c, Line: 1368
 msgid "Please select the file format of the NPT cell data"
 msgstr "Veuillez sélectionner le format de fichier des données des cellules NPT"
 
-# File: gui/callbacks.c, Line: 1352,1671,1679
+# File: gui/callbacks.c, Line: 1368,1704,1712
 msgid "Select format:"
 msgstr "Sélectionnez le format:"
 
-# File: gui/callbacks.c, Line: 1378
+# File: gui/callbacks.c, Line: 1394
 msgid "Read cell data for NPT molecular dynamics"
 msgstr "Lire les données des cellules pour la dynamique moléculaire NPT"
 
-# File: gui/callbacks.c, Line: 1384
+# File: gui/callbacks.c, Line: 1400
 msgid "DAT files (*.dat)"
 msgstr "Fichiers DAT (*.dat)"
 
-# File: gui/callbacks.c, Line: 1482
+# File: gui/callbacks.c, Line: 1498
 msgid "Error loading atomic coordinates:\nfile does not exist"
 msgstr "Erreur lors du chargement des coordonnées atomiques:\nle fichier n'existe pas"
 
-# File: gui/callbacks.c, Line: 1485
+# File: gui/callbacks.c, Line: 1501
 msgid "Error loading coordinates file: format not supported"
 msgstr "Erreur de chargement du fichier de coordonnées: format non pris en charge"
 
-# File: gui/callbacks.c, Line: 1488
+# File: gui/callbacks.c, Line: 1504
 msgid "Error at input: impossible to process input file data"
 msgstr "Erreur de lecture: impossible de traiter les données du fichier d'entrée"
 
-# File: gui/callbacks.c, Line: 1576
+# File: gui/callbacks.c, Line: 1594
 msgid "%s - symmetry position(s)"
 msgstr "%s - position(s) de symétrie"
 
-# File: gui/callbacks.c, Line: 1585
+# File: gui/callbacks.c, Line: 1603
 msgid "Standard CIF Cartesian coordinates"
 msgstr "Coordonnées CIF standard"
 
-# File: gui/callbacks.c, Line: 1586
+# File: gui/callbacks.c, Line: 1604
 msgid "mmCIF - x/y/z coordinates for each atom"
 msgstr "mmCIF - coordonnées x/y/z pour chaque atome"
 
-# File: gui/callbacks.c, Line: 1587
+# File: gui/callbacks.c, Line: 1605
 msgid "mmCIF - computed idealized coordinates"
 msgstr "mmCIF - coordonnées calculées idéales"
 
-# File: gui/callbacks.c, Line: 1671
+# File: gui/callbacks.c, Line: 1704
 msgid "Please select the file format of the atomic coordinates"
 msgstr "Veuillez sélectionner le format de fichier des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1679
+# File: gui/callbacks.c, Line: 1712
 msgid "Please select the format of the atomic coordinates"
 msgstr "Veuillez sélectionner le format des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1722
+# File: gui/callbacks.c, Line: 1755
 msgid "Impossible to export the atomic coordinates\nError code: %d"
 msgstr "Impossible d'exporter les coordonnées atomiques\nCode d'erreur: %d"
 
-# File: gui/callbacks.c, Line: 1763
+# File: gui/callbacks.c, Line: 1805
 msgid "Import atomic coordinates"
 msgstr "Importer des coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1763
+# File: gui/callbacks.c, Line: 1805
 msgid "Export atomic coordinates"
 msgstr "Exporter les coordonnées atomiques"
 
-# File: gui/callbacks.c, Line: 1839
+# File: gui/callbacks.c, Line: 1880
 msgid "No project loaded ... nothing to be saved\n"
 msgstr "Aucun projet chargé ... rien à sauvegarder\n"
 
-# File: gui/callbacks.c, Line: 1843
+# File: gui/callbacks.c, Line: 1884
 msgid "Project <b>%s</b> is empty ... nothing to be saved\n"
 msgstr "Le projet <b>%s</b> est vide ... rien à sauvegarder\n"
 
@@ -1830,7 +1830,7 @@ msgstr "%s - isolé"
 msgid " - isolated"
 msgstr " - isolé"
 
-# File: gui/main.c, Line: 136
+# File: gui/main.c, Line: 139
 msgid "\nUsage: atomes [OPTION]\n"
 "       atomes [FILE]\n"
 "       atomes [OPTION] [FILE]\n"
@@ -1948,36 +1948,36 @@ msgstr "\nUtilisation : atomes [OPTION]\n"
 " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
 " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
 
-# File: gui/main.c, Line: 194,275
+# File: gui/main.c, Line: 197,278
 # File: startup-testing/startup_testing.c, Line: 68,85
 msgid "\nReport a bug to <"
 msgstr "\nSignaler un bug à <"
 
-# File: gui/main.c, Line: 205
+# File: gui/main.c, Line: 208
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\nOutil d'analyse, de création/édition et de post-traitement de modèles atomiques 3D\n"
 
-# File: gui/main.c, Line: 852
+# File: gui/main.c, Line: 874
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Erreur lors de la lecture du fichier d'espace de travail\n%s\n"
 
-# File: gui/main.c, Line: 1428
+# File: gui/main.c, Line: 1450
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible de charger l'écran de démarrage\n"
 
-# File: gui/main.c, Line: 1530
+# File: gui/main.c, Line: 1552
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Erreur fatale à l'initialisation d'OpenGL: tentative d'ajustement de l'environnement !"
 
-# File: gui/main.c, Line: 1533
+# File: gui/main.c, Line: 1555
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible d'initialiser le rendu 3D OpenGL !"
 
-# File: gui/main.c, Line: 1536
+# File: gui/main.c, Line: 1558
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "Le visuel GDK doit être modifié pour initialiser le contexte OpenGL !"
 
-# File: gui/main.c, Line: 1667
+# File: gui/main.c, Line: 1689
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Erreur impossible d'obtenir l'AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -2465,7 +2465,7 @@ msgstr "<b>Sélectionner le type de sélection</b>"
 # File: calc/force_fields/force_fields.c, Line: 2271
 # File: gui/preferences.c, Line: 3242,3357,3362
 # File: opengl/win/w_library.c, Line: 536
-# File: project/readers/read_sml.c, Line: 125,350
+# File: project/readers/read_sml.c, Line: 125,351
 msgid "atom"
 msgstr "atome"
 
@@ -2503,7 +2503,7 @@ msgstr "rayon"
 msgid "size"
 msgstr "taille"
 
-# File: gui/main.c, Line: 559
+# File: gui/main.c, Line: 577
 # File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "largeur"
@@ -3067,7 +3067,7 @@ msgstr "Restaurer les paramètres par défaut d'<b>atomes</b>"
 msgid "rendering"
 msgstr "rendu"
 
-# File: gui/main.c, Line: 566
+# File: gui/main.c, Line: 584
 # File: gui/preferences.c, Line: 1014,2074,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3075,7 +3075,7 @@ msgstr "rendu"
 msgid "box"
 msgstr "boîte"
 
-# File: gui/main.c, Line: 565
+# File: gui/main.c, Line: 583
 # File: gui/preferences.c, Line: 1107,2094,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3327,11 +3327,11 @@ msgstr "Primitif(s)"
 msgid "Strong"
 msgstr "Fort(s)"
 
-# File: global.c, Line: 617
+# File: global.c, Line: 618
 msgid "Error in string format: string = \"%s\" - value == %lf\n"
 msgstr "Erreur dans le format de chaîne : chaîne = \"%s\" - valeur == %lf\n"
 
-# File: global.c, Line: 646
+# File: global.c, Line: 647
 msgid "\n \tAnalysis was performed in: "
 msgstr "\n \tL'analyse a été réalisée en: "
 
@@ -3878,7 +3878,7 @@ msgstr "Impossible d'initialiser le rendu 3D OpenGL ! \n %s\n"
 msgid "Compilation failure in %s shader:\n%s"
 msgstr "Échec de compilation dans le shader %s:\n%s"
 
-# File: gui/main.c, Line: 414
+# File: gui/main.c, Line: 432
 # File: opengl/ogl_shading.c, Line: 111
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
@@ -5247,7 +5247,7 @@ msgstr "Chimie"
 msgid "Sorry OpenGL is not supported !"
 msgstr "Désolé, OpenGL n'est pas supporté !"
 
-# File: gui/callbacks.c, Line: 1592
+# File: gui/callbacks.c, Line: 1610
 # File: opengl/win/glwindow.c, Line: 1376
 # File: opengl/win/m_tools.c, Line: 240
 # File: workspace/workspace.c, Line: 368
@@ -5924,7 +5924,7 @@ msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Erreur de palette de couleurs: %s - %d, personnalisé= %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 209
-# File: gui/main.c, Line: 415
+# File: gui/main.c, Line: 433
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
@@ -6223,7 +6223,7 @@ msgid "Clone(s) configuration - "
 msgstr "Configuration clones - "
 
 # File: calc/force_fields/force_fields.c, Line: 711,2384
-# File: gui/main.c, Line: 563
+# File: gui/main.c, Line: 581
 # File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
 # File: opengl/win/w_library.c, Line: 483

@@ -203,7 +203,7 @@ int update_project ()
       cutoffsend ();
     }
   }
-  if (! atomes_render_image) update_analysis_availability (active_project);
+  if (! atomes_render_image && atomes_convert_file == NONE) update_analysis_availability (active_project);
 #ifdef DEBUG
   g_debug ("UPDATE_PROJECT: updated");
 #endif
@@ -220,7 +220,7 @@ int update_project ()
 void active_project_changed (int id)
 {
   char * errp = NULL;
-  if (! atomes_render_image)
+  if (! atomes_render_image && atomes_convert_file == NONE)
   {
     if (id != inactep && inactep < nprojects && ! atomes_logo) clean_view ();
     gtk_tree_store_clear (tool_model);
@@ -261,7 +261,7 @@ void active_project_changed (int id)
   }
   else
   {
-    if (! atomes_render_image)
+    if (! atomes_render_image && atomes_convert_file == NONE)
     {
       if (active_project -> analysis)
       {

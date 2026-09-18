@@ -632,7 +632,7 @@ int open_project (FILE * fp, int wid)
             }
           }
         }
-        if (! atomes_render_image) fill_tool_model();
+        if (! atomes_render_image && atomes_convert_file == NONE) fill_tool_model();
       }
       else
       {
@@ -656,7 +656,7 @@ int open_project (FILE * fp, int wid)
       if (fread (& tmp_bonding, sizeof(gboolean), 1, fp) != 1) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (fread (tmp_adv_bonding, sizeof(gboolean), 2, fp) != 2) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       apply_project (TRUE);
-      if (! atomes_render_image) fill_tool_model ();
+      if (! atomes_render_image && atomes_convert_file == NONE) fill_tool_model ();
       int tmpcoord[10];
       if (fread (tmpcoord, sizeof(int), 10, fp) != 10) return signal_error (__FILE__, __func__, __LINE__, ERROR_PROJECT);
       if (active_glwin -> bonding)

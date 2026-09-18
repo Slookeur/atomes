@@ -125,6 +125,9 @@ gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_ra
 gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", "S", NULL};
 gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", "c", NULL};
 gchar * do_styles[] = {"dot", "dots", "d", NULL};
+gchar * xyz_files[] = {"xyz", NULL};
+gchar * c3d_files[] = {"c3d", "chemd3d", NULL};
+gchar * sml_files[] = {"sml", NULL};
 
 /*!
   \fn void print_help()
@@ -288,8 +291,8 @@ int test_this_ext (int len, gchar * arg)
 {
   int i;
   gchar * aext = g_strdup_printf ("%c%c%c%c", arg[len-4], arg[len-3], arg[len-2], arg[len-1]);
-  char * eext[16]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", ".car", "NULL", ".pdb", ".ent", ".cif", "NULL", ".hist", ".sml", ".ipf"};
-  for (i=0; i<16; i++) if (g_strcmp0 (aext, eext[i]) == 0)
+  char * eext[17]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", ".car", "NULL", ".pdb", ".ent", ".cif", "NULL", "NULL", ".hist", ".sml", ".ipf"};
+  for (i=0; i<17; i++) if (g_strcmp0 (aext, eext[i]) == 0)
   {
     g_free (aext);
     return -(i+1);
@@ -307,11 +310,11 @@ int test_this_ext (int len, gchar * arg)
 */
 int test_this_arg (gchar * arg)
 {
-  char * fext[16]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-sml", "-ipf"};
+  char * fext[17]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "NULL", "-hist", "-sml", "-ipf"};
   int i, j;
   i = strlen(arg);
   gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<16; j++)
+  for (j=0; j<17; j++)
   {
     if (g_strcmp0 (str, fext[j]) == 0)
     {
@@ -396,6 +399,21 @@ int get_box_axis_from_string (gchar * box_axis_string)
 {
   if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
   if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
+  return NONE;
+}
+
+/*!
+  \fn int get_file_format_from_string (gchar * file_format_string)
+
+  \brief retrieve file format for convertion from command line string
+
+  \param file_format_string the file format keyword from command line
+*/
+int get_file_format_from_string (gchar * file_format_string)
+{
+  if (is_string_in_string_list(file_format_string, xyz_files)) return 0;
+  if (is_string_in_string_list(file_format_string, c3d_files)) return 1;
+  if (is_string_in_string_list(file_format_string, sml_files)) return 2;
   return NONE;
 }
 
@@ -572,6 +590,7 @@ int parse_command_line (int argc, char *argv[])
                                     {"grad_col_a", required_argument, 0, 'U'},
                                     {"grad_col_b", required_argument, 0, 'V'},
                                     {"rep", required_argument, 0, 'r'},
+                                    {"convert", required_argument, 0, 'c'},
                                     // {"debug", no_argument, 0, 'd'},
                                     {0, 0, 0, 0}};
   int opt;
@@ -592,7 +611,7 @@ int parse_command_line (int argc, char *argv[])
   /* Letter follow by : means that the command requires an argument
      No letter if the option is only in long format, ex : --width
      If the long name is empty the command is only in short format */
-  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
+  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:c:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
   {
     switch (opt)
     {
@@ -706,6 +725,9 @@ int parse_command_line (int argc, char *argv[])
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
+      case 'c':
+        atomes_convert_file = get_file_format_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        break;
     }
     index = -1;
   }
@@ -713,7 +735,7 @@ int parse_command_line (int argc, char *argv[])
   if (atomes_render_image)
   {
     if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");
-    if (argc == img_opt + 2)
+    if (argc == img_opt + 2 + ((atomes_convert_file != NONE) ? 2 : 0))
     {
       if (image_x || image_y)
       {
@@ -763,7 +785,7 @@ int parse_command_line (int argc, char *argv[])
     }
   }
 
-  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? FALSE : TRUE;
+  return ((atomes_render_image || atomes_convert_file != NONE) && files_to_read == 1) ? TRUE : (atomes_render_image || atomes_convert_file != NONE) ? FALSE : TRUE;
 }
 
 /*!
@@ -947,7 +969,7 @@ void open_this_data_file (int file_type, gchar * file_name)
         read_this_file (2, file_name);
       }
       break;
-    case 16:
+    case 17:
       init_project (TRUE);
       open_this_isaacs_xml_file (g_strdup_printf ("%s", file_name), activep, FALSE);
       break;
@@ -1156,7 +1178,7 @@ static gboolean check_existing_instance ()
     if (error)
     {
       /* Aucune instance ou erreur réseau : on arrête et on démarre normalement */
-      g_printerr ("D-Bus OpenFile error: %s\n", error->message);
+      g_printerr ("D-Bus OpenFile error: %s\n", error -> message);
       g_error_free (error);
       break;
     }
@@ -1419,7 +1441,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
   print_version ();
 #endif // DEBUG
 
-  if (! atomes_render_image)
+  if (! atomes_render_image && atomes_convert_file == NONE)
   {
     atomes_main_window = create_main_window (app);
     GtkWidget * isplash = create_splash_window ();
@@ -1442,7 +1464,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
       {
         if (ftmp -> file_type == 1)
         {
-          // Open the workspace
+          // Open the workspace file first
           open_this_data_file (ftmp -> file_type, ftmp -> file_name);
         }
         ftmp = ftmp -> next;
@@ -1690,7 +1712,7 @@ int main (int argc, char *argv[])
     set_atomes_preferences ();
 
     // Now user preferences are known
-    if (! atomes_from_libreoffice && ! atomes_render_image)
+    if (! atomes_from_libreoffice && ! atomes_render_image && atomes_convert_file == NONE)
     {
       if (default_instance)
       {

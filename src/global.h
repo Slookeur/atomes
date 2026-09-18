@@ -282,6 +282,7 @@ enum ImageFormats {
 };
 
 #define IODEBUG FALSE
+#define NONE -1
 
 /*! \def ATOM_LIMIT
   \brief atom number limit to compute fragment(s) and molecule(s) analysis automatically
@@ -460,6 +461,7 @@ extern gboolean cif_use_symmetry_positions;
 
 extern gboolean atomes_from_libreoffice;
 extern gboolean atomes_render_image;
+extern int atomes_convert_file;
 
 extern struct timespec start_time;
 extern struct timespec stop_time;
