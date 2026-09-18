@@ -80,7 +80,7 @@ msgstr "Fragment"
 # File: opengl/win/m_coord.c, Line: 582
 # File: opengl/win/m_tools.c, Line: 83
 # File: opengl/win/w_coord.c, Line: 850
-# File: opengl/win/w_library.c, Line: 1150
+# File: opengl/win/w_library.c, Line: 1180
 # File: opengl/win/w_search.c, Line: 4147
 # File: opengl/win/w_volumes.c, Line: 707
 msgid "Molecule"
@@ -427,6 +427,7 @@ msgstr "but homopolar bonds can shorten the rings"
 # File: gui/ringscall.c, Line: 163
 # File: opengl/edit/cbuild_edit.c, Line: 949
 # File: opengl/win/initcoord.c, Line: 645
+# File: opengl/win/m_coord.c, Line: 597
 # File: opengl/win/w_search.c, Line: 4154
 msgid "All"
 msgstr "All"
@@ -445,7 +446,7 @@ msgstr "Save neighbors analysis in file"
 # File: curve/w_data.c, Line: 181
 # File: curve/w_img.c, Line: 250
 # File: gui/calc_menu.c, Line: 785
-# File: gui/callbacks.c, Line: 561,918,1807
+# File: gui/callbacks.c, Line: 562,918,1764
 # File: gui/gui.c, Line: 772,853
 # File: gui/work_menu.c, Line: 133,147,176
 # File: opengl/draw/image.c, Line: 212
@@ -649,7 +650,7 @@ msgstr "<b>Intermediate scattering</b>: F(q,&#x3b4;t)"
 msgid "<b>Dynamic calculations</b>: S(q,&#969;)"
 msgstr "<b>Dynamic calculations</b>: S(q,&#969;)"
 
-# File: gui/callbacks.c, Line: 292
+# File: gui/callbacks.c, Line: 293
 msgid "Impossible to %s project file: \n\n"
 "\t\t%s\n\n"
 "\tError %s %s\n"
@@ -659,7 +660,7 @@ msgstr "Impossible to %s project file: \n\n"
 "\tError %s %s\n"
 "\tProject file version: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 305
+# File: gui/callbacks.c, Line: 306
 msgid "Impossible to %s workspace file.\n"
 "Error with project: \n\n"
 "\t\t%s\n\n"
@@ -671,13 +672,13 @@ msgstr "Impossible to %s workspace file.\n"
 "\tError %s %s\n"
 "\tProject file version: <b>%1.1f</b>\n"
 
-# File: gui/callbacks.c, Line: 1545
+# File: gui/callbacks.c, Line: 1496
 msgid "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 msgstr "Error while parsing the chemical information\n"
 "please check carefully the coordinates file"
 
-# File: gui/callbacks.c, Line: 88,1808
+# File: gui/callbacks.c, Line: 88,1765
 # File: project/readers/read_isaacs.c, Line: 70
 msgid "XYZ file"
 msgstr "XYZ file"
@@ -686,12 +687,12 @@ msgstr "XYZ file"
 msgid "XYZ file - NPT"
 msgstr "XYZ file - NPT"
 
-# File: gui/callbacks.c, Line: 90,1808
+# File: gui/callbacks.c, Line: 90,1765
 # File: project/readers/read_isaacs.c, Line: 71
 msgid "Chem3D file"
 msgstr "Chem3D file"
 
-# File: gui/callbacks.c, Line: 101,1766
+# File: gui/callbacks.c, Line: 101,1765
 msgid "atomes Simple Chemical Library"
 msgstr "atomes Simple Chemical Library"
 
@@ -734,171 +735,171 @@ msgstr "Cryst. information (symmetry positions) - single configuration"
 msgid "DL-POLY HISTORY file"
 msgstr "DL-POLY HISTORY file"
 
-# File: gui/callbacks.c, Line: 101
+# File: gui/callbacks.c, Line: 102
 msgid "ISAACS Project File"
 msgstr "ISAACS Project File"
 
-# File: gui/callbacks.c, Line: 133
+# File: gui/callbacks.c, Line: 134
 msgid "Close workspace ?"
 msgstr "Close workspace ?"
 
 # File: calc/calc.c, Line: 106
-# File: gui/callbacks.c, Line: 133
+# File: gui/callbacks.c, Line: 134
 # File: gui/preferences.c, Line: 4969,5002
 msgid "Are you sure ?"
 msgstr "Are you sure ?"
 
-# File: gui/callbacks.c, Line: 156
+# File: gui/callbacks.c, Line: 157
 msgid "I/O error"
 msgstr "I/O error"
 
-# File: gui/callbacks.c, Line: 157
+# File: gui/callbacks.c, Line: 158
 msgid "project information"
 msgstr "project information"
 
-# File: gui/callbacks.c, Line: 158
+# File: gui/callbacks.c, Line: 159
 msgid "curve(s) information"
 msgstr "curve(s) information"
 
-# File: gui/callbacks.c, Line: 159
+# File: gui/callbacks.c, Line: 160
 msgid "OpenGL information"
 msgstr "OpenGL information"
 
-# File: gui/callbacks.c, Line: 160
+# File: gui/callbacks.c, Line: 161
 msgid "atom's data - A"
 msgstr "atom's data - A"
 
-# File: gui/callbacks.c, Line: 161
+# File: gui/callbacks.c, Line: 162
 msgid "atom's data - B"
 msgstr "atom's data - B"
 
-# File: gui/callbacks.c, Line: 162
+# File: gui/callbacks.c, Line: 163
 msgid "updating project"
 msgstr "updating project"
 
-# File: gui/callbacks.c, Line: 163
+# File: gui/callbacks.c, Line: 164
 msgid "this should not happen"
 msgstr "this should not happen"
 
-# File: gui/callbacks.c, Line: 164
+# File: gui/callbacks.c, Line: 165
 msgid "coordination data"
 msgstr "coordination data"
 
-# File: gui/callbacks.c, Line: 165
+# File: gui/callbacks.c, Line: 166
 msgid "ring(s) data"
 msgstr "ring(s) data"
 
-# File: gui/callbacks.c, Line: 166
+# File: gui/callbacks.c, Line: 167
 msgid "chain(s) data"
 msgstr "chain(s) data"
 
-# File: gui/callbacks.c, Line: 167
+# File: gui/callbacks.c, Line: 168
 msgid "molecule(s) data"
 msgstr "molecule(s) data"
 
-# File: gui/callbacks.c, Line: 168
+# File: gui/callbacks.c, Line: 169
 msgid "analysis data"
 msgstr "analysis data"
 
-# File: gui/callbacks.c, Line: 169
+# File: gui/callbacks.c, Line: 170
 msgid "ab-initio data"
 msgstr "ab-initio data"
 
-# File: gui/callbacks.c, Line: 170
+# File: gui/callbacks.c, Line: 171
 msgid "classical data"
 msgstr "classical data"
 
-# File: gui/callbacks.c, Line: 222
+# File: gui/callbacks.c, Line: 223
 msgid "File    : %s\n"
 msgstr "File    : %s\n"
 
-# File: gui/callbacks.c, Line: 223
+# File: gui/callbacks.c, Line: 224
 msgid "Function: %s()\n"
 msgstr "Function: %s()\n"
 
-# File: gui/callbacks.c, Line: 224
+# File: gui/callbacks.c, Line: 225
 msgid "Line    : %d</span>"
 msgstr "Line    : %d</span>"
 
-# File: gui/callbacks.c, Line: 296,310
+# File: gui/callbacks.c, Line: 297,311
 msgid "open"
 msgstr "open"
 
-# File: gui/callbacks.c, Line: 296,310
+# File: gui/callbacks.c, Line: 297,311
 msgid "save"
 msgstr "save"
 
-# File: gui/callbacks.c, Line: 298,312,473
+# File: gui/callbacks.c, Line: 299,313,474
 # File: gui/interface.c, Line: 340,354
 msgid "reading"
 msgstr "reading"
 
-# File: gui/callbacks.c, Line: 298,312,473
+# File: gui/callbacks.c, Line: 299,313,474
 # File: gui/interface.c, Line: 340,354
 msgid "saving"
 msgstr "saving"
 
-# File: gui/callbacks.c, Line: 528
+# File: gui/callbacks.c, Line: 529
 msgid "Error %s workspace file\n%s\n"
 msgstr "Error %s workspace file\n%s\n"
 
-# File: gui/callbacks.c, Line: 560
+# File: gui/callbacks.c, Line: 561
 msgid "Open Project File(s)"
 msgstr "Open Project File(s)"
 
-# File: gui/callbacks.c, Line: 560
+# File: gui/callbacks.c, Line: 561
 msgid "Save Project File"
 msgstr "Save Project File"
 
-# File: gui/callbacks.c, Line: 560
+# File: gui/callbacks.c, Line: 561
 msgid "Open Workspace"
 msgstr "Open Workspace"
 
-# File: gui/callbacks.c, Line: 560
+# File: gui/callbacks.c, Line: 561
 msgid "Save Workspace"
 msgstr "Save Workspace"
 
-# File: gui/callbacks.c, Line: 561,918,1381,1807
+# File: gui/callbacks.c, Line: 562,918,1381,1764
 # File: gui/gui.c, Line: 767,847
 # File: gui/work_menu.c, Line: 132,145
 # File: opengl/win/m_map.c, Line: 885
 msgid "Open"
 msgstr "Open"
 
-# File: gui/callbacks.c, Line: 562
+# File: gui/callbacks.c, Line: 563
 msgid "Project file (*.apf)"
 msgstr "Project file (*.apf)"
 
-# File: gui/callbacks.c, Line: 562
+# File: gui/callbacks.c, Line: 563
 msgid "Workspace file (*.awf)"
 msgstr "Workspace file (*.awf)"
 
-# File: gui/callbacks.c, Line: 580
+# File: gui/callbacks.c, Line: 581
 msgid "A workspace is already open !"
 msgstr "A workspace is already open !"
 
-# File: gui/callbacks.c, Line: 584
+# File: gui/callbacks.c, Line: 585
 msgid "Empty workspace ... nothing to be saved\n"
 msgstr "Empty workspace ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 591
+# File: gui/callbacks.c, Line: 592
 msgid "Workspace contains only empty projects ... nothing to be saved\n"
 msgstr "Workspace contains only empty projects ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 596
+# File: gui/callbacks.c, Line: 597
 msgid "No project open ... nothing to be saved\n"
 msgstr "No project open ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 600
+# File: gui/callbacks.c, Line: 601
 msgid "Empty project ... nothing to be saved\n"
 msgstr "Empty project ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 651
+# File: gui/callbacks.c, Line: 652
 msgid "%s - New project"
 msgstr "%s - New project"
 
 # File: calc/cpmd/cpmd_init.c, Line: 1556
-# File: gui/callbacks.c, Line: 711,916,1388,1863
+# File: gui/callbacks.c, Line: 712,916,1388,1820
 # File: opengl/win/m_map.c, Line: 937
 msgid "All files (*)"
 msgstr "All files (*)"
@@ -981,7 +982,7 @@ msgstr "Apply"
 msgid "Please select the file format of the NPT cell data"
 msgstr "Please select the file format of the NPT cell data"
 
-# File: gui/callbacks.c, Line: 1352,1718,1726
+# File: gui/callbacks.c, Line: 1352,1671,1679
 msgid "Select format:"
 msgstr "Select format:"
 
@@ -993,59 +994,59 @@ msgstr "Read cell data for NPT molecular dynamics"
 msgid "DAT files (*.dat)"
 msgstr "DAT files (*.dat)"
 
-# File: gui/callbacks.c, Line: 1531
+# File: gui/callbacks.c, Line: 1482
 msgid "Error loading atomic coordinates:\nfile does not exist"
 msgstr "Error loading atomic coordinates:\nfile does not exist"
 
-# File: gui/callbacks.c, Line: 1534
+# File: gui/callbacks.c, Line: 1485
 msgid "Error loading coordinates file: format not supported"
 msgstr "Error loading coordinates file: format not supported"
 
-# File: gui/callbacks.c, Line: 1537
+# File: gui/callbacks.c, Line: 1488
 msgid "Error at input: impossible to process input file data"
 msgstr "Error at input: impossible to process input file data"
 
-# File: gui/callbacks.c, Line: 1625
+# File: gui/callbacks.c, Line: 1576
 msgid "%s - symmetry position(s)"
 msgstr "%s - symmetry position(s)"
 
-# File: gui/callbacks.c, Line: 1634
+# File: gui/callbacks.c, Line: 1585
 msgid "Standard CIF Cartesian coordinates"
 msgstr "Standard CIF Cartesian coordinates"
 
-# File: gui/callbacks.c, Line: 1635
+# File: gui/callbacks.c, Line: 1586
 msgid "mmCIF - x/y/z coordinates for each atom"
 msgstr "mmCIF - x/y/z coordinates for each atom"
 
-# File: gui/callbacks.c, Line: 1636
+# File: gui/callbacks.c, Line: 1587
 msgid "mmCIF - computed idealized coordinates"
 msgstr "mmCIF - computed idealized coordinates"
 
-# File: gui/callbacks.c, Line: 1718
+# File: gui/callbacks.c, Line: 1671
 msgid "Please select the file format of the atomic coordinates"
 msgstr "Please select the file format of the atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1726
+# File: gui/callbacks.c, Line: 1679
 msgid "Please select the format of the atomic coordinates"
 msgstr "Please select the format of the atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1766
+# File: gui/callbacks.c, Line: 1722
 msgid "Impossible to export the atomic coordinates\nError code: %d"
 msgstr "Impossible to export the atomic coordinates\nError code: %d"
 
-# File: gui/callbacks.c, Line: 1806
+# File: gui/callbacks.c, Line: 1763
 msgid "Import atomic coordinates"
 msgstr "Import atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1806
+# File: gui/callbacks.c, Line: 1763
 msgid "Export atomic coordinates"
 msgstr "Export atomic coordinates"
 
-# File: gui/callbacks.c, Line: 1882
+# File: gui/callbacks.c, Line: 1839
 msgid "No project loaded ... nothing to be saved\n"
 msgstr "No project loaded ... nothing to be saved\n"
 
-# File: gui/callbacks.c, Line: 1886
+# File: gui/callbacks.c, Line: 1843
 msgid "Project <b>%s</b> is empty ... nothing to be saved\n"
 msgstr "Project <b>%s</b> is empty ... nothing to be saved\n"
 
@@ -1394,6 +1395,7 @@ msgid "Mean Squared Displacement"
 msgstr "Mean Squared Displacement"
 
 # File: gui/gui.c, Line: 121,133
+# File: gui/initc.c, Line: 280,374
 msgid "Dynamic Structure Factor"
 msgstr "Dynamic Structure Factor"
 
@@ -1594,7 +1596,7 @@ msgstr "Analyze"
 
 # File: curve/m_curve.c, Line: 614
 # File: gui/gui.c, Line: 1036
-# File: opengl/win/glwindow.c, Line: 1523
+# File: opengl/win/glwindow.c, Line: 639,1523
 # File: opengl/win/menu_bar.c, Line: 281
 msgid "Help"
 msgstr "Help"
@@ -1946,36 +1948,36 @@ msgstr "\nUsage: atomes [OPTION]\n"
 " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
 " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
 
-# File: gui/main.c, Line: 192,273
+# File: gui/main.c, Line: 194,275
 # File: startup-testing/startup_testing.c, Line: 68,85
 msgid "\nReport a bug to <"
 msgstr "\nReport a bug to <"
 
-# File: gui/main.c, Line: 203
+# File: gui/main.c, Line: 205
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 
-# File: gui/main.c, Line: 850
+# File: gui/main.c, Line: 852
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Error while reading workspace file\n%s\n"
 
-# File: gui/main.c, Line: 1426
+# File: gui/main.c, Line: 1428
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible to load the splash screen\n"
 
-# File: gui/main.c, Line: 1528
+# File: gui/main.c, Line: 1530
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Fatal error on OpenGL initialization: trying to adjust environment !"
 
-# File: gui/main.c, Line: 1531
+# File: gui/main.c, Line: 1533
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible to initialize the OpenGL 3D rendering !"
 
-# File: gui/main.c, Line: 1534
+# File: gui/main.c, Line: 1536
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "GDK visual must be modified to initialize the OpenGL context !"
 
-# File: gui/main.c, Line: 1665
+# File: gui/main.c, Line: 1667
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -2408,7 +2410,7 @@ msgstr "The <b>View</b> tab regroups representation options"
 msgid "which effect apply to the general aspect of the model:"
 msgstr "which effect apply to the general aspect of the model:"
 
-# File: curve/cedit.c, Line: 384
+# File: curve/cedit.c, Line: 384,385
 # File: gui/preferences.c, Line: 2486,2505
 # File: opengl/win/m_box.c, Line: 301,600
 # File: opengl/win/w_bonds.c, Line: 411
@@ -2462,7 +2464,8 @@ msgstr "<b>Select selection type</b>"
 # File: calc/force_fields/charmm_silicates.c, Line: 195
 # File: calc/force_fields/force_fields.c, Line: 2271
 # File: gui/preferences.c, Line: 3242,3357,3362
-# File: opengl/win/w_library.c, Line: 521
+# File: opengl/win/w_library.c, Line: 536
+# File: project/readers/read_sml.c, Line: 125,350
 msgid "atom"
 msgstr "atom"
 
@@ -2500,7 +2503,7 @@ msgstr "radius"
 msgid "size"
 msgstr "size"
 
-# File: gui/main.c, Line: 557
+# File: gui/main.c, Line: 559
 # File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "width"
@@ -3064,7 +3067,7 @@ msgstr "Restore <b>atomes</b> default parameters"
 msgid "rendering"
 msgstr "rendering"
 
-# File: gui/main.c, Line: 564
+# File: gui/main.c, Line: 566
 # File: gui/preferences.c, Line: 1014,2074,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3072,7 +3075,7 @@ msgstr "rendering"
 msgid "box"
 msgstr "box"
 
-# File: gui/main.c, Line: 563
+# File: gui/main.c, Line: 565
 # File: gui/preferences.c, Line: 1107,2094,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3531,9 +3534,10 @@ msgid "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 msgstr "Wrong file format: searching for <b>%s</b> - error at line <b>%d</b> !\n"
 
 # File: calc/force_fields/force_fields.c, Line: 1048,2637
-# File: opengl/win/w_library.c, Line: 488
+# File: opengl/win/w_library.c, Line: 503
 # File: project/readers/read_cif.c, Line: 1136
 # File: project/readers/read_isaacs.c, Line: 210,829
+# File: project/readers/read_sml.c, Line: 83,316
 msgid "label"
 msgstr "label"
 
@@ -3571,11 +3575,11 @@ msgstr "Occupancy %s\n\t%s\n"
 msgid "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 msgstr "<b>Atomic coordinates</b>: a site has an occupancy > 1.0 !\n"
 
-# File: project/readers/read_cif.c, Line: 1432
+# File: project/readers/read_cif.c, Line: 1545
 msgid "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n"
 msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using occupancy\n"
 
-# File: project/readers/read_cif.c, Line: 1443
+# File: project/readers/read_cif.c, Line: 1556
 msgid "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 msgstr "CIF file is compatible with a chemical reaction: \n\t Reactants can be separated using disorder site\n"
 
@@ -3651,7 +3655,7 @@ msgstr "Please select the configuration to work on"
 msgid "Working on configuration N°%d\n"
 msgstr "Working on configuration N°%d\n"
 
-# File: project/readers/read_coord.c, Line: 416
+# File: project/readers/read_coord.c, Line: 430
 msgid "Error(s) trying to build crystal using the CIF file parameters !\n"
 "This usually comes from: \n"
 "\t - incorrect space group description\n"
@@ -3665,13 +3669,13 @@ msgstr "Error(s) trying to build crystal using the CIF file parameters !\n"
 "\t - missing space group setting\n"
 "\t - incorrect space group setting\n"
 
-# File: project/readers/read_coord.c, Line: 427
+# File: project/readers/read_coord.c, Line: 441
 msgid "Error(s) trying to build crystal using the CIF file parameters !\n"
 "Information lead to change(s) between each configuration\n"
 msgstr "Error(s) trying to build crystal using the CIF file parameters !\n"
 "Information lead to change(s) between each configuration\n"
 
-# File: project/readers/read_coord.c, Line: 434
+# File: project/readers/read_coord.c, Line: 448
 msgid "Potential issue(s) when building crystal !\n"
 "This usually comes from: \n"
 "\t - incorrect space group description\n"
@@ -3685,55 +3689,55 @@ msgstr "Potential issue(s) when building crystal !\n"
 "\t - missing space group setting\n"
 "\t - incorrect space group setting\n"
 
-# File: project/readers/read_coord.c, Line: 145
+# File: project/readers/read_coord.c, Line: 146
 msgid "Wrong file format: error at step %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 msgstr "Wrong file format: error at step %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 
-# File: project/readers/read_coord.c, Line: 151
+# File: project/readers/read_coord.c, Line: 152
 msgid "Wrong file format: error at step %d, atom %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 msgstr "Wrong file format: error at step %d, atom %d !\n"
 "Wrong file format: record <b>%s</b> on line <b>%d</b> is corrupted !"
 
-# File: project/readers/read_coord.c, Line: 193
+# File: project/readers/read_coord.c, Line: 194
 msgid "Use dummy atom(s) for unknown %s species ?"
 msgstr "Use dummy atom(s) for unknown %s species ?"
 
-# File: project/readers/read_coord.c, Line: 194
+# File: project/readers/read_coord.c, Line: 195
 msgid "Use dummy atom(s) ?"
 msgstr "Use dummy atom(s) ?"
 
-# File: project/readers/read_coord.c, Line: 198
+# File: project/readers/read_coord.c, Line: 199
 msgid "Using dummy atom(s) for unknown %s species"
 msgstr "Using dummy atom(s) for unknown %s species"
 
-# File: project/readers/read_coord.c, Line: 205
+# File: project/readers/read_coord.c, Line: 206
 msgid "No dummy atom(s) for unknown %s species"
 msgstr "No dummy atom(s) for unknown %s species"
 
-# File: project/readers/read_coord.c, Line: 282
+# File: project/readers/read_coord.c, Line: 284
 msgid "Error - cannot get file statistics !\n"
 msgstr "Error - cannot get file statistics !\n"
 
-# File: project/readers/read_coord.c, Line: 290
+# File: project/readers/read_coord.c, Line: 299
 msgid "Error - cannot open coordinates file !\n"
 msgstr "Error - cannot open coordinates file !\n"
 
-# File: project/readers/read_coord.c, Line: 442
+# File: project/readers/read_coord.c, Line: 456
 msgid "\nAnother model will be built using included symmetry positions\n"
 msgstr "\nAnother model will be built using included symmetry positions\n"
 
-# File: project/readers/read_coord.c, Line: 475,509
+# File: project/readers/read_coord.c, Line: 489,523
 msgid "Number of species"
 msgstr "Number of species"
 
-# File: project/readers/read_coord.c, Line: 483
+# File: project/readers/read_coord.c, Line: 497
 msgid "Dummy %s"
 msgstr "Dummy %s"
 
-# File: project/readers/read_coord.c, Line: 496
+# File: project/readers/read_coord.c, Line: 510
 msgid "For species %s, radius is equal to 0.0 !\n"
 msgstr "For species %s, radius is equal to 0.0 !\n"
 
@@ -3874,7 +3878,7 @@ msgstr "Impossible to initialize the OpenGL 3D rendering ! \n %s\n"
 msgid "Compilation failure in %s shader:\n%s"
 msgstr "Compilation failure in %s shader:\n%s"
 
-# File: gui/main.c, Line: 412
+# File: gui/main.c, Line: 414
 # File: opengl/ogl_shading.c, Line: 111
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
@@ -3939,7 +3943,7 @@ msgstr "Move"
 
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 3703
-# File: opengl/win/w_library.c, Line: 1141
+# File: opengl/win/w_library.c, Line: 1171
 # File: opengl/win/w_search.c, Line: 2904,2910,3579
 msgid "Replace"
 msgstr "Replace"
@@ -3952,7 +3956,7 @@ msgstr "Remove"
 
 # File: opengl/edit/atom_edit.c, Line: 60
 # File: opengl/win/popup.c, Line: 4201,4256
-# File: opengl/win/w_library.c, Line: 1141
+# File: opengl/win/w_library.c, Line: 1171
 # File: opengl/win/w_search.c, Line: 3581
 msgid "Insert"
 msgstr "Insert"
@@ -3970,6 +3974,7 @@ msgid "All Selected Atoms"
 msgstr "All Selected Atoms"
 
 # File: calc/cpmd/cpmd_init.c, Line: 158
+# File: calc/dl_poly/dlp_edit.c, Line: 2466
 # File: opengl/edit/atom_edit.c, Line: 61
 msgid "All Atoms"
 msgstr "All Atoms"
@@ -4018,6 +4023,7 @@ msgstr "Eye (viewer) axis"
 msgid "Show"
 msgstr "Show"
 
+# File: opengl/edit/atom_move.c, Line: 1247
 # File: opengl/edit/atom_search.c, Line: 332
 msgid "Reset transformation(s)"
 msgstr "Reset transformation(s)"
@@ -5241,7 +5247,7 @@ msgstr "Chemistry"
 msgid "Sorry OpenGL is not supported !"
 msgstr "Sorry OpenGL is not supported !"
 
-# File: gui/callbacks.c, Line: 1641
+# File: gui/callbacks.c, Line: 1592
 # File: opengl/win/glwindow.c, Line: 1376
 # File: opengl/win/m_tools.c, Line: 240
 # File: workspace/workspace.c, Line: 368
@@ -5734,6 +5740,7 @@ msgid "Measures (Edition Mode Only)"
 msgstr "Measures (Edition Mode Only)"
 
 # File: opengl/win/m_tools.c, Line: 88
+# File: opengl/win/w_search.c, Line: 4206,4210
 msgid "Selection"
 msgstr "Selection"
 
@@ -5917,7 +5924,7 @@ msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Color palette error: %s - %d, custom= %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 209
-# File: gui/main.c, Line: 413
+# File: gui/main.c, Line: 415
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
@@ -6216,11 +6223,12 @@ msgid "Clone(s) configuration - "
 msgstr "Clone(s) configuration - "
 
 # File: calc/force_fields/force_fields.c, Line: 711,2384
-# File: gui/main.c, Line: 561
+# File: gui/main.c, Line: 563
 # File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
-# File: opengl/win/w_library.c, Line: 468
+# File: opengl/win/w_library.c, Line: 483
 # File: project/readers/read_isaacs.c, Line: 200,783
+# File: project/readers/read_sml.c, Line: 71,294
 msgid "atoms"
 msgstr "atoms"
 
@@ -6790,7 +6798,7 @@ msgid "Other"
 msgstr "Other"
 
 # File: opengl/win/w_crystal.c, Line: 450
-# File: opengl/win/w_library.c, Line: 867
+# File: opengl/win/w_library.c, Line: 882
 msgid "<i>Formula:</i>"
 msgstr "<i>Formula:</i>"
 
@@ -7419,7 +7427,7 @@ msgstr "Deuterium"
 msgid "Other ..."
 msgstr "Other ..."
 
-# File: opengl/win/w_library.c, Line: 204,1131
+# File: opengl/win/w_library.c, Line: 204,1161
 msgid "Library"
 msgstr "Library"
 
@@ -7436,6 +7444,7 @@ msgid "More ..."
 msgstr "More ..."
 
 # File: opengl/win/w_library.c, Line: 215,243
+# File: project/readers/read_sml.c, Line: 188
 msgid "Misc"
 msgstr "Misc"
 
@@ -7543,15 +7552,15 @@ msgstr "Sulfoxides"
 msgid "Thiols"
 msgstr "Thiols"
 
-# File: opengl/win/w_library.c, Line: 886
+# File: opengl/win/w_library.c, Line: 901
 msgid "<i>Molecular mass:</i>"
 msgstr "<i>Molecular mass:</i>"
 
-# File: opengl/win/w_library.c, Line: 897
+# File: opengl/win/w_library.c, Line: 912
 msgid "<i>IUPAC name:</i>"
 msgstr "<i>IUPAC name:</i>"
 
-# File: opengl/win/w_library.c, Line: 907
+# File: opengl/win/w_library.c, Line: 923
 msgid "<i>Other name(s):</i>"
 msgstr "<i>Other name(s):</i>"
 
@@ -7559,7 +7568,7 @@ msgstr "<i>Other name(s):</i>"
 msgid "<i>Information:</i>"
 msgstr "<i>Information(s):</i>"
 
-# File: opengl/win/w_library.c, Line: 1148
+# File: opengl/win/w_library.c, Line: 1178
 msgid "Family"
 msgstr "Family"
 
@@ -8024,7 +8033,7 @@ msgstr "Species "
 msgid "Atom Id."
 msgstr "Atom Id."
 
-# File: opengl/win/w_search.c, Line: 4205
+# File: opengl/win/w_search.c, Line: 4205,4210
 msgid "All objects"
 msgstr "All objects"
 
@@ -8789,6 +8798,7 @@ msgid "MD time step:"
 msgstr "MD time step:"
 
 # File: calc/cp2k/cp2k_init.c, Line: 187
+# File: calc/cpmd/cpmd_nose.c, Line: 625
 msgid "Initial temperature:"
 msgstr "Initial temperature:"
 
@@ -9891,6 +9901,7 @@ msgstr "Target T°"
 msgid "Frequency"
 msgstr "Frequency"
 
+# File: calc/cpmd/cpmd_nose.c, Line: 625
 # File: calc/dl_poly/dlp_control.c, Line: 585
 msgid "Target temperature:"
 msgstr "Target temperature:"
@@ -9952,7 +9963,7 @@ msgid "All atom(s)"
 msgstr "All atom(s)"
 
 # File: calc/cpmd/cpmd_nose.c, Line: 1389,1440
-# File: calc/dl_poly/dlp_edit.c, Line: 1682,1698,1714,1728,1742,1757,2414,2531,2586,2644,2675,2777
+# File: calc/dl_poly/dlp_edit.c, Line: 1682,1698,1714,1728,1742,1757,2414,2436,2454,2531,2586,2644,2675,2777
 msgid "Not picked yet !"
 msgstr "Not picked yet !"
 
@@ -11775,7 +11786,7 @@ msgstr "k-Joules per mol"
 msgid "Kelvin per Boltzmann"
 msgstr "Kelvin per Boltzmann"
 
-# File: calc/dl_poly/dlp_field.c, Line: 309,310,311,312,313,314,315,316,317,322,323,327,330,333,336
+# File: calc/dl_poly/dlp_field.c, Line: 309,310,311,312,313,314,315,316,317,322,323,327,330,333,336,657
 msgid "Harmonic"
 msgstr "Harmonic"
 
@@ -11979,7 +11990,7 @@ msgstr "Umbrella sampling, harm. constant"
 msgid "electron"
 msgstr "electron"
 
-# File: calc/dl_poly/dlp_field.c, Line: 327,330,333,336
+# File: calc/dl_poly/dlp_field.c, Line: 327,330,333,336,651
 msgid "COMPASS class2 force field"
 msgstr "COMPASS class2 force field"
 
@@ -12047,7 +12058,7 @@ msgstr "Cosine with Buckingham term between 1-3"
 msgid "Difference of cosines"
 msgstr "Difference of cosines"
 
-# File: calc/dl_poly/dlp_field.c, Line: 330,336
+# File: calc/dl_poly/dlp_field.c, Line: 330,336,661
 msgid "DREIDING force field"
 msgstr "DREIDING force field"
 
@@ -12071,7 +12082,7 @@ msgstr "Cross term coupling angle and bond length"
 msgid "Dipole orientation"
 msgstr "Dipole orientation"
 
-# File: calc/dl_poly/dlp_field.c, Line: 331,333,336
+# File: calc/dl_poly/dlp_field.c, Line: 331,333,336,656
 msgid "Fourier (multiple cosines)"
 msgstr "Fourier (multiple cosines)"
 
@@ -12115,31 +12126,31 @@ msgstr "Spherical"
 msgid "Tabulated with analytic cutoff"
 msgstr "Tabulated with analytic cutoff"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,652
 msgid "Cosine squared"
 msgstr "Cosine squared"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,653
 msgid "CVFF force field"
 msgstr "CVFF force field"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,654
 msgid "Distance between atom planes"
 msgstr "Distance between atom planes"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,655
 msgid "Out-of-the plane distance"
 msgstr "Out-of-the plane distance"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,659
 msgid "Planar conformation"
 msgstr "Planar conformation"
 
-# File: calc/dl_poly/dlp_field.c, Line: 336
+# File: calc/dl_poly/dlp_field.c, Line: 336,660
 msgid "Squared distance harmonic"
 msgstr "Squared distance harmonic"
 
-# File: calc/dl_poly/dlp_field.c, Line: 337
+# File: calc/dl_poly/dlp_field.c, Line: 337,658
 msgid "Harmonic with Wilson Decius out-of-plane"
 msgstr "Harmonic with Wilson Decius out-of-plane"
 
@@ -12530,19 +12541,19 @@ msgstr "Add a new %s"
 msgid "Remove %s"
 msgstr "Remove %s"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2958
+# File: calc/dl_poly/dlp_field.c, Line: 2958,3060
 msgid "Add new molecule"
 msgstr "Add new molecule"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2967
+# File: calc/dl_poly/dlp_field.c, Line: 2967,3069
 msgid "Remove molecule %s from force field"
 msgstr "Remove molecule %s from force field"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2983
+# File: calc/dl_poly/dlp_field.c, Line: 2983,3084
 msgid "Created new force field atom from %s atom(s)"
 msgstr "Created new force field atom from %s atom(s)"
 
-# File: calc/dl_poly/dlp_field.c, Line: 2998
+# File: calc/dl_poly/dlp_field.c, Line: 2998,3100
 msgid "Remove atom %s from force field molecule"
 msgstr "Remove atom %s from force field molecule"
 
@@ -12811,15 +12822,15 @@ msgstr "# Integration time step in ps\n"
 msgid "# Target presssure in k atms\n"
 msgstr "# Target presssure in k atms\n"
 
-# File: calc/dl_poly/dlp_print.c, Line: 1673
+# File: calc/dl_poly/dlp_print.c, Line: 1675
 msgid "# Target temperature"
 msgstr "# Target temperature"
 
-# File: calc/dl_poly/dlp_print.c, Line: 1673
+# File: calc/dl_poly/dlp_print.c, Line: 1675
 msgid "# Number of MD steps"
 msgstr "# Number of MD steps"
 
-# File: calc/dl_poly/dlp_print.c, Line: 1673
+# File: calc/dl_poly/dlp_print.c, Line: 1675
 msgid "# MD time step d(t)"
 msgstr "# MD time step d(t)"
 
@@ -13224,16 +13235,16 @@ msgstr "Data sets"
 msgid "Edit curve"
 msgstr "Edit curve"
 
-# File: curve/cedit.c, Line: 372
+# File: curve/cedit.c, Line: 372,373
 msgid "Graph"
 msgstr "Graph"
 
-# File: curve/cedit.c, Line: 376
+# File: curve/cedit.c, Line: 376,377
 # File: curve/m_curve.c, Line: 611
 msgid "Data"
 msgstr "Data"
 
-# File: curve/cedit.c, Line: 380
+# File: curve/cedit.c, Line: 380,381
 msgid "Legend"
 msgstr "Legend"
 
@@ -13241,7 +13252,7 @@ msgstr "Legend"
 msgid "<b>Add data set(s) to the active window</b>"
 msgstr "<b>Add data set(s) to the active window</b>"
 
-# File: curve/cedit.c, Line: 392
+# File: curve/cedit.c, Line: 392,393
 msgid "Add data set"
 msgstr "Add data set"
 
