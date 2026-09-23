@@ -60,6 +60,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   void printhelp();
   void printversion ();
+  void set_atomes_locale ();
   void read_this_file (int file_type, gchar * this_file);
   void open_this_data_file (int file_type, gchar * file_name);
 
@@ -192,8 +193,14 @@ void print_help()
             "  -U, --grad_col_a=[COL]     gradient initial color\n"
             "  -V, --grad_col_b=[COL]     gradient final color\n\n"
             "ex:\n\n"
-            " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
-            " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"));
+            " atomes --render-png --width=1920 -H 1024 --output=project.png project.apf -s ball_and_stick\n"
+            " atomes --jpg --style=vdw -r ortho -e pc -t pc file.xyz\n\n"
+            "Atomic coordinates conversion from the command line:\n\n"
+            "Usage: atomes [CONVERSION_OPTIONS]\n"
+            "  -c, --convert=[FORMAT]     conversion format\n\n"
+            "ex:\n\n"
+            " atomes --convert=xyz project.apf\n"
+            " atomes -c sml file.pdb\n\n"));
   printf ("%s", _("\nReport a bug to <"));
   printf ("%s>\n\n", PACKAGE_BUGREPORT);
 }
@@ -558,6 +565,18 @@ int check_for_atomes_file_options (int start, int end, char *argv[])
 }
 
 /*!
+  \fn void set_atomes_locale ()
+
+  \brief set locale
+*/
+void set_atomes_locale ()
+{
+  bindtextdomain (PACKAGE, PACKAGE_LOCALE);
+  textdomain (PACKAGE);
+  bind_textdomain_codeset (PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
+}
+
+/*!
   \fn int parse_command_line (int argc, char *argv[])
 
   \brief test command line arguments
@@ -616,10 +635,12 @@ int parse_command_line (int argc, char *argv[])
     switch (opt)
     {
       case 'h':
+        set_atomes_locale ();
         print_help();
         return FALSE;
         break;
       case 'v':
+        set_atomes_locale ();
         print_version();
         return FALSE;
         break;
@@ -1705,10 +1726,7 @@ int main (int argc, char *argv[])
     ATOMES_CONFIG = g_strdup_printf ("%s/atomes.pml", ATOMES_CONFIG_DIR);
 #endif
 
-    bindtextdomain (PACKAGE, PACKAGE_LOCALE);
-    textdomain (PACKAGE);
-    bind_textdomain_codeset(PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
-
+    set_atomes_locale ();
     set_atomes_preferences ();
 
     // Now user preferences are known

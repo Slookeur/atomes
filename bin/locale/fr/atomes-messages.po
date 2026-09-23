@@ -16,7 +16,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: atomes 1.3.2\n"
-"PO-Revision-Date: 2026-09-16 14:00+0200\n"
+"PO-Revision-Date: 2026-09-23 18:00+0200\n"
 "Last-Translator: Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>\n"
 "Language-Team: Français\n"
 "Language: fr\n"
@@ -1830,7 +1830,7 @@ msgstr "%s - isolé"
 msgid " - isolated"
 msgstr " - isolé"
 
-# File: gui/main.c, Line: 139
+# File: gui/main.c, Line: 140
 msgid "\nUsage: atomes [OPTION]\n"
 "       atomes [FILE]\n"
 "       atomes [OPTION] [FILE]\n"
@@ -1887,8 +1887,14 @@ msgid "\nUsage: atomes [OPTION]\n"
 "  -U, --grad_col_a=[COL]     gradient initial color\n"
 "  -V, --grad_col_b=[COL]     gradient final color\n\n"
 "ex:\n\n"
-" atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
-" atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
+" atomes --render-png --width=1920 -H 1024 --output=project.png project.apf -s ball_and_stick\n"
+" atomes --jpg --style=vdw -r ortho -e pc -t pc file.xyz\n\n"
+"Atomic coordinates conversion from the command line:\n\n"
+"Usage: atomes [CONVERSION_OPTIONS]\n"
+"  -c, --convert=[FORMAT]     conversion format\n\n"
+"ex:\n\n"
+" atomes --convert=xyz project.apf\n"
+" atomes -c sml file.pdb\n\n"
 msgstr "\nUtilisation : atomes [OPTION]\n"
 "       atomes [FICHIER]\n"
 "       atomes [OPTION] [FICHIER]\n"
@@ -1945,39 +1951,44 @@ msgstr "\nUtilisation : atomes [OPTION]\n"
 "  -U, --grad_col_a=[COL]      couleur initiale du dégradé\n"
 "  -V, --grad_col_b=[COL]      couleur finale du dégradé\n\n"
 "ex :\n\n"
-" atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
-" atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"
+" atomes --render-png --width=1920 -H 1024 --output=project.png project.apf -s ball_and_stick\n"
+" atomes --jpg --style=vdw -r ortho -e pc -t pc file.xyz\n\n"
+"Conversion de coordonnées atomiques depuis la ligne de commande:\n\n"
+"Utilisation: atomes [CONVERSION_OPTIONS]\n"
+"  -c, --convert=[FORMAT]     format de conversion\n\n"
+"ex:\n\n"
+" atomes --convert=xyz project.apf\n"
+" atomes -c sml file.pdb\n\n"
 
-# File: gui/main.c, Line: 197,278
-# File: startup-testing/startup_testing.c, Line: 68,85
+# File: gui/main.c, Line: 204,285
 msgid "\nReport a bug to <"
 msgstr "\nSignaler un bug à <"
 
-# File: gui/main.c, Line: 208
+# File: gui/main.c, Line: 215
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\nOutil d'analyse, de création/édition et de post-traitement de modèles atomiques 3D\n"
 
-# File: gui/main.c, Line: 874
+# File: gui/main.c, Line: 895
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Erreur lors de la lecture du fichier d'espace de travail\n%s\n"
 
-# File: gui/main.c, Line: 1450
+# File: gui/main.c, Line: 1471
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible de charger l'écran de démarrage\n"
 
-# File: gui/main.c, Line: 1552
+# File: gui/main.c, Line: 1573
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Erreur fatale à l'initialisation d'OpenGL: tentative d'ajustement de l'environnement !"
 
-# File: gui/main.c, Line: 1555
+# File: gui/main.c, Line: 1576
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible d'initialiser le rendu 3D OpenGL !"
 
-# File: gui/main.c, Line: 1558
+# File: gui/main.c, Line: 1579
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "Le visuel GDK doit être modifié pour initialiser le contexte OpenGL !"
 
-# File: gui/main.c, Line: 1689
+# File: gui/main.c, Line: 1710
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Erreur impossible d'obtenir l'AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -2503,7 +2514,7 @@ msgstr "rayon"
 msgid "size"
 msgstr "taille"
 
-# File: gui/main.c, Line: 577
+# File: gui/main.c, Line: 596
 # File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "largeur"
@@ -3067,7 +3078,7 @@ msgstr "Restaurer les paramètres par défaut d'<b>atomes</b>"
 msgid "rendering"
 msgstr "rendu"
 
-# File: gui/main.c, Line: 584
+# File: gui/main.c, Line: 603
 # File: gui/preferences.c, Line: 1014,2074,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3075,7 +3086,7 @@ msgstr "rendu"
 msgid "box"
 msgstr "boîte"
 
-# File: gui/main.c, Line: 583
+# File: gui/main.c, Line: 602
 # File: gui/preferences.c, Line: 1107,2094,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3878,7 +3889,7 @@ msgstr "Impossible d'initialiser le rendu 3D OpenGL ! \n %s\n"
 msgid "Compilation failure in %s shader:\n%s"
 msgstr "Échec de compilation dans le shader %s:\n%s"
 
-# File: gui/main.c, Line: 432
+# File: gui/main.c, Line: 439
 # File: opengl/ogl_shading.c, Line: 111
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
@@ -5924,7 +5935,7 @@ msgid "Color palette error: %s - %d, custom= %s"
 msgstr "Erreur de palette de couleurs: %s - %d, personnalisé= %s"
 
 # File: calc/dl_poly/dlp_field.c, Line: 209
-# File: gui/main.c, Line: 433
+# File: gui/main.c, Line: 440
 # File: opengl/win/menu_bar.c, Line: 372
 # File: opengl/win/popup.c, Line: 4143
 # File: opengl/win/w_coord.c, Line: 959
@@ -6223,7 +6234,7 @@ msgid "Clone(s) configuration - "
 msgstr "Configuration clones - "
 
 # File: calc/force_fields/force_fields.c, Line: 711,2384
-# File: gui/main.c, Line: 581
+# File: gui/main.c, Line: 600
 # File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
 # File: opengl/win/w_library.c, Line: 483
