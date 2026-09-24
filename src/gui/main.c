@@ -571,6 +571,8 @@ int check_for_atomes_file_options (int start, int end, char *argv[])
 */
 void set_atomes_locale ()
 {
+  setlocale (LC_ALL, "");        /* Charge la locale système définie par l'utilisateur */
+  setlocale (LC_NUMERIC, "C");   /* Conserve le point comme séparateur décimal */
   bindtextdomain (PACKAGE, PACKAGE_LOCALE);
   textdomain (PACKAGE);
   bind_textdomain_codeset (PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
