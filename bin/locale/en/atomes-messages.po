@@ -1968,27 +1968,27 @@ msgstr "\nReport a bug to <"
 msgid "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 msgstr "\n3D atomic scale model analysis, creation/edition and post-processing tool\n"
 
-# File: gui/main.c, Line: 895
+# File: gui/main.c, Line: 897
 msgid "Error while reading workspace file\n%s\n"
 msgstr "Error while reading workspace file\n%s\n"
 
-# File: gui/main.c, Line: 1471
+# File: gui/main.c, Line: 1473
 msgid "Impossible to load the splash screen\n"
 msgstr "Impossible to load the splash screen\n"
 
-# File: gui/main.c, Line: 1573
+# File: gui/main.c, Line: 1575
 msgid "Fatal error on OpenGL initialization: trying to adjust environment !"
 msgstr "Fatal error on OpenGL initialization: trying to adjust environment !"
 
-# File: gui/main.c, Line: 1576
+# File: gui/main.c, Line: 1578
 msgid "Impossible to initialize the OpenGL 3D rendering !"
 msgstr "Impossible to initialize the OpenGL 3D rendering !"
 
-# File: gui/main.c, Line: 1579
+# File: gui/main.c, Line: 1581
 msgid "GDK visual must be modified to initialize the OpenGL context !"
 msgstr "GDK visual must be modified to initialize the OpenGL context !"
 
-# File: gui/main.c, Line: 1710
+# File: gui/main.c, Line: 1712
 msgid "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 msgstr "Error impossible to obtain the AppData\\Roaming (code 0x%08lx)\n%s"
 
@@ -2514,7 +2514,7 @@ msgstr "radius"
 msgid "size"
 msgstr "size"
 
-# File: gui/main.c, Line: 596
+# File: gui/main.c, Line: 598
 # File: gui/preferences.c, Line: 3321
 msgid "width"
 msgstr "width"
@@ -3078,7 +3078,7 @@ msgstr "Restore <b>atomes</b> default parameters"
 msgid "rendering"
 msgstr "rendering"
 
-# File: gui/main.c, Line: 603
+# File: gui/main.c, Line: 605
 # File: gui/preferences.c, Line: 1014,2074,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -3086,7 +3086,7 @@ msgstr "rendering"
 msgid "box"
 msgstr "box"
 
-# File: gui/main.c, Line: 602
+# File: gui/main.c, Line: 604
 # File: gui/preferences.c, Line: 1107,2094,5178
 # File: opengl/win/m_box.c, Line: 490,498,540,545,569,574
 # File: opengl/win/w_bonds.c, Line: 410
@@ -6234,7 +6234,7 @@ msgid "Clone(s) configuration - "
 msgstr "Clone(s) configuration - "
 
 # File: calc/force_fields/force_fields.c, Line: 711,2384
-# File: gui/main.c, Line: 600
+# File: gui/main.c, Line: 602
 # File: gui/preferences.c, Line: 931,2048,2066
 # File: opengl/win/w_atoms.c, Line: 599
 # File: opengl/win/w_library.c, Line: 483
