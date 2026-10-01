@@ -1564,7 +1564,7 @@ msgid "Bond Cutoffs"
 msgstr "Bond Cutoffs"
 
 # File: gui/gui.c, Line: 985
-# File: gui/tools.c, Line: 342
+# File: gui/tools.c, Line: 349
 # File: project/close_p.c, Line: 371
 msgid "Toolboxes"
 msgstr "Toolboxes"
@@ -3280,19 +3280,19 @@ msgstr " is the maximum wave vector:\n\n"
 msgid "The S(q) calculation has failed"
 msgstr "The S(q) calculation has failed"
 
-# File: gui/tools.c, Line: 302
+# File: gui/tools.c, Line: 309
 msgid "Logo"
 msgstr "Logo"
 
 # File: calc/dl_poly/dlp_atom.c, Line: 744
 # File: calc/dl_poly/dlp_field.c, Line: 924,925
 # File: calc/dl_poly/dlp_mol.c, Line: 761
-# File: gui/tools.c, Line: 302
+# File: gui/tools.c, Line: 309
 # File: opengl/win/w_search.c, Line: 3577,3578,3579,3580,3581,3582
 msgid "Name"
 msgstr "Name"
 
-# File: gui/tools.c, Line: 302
+# File: gui/tools.c, Line: 309
 msgid "Button"
 msgstr "Button"
 
