@@ -1,3 +1,15 @@
+2026-10-06 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
+         Release of version 1.3.2
+         * New features:
+	 	Atomic coordinates convertion from the command line
+		Reading SML files (atomes molecule library) from the GUI
+         * Improvements:
+		Instance management (dbus / mutex) can be configured
+		Library, molecules : few additions including nucleotides
+         * Bug corrections:
+	 	Locale for '-h' and '-v' options in 'main.c'
+	 	Library, molecules : few corrections
+
 2026-06-11 Sébastien Le Roux <sebastien.leroux@ipcms.unistra.fr>
          Release of version 1.3.1
          * Bug corrections:
