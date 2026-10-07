@@ -173,8 +173,8 @@ ifeq ($(WINDOWS),1)
   WIN_STARTUP = $(OBJ)win_startup.o
 
   EXT=".exe"
-  FCVER = 16.1.0
-  CCVER = 16.1.0
+  FCVER = 16.2.0
+  CCVER = 16.2.0
 
   dbus =
   DBUS_XML =
