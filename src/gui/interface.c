@@ -283,7 +283,7 @@ void show_warning_ (char * warning, char * sub, char * tab)
   /* This function is called from fortran 90 */
   gchar * wtot=NULL;
   wtot = g_strdup_printf ("%s\n%s\n%s", warning, sub, tab);
-  show_warning (wtot, MainWindow);
+  show_warning (wtot, atomes_main_window);
   g_free (wtot);
 }
 
@@ -386,7 +386,7 @@ void show_error_ (char * error, char * sub, char * tab)
   /* This function is called from fortran 90 */
   gchar * etot=NULL;
   etot = g_strdup_printf ("%s\n\t%s\n\t%s", error, sub, tab);
-  show_error (etot, 0, MainWindow);
+  show_error (etot, 0, atomes_main_window);
   g_free (etot);
 }
 
@@ -482,13 +482,13 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWindow * widget, gpointer data)
 G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event, gpointer data)
 #endif
 {
-  if (ask_yes_no (_("Leaving ?!"), _("Are you sure you want to quit ?"), GTK_MESSAGE_QUESTION, MainWindow))
+  if (ask_yes_no (_("Leaving ?!"), _("Are you sure you want to quit ?"), GTK_MESSAGE_QUESTION, atomes_main_window))
   {
     quit_gtk ();
   }
   else
   {
-    show_the_widgets (MainWindow);
+    show_the_widgets (atomes_main_window);
   }
   return TRUE;
 }
@@ -502,7 +502,7 @@ G_MODULE_EXPORT gboolean leaving_question (GtkWidget * widget, GdkEvent * event,
 */
 int dummy_ask_ (char * question)
 {
-  GtkWidget * dask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, MainWindow);
+  GtkWidget * dask = message_dialogmodal (question, _("Parameter required"), GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, atomes_main_window);
   run_this_gtk_dialog (dask, G_CALLBACK(run_yes_no), NULL);
   return (res_yes_no) ? 0 : -1;
 }
@@ -870,16 +870,22 @@ void print_info  (gchar * str, gchar * stag, GtkTextBuffer * buffer)
 {
   GtkTextIter bEnd;
   GtkTextTag * tag;
-  gtk_text_buffer_get_end_iter (buffer, &bEnd);
-  if (stag != NULL)
+  if (buffer)
   {
-    tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), stag);
-    gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
-  }
-  else
-  {
-    tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), "default-size");
-    gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+    if (GTK_IS_TEXT_BUFFER(buffer))
+    {
+      gtk_text_buffer_get_end_iter (buffer, &bEnd);
+      if (stag != NULL)
+      {
+        tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), stag);
+        gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+      }
+      else
+      {
+        tag = gtk_text_tag_table_lookup (gtk_text_buffer_get_tag_table(buffer), "default-size");
+        gtk_text_buffer_insert_with_tags (buffer, &bEnd, str, -1, tag, NULL);
+      }
+    }
   }
 }
 
@@ -927,8 +933,8 @@ gchar * textcolor (int i)
 
 /*!
   \fn void lattice_info_ (int * bid, double * volume, double * density,
-                       double dvects[3][3], double rvects[3][3], double mod[3], double ang[3],
-                       double f_to_c[3][3], double c_to_f[3][3])
+                          double dvects[3][3], double rvects[3][3], double mod[3], double ang[3],
+                          double f_to_c[3][3], double c_to_f[3][3])
 
   \brief lattice data from Fortran90
 

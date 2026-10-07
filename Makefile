@@ -37,6 +37,26 @@ else
   DOMP =
 endif
 
+SRC = src/
+GUI = src/gui/
+WORK = src/workspace/
+PROJ = src/project/
+CALC = src/calc/
+DLPOLY = src/calc/dl_poly/
+LAMMPS = src/calc/lammps/
+FIELDS = src/calc/force_fields/
+CPMD = src/calc/cpmd/
+CP2K = src/calc/cp2k/
+CURVE = src/curve/
+OGL = src/opengl/
+GLWIN = src/opengl/win/
+GLDRAW = src/opengl/draw/
+GLEDIT = src/opengl/edit/
+FOR = src/fortran/
+OBJ = obj/
+BIN = bin/
+LOCALE = bin/locale
+
 ifeq ($(LINUX),1)
 
   # Use a specific compiler version
@@ -67,6 +87,15 @@ ifeq ($(LINUX),1)
 
   FCVER = `$(FC) -dumpfullversion`
   CCVER = `$(CC) -dumpfullversion`
+
+  dbus = src/d-bus/
+  DBUS_XML = $(dbus)fr.ipcms.atomes.Instance.xml
+  atomes_dbus = $(dbus)fr_ipcms_atomes-Instance.c
+  DBUS_H = $(dbus)fr_ipcms_atomes-Instance.h
+  OBJECTS_dbus = $(OBJ)fr_ipcms_atomes-Instance.o
+  # Règle pour générer les fichiers dbus C/H
+
+  INC = -I$(SRC) -I$(dbus) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 
 endif
 
@@ -116,6 +145,7 @@ ifeq ($(WINDOWS),1)
 		-latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lepoxy -lxml2 -lpangoft2-1.0 \
 		-lpango-1.0 -lgobject-2.0 -lglib-2.0 -lintl -lfontconfig -lfreetype -lavutil -lavcodec -lavformat -lswscale
   endif
+
   LIB = $(LGTK)
 
   ifeq ($(MAKECMDGOALS), atomes)
@@ -143,32 +173,19 @@ ifeq ($(WINDOWS),1)
   WIN_STARTUP = $(OBJ)win_startup.o
 
   EXT=".exe"
-  FCVER = 16.1.0
-  CCVER = 16.1.0
+  FCVER = 16.2.0
+  CCVER = 16.2.0
+
+  dbus =
+  DBUS_XML =
+  atomes_dbus =
+  DBUS_H =
+  OBJECTS_dbus =
+
+  INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 
 endif
 
-SRC = src/
-GUI = src/gui/
-WORK = src/workspace/
-PROJ = src/project/
-CALC = src/calc/
-DLPOLY = src/calc/dl_poly/
-LAMMPS = src/calc/lammps/
-FIELDS = src/calc/force_fields/
-CPMD = src/calc/cpmd/
-CP2K = src/calc/cp2k/
-CURVE = src/curve/
-OGL = src/opengl/
-GLWIN = src/opengl/win/
-GLDRAW = src/opengl/draw/
-GLEDIT = src/opengl/edit/
-FOR = src/fortran/
-OBJ = obj/
-BIN = bin/
-LOCALE = bin/locale
-
-INC = -I$(SRC) -I$(GUI) -I$(WORK) -I$(PROJ) -I$(PROJ)readers/ -I$(CALC) -I$(DLPOLY) -I$(LAMMPS) -I$(FIELDS) -I$(CPMD) -I$(CP2K) -I$(CURVE) -I$(GLWIN) -I$(GLEDIT) -I$(GLDRAW) -I$(OGL) -I.
 INCLUDES = $(INC) $(IGTK) -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS
 # To enforce strictly newest GTK4 functions: -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
@@ -234,6 +251,7 @@ OBJ_PROJ = \
 	$(OBJ)read_pdb.o \
 	$(OBJ)read_hist.o \
 	$(OBJ)read_npt.o \
+	$(OBJ)read_sml.o \
 	$(OBJ)update_p.o \
 	$(OBJ)init_p.o \
 	$(OBJ)debugio.o \
@@ -445,7 +463,7 @@ ifeq ($(WINDOWS),1)
 
 else
 
-  OBJECTS = $(OBJECTS_F90) $(OBJECTS_c)
+  OBJECTS = $(OBJECTS_F90) $(OBJECTS_dbus) $(OBJECTS_c)
 
 endif
 
@@ -455,6 +473,7 @@ SOURCES_h = \
 	$(SRC)affero.h \
 	$(SRC)bind.h \
 	$(SRC)global.h \
+	$(DBUS_H) \
 	$(GUI)interface.h \
 	$(GUI)callbacks.h \
 	$(PROJ)project.h \
@@ -592,6 +611,11 @@ $(OBJ)startup_testing.o:
 $(OBJ)global.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)global.o $(SRC)global.c $(INCLUDES)
 
+# d-bus for Linux and OSX
+$(OBJ)fr_ipcms_atomes-Instance.o: $(DBUS_XML)
+	gdbus-codegen --interface-prefix fr.ipcms.atomes. --generate-c-code $(dbus)fr_ipcms_atomes-Instance $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)fr_ipcms_atomes-Instance.o $(atomes_dbus) $(INCLUDES)
+
 # GUI
 $(OBJ)gtk-misc.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)gtk-misc.o $(GUI)gtk-misc.c $(INCLUDES)
@@ -665,6 +689,8 @@ $(OBJ)read_hist.o:
 	$(CC) -c $(CFLAGS) $(DOMP) $(DEFS) -o $(OBJ)read_hist.o $(PROJ)readers/read_hist.c $(INCLUDES)
 $(OBJ)read_npt.o:
 	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)read_npt.o $(PROJ)readers/read_npt.c $(INCLUDES)
+$(OBJ)read_sml.o:
+	$(CC) -c $(CFLAGS) $(DEFS) -o $(OBJ)read_sml.o $(PROJ)readers/read_sml.c $(INCLUDES)
 $(OBJ)update_p.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $(OBJ)update_p.o $(PROJ)update_p.c $(INCLUDES)
 $(OBJ)init_p.o:

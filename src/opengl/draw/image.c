@@ -332,5 +332,4 @@ void simple_image_render ()
   }
   run_render_image (NULL, GTK_RESPONSE_ACCEPT, vopts);
   g_free (vopts);
-  if (! atomes_from_libreoffice) to_close_this_project (0, active_project);
 }

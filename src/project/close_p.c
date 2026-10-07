@@ -339,7 +339,7 @@ void close_project (project * to_close)
     }
   }
 
-  if (! atomes_render_image) clean_view ();
+  if (! atomes_render_image && atomes_convert_file == NONE) clean_view ();
   g_free (to_close -> projfile);
 
   if (nprojects > 1)
@@ -360,14 +360,14 @@ void close_project (project * to_close)
       to_close -> next -> prev = to_close -> prev;
     }
   }
-  else if (! atomes_render_image)
+  else if (! atomes_render_image && atomes_convert_file == NONE)
   {
     // if (workzone.first) g_free (workzone.first);
     workzone.first = NULL;
     // if (workzone.last) g_free (workzone.last);
     workzone.last = NULL;
     activep = -1;
-    correct_this_window_title (MainWindow, g_strdup_printf ("%s", PACKAGE));
+    correct_this_window_title (atomes_main_window, g_strdup_printf ("%s", PACKAGE));
     correct_this_window_title (curvetoolbox, g_strdup_printf (_("Toolboxes")));
     if (workspacefile != NULL)
     {
@@ -465,7 +465,7 @@ void close_project (project * to_close)
     }
   }
 
-  if (! atomes_render_image) update_insert_combos ();
+  if (! atomes_render_image && atomes_convert_file == NONE) update_insert_combos ();
 }
 
 /*!
@@ -484,7 +484,7 @@ void to_close_this_project (int to_activate, project * this_proj)
     int new_p = (to_activate >= nprojects) ? nprojects - 1 : to_activate;
     activate_project (NULL, GINT_TO_POINTER(new_p));
   }
-  else if (! atomes_render_image || atomes_from_libreoffice)
+  else if ((! atomes_render_image && atomes_convert_file == NONE) || atomes_from_libreoffice)
   {
     remove_edition_and_analyze_actions ();
     active_project = NULL;
@@ -523,6 +523,6 @@ G_MODULE_EXPORT void on_close_activate (GtkWidget * widg, gpointer cdata)
   }
   else
   {
-    show_warning (_("No project to be closed"), MainWindow);
+    show_warning (_("No project to be closed"), atomes_main_window);
   }
 }

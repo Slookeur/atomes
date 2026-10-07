@@ -23,7 +23,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #define ATOMES_MINOR_VERSION 3
 
 /* Atomes patch version */
-#define ATOMES_PATCH_VERSION 1
+#define ATOMES_PATCH_VERSION 2
 
 /* Define to dummy `main' function (if any) required to link to the Fortran
    libraries. */
@@ -52,7 +52,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #define PACKAGE_NAME "atomes"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "atomes 1.3.1"
+#define PACKAGE_STRING "atomes 1.3.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "atomes"
@@ -61,7 +61,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #define PACKAGE_URL "https://atomes.ipcms.fr"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.3.1"
+#define PACKAGE_VERSION "1.3.2"
 
 /* Version number of package */
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"

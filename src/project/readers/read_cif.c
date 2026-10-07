@@ -31,8 +31,8 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 * List of functions:
 
   int get_atom_wyckoff (gchar * line, int wid);
-  int cif_get_value int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int linec, gchar ** cif_word,
-                                       gboolean rec_val, gboolean all_ligne, gboolean total_num, gboolean record_position, int * line_position)
+  int cif_get_value (gchar * kroot, gchar * keyw, int lstart, int linec, gchar ** cif_word,
+                     gboolean rec_val, gboolean all_ligne, gboolean total_num, gboolean record_position, int * line_position)
   int cif_file_get_data_in_loop (int linec, int lid);
   int cif_file_get_number_of_atoms (int linec, int lid, int nelem);
   int get_loop_line_id (int lid);
@@ -144,6 +144,35 @@ gchar * cif_coord_opts[40][2] = {{"b1", "Monoclinic unique axis b, cell choice 1
                                  {"2", "Tetragonal or cubic origin choice 2"},              // 37
                                  {"h", "Trigonal using hexagonal axes"},                    // 38
                                  {"r", "Trigonal using rhombohedral axes "}};               // 39
+
+/*
+The following lines describe keywords used to declare atomic coordinates in the CIF file:
+
+  - NLKEYS   : the number of keyword possibly used to start the line
+  - linekeys : the keyword possibly used to start the line
+
+  - CFKEYS   : he number of keyword possibly used to describe coordinates
+  - frackeys : the keyword possibly used to describe fractional coordinates
+  - cartkeys : the keyword possibly used to describe Cartesian coordinates
+
+Note that this can change, so in all cases if required add more.
+*/
+#define NLKEYS 2
+gchar * linekeys[NLKEYS] = {"_atom_site",                                            // Most common
+                            "_chem_comp_atom"};                                      // RCSB database: https://www.rcsb.org/
+
+#define CFKEYS 3
+gchar * frackeys[CFKEYS-1][3] = {{"fract_x", "fract_y", "fract_z"},                                                     // Most common
+                                 {"model_fract_x", "model_fract_y", "model_fract_z"}};                                  // mmCIF, RCSB database: https://www.rcsb.org/
+gchar * cartkeys[CFKEYS][3] = {{"cartn_x", "cartn_y", "cartn_z"},                                                       // Most common
+                               {"model_cartn_x", "model_cartn_y", "model_cartn_z"},                                     // mmCIF, RCSB database: https://www.rcsb.org/
+                               {"pdbx_model_cartn_x_ideal", "pdbx_model_cartn_y_ideal", "pdbx_model_cartn_z_ideal"}};   // mmCIF, RCSB database: https://www.rcsb.org/
+
+// Coordinates identification buffers if multiple sets of Cartesian coordinates are found
+int cif_cnfcart = 0;              // Number of formats of Cartesian coordinates, if multiple
+int ** cif_cnfkeys = NULL;        // Associated keywords in linekeys and cartkeys
+gboolean * cif_cnftodo = NULL;    // Was processed already or not
+int cif_cnfdone = 0;              // Number of format(s) processed
 
 #ifdef G_OS_WIN32
   typedef intptr_t ssize_t;
@@ -359,7 +388,7 @@ gboolean get_missing_object_from_user ()
 {
   cif_search = allocate_atom_search (activep, REPLACE, 0, this_reader -> object_to_insert);
   cif_object = NULL;
-  GtkWidget * info = dialogmodal (_("Error while reading CIF file"), GTK_WINDOW(MainWindow));
+  GtkWidget * info = dialogmodal (_("Error while reading CIF file"), GTK_WINDOW(atomes_main_window));
   GtkWidget * vbox, * hbox;
   gchar * str;
   vbox = dialog_get_content_area (info);
@@ -1105,46 +1134,182 @@ gboolean cif_file_get_atoms_data (int conf, int lin, int cid[9])
 gboolean cif_get_atomic_coordinates (int linec, int conf)
 {
   gchar * labkeys[2] = {"type_symbol", "label"};
-  gchar * frackeys[3] = {"fract_x", "fract_y", "fract_z"};
-  gchar * cartkeys[3] = {"cartn_x", "cartn_y", "cartn_z"};
   gchar * symkeys[4] = {"wyckoff_symbol", "occupancy", "symmetry_multiplicity", "disorder_group"};
   gchar * str = NULL;
   int cid[9];
   int loop_line;
   int loop_max;
   int i, j, k;
+  int lid, fid;
   double u, v;
   int * tmp_nsps;
   double * tmp_z;
   if (cif_multiple)
   {
-    loop_line = get_loop_line_for_key (linec, conf, "_atom_site", (this_reader -> cartesian) ? cartkeys[0] : frackeys[0]);
-    if (! loop_line)
+    if (this_reader -> cartesian)
     {
-      return FALSE;
+      if (! cif_cnftodo)
+      {
+        k = 0;
+        for (i=0; i<NLKEYS; i++)
+        {
+          for (j=0; j<CFKEYS; j++)
+          {
+            if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+            {
+              lid = i;
+              fid = j;
+              k ++;
+            }
+          }
+        }
+        if (k > 1)        {
+          // Opening k models for the different sets of atomic coordinates
+          add_reader_info (_("<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
+                             "<b>atomes</b> will open each set of coordinate(s) in a separate model."), 1);
+          cif_cnfkeys = allocdint (k, 2);
+          cif_cnftodo = allocbool (k);
+          cif_cnfcart = k;
+          k = 0;
+          for (i=0; i<NLKEYS; i++)
+          {
+            for (j=0; j<CFKEYS; j++)
+            {
+              if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+              {
+                cif_cnfkeys[k][0] = i;
+                cif_cnfkeys[k][1] = j;
+                k ++;
+              }
+            }
+          }
+          lid = cif_cnfkeys[0][0];
+          fid = cif_cnfkeys[0][1];
+          cif_cnftodo[0] = TRUE;
+          cif_cnfdone = 1;
+        }
+      }
+      else
+      {
+        for (i=0; i<cif_cnfcart; i++)
+        {
+          if (! cif_cnftodo[i])
+          {
+            lid = cif_cnfkeys[i][0];
+            fid = cif_cnfkeys[i][1];
+            cif_cnftodo[i] = TRUE;
+            cif_cnfdone ++;
+            break;
+          }
+        }
+      }
+      loop_line = get_loop_line_for_key (linec, conf, linekeys[lid], cartkeys[fid][0]);
+    }
+    else
+    {
+      for (i=0; i<NLKEYS; i++)
+      {
+        for (j=0; j<CFKEYS-1; j++)
+        {
+          loop_line = get_loop_line_for_key (linec, conf, linekeys[i], frackeys[j][0]);
+          if (loop_line)
+          {
+            lid = i;
+            fid = j;
+            break;
+          }
+        }
+        if (loop_line) break;
+      }
+      if (! loop_line) return FALSE;
     }
   }
   else
   {
-    loop_line = get_loop_line_for_key (linec, 0, "_atom_site", cartkeys[0]);
-    if (! loop_line)
+    if (this_reader -> cartesian)
     {
-      loop_line = get_loop_line_for_key (linec, 0, "_atom_site", frackeys[0]);
-      if (! loop_line)
+      if (! cif_cnftodo)
       {
-        return FALSE;
+        k = 0;
+        for (i=0; i<NLKEYS; i++)
+        {
+          for (j=0; j<CFKEYS; j++)
+          {
+            if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+            {
+              lid = i;
+              fid = j;
+              k ++;
+            }
+          }
+        }
+        if (k > 1)
+        {
+          // Opening k models for the different sets of atomic coordinates
+          add_reader_info (_("<b>Atomic coordinates</b>: different sets of coordinate(s) were found.\n"
+                             "<b>atomes</b> will open each set of coordinate(s) in a separate model."), 1);
+          cif_cnfkeys = allocdint (k, 2);
+          cif_cnftodo = allocbool (k);
+          cif_cnfcart = k;
+          k = 0;
+          for (i=0; i<NLKEYS; i++)
+          {
+            for (j=0; j<CFKEYS; j++)
+            {
+              if (get_loop_line_for_key (linec, conf, linekeys[i], cartkeys[j][0]))
+              {
+                cif_cnfkeys[k][0] = i;
+                cif_cnfkeys[k][1] = j;
+                k ++;
+              }
+            }
+          }
+          lid = cif_cnfkeys[0][0];
+          fid = cif_cnfkeys[0][1];
+          cif_cnftodo[0] = TRUE;
+          cif_cnfdone = 1;
+        }
       }
+      else
+      {
+        for (i=1; i<cif_cnfcart; i++)
+        {
+          if (! cif_cnftodo[i])
+          {
+            lid = cif_cnfkeys[i][0];
+            fid = cif_cnfkeys[i][1];
+            cif_cnftodo[i] = TRUE;
+            cif_cnfdone ++;
+            break;
+          }
+        }
+      }
+      loop_line = get_loop_line_for_key (linec, conf, linekeys[lid], cartkeys[fid][0]);
     }
     else
     {
-      this_reader -> cartesian = TRUE;
+      for (i=0; i<NLKEYS; i++)
+      {
+        for (j=0; j<CFKEYS-1; j++)
+        {
+          loop_line = get_loop_line_for_key (linec, 0, linekeys[i], frackeys[j][0]);
+          if (loop_line)
+          {
+            lid = i;
+            fid = j;
+            break;
+          }
+        }
+        if (loop_line) break;
+      }
+      if (! loop_line) return FALSE;
     }
   }
   loop_max = (loop_line + 1000 > linec) ? linec : loop_line + 1000;
   i = 0;
   for (j=0; j<2; j++)
   {
-    cid[j] = cif_get_value ("_atom_site", labkeys[j], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+    cid[j] = cif_get_value (linekeys[lid], labkeys[j], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[j])
     {
       i ++;
@@ -1158,14 +1323,14 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   }
   for (i=0; i<3; i++)
   {
-    cid[i+2] = cif_get_value ("_atom_site", (this_reader -> cartesian) ? cartkeys[i] : frackeys[i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+    cid[i+2] = cif_get_value (linekeys[lid], (this_reader -> cartesian) ? cartkeys[fid][i] : frackeys[fid][i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
     if (cid[i+2])
     {
       cid[i+2] -= loop_line;
     }
     else
     {
-      str = g_strdup_printf (_("<b>Atomic coordinates</b>: impossible to find '%s' ..."), (this_reader -> cartesian) ? cartkeys[i] : frackeys[i]);
+      str = g_strdup_printf (_("<b>Atomic coordinates</b>: impossible to find '%s' ..."), (this_reader -> cartesian) ? cartkeys[fid][i] : frackeys[fid][i]);
       add_reader_info (str, 1);
       g_free (str);
       this_reader -> cartesian = FALSE;
@@ -1175,13 +1340,13 @@ gboolean cif_get_atomic_coordinates (int linec, int conf)
   {
     for (i=0; i<4; i++)
     {
-      cid[i+5] = cif_get_value ("_atom_site", symkeys[i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
+      cid[i+5] = cif_get_value (linekeys[lid], symkeys[i], loop_line, loop_max, NULL, FALSE, FALSE, FALSE, FALSE, NULL);
       if (cid[i+5])
       {
         cid[i+5] -= loop_line;
         if (i == 1 && this_reader -> rounding < 0)
         {
-          this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
+          this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, atomes_main_window);
           if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
           if (! cif_use_symmetry_positions)
           {
@@ -2084,44 +2249,69 @@ int open_cif_configuration (int linec, int conf)
   int res;
   int i, j, k, l, m, n;
   int cid;
-  if (cif_get_cell_data (linec, conf))
+
+  if (! this_reader -> cartesian && ! conf)
   {
-    i = cif_get_space_group (linec, conf);
-    if (conf && active_project -> steps > 1 && i != saved_group)
+    for (i=0; i<2; i++)
     {
-#ifdef DEBUG
-      g_debug ("CIF:: SP group changes between configuration:: conf= %d, saved_group= %d, new_group= %d", conf, saved_group, i);
-#endif
-      add_reader_info (_("Space group changes between configurations !\n"), 0);
-      return 3;
+      for (j=0; j<2; j++)
+      {
+        k = cif_get_value (linekeys[i], cartkeys[j][0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+        if (k)
+        {
+          this_reader -> cartesian = TRUE;
+          break;
+        }
+      }
+      if (this_reader -> cartesian) break;
     }
-    else if (i > 0)
-    {
-      saved_group = i;
-#ifdef DEBUG
-      g_debug ("CIF:: SP setting:: %d, name= %s", this_reader -> setting+1, this_reader -> lattice.sp_group -> settings[this_reader -> setting].name);
-#endif
-      if (this_reader -> lattice.sp_group) get_origin (this_reader -> lattice.sp_group);
-    }
-    else if (i == 0)
-    {
-      // No space group found
-#ifdef DEBUG
-      g_debug ("CIF:: Impossible to retrieve space group information !");
-#endif
-    }
-    else if (cif_multiple && ! this_reader -> cartesian)
-    {
-      // Error in space group
-      return 3;
-    }
-  }
-  else if (! this_reader -> cartesian)
-  {
-    // Error no cell data using fractional coordinates
-    return 3;
   }
 
+  if (! this_reader -> cartesian)
+  {
+    if (cif_get_cell_data (linec, conf))
+    {
+      i = cif_get_space_group (linec, conf);
+      if (conf && active_project -> steps > 1 && i != saved_group)
+      {
+#ifdef DEBUG
+        g_debug ("CIF:: SP group changes between configuration:: conf= %d, saved_group= %d, new_group= %d", conf, saved_group, i);
+#endif
+        add_reader_info (_("Space group changes between configurations !\n"), 0);
+        return 3;
+      }
+      else if (i > 0)
+      {
+        saved_group = i;
+#ifdef DEBUG
+        g_debug ("CIF:: SP setting:: %d, name= %s", this_reader -> setting+1, this_reader -> lattice.sp_group -> settings[this_reader -> setting].name);
+#endif
+        if (this_reader -> lattice.sp_group) get_origin (this_reader -> lattice.sp_group);
+      }
+      else if (i == 0)
+      {
+        // No space group found
+#ifdef DEBUG
+        g_debug ("CIF:: Impossible to retrieve space group information !");
+#endif
+      }
+      else if (cif_multiple && ! this_reader -> cartesian)
+      {
+        // Error in space group
+        return 3;
+      }
+    }
+    else
+    {
+      // Coordinates are fractional and no cell data is provided
+      return 3;
+    }
+  }
+  else
+  {
+    // No symmetry data for Cartesian CIF file
+    cif_use_symmetry_positions = FALSE;
+  }
   // Reading positions
   if (cif_get_symmetry_positions (linec, conf))
   {
@@ -2546,31 +2736,54 @@ int open_cif_configuration (int linec, int conf)
 */
 int open_cif_file (int linec)
 {
-  gchar * frackeys[3] = {"fract_x", "fract_y", "fract_z"};
-  gchar * cartkeys[3] = {"cartn_x", "cartn_y", "cartn_z"};
   gchar * str = NULL;
   int cif_action = 0;
   int cif_step = 1;
   int cif_site;
   int cif_occup = 0;
+  int lid;
   int i, j;
 
   cif_multiple = TRUE;
   // Determine the number of configuration(s) by checking the presence
   // of the instruction used to declare atomic coordinates
-  this_reader -> steps = cif_get_value ("_atom_site", frackeys[0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+  for (i=0; i<NLKEYS; i++)
+  {
+    for (j=0; j<CFKEYS-1; j++)
+    {
+      this_reader -> steps = cif_get_value (linekeys[i], frackeys[j][0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+      if (this_reader -> steps)
+      {
+        lid = i;
+        break;
+      }
+    }
+    if (this_reader -> steps) break;
+  }
   if (! this_reader -> steps)
   {
-    this_reader -> steps = cif_get_value ("_atom_site", cartkeys[0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
-    this_reader -> cartesian = TRUE;
+    for (i=0; i<NLKEYS; i++)
+    {
+      for (j=0; j<CFKEYS; j++)
+      {
+       this_reader -> steps = cif_get_value (linekeys[i], cartkeys[j][0], 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+        if (this_reader -> steps)
+        {
+          lid = i;
+          this_reader -> cartesian = TRUE;
+          break;
+        }
+      }
+      if (this_reader -> steps) break;
+    }
   }
   else
   {
     // How to treat occupancy
-    cif_occup = cif_get_value ("_atom_site", _("occupancy"), 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+    cif_occup = cif_get_value (linekeys[lid], _("occupancy"), 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occup)
     {
-      this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, MainWindow);
+      this_reader -> rounding = iask (_("Please select how to handle occupancy"), _("Select how to handle occupancy"), 5, atomes_main_window);
       if (this_reader -> rounding < 0 || this_reader -> rounding > 2) this_reader -> rounding = 2;
       if (! cif_use_symmetry_positions)
       {
@@ -2596,7 +2809,7 @@ int open_cif_file (int linec)
 
   if (this_reader -> steps > 1 && ! cif_use_symmetry_positions)
   {
-    cif_site = cif_get_value ("_atom_site", "disorder_group", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
+    cif_site = cif_get_value (linekeys[lid], "disorder_group", 0, linec, NULL, FALSE, FALSE, TRUE, FALSE, NULL);
     if (cif_occup == this_reader -> steps && cif_occup == cif_site)
     {
       add_reader_info (_("This CIF file could be describing a trajectory or a chemical reaction.\n"), 1);
@@ -2607,15 +2820,15 @@ int open_cif_file (int linec)
       // Read only a selected configuration and:
       //   - read as normal CIF file, forget about using occupancy to sort coordinates
       // Because what follow will depend on this choice
-      /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, MainWindow);
+      /* cif_action = iask ("Please select how to process the data in the CIF file", "Select how to process data", 3, atomes_main_window);
       this_reader -> chemical = ! cif_action;
       cif_action = (cif_action == 1) ? 0 : 1; */
-      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, atomes_main_window);
     }
     else
     {
       add_reader_info (_("This CIF file could be describing a trajectory.\n"), 1);
-      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, MainWindow);
+      cif_action = iask (_("Please select how to process the data in the CIF file"), _("Select how to process data"), 4, atomes_main_window);
     }
   }
   else
@@ -2630,7 +2843,7 @@ int open_cif_file (int linec)
     cif_step = 0;
     while (! cif_step)
     {
-      cif_step = iask (_("Please select the configuration to work on"), str, 0, MainWindow);
+      cif_step = iask (_("Please select the configuration to work on"), str, 0, atomes_main_window);
       if (cif_step < 1 || cif_step > this_reader -> steps) cif_step = 0;
     }
     g_free (str);

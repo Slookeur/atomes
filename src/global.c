@@ -194,6 +194,7 @@ gboolean cif_use_symmetry_positions = FALSE;
 
 gboolean atomes_from_libreoffice = FALSE;
 gboolean atomes_render_image = FALSE;
+int atomes_convert_file = -1;
 
 struct timespec start_time;
 struct timespec stop_time;
@@ -203,8 +204,8 @@ double pi = 3.141592653589793238462643383279502884197;
 
 GSimpleAction * edition_actions[3];
 
-GtkApplication * AtomesApp = NULL;
-GtkWidget * MainWindow = NULL;
+GtkApplication * atomes_app = NULL;
+GtkWidget * atomes_main_window = NULL;
 GtkWidget * MainView = NULL;
 GtkWidget * MainFrame[2];
 GtkWidget * pop = NULL;

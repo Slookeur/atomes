@@ -1135,6 +1135,9 @@ GtkWidget * init_cp2k ()
 #endif
     add_box_child_start (GTK_ORIENTATION_HORIZONTAL, hbx, filebut[i], FALSE, FALSE, (i==0) ? 50 : 120);
   }
+#ifdef GTK3
+  gtk_toggle_button_set_active ((GtkToggleButton *)filebut[j], TRUE);
+#endif // GTK3
   tmp_cp2k -> input_type = j;
   widget_set_sensitive (fileinf[tmp_cp2k -> input_type], TRUE);
   widget_set_sensitive (fileinf[! tmp_cp2k -> input_type], FALSE);

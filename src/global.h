@@ -51,6 +51,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #endif
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <gio/gio.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -281,6 +282,7 @@ enum ImageFormats {
 };
 
 #define IODEBUG FALSE
+#define NONE -1
 
 /*! \def ATOM_LIMIT
   \brief atom number limit to compute fragment(s) and molecule(s) analysis automatically
@@ -329,7 +331,7 @@ enum ImageFormats {
 /*!< \def NCFORMATS
   \brief number atomic coordinates file formats
 */
-#define NCFORMATS 13
+#define NCFORMATS 14
 
 #define NITEMS 4
 
@@ -459,6 +461,7 @@ extern gboolean cif_use_symmetry_positions;
 
 extern gboolean atomes_from_libreoffice;
 extern gboolean atomes_render_image;
+extern int atomes_convert_file;
 
 extern struct timespec start_time;
 extern struct timespec stop_time;
@@ -466,7 +469,8 @@ extern struct timespec stop_time;
 extern double opac;
 extern double pi;
 
-extern GtkWidget * MainWindow;
+extern GtkApplication * atomes_app;
+extern GtkWidget * atomes_main_window;
 extern GtkWidget * MainView;
 extern GtkWidget * MainFrame[2];
 extern GtkWidget * pop;
@@ -1135,7 +1139,6 @@ extern void remove_action (gchar * action_name);
 extern void remove_edition_actions ();
 extern void remove_edition_and_analyze_actions ();
 
-extern GtkApplication * AtomesApp;
 extern workspace workzone;
 extern project * proj;
 extern chemical_data * active_chem;

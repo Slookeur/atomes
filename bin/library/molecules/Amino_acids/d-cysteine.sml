@@ -6,7 +6,7 @@
    <library-name>Cysteine-(D)</library-name>
   <iupac-name>(D)-Cysteine</iupac-name>
   <other-names>
-   <name>(2S)-2-Amino-3-sulfanylpropanoicacid</name>
+   <name>(2S)-2-Amino-3-sulfanylpropanoic acid</name>
   </other-names>
  </names>
  <chemistry>

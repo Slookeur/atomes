@@ -6,7 +6,7 @@
    <library-name>Asparagine-(D)</library-name>
   <iupac-name>(D)-Asparagine</iupac-name>
   <other-names>
-   <name>(2R)-2-Amino-3-carbamoylpropanoicacid</name>
+   <name>(2R)-2-Amino-3-carbamoylpropanoic acid</name>
   </other-names>
  </names>
  <chemistry>

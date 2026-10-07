@@ -53,4 +53,9 @@ extern void add_reader_info (gchar * info, int mid);
 extern void reader_info (gchar * type, gchar * sinf, int val);
 extern void format_error (int stp, int ato, gchar * mot, int line);
 extern void check_for_species (double v, int ato);
+
+extern int cif_cnfcart;
+extern int ** cif_cnfkeys;
+extern gboolean * cif_cnftodo;
+extern int cif_cnfdone;
 #endif

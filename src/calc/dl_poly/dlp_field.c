@@ -255,7 +255,7 @@ gchar * intelemt[MAXDATA] = {i18n("of the molecule"),
                              i18n("of the core-shell unit"),
                              i18n("of the constraint bond"),
                              i18n("of the mean force potential"),
-                             i18n("of the rigid unit)"),
+                             i18n("of the rigid unit"),
                              i18n("of the tethering potential"),
                              i18n("of the flexible chemical bond"),
                              i18n("of the bond restraint"),
@@ -1264,8 +1264,8 @@ void fill_field_struct (GtkTreeStore * store, int id, int mo)
     gtk_tree_store_append (store, & field_level, NULL);
     tmp_fprop = tmp_fstr -> def;
     stra = g_strdup_printf ("%.3f", tmp_fstr -> av);
-    strb = g_strdup_printf (_("<b>Default</b>: %s (%s)"), 
-                            dlp_to_translate(activef,l,tmp_fprop -> key) ? _(fnames[activef][l][tmp_fprop -> key]) : fnames[activef][l][tmp_fprop -> key], 
+    strb = g_strdup_printf (_("<b>Default</b>: %s (%s)"),
+                            dlp_to_translate(activef,l,tmp_fprop -> key) ? _(fnames[activef][l][tmp_fprop -> key]) : fnames[activef][l][tmp_fprop -> key],
                             exact_name(fkeysw[activef][l][tmp_fprop -> key]));
     if (id < 2)
     {
@@ -1358,7 +1358,7 @@ void fill_field_body (GtkTreeStore * store, int id)
         }
       }
     }
-    stra = g_strdup_printf ("%s (%s)", 
+    stra = g_strdup_printf ("%s (%s)",
                             dlp_to_translate(activef,10+id,tmp_fbody -> key) ? _(fnames[activef][10+id][tmp_fbody -> key]) : fnames[activef][10+id][tmp_fbody -> key],
                             exact_name(fkeysw[activef][10+id][tmp_fbody -> key]));
     if (id == 0) strb = parameters_info (9+id, tmp_fbody -> key, fvars_vdw[activef][tmp_fbody -> key], tmp_fbody -> val);

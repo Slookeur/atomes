@@ -47,10 +47,20 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   gboolean destroy_func (gpointer user_data);
 
+  static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * invocation, const gchar * arg_file, gpointer user_data);
+  static gboolean init_dbus_server ();
+  static gboolean check_existing_instance (void);
+
+  static gboolean win32_open_file_idle (gpointer user_data);
+  static gpointer win32_pipe_server_thread (gpointer user_data);
+  static gboolean init_win32_server ();
+  static gboolean check_existing_win32_instance ();
+
   G_MODULE_EXPORT gboolean splashdraw (GtkWidget * widget, cairo_t * cr, gpointer data);
 
   void printhelp();
   void printversion ();
+  void set_atomes_locale ();
   void read_this_file (int file_type, gchar * this_file);
   void open_this_data_file (int file_type, gchar * file_name);
 
@@ -64,6 +74,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 
   LLM tools (Le Chat) were used at few occasions to prepare some sections of this file, including:
     - To write of the function to convert hexadecimal chain to color
+    - To write parts of the d-bus, and Mutex instances management functions
 
 */
 
@@ -86,6 +97,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
 #else
 #include <pwd.h>
 #define APP_EXTENSION
+#include "fr_ipcms_atomes-Instance.h"
 #endif
 
 extern GtkWidget * create_main_window (GApplication * app);
@@ -114,6 +126,9 @@ gchar * cr_styles[] = {"crystal", "crystal_radius", "in_crystal", "in_crystal_ra
 gchar * sp_styles[] = {"sphere", "spheres", "sph", "sp", "S", NULL};
 gchar * cy_styles[] = {"cylinder", "cylinders", "cyl", "cy", "c", NULL};
 gchar * do_styles[] = {"dot", "dots", "d", NULL};
+gchar * xyz_files[] = {"xyz", NULL};
+gchar * c3d_files[] = {"c3d", "chemd3d", NULL};
+gchar * sml_files[] = {"sml", NULL};
 
 /*!
   \fn void print_help()
@@ -132,16 +147,17 @@ void print_help()
             "  -v, --version             version information\n"
             "  -h, --help                display this help message\n\n"
             "files, any number, in any order, in the following formats:\n\n"
-            "  atomes workspace file             : .awf\n"
-            "  atomes project file               : .apf\n"
-            "  XYZ coordinates file              : .xyz\n"
-            "  Chem3D coordinates file           : .c3d\n"
-            "  CPMD trajectory                   : .trj\n"
-            "  VASP trajectory                   : .xdatcar\n"
-            "  PDB coordinates                   : .pdb, .ent\n"
-            "  Crystallographic Information File : .cif\n"
-            "  DL-POLY history file              : .hist\n"
-            "  ISAACS project file               : .ipf\n\n"
+            "  atomes workspace file              : .awf\n"
+            "  atomes project file                : .apf\n"
+            "  XYZ coordinates file               : .xyz\n"
+            "  Chem3D coordinates file            : .c3d\n"
+            "  CPMD trajectory                    : .trj\n"
+            "  VASP trajectory                    : .xdatcar\n"
+            "  PDB coordinates                    : .pdb, .ent\n"
+            "  Crystallographic Information File  : .cif\n"
+            "  DL-POLY history file               : .hist\n"
+            "  atomes chemical library file (XML) : .sml\n"
+            "  ISAACS project file                : .ipf\n\n"
             " alternatively specify the file format using:\n\n"
             " -awf [FILE]\n"
             " -apf [FILE]\n"
@@ -152,6 +168,7 @@ void print_help()
             " -pdb [FILE], or, -ent [FILE]\n"
             " -cif [FILE]\n"
             " -hist [FILE]\n"
+            " -sml [FILE]\n"
             " -ipf [FILE]\n\n"
             "ex:\n\n"
             " atomes -pdb this.f file.awf -cif that.f *.xyz\n\n"
@@ -176,8 +193,14 @@ void print_help()
             "  -U, --grad_col_a=[COL]     gradient initial color\n"
             "  -V, --grad_col_b=[COL]     gradient final color\n\n"
             "ex:\n\n"
-            " atomes --render-png --width=1920 -H 1024 --output=image.png project.apf -s ball_and_stick\n"
-            " atomes --jpg --style=vdw -r ortho -e pc -t pc\n\n"));
+            " atomes --render-png --width=1920 -H 1024 --output=project.png project.apf -s ball_and_stick\n"
+            " atomes --jpg --style=vdw -r ortho -e pc -t pc file.xyz\n\n"
+            "Atomic coordinates conversion from the command line:\n\n"
+            "Usage: atomes [CONVERSION_OPTIONS]\n"
+            "  -c, --convert=[FORMAT]     conversion format\n\n"
+            "ex:\n\n"
+            " atomes --convert=xyz project.apf\n"
+            " atomes -c sml file.pdb\n\n"));
   printf ("%s", _("\nReport a bug to <"));
   printf ("%s>\n\n", PACKAGE_BUGREPORT);
 }
@@ -275,8 +298,8 @@ int test_this_ext (int len, gchar * arg)
 {
   int i;
   gchar * aext = g_strdup_printf ("%c%c%c%c", arg[len-4], arg[len-3], arg[len-2], arg[len-1]);
-  char * eext[15]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", "tcar", "NULL", ".pdb", ".ent", ".cif", "NULL", "hist", ".ipf"};
-  for (i=0; i<15; i++) if (g_strcmp0 (aext, eext[i]) == 0)
+  char * eext[17]={".awf", ".apf", ".xyz", "NULL", ".c3d", ".trj", "NULL", ".car", "NULL", ".pdb", ".ent", ".cif", "NULL", "NULL", ".hist", ".sml", ".ipf"};
+  for (i=0; i<17; i++) if (g_strcmp0 (aext, eext[i]) == 0)
   {
     g_free (aext);
     return -(i+1);
@@ -294,11 +317,11 @@ int test_this_ext (int len, gchar * arg)
 */
 int test_this_arg (gchar * arg)
 {
-  char * fext[15]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "-hist", "-ipf"};
+  char * fext[17]={"-awf", "-apf", " -xyz", "NULL", "-c3d", "-trj", "NULL", "-xdatcar", "NULL", "-pdb", "-ent", "-cif", "NULL", "NULL", "-hist", "-sml", "-ipf"};
   int i, j;
   i = strlen(arg);
   gchar * str = g_ascii_strdown (arg, i);
-  for (j=0; j<15; j++)
+  for (j=0; j<17; j++)
   {
     if (g_strcmp0 (str, fext[j]) == 0)
     {
@@ -383,6 +406,21 @@ int get_box_axis_from_string (gchar * box_axis_string)
 {
   if (is_string_in_string_list(box_axis_string, wi_styles)) return WIREFRAME;
   if (is_string_in_string_list(box_axis_string, cy_styles)) return CYLINDERS;
+  return NONE;
+}
+
+/*!
+  \fn int get_file_format_from_string (gchar * file_format_string)
+
+  \brief retrieve file format for convertion from command line string
+
+  \param file_format_string the file format keyword from command line
+*/
+int get_file_format_from_string (gchar * file_format_string)
+{
+  if (is_string_in_string_list(file_format_string, xyz_files)) return 0;
+  if (is_string_in_string_list(file_format_string, c3d_files)) return 1;
+  if (is_string_in_string_list(file_format_string, sml_files)) return 2;
   return NONE;
 }
 
@@ -527,6 +565,20 @@ int check_for_atomes_file_options (int start, int end, char *argv[])
 }
 
 /*!
+  \fn void set_atomes_locale ()
+
+  \brief set locale
+*/
+void set_atomes_locale ()
+{
+  setlocale (LC_ALL, "");        /* Charge la locale système définie par l'utilisateur */
+  setlocale (LC_NUMERIC, "C");   /* Conserve le point comme séparateur décimal */
+  bindtextdomain (PACKAGE, PACKAGE_LOCALE);
+  textdomain (PACKAGE);
+  bind_textdomain_codeset (PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
+}
+
+/*!
   \fn int parse_command_line (int argc, char *argv[])
 
   \brief test command line arguments
@@ -559,6 +611,7 @@ int parse_command_line (int argc, char *argv[])
                                     {"grad_col_a", required_argument, 0, 'U'},
                                     {"grad_col_b", required_argument, 0, 'V'},
                                     {"rep", required_argument, 0, 'r'},
+                                    {"convert", required_argument, 0, 'c'},
                                     // {"debug", no_argument, 0, 'd'},
                                     {0, 0, 0, 0}};
   int opt;
@@ -579,15 +632,17 @@ int parse_command_line (int argc, char *argv[])
   /* Letter follow by : means that the command requires an argument
      No letter if the option is only in long format, ex : --width
      If the long name is empty the command is only in short format */
-  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
+  while ((opt = getopt_long(argc, argv, "hvlpjdW:H:o:s:a:b:c:r:e:t:B:C:G:D:P:U:V:", atomes_options, & index)) != -1)
   {
     switch (opt)
     {
       case 'h':
+        set_atomes_locale ();
         print_help();
         return FALSE;
         break;
       case 'v':
+        set_atomes_locale ();
         print_version();
         return FALSE;
         break;
@@ -693,6 +748,9 @@ int parse_command_line (int argc, char *argv[])
         img_opt ++;
         img_opt += (index == -1) ? 1 : 0;
         break;
+      case 'c':
+        atomes_convert_file = get_file_format_from_string (g_ascii_strdown(optarg,strlen(optarg)));
+        break;
     }
     index = -1;
   }
@@ -700,7 +758,7 @@ int parse_command_line (int argc, char *argv[])
   if (atomes_render_image)
   {
     if (! render_image_output) render_image_output = g_strdup_printf ("%s", (render_image_format) ? "image.jpg" : "image.png");
-    if (argc == img_opt + 2)
+    if (argc == img_opt + 2 + ((atomes_convert_file != NONE) ? 2 : 0))
     {
       if (image_x || image_y)
       {
@@ -750,7 +808,7 @@ int parse_command_line (int argc, char *argv[])
     }
   }
 
-  return (atomes_render_image && files_to_read == 1) ? TRUE : (atomes_render_image) ? FALSE : TRUE;
+  return ((atomes_render_image || atomes_convert_file != NONE) && files_to_read == 1) ? TRUE : (atomes_render_image || atomes_convert_file != NONE) ? FALSE : TRUE;
 }
 
 /*!
@@ -815,7 +873,7 @@ GtkWidget * create_splash_window ()
   image = gtk_image_new_from_file (PACKAGE_LOGO);
 #endif
   add_container_child (CONTAINER_WIN, splash_window, image);
-  gtk_window_set_transient_for ((GtkWindow *)splash_window, (GtkWindow *)MainWindow);
+  gtk_window_set_transient_for ((GtkWindow *)splash_window, (GtkWindow *)atomes_main_window);
   show_the_widgets (splash_window);
   return splash_window;
 }
@@ -837,7 +895,7 @@ void read_this_file (int file_type, gchar * this_file)
     if (i != 0)
     {
       gchar * err = g_strdup_printf (_("Error while reading workspace file\n%s\n"), this_file);
-      show_error (err, 0, MainWindow);
+      show_error (err, 0, atomes_main_window);
       g_free (err);
     }
   }
@@ -934,7 +992,7 @@ void open_this_data_file (int file_type, gchar * file_name)
         read_this_file (2, file_name);
       }
       break;
-    case 15:
+    case 17:
       init_project (TRUE);
       open_this_isaacs_xml_file (g_strdup_printf ("%s", file_name), activep, FALSE);
       break;
@@ -959,7 +1017,7 @@ void open_this_data_file (int file_type, gchar * file_name)
           {
             init_project (TRUE);
             active_project -> coordfile =  g_strdup_printf ("%s\\%s", filedir, (gchar *)ffd.cFileName);
-            open_this_coordinate_file (file_type-3, NULL);
+            open_this_coordinate_file (file_type-3, NULL, TRUE);
           }
           while (FindNextFile(hFind, &ffd) != 0)
           {
@@ -967,7 +1025,7 @@ void open_this_data_file (int file_type, gchar * file_name)
             {
               init_project (TRUE);
               active_project -> coordfile = g_strdup_printf ("%s\\%s", filedir, (gchar *)ffd.cFileName);
-              open_this_coordinate_file (file_type-3, NULL);
+              open_this_coordinate_file (file_type-3, NULL, TRUE);
             }
           }
         }
@@ -982,7 +1040,7 @@ void open_this_data_file (int file_type, gchar * file_name)
             {
               init_project (TRUE);
               active_project -> coordfile = g_strdup_printf ("%s/%s", filedir, dir -> d_name);
-              open_this_coordinate_file (file_type-3, NULL);
+              open_this_coordinate_file (file_type-3, NULL, TRUE);
             }
           }
           closedir(d);
@@ -994,11 +1052,373 @@ void open_this_data_file (int file_type, gchar * file_name)
       {
         init_project (TRUE);
         active_project -> coordfile = g_strdup_printf ("%s", file_name);
-        open_this_coordinate_file (file_type-3, NULL);
+        open_this_coordinate_file (file_type-3, NULL, TRUE);
       }
       break;
   }
 }
+
+#ifndef G_OS_WIN32
+/*!
+  \fn static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * invocation, const gchar * arg_file, gpointer user_data)
+
+  \brief D-Bus method for OpenFile : open a file in the active instance
+
+  \param object D-bus skeleton
+  \param invocation invocation method
+  \param arg_file file to be opened
+  \param user_data associated data pointer
+*/
+static gboolean handle_open_file (Instance * object, GDBusMethodInvocation * invocation, const gchar * arg_file, gpointer user_data)
+{
+  if (arg_file && strlen (arg_file) > 0)
+  {
+    int len = strlen (arg_file);
+    int file_type = -test_this_ext (len, (gchar *) arg_file);
+    if (file_type > 0)
+    {
+      open_this_data_file (file_type, (gchar *) arg_file);
+    }
+  }
+  instance_complete_open_file (object, invocation);
+  // Bring the main window on sight
+
+  if (atomes_app && atomes_main_window)
+  {
+    if (GTK_IS_WIDGET(atomes_main_window))
+    {
+      gtk_window_present (GTK_WINDOW(atomes_main_window));
+    }
+  }
+  return TRUE;
+}
+
+/*!
+  \fn static gboolean init_dbus_server ()
+
+  \brief initialize D-Bus server for the atomes instance
+*/
+static gboolean init_dbus_server ()
+{
+  GError * error = NULL;
+  GDBusConnection * connection;       // D-Bus connection
+  GDBusInterfaceSkeleton * skeleton;  // D-Bus skeleton
+
+  // Connexion au bus de session
+  connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, & error);
+  if (error)
+  {
+    g_printerr ("D-Bus connection error : %s\n", error -> message);
+    g_error_free (error);
+    return FALSE;
+  }
+
+  // Créer le skeleton généré par gdbus-codegen
+  Instance * interface = instance_skeleton_new ();
+  skeleton = G_DBUS_INTERFACE_SKELETON (interface);
+
+  // Connecter le gestionnaire de méthode OpenFile
+  g_signal_connect (interface, "handle-open-file", G_CALLBACK (handle_open_file), NULL);
+
+  // Exporter le skeleton via son API propre (utilise sa vtable interne)
+  if (! g_dbus_interface_skeleton_export (skeleton, connection, "/fr/ipcms/atomes/Instance", & error))
+  {
+    g_printerr ("D-Bus interface export error : %s\n", error -> message);
+    g_error_free (error);
+    return FALSE;
+  }
+
+  // Réserver le nom bien connu sur le bus (appel synchrone pour garantir
+  // que le nom est disponible avant le démarrage de la boucle principale)
+  GVariant * name_result = g_dbus_connection_call_sync (connection,
+                                                        "org.freedesktop.DBus",
+                                                        "/org/freedesktop/DBus",
+                                                        "org.freedesktop.DBus",
+                                                        "RequestName",
+                                                        g_variant_new ("(su)", "fr.ipcms.atomes.Instance", 4u), /* 4 = DO_NOT_QUEUE */
+                                                        G_VARIANT_TYPE ("(u)"),
+                                                        G_DBUS_CALL_FLAGS_NONE,
+                                                        -1, NULL, & error);
+
+  if (error)
+  {
+    g_printerr ("D-Bus name reservation error : %s\n", error -> message);
+    g_error_free (error);
+    /* non fatal */
+  }
+  else if (name_result)
+  {
+    guint reply;
+    g_variant_get (name_result, "(u)", & reply);
+    g_variant_unref (name_result);
+    if (reply != 1u) /* 1 = DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER */
+    {
+      g_printerr ("Impossible d'obtenir le nom D-Bus (code: %u)\n", reply);
+    }
+  }
+
+  return TRUE;
+}
+
+/*!
+  \fn static gboolean check_existing_instance ()
+
+  \brief search for already existing atomes instance, if any transmits file list flist
+
+  \return TRUE if already existing instance is handling flist, FALSE otherwise
+*/
+static gboolean check_existing_instance ()
+{
+  gboolean sent = FALSE;
+  if (! flist) return sent;
+
+  GError * error = NULL;
+  GDBusConnection * connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, & error);
+  if (error)
+  {
+    g_printerr ("D-Bus connection error : %s\n", error -> message);
+    g_error_free (error);
+    return sent;
+  }
+
+  if (! flist) return sent;
+
+  struct file_list * tmp = flist;
+  while (tmp)
+  {
+    error = NULL;
+    GVariant * result = g_dbus_connection_call_sync (connection,
+                                                     "fr.ipcms.atomes.Instance",
+                                                     "/fr/ipcms/atomes/Instance",
+                                                     "fr.ipcms.atomes.Instance",
+                                                     "OpenFile",
+                                                     g_variant_new ("(s)", tmp -> file_name),
+                                                     NULL,
+                                                     G_DBUS_CALL_FLAGS_NONE,
+                                                     -1,
+                                                     NULL,
+                                                     & error);
+    if (error)
+    {
+      /* Aucune instance ou erreur réseau : on arrête et on démarre normalement */
+      g_printerr ("D-Bus OpenFile error: %s\n", error -> message);
+      g_error_free (error);
+      break;
+    }
+    if (result)
+    {
+      g_variant_unref (result);
+      sent = TRUE;
+    }
+    tmp = tmp -> next;
+  }
+
+  g_object_unref (connection);
+  return sent;
+}
+#else
+
+#define ATOMES_MUTEX_NAME "fr.ipcms.atomes.mutex"
+#define ATOMES_PIPE_NAME "\\\\.\\pipe\\fr.ipcms.atomes.pipe"
+#define ATOMES_PIPE_BUFSIZE 4096
+
+HANDLE win32_mutex = NULL;
+
+/*! \typedef OpenFileData
+
+  \brief Data structure used to pass file-open parameters to the GTK main thread
+         via g_idle_add() from the Windows Named Pipe listener thread
+*/
+typedef struct OpenFileData OpenFileData;
+struct OpenFileData
+{
+  int    file_type;   /*!< File type identifier (see test_this_ext()) */
+  gchar * file_name;  /*!< Absolute path of the file to open */
+};
+
+/*!
+  \fn static gboolean win32_open_file_idle (gpointer user_data)
+
+  \brief GTK idle callback: open a file received from the Windows Named Pipe server
+         and bring the main window to the foreground.
+         Called via g_idle_add() to ensure GTK operations run on the main thread.
+
+  \param user_data pointer to an OpenFileData structure (ownership transferred; freed here)
+
+  \return FALSE
+*/
+static gboolean win32_open_file_idle (gpointer user_data)
+{
+  OpenFileData * ofd = (OpenFileData *) user_data;
+  open_this_data_file (ofd -> file_type, ofd -> file_name);
+  if (atomes_app && atomes_main_window)
+  {
+    gtk_window_present (GTK_WINDOW (atomes_main_window));
+  }
+  g_free (ofd -> file_name);
+  g_free (ofd);
+  return FALSE;
+}
+
+/*!
+  \fn static gpointer win32_pipe_server_thread (gpointer user_data)
+
+  \brief Windows Named Pipe server thread: listens for file paths sent by new
+         atomes instances and dispatches each one to the GTK main thread via
+         g_idle_add(). Runs indefinitely until the process exits.
+
+  \param user_data unused
+
+  \return NULL
+*/
+static gpointer win32_pipe_server_thread (gpointer user_data)
+{
+  while (TRUE)
+  {
+    HANDLE pipe = CreateNamedPipe (ATOMES_PIPE_NAME,
+                                   PIPE_ACCESS_INBOUND,
+                                   PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                                   PIPE_UNLIMITED_INSTANCES,
+                                   ATOMES_PIPE_BUFSIZE,
+                                   ATOMES_PIPE_BUFSIZE,
+                                   0, NULL);
+    if (pipe == INVALID_HANDLE_VALUE)
+    {
+      g_printerr ("CreateNamedPipe failed: %lu\n", GetLastError ());
+      break;
+    }
+
+    BOOL connected = ConnectNamedPipe(pipe, NULL);
+    if (! connected && GetLastError() != ERROR_PIPE_CONNECTED)
+    {
+      g_printerr ("ConnectNamedPipe failed: %lu", GetLastError());
+      CloseHandle(pipe);
+      break;
+    }
+    else if (connected || GetLastError () == ERROR_PIPE_CONNECTED)
+    {
+      char buf[ATOMES_PIPE_BUFSIZE];
+      DWORD bytes_read = 0;
+      BOOL ok = ReadFile (pipe, buf, sizeof (buf) - 1, & bytes_read, NULL);
+      if (ok && bytes_read > 0)
+      {
+        buf[bytes_read] = '\0';
+        int len = (int) strlen (buf);
+        int file_type = -test_this_ext (len, buf);
+        if (file_type > 0)
+        {
+          OpenFileData * ofd = g_malloc0 (sizeof * ofd);
+          ofd -> file_type = file_type;
+          ofd -> file_name = g_strdup (buf);
+          g_idle_add (win32_open_file_idle, ofd);
+        }
+      }
+      else
+      {
+        g_printerr ("ReadFile failed: %lu", GetLastError());
+      }
+    }
+    DisconnectNamedPipe(pipe);
+    CloseHandle (pipe);
+  }
+  return NULL;
+}
+
+/*!
+  \fn static gboolean init_win32_server ()
+
+  \brief Initialize the Windows single-instance server: create the Named Mutex
+         that signals an active instance, then start the Named Pipe listener thread.
+
+  \return TRUE on success, FALSE on failure
+*/
+static gboolean init_win32_server ()
+{
+  win32_mutex = CreateMutex (NULL, TRUE, ATOMES_MUTEX_NAME);
+  if (win32_mutex == NULL)
+  {
+    g_printerr ("CreateMutex failed: %lu\n", GetLastError ());
+    return FALSE;
+  }
+
+  if (GetLastError () == ERROR_ALREADY_EXISTS)
+  {
+    CloseHandle (win32_mutex);
+    win32_mutex = NULL;
+    return TRUE;
+  }
+
+  HANDLE thread = g_thread_new ("atomes-pipe-server", win32_pipe_server_thread, NULL);
+  if (thread == NULL)
+  {
+    CloseHandle (win32_mutex);
+    win32_mutex = NULL;
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/*!
+  \fn gboolean check_existing_win32_instance ()
+
+  \brief Search for an already running atomes instance on Windows.
+         If found, transmit all pending files (flist) via the Named Pipe
+         so the existing instance opens them, then return TRUE so the
+         calling process can exit immediately.
+
+  \return TRUE if an existing instance was found and handled flist,
+          FALSE otherwise (no instance found, or flist is empty)
+*/
+static gboolean check_existing_win32_instance ()
+{
+  if (! flist) return FALSE;
+
+  HANDLE mutex = OpenMutex (MUTEX_ALL_ACCESS, FALSE, ATOMES_MUTEX_NAME);
+  if (mutex == NULL) return FALSE;
+
+  gboolean sent = FALSE;
+  struct file_list * tmp = flist;
+  while (tmp)
+  {
+    HANDLE pipe = CreateFile (ATOMES_PIPE_NAME,
+                              GENERIC_WRITE,
+                              0,
+                              NULL,
+                              OPEN_EXISTING,
+                              0,
+                              NULL);
+
+    if (pipe == INVALID_HANDLE_VALUE)
+    {
+      g_printerr ("CreateFile PIPE FAILED: %lu\n", GetLastError());
+    }
+
+    DWORD len = (DWORD) strlen (tmp -> file_name);
+    DWORD written = 0;
+
+    BOOL ok = WriteFile (pipe, tmp -> file_name, len, & written, NULL);
+
+    if (! ok)
+    {
+      g_printerr ("WriteFile FAILED: %lu\n", GetLastError());
+    }
+    else
+    {
+      g_printerr ("WriteFile OK: %lu/%lu bytes\n", written, len);
+      if (written == len) sent = TRUE;
+    }
+
+    CloseHandle (pipe);
+    tmp = tmp->next;
+  }
+
+  CloseHandle (mutex);
+  mutex = NULL;
+
+  return sent;
+}
+#endif /* G_OS_WIN32 */
 
 /*!
   \fn G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
@@ -1044,9 +1464,9 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
   print_version ();
 #endif // DEBUG
 
-  if (! atomes_render_image)
+  if (! atomes_render_image && atomes_convert_file == NONE)
   {
-    MainWindow = create_main_window (app);
+    atomes_main_window = create_main_window (app);
     GtkWidget * isplash = create_splash_window ();
     if (isplash == NULL)
     {
@@ -1067,7 +1487,7 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
       {
         if (ftmp -> file_type == 1)
         {
-          // Open the workspace
+          // Open the workspace file first
           open_this_data_file (ftmp -> file_type, ftmp -> file_name);
         }
         ftmp = ftmp -> next;
@@ -1132,7 +1552,7 @@ int check_opengl_rendering ()
 
   if (error)
   {
-    g_print ("error: %s\n", error -> message);
+    g_printerr ("error: %s\n", error -> message);
     g_clear_error (& error);
   }
   g_subprocess_wait (proc, NULL, & error);
@@ -1183,6 +1603,9 @@ int check_opengl_rendering ()
 int main (int argc, char *argv[])
 {
   gboolean RUNC = FALSE;
+
+  // Allocating application data structure, custom required for instance(s) managment
+  atomes_app = g_malloc0 (sizeof *atomes_app);
 
 #ifdef G_OS_WIN32
   PACKAGE_PREFIX = g_win32_get_package_installation_directory_of_module (NULL);
@@ -1305,22 +1728,61 @@ int main (int argc, char *argv[])
     ATOMES_CONFIG = g_strdup_printf ("%s/atomes.pml", ATOMES_CONFIG_DIR);
 #endif
 
-    bindtextdomain (PACKAGE, PACKAGE_LOCALE);
-    textdomain (PACKAGE);
-    bind_textdomain_codeset(PACKAGE, "UTF-8");  // Forcer UTF-8 pour gettext
-
+    set_atomes_locale ();
     set_atomes_preferences ();
 
-#if GLIB_MINOR_VERSION < 74
-    AtomesApp = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
+    // Now user preferences are known
+    if (! atomes_from_libreoffice && ! atomes_render_image && atomes_convert_file == NONE)
+    {
+      if (default_instance)
+      {
+        // Check if there is already an existing atomes instance running
+        // If yes then transmit the file(s) to open to this instance
+#ifdef G_OS_WIN32
+        /* Check for an existing atomes instance via Win32 Named Mutex/Pipe */
+        if (argc > 1 && check_existing_win32_instance ())
+        {
+          return 0;
+        }
+        if (! init_win32_server ())
+        {
+          g_print ("Init Win32 pipe server failed\n");
+          return 1;
+        }
 #else
-    AtomesApp = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS);
+        if (argc > 1 && check_existing_instance ())
+        {
+          // Another instance was found, quit.
+          return 0;
+        }
+
+        if (! init_dbus_server ())
+        {
+          g_print ("Init D-BUS failed\n");
+          return 1;
+        }
+#endif // G_OS_WIN32
+      }
+    }
+
+#if GLIB_MINOR_VERSION < 74
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
+#else
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS);
 #endif
     GError * error = NULL;
-    g_application_register (G_APPLICATION(AtomesApp), NULL, & error);
-    g_signal_connect (G_OBJECT(AtomesApp), "activate", G_CALLBACK(run_program), NULL);
-    int status = g_application_run (G_APPLICATION (AtomesApp), 0, NULL);
-    g_object_unref (AtomesApp);
+    g_application_register (G_APPLICATION(atomes_app), NULL, & error);
+    g_signal_connect (G_OBJECT(atomes_app), "activate", G_CALLBACK(run_program), NULL);
+
+    int status = g_application_run (G_APPLICATION (atomes_app), 0, NULL);
+    g_object_unref (atomes_app);
+#ifdef G_OS_WIN32
+    if (win32_mutex)
+    {
+      ReleaseMutex (win32_mutex);
+      CloseHandle (win32_mutex);
+    }
+#endif
     return status;
   }
   return 0;

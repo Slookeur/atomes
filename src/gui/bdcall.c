@@ -586,14 +586,14 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
 
   if (! active_project -> dmtx)
   {
-    show_error (_("The nearest neighbors table calculation has failed"), 0, (widg) ? widg : MainWindow);
+    show_error (_("The nearest neighbors table calculation has failed"), 0, (widg) ? widg : atomes_main_window);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
   }
   else if (! err_update)
   {
-    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : MainWindow);
+    show_error (_("Impossible to update FORTRAN data"), 0, (widg) ? widg : atomes_main_window);
     bonding = 0;
     active_glwin -> adv_bonding[0] = 0;
     active_glwin -> adv_bonding[1] = 0;
@@ -620,11 +620,11 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       active_project -> analysis[SPH] -> avail_ok = j;
       if (! j)
       {
-        show_error (_("Unexpected error when calculating bond properties"), 0, (widg) ? widg : MainWindow);
+        show_error (_("Unexpected error when calculating bond properties"), 0, (widg) ? widg : atomes_main_window);
       }
       else
       {
-        if (active_glwin -> init && ! atomes_render_image) print_info (calculation_time(TRUE, active_project -> analysis[BND] -> calc_time), NULL, active_project -> analysis[BND] -> calc_buffer);
+        if (active_glwin -> init && ! atomes_render_image && atomes_convert_file == NONE) print_info (calculation_time(TRUE, active_project -> analysis[BND] -> calc_time), NULL, active_project -> analysis[BND] -> calc_buffer);
         bonding = 1;
         if (frag_update)
         {
@@ -632,7 +632,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           clock_gettime (CLOCK_MONOTONIC, & start_time);
           if (! molecules_ (& mol_update, & k))
           {
-            show_error (_("Unexpected error when looking for isolated fragment(s) and molecule(s)"), 0, (widg) ? widg : MainWindow);
+            show_error (_("Unexpected error when looking for isolated fragment(s) and molecule(s)"), 0, (widg) ? widg : atomes_main_window);
             if (active_glwin)
             {
               for (k=0; k<2; k++)
@@ -665,7 +665,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
           // Using the unused RI calc_time slot to store Frag-mol calc time.
           active_project -> analysis[RIN] -> calc_time = get_calc_time (start_time, stop_time);
           active_project_changed (activep);
-          if (widg != NULL && ! atomes_render_image) show_the_widgets (curvetoolbox);
+          if (widg != NULL && ! atomes_render_image && atomes_convert_file == NONE) show_the_widgets (curvetoolbox);
         }
       }
     }
@@ -678,7 +678,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
       if (! j)
       {
         prepostcalc (widg, TRUE, ANG, j, 1.0);
-        show_error (_("Unexpected error when calculating the bond angles distribution"), 0, (widg) ? widg : MainWindow);
+        show_error (_("Unexpected error when calculating the bond angles distribution"), 0, (widg) ? widg : atomes_main_window);
       }
       else
       {
@@ -686,11 +686,11 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
         prepostcalc (widg, TRUE, ANG, j, 1.0);
         if (! j)
         {
-          show_error (_("Unexpected error when calculating the dihedral angles distribution"), 0, (widg) ? widg : MainWindow);
+          show_error (_("Unexpected error when calculating the dihedral angles distribution"), 0, (widg) ? widg : atomes_main_window);
         }
         else
         {
-          if (widg != NULL && ! atomes_render_image) show_the_widgets (curvetoolbox);
+          if (widg != NULL && ! atomes_render_image && atomes_convert_file == NONE) show_the_widgets (curvetoolbox);
           if (! active_project -> runc[0]) update_ang_view (active_project);
         }
       }
@@ -698,7 +698,7 @@ G_MODULE_EXPORT void on_calc_bonds_released (GtkWidget * widg, gpointer data)
   }
 
   if (active_glwin && bonds_update) update_glwin_after_bonds (bonding, colm);
-  if (! atomes_render_image)
+  if (! atomes_render_image && atomes_convert_file == NONE)
   {
     fill_tool_model ();
     if (widg) show_the_widgets (curvetoolbox);
@@ -818,7 +818,7 @@ void coordination_info (int sp, double sac, double ssac[active_project -> nspec]
 void coordout_ (int * sid, double * sac, double ssac[active_project -> nspec], int * totgsa)
 {
   active_coord -> ntg[1][* sid] = * totgsa;
-  if (bonds_update && ! atomes_render_image) coordination_info (* sid, * sac, ssac);
+  if (bonds_update && ! atomes_render_image && atomes_convert_file == NONE) coordination_info (* sid, * sac, ssac);
 }
 
 /*!
@@ -1013,7 +1013,7 @@ void update_angle_view (project * this_proj)
 void envout_ (int * sid, int * totgsa, int numgsa[* totgsa])
 {
   /* Send info for OpenGL */
-  if (bonds_update && ! atomes_render_image) env_info (* sid, * totgsa, numgsa);
+  if (bonds_update && ! atomes_render_image && atomes_convert_file == NONE) env_info (* sid, * totgsa, numgsa);
 }
 
 void tetraout_ (int * sid, double eda[active_project -> nspec],
@@ -1034,7 +1034,7 @@ void tetraout_ (int * sid, double eda[active_project -> nspec],
     if (eda[i] != 0.0 || cda[i] != 0.0) print=TRUE;
   }
 
-  if (print && bonds_update && ! atomes_render_image)
+  if (print && bonds_update && ! atomes_render_image && atomes_convert_file == NONE)
   {
     print_info (_("\nNumber and proportion of tetrahedra links for "), "italic", active_project -> analysis[BND] -> calc_buffer);
     print_info (exact_name(active_chem -> label[* sid]), textcolor(* sid), active_project -> analysis[BND] -> calc_buffer);

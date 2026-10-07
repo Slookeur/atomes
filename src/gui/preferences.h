@@ -98,6 +98,9 @@ extern void duplicate_axis_data (axis * new_axis, axis * old_axis);
 
 extern gboolean preferences;
 
+extern int default_instance;
+extern int tmp_instance;
+
 extern double default_totcut;
 extern double tmp_totcut;
 extern bond_cutoff * default_bond_cutoff;

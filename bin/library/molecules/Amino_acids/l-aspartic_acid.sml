@@ -3,7 +3,7 @@
 <scl-xml>
  <class>Amino acids</class>
  <names>
-   <library-name>Aspartic-(L)</library-name>
+   <library-name>Aspartic acid-(L)</library-name>
   <iupac-name>(L)-Aspartic acid</iupac-name>
   <other-names>
    <name>(2S)-2-Aminobutanedioic acid</name>

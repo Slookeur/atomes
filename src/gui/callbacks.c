@@ -51,7 +51,7 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void update_sa_info (int sid);
   void prepare_sp_box ();
   void cell_data_from_pdb_ (float * a, float * b, float * c, float * alp, float * bet, float * gam);
-  void open_this_coordinate_file (int format, gchar * proj_name);
+  void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader);
 
   G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data);
   G_MODULE_EXPORT void run_on_open_save_active (GtkNativeDialog * info, gint response_id, gpointer data);
@@ -98,10 +98,14 @@ char * coord_files[NCFORMATS+1] = {i18n("XYZ file"),
                                    i18n("Cryst. information (crystal build) - multiple configurations"),
                                    i18n("Cryst. information (symmetry positions) - single configuration"),
                                    i18n("DL-POLY HISTORY file"),
+                                   i18n("atomes Simple Chemical Library"),
                                    i18n("ISAACS Project File")};
 
 char * coord_files_ext[NCFORMATS+1]={"xyz", "xyz", "c3d", "trj", "trj", "xdatcar", "xdatcar",
-                                    "pdb", "ent", "cif", "cif", "cif", "hist", "ipf"};
+                                     "pdb", "ent", "cif", "cif", "cif", "hist", "sml", "ipf"};
+
+#define OUT_FORMATS 3
+char * out_ext[OUT_FORMATS]={"xyz", "c3d", "sml"};
 
 char ** las;
 
@@ -114,6 +118,13 @@ extern int open_coord_file (gchar * filename, int fti);
 extern int open_history_file (gchar * filename);
 extern int open_cell_file (int format, gchar * filename);
 extern double get_z_from_periodic_table (gchar * lab);
+extern int write_sml (project * this_proj);
+
+#ifdef GTK4
+G_MODULE_EXPORT void run_on_coord_port (GtkNativeDialog * info, gint response_id, gpointer data);
+#else
+G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpointer data);
+#endif
 
 /*!
   \fn G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
@@ -130,7 +141,7 @@ G_MODULE_EXPORT void on_close_workspace (GtkWidget * widg, gpointer data)
   j = GPOINTER_TO_INT (data);
   if (j == 1)
   {
-    close = ask_yes_no (_("Close workspace ?"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, MainWindow);
+    close = ask_yes_no (_("Close workspace ?"), _("Are you sure ?"), GTK_MESSAGE_QUESTION, atomes_main_window);
   }
   else
   {
@@ -261,14 +272,20 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
     else
     {
       get_project_by_id (pid) -> projfile = g_strdup_printf ("%s", pfile);
-      if (! atomes_render_image)
+      if (! atomes_render_image && atomes_convert_file == NONE)
       {
         add_project_to_workspace ();
         prep_calc_actions ();
       }
       else
       {
-        simple_image_render ();
+        if (atomes_render_image) simple_image_render ();
+        if (atomes_convert_file != NONE)
+        {
+          active_project -> coordfile = g_strdup_printf ("%s", active_project -> projfile);
+          run_on_coord_port (NULL, GTK_RESPONSE_ACCEPT, GINT_TO_POINTER(1));
+        }
+        if (! atomes_from_libreoffice) to_close_this_project (0, active_project);
       }
     }
   }
@@ -313,7 +330,7 @@ int open_save (FILE * fp, int act, int wid, int pid, int aid, gchar * pfile)
                                _(project_error -> error_signal.message),
                                project_file_version);
     }
-    show_error_with_trace (err, project_error, act, 0, MainWindow);
+    show_error_with_trace (err, project_error, act, 0, atomes_main_window);
     g_free (tmp_err);
     g_free (err);
   }
@@ -347,7 +364,7 @@ void quit_gtk ()
     for (i=nprojects-1; i>=0; i--) to_close_this_project (i, get_project_by_id(i));
   }
   profree_ ();
-  g_application_quit (G_APPLICATION(AtomesApp));
+  g_application_quit (G_APPLICATION(atomes_app));
 }
 
 /*!
@@ -526,7 +543,7 @@ G_MODULE_EXPORT void run_on_open_save_active (GtkDialog * info, gint response_id
       if (k != 0)
       {
         err = g_strdup_printf (_("Error %s workspace file\n%s\n"), _(mess[osp.b]), projfile);
-        show_error (err, 0, MainWindow);
+        show_error (err, 0, atomes_main_window);
         g_free (err);
       }
     }
@@ -577,27 +594,27 @@ G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data)
   action = 0;
   if (i == 2 && ! newspace)
   {
-    show_info (_("A workspace is already open !"), 0, MainWindow);
+    show_info (_("A workspace is already open !"), 0, atomes_main_window);
   }
   else if (i == 3 && newspace)
   {
-    show_warning (_("Empty workspace ... nothing to be saved\n"), MainWindow);
+    show_warning (_("Empty workspace ... nothing to be saved\n"), atomes_main_window);
   }
   else if (i == 3)
   {
     for (k=0; k<nprojects; k++) if (get_project_by_id(k) -> natomes) action = 1;
     if (! action)
     {
-      show_warning (_("Workspace contains only empty projects ... nothing to be saved\n"), MainWindow);
+      show_warning (_("Workspace contains only empty projects ... nothing to be saved\n"), atomes_main_window);
     }
   }
   else if (i == 1 && nprojects == 0)
   {
-    show_warning (_("No project open ... nothing to be saved\n"), MainWindow);
+    show_warning (_("No project open ... nothing to be saved\n"), atomes_main_window);
   }
   else if (i == 1 && ! this_proj -> natomes)
   {
-    show_warning (_("Empty project ... nothing to be saved\n"), MainWindow);
+    show_warning (_("Empty project ... nothing to be saved\n"), atomes_main_window);
   }
   else
   {
@@ -659,7 +676,7 @@ G_MODULE_EXPORT void on_open_save_activate (GtkWidget * widg, gpointer data)
       tmp_str = g_strdup_printf ("%s", _(str[i]));
     }
     info = create_file_chooser (tmp_str,
-                                GTK_WINDOW(MainWindow),
+                                GTK_WINDOW(atomes_main_window),
                                 act[j],
                                 _(res[j]));
     chooser = GTK_FILE_CHOOSER (info);
@@ -799,7 +816,7 @@ void apply_project (gboolean showtools)
     initcutoffs (active_chem, active_project -> nspec);
   }
   prep_model (active_project -> id);
-  if (showtools && ! atomes_render_image) show_the_widgets (curvetoolbox);
+  if (showtools && ! atomes_render_image && atomes_convert_file == NONE) show_the_widgets (curvetoolbox);
 }
 
 /*!
@@ -824,7 +841,6 @@ void open_this_isaacs_xml_file (gchar * profile, int ptoc, gboolean visible)
     apply_project (TRUE);
     active_project_changed (activep);
     add_project_to_workspace ();
-    if (visible) show_info (_("ISAACS project file (XML) successfully opened"), 0, MainWindow);
   }
   else
   {
@@ -877,7 +893,7 @@ G_MODULE_EXPORT void run_on_isaacs_port (GtkDialog * info, gint response_id, gpo
       active_project_changed (activew);
       if (write_xml (projfile) == 0)
       {
-        show_error (_("Impossible to write the IPF file\n"), 0, MainWindow);
+        show_error (_("Impossible to write the IPF file\n"), 0, atomes_main_window);
       }
       active_project_changed (osp.b);
     }
@@ -920,11 +936,11 @@ G_MODULE_EXPORT void on_isaacs_port (GtkWidget * widg, gpointer data)
   int pactive = activep;
   i = GPOINTER_TO_INT (data);
 
-  action = (i && ! nprojects) ? ask_yes_no (_("Save an empty project ?"), _("Do you want to save an empty project ?"), GTK_MESSAGE_QUESTION, MainWindow) : TRUE;
+  action = (i && ! nprojects) ? ask_yes_no (_("Save an empty project ?"), _("Do you want to save an empty project ?"), GTK_MESSAGE_QUESTION, atomes_main_window) : TRUE;
   if (action)
   {
     info = create_file_chooser (_(str[i]),
-                                GTK_WINDOW(MainWindow),
+                                GTK_WINDOW(atomes_main_window),
                                 act[i],
                                 _(res[i]));
     chooser = GTK_FILE_CHOOSER (info);
@@ -1269,7 +1285,7 @@ int to_read_trj_or_vas (int ff)
 {
   int i;
   gchar * rlabel[2]={i18n("Total number of atom(s):"), i18n("Number of chemical species:")};
-  GtkWidget * dialog = dialogmodal (_("Reading CPMD / VASP trajectory"), GTK_WINDOW(MainWindow));
+  GtkWidget * dialog = dialogmodal (_("Reading CPMD / VASP trajectory"), GTK_WINDOW(atomes_main_window));
   read_this = gtk_dialog_add_button (GTK_DIALOG (dialog), _("Apply"), GTK_RESPONSE_APPLY);
   GtkWidget * vbox = dialog_get_content_area (dialog);
   widget_set_sensitive (read_this, 0);
@@ -1349,7 +1365,7 @@ G_MODULE_EXPORT void run_read_npt_data (GtkDialog * info, gint response_id, gpoi
   if (response_id == GTK_RESPONSE_ACCEPT)
   {
     npt_file = file_chooser_get_file_name (chooser);
-    npt_selection = iask (_("Please select the file format of the NPT cell data"), _("Select format:"), 6, MainWindow);
+    npt_selection = iask (_("Please select the file format of the NPT cell data"), _("Select format:"), 6, atomes_main_window);
   }
   else
   {
@@ -1376,7 +1392,7 @@ int read_npt_data ()
    GtkWidget * info;
 #endif
   info = create_file_chooser (_("Read cell data for NPT molecular dynamics"),
-                              GTK_WINDOW(MainWindow),
+                              GTK_WINDOW(atomes_main_window),
                               GTK_FILE_CHOOSER_ACTION_OPEN,
                               _("Open"));
   GtkFileChooser * chooser = GTK_FILE_CHOOSER(info);
@@ -1409,76 +1425,27 @@ int open_coordinate_file (int id)
   struct timespec sta_time;
   struct timespec sto_time;
   int result;
-  int length = strlen(active_project -> coordfile);
   clock_gettime (CLOCK_MONOTONIC, & sta_time);
   this_reader = g_malloc0(sizeof*this_reader);
   // Set default message type to warning
   this_reader -> mid = 1;
-  switch (id)
+  if (id == 7 || id == 8)
   {
-    case 0:
-      // XYZ file
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_xyz_ (active_project -> coordfile, & length, & npt);
-      break;
-    case 1:
-      // XYZ file NPT
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_xyz_ (active_project -> coordfile, & length, & npt);
-      if (! result) result = read_npt_data ();
-      break;
-    case 2:
-      // Chem3D file
-      result = open_coord_file (active_project -> coordfile, id);
-      // result = read_c3d_ (active_project -> coordfile, & length);
-      break;
-    case 3:
-      // CPMD TRJ file
-      result = to_read_trj_or_vas (id);
-      break;
-    case 4:
-      // CPMD TRJ file NPT
-      result = to_read_trj_or_vas (id);
-      if (! result) result = read_npt_data ();
-      break;
-    case 5:
-      // VASP XDATCAR file
-      result = to_read_trj_or_vas (id);
-      break;
-    case 6:
-      // VASP XDATCAR file NPT
-      result = to_read_trj_or_vas (id);
-      if (! result) result = read_npt_data ();
-      break;
-    case 7:
-      // PDB file
-      // result = open_coord_file (active_project -> coordfile, id);
-      result = read_pdb_ (active_project -> coordfile, & length);
-      break;
-    case 8:
-      // PDB file
-      // result = open_coord_file (active_project -> coordfile, id);
-      result = read_pdb_ (active_project -> coordfile, & length);
-      break;
-    case 9:
-      // CIF file building the crystal
-      result = open_coord_file (active_project -> coordfile, 9);
-      break;
-    case 10:
-      // CIF file using symmetry positions
-      result = open_coord_file (active_project -> coordfile, 10);
-      break;
-    case 11:
-      // CIF file using symmetry positions
-      result = open_coord_file (active_project -> coordfile, 11);
-      break;
-    case 12:
-      // DL-POLY file
-      result = open_coord_file (active_project -> coordfile, 12);
-      break;
-    default:
-      result = 2;
-      break;
+    int length = strlen (active_project -> coordfile);
+    result = read_pdb_ (active_project -> coordfile, & length);
+  }
+  else if (id < 3 || id > 8)
+  {
+    result = open_coord_file (active_project -> coordfile, id);
+  }
+  else
+  {
+    result = to_read_trj_or_vas (id);
+  }
+
+  if (! result && (id == 1 || id == 4 || id == 6))
+  {
+   result = read_npt_data ();
   }
   clock_gettime (CLOCK_MONOTONIC, & sto_time);
   g_print ("Time to read atomic coordinates: %s\n", calculation_time(FALSE, get_calc_time (sta_time, sto_time)));
@@ -1495,10 +1462,10 @@ int open_coordinate_file (int id)
       switch (this_reader -> mid)
       {
         case 0:
-          show_error (info, 0, MainWindow);
+          show_error (info, 0, atomes_main_window);
           break;
         case 1:
-          show_warning (info, MainWindow);
+          show_warning (info, atomes_main_window);
           break;
       }
       g_free (info);
@@ -1528,13 +1495,13 @@ int open_coordinate_file (int id)
   switch (result)
   {
     case 1:
-      show_error (_("Error loading atomic coordinates:\nfile does not exist"), 0, MainWindow);
+      show_error (_("Error loading atomic coordinates:\nfile does not exist"), 0, atomes_main_window);
       break;
     case 2:
-      show_error (_("Error loading coordinates file: format not supported"), 0, MainWindow);
+      show_error (_("Error loading coordinates file: format not supported"), 0, atomes_main_window);
       break;
     case 3:
-      show_error (_("Error at input: impossible to process input file data"), 0, MainWindow);
+      show_error (_("Error at input: impossible to process input file data"), 0, atomes_main_window);
       break;
     default:
       if (id > 6 && id < 9)
@@ -1543,7 +1510,7 @@ int open_coordinate_file (int id)
         if (! prep_data_ ())
         {
           show_error (_("Error while parsing the chemical information\n"
-                        "please check carefully the coordinates file"), 0, MainWindow);
+                        "please check carefully the coordinates file"), 0, atomes_main_window);
           result = 4;
         }
         clock_gettime (CLOCK_MONOTONIC, & sto_time);
@@ -1558,15 +1525,21 @@ GtkFileFilter * filter[NCFORMATS+1];
 int pactive;
 
 /*!
-  \fn void open_this_coordinate_file (int format, gchar * proj_name)
+  \fn void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader)
 
   \brief open coordinate file format, if successful add to workspace
 
   \param format the format of the file that contains the atomic coordinates
   \param proj_name the project name to use, if any
+  \param main_reader CIF file use only to define the initial process
 */
-void open_this_coordinate_file (int format, gchar * proj_name)
+void open_this_coordinate_file (int format, gchar * proj_name, gboolean main_reader)
 {
+  // Extra for CIF files
+  int ncc;
+  gchar * cif_file_name;
+  gchar * cif_proj_name;
+  //
   active_project -> newproj = FALSE;
   clock_gettime (CLOCK_MONOTONIC, & start_time);
   if (open_coordinate_file (format) == 0)
@@ -1594,9 +1567,11 @@ void open_this_coordinate_file (int format, gchar * proj_name)
     chemistry_ ();
     apply_project (TRUE);
     active_project_changed (activep);
-    if (atomes_render_image)
+    if (atomes_render_image || atomes_convert_file != NONE)
     {
-      simple_image_render();
+      if (atomes_render_image) simple_image_render ();
+      if (atomes_convert_file != NONE) run_on_coord_port (NULL, GTK_RESPONSE_ACCEPT, GINT_TO_POINTER(1));
+      if (! atomes_from_libreoffice) to_close_this_project (0, active_project);
     }
     else
     {
@@ -1620,8 +1595,34 @@ void open_this_coordinate_file (int format, gchar * proj_name)
         init_project (TRUE);
         active_project -> coordfile = g_strdup_printf ("%s", file_name);
         g_free (file_name);
-        open_this_coordinate_file (11, proj_name);
+        open_this_coordinate_file (11, proj_name, FALSE);
         g_free (proj_name);
+      }
+      else if (cif_cnftodo && main_reader)
+      {
+        gchar * cif_coordinates[3]={i18n("Standard CIF Cartesian coordinates"),
+                                    i18n("mmCIF - x/y/z coordinates for each atom"),
+                                    i18n("mmCIF - computed idealized coordinates")};
+        // For Cartesian coordinates only, if multiple formats are found
+        cif_file_name = g_strdup_printf ("%s", active_project -> coordfile);
+        cif_proj_name = g_strdup_printf ("%s", active_project -> name);
+        active_project -> name = g_strdup_printf ("%s - %s", cif_proj_name, (! cif_cnfkeys[0][0]) ? _(cif_coordinates[0]) : _(cif_coordinates[cif_cnfkeys[0][1]]));
+        correct_this_window_title (active_glwin -> win, g_strdup_printf (_("%s - 3D view - [%s mode]"), active_project -> name, _(mode_name[active_glwin -> mode])));
+        for (ncc=1; ncc < cif_cnfcart; ncc ++)
+        {
+          init_project (TRUE);
+          active_project -> coordfile = g_strdup_printf ("%s", cif_file_name);
+          active_project -> name =  g_strdup_printf ("%s - %s", cif_proj_name, (! cif_cnfkeys[ncc][0]) ? _(cif_coordinates[0]) : _(cif_coordinates[cif_cnfkeys[ncc][1]]));
+          open_this_coordinate_file (format, active_project -> name, FALSE);
+        }
+        g_free (cif_file_name);
+        g_free (cif_proj_name);
+        cif_cnfcart = 0;
+        g_free (cif_cnfkeys);
+        cif_cnfkeys = NULL;
+        g_free (cif_cnftodo);
+        cif_cnftodo = NULL;
+        cif_cnfdone = 0;
       }
     }
   }
@@ -1656,26 +1657,43 @@ G_MODULE_EXPORT void run_on_coord_port (GtkNativeDialog * info, gint response_id
 */
 G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpointer data)
 {
-  GtkFileChooser * chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
+  GtkFileChooser * chooser;
+  if (info)
+  {
+    chooser = GTK_FILE_CHOOSER((GtkWidget *)info);
+  }
+  else
+  {
+    // Convert
+  }
 #endif
   int i, j, k, l, m;
   GtkFileFilter * tmp;
   int format;
+  int length;
   int car_to_au;
   i = GPOINTER_TO_INT(data);
   gchar * tmp_str;
   switch (response_id)
   {
     case GTK_RESPONSE_ACCEPT:
-      tmp = gtk_file_chooser_get_filter (chooser);
-      active_project -> coordfile = file_chooser_get_file_name (chooser);
+      if (info)
+      {
+        tmp = gtk_file_chooser_get_filter (chooser);
+        active_project -> coordfile = file_chooser_get_file_name (chooser);
 #ifdef GTK4
-      destroy_this_native_dialog (info);
+        destroy_this_native_dialog (info);
 #else
-      destroy_this_dialog (info);
+        destroy_this_dialog (info);
 #endif
-      j = 0;
-      while (tmp != filter[j]) j++;
+        j = 0;
+        while (tmp != filter[j]) j++;
+      }
+      else
+      {
+        j = atomes_convert_file;
+        active_project -> coordfile = g_strdup_printf ("%s-conv.%s", active_project -> coordfile, out_ext[j]);
+      }
       if (i == 0)
       {
 #ifdef OSX
@@ -1683,15 +1701,15 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
 #endif
         if (j == NCFORMATS)
         {
-          j = iask (_("Please select the file format of the atomic coordinates"), _("Select format:"), 2, MainWindow);
+          j = iask (_("Please select the file format of the atomic coordinates"), _("Select format:"), 2, atomes_main_window);
         }
-        open_this_coordinate_file (j, NULL);
+        open_this_coordinate_file (j, NULL, TRUE);
       }
       else
       {
-        if (j < 2)
+        if (j < 2 && atomes_convert_file == NONE)
         {
-          format = iask (_("Please select the format of the atomic coordinates"), _("Select format:"), 1, MainWindow);
+          format = iask (_("Please select the format of the atomic coordinates"), _("Select format:"), 1, atomes_main_window);
         }
         else
         {
@@ -1713,12 +1731,12 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
                       & active_cell -> pbc);
           }
           to_read_pos ();
-        }
-        int length = strlen (active_project -> coordfile);
-        for (l=1; l<active_project -> nspec+1; l++)
-        {
-          m = strlen(active_chem -> label[l-1]);
-          send_label_ (& l, & m, active_chem -> label[l-1]);
+          length = strlen (active_project -> coordfile);
+          for (l=1; l<active_project -> nspec+1; l++)
+          {
+            m = strlen(active_chem -> label[l-1]);
+            send_label_ (& l, & m, active_chem -> label[l-1]);
+          }
         }
         switch (j)
         {
@@ -1728,14 +1746,24 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
           case 1:
             k = write_c3d_ (active_project -> coordfile, & length, & active_cell -> frac, & car_to_au);
             break;
+          case 2:
+            k = write_sml (active_project);
+            break;
         }
         if (k)
         {
           tmp_str = g_strdup_printf (_("Impossible to export the atomic coordinates\nError code: %d"), k);
-          show_error (tmp_str, 0, MainWindow);
+          if (atomes_convert_file == NONE)
+          {
+            show_error (tmp_str, 0, atomes_main_window);
+          }
+          else
+          {
+            g_print ("%s\n", tmp_str);
+          }
           g_free (tmp_str);
         }
-        active_project_changed (pactive);
+        if (atomes_convert_file == NONE) active_project_changed (pactive);
       }
       break;
     default:
@@ -1743,11 +1771,14 @@ G_MODULE_EXPORT void run_on_coord_port (GtkDialog * info, gint response_id, gpoi
       {
         to_close_this_project (pactive, active_project);
       }
+      if (info)
+      {
 #ifdef GTK4
-      destroy_this_native_dialog (info);
+        destroy_this_native_dialog (info);
 #else
-      destroy_this_dialog (info);
+        destroy_this_dialog (info);
 #endif
+      }
       break;
   }
 }
@@ -1770,11 +1801,10 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
 #endif
   GtkFileChooser * chooser;
   gchar * tmp_str;
-  int num_files[2]={NCFORMATS, 2};
+  int num_files[2]={NCFORMATS, OUT_FORMATS};
   const gchar * str[2]= {i18n("Import atomic coordinates"), i18n("Export atomic coordinates")};
   const gchar * res[2]= {i18n("Open"), i18n("Save")};
-  char * out_files[2] = {i18n("XYZ file"), i18n("Chem3D file")};
-  char * out_ext[2]={"xyz", "c3d"};
+  char * out_files[OUT_FORMATS] = {i18n("XYZ file"), i18n("Chem3D file"), i18n("atomes Simple Chemical Library")};
   GtkFileChooserAction act[2]={GTK_FILE_CHOOSER_ACTION_OPEN, GTK_FILE_CHOOSER_ACTION_SAVE};
   pactive = activep;
   i = GPOINTER_TO_INT (data);
@@ -1791,7 +1821,7 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
     }
     tmp_str = g_strdup_printf ("%s - %s", prepare_for_title(active_project -> name), _(str[i]));
     info = create_file_chooser (tmp_str,
-                                GTK_WINDOW(MainWindow),
+                                GTK_WINDOW(atomes_main_window),
                                 act[i],
                                 _(res[i]));
     g_free (tmp_str);
@@ -1847,13 +1877,13 @@ G_MODULE_EXPORT void on_coord_port (GtkWidget * widg, gpointer data)
   {
     if (nprojects == 0)
     {
-      show_warning (_("No project loaded ... nothing to be saved\n"), MainWindow);
+      show_warning (_("No project loaded ... nothing to be saved\n"), atomes_main_window);
     }
     else
     {
       tmp_str = g_strdup_printf (_("Project <b>%s</b> is empty ... nothing to be saved\n"),
                                  get_project_by_id(activew) -> name);
-      show_warning (tmp_str, MainWindow);
+      show_warning (tmp_str, atomes_main_window);
       g_free (tmp_str);
     }
   }

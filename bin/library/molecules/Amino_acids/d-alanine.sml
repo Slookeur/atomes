@@ -6,7 +6,7 @@
    <library-name>Alanine-(D)</library-name>
   <iupac-name>(D)-Alanine</iupac-name>
   <other-names>
-   <name>(2R)-2-Aminopropanoicacid</name>
+   <name>(2R)-2-Aminopropanoic acid</name>
   </other-names>
  </names>
  <chemistry>

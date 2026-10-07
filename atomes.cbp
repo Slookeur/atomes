@@ -2051,6 +2051,9 @@
 			<Option target="cleancpmd" />
 			<Option target="cleancp2k" />
 		</Unit>
+		<Unit filename="src/opengl/edit/dna_edit.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/opengl/glview.c">
 			<Option compilerVar="CC" />
 			<Option target="atomes" />
@@ -3131,6 +3134,9 @@
 		<Unit filename="src/project/readers/read_pdb.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/project/readers/read_sml.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/project/readers/read_trj.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -3242,6 +3248,7 @@
 			<Option target="debug" />
 			<Option target="clean" />
 		</Unit>
+		<Unit filename="src/project/writers/writers.h" />
 		<Unit filename="src/startup-testing/startup_testing.c">
 			<Option compilerVar="CC" />
 		</Unit>
