@@ -8,8 +8,8 @@
 	<string>@PACKAGE@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-        <key>CFBundleDisplayName</key>
-        <string>@PACKAGE@</string>
+  <key>CFBundleDisplayName</key>
+  <string>@PACKAGE@</string>
 	<key>CFBundleExecutable</key>
 	<string>@PACKAGE@</string>
 	<key>CFBundleIdentifier</key>
@@ -26,8 +26,6 @@
 	<string>atomes</string>
 	<key>CFBundleIconFile</key>
 	<string>atomes.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>atomes.app</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -40,7 +38,7 @@
 			<key>CFBundleTypeName</key>
 			<string>atomes workspace file</string>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>Editor</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -52,7 +50,7 @@
 			<key>CFBundleTypeName</key>
 			<string>atomes project file</string>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>Editor</string>
 		</dict>
 	</array>
 	<key>CFBundleInfoDictionaryVersion</key>

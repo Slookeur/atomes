@@ -63,8 +63,10 @@ Copyright (C) 2022-2026 by CNRS and University of Strasbourg */
   void set_atomes_locale ();
   void read_this_file (int file_type, gchar * this_file);
   void open_this_data_file (int file_type, gchar * file_name);
+  static void queue_open_file (const gchar * path);
 
-  G_MODULE_EXPORT void run_program (GApplication * app, gpointer data);
+  G_MODULE_EXPORT void on_atomes_start (GApplication * app, gpointer data);
+  G_MODULE_EXPORT void on_atomes_open (GApplication * app, GFile ** files, gint n_files, const gchar * hint, gpointer user_data);
 
   GtkWidget * create_splash_window ();
 
@@ -1421,14 +1423,52 @@ static gboolean check_existing_win32_instance ()
 #endif /* G_OS_WIN32 */
 
 /*!
-  \fn G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
+  \fn static void process_pending_files ()
+
+  \brief open pending file(s)
+*/
+static void process_pending_files ()
+{
+  ftmp = flist;
+  silent_input = TRUE;
+  if (with_workspace)
+  {
+    while (ftmp)
+    {
+      if (ftmp -> file_type == 1)
+      {
+        // Open the workspace file first
+        open_this_data_file (ftmp -> file_type, ftmp -> file_name);
+        g_free (ftmp -> file_name);
+      }
+      ftmp = ftmp -> next;
+    }
+  }
+  ftmp = flist;
+  while (ftmp)
+  {
+    if (ftmp -> file_type != 1)
+    {
+      // Add project(s) to workspace
+      open_this_data_file (ftmp -> file_type, ftmp -> file_name);
+      g_free (ftmp -> file_name);
+    }
+    ftmp = ftmp -> next;
+  }
+  g_free (flist);
+  flist = NULL;
+  silent_input = FALSE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void on_atomes_start (GApplication * app, gpointer data)
 
   \brief run the program
 
   \param app the application to run
   \param data the associated data pointer
 */
-G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
+G_MODULE_EXPORT void on_atomes_start (GApplication * app, gpointer data)
 {
   /* GTK re-initializes the locale during startup (gtk_init calls setlocale(LC_ALL, "")),
      which overrides the LC_NUMERIC = "C" set in main(). We must enforce it again here
@@ -1477,39 +1517,85 @@ G_MODULE_EXPORT void run_program (GApplication * app, gpointer data)
       g_timeout_add_seconds (1, destroy_func, isplash);
     }
   }
-  if (flist)
-  {
-    ftmp = flist;
-    silent_input = TRUE;
-    if (with_workspace)
-    {
-      while (ftmp)
-      {
-        if (ftmp -> file_type == 1)
-        {
-          // Open the workspace file first
-          open_this_data_file (ftmp -> file_type, ftmp -> file_name);
-        }
-        ftmp = ftmp -> next;
-      }
-    }
-    ftmp = flist;
-    while (ftmp)
-    {
-      if (ftmp -> file_type != 1)
-      {
-        // Add project(s) to workspace
-        open_this_data_file (ftmp -> file_type, ftmp -> file_name);
-      }
-      ftmp = ftmp -> next;
-    }
-    g_free (flist);
-    flist = NULL;
-    silent_input = FALSE;
-  }
+
+  if (flist) process_pending_files ();
+
 #ifdef MAC_INTEGRATION
   g_object_unref (ProgOSX);
 #endif
+}
+
+/*!
+  \fn static void queue_open_file (const gchar * path)
+
+  \brief increment the flist list of file(s) to be opened
+
+  \param the file path to add to flist
+*/
+static void queue_open_file (const gchar * path)
+{
+  if (path == NULL || * path == '\0') return;
+
+  gsize len = strlen(path);
+  if (len < 4) return;
+
+  /* Même détection que dans handle_open_file(). */
+  int file_type = - test_this_ext((int)len, (gchar *)path);
+  if (file_type <= 0) return;
+
+  struct file_list * last;
+  struct file_list * node = g_malloc0(sizeof*node);
+  node -> file_name = g_strdup(path);
+  node -> file_type = file_type;
+
+  if (flist == NULL)
+  {
+    flist = node;
+  }
+  else
+  {
+    last = flist;
+    while (last -> next != NULL)
+    {
+      last = last -> next;
+    }
+    last -> next = node;
+  }
+
+  ftmp = node;
+
+  if (file_type == 1) with_workspace = TRUE;
+}
+
+/*!
+  \fn G_MODULE_EXPORT void on_atomes_open (GApplication * app, GFile ** files, gint n_files, const gchar * hint, gpointer user_data)
+
+  \brief hanlde the open signal for the atomes application
+
+  \param app the application sending the signal
+  \param files the file list, if any
+  \param n_files the number of files, if any
+  \param hint hint provided by the calling instance
+  \param user_data the associated data pointer
+*/
+G_MODULE_EXPORT void on_atomes_open (GApplication * app, GFile ** files, gint n_files, const gchar * hint, gpointer user_data)
+{
+  int i;
+  for (i = 0; i < n_files; i++)
+  {
+    gchar * path = g_file_get_path(files[i]);
+    if (path != NULL)
+    {
+      gchar * absolute_path = g_canonicalize_filename (path, NULL);
+      queue_open_file (absolute_path);
+      g_free (absolute_path);
+      g_free (path);
+    }
+  }
+
+  if (! atomes_main_window) g_application_activate (app);
+  process_pending_files ();
+  gtk_window_present (GTK_WINDOW(atomes_main_window));
 }
 
 /*!
@@ -1766,13 +1852,21 @@ int main (int argc, char *argv[])
     }
 
 #if GLIB_MINOR_VERSION < 74
-    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_FLAGS_NONE);
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_HANDLES_OPEN);
 #else
-    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS);
+    atomes_app = gtk_application_new (g_strdup_printf ("fr.ipcms.atomes.prog-%d", (int)clock()), G_APPLICATION_DEFAULT_FLAGS | G_APPLICATION_HANDLES_OPEN);
 #endif
+    g_signal_connect (G_OBJECT(atomes_app), "activate", G_CALLBACK(on_atomes_start), NULL);
+    g_signal_connect (G_OBJECT(atomes_app), "open", G_CALLBACK(on_atomes_open), NULL);
+
     GError * error = NULL;
-    g_application_register (G_APPLICATION(atomes_app), NULL, & error);
-    g_signal_connect (G_OBJECT(atomes_app), "activate", G_CALLBACK(run_program), NULL);
+    if (! g_application_register (G_APPLICATION(atomes_app), NULL, & error))
+    {
+      g_printerr ("Application registration failed: %s\n", error -> message);
+      g_error_free (error);
+      g_object_unref (atomes_app);
+      return 1;
+    }
 
     int status = g_application_run (G_APPLICATION (atomes_app), 0, NULL);
     g_object_unref (atomes_app);

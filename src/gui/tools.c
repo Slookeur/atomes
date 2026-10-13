@@ -102,8 +102,13 @@ void fill_tool_model ()
     i = (active_project -> steps > 1) ? 25 : 0;
     gtk_window_set_resizable (GTK_WINDOW (curvetoolbox), TRUE);
 #ifdef GTK4
+#ifdef OSX
+    gtk_window_set_default_size (GTK_WINDOW (curvetoolbox), 300, 180+i);
+    gtk_widget_set_size_request (curvetoolbox, 300, 180+i);
+#else
     gtk_window_set_default_size (GTK_WINDOW (curvetoolbox), 300, 230+i);
     gtk_widget_set_size_request (curvetoolbox, 300, 230+i);
+#endif
 #else
 #ifdef G_OS_WIN32
     gtk_widget_set_size_request (curvetoolbox, 300, 220+i);
@@ -348,8 +353,13 @@ GtkWidget * create_curve_tool_box ()
   GtkWidget * ctbox;
   ctbox = create_win (_("Toolboxes"), atomes_main_window, FALSE, FALSE);
 #ifdef GTK4
+#ifdef OSX
+  gtk_window_set_default_size (GTK_WINDOW (ctbox), 300, 180);
+  // gtk_widget_set_size_request (ctbox, 300, 180);
+#else
   gtk_window_set_default_size (GTK_WINDOW (ctbox), 300, 230);
   // gtk_widget_set_size_request (ctbox, 300, 230);
+#endif
 #else
 #ifdef G_OS_WIN32
   gtk_widget_set_size_request (ctbox, 300, 220);
