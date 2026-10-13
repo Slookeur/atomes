@@ -115,13 +115,73 @@ fi
 # Extra arguments can be added in environment.sh.
 EXTRA_ARGS=
 if test -f "$bundle_res/environment.sh"; then
-  source "$bundle_res/environment.sh"
+    . "$bundle_res/environment.sh"
 fi
+
+# --- Private D-Bus session for Atomes ---
+
+# Locate the bundled daemon.
+DBUS_DAEMON="$bundle_bin/dbus-daemon"
+
+if test ! -x "$DBUS_DAEMON"; then
+    echo "ERROR: dbus-daemon not found: $DBUS_DAEMON" >&2
+    exit 1
+fi
+
+# Create a private runtime directory.
+RUNTIME_DIR="$(mktemp -d "${TMPDIR:-/tmp}/atomes-dbus.XXXXXX")" || exit 1
+chmod 700 "$RUNTIME_DIR"
+
+DBUS_PID=""
+
+cleanup_dbus() {
+    if test -n "$DBUS_PID"; then
+        kill "$DBUS_PID" 2>/dev/null || true
+    fi
+    rm -rf "$RUNTIME_DIR"
+}
+
+trap cleanup_dbus 0
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+
+# Explicit Unix socket: do not rely on launchd autolaunch.
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$RUNTIME_DIR/bus"
+
+DBUS_PID=$("$DBUS_DAEMON" \
+    --session \
+    --address="$DBUS_SESSION_BUS_ADDRESS" \
+    --fork \
+    --print-pid=1) || {
+        echo "ERROR: unable to start private D-Bus session" >&2
+        exit 1
+    }
+
+if test -z "$DBUS_PID"; then
+    echo "ERROR: dbus-daemon did not return a PID" >&2
+    exit 1
+fi
+
+# --- End private D-Bus session ---
 
 # Strip out the argument added by the OS.
 if /bin/expr "x$1" : '^x-psn_' > /dev/null; then
     shift 1
 fi
+
+# --- Debug comments ---
+# Uncomment the next lines to debug atomes
+
+#LOG="$HOME/Desktop/atomes-debug.log"
+#exec >> "$LOG" 2>&1
+
+#echo "========== Lancement : $(date) =========="
+#echo "PWD=$PWD"
+#echo "Arguments reçus : $#"
+#printf 'Argument : <%s>\n' "$@"
+
+# --- End Debug comments ---
 
 cd $bundle_contents/MacOS/
 $EXEC "./$name-bin" "$@" $EXTRA_ARGS

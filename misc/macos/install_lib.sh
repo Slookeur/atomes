@@ -1,6 +1,7 @@
 #!/bin/sh
 
 lib_dir=${MESON_INSTALL_PREFIX}/Contents/Resources/lib
+bin_dir=${MESON_INSTALL_PREFIX}/Contents/Resources/bin
 
 function inst_tool
 {
@@ -56,7 +57,11 @@ do
   inst_tool $llib  
 done
 
-#Extra stuff because you'll never know
+# d-bus utility
+mkdir -p $bin_dir
+cp /opt/homebrew/bin/dbus-daemon $bin_dir
+
+# Extra stuff because you'll never know
 cp -R -L /opt/homebrew/lib/gtk-4.0 $lib_dir
 cp -R -L /opt/homebrew/lib/gdk-pixbuf-2.0 $lib_dir
 
